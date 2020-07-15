@@ -676,4 +676,18 @@ public class DefaultModelBridge implements ModelBridge
 
         return false;
     }
+
+    @Override
+    public boolean rename(DocumentReference source, DocumentReference destination)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            return xcontext.getWiki()
+                .renameDocument(source, destination, true,
+                    Collections.emptyList(), Collections.emptyList(), xcontext);
+        } catch (Exception e) {
+            this.logger.error("Failed to rename [{}] to [{}].", source, destination, e);
+        }
+        return false;
+    }
 }

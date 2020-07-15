@@ -25,7 +25,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.URLStreamHandlerFactory;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -36,7 +38,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
-import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.annotation.Component;
 
 /**
@@ -74,8 +75,12 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
     @Override
     public ExtendedURLClassLoader createAttachmentClassLoader(String jarURLs, ClassLoader parent) throws Exception
     {
-        URI[] uris = extractURIs(jarURLs).toArray(new URI[0]);
-        return new URIClassLoader(uris, parent, this.streamHandlerFactory);
+        List<URL> urls = new ArrayList<>();
+        for (URI uri : extractURIs(jarURLs)) {
+            urls.add(new URL(null, uri.toString(), this.streamHandlerFactory.createURLStreamHandler(uri.getScheme())));
+        }
+
+        return new ExtendedURLClassLoader(urls.toArray(new URL[0]), parent, this.streamHandlerFactory);
     }
     
     @Override
@@ -95,7 +100,7 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
      * @param jarURLs the comma-separated list of JARs locations, specified using either an already registered
      *        protocol (such as {@code http}) or using the format {@code attach:(wiki):(space).(page)@(filename)}.
      * @return the list of URIs
-     * @throws URISyntaxException in case of an invalid URI 
+     * @throws URISyntaxException in case of an invalid URI
      */
     private Set<URI> extractURIs(String jarURLs) throws URISyntaxException
     {
@@ -118,9 +123,9 @@ public class DefaultAttachmentClassLoaderFactory implements AttachmentClassLoade
 
     /**
      * @param attachmentReference the attachment reference in the form {@code attach:(wiki):(space).(page)@(filename)}
-     * @return a URI of the form {@code attachmentjar://(wiki):(space).(page)@(filename)}. 
+     * @return a URI of the form {@code attachmentjar://(wiki):(space).(page)@(filename)}.
      *         The {@code (wiki):(space).(page)@(filename)} part is URL-encoded
-     * @throws URISyntaxException in case of an invalid URI 
+     * @throws URISyntaxException in case of an invalid URI
      */
     private URI createURI(String attachmentReference) throws URISyntaxException
     {

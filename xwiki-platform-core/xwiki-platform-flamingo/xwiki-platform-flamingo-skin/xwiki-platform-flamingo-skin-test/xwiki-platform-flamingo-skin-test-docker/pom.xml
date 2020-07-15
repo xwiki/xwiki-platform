@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -89,6 +89,12 @@
       <artifactId>xwiki-platform-captcha-jcaptcha-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Needed for ObectEditorIT to test user displayer. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- ================================
          Test only dependencies

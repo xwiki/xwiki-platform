@@ -22,9 +22,7 @@ package org.xwiki.platform.notifications.test.ui;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -57,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 public class NotificationsSettingsIT
 {
-    private static final String FIRST_USER_NAME = "user1";
+    private static final String FIRST_USER_NAME = NotificationsSettingsIT.class.getSimpleName() + "user1";
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
     private static final String EMAIL_FORMAT = "email";
     private static final String SYSTEM = "org.xwiki.platform";
@@ -264,10 +262,47 @@ public class NotificationsSettingsIT
             assertFalse(trayPage.isPageOnlyWatched());
             assertFalse(trayPage.arePageAndChildrenWatched());
 
+            // Go back to the preferences to ensure the filter has been created
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            assertEquals(7, preferences.size());
+
+            // Filter 6
+            assertTrue(preferences.get(6).getFilterName().contains("Wiki"));
+            assertEquals("", preferences.get(6).getLocation());
+            assertEquals("Exclusive", preferences.get(6).getFilterType());
+            assertTrue(preferences.get(6).getEventTypes().isEmpty());;
+            assertTrue(preferences.get(6).getFormats().containsAll(Arrays.asList("Email", "Alert")));
+            assertTrue(preferences.get(6).isEnabled());
+
+            // back to the page
+            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            trayPage = new NotificationsTrayPage();
+            trayPage.showNotificationTray();
+
             // Watch the space
             trayPage.setPageAndChildrenWatchedState(true);
             // Verify the other button is updated
             assertTrue(trayPage.isPageOnlyWatched());
+
+            // Go back to the preferences to ensure the filter has been created
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            preferences = p.getNotificationFilterPreferences();
+            assertEquals(8, preferences.size());
+
+            // Filter 7
+            assertTrue(preferences.get(7).getFilterName().contains("Page and children"),
+                String.format("Name: [%s] ID: [%s]", preferences.get(7).getFilterName(), preferences.get(7).getID()));
+            assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome", preferences.get(7).getLocation());
+            assertEquals("Inclusive", preferences.get(7).getFilterType());
+            assertTrue(preferences.get(7).getEventTypes().isEmpty());
+            assertTrue(preferences.get(7).getFormats().containsAll(Arrays.asList("Email", "Alert")));
+            assertTrue(preferences.get(7).isEnabled());
+
+            // back to the page
+            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            trayPage = new NotificationsTrayPage();
+            trayPage.showNotificationTray();
 
             // Unwatch the page
             trayPage.setPageOnlyWatchedState(false);
@@ -278,24 +313,8 @@ public class NotificationsSettingsIT
 
             // Go back to the preferences
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            preferences = p.getNotificationFilterPreferences();
             assertEquals(9, preferences.size());
-
-            // Filter 6
-            assertTrue(preferences.get(6).getFilterName().contains("Wiki"));
-            assertEquals("", preferences.get(6).getLocation());
-            assertEquals("Exclusive", preferences.get(6).getFilterType());
-            assertTrue(preferences.get(6).getEventTypes().isEmpty());;
-            assertTrue(preferences.get(6).getFormats().containsAll(Arrays.asList("Email", "Alert")));
-            assertTrue(preferences.get(6).isEnabled());
-
-            // Filter 7
-            assertTrue(preferences.get(7).getFilterName().contains("Page and children"));
-            assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome", preferences.get(7).getLocation());
-            assertEquals("Inclusive", preferences.get(7).getFilterType());
-            assertTrue(preferences.get(7).getEventTypes().isEmpty());
-            assertTrue(preferences.get(7).getFormats().containsAll(Arrays.asList("Email", "Alert")));
-            assertTrue(preferences.get(7).isEnabled());
 
             // Filter 8
             assertTrue(preferences.get(8).getFilterName().contains("Page only"));

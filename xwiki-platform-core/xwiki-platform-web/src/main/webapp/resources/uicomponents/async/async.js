@@ -110,10 +110,14 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
 
       for (var j = 0; j < mutation.addedNodes.length; j++) {
         var element = mutation.addedNodes[j];
+        // we activate placeholder because they contain class xwiki-async and they are visible
+        var selector = ".xwiki-async:visible";
 
-        if (element.className == 'xwiki-async' && $(element).is(":visible")) {
-          activateAsyncPlaceHolder(element);
-        }
+        // placeholder can be in the subtree of the added/mutated element, so we use find()
+        // but it can also be the currently added/mutated element, so we use addBack()
+        $(element).find(selector).addBack(selector).each(function() {
+          activateAsyncPlaceHolder(this);
+        });
       }
     }
   };

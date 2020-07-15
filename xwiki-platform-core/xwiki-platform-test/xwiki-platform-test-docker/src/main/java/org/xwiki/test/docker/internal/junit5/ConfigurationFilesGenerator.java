@@ -33,6 +33,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.aether.artifact.Artifact;
@@ -43,7 +44,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
-import org.xwiki.text.StringUtils;
 
 /**
  * Generate XWiki config files for a given database and a given version of XWiki.
@@ -64,6 +64,8 @@ public class ConfigurationFilesGenerator
     private static final String DB_PASSWORD = DB_USERNAME;
 
     private static final String SKIN = "flamingo";
+
+    private static final String LOGBACK_FILE = "logback.xml";
 
     private TestConfiguration testConfiguration;
 
@@ -105,7 +107,7 @@ public class ConfigurationFilesGenerator
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     if (this.testConfiguration.isVerbose()) {
-                        LOGGER.info("... Generating: " + outputFile);
+                        LOGGER.info("... Generating: {}", outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
@@ -119,14 +121,33 @@ public class ConfigurationFilesGenerator
         } catch (Exception e) {
             throw new Exception("Failed to extract configuration files", e);
         }
+
+
+        // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
+        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // problems.
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+            copyLogbackConfigFile(configurationFileTargetDirectory);
+        }
+    }
+
+    private void copyLogbackConfigFile(File configurationFileTargetDirectory) throws Exception
+    {
+        File outputDirectory = new File(configurationFileTargetDirectory, "classes");
+        File outputFile = new File(outputDirectory, LOGBACK_FILE);
+        if (this.testConfiguration.isVerbose()) {
+            LOGGER.info("... Generating logging configuration: {}", outputFile);
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            IOUtils.copy(getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE), fos);
+        }
     }
 
     private VelocityContext createVelocityContext()
     {
         Properties properties = this.propertiesMerger.merge(getDefaultConfigurationProperties(),
             this.testConfiguration.getProperties());
-        VelocityContext context = new VelocityContext((Map) properties);
-        return context;
+        return new VelocityContext((Map) properties);
     }
 
     private Properties getDefaultConfigurationProperties()
@@ -171,11 +192,12 @@ public class ConfigurationFilesGenerator
         repositories.add(String.format("maven-local:maven:file://%s", localRepo));
 
         if (!this.repositoryResolver.getSession().isOffline()) {
-            repositories.add("maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public");
+            repositories.add("maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public");
             // Allow snapshot extensions to be resolved too when not offline
             // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
             // WARBuilder when resolving distribution artifacts.
-            repositories.add("maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots");
+            repositories.add(
+                "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots");
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
@@ -207,6 +229,18 @@ public class ConfigurationFilesGenerator
                 null,
                 null,
                 null)));
+        } else if (this.testConfiguration.getDatabase().equals(Database.MARIADB)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "mariadb",
+                String.format("jdbc:mariadb://%s:%s/xwiki?useSSL=false", ipAddress, port),
+                DB_USERNAME,
+                DB_PASSWORD,
+                "org.mariadb.jdbc.Driver",
+                null,
+                null,
+                null,
+                null)));
+
         } else if (this.testConfiguration.getDatabase().equals(Database.POSTGRESQL)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "pgsql",
@@ -277,6 +311,21 @@ public class ConfigurationFilesGenerator
             xwikiDbHbmFeeds = "feeds.hbm.xml";
         }
         props.setProperty("xwikiDbHbmFeeds", xwikiDbHbmFeeds);
+
+        // Increase the connection pool size since it appears that on slow CI agents, the default 50 connections is too
+        // small, especially at startup. I haven't proved it but I think we're doing more stuff at startup that require
+        // DB connections. compared  to in the past. When the tests succeed, xwiki starts in about 1mn20s. When they
+        // fail xwiki takes over 5mn to start, showing how slow the machine is. When it succeeds the connection cool
+        // is used up to 40 connections (out of 50) so already close to the max. When it fails, it goes quickly to 50.
+        // Basically the connections are not released fast enough becauase the SQL queries take longer to execute.
+        // Thus trying with 300 max connections to see if that's the problem.
+        props.setProperty("xwikiDbDbcpMaxTotal", "300");
+
+        // Set the xwikiDbDbcpMaxOpenPreparedStatements to unlimited (default) since we saw the message
+        // "Data source rejected establishment of connection,  message from server: "Too many connections"" and at
+        // that time the number of connections (95) was well under the maximum allowed (300). Thus, as a hunch, we're
+        // trying to increase the pooled statement maximum too.
+        props.setProperty("xwikiDbDbcpMaxOpenPreparedStatements", "-1");
 
         return props;
     }

@@ -166,7 +166,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (parentReference != null) {
                 SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                 if (parent == null) {
-                    throw new ParentEntryEvictedException();
+                    throw new ParentEntryEvictedException(String.format(
+                        "The parent with reference [%s] for entry [%s] is no longer available in the cache",
+                        parentReference, entry));
                 }
                 this.parents = Arrays.asList(parent);
                 parent.addChild(this);
@@ -188,9 +190,16 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             this.entry = entry;
             SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
+            if (parent1 == null) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The parent entry with reference [%s] for entry [%s] is no longer available in the cache", parent1,
+                    entry));
+            }
             SecurityCacheEntry parent2 = DefaultSecurityCache.this.getEntry(entry.getWikiReference());
-            if (parent1 == null || parent2 == null) {
-                throw new ParentEntryEvictedException();
+            if (parent2 == null) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The wiki entry with reference [%s] for entry [%s] is no longer available in the cache", parent2,
+                    entry));
             }
             this.parents = Arrays.asList(parent1, parent2);
             parent1.addChild(this);
@@ -210,11 +219,18 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             this.entry = entry;
             boolean isSelf = entry.getReference().equals(entry.getUserReference());
             SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
+            if (parent1 == null) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The first parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available in the cache.",
+                    parent1, entry, wiki));
+            }
             SecurityCacheEntry parent2 = (isSelf) ? parent1
                 : (wiki != null) ? DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki)
                     : DefaultSecurityCache.this.getEntry(entry.getUserReference());
-            if (parent1 == null || parent2 == null) {
-                throw new ParentEntryEvictedException();
+            if (parent2 == null) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available in the cache.",
+                    parent2, entry, wiki));
             }
             this.parents = (isSelf) ? Arrays.asList(parent1) : Arrays.asList(parent1, parent2);
             parent1.addChild(this);
@@ -268,7 +284,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 if (parentReference != null) {
                     SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                     if (parent == null) {
-                        throw new ParentEntryEvictedException();
+                        throw new ParentEntryEvictedException(String.format(
+                            "The parent with reference [%s] required by entry [%s] with groups [%s]"
+                                + " is no longer available in the cache.",
+                            parentReference, entry, groups));
                     }
                     this.parents.add(parent);
                     parent.addChild(this);
@@ -299,7 +318,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     ? DefaultSecurityCache.this.getShadowEntry(group, ((SecurityShadowEntry) entry).getWikiReference())
                     : DefaultSecurityCache.this.getEntry(group);
                 if (parent == null) {
-                    throw new ParentEntryEvictedException();
+                    throw new ParentEntryEvictedException(String
+                        .format("The parent with reference [%s] is no longer available in the cache", parentReference));
                 }
                 this.parents.add(parent);
                 parent.addChild(this);
@@ -459,6 +479,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             return entry.getReference() instanceof UserSecurityReference && !(entry instanceof SecurityAccessEntry);
         }
+
+        @Override
+        public String toString()
+        {
+            return this.entry.toString();
+        }
     }
 
     /**
@@ -602,8 +628,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         SecurityCacheEntry oldEntry = cache.get(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
-                // Another thread have inserted an entry which is different from this entry!
-                throw new ConflictingInsertionException();
+                // Another thread has inserted an entry which is different from this entry!
+                throw new ConflictingInsertionException(
+                    String.format(
+                        "Another thread has inserted an entry [%s] which is different from entry [%s]"
+                            + " with key [%s] and groups [%s]",
+                        oldEntry, entry, key, groups));
             }
             // If the user/group has been completed
             if (oldEntry.updateParentGroups(groups)) {
@@ -635,7 +665,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 // XWIKI-13746: The added entry have been disposed while being added, meaning that the eviction
                 // triggered by adding the entry has hit the entry itself, so remove it and fail.
                 cache.remove(key);
-                throw new ConflictingInsertionException();
+                throw new ConflictingInsertionException(String.format(
+                    "The cache entry [%s] with key [%s] has been disposed by another thread while being added.", entry,
+                    key));
             }
         } finally {
             newEntry = null;

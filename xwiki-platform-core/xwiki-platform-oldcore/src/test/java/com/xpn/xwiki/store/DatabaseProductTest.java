@@ -19,50 +19,68 @@
  */
 package com.xpn.xwiki.store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DatabaseProduct}.
  *
  * @version $Id$
  */
-public class DatabaseProductTest
+class DatabaseProductTest
 {
     @Test
-    public void testEquality()
+    void toProductEquality()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
+        assertEquals(DatabaseProduct.ORACLE, product);
+        assertSame(DatabaseProduct.ORACLE, product);
+        product = DatabaseProduct.toProduct("oracle");
         assertEquals(DatabaseProduct.ORACLE, product);
         assertSame(DatabaseProduct.ORACLE, product);
 
         product = DatabaseProduct.toProduct("Apache Derby");
         assertEquals(DatabaseProduct.DERBY, product);
         assertSame(DatabaseProduct.DERBY, product);
+        product = DatabaseProduct.toProduct("derby");
+        assertEquals(DatabaseProduct.DERBY, product);
+        assertSame(DatabaseProduct.DERBY, product);
 
         product = DatabaseProduct.toProduct("HSQL Database Engine");
+        assertEquals(DatabaseProduct.HSQLDB, product);
+        assertSame(DatabaseProduct.HSQLDB, product);
+        product = DatabaseProduct.toProduct("hsqldb");
         assertEquals(DatabaseProduct.HSQLDB, product);
         assertSame(DatabaseProduct.HSQLDB, product);
 
         product = DatabaseProduct.toProduct("DB2/LINUXX8664");
         assertEquals(DatabaseProduct.DB2, product);
         assertSame(DatabaseProduct.DB2, product);
-
-        product = DatabaseProduct.toProduct("Unknown");
-        assertEquals(DatabaseProduct.UNKNOWN, product);
-        assertSame(DatabaseProduct.UNKNOWN, product);
+        product = DatabaseProduct.toProduct("db2");
+        assertEquals(DatabaseProduct.DB2, product);
+        assertSame(DatabaseProduct.DB2, product);
 
         product = DatabaseProduct.toProduct("H2");
         assertEquals(DatabaseProduct.H2, product);
         assertSame(DatabaseProduct.H2, product);
+        product = DatabaseProduct.toProduct("h2");
+        assertEquals(DatabaseProduct.H2, product);
+        assertSame(DatabaseProduct.H2, product);
+
+        product = DatabaseProduct.toProduct("Unknown");
+        assertEquals(DatabaseProduct.UNKNOWN, product);
+        assertSame(DatabaseProduct.UNKNOWN, product);
+        product = DatabaseProduct.toProduct("unknown");
+        assertEquals(DatabaseProduct.UNKNOWN, product);
+        assertSame(DatabaseProduct.UNKNOWN, product);
     }
 
     @Test
-    public void testDifference()
+    void toProductDifference()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
         assertTrue(product != DatabaseProduct.DERBY);
@@ -70,7 +88,7 @@ public class DatabaseProductTest
     }
 
     @Test
-    public void testUnknown()
+    void toProductUnknown()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("whatever");
         assertSame(DatabaseProduct.UNKNOWN, product);

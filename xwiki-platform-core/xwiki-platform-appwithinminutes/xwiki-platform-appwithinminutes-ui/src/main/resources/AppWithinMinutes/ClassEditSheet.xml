@@ -135,6 +135,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #set ($fieldURL = $doc.getURL('edit', $escapetool.url({
               'xpage': 'plain',
               'sheet': 'AppWithinMinutes.ClassEditSheet',
+              'template': 'AppWithinMinutes.ClassTemplate',
               'field': $formFieldDoc.fullName,
               'xeditmode': 'text'
             })))
@@ -655,6 +656,10 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($discard = $sheetDoc.setParent($doc.documentReference.name))
       #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content,
         $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+      ## We assume for now that the output produced by the sheet generator uses the same syntax as the code of the sheet
+      ## generator. We have to set the syntax because the default wiki syntax (used when creating new wiki pages) could
+      ## be different than the one used by the sheet generator.
+      #set($discard = $sheetDoc.setSyntax($sheetGeneratorDoc.syntax))
       #set($discard = $sheetDoc.setHidden(true))
       #set($discard = $sheetDoc.save($services.localization.render('platform.appwithinminutes.classEditorSheetSaveComment'),
         $minorEdit))
@@ -680,6 +685,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content,
       $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set($discard = $translationsDoc.setSyntaxId('plain/1.0'))
     #set($discard = $translationsDoc.setHidden(true))
     #set($discard = $translationsDoc.save(
       $services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'),

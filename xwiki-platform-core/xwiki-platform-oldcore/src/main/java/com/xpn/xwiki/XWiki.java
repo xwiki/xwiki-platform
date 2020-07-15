@@ -148,10 +148,12 @@ import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -209,6 +211,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
+import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
@@ -2974,10 +2977,6 @@ public class XWiki implements EventListener
         String result =
             getUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
-        if (StringUtils.isEmpty(result)) {
-            result = getSpacePreference(prefname, context);
-        }
-
         return result != null ? result : "";
     }
 
@@ -4654,6 +4653,258 @@ public class XWiki implements EventListener
         e.printStackTrace(writer);
 
         return strwriter.toString();
+    }
+
+    /**
+     * API to rename a document to another document.
+     *
+     * @param sourceDocumentReference the source document to rename.
+     * @param targetDocumentReference the target reference to rename the document to.
+     * @param overwrite if {@code true} the target document reference will be overwritten if it exists
+     *                  (deleted to the recycle bin before the rename). If {@code false} and the target document exist
+     *                  the rename won't be performed.
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *                                  modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *                                 document reference
+     * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
+     * @throws XWikiException if the document cannot be renamed properly.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences, XWikiContext context)
+        throws XWikiException
+    {
+        boolean result = false;
+
+        // if source and destination are same, no need to perform the rename.
+        if (sourceDocumentReference.equals(targetDocumentReference)) {
+            result = false;
+        } else {
+
+            XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
+            XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
+
+            ConfigurationSource xwikiproperties = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
+            boolean useAtomicRename = xwikiproperties.getProperty("refactoring.rename.useAtomicRename", Boolean.TRUE);
+
+            // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
+            // the overwritten is accepted.
+            if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
+                if (!useAtomicRename) {
+                    this.renameByCopyAndDelete(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
+                        childDocumentReferences, context);
+                    result = true;
+                } else {
+                    // Ensure that the current context contains the wiki reference of the source document.
+                    WikiReference wikiReference = context.getWikiReference();
+                    context.setWikiReference(sourceDocumentReference.getWikiReference());
+                    // Step 1: Perform atomic rename in DB
+                    try {
+                        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+                    } finally {
+                        context.setWikiReference(wikiReference);
+                    }
+
+                    // Step 2: For each child document, update its parent reference.
+                    // Step 3: For each backlink to rename, parse the backlink document and replace the links with
+                    // the new name.
+                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
+                    // to the new document's location.
+                    this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
+                        childDocumentReferences, context);
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    private void updateLinksForRename(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
+        List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
+        XWikiContext context) throws XWikiException
+    {
+        // Step 2: For each child document, update its parent reference.
+        if (childDocumentReferences != null) {
+            for (DocumentReference childDocumentReference : childDocumentReferences) {
+                XWikiDocument childDocument = getDocument(childDocumentReference, context);
+                String compactReference = getCompactEntityReferenceSerializer().serialize(newDocumentReference);
+                childDocument.setParent(compactReference);
+                String saveMessage = localizePlainOrKey("core.comment.renameParent", compactReference);
+                childDocument.setAuthorReference(context.getUserReference());
+                saveDocument(childDocument, saveMessage, true, context);
+            }
+        }
+
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
+        for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
+            XWikiDocument backlinkRootDocument = getDocument(backlinkDocumentReference, context);
+
+            // Update default locale instance
+            renameLinks(backlinkRootDocument, sourceDoc.getDocumentReference(), newDocumentReference, context);
+
+            // Update translations
+            for (Locale locale : backlinkRootDocument.getTranslationLocales(context)) {
+                XWikiDocument backlinkDocument = backlinkRootDocument.getTranslatedDocument(locale, context);
+
+                renameLinks(backlinkDocument, sourceDoc.getDocumentReference(), newDocumentReference, context);
+            }
+        }
+
+        // Get new document
+        XWikiDocument newDocument = getDocument(newDocumentReference, context);
+
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
+        if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, sourceDoc.getSyntax().toIdString())) {
+            // Only support syntax for which a renderer is provided
+
+            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
+
+            DocumentReference oldDocumentReference = sourceDoc.getDocumentReference();
+
+            XDOM newDocumentXDOM = newDocument.getXDOM();
+            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
+
+            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
+            // xwiki-platform-refactoring-default
+            boolean modified = false;
+            for (Block block : blocks) {
+                org.xwiki.rendering.listener.reference.ResourceReference resourceReference =
+                    linkedResourceHelper.getResourceReference(block);
+                if (resourceReference == null) {
+                    // Skip invalid blocks.
+                    continue;
+                }
+
+                org.xwiki.rendering.listener.reference.ResourceType resourceType = resourceReference.getType();
+
+                // TODO: support ATTACHMENT as well.
+                if (!org.xwiki.rendering.listener.reference.ResourceType.DOCUMENT.equals(resourceType) &&
+                    !org.xwiki.rendering.listener.reference.ResourceType.SPACE.equals(resourceType)) {
+                    // We are currently only interested in Document or Space references.
+                    continue;
+                }
+
+                // current link, use the old document's reference to fill in blanks.
+                EntityReference oldLinkReference = getResourceReferenceEntityReferenceResolver()
+                    .resolve(resourceReference, null, oldDocumentReference);
+                // new link, use the new document's reference to fill in blanks.
+                EntityReference newLinkReference = getResourceReferenceEntityReferenceResolver()
+                    .resolve(resourceReference, null, newDocumentReference);
+
+                // If the new and old link references don`t match, then we must update the relative link.
+                if (!newLinkReference.equals(oldLinkReference)) {
+                    modified = true;
+
+                    // Serialize the old (original) link relative to the new document's location, in compact form.
+                    String serializedLinkReference =
+                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
+
+                    // Update the reference in the XDOM.
+                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
+                }
+            }
+
+            // Set the new content and save document if needed
+            if (modified) {
+                newDocument.setContent(newDocumentXDOM);
+                newDocument.setAuthorReference(context.getUserReference());
+                saveDocument(newDocument, context);
+            }
+        }
+    }
+
+    /**
+     * Perform a rename of document by copying the document and deleting the old one.
+     * This operation must be used only in case of document rename from one wiki to another, since it's not supported
+     * by the atomic store operation.
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *            modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *            document reference
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     * @since 12.5
+     * @deprecated Old implementation of the rename by copy and delete. Since 12.5 the implementation using
+     * {@link XWikiStoreInterface#renameXWikiDoc(XWikiDocument, DocumentReference, XWikiContext)} should be preferred.
+     */
+    @Deprecated
+    @Unstable
+    public void renameByCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
+        List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
+        XWikiContext context) throws XWikiException
+    {
+        // Step 1: Copy the document and all its translations under a new document with the new reference.
+        copyDocument(sourceDoc.getDocumentReference(), newDocumentReference, false, context);
+
+        // Step 2: For each child document, update its parent reference.
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
+        updateLinksForRename(sourceDoc, newDocumentReference, backlinkDocumentReferences, childDocumentReferences,
+            context);
+
+        // Step 5: Delete the old document
+        deleteDocument(sourceDoc, context);
+
+        // Get new document
+        XWikiDocument newDocument = getDocument(newDocumentReference, context);
+
+        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
+        // invalid XWikiDocument object as it's been deleted...
+        sourceDoc.clone(newDocument);
+    }
+
+    /**
+     * Rename links in passed document and save it if needed.
+     */
+    private void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldLink, DocumentReference newLink,
+        XWikiContext context) throws XWikiException
+    {
+        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
+        // xwiki-platform-refactoring-default
+        getOldRendering().renameLinks(backlinkDocument, oldLink, newLink, context);
+
+        // Save if content changed
+        if (backlinkDocument.isContentDirty()) {
+            String saveMessage =
+                localizePlainOrKey("core.comment.renameLink", getCompactEntityReferenceSerializer().serialize(newLink));
+            backlinkDocument.setAuthorReference(context.getUserReference());
+            context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
+        }
+    }
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
+    {
+        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+    }
+
+    /**
+     * Used to convert a proper Document Reference to string (compact form).
+     */
+    private static EntityReferenceSerializer<String> getCompactEntityReferenceSerializer()
+    {
+        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
+    }
+
+    /**
+     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
+     */
+    private static EntityReferenceResolver<org.xwiki.rendering.listener.reference.ResourceReference>
+        getResourceReferenceEntityReferenceResolver()
+    {
+        return Utils
+            .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class,
+                org.xwiki.rendering.listener.reference.ResourceReference.class));
     }
 
     /**

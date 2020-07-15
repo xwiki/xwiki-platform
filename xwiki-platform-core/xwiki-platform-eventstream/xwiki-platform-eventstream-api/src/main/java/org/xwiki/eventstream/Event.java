@@ -190,6 +190,12 @@ public interface Event
      */
     String FIELD_HIDDEN = "hidden";
 
+    /**
+     * @see #isPrefiltered()
+     * @since 12.5RC1
+     */
+    String FIELD_PREFILTERED = "preFiltered";
+
     /** The importance of an event. */
     enum Importance
     {
@@ -487,6 +493,25 @@ public interface Event
     default void setHidden(boolean isHidden)
     {
         LoggerFactory.getLogger(Event.class)
-            .warn("org.xwiki.eventstream.Event#setHidden() has been called without being reimplemented.");
+            .warn("org.xwiki.eventstream.Event#setHidden(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return true if the event has already been prefiltered
+     * @since 11.5RC1
+     */
+    default boolean isPrefiltered()
+    {
+        return false;
+    }
+
+    /**
+     * @param prefiltered true if the event has already been prefiltered
+     * @since 11.5RC1
+     */
+    default void setPrefiltered(boolean prefiltered)
+    {
+        LoggerFactory.getLogger(Event.class)
+            .warn("org.xwiki.eventstream.Event#setPrefiltered(boolean) has been called without being reimplemented.");
     }
 }

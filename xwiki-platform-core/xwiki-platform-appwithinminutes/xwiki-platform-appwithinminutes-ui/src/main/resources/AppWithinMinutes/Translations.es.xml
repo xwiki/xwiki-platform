@@ -37,38 +37,38 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
+platform.appwithinminutes.homePageTitle=Aplicación en cuestión de minutos
 platform.appwithinminutes.description=Crea aplicaciones web colaborativas en cuestión de minutos, basadas en el potente sistema de gestión de datos estructurados de XWiki.
-platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
+platform.appwithinminutes.createAppButtonLabel=Crear aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
 platform.appwithinminutes.appsLiveTable.doc.title=Aplicación
-platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autor
+platform.appwithinminutes.appsLiveTable.doc.author=Último autor
 platform.appwithinminutes.appsLiveTable.doc.date=Fecha de actualización
 platform.appwithinminutes.appsLiveTable._actions=Acciones
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Gestionar permisos administrativos para el espacio.
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Conceder derechos administrativos en el espacio de trabajo.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Crea tu propio!
+platform.appwithinminutes.appPanelCreateEntry=¡Crea tu propia aplicación!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Paso {0} — {1}
 appWithinMinutes.wizardStep.name.name=Nombre
-appWithinMinutes.wizardStep.name.title=Nombre su aplicación
-appWithinMinutes.wizardStep.name.description=Seleccione el nombre de la aplicación
+appWithinMinutes.wizardStep.name.title=Nombra tu aplicación
+appWithinMinutes.wizardStep.name.description=Elige el nombre de la aplicación
 appWithinMinutes.wizardStep.structure.name=Estructura
-appWithinMinutes.wizardStep.structure.title=Estructurar los datos
-appWithinMinutes.wizardStep.structure.description=Describa los datos de la aplicación
+appWithinMinutes.wizardStep.structure.title=Estructura tus datos
+appWithinMinutes.wizardStep.structure.description=Describir los datos de la aplicación
 appWithinMinutes.wizardStep.entries.name=Entradas
-appWithinMinutes.wizardStep.entries.title=Localice sus datos
+appWithinMinutes.wizardStep.entries.title=Regionalice sus datos
 appWithinMinutes.wizardStep.entries.description=Elija dónde almacenar los datos
 appWithinMinutes.wizardStep.presentation.name=Presentación
-appWithinMinutes.wizardStep.presentation.title=Personalice la página de inicio de su aplicación
-appWithinMinutes.wizardStep.presentation.description=Personalice la página de inicio de la aplicación
-platform.appwithinminutes.wizardStepNextButtonLabel=Siguiente Paso
-platform.appwithinminutes.wizardStepNextButtonTip=Ir al siguiente paso
+appWithinMinutes.wizardStep.presentation.title=Personaliza la página de inicio de tu aplicación
+appWithinMinutes.wizardStep.presentation.description=Personaliza la página de inicio de la aplicación
+platform.appwithinminutes.wizardStepNextButtonLabel=Paso siguiente
+platform.appwithinminutes.wizardStepNextButtonTip=Ir al paso siguiente
 platform.appwithinminutes.wizardStepFinishButtonLabel=Terminar
 platform.appwithinminutes.wizardStepFinishButtonTip=Ir a la página de inicio de la aplicación
-platform.appwithinminutes.wizardStepPreviousButtonLabel=Paso Anterior
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Paso anterior
 platform.appwithinminutes.wizardStepPreviousButtonTip=Ir al paso anterior
 platform.appwithinminutes.wizardStepHelpTitle=Pasos
 platform.appwithinminutes.wizardStepHelpDescription=Este asistente le guiará a través del proceso de creación de una aplicación. Estos son los pasos a seguir:
@@ -105,7 +105,7 @@ platform.appwithinminutes.classEditorUpdateTranslationsHint=Actualizar la traduc
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Esta clase tiene varias hojas.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=La clase tiene dos campos con el mismo nombre: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Actualizar valores propuestos
-platform.appwithinminutes.classEditorBindSheetSaveComment=Ocultar la hoja de clases
+platform.appwithinminutes.classEditorBindSheetSaveComment=Forzar la hoja de clases
 platform.appwithinminutes.classEditorSheetSaveComment=Actualizar la hoja de clases
 platform.appwithinminutes.classEditorTranslationsSaveComment=Actualización de traducciones
 
@@ -210,8 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación
 platform.appwithinminutes.appHomePageDeleteAppLabel=Borrar aplicación
 platform.appwithinminutes.appHomePageMovedWarning=Es posible que la aplicación no funcione correctamente porque ha sido renombrada o movida sin actualizar el código. Por favor, edite la aplicación y siga los pasos para actualizar el código.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+AppWithinMinutes.LiveTableClass_description=Descripción
+AppWithinMinutes.LiveTableClass_columns=Columnas de la tabla dinámica ("Live Table")
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=La aplicación {0} y TODAS sus entradas serán borradas. ¿Seguro que quiere continuar?
@@ -224,7 +224,7 @@ platform.appwithinminutes.deleteAppNotSpecifiedError=No se especificó ningún n
 appWithinMinutes.renameApp.changeAppTitleInfo=Puede cambiar el título de la aplicación sin renombrarla tan con sólo editar la página de inicio de la aplicación.
 appWithinMinutes.renameApp.regenerateAppCodeWarning=El código de la aplicación va a ser regenerado si cambia el nombre de la aplicación. Como consecuencia, las personalizaciones de código se sobrescribirán.
 appWithinMinutes.renameApp.newName.label=Nuevo Nombre
-appWithinMinutes.renameApp.pageExistsError=Una página con este nombre ya existe en la ubicación seleccionada.
+appWithinMinutes.renameApp.pageExistsError=Ya existe una página con este nombre en la ubicación seleccionada.
 appWithinMinutes.renameApp.locationForbiddenError=No se le permite mover la aplicación a la ubicación seleccionada.
 appWithinMinutes.renameApp.location.label=Nueva ubicación
 appWithinMinutes.renameApp.location.hint=La ubicación en la jerarquía de páginas donde mover la aplicación.

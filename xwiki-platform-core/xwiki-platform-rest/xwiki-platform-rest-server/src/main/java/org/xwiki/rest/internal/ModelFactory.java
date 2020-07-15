@@ -495,12 +495,12 @@ public class ModelFactory
         Translations translations = this.objectFactory.createTranslations();
         translations.setDefault(doc.getDefaultLocale().toString());
 
-        List<String> languages = doc.getTranslationList();
+        List<Locale> locales = doc.getTranslationLocales();
 
         List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
 
         // Add the default (original) page translation, if it makes sense.
-        if (!languages.isEmpty() && !Locale.ROOT.equals(doc.getDefaultLocale())) {
+        if (!locales.isEmpty() && !Locale.ROOT.equals(doc.getDefaultLocale())) {
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(doc.getDefaultLocale().toString());
 
@@ -522,19 +522,19 @@ public class ModelFactory
             translations.getTranslations().add(translation);
         }
 
-        for (String language : languages) {
+        for (Locale locale : locales) {
             Translation translation = this.objectFactory.createTranslation();
-            translation.setLanguage(language);
+            translation.setLanguage(locale.toString());
 
             String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
             String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -560,6 +560,7 @@ public class ModelFactory
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getDocumentReference().getName());
         pageSummary.setTitle(doc.getDisplayTitle());
+        pageSummary.setRawTitle(doc.getTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(toRestTranslations(baseUri, doc));

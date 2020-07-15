@@ -88,8 +88,8 @@ public interface MailSenderConfiguration
     boolean usesAuthentication();
 
     /**
-     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check if a
-     *         mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
+     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check
+     *         if a mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
      *         "alwaysallow", "programmingrights".
      * @since 6.4M2
      */

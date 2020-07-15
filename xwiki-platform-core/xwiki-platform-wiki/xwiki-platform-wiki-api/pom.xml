@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-api</artifactId>
   <name>XWiki Platform - Wiki - API</name>
@@ -44,7 +44,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

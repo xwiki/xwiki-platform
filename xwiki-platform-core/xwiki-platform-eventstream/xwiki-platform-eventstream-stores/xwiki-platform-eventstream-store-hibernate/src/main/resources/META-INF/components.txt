@@ -6,7 +6,9 @@ org.xwiki.eventstream.store.internal.LegacyEventDeleter
 org.xwiki.eventstream.store.internal.LegacyEventLoader
 org.xwiki.eventstream.store.internal.LegacyEventSaver
 org.xwiki.eventstream.store.internal.LegacyEventStatusManager
+org.xwiki.eventstream.store.internal.LegacyEventStore
 org.xwiki.eventstream.store.internal.LegacyEventStream
 org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration
 org.xwiki.eventstream.store.internal.RecordableEventMigrator
 org.xwiki.eventstream.store.internal.observation.LegacyEventStatusEventConverter
+org.xwiki.eventstream.store.internal.VerboseLegacyEventStore

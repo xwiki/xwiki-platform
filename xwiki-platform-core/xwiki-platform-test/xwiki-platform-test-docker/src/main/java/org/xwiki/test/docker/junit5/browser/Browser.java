@@ -40,12 +40,12 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public enum Browser
 {
     /**
-     * the Firefox Browser.
+     * The Firefox Browser.
      */
     FIREFOX(new FirefoxOptions()),
 
     /**
-     * the Chrome Browser.
+     * The Chrome Browser.
      */
     CHROME(new ChromeOptions());
 

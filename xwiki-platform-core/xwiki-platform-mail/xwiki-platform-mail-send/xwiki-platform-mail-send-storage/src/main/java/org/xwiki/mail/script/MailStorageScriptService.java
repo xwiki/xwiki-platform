@@ -54,14 +54,14 @@ import com.xpn.xwiki.XWikiContext;
  * @since 6.4M3
  */
 @Component
-@Named("mailstorage")
+@Named("mail.storage")
 @Singleton
 public class MailStorageScriptService extends AbstractMailScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    private static final String ERROR_KEY = "scriptservice.mailstorage.error";
+    private static final String ERROR_KEY = "scriptservice.mail.storage.error";
 
     @Inject
     @Named("filesystem")

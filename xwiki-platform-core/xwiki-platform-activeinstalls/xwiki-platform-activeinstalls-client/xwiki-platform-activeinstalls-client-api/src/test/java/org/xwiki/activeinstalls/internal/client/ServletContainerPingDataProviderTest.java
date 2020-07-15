@@ -23,14 +23,14 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.client.data.ServletContainerPingDataProvider;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,16 +40,16 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
-public class ServletContainerPingDataProviderTest
+@ComponentTest
+class ServletContainerPingDataProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ServletContainerPingDataProvider> mocker =
-        new MockitoComponentMockingRule<>(ServletContainerPingDataProvider.class);
+    @InjectMockComponents
+    private ServletContainerPingDataProvider pingDataProvider;
 
     @Test
-    public void provideMapping() throws Exception
+    void provideMapping()
     {
-        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        Map<String, Object> mapping = this.pingDataProvider.provideMapping();
         assertEquals(2, mapping.size());
 
         Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("servletContainerVersion");
@@ -64,16 +64,16 @@ public class ServletContainerPingDataProviderTest
     }
 
     @Test
-    public void provideData() throws Exception
+    void provideData()
     {
         ServletEnvironment servletEnvironment = mock(ServletEnvironment.class);
-        ReflectionUtils.setFieldValue(this.mocker.getComponentUnderTest(), "environment", servletEnvironment);
+        ReflectionUtils.setFieldValue(this.pingDataProvider, "environment", servletEnvironment);
 
         ServletContext servletContext = mock(ServletContext.class);
         when(servletEnvironment.getServletContext()).thenReturn(servletContext);
         when(servletContext.getServerInfo()).thenReturn("Apache Tomcat/7.0.4 (optional text)");
 
-        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        Map<String, Object> data = this.pingDataProvider.provideData();
         assertEquals(2, data.size());
         assertEquals("7.0.4", data.get("servletContainerVersion"));
         assertEquals("Apache Tomcat", data.get("servletContainerName"));

@@ -25,15 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-configuration</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-configuration-api</artifactId>
   <name>XWiki Platform - Configuration - API</name>
   <packaging>jar</packaging>
-  <description>Plùtform Configuration API</description>
+  <description>Extra Configuration APIs related to platform concepts (e.g. user references)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Platform Configuration API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

@@ -129,8 +129,8 @@ public class WARBuilder
 
             // Step: Gather all the required JARs for the minimal WAR
             LOGGER.info("Resolving distribution dependencies ...");
-            List<Artifact> extraArtifacts =
-                this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs());
+            List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
+                this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
             Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
                 extraArtifacts);
@@ -212,11 +212,11 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isVerbose()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Copying JAR: {}", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isVerbose()) {
+            if (testConfiguration.isDebug()) {
                 LOGGER.info("... Generating XED file for: {}", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);

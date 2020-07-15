@@ -266,7 +266,10 @@
   #set ($displayParameters = $services.display.createDocumentDisplayerParameters())
   #set ($discard = $displayParameters.setExecutionContextIsolated(false))
   #set ($discard = $displayParameters.setContentTranslated(true))
-  #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, { 'outputSyntaxId' : 'plain/1.0', 'displayerParameters' : $displayParameters }))
+  #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, {
+    'outputSyntaxId': 'plain/1.0',
+    'displayerParameters': $displayParameters
+  }))
 
   ## Use the generated LiveTable content for the data home page.
   #set ($dataSpaceReference = $services.model.resolveSpace($doc.getValue('dataSpace')))
@@ -292,6 +295,10 @@
     #set ($discard = $doc.setContent($homePageContent))
   #end
   #set ($discard = $dataHomePage.setContent($generatedLiveTableContent))
+  ## We assume for now that the output produced by the live table generator uses the same syntax as the code of the live
+  ## table generator. We have to set the syntax because the default wiki syntax (used when creating new wiki pages)
+  ## could be different than the one used by the live table generator.
+  #set ($discard = $dataHomePage.setSyntax($liveTableGeneratorDoc.syntax))
 
   #set ($minorEdit = "$!request.minorEdit" != '')
   #set ($comment = $request.comment)

@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-default</artifactId>
   <name>XWiki Platform - User - Default</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>71</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
       org.xwiki.contrib.membership:application-membership-default

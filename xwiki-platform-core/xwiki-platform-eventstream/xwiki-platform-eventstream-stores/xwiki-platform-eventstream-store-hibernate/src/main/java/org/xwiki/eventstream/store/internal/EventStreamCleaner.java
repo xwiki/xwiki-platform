@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -71,11 +70,7 @@ public class EventStreamCleaner
                 Query query = queryManager.createQuery("where event.date < :date", Query.HQL);
                 query.bindValue("date", DateUtils.addDays(new Date(), -days));
                 for (Event event : eventStream.searchEvents(query)) {
-                    try {
-                        this.eventStore.deleteEvent(event);
-                    } catch (EventStreamException e) {
-                        this.logger.error("Failed to delete event", e);
-                    }
+                    this.eventStore.deleteEvent(event);
                 }
             } catch (QueryException e) {
                 logger.error("Impossible to clean the old events of the event stream.", e);

@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
   <name>XWiki Platform - Rendering - Macro - Groovy</name>
   <description>Adds ability to write scripts in Groovy in wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Groovy Macro</xwiki.extension.name>
   </properties>
@@ -71,4 +70,35 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude javax.script.ScriptEngineFactory since it's not an XWiki interface and thus
+                           doesn't have a @Role annotation. there's no way for the Spoon checker to find
+                           out about this, since only the Component Manager knows what has been registered for it. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["javax.script.ScriptEngineFactory"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

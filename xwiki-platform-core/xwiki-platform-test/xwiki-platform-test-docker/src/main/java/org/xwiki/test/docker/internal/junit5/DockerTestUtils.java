@@ -83,7 +83,7 @@ public final class DockerTestUtils
      * @param container the container for which to follow the logs
      * @param loggingClass the SLF4J logging class to use for logging
      */
-    public static void followOutput(GenericContainer container, Class<?> loggingClass)
+    public static void followOutput(GenericContainer<?> container, Class<?> loggingClass)
     {
         LogContainerCmd cmd = container.getDockerClient().logContainerCmd(container.getContainerId())
             .withFollowStream(true)
@@ -133,7 +133,8 @@ public final class DockerTestUtils
      *        to pull the image
      * @throws Exception if the container fails to start
      */
-    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration) throws Exception
+    public static void startContainer(GenericContainer<?> container, TestConfiguration testConfiguration)
+        throws Exception
     {
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
@@ -166,17 +167,44 @@ public final class DockerTestUtils
 
         // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208
         try {
-            container.start();
+            startContainerInternal(container, testConfiguration);
         } catch (Exception e) {
             if (ExceptionUtils.getRootCause(e) instanceof EOFException) {
                 // Retry once after waiting 5 seconds to increase the odds ;)
                 LOGGER.info("Error starting docker container [{}]. Retrying once", container.getDockerImageName(), e);
                 Thread.sleep(5000L);
-                container.start();
+                startContainerInternal(container, testConfiguration);
             } else {
-                throw e;
+                throw new Exception(String.format("Failed to start container from image [%s], on agent [%s]",
+                    dockerImageName, getAgentName()), e);
             }
         }
+    }
+
+    private static void startContainerInternal(GenericContainer<?> container, TestConfiguration testConfiguration)
+    {
+        // Try to debug a timeout error starting BrowserWebDriverContainer:
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Container startup failed
+        //   ...
+        //   Caused by: org.rnorth.ducttape.RetryCountExceededException: Retry limit hit with exception
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Could not create/start container
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: org.rnorth.ducttape.TimeoutException: java.util
+        //     .concurrent.TimeoutException
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: java.util.concurrent.TimeoutException
+        //   ...
+        //   Caused by: java.util.concurrent.TimeoutException
+        //   ...
+        // We noticed that several BrowserWebDriverContainer are started when it fails and we need to find out which
+        // code starts them.
+        if (testConfiguration.isVerbose()) {
+            LOGGER.info("XWiki starting container type/image: [{}]/[{}]", container.getClass().getName(),
+                container.getDockerImageName());
+        }
+        container.start();
     }
 
     /**
@@ -245,11 +273,10 @@ public final class DockerTestUtils
         // Thus we currently extract the repetition index from the display name which is like:
         //     ...[test-template-invocation:#2]
         String repetitionIndex = getRepetitionIndex(extensionContext);
-        File newFile = new File(newDir, String.format("%s-%s-%s%s.%s",
+        return new File(newDir, String.format("%s-%s-%s%s.%s",
             DockerTestUtils.getTestConfigurationName(testConfiguration),
             extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
             repetitionIndex, fileSuffix));
-        return newFile;
     }
 
     /**
@@ -299,4 +326,12 @@ public final class DockerTestUtils
         return hostname;
     }
 
+    /**
+     * @return the CI agent on which the test is executing
+     * @since 12.5RC1
+     */
+    public static String getAgentName()
+    {
+        return System.getProperty("jenkinsAgentName");
+    }
 }

@@ -21,34 +21,223 @@ var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
 var editors = XWiki.editors = XWiki.editors || {};
 editors.XDataEditors = Class.create({
+
+  // Maintain informations about actions performed on the editor.
+  // Data abouts xobjects are map whom keys are xclass names and values are list of sorted xobjects ids
+  editorStatus : {
+    savedXObjects: {}, // already saved objects
+    addedXObjects: {}, // objects added but not saved yet
+    deletedXObjects: {} // objects deleted but not removed yet
+  },
+
   initialize : function() {
     this.editedDocument = XWiki.currentDocument;
 
     $$('.xclass').each(function(item) {
-      this.enhanceClassUX(item);
+      this.enhanceClassUX(item, true);
     }.bind(this));
     this.ajaxObjectAdd($('add_xobject'));
     this.ajaxPropertyAdd();
     this.makeSortable($('xwikiclassproperties'));
     this.ajaxRemoveDeprecatedProperties($("body"), ".syncAllProperties");
-  },
-  enhanceClassUX : function(xclass) {
-    this.expandCollapseClass(xclass);
-    xclass.select('.xobject').each(function(item) {
-      this.enhanceObjectUX(item);
+
+    // everytime the document is saved we restore the current state to be in sync with the server
+    document.observe('xwiki:document:saved', function (event) {
+      // Remove fields about deleted and added objects
+      $$('input[name=deletedObjects]').each(function(item) {
+        item.remove();
+      });
+      $$('input[name=addedObjects]').each(function(item) {
+        item.remove();
+      });
+
+      // Show hidden links about edit and delete
+      // Edit link is hidden on not-saved objects since it needs to be saved on the server.
+      // Delete links are only shown for latest added object of an xclass to keep a good numbering.
+      $$('.xobject-action.edit').invoke('show');
+      $$('.xobject').each(function (item) {
+        item.down('a.delete').show();
+      });
+
+      // We need to put all info about added objects in the saved objects collection.
+      // We don't need to do that for deleted objects since we cannot revert a deletion in the UI except by canceling
+      // the changes. So we directly manipulate the savedXObjects collection when performing a deletion.
+      for (var xclassName in this.editorStatus.addedXObjects) {
+        if (this.editorStatus.savedXObjects[xclassName] === undefined) {
+          this.editorStatus.savedXObjects[xclassName] = this.editorStatus.addedXObjects[xclassName];
+        } else {
+          this.editorStatus.savedXObjects[xclassName].concat(this.editorStatus.addedXObjects[xclassName]);
+          this.editorStatus.savedXObjects[xclassName].sort(this.numberSort);
+        }
+      }
+      this.editorStatus.addedXObjects = {};
+      this.editorStatus.deletedXObjects = {};
+    }.bindAsEventListener(this));
+
+    // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
+    document.observe('xwiki:actions:cancel', function (event) {
+      // Remove fields about deleted and added objects
+      $$('input[name=deletedObjects]').each(function(item) {
+        item.remove();
+      });
+      $$('input[name=addedObjects]').each(function(item) {
+        item.remove();
+      });
+      this.editorStatus.addedXObjects = {};
+      this.editorStatus.deletedXObjects = {};
+    }.bindAsEventListener(this));
+
+    // We want to the user to be prevented if he tries to leave the editor before saving.
+    window.addEventListener("beforeunload", function(event) {
+      if (Object.keys(this.editorStatus.addedXObjects).length > 0
+        || Object.keys(this.editorStatus.deletedXObjects).length > 0) {
+        event.preventDefault();
+        event.returnValue = "";
+      } else {
+        return;
+      }
     }.bind(this));
+  },
+  /**
+   * Sort function to allow sorting an array of integer.
+   * Using [3, 0, 1].sort(numberSort) produces [0, 1, 3].
+   */
+  numberSort : function (a, b) {
+    return a - b;
+  },
+  /**
+   * Extract the xclass name from the XDOM id of the xclass.
+   */
+  getXClassNameFromXClassId : function (xclassId) {
+    return xclassId.substring("xclass_".length);
+  },
+  /**
+   * Extract the xclass name from the XDOM id of an xobject.
+   */
+  getXClassNameFromXObjectId : function (xobjectId) {
+    return xobjectId.substring("xobject_".length, xobjectId.lastIndexOf('_'));
+  },
+  /**
+   * Extract the xobject number from the XDOM id of an xobject.
+   */
+  getXObjectNumberFromXObjectId : function (xobjectId) {
+    return xobjectId.substring(xobjectId.lastIndexOf('_') + 1);
+  },
+  /**
+   * Returns true if an object exists with the given classname and number.
+   */
+  xObjectAlreadyExist : function (xclassName, objectNumber) {
+    return (this.editorStatus.savedXObjects[xclassName] !== undefined
+      && this.editorStatus.savedXObjects[xclassName].indexOf(objectNumber) !== -1)
+      || (this.editorStatus.addedXObjects[xclassName] !== undefined
+        && this.editorStatus.addedXObjects[xclassName].indexOf(objectNumber) !== -1);
+  },
+  /**
+   * Returns the xobject DOM element for the given class and number.
+   */
+  getXObject : function (xclassName, objectNumber) {
+    return $$('#xobject_' + xclassName.replace('.','\\.')+'_'+objectNumber)[0];
+  },
+  /**
+   * Helper to remove an element from an array if and only if it was already in the array.
+   */
+  removeElementFromArray : function (array, element) {
+    if (array.indexOf(element) !== -1) {
+      array.splice(array.indexOf(element), 1);
+    }
+  },
+  /**
+   * Compute the new object number for a class name given the information we already have about savedXObjects and
+   * addedXObjects.
+   */
+  getNewObjectNumber : function (xclassName) {
+    var objectNumberVal;
+    // if we already added xobjects of this type, the last number has to be taken there
+    if (this.editorStatus.addedXObjects[xclassName] !== undefined) {
+      objectNumberVal = Number(this.editorStatus.addedXObjects[xclassName].last()) + 1;
+      // if we don't have added xobjects yet, but some are already saved, then we take the last number there
+    } else if (this.editorStatus.savedXObjects[xclassName] !== undefined) {
+      objectNumberVal = Number(this.editorStatus.savedXObjects[xclassName].last()) + 1;
+    } else {
+      objectNumberVal = 0;
+    }
+    objectNumberVal = objectNumberVal + "";
+
+    // if an object with this number was already deleted, we remove the info from deleted objects.
+    var deletedArray = this.editorStatus.deletedXObjects[xclassName];
+    if (deletedArray !== undefined && deletedArray.indexOf(objectNumberVal) !== -1) {
+      $$('#deletedObject_' + xclassName.replace('.','\\.') + '_' + objectNumberVal)[0].remove();
+      this.removeElementFromArray(deletedArray, objectNumberVal);
+      if (deletedArray.length === 0) {
+        delete this.editorStatus.deletedXObjects[xclassName];
+      }
+    }
+    return objectNumberVal;
+  },
+  /**
+   * Enhance xclass for the JS behaviours and iterate over inner xobjects or xproperties to enhance them.
+   *
+   * @param xclass the xclass DOM element
+   * @param init true if it's the call performed during the script initialization.
+   */
+  enhanceClassUX : function(xclass, init) {
+    var xclassName = this.getXClassNameFromXClassId(xclass.id);
+    this.ajaxObjectAdd(xclass);
+    this.expandCollapseClass(xclass);
+
     xclass.select('.xproperty').each(function(item) {
       this.expandCollapseMetaProperty(item);
       this.ajaxPropertyDeletion(item);
       this.makeDisableVisible(item);
     }.bind(this));
-    this.ajaxObjectAdd(xclass);
+
+    // We always iterate on the xobjects of the xclass to enhance them.
+    xclass.select('.xobject').each(function(item) {
+      this.enhanceObjectUX(item, init);
+    }.bind(this));
   },
-  enhanceObjectUX : function(object) {
-    this.ajaxObjectDeletion(object);
-    this.editButtonBehavior(object);
-    this.expandCollapseObject(object);
-    this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
+  enhanceObjectUX : function(object, init) {
+    var xclassName = this.getXClassNameFromXObjectId(object.id);
+    var objectNumber = this.getXObjectNumberFromXObjectId(object.id);
+    var listObjects;
+
+    // Initialize the xobjects collections.
+    if (init) {
+      if (this.editorStatus.savedXObjects[xclassName] === undefined) {
+        this.editorStatus.savedXObjects[xclassName] = [];
+      }
+      listObjects = this.editorStatus.savedXObjects[xclassName];
+    } else {
+      if (this.editorStatus.addedXObjects[xclassName] === undefined) {
+        this.editorStatus.addedXObjects[xclassName] = [];
+      }
+      listObjects = this.editorStatus.addedXObjects[xclassName];
+    }
+
+    if (!this.xObjectAlreadyExist(xclassName, objectNumber)) {
+      // we push the object number and we always sort the array.
+      listObjects.push(objectNumber);
+      listObjects.sort(this.numberSort);
+
+      // We keep record of the added objects after init by adding a form input about them
+      // The idea is to be able to submit to the server all the object added, even if they don't have any property
+      // such as for AWM Content type.
+      // We put those input directly with the xobject DOM element since we want it to be removed if the object is
+      // removed later.
+      if (!init) {
+        var addedObject = new Element('input', {
+          'type': 'hidden',
+          'name': 'addedObjects',
+          'id': 'addedObject_' + xclassName + '_' + objectNumber,
+          'value': xclassName + '_' + objectNumber
+        });
+        object.appendChild(addedObject);
+      }
+      this.ajaxObjectDeletion(object);
+      this.editButtonBehavior(object);
+      this.expandCollapseObject(object);
+      this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
+    }
   },
   // -----------------------------------------------
   /* AJAX object add */
@@ -60,10 +249,14 @@ editors.XDataEditors = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        var url, validClassName, classNameVal;
+        var url, validClassName, classNameVal, objectNumberVal;
         if (item.href) {
           url = item.href.replace(/[?&]xredirect=[^&]*/, '');
           validClassName = true;
+
+          // We compute the object number based on the information we have in our recorded objects array.
+          classNameVal = this.getXClassNameFromXClassId(item.up('.xclass').id);
+          url += "&objectNumber=" + this.getNewObjectNumber(classNameVal);
         } else {
           var classNameElt = element.down('select');
           if (classNameElt && classNameElt.selectedIndex >= 0) {
@@ -73,7 +266,8 @@ editors.XDataEditors = Class.create({
           url = this.editedDocument.getURL('edit', Object.toQueryString({
             xpage: 'editobject',
             xaction: 'addObject',
-            classname: classNameVal
+            classname: classNameVal,
+            objectNumber: this.getNewObjectNumber(classNameVal)
           }));
         }
         if (!item.disabled && validClassName) {
@@ -92,6 +286,7 @@ editors.XDataEditors = Class.create({
                   var insertedElement;
                   // We don't use Prototype API here because we wan't to move the CSS/JavaScript includes to the page head.
                   var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
+
                   if (activator.up('.xclass')) {
                     // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment..
                     activator.up().insertBefore(responseDocumentFragment, activator);
@@ -100,16 +295,31 @@ editors.XDataEditors = Class.create({
                     activator.up().insertBefore(responseDocumentFragment, activator.nextSibling);
                     insertedElement = activator.next();
                   }
+
                   if (insertedElement) {
                     // Notify the listeners that the DOM has been updated. This is needed in order to have pickers.
                     document.fire('xwiki:dom:updated', {elements: [insertedElement]});
                     var insertedObject;
-                    if(insertedElement.hasClassName('xclass')) {
-                      this.enhanceClassUX(insertedElement);
+                    if (insertedElement.hasClassName('xclass')) {
+                      this.enhanceClassUX(insertedElement, false);
                       insertedObject = insertedElement.down('.xobject');
-                    } else if(insertedElement.hasClassName('xobject')) {
-                      this.enhanceObjectUX(insertedElement);
+                    } else if (insertedElement.hasClassName('xobject')) {
                       var classId = insertedElement.id.replace(/^xobject_/, "xclass_").replace(/_\d+$/, "");
+
+                      // clean up the deletion array if we add back a deleted object.
+                      var xclassName = this.getXClassNameFromXObjectId(insertedElement.id);
+                      if (this.editorStatus.deletedXObjects[xclassName] !== undefined) {
+                        var deletionArray = this.editorStatus.deletedXObjects[xclassName];
+                        // be sure to remove the requested object number from the array first.
+                        if (deletionArray.indexOf(objectNumberVal) !== -1) {
+                          this.removeElementFromArray(deletionArray, objectNumberVal);
+                          insertedElement.up('form').down('#deletedObject_'+xclassName.replace('.','\\.')+'_'+objectNumberVal).remove();
+                        }
+                        if (deletionArray.length === 0) {
+                          delete this.editorStatus.deletedXObjects[xclassName];
+                        }
+                      }
+                      this.enhanceObjectUX(insertedElement, false);
                       var xclass = $(classId);
                       if(xclass) {
                         xclass.down('.add_xobject').insert({before: insertedElement});
@@ -120,6 +330,8 @@ editors.XDataEditors = Class.create({
                     // Expand the newly inserted object, since the user will probably want to edit it once it was added
                     insertedObject.removeClassName('collapsed');
                     insertedObject.up('.xclass').removeClassName('collapsed');
+                    // We don't display the edit link on newly added object until they have been saved.
+                    insertedObject.down('.xobject-action.edit').hide();
                   }
                 }
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", "done"));
@@ -191,46 +403,75 @@ editors.XDataEditors = Class.create({
   // Ajax object deletion
   ajaxObjectDeletion : function(object) {
     var item = object.down('a.delete');
+    var xclassName = this.getXClassNameFromXObjectId(object.id);
+    var addedObjects = this.editorStatus.addedXObjects[xclassName];
+
+    // if we have more than one object of the same type added, we always want the latest want to be deleted
+    // so we hide the delete link for previous one.
+    if (addedObjects !== undefined && addedObjects.length > 1) {
+      var previousObjectNumber = addedObjects[addedObjects.length - 2];
+      this.getXObject(xclassName, previousObjectNumber).down('a.delete').hide();
+    }
+
     item.observe('click', function(event) {
       item.blur();
       event.stop();
-      if (!item.disabled) {
-              new XWiki.widgets.ConfirmedAjaxRequest(
-                /* Ajax request URL */
-                item.href,
-                /* Ajax request parameters */
-                {
-                  onCreate : function() {
-                    item.disabled = true;
-                  },
-                  onSuccess : function() {
-                    var xobjectElement = item.up('.xobject');
-                    var xclassElement = xobjectElement.up('.xclass');
-                    xobjectElement.remove();
-                    this.updateXObjectCount(xclassElement);
-                  }.bind(this),
-                  onComplete : function() {
-                    item.disabled = false;
-                    require(['xwiki-meta'], function (xm) {
-                      xm.refreshVersion();
-                    });
-                    document.fire('xwiki:dom:refresh');
-                  }
-                },
-                /* Interaction parameters */
-                {
-                  confirmationText: "$services.localization.render('core.editors.object.delete.confirm')",
-                  progressMessageText : "$services.localization.render('core.editors.object.delete.inProgress')",
-                  successMessageText : "$services.localization.render('core.editors.object.delete.done')",
-                  failureMessageText : "$services.localization.render('core.editors.object.delete.failed')"
-                }
-              );
-      }
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function () {
+          if (!item.disabled) {
+            var form = item.up('form');
+            var xobjectElement = item.up('.xobject');
+            var xclassName = this.getXClassNameFromXObjectId(xobjectElement.id);
+            var xObjectNumber = this.getXObjectNumberFromXObjectId(xobjectElement.id);
+            var addedObjects = this.editorStatus.addedXObjects[xclassName];
+
+            // if the object was already saved, then we need to add the right form information to delete it on server
+            if (addedObjects === undefined || addedObjects.indexOf(xObjectNumber) === -1) {
+              if (this.editorStatus.deletedXObjects[xclassName] === undefined) {
+                this.editorStatus.deletedXObjects[xclassName] = [];
+              }
+              this.editorStatus.deletedXObjects[xclassName].push(xObjectNumber);
+              this.editorStatus.deletedXObjects[xclassName].sort(this.numberSort);
+              var deletedObject = new Element('input', {
+                'type': 'hidden',
+                'name': 'deletedObjects',
+                'id': 'deletedObject_' + xclassName + '_' + xObjectNumber,
+                'value': xclassName + '_' + xObjectNumber
+              });
+              form.appendChild(deletedObject);
+              this.removeElementFromArray(this.editorStatus.savedXObjects[xclassName], xObjectNumber);
+              if (this.editorStatus.savedXObjects[xclassName].length === 0) {
+                delete this.editorStatus.savedXObjects[xclassName];
+              }
+              // if the object wasn't already saved, then we need to enable back the delete link on the previous added element
+            } else {
+              this.removeElementFromArray(addedObjects, xObjectNumber);
+              if (addedObjects.length === 0) {
+                delete this.editorStatus.addedXObjects[xclassName];
+              } else {
+                this.getXObject(xclassName, addedObjects.last()).down('a.delete').show();
+              }
+            }
+            var xclassElement = xobjectElement.up('.xclass');
+            xobjectElement.remove();
+
+            this.updateXObjectCount(xclassElement);
+          }
+        }.bind(this),
+      }, {
+        confirmationText: "$services.localization.render('core.editors.object.delete.confirmJS')",
+        // Allow the users to cancel the switch.
+        showCancelButton: true
+      });
     }.bindAsEventListener(this));
   },
   // -----------------------------------------------
   /* AJAX removal of deprecated properties */
   ajaxRemoveDeprecatedProperties : function(container, triggerSelector) {
+    // Should never happen, but helpful for tests.
+    if (!container) {
+      return;
+    }
     container.select(triggerSelector).each(function(item) {
       item.observe("click", function(event) {
         item.blur();

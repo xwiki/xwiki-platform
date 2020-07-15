@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -32,7 +33,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.text.StringUtils;
+import org.xwiki.test.junit5.RuntimeUtils;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -95,7 +96,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
         //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
         //     --explicit-defaults-for-timestamp=1
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
         } else {
@@ -104,7 +105,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startMySQLContainer(databaseContainer, testConfiguration);
     }
 
-    private void startMySQLContainer(JdbcDatabaseContainer databaseContainer, TestConfiguration testConfiguration)
+    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration)
         throws Exception
     {
         databaseContainer
@@ -125,8 +126,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         }
         // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
         // the native password mechanism.
-        // The reason we don't include when the tag is null is because with the TC version we use, MySQLContainer
-        // defaults to
         if (isMySQL8xPlus(testConfiguration)) {
             commands.setProperty("default-authentication-plugin", "mysql_native_password");
         }
@@ -138,25 +137,37 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         grantMySQLPrivileges(databaseContainer);
     }
 
-    private void grantMySQLPrivileges(JdbcDatabaseContainer databaseContainer) throws Exception
+    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer) throws Exception
     {
-        // Retry 3 times, as we're getting some flickering from time to time with the message:
+        // Retry several times, as we're getting some flickering from time to time with the message:
         //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
         LOGGER.info("Setting MySQL permissions to create subwikis");
-        for (int i = 0; i < 3; i++) {
-            Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
-                "-e", String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBNAME));
+        int maxRetries = 3;
+        for (int i = 0; i < maxRetries + 1; i++) {
+            // In order to avoid "Warning: Using a password on the command line interface can be insecure.", we
+            // put the credentials in a file.
+            databaseContainer.execInContainer("sh", "-c",
+                String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
+            Container.ExecResult result = databaseContainer.execInContainer("mysql",
+                "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
+                String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
             } else {
+                // Trying to debug the following error:
+                //   ERROR 2002 (HY000): Can't connect to local MySQL server through socket
+                //      '/var/run/mysqld/mysqld.sock'
+                LOGGER.info(RuntimeUtils.run("ps -ef | grep mysql"));
                 String errorMessage = result.getStderr().isEmpty() ? result.getStdout() : result.getStderr();
-                if (i == 2) {
+                if (i == maxRetries) {
                     throw new RuntimeException(String.format("Failed to grant all privileges to user [%s] on MySQL "
                         + "with return code [%d] and console logs [%s]", DBUSERNAME, result.getExitCode(),
                         errorMessage));
                 } else {
-                    LOGGER.info("Failed to set MySQL permissions, retrying ({}/2)... Error: [{}]", i + 1, errorMessage);
-                    Thread.sleep(1000L);
+                    LOGGER.info("Failed to set MySQL permissions, retrying ({}/{})... Error: [{}]", i + 1, maxRetries,
+                        errorMessage);
+                    // Wait longer at each retry to slightly increase the chance that the retry will work.
+                    Thread.sleep(5000L * (i + 1));
                 }
             }
         }
@@ -169,8 +180,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
     {
-        return (testConfiguration.getDatabaseTag() != null && extractMajor(testConfiguration.getDatabaseTag()) >= 8)
-            || (extractMajor(MySQLContainer.DEFAULT_TAG) >= 8 && testConfiguration.getDatabaseTag() == null);
+        boolean isMySQL8xPlus;
+        if (testConfiguration.getDatabaseTag() != null) {
+            isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
+                || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
+        } else {
+            isMySQL8xPlus = extractMajor(MySQLContainer.DEFAULT_TAG) >= 8;
+        }
+        return isMySQL8xPlus;
     }
 
     private int extractMajor(String version)
@@ -180,7 +197,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception
     {
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
         } else {
@@ -194,7 +211,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
         //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
         //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer =
                 new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
@@ -215,7 +232,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
     }
 
-    private void mountDatabaseDataIfNeeded(JdbcDatabaseContainer databaseContainer, String hostPath,
+    private void mountDatabaseDataIfNeeded(JdbcDatabaseContainer<?> databaseContainer, String hostPath,
         String containerPath, TestConfiguration testConfiguration)
     {
         if (testConfiguration.isDatabaseDataSaved()) {
@@ -230,7 +247,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
                 testConfiguration.getDatabaseTag()));
@@ -244,13 +261,20 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }
 
-    private void startDatabaseContainer(JdbcDatabaseContainer databaseContainer, int port,
+    private void startDatabaseContainer(JdbcDatabaseContainer<?> databaseContainer, int port,
         TestConfiguration testConfiguration) throws Exception
     {
+        // Note: default startup and connect timeout are at 120s (2mn) but we've noticed cases when it was taking
+        // a lot longer than that and thus our SQL code in grantMySQLPrivileges() is failing because after the timeout
+        // is reached, TC considers that the DB container is started and thus our SQL code is executed even though the
+        // DB is not started, and this, it fails. We've increased the timeouts to 15mn which is a lot and we might need
+        // to debug to find out why MySQL is taking so long to start in these cases.
         databaseContainer
             .withExposedPorts(port)
             .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+            .withNetworkAliases("xwikidb")
+            .withStartupTimeoutSeconds(900)
+            .withConnectTimeoutSeconds(900);
 
         start(databaseContainer, testConfiguration);
 
@@ -258,7 +282,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration.getDatabase().setIP(databaseContainer.getContainerIpAddress());
             testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
         } else {
-            testConfiguration.getDatabase().setIP((String) databaseContainer.getNetworkAliases().get(0));
+            testConfiguration.getDatabase().setIP(databaseContainer.getNetworkAliases().get(0));
             testConfiguration.getDatabase().setPort(port);
         }
     }

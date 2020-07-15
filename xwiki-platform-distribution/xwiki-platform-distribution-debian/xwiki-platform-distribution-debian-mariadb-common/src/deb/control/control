@@ -1,0 +1,14 @@
+Package: xwiki-mariadb-common
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-common (= [[version]]), mariadb-server, dbconfig-mysql | dbconfig-common
+Provides: xwiki-database
+Replaces: xwiki-database, xwiki-enterprise-database
+Conflicts: xwiki-database, xwiki-enterprise-database
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

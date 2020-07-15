@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,13 +18,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -133,63 +131,66 @@
         <groupId>org.revapi</groupId>
         <artifactId>revapi-maven-plugin</artifactId>
         <configuration>
-          <analysisConfiguration><![CDATA[
-            {
-              "revapi": {
-                "filter": {
-                  // We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
-                  // since they're already covered by their own builds and we release all of them together.
-                  "archives": {
-                    "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
-                  }
-                },
-                "ignore" : [
-                  // Add more ignores below...
-                  // Note: you can use regexes by using the syntax: { "regex": true, ... }
-                  // Don't forget to '\'-escape dots and other special characters in this case ;)
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "interface org.xwiki.xar.XarEntryTypeResolver",
-                    "new": "interface org.xwiki.xar.XarEntryTypeResolver",
-                    "annotation": "@org.xwiki.component.annotation.Component",
-                    "justification": "Wrongly placed extension. Breakage is limited"
-                  },
-                  {
-                    "regex": true,
-                    "code": "java\.annotation\..*",
-                    "old": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
-                    "new": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
-                    "annotation": "@org\.xwiki\.properties\.annotation\.Property.*",
-                    "justification": "Not a breakage. Annotation harmonized and moved to the setters or removed to prevent properties to be visible in the WYSIWYG macro dialog UI"
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
-                    "new": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
-                    "annotationType": "org.xwiki.properties.annotation.PropertyDescription",
-                    "attribute": "value",
-                    "oldValue": "\"an optional id of a section to include in the specified document\"",
-                    "newValue": "\"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'\"",
-                    "justification": "Not a breakage, just improved text description!"
-                  },
-                  {
-                    "regex": true,
-                    "code": ".*",
-                    "new": "method .* org\.xwiki\.user\.UserProperties::.*",
-                    "justification": "Young API, not a breakage"
-                  }
-                ]
-              }
-            }
-          ]]></analysisConfiguration>
+          <analysisConfiguration>
+            <revapi.filter>
+              <archives>
+                <!-- We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
+                     since they're already covered by their own builds and we release all of them together. -->
+                <exclude>
+                  <item>org\.xwiki\.commons:.*:.*</item>
+                  <item>org\.xwiki\.rendering:.*:.*</item>
+                </exclude>
+              </archives>
+            </revapi.filter>
+            <!-- Add ignores here using the following syntax. You can use a single <revapi.ignore> entry but it
+                 cannot be empty.
+
+                 Note: you can use regexes by using the syntax: <regex>true</regex>
+                 Don't forget to '\'-escape dots and other special characters in this case ;)
+            <revapi.ignore>
+              <item>
+                <code>java.class.removed</code>
+                <old>class org.xwiki.velocity.tools.CollectionsTool</old>
+                <justification>Not a Breakage. Moved to Legacy</justification>
+              </item>
+            </revapi.ignore>
+            -->
+            <revapi.ignore>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.util.Optional&lt;org.xwiki.eventstream.EventStatus&gt;&gt; org.xwiki.eventstream.EventStore::deleteMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.Event&gt; org.xwiki.eventstream.EventStore::prefilterEvent(org.xwiki.eventstream.Event)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.EventStatus&gt; org.xwiki.eventstream.EventStore::saveMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                <old>class org.xwiki.eventstream.query.StatusQueryCondition</old>
+                <new>class org.xwiki.eventstream.query.StatusQueryCondition</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method boolean org.xwiki.notifications.NotificationConfiguration::isEventPreFilteringEnabled()</old>
+                <justification>Young API</justification>
+              </item>
+            </revapi.ignore>
+          </analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <modules>
-    <!-- Sorted Alphabetically -->
+      <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
-    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -236,6 +237,7 @@
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
@@ -273,7 +275,6 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-vfs</module>
-    <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>

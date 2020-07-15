@@ -1080,6 +1080,7 @@ public class MockitoOldcore
     }
 
     /**
+     * Return the default configuration, which is also registered for xwikiproperties.
      * @since 7.1M1
      */
     public MemoryConfigurationSource getConfigurationSource()

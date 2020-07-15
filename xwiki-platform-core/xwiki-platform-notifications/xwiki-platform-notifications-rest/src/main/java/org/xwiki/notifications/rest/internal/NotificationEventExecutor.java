@@ -46,12 +46,12 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 
@@ -69,7 +69,7 @@ import com.xpn.xwiki.XWikiContext;
 public class NotificationEventExecutor implements Initializable, Disposable
 {
     @Inject
-    private ConfigurationSource configurationSource;
+    private NotificationConfiguration notificationConfiguration;
 
     @Inject
     private CacheManager cacheManager;
@@ -275,7 +275,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
     @Override
     public void initialize() throws InitializationException
     {
-        int poolSize = this.configurationSource.getProperty("notifications.rest.poolSize", 2);
+        int poolSize = this.notificationConfiguration.getRESTPoolSize();
 
         if (poolSize > 0) {
             this.executor = new CallableEntryExecutor(poolSize);

@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-creationjob</artifactId>
   <name>XWiki Platform - Wiki - Creation Job</name>
   <description>Provide components to create wikis asynchronously, in a job.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.98</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>95</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

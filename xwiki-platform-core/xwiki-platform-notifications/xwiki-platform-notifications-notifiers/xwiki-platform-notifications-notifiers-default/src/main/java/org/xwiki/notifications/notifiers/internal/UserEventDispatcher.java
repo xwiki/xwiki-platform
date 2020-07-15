@@ -37,12 +37,15 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.user.internal.group.UsersCache;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -65,9 +68,6 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
     private WikiDescriptorManager wikiManager;
 
     @Inject
-    private ObservationManager observation;
-
-    @Inject
     private UserEventManager userEventManager;
 
     @Inject
@@ -75,6 +75,12 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
 
     @Inject
     private ExecutionContextManager ecm;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private EventStore events;
 
     @Inject
     private Logger logger;
@@ -162,28 +168,34 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         // Associated event with event's wiki users
         dispatch(event, this.userCache.getUsers(eventWiki, true));
 
-        // Also take into account global users (main wiki users)
-        if (this.wikiManager.isMainWiki(eventWiki.getName())) {
+        // Also take into account global users (main wiki users) if the event is on a subwiki
+        if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
             dispatch(event, this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true));
         }
     }
 
     private void dispatch(Event event, List<DocumentReference> users)
     {
+        boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
+
         for (DocumentReference user : users) {
             // Make sure the user asked to be alerted about this event
             if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
                 // Associate the event with the user
-                this.observation.notify(new UserNotificationEvent(user, NotificationFormat.ALERT), event);
+                String userId = this.entityReferenceSerializer.serialize(user);
+                this.events.saveEventStatus(new DefaultEventStatus(event, userId, false));
             }
 
             // Make sure the notification module is allowed to send mails
             // Make sure the user asked to receive mails about this event
-            if (this.notificationConfiguration.areEmailsEnabled()
-                && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
+            if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
                 // Associate the event with the user
-                this.observation.notify(new UserNotificationEvent(user, NotificationFormat.EMAIL), event);
+                String userId = this.entityReferenceSerializer.serialize(user);
+                this.events.saveMailEntityEvent(new DefaultEntityEvent(event, userId));
             }
         }
+
+        // Remember we are done pre filtering this event
+        this.events.prefilterEvent(event);
     }
 }

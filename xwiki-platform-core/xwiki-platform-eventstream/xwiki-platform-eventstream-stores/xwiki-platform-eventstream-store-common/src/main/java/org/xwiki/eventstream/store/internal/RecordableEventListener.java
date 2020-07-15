@@ -19,25 +19,22 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
-import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Store the recordable event inside the event stream (except events that are already handled by the Activity Stream
@@ -51,10 +48,7 @@ import javax.inject.Singleton;
 @Named("RecordableEventListener")
 public class RecordableEventListener extends AbstractEventListener
 {
-    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent ->  otherEvent instanceof BeginFoldEvent;
-
-    @Inject
-    private EventStream eventStream;
+    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
 
     @Inject
     private EventStore eventStore;
@@ -74,9 +68,6 @@ public class RecordableEventListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
-    @Inject
-    private Execution execution;
-
     /**
      * Construct a NotificationEventListener.
      */
@@ -93,26 +84,21 @@ public class RecordableEventListener extends AbstractEventListener
             return;
         }
 
-        if (!this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+        // Don't handle events that are already saved by the Activity Stream implementation.
+        for (Event ignoredEvent : DocumentEventListener.LISTENER_EVENTS) {
+            if (ignoredEvent.matches(event)) {
+                return;
+            }
+        }
 
-            // Don't handle events that are already saved by the Activity Stream implementation.
-            for (Event ignoredEvent : DocumentEventListener.LISTENER_EVENTS) {
-                if (ignoredEvent.matches(event)) {
-                    return;
+        try {
+            this.eventStore.saveEvent(convertEvent(event, source, data)).whenComplete((e, ex) -> {
+                if (ex != null) {
+                    logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), ex);
                 }
-            }
-
-            try {
-                this.execution.getContext()
-                        .setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
-
-                this.eventStore.saveEvent(convertEvent(event, source, data));
-            } catch (Exception e) {
-                logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
-            } finally {
-                this.execution.getContext()
-                        .removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
-            }
+            });
+        } catch (Exception e) {
+            logger.warn("Failed to convert event [{}].", event.getClass().getCanonicalName(), e);
         }
     }
 
@@ -121,8 +107,8 @@ public class RecordableEventListener extends AbstractEventListener
      */
     private org.xwiki.eventstream.Event convertEvent(Event event, Object source, Object data) throws Exception
     {
-        for (RecordableEventConverter converter
-                : componentManager.<RecordableEventConverter>getInstanceList(RecordableEventConverter.class)) {
+        for (RecordableEventConverter converter : componentManager
+            .<RecordableEventConverter>getInstanceList(RecordableEventConverter.class)) {
             if (converter == defaultConverter) {
                 continue;
             }

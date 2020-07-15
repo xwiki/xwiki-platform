@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-send</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-mail-send-default</artifactId>
@@ -33,12 +33,16 @@
   <description>Default implementation of the API to send emails</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-general</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-api</artifactId>
@@ -64,8 +68,8 @@
       <artifactId>xwiki-commons-text</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly load some
-      components (e.g. DefaultXWikiStubContextProvider) -->
+    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly
+         load some components (e.g. DefaultXWikiStubContextProvider) -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

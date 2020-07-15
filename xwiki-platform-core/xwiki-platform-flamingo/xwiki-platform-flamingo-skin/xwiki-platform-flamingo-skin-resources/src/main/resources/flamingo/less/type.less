@@ -30,8 +30,9 @@
 @font-size-h5: ceil((@font-size-base * 1.266));
 @font-size-h6: ceil((@font-size-base * 1.125));
 
+@font-size-document-title: ceil((@font-size-base * 2.42)); // ~34px
 #document-title h1 {
-  font-size: ceil((@font-size-base * 2.42)); // ~34px
+  font-size: @font-size-document-title;
   margin-top: 0;
 }
 

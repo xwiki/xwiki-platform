@@ -24,14 +24,13 @@
   <parent>
     <artifactId>xwiki-platform-rendering-wikimacro-macros</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Macro - WikiMacroContent</name>
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - Macro - WikiMacroContent</description>
   <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacrocontent</artifactId>
   <properties>
     <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>1</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wikimacro Content Macro</xwiki.extension.name>
   </properties>

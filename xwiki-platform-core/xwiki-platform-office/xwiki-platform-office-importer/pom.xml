@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -34,7 +34,6 @@
     <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>57</xwiki.pitest.mutationThreshold>
     <jodconverter.version>4.2.4</jodconverter.version>
   </properties>
   <dependencies>

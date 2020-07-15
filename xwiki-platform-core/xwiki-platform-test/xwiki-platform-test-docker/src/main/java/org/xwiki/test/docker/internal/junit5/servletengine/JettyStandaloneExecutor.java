@@ -111,7 +111,7 @@ public class JettyStandaloneExecutor
 
             VelocityContext velocityContext = createVelocityContext();
             for (File startFile : startFiles) {
-                LOGGER.info(String.format("Replacing variables in [%s]...", startFile));
+                LOGGER.info("Replacing variables in [{}]...", startFile);
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile, StandardCharsets.UTF_8);
                 try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile))) {
                     writer.write(replaceProperty(content, velocityContext));
@@ -169,8 +169,7 @@ public class JettyStandaloneExecutor
     {
         Map<String, Object> properties = new HashMap<>();
         properties.put("xwikiDataDir", DATA_SUBDIR);
-        VelocityContext context = new VelocityContext(properties);
-        return context;
+        return new VelocityContext(properties);
     }
 
     private String replaceProperty(String content, VelocityContext velocityContext)

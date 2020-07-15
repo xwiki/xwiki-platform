@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
@@ -115,6 +116,8 @@ public class CreateActionTest
         context.setResponse(mockResponse);
 
         when(mockRequest.get("type")).thenReturn("plain");
+
+        this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
     }
 
     @Test
@@ -779,6 +782,17 @@ public class CreateActionTest
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
         List<String> allowedSpaces, Boolean terminal, String type) throws Exception
     {
+        mockExistingTemplateProviders(fullName, resolvedDocumentReference, allowedSpaces, terminal, type, null);
+    }
+
+    /**
+     * Mocks 1 existing template provider.
+     * <p>
+     * Note: Calling it multiple times does not add multiple providers.
+     */
+    private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
+        List<String> allowedSpaces, Boolean terminal, String type, String action) throws Exception
+    {
         DocumentReference templateProviderClassReference =
             new DocumentReference("xwiki", Arrays.asList("XWiki"), "TemplateProviderClass");
 
@@ -802,6 +816,9 @@ public class CreateActionTest
         }
         if (type != null) {
             when(templateProviderObject.getStringValue("type")).thenReturn(type);
+        }
+        if (action != null) {
+            when(templateProviderObject.getStringValue("action")).thenReturn(action);
         }
         when(templateProviderDocument.getXObject(templateProviderClassReference)).thenReturn(templateProviderObject);
 
@@ -1518,5 +1535,50 @@ public class CreateActionTest
         // compatibility resolutions. Also using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
             null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedWithSaveAndEdit() throws Exception
+    {
+        // Mock the document to create.
+        DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+        when(document.getLocalReferenceMaxLength()).thenReturn(255);
+        when(document.getDefaultEditMode(this.context)).thenReturn("edit");
+        when(document.getDefaultLocale()).thenReturn(Locale.ROOT);
+        when(document.clone()).thenReturn(document);
+
+        // Mock the XWiki context.
+        when(this.context.getWiki().getLocalePreference(this.context)).thenReturn(Locale.FRENCH);
+        when(this.context.getWiki().getDocument(documentReference, this.context)).thenReturn(document);
+        this.context.setDoc(document);
+        DocumentReference userReference = new DocumentReference("xwiki", "Users", "Alice");
+        this.context.setUserReference(userReference);
+
+        // Mock the creation request.
+        when(mockRequest.getParameter("spaceReference")).thenReturn("X");
+        when(mockRequest.getParameter("name")).thenReturn("Y");
+        when(mockRequest.getParameter("title")).thenReturn("Yippee");
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+
+        // Mock the template provider.
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.emptyList(), null,
+            "page", "saveandedit");
+
+        // Run the create action.
+        assertNull(this.action.render(this.context));
+
+        verify(document).setLocale(Locale.ROOT);
+        verify(document).setDefaultLocale(Locale.FRENCH);
+        verify(document).readFromTemplate(new DocumentReference("xwiki", "XWiki", "MyTemplate"), this.context);
+        verify(document).setTitle("Yippee");
+        verify(document).setCreatorReference(userReference);
+        verify(document).setAuthorReference(userReference);
+        verify(this.context.getWiki()).saveDocument(document, this.context);
     }
 }

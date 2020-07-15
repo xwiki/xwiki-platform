@@ -1,4 +1,5 @@
 #template('colorThemeInit.vm')
+
 /*!
 #macro (toRGBa $hexColor $opacity)
   #set ($macro.hexColor = "$!hexColor")
@@ -17,6 +18,11 @@
 #set ($lightBackgroundSecondaryColor = "#toRGBa($theme.backgroundSecondaryColor, 0.5)")
 #set ($lightTextSecondaryColor = "#toRGBa($theme.textSecondaryColor, 0.5)")
 */
+
+/**
+ * Raw (Wiki Syntax) Diff
+ */
+
 .diff-container {
   border: 1px solid $theme.borderColor;
   font-family: Consolas, "Liberation Mono", "Courier New", monospace;

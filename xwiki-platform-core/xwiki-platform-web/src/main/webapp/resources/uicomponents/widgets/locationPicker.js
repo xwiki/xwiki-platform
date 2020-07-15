@@ -323,7 +323,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
 
     // Update the location with whatever the initial value of the title is.
-    if (nameInput.val() !== undefined && !nameInput.val()) {
+    if (nameInput.val() !== undefined && !nameInput.val() && titleInput.val()) {
       updateLocationAndNameFromTitleInput();
     } else {
       updateLocationFromTitleInput();
@@ -442,7 +442,7 @@ require(['jquery'], function($) {
 
   var addTerminalPageValidation = function(spaceValidator, terminalCheckbox) {
     spaceValidator.add(Validate.Custom, {
-      failureMessage: "$services.localization.render('core.validation.required.message')",
+      failureMessage: "$services.localization.render('core.validation.required.message.terminal')",
       against: function(value) {
         if (terminalCheckbox.prop('checked')) {
           // Space reference is required for terminal documents.

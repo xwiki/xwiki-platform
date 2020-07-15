@@ -35,6 +35,7 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 
@@ -57,7 +58,6 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     /**
      * All indexers run in the same thread.
      */
-    // TODO: group indexers based on the IndexerRequest root entity
     private static final JobGroupPath GROUP = new JobGroupPath(Arrays.asList("solr", "indexer"));
 
     /**
@@ -74,6 +74,9 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     @Named("solr")
     private transient DocumentIterator<String> solrIterator;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Override
     public String getType()
     {
@@ -83,7 +86,11 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     @Override
     public JobGroupPath getGroupPath()
     {
-        return GROUP;
+        if (getRequest().getRootReference() == null) {
+            return GROUP;
+        } else {
+            return new JobGroupPath(this.entityReferenceSerializer.serialize(getRequest().getRootReference()), GROUP);
+        }
     }
 
     @Override

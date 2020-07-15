@@ -164,6 +164,26 @@ public class LegacyEventStatusManager implements EventStatusManager
         }
     }
 
+    @Override
+    public void deleteEventStatus(EventStatus eventStatus) throws Exception
+    {
+        LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
+
+        boolean isSavedOnMainStore = false;
+
+        if (configuration.useLocalStore()) {
+            String currentWiki = wikiDescriptorManager.getCurrentWikiId();
+            deleteEventStatusFromStore(status, currentWiki);
+            isSavedOnMainStore = wikiDescriptorManager.isMainWiki(currentWiki);
+        }
+
+        if (configuration.useMainStore() && !isSavedOnMainStore) {
+            // save event into the main database (if the event was not already be recorded on the main store,
+            // otherwise we would duplicate the event)
+            deleteEventStatusFromStore(status, wikiDescriptorManager.getMainWikiId());
+        }
+    }
+
     private void saveEventStatusInStore(LegacyEventStatus eventStatus, String wikiId) throws Exception
     {
         namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
@@ -173,6 +193,27 @@ public class LegacyEventStatusManager implements EventStatusManager
                 hibernateStore.executeWrite(context, session -> {
                     // The event status may already exists, so we use saveOrUpdate
                     session.saveOrUpdate(eventStatus);
+
+                    return null;
+                });
+            } catch (XWikiException e) {
+                throw new EventStreamException(e);
+            }
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
+            return null;
+        });
+    }
+
+    private void deleteEventStatusFromStore(LegacyEventStatus eventStatus, String wikiId) throws Exception
+    {
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+            XWikiContext context = contextProvider.get();
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+            try {
+                hibernateStore.executeWrite(context, session -> {
+                    // The event status may already exists, so we use saveOrUpdate
+                    session.delete(eventStatus);
 
                     return null;
                 });

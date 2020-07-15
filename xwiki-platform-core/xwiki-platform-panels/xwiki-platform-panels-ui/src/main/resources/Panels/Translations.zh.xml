@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=Available Panels
-### Missing: panels.name=Name
-### Missing: panels.description=Description
-### Missing: panels.type=Type
-### Missing: panels.category=Category
-### Missing: panels._actions=Actions
+  <content>panels.available=可用面板
+panels.name=名称
+panels.description=描述
+panels.type=类型
+panels.category=分类
+panels._actions=动作
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
-### Missing: panels.siblings.title=Sibling Pages
+panels.children.title=子页面
+panels.siblings.title=同级页面
 panels.documentInformation.configureSyntaxes=配置更多语法
 ### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.</content>
+panels.documentInformation.confirmChangeSyntax=您是否想将文档的内容和对象转换为所选语法？选择 "取消 "只会改变语法标识符，不会修改文档的内容。注意，如果您选择 "确定 "，则会自动保存文档，您可以通过进入文档历史记录界面取消修改，并恢复到最后的版本。
+panels.documentInformation.failedSyntaxConversion=无法转换到所选语法。如果你想要使用这个语法，您可以选择但不会作出任何转换。</content>
 </xwikidoc>

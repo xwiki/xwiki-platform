@@ -135,6 +135,17 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final boolean SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT = true;
 
     /**
+     * The name of the configuration property indicating which synchronization mode should be used at startup.
+     */
+    public static final String SOLR_SYNCHRONIZE_AT_STARTUP_MODE = "solr.synchronizeAtStartupMode";
+
+    /**
+     * Indicate which mode to use for synchronize at startup by default.
+     */
+    public static final SynchronizeAtStartupMode SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT =
+        SynchronizeAtStartupMode.FARM;
+
+    /**
      * The Solr configuration source.
      */
     @Inject
@@ -161,6 +172,12 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public InputStream getSearchCoreDefaultContent()
     {
         return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core.zip");
+    }
+
+    @Override
+    public InputStream getMinimalCoreDefaultContent()
+    {
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-minimal.zip");
     }
 
     @Override
@@ -205,5 +222,20 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         File solrStoreDirectory = new File(this.environment.getPermanentDirectory(), "store/solr");
 
         return solrStoreDirectory.getPath();
+    }
+
+    @Override
+    public SynchronizeAtStartupMode synchronizeAtStartupMode()
+    {
+        String value = this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name());
+
+        SynchronizeAtStartupMode result;
+        try {
+            result = SynchronizeAtStartupMode.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            result = SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT;
+        }
+        return result;
     }
 }

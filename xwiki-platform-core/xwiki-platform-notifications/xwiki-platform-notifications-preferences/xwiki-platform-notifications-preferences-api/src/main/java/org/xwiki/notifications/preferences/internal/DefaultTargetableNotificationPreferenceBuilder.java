@@ -94,51 +94,59 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     }
 
     @Override
-    public void prepare()
+    public TargetableNotificationPreferenceBuilder prepare()
     {
         preference = new TargetablePreference();
         preference.category = NotificationPreferenceCategory.DEFAULT;
+        return this;
     }
 
     @Override
-    public void setEnabled(boolean isEnabled)
+    public TargetableNotificationPreferenceBuilder setEnabled(boolean isEnabled)
     {
         preference.isNotificationEnabled = isEnabled;
+        return this;
     }
 
     @Override
-    public void setFormat(NotificationFormat format)
+    public TargetableNotificationPreferenceBuilder setFormat(NotificationFormat format)
     {
         preference.format = format;
+        return this;
     }
 
     @Override
-    public void setProperties(Map<NotificationPreferenceProperty, Object> properties)
+    public TargetableNotificationPreferenceBuilder setProperties(Map<NotificationPreferenceProperty, Object> properties)
     {
         preference.properties = properties;
+        return this;
     }
 
     @Override
-    public void setProviderHint(String providerHint)
+    public TargetableNotificationPreferenceBuilder setProviderHint(String providerHint)
     {
         preference.providerHint = providerHint;
+        return this;
     }
 
     @Override
-    public void setStartDate(Date startDate)
+    public TargetableNotificationPreferenceBuilder setStartDate(Date startDate)
     {
         preference.startDate = startDate;
+        return this;
     }
 
     @Override
-    public void setTarget(EntityReference target)
+    public TargetableNotificationPreferenceBuilder setTarget(EntityReference target)
     {
         preference.target = target;
+        return this;
     }
 
     @Override
-    public void setCategory(NotificationPreferenceCategory category)
+    public TargetableNotificationPreferenceBuilder setCategory(NotificationPreferenceCategory category)
     {
         preference.category = category;
+        return this;
     }
 }

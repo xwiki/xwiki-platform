@@ -78,4 +78,10 @@ public class AllIT
     class NestedWikiTemplateIT extends WikiTemplateIT
     {
     }
+
+    @Nested
+    @DisplayName("Tests using a subwiki")
+    class NestedSubWikiIT extends SubWikiIT
+    {
+    }
 }

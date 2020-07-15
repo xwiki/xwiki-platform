@@ -1,0 +1,85 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Helper macros for ActivityPub notifications.
+
+#template('notification/macros.vm')
+
+#set ($mainIcon = "bell")
+#set ($smallIcon = "page")
+#set ($compositeEventDate = $escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0))))
+
+#macro (insertEventDate $event)
+<td class="text-right text-muted">$escapetool.xml($services.date.displayTimeAgo($event.date))</td>
+#end
+
+#macro (displayEventDetail $event $summary)
+    #set ($username = $event.user.name)
+    #set ($eventParams = $compositeEventParams.get($event))
+<tr>
+    <td>
+        <span class="notification-event-user">
+            <a href="$eventParams.getAuthorURL()">$username</a>
+        </span>
+    </td>
+    <td class="description">$summary</td>
+    #insertEventDate($event)
+</tr>
+#end
+
+#define ($content)
+<div class="notification-description">
+    <div class="activity-type">$services.localization.render('mentions.event.mention.type')</div>
+    <div class="activity-summary">
+        #if ($compositeEvent.events.size() == 1)
+            $services.localization.render('mentions.event.mention.summary.singular')
+        #else
+            $services.localization.render('mentions.event.mention.summary.plural', $compositeEvent.events.size())
+        #end
+    </div>
+    <div><small class="text-muted">$compositeEventDate</small></div>
+</div>
+#end
+
+#define ($details)
+    #define($rows)
+        #foreach($event in $compositeEvent.events)
+            #set ($eventParams = $compositeEventParams.get($event))
+            #set ($location = $eventParams.location)
+            ## TODO: define variation for group mention
+            ## TODO: add an achor to the specific place on the document.
+            #if ($location == "DOCUMENT")
+                #set ($descriptionKey = 'mentions.event.mention.description.document')
+            #elseif($location == "COMMENT")
+                #set ($descriptionKey = 'mentions.event.mention.description.comment')
+            #elseif($location == "ANNOTATION")
+                #set ($descriptionKey = 'mentions.event.mention.description.annotation')
+            #elseif($location == "AWM_FIELD")
+                #set ($descriptionKey = 'mentions.event.mention.description.awmField')
+            #else
+                #set ($descriptionKey = 'mentions.event.mention.description')
+            #end
+            #set ($description = "$services.localization.render($descriptionKey) <a href='$eventParams.getDocumentURL()'>$eventParams.getDocument().getTitle()</a>")
+            #displayEventDetail($event $description)
+        #end
+    #end
+    #displayNotificationEventDetailsSkeletons($events.size(), $rows)
+#end
+
+#displayNotificationEventSkeleton($mainIcon $smallIcon $content $details)

@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Consejos
 help.tipsPanel.noTipMessage=¡No hay consejos disponibles!
-help.tipsPanel.gettingStartedTip=Si eres un nuevo usuario de XWiki, echa un vistazo a la [[Guía de introducción&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Ve a cualquier página del wiki con Ctrl+G o Meta+G.\nVer [[más atajos&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=¿Sabías que puedes mejorar XWiki? ¡Dedique 5 minutos a [[rellenar esta encuesta&gt;&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] y ayude a este proyecto de código abierto!
+help.tipsPanel.gettingStartedTip=Si eres un nuevo usuario de XWiki, echa un vistazo a la [[Guía de introducción&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Ve a cualquier página del wiki con Ctrl+G o Meta+G.\nVer [[más atajos&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=¿Sabías que puedes mejorar XWiki? ¡Dedique 5 minutos a [[rellenar esta encuesta&gt;&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] y ayude a este proyecto de código abierto!
 help.tipsPanel.breadcrumbsTip=Puede hacer clic en las flechas junto a los elementos de la miga de pan para navegar rápidamente a las páginas para hermanas e hijas.
-help.tipsPanel.advancedHiddenShortcutTip=Presione la combinación de teclas x+x+x+a para alternar entre [[Modo avanzado&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] y x+x+x+h para alternar la visualización de [[páginas ocultas&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.advancedHiddenShortcutTip=Presione la combinación de teclas x+x+x+a para alternar entre [[Modo avanzado&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] y x+x+x+h para alternar la visualización de [[páginas ocultas&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Cuando edite en WYSIWYG, escriba ##[## y luego empiece a escribir letras para obtener sugerencias para crear un enlace.
 help.macroList.title=Macros disponibles
 help.macroList.id=Id

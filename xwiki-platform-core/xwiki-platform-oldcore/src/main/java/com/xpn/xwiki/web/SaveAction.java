@@ -43,7 +43,6 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -179,8 +178,7 @@ public class SaveAction extends PreviewAction
         if (doc.isNew()) {
             doc.setLocale(Locale.ROOT);
             if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(
-                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+                doc.setDefaultLocale(xwiki.getLocalePreference(context));
             }
         }
 
@@ -253,8 +251,7 @@ public class SaveAction extends PreviewAction
         }
 
         // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(),
-            context);
+        xwiki.checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
 
         // We get the comment to be used from the document
         // It was read using readFromForm

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat9-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat 9 - Common</name>
@@ -52,19 +52,12 @@
               <conffile>true</conffile>
             </data>
 
-            <!--Custom tomcat 9 context configuration -->
+            <!-- Custom tomcat 9 context configuration -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
               <linkName>/etc/tomcat9/Catalina/localhost/xwiki.xml</linkName>
               <linkTarget>/etc/xwiki/xwiki-tomcat9.xml</linkTarget>
-            </data>
-            <!-- Inject configuration in tomcat9 systemd service -->
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/etc/systemd/system/tomcat9.service.d/xwiki-tomcat9-systemd.conf</linkName>
-              <linkTarget>/etc/xwiki/xwiki-tomcat9-systemd.conf</linkTarget>
             </data>
           </dataSet>
         </configuration>

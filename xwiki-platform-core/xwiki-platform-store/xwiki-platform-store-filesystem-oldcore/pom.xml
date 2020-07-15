@@ -25,15 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-store</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
   <name>XWiki Platform - Store - Filesystem - Old Core</name>
   <description>Implement various oldcore store APIs based on filesystem.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
-    <!-- TODO: put back value of 36 when https://github.com/STAMP-project/pitest-descartes/issues/127 is fixed -->
-    <xwiki.pitest.mutationThreshold>35</xwiki.pitest.mutationThreshold>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-store-filesystem-attachments</xwiki.extension.features>
   </properties>

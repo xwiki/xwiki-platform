@@ -39,7 +39,8 @@ import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.velocity.tools.EscapeTool;
 
 /**
- * Extend a {@link URL} by providing access to the URL path segments (URL-decoded).
+ * Extend a {@link URL} by providing access to the URL path segments (URL-decoded). Allows representing both a full
+ * URL or a relative one.
  *
  * @version $Id$
  * @since 6.1M2
@@ -86,7 +87,7 @@ public class ExtendedURL implements Cloneable
      */
     public ExtendedURL(List<String> segments)
     {
-        this(segments, Collections.<String, List<String>>emptyMap());
+        this(segments, Collections.emptyMap());
     }
 
     /**
@@ -224,7 +225,7 @@ public class ExtendedURL implements Cloneable
      */
     private List<String> extractPathSegments(String rawPath)
     {
-        List<String> urlSegments = new ArrayList<String>();
+        List<String> urlSegments = new ArrayList<>();
 
         if (StringUtils.isEmpty(rawPath)) {
             return urlSegments;

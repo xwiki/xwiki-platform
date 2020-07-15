@@ -20,13 +20,13 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.query.QueryException;
 import org.xwiki.test.annotation.AfterComponent;
@@ -36,6 +36,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,14 +53,14 @@ public class DefaultEventStoreTest
 
     private static final DefaultEventStatus EVENTSTATUS = new DefaultEventStatus(EVENT, "entity", true);
 
+    private static final DefaultEntityEvent MAILENTITY = new DefaultEntityEvent(EVENT, "entity");
+
     @MockComponent
     private EventStreamConfiguration configuration;
 
     @MockComponent
-    private EventStream eventStream;
-
-    @MockComponent
-    private EventStatusManager eventStatusManager;
+    @Named("legacy")
+    private EventStore legacyStore;
 
     @MockComponent
     @Named("test")
@@ -73,6 +74,9 @@ public class DefaultEventStoreTest
     {
         when(this.configuration.isEventStoreEnabled()).thenReturn(true);
         when(this.configuration.getEventStore()).thenReturn("test");
+
+        when(this.store.deleteEvent(anyString())).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
+        when(this.legacyStore.deleteEvent(anyString())).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
     }
 
     @Test
@@ -81,7 +85,7 @@ public class DefaultEventStoreTest
         this.defaultStore.saveEvent(EVENT);
 
         verify(this.store).saveEvent(EVENT);
-        verify(this.eventStream).addEvent(EVENT);
+        verify(this.legacyStore).saveEvent(EVENT);
     }
 
     @Test
@@ -90,7 +94,16 @@ public class DefaultEventStoreTest
         this.defaultStore.saveEventStatus(EVENTSTATUS);
 
         verify(this.store).saveEventStatus(EVENTSTATUS);
-        verify(this.eventStatusManager).saveEventStatus(EVENTSTATUS);
+        verify(this.legacyStore).saveEventStatus(EVENTSTATUS);
+    }
+
+    @Test
+    void saveMailEntityEvent() throws Exception
+    {
+        this.defaultStore.saveMailEntityEvent(MAILENTITY);
+
+        verify(this.store).saveMailEntityEvent(MAILENTITY);
+        verify(this.legacyStore).saveMailEntityEvent(MAILENTITY);
     }
 
     @Test
@@ -99,7 +112,7 @@ public class DefaultEventStoreTest
         this.defaultStore.deleteEvent(EVENT);
 
         verify(this.store).deleteEvent(EVENT);
-        verify(this.eventStream).deleteEvent(EVENT);
+        verify(this.legacyStore).deleteEvent(EVENT);
     }
 
     @Test
@@ -108,21 +121,32 @@ public class DefaultEventStoreTest
         this.defaultStore.deleteEventStatus(EVENTSTATUS);
 
         verify(this.store).deleteEventStatus(EVENTSTATUS);
+        verify(this.legacyStore).deleteEventStatus(EVENTSTATUS);
     }
 
     @Test
-    void deleteEventById() throws EventStreamException
+    void deleteMailEntityEvent() throws EventStreamException
     {
-        assertFalse(this.defaultStore.deleteEvent("id").isPresent());
+        this.defaultStore.deleteMailEntityEvent(MAILENTITY);
 
+        verify(this.store).deleteMailEntityEvent(MAILENTITY);
+        verify(this.legacyStore).deleteMailEntityEvent(MAILENTITY);
+    }
+
+    @Test
+    void deleteEventById() throws EventStreamException, InterruptedException, ExecutionException
+    {
+        assertFalse(this.defaultStore.deleteEvent("id").get().isPresent());
+
+        verify(this.legacyStore).deleteEvent("id");
         verify(this.store).deleteEvent("id");
 
-        when(this.store.deleteEvent("id")).thenReturn(Optional.of(EVENT));
+        when(this.store.deleteEvent("id")).thenReturn(CompletableFuture.completedFuture(Optional.of(EVENT)));
 
-        assertSame(EVENT, this.defaultStore.deleteEvent("id").get());
+        assertSame(EVENT, this.defaultStore.deleteEvent("id").get().get());
 
         verify(this.store, times(2)).deleteEvent("id");
-        verify(this.eventStream).deleteEvent(EVENT);
+        verify(this.legacyStore, times(2)).deleteEvent("id");
     }
 
     @Test
@@ -138,18 +162,17 @@ public class DefaultEventStoreTest
 
         assertFalse(this.defaultStore.getEvent("id").isPresent());
 
-        when(this.eventStream.getEvent("id")).thenReturn(EVENT);
+        when(this.legacyStore.getEvent("id")).thenReturn(Optional.of(EVENT));
 
-        assertSame(EVENT, this.defaultStore.getEvent("id").get());
+        assertFalse(this.defaultStore.getEvent("id").isPresent());
     }
 
     @Test
-    void getEventStatus() throws EventStreamException, QueryException
+    void prefilter() throws EventStreamException
     {
-        assertFalse(this.defaultStore.getEventStatus("id", "entity").isPresent());
+        this.defaultStore.prefilterEvent(EVENT);
 
-        when(this.store.getEventStatus("id", "entity")).thenReturn(Optional.of(EVENTSTATUS));
-
-        assertSame(EVENTSTATUS, this.defaultStore.getEventStatus("id", "entity").get());
+        verify(this.store).prefilterEvent(EVENT);
+        verify(this.legacyStore).prefilterEvent(EVENT);
     }
 }

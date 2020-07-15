@@ -21,9 +21,10 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -92,7 +93,7 @@ public class SeparatePageRating implements Rating
      * SeparatePageRating constructor.
      * 
      * @param documentRef the document reference of the document with which the rating is associated
-     * @param doc the document with which the rating is associated
+     * @param doc the actual document which will store the rating information.
      * @param context the context in which the rating took place
      * @param ratingsManager the RatingsManager to be used in processing the rating
      * @throws RatingsException when encountering an error while instantiating a SeparatePageRating
@@ -126,9 +127,12 @@ public class SeparatePageRating implements Rating
 
     private XWikiDocument getDocument()
     {
+        // TODO This lazy loading doesn't feel right since the document is always supposed to be there.
+        // Not changing it yet since the code is badly covered and I'm afraid of making a regression...
         if (document == null) {
             try {
-                document = context.getWiki().getDocument(getPageReference(this.documentRef), context);
+                document = context.getWiki().getDocument(
+                    this.ratingsManager.getRatingDocumentReference(this.documentRef), context);
             } catch (XWikiException e) {
                 return null;
             }
@@ -228,61 +232,6 @@ public class SeparatePageRating implements Rating
     }
 
     /**
-     * Generate page name from the container page We add Rating and getUniquePageName will add us a counter to our page.
-     * 
-     * @param documentRef reference to the document with which the rating is associated
-     * @return a reference to the document in which the rating is stored
-     */
-    private DocumentReference getPageReference(DocumentReference documentRef) throws XWikiException
-    {
-        XWikiDocument doc = context.getWiki().getDocument(documentRef, context);
-        String ratingsSpace = ratingsManager.getRatingsSpaceName(documentRef);
-        String pageSufix = "R";
-
-        boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentRef);
-
-        SpaceReference spaceReference = doc.getDocumentReference().getLastSpaceReference();
-        spaceReference.replaceParent(spaceReference.getWikiReference(), this.context.getWikiReference());
-
-        if (hasRatingsSpaceForeachSpace) {
-            spaceReference = new SpaceReference(spaceReference.getName() + ratingsSpace, spaceReference.getParent());
-            String uniqueName = getUniquePageName(ratingsSpace, doc.getName(), pageSufix, true);
-
-            return new DocumentReference(uniqueName, spaceReference);
-        } else if (ratingsSpace == null) {
-            String uniqueName = getUniquePageName(doc.getSpace(), doc.getName() + pageSufix, "", true);
-
-            return new DocumentReference(uniqueName, spaceReference);
-        } else {
-            String uniqueName = getUniquePageName(ratingsSpace, doc.getSpace() + "_" + doc.getName(), pageSufix, true);
-
-            return new DocumentReference(context.getWikiId(), ratingsSpace, uniqueName);
-        }
-    }
-
-    /**
-     * Gets a unique page name.
-     * 
-     * @param spaceReference the reference of the space in which the document should be
-     * @param name the name of the document
-     * @param postfix post fix to add to the document name
-     * @param forcepostfix force post fix or not
-     * @return the unique document name
-     */
-    private String getUniquePageName(String spaceReference, String name, String postfix, boolean forcepostfix)
-    {
-        String pageName = context.getWiki().clearName(name, context);
-        if (forcepostfix || context.getWiki().exists(spaceReference + '.' + pageName, context)) {
-            int i = 1;
-            while (context.getWiki().exists(spaceReference + '.' + pageName + postfix + i, context)) {
-                i++;
-            }
-            return pageName + postfix + i;
-        }
-        return pageName;
-    }
-
-    /**
      * Adds a new document in which to store ratings.
      * 
      * @param documentRef reference to the document with which the rating is associated
@@ -296,7 +245,7 @@ public class SeparatePageRating implements Rating
         throws RatingsException
     {
         try {
-            DocumentReference pageRef = getPageReference(documentRef);
+            DocumentReference pageRef = this.ratingsManager.getRatingDocumentReference(documentRef);
             String parentDocName = ratingsManager.entityReferenceSerializer.serialize(documentRef);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(pageRef, context);
@@ -342,5 +291,37 @@ public class SeparatePageRating implements Rating
     public DocumentReference getDocumentReference()
     {
         return this.documentRef;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SeparatePageRating that = (SeparatePageRating) o;
+
+        return new EqualsBuilder()
+            .append(documentRef, that.documentRef)
+            .append(document, that.document)
+            .append(context, that.context)
+            .append(ratingsManager, that.ratingsManager)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(documentRef)
+            .append(document)
+            .append(context)
+            .append(ratingsManager)
+            .toHashCode();
     }
 }

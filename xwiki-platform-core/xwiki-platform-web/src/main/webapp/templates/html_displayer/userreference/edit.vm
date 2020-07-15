@@ -17,7 +17,8 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#userPicker_import
-#set ($discard = $displayer.parameters.put('class', "$!displayer.parameters.get('class') suggest-users"))
-#set ($discard = $displayer.parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
-#template('html_displayer/default.vm')
+#set ($parameters = {})
+#set ($discard = $parameters.putAll($displayer.parameters))
+#set ($parameters.value = $displayer.value)
+#set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
+#userPicker(false $parameters)

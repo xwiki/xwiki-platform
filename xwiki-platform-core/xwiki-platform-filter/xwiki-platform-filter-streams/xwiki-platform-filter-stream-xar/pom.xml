@@ -25,15 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-streams</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-stream-xar</artifactId>
   <name>XWiki Platform - Filter - XAR</name>
   <description>Filter stream extension to read and write XAR packages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
-
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filter XAR module</xwiki.extension.name>
   </properties>

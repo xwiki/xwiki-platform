@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-provision-plugin</artifactId>
   <name>XWiki Platform - Tools - Provision</name>
@@ -35,7 +35,6 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>50</xwiki.pitest.mutationThreshold>
     <!-- Allow Maven plugins to output to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

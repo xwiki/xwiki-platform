@@ -19,38 +19,20 @@
  */
 package org.xwiki.refactoring.script;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.job.api.AbstractCheckRightsRequest;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
-import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Factory dedicated to the creation of the requests.
@@ -58,50 +40,9 @@ import org.xwiki.wiki.manager.WikiManagerException;
  * @version $Id$
  * @since 10.11RC1
  */
-@Component(roles = RequestFactory.class)
-@Singleton
-public class RequestFactory
+@Role
+public interface RequestFactory
 {
-    @Inject
-    private Logger logger;
-    
-    /**
-     * Needed for getting the current user reference.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    /**
-     * @param type the type of refactoring
-     * @return an id for a job to perform the specified type of refactoring
-     */
-    private List<String> generateJobId(String type)
-    {
-        String suffix = new Date().getTime() + "-" + ThreadLocalRandom.current().nextInt(100, 1000);
-        return getJobId(type, suffix);
-    }
-
-    /**
-     * @param type the type of refactoring
-     * @param suffix uniquely identifies the job among those of the specified type
-     * @return an id for a job to perform the specified type of refactoring
-     */
-    private List<String> getJobId(String type, String suffix)
-    {
-        return Arrays
-            .asList(RefactoringJobs.GROUP, StringUtils.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
-    }
-
-    protected void setRightsProperties(AbstractCheckRightsRequest request)
-    {
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
-        request.setAuthorReference(this.documentAccessBridge.getCurrentAuthorReference());
-    }
-
     /**
      * Creates a request to move the specified source entities to the specified destination entity (which becomes their
      * new parent).
@@ -110,10 +51,7 @@ public class RequestFactory
      * @param destination specifies the place where to move the entities (their new parent entity)
      * @return the move request
      */
-    public MoveRequest createMoveRequest(Collection<EntityReference> sources, EntityReference destination)
-    {
-        return createMoveRequest(RefactoringJobs.MOVE, sources, destination);
-    }
+    MoveRequest createMoveRequest(Collection<EntityReference> sources, EntityReference destination);
 
     /**
      * Creates a request to move the specified source entity to the specified destination entity (which becomes its new
@@ -123,10 +61,7 @@ public class RequestFactory
      * @param destination specifies the place where to move the source entity (its new parent entity)
      * @return the move request
      */
-    public MoveRequest createMoveRequest(EntityReference source, EntityReference destination)
-    {
-        return createMoveRequest(Arrays.asList(source), destination);
-    }
+    MoveRequest createMoveRequest(EntityReference source, EntityReference destination);
 
     /**
      * Creates a request to rename the entity specified by the given old reference.
@@ -135,10 +70,7 @@ public class RequestFactory
      * @param newReference the new entity reference after the rename
      * @return the rename request
      */
-    public MoveRequest createRenameRequest(EntityReference oldReference, EntityReference newReference)
-    {
-        return createMoveRequest(RefactoringJobs.RENAME, Collections.singletonList(oldReference), newReference);
-    }
+    MoveRequest createRenameRequest(EntityReference oldReference, EntityReference newReference);
 
     /**
      * Creates a request to rename the specified entity.
@@ -147,10 +79,7 @@ public class RequestFactory
      * @param newName the new entity name
      * @return the rename request
      */
-    public MoveRequest createRenameRequest(EntityReference reference, String newName)
-    {
-        return createRenameRequest(reference, new EntityReference(newName, reference.getType(), reference.getParent()));
-    }
+    MoveRequest createRenameRequest(EntityReference reference, String newName);
 
     /**
      * Creates a request to copy the specified source entities to the specified destination entity.
@@ -159,23 +88,7 @@ public class RequestFactory
      * @param destination specifies the place where to copy the entities (becomes the parent of the copies)
      * @return the copy request
      */
-    public CopyRequest createCopyRequest(Collection<EntityReference> sources, EntityReference destination)
-    {
-        CopyRequest request = new CopyRequest();
-        this.initEntityRequest(request, RefactoringJobs.COPY, sources);
-
-        EntityReference dest;
-
-        // in case of a simple copy request, we only want it to be placed under the given destination document.
-        if (destination.getType().equals(EntityType.DOCUMENT)) {
-            DocumentReference documentReference = new DocumentReference(destination);
-            dest = documentReference.getLastSpaceReference();
-        } else {
-            dest = destination;
-        }
-        request.setDestination(dest);
-        return request;
-    }
+    CopyRequest createCopyRequest(Collection<EntityReference> sources, EntityReference destination);
 
     /**
      * Creates a request to copy the specified source entity to the specified destination entity.
@@ -184,10 +97,7 @@ public class RequestFactory
      * @param destination specifies the place where to copy the source entity (becomes the parent of the copy)
      * @return the copy request
      */
-    public CopyRequest createCopyRequest(EntityReference source, EntityReference destination)
-    {
-        return createCopyRequest(Arrays.asList(source), destination);
-    }
+    CopyRequest createCopyRequest(EntityReference source, EntityReference destination);
 
     /**
      * Creates a request to copy the specified entity with a different reference.
@@ -196,13 +106,7 @@ public class RequestFactory
      * @param copyReference the reference to use for the copy
      * @return the copy-as request
      */
-    public CopyRequest createCopyAsRequest(EntityReference sourceReference, EntityReference copyReference)
-    {
-        CopyRequest request = new CopyRequest();
-        this.initEntityRequest(request, RefactoringJobs.COPY_AS, Arrays.asList(sourceReference));
-        request.setDestination(copyReference);
-        return request;
-    }
+    CopyRequest createCopyAsRequest(EntityReference sourceReference, EntityReference copyReference);
 
     /**
      * Creates a request to copy the specified entity with a different name.
@@ -211,11 +115,7 @@ public class RequestFactory
      * @param copyName the name of the entity copy
      * @return the copy-as request
      */
-    public CopyRequest createCopyAsRequest(EntityReference reference, String copyName)
-    {
-        EntityReference copyReference = new EntityReference(copyName, reference.getType(), reference.getParent());
-        return createCopyAsRequest(reference, copyReference);
-    }
+    CopyRequest createCopyAsRequest(EntityReference reference, String copyName);
 
     /**
      * Creates a request to delete the specified entities.
@@ -223,12 +123,7 @@ public class RequestFactory
      * @param entityReferences the entities to delete
      * @return the delete request
      */
-    public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences)
-    {
-        EntityRequest request = new EntityRequest();
-        initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
-        return request;
-    }
+    EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences);
 
     /**
      * Creates a request to create the specified entities.
@@ -237,34 +132,7 @@ public class RequestFactory
      * @return the create request
      * @since 7.4M2
      */
-    public CreateRequest createCreateRequest(Collection<EntityReference> entityReferences)
-    {
-        CreateRequest request = new CreateRequest();
-        initEntityRequest(request, RefactoringJobs.CREATE, entityReferences);
-        // Set deep create by default, to copy (if possible) any existing hierarchy of a specified template document.
-        // TODO: expose this in the create UI to advanced users to allow them to opt-out?
-        request.setDeep(true);
-        return request;
-    }
-
-    private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
-    {
-        request.setId(generateJobId(type));
-        request.setJobType(type);
-        request.setEntityReferences(entityReferences);
-        setRightsProperties(request);
-    }
-
-    private MoveRequest createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
-    {
-        MoveRequest request = new MoveRequest();
-        initEntityRequest(request, type, sources);
-        request.setDestination(destination);
-        request.setUpdateLinks(true);
-        request.setAutoRedirect(true);
-        request.setUpdateParentField(true);
-        return request;
-    }
+    CreateRequest createCreateRequest(Collection<EntityReference> entityReferences);
 
     /**
      * Creates a request to permanently delete a specified batch of deleted documents from the recycle bin.
@@ -273,12 +141,7 @@ public class RequestFactory
      * @return the permanently delete request
      * @since 10.10RC1
      */
-    public PermanentlyDeleteRequest createPermanentlyDeleteRequest(String batchId)
-    {
-        PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
-        request.setBatchId(batchId);
-        return request;
-    }
+    PermanentlyDeleteRequest createPermanentlyDeleteRequest(String batchId);
 
     /**
      * Creates a request to permanently delete a specified list of deleted documents from the recycle bin.
@@ -287,24 +150,7 @@ public class RequestFactory
      * @return the permanently delete request
      * @since 10.10RC1
      */
-    public PermanentlyDeleteRequest createPermanentlyDeleteRequest(List<Long> deletedDocumentIds)
-    {
-        PermanentlyDeleteRequest request = initializePermanentlyDeleteRequest();
-        request.setDeletedDocumentIds(deletedDocumentIds);
-        return request;
-    }
-
-    private PermanentlyDeleteRequest initializePermanentlyDeleteRequest()
-    {
-        PermanentlyDeleteRequest request = new PermanentlyDeleteRequest();
-
-        request.setId(generateJobId(RefactoringJobs.PERMANENTLY_DELETE));
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
-        request.setWikiReference(getCurrentWikiReference());
-
-        return request;
-    }
+    PermanentlyDeleteRequest createPermanentlyDeleteRequest(List<Long> deletedDocumentIds);
 
     /**
      * Creates a request to restore a specified batch of deleted documents from the recycle bin.
@@ -313,12 +159,7 @@ public class RequestFactory
      * @return the restore request
      * @since 9.4RC1
      */
-    public RestoreRequest createRestoreRequest(String batchId)
-    {
-        RestoreRequest request = initializeRestoreRequest();
-        request.setBatchId(batchId);
-        return request;
-    }
+    RestoreRequest createRestoreRequest(String batchId);
 
     /**
      * Creates a request to restore a specified list of deleted documents from the recycle bin.
@@ -327,30 +168,7 @@ public class RequestFactory
      * @return the restore request
      * @since 9.4RC1
      */
-    public RestoreRequest createRestoreRequest(List<Long> deletedDocumentIds)
-    {
-        RestoreRequest request = initializeRestoreRequest();
-        request.setDeletedDocumentIds(deletedDocumentIds);
-        return request;
-    }
-
-    private RestoreRequest initializeRestoreRequest()
-    {
-        RestoreRequest request = new RestoreRequest();
-
-        request.setId(generateJobId(RefactoringJobs.RESTORE));
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
-        request.setWikiReference(getCurrentWikiReference());
-
-        return request;
-    }
-
-    private WikiReference getCurrentWikiReference()
-    {
-        String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
-        return currentWikiId != null ? new WikiReference(currentWikiId) : null;
-    }
+    RestoreRequest createRestoreRequest(List<Long> deletedDocumentIds);
 
     /**
      * Creates a request to replace the occurrences of the old user reference with the new user reference.
@@ -361,42 +179,5 @@ public class RequestFactory
      * @since 11.8RC1
      */
     @Unstable
-    public ReplaceUserRequest createReplaceUserRequest(DocumentReference oldUserReference,
-        DocumentReference newUserReference)
-    {
-        ReplaceUserRequest request = new ReplaceUserRequest();
-        request.setId(generateJobId(RefactoringJobs.REPLACE_USER));
-        request.setOldUserReference(oldUserReference);
-        request.setNewUserReference(newUserReference);
-        setRightsProperties(request);
-
-        Collection<String> targetWikis = null;
-        if (oldUserReference != null) {
-            targetWikis = getReplaceUserTargetWikis(oldUserReference);
-        } else if (newUserReference != null) {
-            targetWikis = getReplaceUserTargetWikis(newUserReference);
-        }
-        if (targetWikis != null) {
-            request.setEntityReferences(targetWikis.stream().map(WikiReference::new).collect(Collectors.toSet()));
-        }
-
-        return request;
-    }
-
-    private Collection<String> getReplaceUserTargetWikis(DocumentReference userReference)
-    {
-        if (userReference.getWikiReference().getName().equals(this.wikiDescriptorManager.getMainWikiId())) {
-            // Global user, replace globally.
-            try {
-                return this.wikiDescriptorManager.getAllIds();
-            } catch (WikiManagerException e) {
-                this.logger.warn("Failed to get the list of wikis. Root cause is [{}].",
-                    ExceptionUtils.getRootCauseMessage(e));
-                return Collections.emptySet();
-            }
-        } else {
-            // Local user, replace locally.
-            return Collections.singleton(userReference.getWikiReference().getName());
-        }
-    }
+    ReplaceUserRequest createReplaceUserRequest(DocumentReference oldUserReference, DocumentReference newUserReference);
 }

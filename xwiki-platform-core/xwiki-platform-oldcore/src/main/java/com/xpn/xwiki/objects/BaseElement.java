@@ -58,7 +58,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 {
     private static final long serialVersionUID = 1L;
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseObject.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
 
     /**
      * Full reference of this element.

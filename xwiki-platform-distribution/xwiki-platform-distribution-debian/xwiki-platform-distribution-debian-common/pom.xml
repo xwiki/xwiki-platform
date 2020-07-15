@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>${project.version}</version>
+      <version>${debian.platform.version}</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -60,6 +60,12 @@
       <groupId>${pgsql.groupId}</groupId>
       <artifactId>${pgsql.artifactId}</artifactId>
       <version>${pgsql.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${mariadb.groupId}</groupId>
+      <artifactId>${mariadb.artifactId}</artifactId>
+      <version>${mariadb.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -94,7 +100,7 @@
                   <artifactItem>
                     <groupId>org.xwiki.platform</groupId>
                     <artifactId>xwiki-platform-distribution-war</artifactId>
-                    <version>${project.version}</version>
+                    <version>${debian.platform.version}</version>
                     <type>war</type>
                   </artifactItem>
                 </artifactItems>
@@ -132,6 +138,24 @@
                     <groupId>${pgsql.groupId}</groupId>
                     <artifactId>${pgsql.artifactId}</artifactId>
                     <version>${pgsql.version}</version>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Copy MariaDB JDBC connector -->
+            <execution>
+              <id>copy-mariadb</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${mariadb.groupId}</groupId>
+                    <artifactId>${mariadb.artifactId}</artifactId>
+                    <version>${mariadb.version}</version>
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>

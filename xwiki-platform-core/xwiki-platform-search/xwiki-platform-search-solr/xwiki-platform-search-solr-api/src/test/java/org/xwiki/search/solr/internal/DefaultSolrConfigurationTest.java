@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -96,5 +97,33 @@ public class DefaultSolrConfigurationTest
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT)).thenReturn(false);
 
         assertFalse(this.configuration.synchronizeAtStartup());
+    }
+
+    @Test
+    public void synchronizeAtStartupMode()
+    {
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("farm");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("FARM");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("foobar");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("wiki");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.WIKI, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("WIKI");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.WIKI, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
     }
 }

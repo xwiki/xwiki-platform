@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-api</artifactId>
   <name>XWiki Platform - Notifications - API</name>
   <description>Handle notifications</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications API</xwiki.extension.name>
   </properties>

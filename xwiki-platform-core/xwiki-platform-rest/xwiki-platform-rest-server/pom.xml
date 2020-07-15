@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -33,8 +33,7 @@
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -56,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -221,6 +220,34 @@
                 org/xwiki/rest/internal/resources/search/SearchSource.java,
                 org/xwiki/rest/internal/resources/wikis/WikiPagesResourceImpl.java
               </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude javax.ws.rs.core.Application & org.restlet.ext.jaxrs.ObjectFactory since we use an
+                           Inject on them. These are special cases when we don't inject on an interface with a @Role
+                           and there's no way for the Spoon checker to find out about this, since only the Component
+                           Manager knows what has been registered in it. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["javax.ws.rs.core.Application", "org.restlet.ext.jaxrs.ObjectFactory"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
             </configuration>
           </execution>
         </executions>

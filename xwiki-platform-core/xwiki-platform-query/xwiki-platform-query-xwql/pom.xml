@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-xwql</artifactId>
   <name>XWiki Platform - Query - XWQL</name>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>92</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

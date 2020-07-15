@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
@@ -90,6 +91,9 @@ public class RefactoringScriptService implements ScriptService
 
     @Inject
     private RequestFactory requestFactory;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @return the standard request factory for creating the different refactoring requests.
@@ -391,7 +395,9 @@ public class RefactoringScriptService implements ScriptService
 
         // Make sure that only the PR users can change the rights and context properties from the request.
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
-            getRequestFactory().setRightsProperties(request);
+            request.setCheckRights(true);
+            request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+            request.setAuthorReference(this.documentAccessBridge.getCurrentAuthorReference());
         }
 
         try {

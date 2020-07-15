@@ -166,13 +166,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import org.xwiki.store.merge.MergeManagerResult;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
-import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
@@ -280,13 +278,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile(
         "</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
-
-    /**
-     * Format for passing xproperties references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;} (e.g.
-     * {@code XWiki.XWikiRights_0_member}).
-     */
-    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("(.+?)_([0-9]+)_(.+)");
 
     public static final EntityReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiComments");
 
@@ -3914,91 +3905,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Generate a map from the request parameters of the form '<spacename>.<classname>_<number>_<propertyname>' Keys of
-     * this map will be the reference '<spacename>.<classname>' to the Class (for example, 'XWiki.XWikiRights'), the
-     * content is a list where each element describe property for the object <number>. Element of the list is a map
-     * where key is <propertyname> and content is the array of corresponding values. Example with a list of HTTP
-     * parameters:
-     * <ul>
-     * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
-     * <li>XWiki.XWikiRights_0_users=XWiki.Me</li>
-     * <li>XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup</li>
-     * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
-     * <li>XWiki.XWikiUsers_1_name=Spirou</li>
-     * </ul>
-     * will result in the following map <code><pre>
-     * {
-     *   "XWiki.XWikiRights": {
-     *     "0": {
-     *       "users": ["XWiki.Admin", "XWiki.Me"],
-     *       "groups": ["XWiki.XWikiAllGroup"]
-     *     },
-     *     "1": {
-     *       "users": ["XWiki.Admin"]
-     *     }
-     *   ],
-     *   "XWiki.XWikiUsers":
-     *     "1": {
-     *       "name": ["Spirou"]
-     *     }
-     *   ]
-     * }
-     * </pre></code>
-     *
-     * @param request is the input HTTP request that provides the parameters
-     * @param context
-     * @return a map containing ordered data
-     */
-    private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(
-        XWikiRequest request, XWikiContext context)
-    {
-        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
-        @SuppressWarnings("unchecked")
-        Map<String, String[]> allParameters = request.getParameterMap();
-        for (Entry<String, String[]> parameter : allParameters.entrySet()) {
-            Matcher matcher = XPROPERTY_REFERENCE_PATTERN.matcher(parameter.getKey());
-            if (matcher.matches() == false) {
-                continue;
-            }
-            Integer classNumber;
-            String className = matcher.group(1);
-            String classNumberAsString = matcher.group(2);
-            String classPropertyName = matcher.group(3);
-            DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
-            try {
-                BaseClass xClass = context.getWiki().getDocument(classReference, context).getXClass();
-                if (xClass.getPropertyList().contains(classPropertyName) == false) {
-                    continue;
-                }
-                classNumber = Integer.parseInt(classNumberAsString);
-            } catch (XWikiException e) {
-                // If the class page cannot be found, skip the property update
-                LOGGER.warn("Failed to load document [{}], ignoring property update [{}]. Reason: [{}]", classReference,
-                    parameter.getKey(), ExceptionUtils.getRootCauseMessage(e));
-                continue;
-            } catch (NumberFormatException e) {
-                // If the numner isn't valid, skip the property update
-                LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
-                    parameter.getKey());
-                continue;
-            }
-            SortedMap<Integer, Map<String, String[]>> objectMap = result.get(classReference);
-            if (objectMap == null) {
-                objectMap = new TreeMap<>();
-                result.put(classReference, objectMap);
-            }
-            // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
-            Map<String, String[]> object = objectMap.get(classNumber);
-            if (object == null) {
-                object = new HashMap<>();
-                objectMap.put(classNumber, object);
-            }
-            object.put(classPropertyName, parameter.getValue());
-        }
-        return result;
-    }
-
-    /**
      * Create and/or update objects in a document given a list of HTTP parameters of the form {@code
      * <spacename>.<classname>_<number>_<propertyname>}. If the object already exists, the field is replace by the given
      * value. If the object doesn't exist in the document, it is created then the property {@code <propertyname>} is
@@ -4014,30 +3920,47 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {
-        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> fromRequest =
-            parseRequestUpdateOrCreate(eform.getRequest(), context);
-        for (Entry<DocumentReference, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest
+        Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap = eform.getUpdateOrCreateMap();
+        for (Entry<String, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : updateOrCreateMap
             .entrySet()) {
-            DocumentReference requestClassReference = requestClassEntries.getKey();
+            String className = requestClassEntries.getKey();
+            DocumentReference requestClassReference = getCurrentDocumentReferenceResolver().resolve(className);
+
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
             for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {
                 Integer requestObjectNumber = requestObjectEntry.getKey();
                 Map<String, String[]> requestObjectPropertyMap = requestObjectEntry.getValue();
-                BaseObject oldObject = getXObject(requestClassReference, requestObjectNumber);
-                if (oldObject == null) {
-                    // Create the object only if it has been numbered one more than the number of existing objects
-                    if (requestObjectPropertyMap != null) {
-                        oldObject = newXObject(requestClassReference, context);
-                    } else {
-                        break;
+                List<String> properties = new ArrayList<>(requestObjectPropertyMap.keySet());
+                try {
+                    BaseClass xClass = context.getWiki().getDocument(requestClassReference, context).getXClass();
+
+                    // clean-up the properties that do not belong to the xclass
+                    for (String property : properties) {
+                        if (!xClass.getPropertyList().contains(property)) {
+                            requestObjectPropertyMap.remove(property);
+                        }
                     }
+                } catch (XWikiException e) {
+                    // If the class page cannot be found, skip entirely the property update
+                    LOGGER.warn("Failed to load document [{}], ignoring properties update [{}]. Reason: [{}]",
+                        requestClassReference, StringUtils.join(properties, ","),
+                        ExceptionUtils.getRootCauseMessage(e));
+                    continue;
                 }
-                BaseClass baseClass = oldObject.getXClass(context);
-                BaseObject newObject = (BaseObject) baseClass.fromMap(requestObjectPropertyMap, oldObject);
-                newObject.setNumber(oldObject.getNumber());
-                newObject.setGuid(oldObject.getGuid());
-                newObject.setOwnerDocument(this);
-                setXObject(requestObjectNumber, newObject);
+
+                if (!requestObjectPropertyMap.isEmpty()) {
+                    BaseObject oldObject = getXObject(requestClassReference, requestObjectNumber);
+                    if (oldObject == null) {
+                        // Create the object only if it has been numbered one more than the number of existing objects
+                        oldObject = newXObject(requestClassReference, context);
+                    }
+                    BaseClass baseClass = oldObject.getXClass(context);
+                    BaseObject newObject = (BaseObject) baseClass.fromMap(requestObjectPropertyMap, oldObject);
+                    newObject.setNumber(oldObject.getNumber());
+                    newObject.setGuid(oldObject.getGuid());
+                    newObject.setOwnerDocument(this);
+                    setXObject(requestObjectNumber, newObject);
+                }
             }
         }
     }
@@ -4046,11 +3969,40 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
+
+        // We add the new objects that have been submitted in the form, before filling them with their values.
+        Map<String, List<Integer>> objectsToAdd = eform.getObjectsToAdd();
+        for (String className : objectsToAdd.keySet()) {
+            DocumentReference classReference = resolveClassReference(className);
+            List<Integer> classIds = objectsToAdd.get(className);
+            for (Integer classId : classIds) {
+                BaseObject xObject = getXObject(classReference, classId);
+
+                // we ensure that the object has not been added yet, for example because of the update or create.
+                if (xObject == null) {
+                    newXObject(classReference, context);
+                }
+            }
+        }
+
         ObjectPolicyType objectPolicy = eform.getObjectPolicy();
         if (objectPolicy == null || objectPolicy.equals(ObjectPolicyType.UPDATE)) {
             readObjectsFromForm(eform, context);
         } else if (objectPolicy.equals(ObjectPolicyType.UPDATE_OR_CREATE)) {
             readObjectsFromFormUpdateOrCreate(eform, context);
+        }
+
+        // remove xobjects
+        Map<String, List<Integer>> objectsToRemove = eform.getObjectsToRemove();
+        for (String className : objectsToRemove.keySet()) {
+            DocumentReference classReference = resolveClassReference(className);
+            List<Integer> classIds = objectsToRemove.get(className);
+            for (Integer classId : classIds) {
+                BaseObject xObject = getXObject(classReference, classId);
+                if (xObject != null) {
+                    removeXObject(xObject);
+                }
+            }
         }
     }
 
@@ -4133,9 +4085,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Use the document passed as parameter as the new identity for the current document.
      *
      * @param document the document containing the new identity
-     * @throws XWikiException in case of error
      */
-    private void clone(XWikiDocument document)
+    public void clone(XWikiDocument document)
     {
         this.id = document.id;
 
@@ -4185,7 +4136,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public XWikiDocument clone()
     {
-        return cloneInternal(getDocumentReference(), true);
+        return cloneInternal(getDocumentReference(), true, false);
     }
 
     /**
@@ -4195,10 +4146,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiDocument duplicate(DocumentReference newDocumentReference)
     {
-        return cloneInternal(newDocumentReference, false);
+        return cloneInternal(newDocumentReference, false, false);
     }
 
-    private XWikiDocument cloneInternal(DocumentReference newDocumentReference, boolean keepsIdentity)
+    private void cloneDocumentArchive(XWikiDocument originalDocument) throws XWikiException
+    {
+        XWikiDocumentArchive documentArchive = originalDocument.getDocumentArchive();
+        if (documentArchive != null) {
+            this.setDocumentArchive(documentArchive.clone(this.getId(), getXWikiContext()));
+        }
+    }
+
+    private XWikiDocument cloneInternal(DocumentReference newDocumentReference,
+        boolean keepsIdentity,
+        boolean cloneArchive)
     {
         XWikiDocument doc = null;
 
@@ -4209,7 +4170,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.id = this.id;
-            doc.setDocumentArchive(getDocumentArchive());
+            if (cloneArchive) {
+                doc.cloneDocumentArchive(this);
+            } else {
+                doc.setDocumentArchive(getDocumentArchive());
+            }
             doc.setAuthorReference(getAuthorReference());
             doc.setContentAuthorReference(getContentAuthorReference());
             doc.setContent(getContent());
@@ -6809,25 +6774,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent.
      * <p>
-     * See {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
+     * See {@link #rename(DocumentReference, List, List, XWikiContext)} for more details.
      *
      * @param newDocumentReference the new document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *          {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         rename(newDocumentReference, getBackLinkedReferences(context), context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, XWikiContext context) throws XWikiException
-    {
-        rename(newDocumentName, getBackLinkedPages(context), context);
     }
 
     /**
@@ -6852,21 +6811,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         XWikiContext context) throws XWikiException
     {
         rename(newDocumentReference, backlinkDocumentReferences, getChildrenReferences(context), context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, java.util.List, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
-        throws XWikiException
-    {
-        rename(newDocumentName, backlinkDocumentNames, getChildren(context), context);
     }
 
     /**
@@ -6881,7 +6833,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences, XWikiContext context) throws XWikiException
     {
@@ -6893,147 +6848,27 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (isNew() || getDocumentReference().equals(newDocumentReference)) {
             return;
         }
-
-        // Grab the xwiki object, it gets used a few times.
-        XWiki xwiki = context.getWiki();
-
-        // Step 1: Copy the document and all its translations under a new document with the new reference.
-        xwiki.copyDocument(getDocumentReference(), newDocumentReference, false, context);
-
-        // Step 2: For each child document, update its parent reference.
-        if (childDocumentReferences != null) {
-            for (DocumentReference childDocumentReference : childDocumentReferences) {
-                XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
-                String compactReference = getCompactEntityReferenceSerializer().serialize(newDocumentReference);
-                childDocument.setParent(compactReference);
-                String saveMessage = localizePlainOrKey("core.comment.renameParent", compactReference);
-                childDocument.setAuthorReference(context.getUserReference());
-                xwiki.saveDocument(childDocument, saveMessage, true, context);
-            }
-        }
-
-        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
-        for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
-            XWikiDocument backlinkRootDocument = xwiki.getDocument(backlinkDocumentReference, context);
-
-            // Update default locale instance
-            renameLinks(backlinkRootDocument, getDocumentReference(), newDocumentReference, context);
-
-            // Update translations
-            for (Locale locale : backlinkRootDocument.getTranslationLocales(context)) {
-                XWikiDocument backlinkDocument = backlinkRootDocument.getTranslatedDocument(locale, context);
-
-                renameLinks(backlinkDocument, getDocumentReference(), newDocumentReference, context);
-            }
-        }
-
-        // Get new document
-        XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
-
-        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
-        // document's location.
-        if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
-            // Only support syntax for which a renderer is provided
-
-            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
-
-            DocumentReference oldDocumentReference = getDocumentReference();
-
-            XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
-
-            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
-            // xwiki-platform-refactoring-default
-            boolean modified = false;
-            for (Block block : blocks) {
-                ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
-                if (resourceReference == null) {
-                    // Skip invalid blocks.
-                    continue;
-                }
-
-                ResourceType resourceType = resourceReference.getType();
-
-                // TODO: support ATTACHMENT as well.
-                if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-                    // We are currently only interested in Document or Space references.
-                    continue;
-                }
-
-                // current link, use the old document's reference to fill in blanks.
-                EntityReference oldLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, oldDocumentReference);
-                // new link, use the new document's reference to fill in blanks.
-                EntityReference newLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, newDocumentReference);
-
-                // If the new and old link references don`t match, then we must update the relative link.
-                if (!newLinkReference.equals(oldLinkReference)) {
-                    modified = true;
-
-                    // Serialize the old (original) link relative to the new document's location, in compact form.
-                    String serializedLinkReference =
-                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
-
-                    // Update the reference in the XDOM.
-                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
-                }
-            }
-
-            // Set the new content and save document if needed
-            if (modified) {
-                newDocument.setContent(newDocumentXDOM);
-                newDocument.setAuthorReference(context.getUserReference());
-                xwiki.saveDocument(newDocument, context);
-            }
-        }
-
-        // Step 5: Delete the old document
-        xwiki.deleteDocument(this, context);
-
-        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
-        // invalid XWikiDocument object as it's been deleted...
-        clone(newDocument);
-    }
-
-    /**
-     * Rename links in passed document and save it if needed.
-     */
-    private void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldLink, DocumentReference newLink,
-        XWikiContext context) throws XWikiException
-    {
-        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
-        // xwiki-platform-refactoring-default
-        getOldRendering().renameLinks(backlinkDocument, oldLink, newLink, context);
-
-        // Save if content changed
-        if (backlinkDocument.isContentDirty()) {
-            String saveMessage =
-                localizePlainOrKey("core.comment.renameLink", getCompactEntityReferenceSerializer().serialize(newLink));
-            backlinkDocument.setAuthorReference(context.getUserReference());
-            context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
-        }
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, List, List, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames,
-        XWikiContext context) throws XWikiException
-    {
-        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
-        for (String backlinkDocumentName : backlinkDocumentNames) {
-            backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
-        }
-
-        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
-        for (String childDocumentName : childDocumentNames) {
-            childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
-        }
-
-        rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), backlinkDocumentReferences,
+        context.getWiki().renameByCopyAndDelete(this,
+            newDocumentReference,
+            backlinkDocumentReferences,
             childDocumentReferences, context);
+    }
+
+    /**
+     * Clone a document and change its reference.
+     *
+     * @param newDocumentReference the new reference of the cloned document.
+     * @param context the current context.
+     * @return a clone of the current document with a new reference.
+     * @throws XWikiException in case of problem during the clone operation.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public XWikiDocument cloneRename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+    {
+        loadAttachments(context);
+        loadArchive(context);
+        return this.cloneInternal(newDocumentReference, true, true);
     }
 
     /**
@@ -7045,7 +6880,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         loadAttachments(context);
         loadArchive(context);
 
-        XWikiDocument newdoc = duplicate(newDocumentReference);
+        XWikiDocument newdoc = cloneInternal(newDocumentReference, false, true);
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
@@ -7056,11 +6891,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setOwnerDocument(newdoc);
-
-        XWikiDocumentArchive archive = getDocumentArchive();
-        if (archive != null) {
-            newdoc.setDocumentArchive(archive.clone(newdoc.getId(), context));
-        }
 
         return newdoc;
     }

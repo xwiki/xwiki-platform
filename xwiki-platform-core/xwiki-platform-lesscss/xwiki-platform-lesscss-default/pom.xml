@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-lesscss</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-lesscss-default</artifactId>
   <name>XWiki Platform - LESS CSS - Default</name>
@@ -33,8 +33,7 @@
   <description>Default implementation for XWiki Platform - LESS CSS - Default Implementation</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>87</xwiki.pitest.mutationThreshold>
-     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
      <xwiki.extension.features>
      <!-- only used in 6.2M1 -->
      org.xwiki.platform:xwiki-platform-less-css-default

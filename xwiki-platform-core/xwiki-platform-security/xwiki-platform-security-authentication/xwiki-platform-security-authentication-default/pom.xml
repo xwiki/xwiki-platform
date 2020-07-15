@@ -22,7 +22,7 @@
   <parent>
     <artifactId>xwiki-platform-security-authentication</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,8 +32,7 @@
   <description>XWiki Platform - Security - Authentication - Default contains the default implementations related to authentication</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>51</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

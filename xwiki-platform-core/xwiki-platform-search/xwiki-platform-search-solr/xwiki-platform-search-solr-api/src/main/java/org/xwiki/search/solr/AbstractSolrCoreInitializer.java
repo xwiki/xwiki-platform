@@ -64,6 +64,20 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_3 = 120300000;
 
     /**
+     * The base schema version for XWiki 12.5.
+     * 
+     * @since 12.5RC1
+     */
+    public static final long SCHEMA_VERSION_12_5 = 120500000;
+
+    /**
+     * The base schema version for XWiki 12.6.
+     * 
+     * @since 12.6RC1
+     */
+    public static final long SCHEMA_VERSION_12_6 = 120600000;
+
+    /**
      * The base schema version.
      */
     public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_3;
@@ -113,6 +127,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     protected Map<String, FieldTypeRepresentation> types;
 
+    protected Map<String, Map<String, Object>> fields;
+
     @Override
     public void initialize(SolrClient client) throws SolrException
     {
@@ -148,6 +164,26 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         return this.types;
     }
 
+    protected Map<String, Map<String, Object>> getFields(boolean force) throws SolrException
+    {
+        if (this.fields == null || force) {
+            SchemaResponse.FieldsResponse response;
+            try {
+                response = new SchemaRequest.Fields().process(this.client);
+            } catch (Exception e) {
+                throw new SolrException("Failed to get the list of fields", e);
+            }
+
+            Map<String, Map<String, Object>> map = new HashMap<>(response.getFields().size());
+
+            response.getFields().forEach(e -> map.put((String) e.get(SOLR_FIELD_NAME), e));
+
+            this.fields = map;
+        }
+
+        return this.fields;
+    }
+
     protected void initializeBaseSchema() throws SolrException
     {
         Long xversion = getCurrentXWikiVersion();
@@ -156,6 +192,10 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             // No xversion means it's the old version which only contained the id field and string field type
             // Inspired from _default Solr configset
             // http://github.com/apache/lucene-solr/blob/master/solr/server/solr/configsets/_default/conf/managed-schema
+
+            // Some types and field are part of the initial configuration because they are required for Solr to start or
+            // because they are required for things located in solrconfig.xml which is unfortunately impossible to
+            // update at runtime
 
             //////////
             // TYPES
@@ -175,7 +215,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
             addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
                 true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONG, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
             addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
                 true);
 
@@ -203,11 +242,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             //////////
             // FIELDS
             //////////
-
-            // Used for partial update
-            // docValues are enabled by default for long type so we don't need to index the version field
-            addField("_version_", DefaultSolrUtils.SOLR_TYPE_PLONG, false, SOLR_FIELD_INDEXED, false, SOLR_FIELD_STORED,
-                false);
 
             // Save scheme version
             setCurrentXWikiVersion(true);
@@ -500,6 +534,258 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     }
 
     /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * String (UTF-8 encoded string or Unicode). Strings are intended for small fields and are not tokenized or analyzed
+     * in any way. They have a hard limit of slightly less than 32K.
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setStringField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_STRINGS : DefaultSolrUtils.SOLR_TYPE_STRING, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Contains either true or false. Values of "1", "t", or "T" in the first character are interpreted as true. Any
+     * other values in the first character are interpreted as false.
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setBooleanField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_BOOLEANS : DefaultSolrUtils.SOLR_TYPE_BOOLEAN, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Integer field (32-bit signed integer).
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setPIntField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PINTS : DefaultSolrUtils.SOLR_TYPE_PINT, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Floating point field (32-bit IEEE floating point).
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setPFloatField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PFLOATS : DefaultSolrUtils.SOLR_TYPE_PFLOAT, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Long field (64-bit signed integer).
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setPLongField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PLONGS : DefaultSolrUtils.SOLR_TYPE_PLONG, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Double field (64-bit IEEE floating point).
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setPDoubleField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDOUBLES : DefaultSolrUtils.SOLR_TYPE_PDOUBLE, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Date field. Represents a point in time with millisecond precision.
+     * 
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setPDateField(String name, boolean multiValued, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDATES : DefaultSolrUtils.SOLR_TYPE_PDATE, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Binary data.
+     * 
+     * @param name the name of the field to set
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setBinaryField(String name, boolean dynamic, Object... attributes) throws SolrException
+    {
+        setField(name, DefaultSolrUtils.SOLR_TYPE_BINARY, dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Map data.
+     * 
+     * @param name the name of the field to set
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 12.5RC1
+     */
+    protected void setMapField(String name, Object... attributes) throws SolrException
+    {
+        setStringField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_STRING), false, true,
+            attributes);
+        setStringField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_STRINGS), true, true,
+            attributes);
+        setBooleanField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BOOLEAN), false, true,
+            attributes);
+        setBooleanField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BOOLEANS), true, true,
+            attributes);
+        setPIntField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PINT), false, true,
+            attributes);
+        setPIntField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PINTS), true, true,
+            attributes);
+        setPFloatField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PFLOAT), false, true,
+            attributes);
+        setPFloatField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PFLOATS), true, true,
+            attributes);
+        setPLongField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PLONG), false, true,
+            attributes);
+        setPLongField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PLONGS), true, true,
+            attributes);
+        setPDoubleField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDOUBLE), false, true,
+            attributes);
+        setPDoubleField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDOUBLES), true, true,
+            attributes);
+        setPDateField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDATE), false, true,
+            attributes);
+        setPDateField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDATES), true, true,
+            attributes);
+        setBinaryField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BINARY), true,
+            attributes);
+
+        // TODO: storage of unsupported types
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * 
+     * @param name the name of the field to set
+     * @param type the type of the field to set
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to add the field
+     * @since 12.5RC1
+     */
+    protected void setField(String name, String type, boolean dynamic, Object... attributes) throws SolrException
+    {
+        Map<String, Object> fieldAttributes = new HashMap<>();
+        fieldAttributes.put(SOLR_FIELD_NAME, name);
+        fieldAttributes.put(FieldType.TYPE, type);
+
+        MapUtils.putAll(fieldAttributes, attributes);
+
+        setField(fieldAttributes, dynamic);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * 
+     * @param fieldAttributes the attributes of the field to add
+     * @param dynamic true to create a dynamic field
+     * @throws SolrException when failing to add the field
+     * @since 12.5RC1
+     */
+    protected void setField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
+    {
+        String name = (String) fieldAttributes.get(SOLR_FIELD_NAME);
+
+        try {
+            if (getFields(false).containsKey(name)) {
+                if (dynamic) {
+                    new SchemaRequest.ReplaceDynamicField(fieldAttributes).process(this.client);
+                } else {
+                    new SchemaRequest.ReplaceField(fieldAttributes).process(this.client);
+                }
+            } else {
+                if (dynamic) {
+                    new SchemaRequest.AddDynamicField(fieldAttributes).process(this.client);
+                } else {
+                    new SchemaRequest.AddField(fieldAttributes).process(this.client);
+                }
+            }
+
+            // Add it to the cache
+            this.fields.put(name, fieldAttributes);
+        } catch (Exception e) {
+            throw new SolrException("Failed to set a field in the Solr core", e);
+        }
+    }
+
+    /**
      * Add a field type in the Solr schema.
      * 
      * @param name the name of the field type
@@ -513,7 +799,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     }
 
     /**
-     * Add a field type in the Solr schema.
+     * Replace a field type in the Solr schema.
      * 
      * @param name the name of the field type
      * @param solrClass the class of the field type
@@ -564,12 +850,14 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             } else {
                 new SchemaRequest.ReplaceFieldType(definition).process(this.client);
             }
+
+            // Add it to the cache
+            FieldTypeRepresentation representation = new FieldTypeRepresentation();
+            representation.setAttributes(attributes);
+            this.types.put((String) definition.getAttributes().get(FieldType.TYPE_NAME), representation);
         } catch (Exception e) {
             throw new SolrException("Failed to add a field type in the Solr core", e);
         }
-
-        // Reset the cache
-        this.types = null;
     }
 
     /**
@@ -584,5 +872,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         } catch (Exception e) {
             throw new SolrException("Failed to commit", e);
         }
+
+        // Reset the cache
+        this.types = null;
+        this.fields = null;
     }
 }

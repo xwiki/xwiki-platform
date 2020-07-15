@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model-validation</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-api</artifactId>
   <name>XWiki Platform - Name Strategies - API</name>
@@ -31,8 +31,7 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

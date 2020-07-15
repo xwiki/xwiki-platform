@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-configuration</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-configuration-default</artifactId>
   <name>XWiki Platform - Configuration - Default</name>
@@ -33,7 +33,6 @@
   <description>XWiki Platform - Configuration - Default</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>78</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -47,6 +46,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

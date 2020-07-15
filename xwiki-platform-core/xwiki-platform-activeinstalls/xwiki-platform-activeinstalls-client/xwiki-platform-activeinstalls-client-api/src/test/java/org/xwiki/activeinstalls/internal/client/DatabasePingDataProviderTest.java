@@ -22,18 +22,19 @@ package org.xwiki.activeinstalls.internal.client;
 import java.sql.DatabaseMetaData;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.client.data.DatabasePingDataProvider;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,16 +44,19 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
-public class DatabasePingDataProviderTest
+@ComponentTest
+class DatabasePingDataProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DatabasePingDataProvider> mocker =
-        new MockitoComponentMockingRule<>(DatabasePingDataProvider.class);
+    @InjectMockComponents
+    private DatabasePingDataProvider pingDataProvider;
+
+    @MockComponent
+    private Execution execution;
 
     @Test
-    public void provideMapping() throws Exception
+    void provideMapping()
     {
-        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        Map<String, Object> mapping = this.pingDataProvider.provideMapping();
         assertEquals(2, mapping.size());
 
         Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("dbName");
@@ -67,11 +71,10 @@ public class DatabasePingDataProviderTest
     }
 
     @Test
-    public void provideData() throws Exception
+    void provideData() throws Exception
     {
-        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
         XWikiContext xwikiContext = mock(XWikiContext.class);
         when(executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xwikiContext);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
@@ -85,7 +88,7 @@ public class DatabasePingDataProviderTest
         when(databaseMetaData.getDatabaseProductName()).thenReturn("HSQL Database Engine");
         when(databaseMetaData.getDatabaseProductVersion()).thenReturn("2.2.9");
 
-        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        Map<String, Object> data = this.pingDataProvider.provideData();
         assertEquals(2, data.size());
         assertEquals("HSQL Database Engine", data.get("dbName"));
         assertEquals("2.2.9", data.get("dbVersion"));

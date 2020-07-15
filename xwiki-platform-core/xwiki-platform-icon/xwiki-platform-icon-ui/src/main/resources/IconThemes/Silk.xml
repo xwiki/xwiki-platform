@@ -193,6 +193,8 @@ log-in=user_go
 log-out=user_go
 th=application_view_tile
 translate=page_white_world
+minus-square = bullet_toggle_minus
+plus-square = bullet_toggle_plus
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

@@ -122,9 +122,10 @@
       <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.MessageStream = Class.create({
-  initialize : function() {
-    this.prepareForms();
-    this.enhanceSelect();
+  initialize : function(container) {
+    container = container || $(document.body);
+    this.prepareForms(container);
+    this.enhanceSelect(container);
   },
   prepareTargetInput : function(event, element) {
     var targetType = element.options[element.selectedIndex].value;
@@ -151,14 +152,14 @@ XWiki.MessageStream = Class.create({
       }
     });
   },
-  enhanceSelect: function () {
-    $$('.messagestream select[name="visibilityLevel"]').each(function(element) {
+  enhanceSelect: function (container) {
+    container.select('.messagestream select[name="visibilityLevel"]').each(function(element) {
       element.observe('change', this.prepareTargetInput.bindAsEventListener(this, element));
       this.prepareTargetInput(null, element);
     }.bind(this));
   },
-  prepareForms: function() {
-    $$('.messagestream form').each(function(msForm) {
+  prepareForms: function(container) {
+    container.select('.messagestream form').each(function(msForm) {
       msForm.action = msForm.action.replace(/xredirect=.*$/, 'xpage=plain')
       msForm.observe('submit', function(event) {
         event.stop();
@@ -214,10 +215,20 @@ XWiki.MessageStream = Class.create({
   }
 });
 
-var init = function() {
-  return new XWiki.MessageStream();
+var init = function (event) {
+  var elements = (event &amp;&amp; event.memo.elements) || [$(document.body)];
+  elements.forEach(function(container) {
+    new XWiki.MessageStream(container);
+  });
+  return true;
 };
-(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// Initialize the message sender macro when the page is loaded.
+(XWiki.domIsLoaded &amp;&amp; init())
+|| document.observe('xwiki:dom:loaded', init);
+
+// Initialize the message sender macro when it is added after the page is loaded.
+document.observe('xwiki:dom:updated', init);
 
 // End XWiki augmentation.
 return XWiki;

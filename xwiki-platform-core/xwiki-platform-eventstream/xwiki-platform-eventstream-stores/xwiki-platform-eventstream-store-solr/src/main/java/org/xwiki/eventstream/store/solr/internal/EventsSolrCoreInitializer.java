@@ -19,10 +19,6 @@
  */
 package org.xwiki.eventstream.store.solr.internal;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -63,51 +59,72 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     public static final String SOLR_FIELD_UNREADLISTENERS = "unreadListeners";
 
     /**
-     * The known fields.
+     * The name of the field containing the list of users who should get this event by mail.
+     * 
+     * @since 12.6RC1
      */
-    public static final Set<String> KNOWN_FIELDS = new HashSet<>(
-        Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID, Event.FIELD_DATE, Event.FIELD_IMPORTANCE, Event.FIELD_TITLE,
-            Event.FIELD_BODY, Event.FIELD_APPLICATION, Event.FIELD_STREAM, Event.FIELD_TYPE, Event.FIELD_WIKI,
-            Event.FIELD_SPACE, Event.FIELD_DOCUMENT, Event.FIELD_DOCUMENTVERSION, Event.FIELD_RELATEDENTITY,
-            Event.FIELD_USER, Event.FIELD_URL, Event.FIELD_DOCUMENTTITLE, Event.FIELD_TARGET, Event.FIELD_HIDDEN));
+    public static final String SOLR_FIELD_MAILLISTENERS = "mailListeners";
+
+    /**
+     * The name of the field containing the different variation of space reference.
+     * 
+     * @since 12.5RC1
+     */
+    public static final String FIELD_SPACE_INDEX = "space_index";
+
+    /**
+     * The name of the field containing the different variations of document reference.
+     * 
+     * @since 12.5RC1
+     */
+    public static final String FIELD_DOCUMENT_INDEX = "document_index";
 
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_3;
+        return SCHEMA_VERSION_12_6;
     }
 
     @Override
     protected void createSchema() throws SolrException
     {
-        addStringField(Event.FIELD_GROUPID, false, false);
-        addPDateField(Event.FIELD_DATE, false, false);
-        addStringField(Event.FIELD_IMPORTANCE, false, false);
-        addStringField(Event.FIELD_TITLE, false, false);
-        addStringField(Event.FIELD_BODY, false, false);
-        addStringField(Event.FIELD_APPLICATION, false, false);
-        addStringField(Event.FIELD_STREAM, false, false);
-        addStringField(Event.FIELD_TYPE, false, false);
-        addStringField(Event.FIELD_WIKI, false, false);
-        addStringField(Event.FIELD_SPACE, false, false);
-        addStringField(Event.FIELD_DOCUMENT, false, false);
-        addStringField(Event.FIELD_DOCUMENTVERSION, false, false);
-        addStringField(Event.FIELD_RELATEDENTITY, false, false);
-        addStringField(Event.FIELD_USER, false, false);
-        addStringField(Event.FIELD_URL, false, false);
-        addStringField(Event.FIELD_DOCUMENTTITLE, false, false);
-        addStringField(Event.FIELD_TARGET, true, false);
-        addBooleanField(Event.FIELD_HIDDEN, false, false);
+        setStringField(Event.FIELD_GROUPID, false, false);
+        setPDateField(Event.FIELD_DATE, false, false);
+        setStringField(Event.FIELD_IMPORTANCE, false, false);
+        setStringField(Event.FIELD_TITLE, false, false);
+        setStringField(Event.FIELD_BODY, false, false);
+        setStringField(Event.FIELD_APPLICATION, false, false);
+        setStringField(Event.FIELD_STREAM, false, false);
+        setStringField(Event.FIELD_TYPE, false, false);
+        setStringField(Event.FIELD_WIKI, false, false);
+        setStringField(Event.FIELD_SPACE, false, false);
+        setStringField(Event.FIELD_DOCUMENT, false, false);
+        setStringField(Event.FIELD_DOCUMENTVERSION, false, false);
+        setStringField(Event.FIELD_RELATEDENTITY, false, false);
+        setStringField(Event.FIELD_USER, false, false);
+        setStringField(Event.FIELD_URL, false, false);
+        setStringField(Event.FIELD_DOCUMENTTITLE, false, false);
+        setStringField(Event.FIELD_TARGET, true, false);
+        setBooleanField(Event.FIELD_HIDDEN, false, false);
+        setBooleanField(Event.FIELD_PREFILTERED, false, false);
 
-        addStringField(SOLR_FIELD_READLISTENERS, true, false);
-        addStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
+        setStringField(SOLR_FIELD_READLISTENERS, true, false);
+        setStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
 
-        addMapField(SOLR_FIELD_PROPERTIES);
+        setMapField(SOLR_FIELD_PROPERTIES);
+
+        // Add support for searching various forms of references
+        setStringField(FIELD_SPACE_INDEX, true, false, SOLR_FIELD_STORED, false);
+        setStringField(FIELD_DOCUMENT_INDEX, true, false, SOLR_FIELD_STORED, false);
+
+        migrateSchema(SCHEMA_VERSION_12_5);
     }
 
     @Override
-    protected void migrateSchema(long cversion)
+    protected void migrateSchema(long cversion) throws SolrException
     {
-        // No migration needed yet
+        if (cversion < SCHEMA_VERSION_12_6) {
+            setStringField(SOLR_FIELD_MAILLISTENERS, true, false);
+        }
     }
 }

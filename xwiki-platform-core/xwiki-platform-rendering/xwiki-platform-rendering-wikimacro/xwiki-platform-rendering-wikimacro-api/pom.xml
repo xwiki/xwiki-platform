@@ -25,15 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>12.4-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - API</name>
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>33</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

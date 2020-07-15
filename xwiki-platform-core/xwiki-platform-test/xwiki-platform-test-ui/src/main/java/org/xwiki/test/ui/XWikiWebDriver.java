@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -209,6 +208,19 @@ public class XWikiWebDriver extends RemoteWebDriver
             return true;
         } catch (NoSuchElementException e) {
             return false;
+        }
+    }
+
+    public <T> void waitUntilCondition(ExpectedCondition<T> condition, int timeout)
+    {
+        int currentTimeout = getTimeout();
+
+        try {
+            setTimeout(timeout);
+
+            waitUntilCondition(condition);
+        } finally {
+            setTimeout(currentTimeout);
         }
     }
 

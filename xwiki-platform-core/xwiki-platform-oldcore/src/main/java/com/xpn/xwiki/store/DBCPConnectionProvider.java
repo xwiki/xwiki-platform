@@ -123,7 +123,11 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
 
             // DriverClass & url
             String jdbcDriverClass = (String) props.get(Environment.DRIVER);
-            dbcpProperties.put("driverClassName", jdbcDriverClass);
+            // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
+            // to set the Hibernate "driverClassName" property.
+            if (jdbcDriverClass != null) {
+                dbcpProperties.put("driverClassName", jdbcDriverClass);
+            }
 
             String jdbcUrl = System.getProperty(Environment.URL);
             if (jdbcUrl == null) {

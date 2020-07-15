@@ -19,15 +19,47 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.xpn.xwiki.util.Util;
 
+/**
+ * An object containing the information sent in an action request to perform changes on a document.
+ *
+ * @version $Id$
+ */
 public class EditForm extends XWikiForm
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditForm.class);
+
+    /**
+     * Format for passing xproperties references in URLs. General format:
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;} (e.g.
+     * {@code XWiki.XWikiRights_0_member}).
+     */
+    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)_(.+)$");
+
+    /**
+     * Format for passing xobjects references in URLs. General format:
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;} (e.g.
+     * {@code XWiki.XWikiRights_0}).
+     */
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)$");
+
+    private static final String OBJECTS_CLASS_DELIMITER = "_";
+
     // ---- Form fields -------------------------------------------------
     private String content;
 
@@ -63,6 +95,12 @@ public class EditForm extends XWikiForm
     
     private ObjectPolicyType objectPolicy;
 
+    private Map<String, List<Integer>> objectsToRemove;
+
+    private Map<String, List<Integer>> objectsToAdd;
+
+    private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
+
     @Override
     public void readRequest()
     {
@@ -84,6 +122,9 @@ public class EditForm extends XWikiForm
         setSyntaxId(request.getParameter("syntaxId"));
         setHidden(request.getParameter("xhidden"));
         setObjectPolicy(request.getParameter("objectPolicy"));
+        setUpdateOrCreateMap(request);
+        setObjectsToRemove(request.getParameterValues("deletedObjects"));
+        setObjectsToAdd(request.getParameterValues("addedObjects"));
     }
 
     public void setTags(String[] parameter)
@@ -294,7 +335,7 @@ public class EditForm extends XWikiForm
     }
 
     /**
-     * see {@link #getObjectPolicyType}
+     * see {@link #getObjectPolicy}
      * 
 
      * @since 7.0RC1
@@ -305,13 +346,174 @@ public class EditForm extends XWikiForm
     }
 
     /**
-     * see {@link #getObjectPolicyType}
+     * see {@link #getObjectPolicy}
      *
-     * @param objectPolicy is a string converted to {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType}
+     * @param objectPolicyName is a string converted to {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType}
      * @since 7.0RC1
      */
     private void setObjectPolicy(String objectPolicyName)
     {
         this.objectPolicy = ObjectPolicyType.forName(objectPolicyName);
+    }
+
+    private void setObjectsToRemove(String[] objectsToRemove)
+    {
+        if (objectsToRemove == null) {
+            this.objectsToRemove = Collections.emptyMap();
+        } else {
+            this.objectsToRemove = new HashMap<>();
+            for (String objectAndId : objectsToRemove) {
+                Matcher matcher = XOBJECTS_REFERENCE_PATTERN.matcher(objectAndId);
+                if (matcher.matches()) {
+                    String className = matcher.group(1);
+                    String objectNumber = matcher.group(2);
+                    try {
+                        Integer objectId = Integer.parseInt(objectNumber);
+
+                        if (!this.objectsToRemove.containsKey(className)) {
+                            this.objectsToRemove.put(className, new ArrayList<>());
+                        }
+                        List<Integer> objectIds = this.objectsToRemove.get(className);
+                        objectIds.add(objectId);
+                    } catch (NumberFormatException e) {
+                        LOGGER.warn("Invalid xobject number [{}], ignoring removed xobject [{}].", objectNumber,
+                            objectAndId);
+                    }
+                }
+            }
+        }
+    }
+
+    public Map<String, List<Integer>> getObjectsToRemove()
+    {
+        return objectsToRemove;
+    }
+
+    private void setObjectsToAdd(String[] objectsToAdd)
+    {
+        if (objectsToAdd == null) {
+            this.objectsToAdd = Collections.emptyMap();
+        } else {
+            this.objectsToAdd = new HashMap<>();
+            for (String objectAndId : objectsToAdd) {
+                Matcher matcher = XOBJECTS_REFERENCE_PATTERN.matcher(objectAndId);
+                if (matcher.matches()) {
+                    String className = matcher.group(1);
+                    String objectNumber = matcher.group(2);
+                    try {
+                        Integer objectId = Integer.parseInt(objectNumber);
+
+                        if (!this.objectsToAdd.containsKey(className)) {
+                            this.objectsToAdd.put(className, new ArrayList<>());
+                        }
+                        List<Integer> objectIds = this.objectsToAdd.get(className);
+                        objectIds.add(objectId);
+                    } catch (NumberFormatException e) {
+                        LOGGER.warn("Invalid xobject number [{}], ignoring added xobject [{}].", objectNumber,
+                            objectAndId);
+                    }
+                }
+            }
+        }
+    }
+
+    public Map<String, List<Integer>> getObjectsToAdd()
+    {
+        return objectsToAdd;
+    }
+
+    /**
+     * See {@link #getUpdateOrCreateMap()} for more information how the information are retrieved.
+     */
+    private void setUpdateOrCreateMap(XWikiRequest request)
+    {
+        if (ObjectPolicyType.UPDATE_OR_CREATE.equals(getObjectPolicy())) {
+            this.updateOrCreateMap = new HashMap<>();
+            @SuppressWarnings("unchecked")
+            Map<String, String[]> allParameters = request.getParameterMap();
+            for (Map.Entry<String, String[]> parameter : allParameters.entrySet()) {
+                Matcher matcher = XPROPERTY_REFERENCE_PATTERN.matcher(parameter.getKey());
+                if (!matcher.matches()) {
+                    continue;
+                }
+                Integer classNumber;
+                String className = matcher.group(1);
+                String classNumberAsString = matcher.group(2);
+                String classPropertyName = matcher.group(3);
+
+                try {
+                    classNumber = Integer.parseInt(classNumberAsString);
+                } catch (NumberFormatException e) {
+                    // If the numner isn't valid, skip the property update
+                    LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
+                        parameter.getKey());
+                    continue;
+                }
+                SortedMap<Integer, Map<String, String[]>> objectMap = this.updateOrCreateMap.get(className);
+                if (objectMap == null) {
+                    objectMap = new TreeMap<>();
+                    this.updateOrCreateMap.put(className, objectMap);
+                }
+                // Get the property from the right object #objectNumber of type 'objectName';
+                // create it if they don't exist
+                Map<String, String[]> object = objectMap.get(classNumber);
+                if (object == null) {
+                    object = new HashMap<>();
+                    objectMap.put(classNumber, object);
+                }
+                object.put(classPropertyName, parameter.getValue());
+            }
+        } else {
+            this.updateOrCreateMap = Collections.emptyMap();
+        }
+    }
+
+    /**
+     * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_&lt;propertyname&gt;'}
+     * Keys of this map will be the reference {@code &lt;spacename&gt;.&lt;classname&gt;} to the Class
+     * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
+     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code &lt;propertyname&gt;} and
+     * content is the array of corresponding values.
+     *
+     * Example with a list of HTTP parameters:
+     * <ul>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Me</li>
+     * <li>XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup</li>
+     * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
+     * <li>XWiki.XWikiUsers_1_name=Spirou</li>
+     * </ul>
+     * will result in the following map <code>
+     * {
+     *   "XWiki.XWikiRights": {
+     *     "0": {
+     *       "users": ["XWiki.Admin", "XWiki.Me"],
+     *       "groups": ["XWiki.XWikiAllGroup"]
+     *     },
+     *     "1": {
+     *       "users": ["XWiki.Admin"]
+     *     }
+     *   ],
+     *   "XWiki.XWikiUsers":
+     *     "1": {
+     *       "name": ["Spirou"]
+     *     }
+     *   ]
+     * }
+     * </code>
+     * Note that the resulting map does not guarantee the consistency of the properties in regards with the actual
+     * definition of the XClass. For example, the request could contain {@code XWiki.XWikiRights_0_foobar=value}: the
+     * resulting map will always return a parameter "foobar" for XWiki.XWikiRights
+     * even if the xclass does not define it or even if the xclass does not exist.
+     *
+     * If the current objectPolicyType is not {@link ObjectPolicyType#UPDATE_OR_CREATE}
+     * it will return an empty map.
+     *
+     * @return a map containing ordered data or an empty map.
+     */
+    public Map<String, SortedMap<Integer, Map<String, String[]>>> getUpdateOrCreateMap()
+    {
+        return updateOrCreateMap;
     }
 }

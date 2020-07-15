@@ -25,6 +25,8 @@ import java.util.HashSet;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
+
 /**
  * A configuration for the {@link DefaultAsyncNotificationRenderer}.
  *
@@ -45,7 +47,10 @@ public class NotificationAsyncRendererConfiguration extends AsyncRendererConfigu
     {
         this.isCount = isCount;
         this.notificationParameters = parameters;
-        this.setContextEntries(new HashSet<>(Arrays.asList("user", "wiki")));
+        this.setContextEntries(new HashSet<>(Arrays.asList(
+            XWikiContextContextStore.PROP_USER,
+            XWikiContextContextStore.PROP_REQUEST_WIKI
+        )));
     }
 
     /**

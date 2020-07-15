@@ -118,6 +118,10 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
       $(this).xwikiSelectize($.extend(getSelectizeOptions($(this)), options));
     });
   };
+
+  return {
+    'loadUsers': loadUsers
+  }
 });
 
 /**

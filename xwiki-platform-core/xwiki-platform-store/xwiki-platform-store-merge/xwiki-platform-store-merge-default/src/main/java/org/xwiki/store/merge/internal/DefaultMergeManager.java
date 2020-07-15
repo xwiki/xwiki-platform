@@ -519,7 +519,7 @@ public class DefaultMergeManager implements MergeManager
                                 } else {
                                     // Already added to the DB, lets assume the user is prescient
                                     attachmentMergeResult.getLog().warn("Attachment [{}] already added",
-                                        previousAttachment.getReference());
+                                        nextAttachment.getReference());
                                 }
                             } catch (XWikiException e) {
                                 attachmentMergeResult.getLog().error("Failed to compare attachments with reference "

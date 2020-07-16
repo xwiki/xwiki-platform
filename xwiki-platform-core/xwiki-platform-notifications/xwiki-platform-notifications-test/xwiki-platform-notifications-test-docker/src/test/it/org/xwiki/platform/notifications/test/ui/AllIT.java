@@ -44,8 +44,13 @@ import org.xwiki.test.docker.junit5.UITest;
         "xwikiCfgVirtualUsepath=0"
     },
     extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
 public class AllIT

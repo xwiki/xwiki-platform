@@ -28,17 +28,14 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.internal.async.MentionsCreatedRequest;
-import org.xwiki.mentions.internal.async.jobs.MentionsCreateJob;
-import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Listen to entities creation. 
@@ -57,7 +54,10 @@ public class MentionsCreatedEventListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private JobExecutor jobExecutor;
+    private MentionsEventExecutor executor;
+    
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
 
     /**
      * Default constructor.
@@ -70,20 +70,12 @@ public class MentionsCreatedEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        if (!(event instanceof DocumentCreatedEvent) || this.remoteObservationManagerContext.isRemoteState()) {
+            return;
+        }
         this.logger.debug("Event [{}] received from [{}] with data [{}].",
             DocumentCreatedEvent.class.getName(), source, data);
-
         XWikiDocument doc = (XWikiDocument) source;
-        MentionsCreatedRequest mentionsCreatedRequest = new MentionsCreatedRequest(doc);
-        mentionsCreatedRequest.setVerbose(false);
-
-        try {
-            this.jobExecutor.execute(MentionsCreateJob.ASYNC_REQUEST_TYPE, mentionsCreatedRequest);
-        } catch (JobException e) {
-            this.logger.warn(
-                "Failed to create a Job for the Event [{}] received from [{}] with data [{}]. Cause: [{}]",
-                DocumentCreatedEvent.class.getName(), source, data, getRootCauseMessage(e));
-        }
+        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
     }
-
 }

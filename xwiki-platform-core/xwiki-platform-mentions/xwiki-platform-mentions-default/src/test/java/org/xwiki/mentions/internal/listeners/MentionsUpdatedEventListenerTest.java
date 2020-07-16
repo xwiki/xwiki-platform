@@ -19,10 +19,11 @@
  */
 package org.xwiki.mentions.internal.listeners;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -34,28 +35,28 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import ch.qos.logback.classic.Level;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
- * Test of {@link MentionsCreatedEventListener}.
+ * Test of {@link MentionsUpdatedEventListener}.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
 @ComponentTest
-public class MentionsCreatedEventListenerTest
+public class MentionsUpdatedEventListenerTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @InjectMockComponents
-    private MentionsCreatedEventListener listener;
+    private MentionsUpdatedEventListener listener;
 
     @Mock
     private XWikiDocument document;
+
 
     @MockComponent
     private MentionsEventExecutor executor;
@@ -65,19 +66,22 @@ public class MentionsCreatedEventListenerTest
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
-        DocumentCreatedEvent event = new DocumentCreatedEvent(documentReference);
+        DocumentUpdatedEvent event = new DocumentUpdatedEvent(documentReference);
 
         when(this.document.getDocumentReference()).thenReturn(documentReference);
         when(this.document.getAuthorReference()).thenReturn(authorReference);
-        when(this.document.getVersion()).thenReturn("1.1");
+        when(this.document.getVersion()).thenReturn("2.1");
 
         this.listener.onEvent(event, this.document, null);
 
-        assertEquals(1, this.logCapture.size());
-        assertEquals(Level.DEBUG, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Event [org.xwiki.bridge.event.DocumentCreatedEvent] received from [document] with data [null].",
+        Assert.assertEquals(1, this.logCapture.size());
+        Assert.assertEquals(Level.DEBUG, this.logCapture.getLogEvent(0).getLevel());
+        Assert.assertEquals(
+            "Event [org.xwiki.bridge.event.DocumentUpdatedEvent] received from [document] with data [null].",
             this.logCapture.getMessage(0));
 
-        verify(this.executor).execute(documentReference, authorReference, "1.1");
+        verify(this.executor).execute(documentReference, authorReference, "2.1");
     }
+
+   
 }

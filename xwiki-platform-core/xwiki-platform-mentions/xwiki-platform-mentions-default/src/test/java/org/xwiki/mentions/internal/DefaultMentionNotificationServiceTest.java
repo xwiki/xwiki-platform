@@ -55,7 +55,7 @@ public class DefaultMentionNotificationServiceTest
     private EntityReferenceSerializer<String> serializer;
 
     @Test
-    void sendNotif()
+    void sendNotification()
     {
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
@@ -63,8 +63,10 @@ public class DefaultMentionNotificationServiceTest
 
         Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
         when(this.serializer.serialize(mentionedIdentity)).thenReturn("xwiki:XWiki.U2");
+        when(this.serializer.serialize(authorReference)).thenReturn("xwiki:XWiki.Author");
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:XWiki.Doc");
 
-        this.notificationService.sendNotif(authorReference, documentReference, mentionedIdentity,
+        this.notificationService.sendNotification(authorReference, documentReference, mentionedIdentity,
             MentionLocation.COMMENT, "anchor");
 
         MentionEvent event = new MentionEvent(eventTarget,

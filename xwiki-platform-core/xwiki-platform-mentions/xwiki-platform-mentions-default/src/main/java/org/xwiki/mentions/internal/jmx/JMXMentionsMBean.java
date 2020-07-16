@@ -17,31 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
+package org.xwiki.mentions.internal.jmx;
 
 /**
- * A service to send mentions notification.
+ * Interface of the Mentions JMX MBean.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Role
-@Unstable
-public interface MentionNotificationService
+public interface JMXMentionsMBean
 {
     /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
      *
-     * @param authorReference the reference of the author of the mention.
-     * @param documentReference the document in which the mention has been done.
-     * @param mentionedIdentity the identity of the mentioned user.
-     * @param location The location of the mention.
-     * @param anchorId The anchor link to use.
+     * @return the mentions analysis tasks queue size.
      */
-    void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
-        DocumentReference mentionedIdentity, MentionLocation location, String anchorId);
+    int getQueueSize();
+
+    /**
+     * Clear the mentions analysis tasks queue.
+     */
+    void clearQueue();
+
+    /**
+     * @return the current number of threads dedicated to user mentions analysis tasks
+     */
+    Integer getThreadNumber();
 }

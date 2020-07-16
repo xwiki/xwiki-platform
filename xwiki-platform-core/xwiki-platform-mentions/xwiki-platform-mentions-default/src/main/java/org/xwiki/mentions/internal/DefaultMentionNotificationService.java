@@ -50,12 +50,12 @@ public class DefaultMentionNotificationService implements MentionNotificationSer
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public void sendNotif(DocumentReference authorReference, DocumentReference documentReference,
+    public void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
         DocumentReference mentionedIdentity, MentionLocation location, String anchorId)
     {
         MentionEventParams params = new MentionEventParams()
-                                        .setUserReference(authorReference.toString())
-                                        .setDocumentReference(documentReference.toString())
+                                        .setUserReference(this.serializer.serialize(authorReference))
+                                        .setDocumentReference(this.serializer.serialize(documentReference))
                                         .setLocation(location)
                                         .setAnchor(anchorId);
         MentionEvent event =

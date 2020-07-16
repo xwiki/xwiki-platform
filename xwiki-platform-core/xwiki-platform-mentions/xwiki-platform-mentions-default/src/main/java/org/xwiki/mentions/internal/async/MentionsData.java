@@ -33,9 +33,9 @@ public class MentionsData
 {
     /**
      * Static object used to identify if elements has been persisted 
-     * in the current JVM. 
+     * in the current JVM.
      */
-    private static final Object STOP = new Object();
+    public static final MentionsData STOP = new MentionsData(true);
 
     private String documentReference;
 
@@ -45,7 +45,24 @@ public class MentionsData
 
     private String wikiId;
 
-    private Object stop;
+    private final boolean stop;
+
+    /**
+     * Default constructor.
+     */
+    public MentionsData()
+    {
+        this.stop = false;
+    }
+
+    /**
+     * Private constructor for the {@link MentionsData#STOP} static object.
+     * @param stop stop flag.
+     */
+    private MentionsData(boolean stop)
+    {
+        this.stop = stop;
+    }
 
     /**
      *
@@ -120,23 +137,12 @@ public class MentionsData
     }
 
     /**
-     * Set the data as stop.
-     * When a data set to stop is consumed, the consumer just stop itself.
-     * @return this current objects
-     */
-    public MentionsData stop()
-    {
-        this.stop = STOP;
-        return this;
-    }
-
-    /**
      *
-     * @return true if {@link MentionsData#stop()} has been called. 
+     * @return true if the current object is {@link MentionsData#STOP}.  
      */
     public boolean isStop()
     {
-        return this.stop != null;
+        return this == STOP;
     }
 
     /**
@@ -147,7 +153,7 @@ public class MentionsData
      */
     public boolean isDeprecated()
     {
-        return this.stop != null && this.stop != STOP;
+        return this.stop && this != STOP;
     }
 
     /**

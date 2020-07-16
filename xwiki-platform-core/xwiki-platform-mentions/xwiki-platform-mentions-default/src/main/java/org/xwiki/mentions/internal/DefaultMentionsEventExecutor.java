@@ -111,7 +111,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
             // Additionally we fill the queue with stop element in order to wake up consumers and notify them
             // to stop if the queue is empty.
             consumer.halt();
-            this.queue.add(new MentionsData().stop());
+            this.queue.add(MentionsData.STOP);
         }
     }
 

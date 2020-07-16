@@ -17,35 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal.rendering;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
- * Gives access to the configuration settings of the mentions.
+ * Mentions specific plain text renderer factory.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Unstable
-@Role
-public interface MentionsConfiguration
+@Component
+@Named("plainmentions/1.0")
+@Singleton
+public class PlainTextMentionsRendererFactory extends AbstractPrintRendererFactory
 {
-    /**
-     * 
-     * @return the color for the mentions.
-     */
-    String getMentionsColor();
-
-    /**
-     * @return the color for the mentions to the current user.
-     */
-    String getSelfMentionsColor();
-
-    /**
-     * 
-     * @return true if the mentions quote feature is activated.
-     */
-    boolean isQuoteActivated();
+    @Override
+    public Syntax getSyntax()
+    {
+        String plainmentions = "plainmentions";
+        return new Syntax(new SyntaxType(plainmentions, plainmentions), "1.0");
+    }
 }

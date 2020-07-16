@@ -39,6 +39,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.async.MentionsData;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.MacroBlock;
@@ -63,7 +64,7 @@ import static org.xwiki.mentions.MentionLocation.COMMENT;
 
 /**
  * Default implementation of {@link MentionsDataConsumer}.
- * 
+ *
  * This class is responsible to analyze documents update in order to identify new user mentions.
  * Notifications are then produced for each newly introduced user mentions.
  * This analysis is done by identifying mentions macro with new identifiers in document content.
@@ -199,8 +200,9 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
             boolean emptyAnchorProcessed = false;
             for (String anchorId : entry.getValue()) {
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    sendNotif(documentReference, authorReference, location, entry.getKey(),
-                        anchorId);
+                    sendNotif(
+                        new MentionNotificationParameters(authorReference, documentReference, entry.getKey(), location,
+                            anchorId, xdom));
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }
@@ -233,12 +235,15 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                sendNotif(documentReferenceStr, authorReferenceStr, location, key, "");
+                sendNotif(new MentionNotificationParameters(authorReferenceStr, documentReferenceStr, key, location, "",
+                    newXDOM));
             }
 
             // Notify all new mentions with new anchors.
             for (String anchorId : anchorsToNotify) {
-                sendNotif(documentReferenceStr, authorReferenceStr, location, key, anchorId);
+                sendNotif(
+                    new MentionNotificationParameters(authorReferenceStr, documentReferenceStr, key, location, anchorId,
+                        newXDOM));
             }
         }
     }
@@ -253,7 +258,9 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         this.xdomService
             .countByIdentifier(newMentions)
             .forEach((key, value) -> value.forEach(
-                anchorId -> sendNotif(documentReference, authorReference, location, key, anchorId)));
+                anchorId -> sendNotif(
+                    new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
+                        newXdom))));
     }
 
     private void handBaseObject(List<BaseObject> oldEntry, BaseObject baseObject,
@@ -308,9 +315,8 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         });
     }
 
-    private void sendNotif(DocumentReference documentReference, DocumentReference authorReference,
-        MentionLocation location, DocumentReference key, String anchorId)
+    private void sendNotif(MentionNotificationParameters notificationParameters)
     {
-        this.notificationService.sendNotification(authorReference, documentReference, key, location, anchorId);
+        this.notificationService.sendNotification(notificationParameters);
     }
 }

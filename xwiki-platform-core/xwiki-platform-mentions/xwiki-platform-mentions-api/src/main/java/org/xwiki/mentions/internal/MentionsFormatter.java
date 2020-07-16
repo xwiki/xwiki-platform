@@ -17,35 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.mentions.DisplayStyle;
 
 /**
- * Gives access to the configuration settings of the mentions.
+ * Provides services to format the user mentions.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Unstable
 @Role
-public interface MentionsConfiguration
+public interface MentionsFormatter
 {
     /**
-     * 
-     * @return the color for the mentions.
+     * Format a user mention.
+     * @param userReference The user reference
+     * @param style The display style of the mention
+     * @return the formatted mention
      */
-    String getMentionsColor();
-
-    /**
-     * @return the color for the mentions to the current user.
-     */
-    String getSelfMentionsColor();
-
-    /**
-     * 
-     * @return true if the mentions quote feature is activated.
-     */
-    boolean isQuoteActivated();
+    String formatMention(String userReference, DisplayStyle style);
 }

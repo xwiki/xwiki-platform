@@ -380,6 +380,10 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
 
 .xwiki-mention.removed {
   text-decoration: line-through;
+}
+
+blockquote.mention-quote {
+  font-size: inherit;
 }</code>
     </property>
     <property>
@@ -591,23 +595,12 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       <code>{{velocity}}
 #set ($reference = $wikimacro.parameters.reference)
 #set ($style = $wikimacro.parameters.style)
+#set ($content = $services.mentions.format($reference.reference, $style))
 #set ($anchor = $wikimacro.parameters.anchor)
-#set ($userProperties = $services.user.getProperties($reference))
-#set ($firstName = $userProperties.getFirstName())
-#set ($lastName = $userProperties.getLastName())
 #set ($isCurrentUser = $xcontext.userReference == $reference.reference)
 #set ($cssClasses = ['xwiki-mention', 'user'])
 #if ($isCurrentUser)
   #set ($discard = $cssClasses.add('self'))
-#end
-#if ("$!firstName" == "")
-  #set($content = "@$reference.reference.name")
-#elseif ($style == 'FIRST_NAME')
-  #set($content = "@$firstName")
-#elseif ($style == 'LOGIN')
-  #set($content = "@$reference.reference.name")
-#else
-  #set($content = "@$firstName $!lastName")
 #end
 #set ($link = $xwiki.getURL($reference.reference, 'view'))
 {{html}}

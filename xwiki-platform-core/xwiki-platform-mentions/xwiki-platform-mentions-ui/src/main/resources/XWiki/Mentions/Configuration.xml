@@ -40,56 +40,6 @@
   <object>
     <name>XWiki.Mentions.Configuration</name>
     <number>0</number>
-    <className>XWiki.Mentions.MentionsConfigurationClass</className>
-    <guid>3b8e1608-7e71-41ff-bdcb-7a4501882460</guid>
-    <class>
-      <name>XWiki.Mentions.MentionsConfigurationClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <mentionsColor>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>mentionsColor</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>mentionsColor</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </mentionsColor>
-      <selfMentionsColor>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>selfMentionsColor</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>selfMentionsColor</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </selfMentionsColor>
-    </class>
-    <property>
-      <mentionsColor>rgba(194, 194, 194, 0.8)</mentionsColor>
-    </property>
-    <property>
-      <selfMentionsColor>rgba(255, 0, 1, 0.5)</selfMentionsColor>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Mentions.Configuration</name>
-    <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>7d0a4322-79dc-4974-b8b8-0007e0b3171e</guid>
     <class>
@@ -316,6 +266,74 @@
     </property>
     <property>
       <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Mentions.Configuration</name>
+    <number>0</number>
+    <className>XWiki.Mentions.MentionsConfigurationClass</className>
+    <guid>3b8e1608-7e71-41ff-bdcb-7a4501882460</guid>
+    <class>
+      <name>XWiki.Mentions.MentionsConfigurationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <mentionsColor>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>mentionsColor</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>mentionsColor</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </mentionsColor>
+      <quoteActivated>
+        <customDisplay/>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>radio</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>quoteActivated</name>
+        <number>3</number>
+        <prettyName>Quote Activated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </quoteActivated>
+      <selfMentionsColor>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>selfMentionsColor</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>selfMentionsColor</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </selfMentionsColor>
+    </class>
+    <property>
+      <mentionsColor>rgba(194, 194, 194, 0.8)</mentionsColor>
+    </property>
+    <property>
+      <quoteActivated>1</quoteActivated>
+    </property>
+    <property>
+      <selfMentionsColor>rgba(255, 0, 1, 0.5)</selfMentionsColor>
     </property>
   </object>
 </xwikidoc>

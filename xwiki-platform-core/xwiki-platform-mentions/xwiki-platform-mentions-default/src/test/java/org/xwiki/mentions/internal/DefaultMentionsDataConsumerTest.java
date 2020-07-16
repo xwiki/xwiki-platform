@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.async.MentionsData;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.MacroBlock;
@@ -134,11 +135,17 @@ class DefaultMentionsDataConsumerTest
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor1");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor1",
+                    xdom));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor2");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor2",
+                    xdom));
         verify(this.notificationService, times(1))
-            .sendNotification(authorReference, documentReference, authorReference, DOCUMENT, "");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, authorReference, DOCUMENT, "",
+                    xdom));
     }
 
     @Test
@@ -194,11 +201,17 @@ class DefaultMentionsDataConsumerTest
                 .setAuthorReference(authorReference.toString()));
 
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor1");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor1",
+                    xdom));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor2");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor2",
+                    xdom));
         verify(this.notificationService, times(1))
-            .sendNotification(authorReference, documentReference, authorReference, DOCUMENT, "");
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, authorReference, DOCUMENT, "",
+                    xdom));
     }
 
     @Test
@@ -231,7 +244,7 @@ class DefaultMentionsDataConsumerTest
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
 
-        verify(this.notificationService, never()).sendNotification(any(), any(), any(), any(), any());
+        verify(this.notificationService, never()).sendNotification(any());
     }
 
     @Test
@@ -299,7 +312,9 @@ class DefaultMentionsDataConsumerTest
                                       .setVersion("1.3")
         );
 
-        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, COMMENT, "anchor1");
+        verify(this.notificationService).sendNotification(
+            new MentionNotificationParameters(authorReference, documentReference, U1, COMMENT, "anchor1",
+                newCommentXDOM));
     }
 
     @Test
@@ -360,7 +375,8 @@ class DefaultMentionsDataConsumerTest
                 .setWikiId("xwiki")
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
-        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, ANNOTATION,
-            "anchor1");
+        verify(this.notificationService)
+            .sendNotification(new MentionNotificationParameters(authorReference, documentReference, U1, ANNOTATION,
+                "anchor1", newCommentXDOM));
     }
 }

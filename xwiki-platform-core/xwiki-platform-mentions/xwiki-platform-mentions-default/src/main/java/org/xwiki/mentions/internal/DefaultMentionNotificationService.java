@@ -25,11 +25,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionNotificationService;
+import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.mentions.events.MentionEventParams;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 
@@ -49,17 +49,36 @@ public class DefaultMentionNotificationService implements MentionNotificationSer
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    // TODO: probably badly placed
+    @Inject
+    private QuoteService quote;
+
+    @Inject
+    private MentionsConfiguration configuration;
+
     @Override
-    public void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
-        DocumentReference mentionedIdentity, MentionLocation location, String anchorId)
+    public void sendNotification(MentionNotificationParameters mentionNotificationParameters)
     {
+        String extractedQuote;
+        if (this.configuration.isQuoteActivated()) {
+            extractedQuote = this.quote.extract(mentionNotificationParameters.getXdom(),
+                mentionNotificationParameters.getAnchorId()).orElse(null);
+        } else {
+            extractedQuote = null;
+        }
+
         MentionEventParams params = new MentionEventParams()
-                                        .setUserReference(this.serializer.serialize(authorReference))
-                                        .setDocumentReference(this.serializer.serialize(documentReference))
-                                        .setLocation(location)
-                                        .setAnchor(anchorId);
+                                        .setUserReference(this.serializer.serialize(
+                                            mentionNotificationParameters.getAuthorReference()))
+                                        .setDocumentReference(this.serializer.serialize(
+                                            mentionNotificationParameters.getDocumentReference()))
+                                        .setLocation(mentionNotificationParameters.getLocation())
+                                        .setAnchor(mentionNotificationParameters.getAnchorId())
+                                        .setQuote(extractedQuote);
         MentionEvent event =
-            new MentionEvent(Collections.singleton(this.serializer.serialize(mentionedIdentity)), params);
+            new MentionEvent(
+                Collections.singleton(this.serializer.serialize(mentionNotificationParameters.getMentionedIdentity())),
+                params);
         this.observationManager.notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
     }
 }

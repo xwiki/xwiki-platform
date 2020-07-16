@@ -17,35 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
+
+import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.rendering.block.XDOM;
 
 /**
- * Gives access to the configuration settings of the mentions.
+ * Extract a quote around a mention.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Unstable
 @Role
-public interface MentionsConfiguration
+public interface QuoteService
 {
     /**
-     * 
-     * @return the color for the mentions.
+     * Extract a quote around the mention on the content.
+     *
+     * @return the quote.
+     * @param xdom the xdom of the content
+     * @param anchorId The identifier of the mention to quote
      */
-    String getMentionsColor();
-
-    /**
-     * @return the color for the mentions to the current user.
-     */
-    String getSelfMentionsColor();
-
-    /**
-     * 
-     * @return true if the mentions quote feature is activated.
-     */
-    boolean isQuoteActivated();
+    Optional<String> extract(XDOM xdom, String anchorId);
 }

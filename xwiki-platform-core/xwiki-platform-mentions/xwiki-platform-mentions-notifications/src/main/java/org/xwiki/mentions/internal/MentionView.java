@@ -41,8 +41,10 @@ public class MentionView
 
     private String location;
 
+    private String quote;
+
     /**
-     * 
+     *
      * @return URL of the profile page of the mention author.
      */
     public String getAuthorURL()
@@ -71,9 +73,9 @@ public class MentionView
     }
 
     /**
-     * 
+     *
      * @param documentURL URL of the document in which the mention occurred.
-     * @return @return the current object.
+     * @return the current object.
      */
     public MentionView setDocumentURL(String documentURL)
     {
@@ -91,9 +93,9 @@ public class MentionView
     }
 
     /**
-     * 
+     *
      * @param document Document in which the mention occurred.
-     * @return @return the current object.
+     * @return the current object.
      */
     public MentionView setDocument(XWikiDocument document)
     {
@@ -111,13 +113,33 @@ public class MentionView
     }
 
     /**
-     * 
+     *
      * @param location the location at which the mention occurred.
-     * @return @return the current object.
+     * @return the current object.
      */
     public MentionView setLocation(String location)
     {
         this.location = location;
+        return this;
+    }
+
+    /**
+     *
+     * @return the quote text around the mention
+     */
+    public String getQuote()
+    {
+        return this.quote;
+    }
+
+    /**
+     *
+     * @param quote the quote of text around the mentio
+     * @return the current object
+     */
+    public MentionView setQuote(String quote)
+    {
+        this.quote = quote;
         return this;
     }
 
@@ -139,6 +161,7 @@ public class MentionView
                    .append(this.documentURL, that.documentURL)
                    .append(this.document, that.document)
                    .append(this.location, that.location)
+                   .append(this.quote, that.quote)
                    .isEquals();
     }
 
@@ -150,6 +173,7 @@ public class MentionView
                    .append(this.documentURL)
                    .append(this.document)
                    .append(this.location)
+                   .append(this.quote)
                    .toHashCode();
     }
 
@@ -160,6 +184,7 @@ public class MentionView
                    .append("authorURL", this.getAuthorURL())
                    .append("documentURL", this.getDocumentURL())
                    .append("location", this.getLocation())
+                   .append("quote", this.getQuote())
                    .build();
     }
 }

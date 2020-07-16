@@ -194,7 +194,12 @@
               </item>
               <item>
                 <code>java.method.addedToInterface</code>
-                <new>method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)</new>
+                <new>method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.mentions.notifications.MentionNotificationParameters)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method boolean org.xwiki.mentions.MentionsConfiguration::isQuoteActivated()</new>
                 <justification>Young API</justification>
               </item>
             </revapi.ignore>

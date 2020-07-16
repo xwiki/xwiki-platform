@@ -19,7 +19,9 @@
  */
 package org.xwiki.security.authorization;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -48,6 +50,11 @@ import org.xwiki.security.internal.XWikiBridge;
 @Singleton
 public class DefaultAuthorizationManager implements AuthorizationManager
 {
+    /**
+     * List of rights that should imply any newly registered right.
+     */
+    private static final List<Right> DEFAULT_IMPLIED_BY_RIGHTS = Arrays.asList(Right.ADMIN, Right.PROGRAM);
+
     /** Logger. **/
     @Inject
     private Logger logger;
@@ -178,7 +185,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     public Right register(RightDescription rightDescription) throws UnableToRegisterRightException
     {
         // By default Admin should imply any newly registered right.
-        return register(rightDescription, Collections.singleton(Right.ADMIN));
+        return register(rightDescription, new HashSet<>(DEFAULT_IMPLIED_BY_RIGHTS));
     }
 
     @Override
@@ -186,7 +193,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         throws UnableToRegisterRightException
     {
         try {
-            Right newRight = new Right(rightDescription, impliedByRights);
+            // Ensure that the default implied by rights are in the given set.
+            Set<Right> augmentedImpliedByRights = new HashSet<>(impliedByRights);
+            augmentedImpliedByRights.addAll(DEFAULT_IMPLIED_BY_RIGHTS);
+
+            Right newRight = new Right(rightDescription, augmentedImpliedByRights);
             // cleanup the cache since a new right scheme enter in action
             securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
             return newRight;

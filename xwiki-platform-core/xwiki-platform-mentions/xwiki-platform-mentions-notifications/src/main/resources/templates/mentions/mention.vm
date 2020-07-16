@@ -44,7 +44,7 @@
 #if($services.mentions.isQuoteActivated() && $eventParams.getQuote())
   <tr>
     <td colspan="3">
-      <blockquote style="font-size: inherit">
+      <blockquote class="mention-quote">
         $eventParams.getQuote()
       </blockquote>
     </td>

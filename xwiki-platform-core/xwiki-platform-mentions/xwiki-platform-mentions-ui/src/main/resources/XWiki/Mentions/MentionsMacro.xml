@@ -380,6 +380,10 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
 
 .xwiki-mention.removed {
   text-decoration: line-through;
+}
+
+blockquote.mention-quote {
+  font-size: inherit;
 }</code>
     </property>
     <property>

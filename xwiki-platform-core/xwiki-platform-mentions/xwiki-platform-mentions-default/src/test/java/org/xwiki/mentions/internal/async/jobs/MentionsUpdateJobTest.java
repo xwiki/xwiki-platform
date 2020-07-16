@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsUpdatedRequest;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -120,11 +121,14 @@ public class MentionsUpdateJobTest
         this.job.runInternal();
 
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, u1, DOCUMENT, "", dom2Mention);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, u1, DOCUMENT, "", dom2Mention));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, u1, DOCUMENT, "anchor2", dom2Mention);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, u1, DOCUMENT, "anchor2", dom2Mention));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, u2, DOCUMENT, "anchor2", dom2Mention);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, u2, DOCUMENT, "anchor2", dom2Mention));
     }
 
     @Test
@@ -166,8 +170,9 @@ public class MentionsUpdateJobTest
         this.job.initialize(new MentionsUpdatedRequest(this.newDocument, this.oldDocument, authorReference));
         this.job.runInternal();
 
-        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, ANNOTATION, "anchor1",
-            new XDOM(emptyList()));
+        verify(this.notificationService).sendNotification(
+            new MentionNotificationParameters(authorReference, documentReference, U1, ANNOTATION, "anchor1",
+                new XDOM(emptyList())));
     }
 
     @Test
@@ -221,7 +226,8 @@ public class MentionsUpdateJobTest
         this.job.runInternal();
 
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, U1, COMMENT, "anchor1", newCommentXDOM);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, U1, COMMENT, "anchor1", newCommentXDOM));
     }
 
     @Test

@@ -49,34 +49,6 @@
     <module>xwiki-platform-mentions-ui</module>
     <module>xwiki-platform-mentions-default</module>
   </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <analysisConfiguration><![CDATA[
-            {
-              "revapi": {
-                "ignore": [
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String, org.xwiki.rendering.block.XDOM)",
-                    "justification": "Unstable API. Method renamed. New parameter."
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
-                    "justification": "Unstable API."
-                  }
-                ]
-              }
-            }
-          ]]></analysisConfiguration>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
       <id>integration-tests</id>

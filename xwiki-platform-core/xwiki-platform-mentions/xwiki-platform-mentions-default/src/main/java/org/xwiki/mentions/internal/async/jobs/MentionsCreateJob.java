@@ -34,6 +34,7 @@ import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsCreatedRequest;
 import org.xwiki.mentions.internal.async.MentionsCreatedStatus;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -89,8 +90,10 @@ public class MentionsCreateJob extends AbstractJob<MentionsCreatedRequest, Menti
             boolean emptyAnchorProcessed = false;
             for (String anchorId : entry.getValue()) {
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    this.notificationService
-                        .sendNotification(authorReference, documentReference, entry.getKey(), location, anchorId, xdom);
+                    MentionNotificationParameters parameters =
+                        new MentionNotificationParameters(authorReference, documentReference, entry.getKey(), location,
+                            anchorId, xdom);
+                    this.notificationService.sendNotification(parameters);
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }

@@ -61,6 +61,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </mentionsColor>
+    <quoteActivated>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>radio</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>quoteActivated</name>
+      <number>3</number>
+      <prettyName>Quote Activated</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </quoteActivated>
     <selfMentionsColor>
       <customDisplay/>
       <disabled>0</disabled>

@@ -37,6 +37,7 @@ import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsUpdatedRequest;
 import org.xwiki.mentions.internal.async.MentionsUpdatedStatus;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -166,14 +167,17 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                this.notificationService.sendNotification(authorReference, documentReference, key, location, "",
-                    newXdom);
+                MentionNotificationParameters parameters =
+                    new MentionNotificationParameters(authorReference, documentReference, key, location, "", newXdom);
+                this.notificationService.sendNotification(parameters);
             }
 
             // Notify all new mentions with new anchors.
             for (String anchorId : anchorsToNotify) {
-                this.notificationService.sendNotification(authorReference, documentReference, key, location, anchorId,
-                    newXdom);
+                MentionNotificationParameters parameters =
+                    new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
+                        newXdom);
+                this.notificationService.sendNotification(parameters);
             }
         }
     }
@@ -192,7 +196,9 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
             List<String> value = entry.getValue();
             for (String anchorId : value) {
                 this.notificationService
-                    .sendNotification(authorReference, documentReference, key, location, anchorId, newXdom);
+                    .sendNotification(
+                        new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
+                            newXdom));
             }
         }
     }

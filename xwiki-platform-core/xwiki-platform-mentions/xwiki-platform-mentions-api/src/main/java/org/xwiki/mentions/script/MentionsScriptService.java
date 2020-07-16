@@ -69,6 +69,17 @@ public class MentionsScriptService implements ScriptService
     }
 
     /**
+     *
+     * @see MentionsConfiguration#isQuoteActivated()
+     * @return true if the mentions quote feature is activated.
+     * @since 12.6RC1
+     */
+    public boolean isQuoteActivated()
+    {
+        return this.configuration.isQuoteActivated();
+    }
+
+    /**
      * Format a user mention.
      *
      * @see MentionsFormatter#formatMention(String, DisplayStyle)

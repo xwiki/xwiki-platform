@@ -182,6 +182,21 @@
                 <old>method boolean org.xwiki.notifications.NotificationConfiguration::isEventPreFilteringEnabled()</old>
                 <justification>Young API</justification>
               </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)</old>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.mentions.notifications.MentionNotificationParameters)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method boolean org.xwiki.mentions.MentionsConfiguration::isQuoteActivated()</new>
+                <justification>Young API</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

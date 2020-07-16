@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.xwiki.mentions.MentionNotificationService;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsCreatedRequest;
+import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
@@ -50,7 +51,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -122,11 +122,15 @@ public class MentionsCreateJobTest
         this.job.runInternal();
 
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor1", xdom);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor1",
+                    xdom));
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor2", xdom);
-        verify(this.notificationService).sendNotification(authorReference, documentReference, authorReference,
-            DOCUMENT, "", xdom);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor2",
+                    xdom));
+        verify(this.notificationService).sendNotification(
+            new MentionNotificationParameters(authorReference, documentReference, authorReference, DOCUMENT, "", xdom));
     }
 
     @Test
@@ -150,7 +154,7 @@ public class MentionsCreateJobTest
         this.job.initialize(new MentionsCreatedRequest(this.document));
         this.job.runInternal();
 
-        verify(this.notificationService, never()).sendNotification(any(), any(), any(), any(), any(), eq(xdom));
+        verify(this.notificationService, never()).sendNotification(any(MentionNotificationParameters.class));
     }
 
     @Test
@@ -210,7 +214,9 @@ public class MentionsCreateJobTest
         verify(this.xdomService).listMentionMacros(xdom2);
         verify(this.xdomService).countByIdentifier(mentionsBlocks);
         verify(this.notificationService)
-            .sendNotification(authorReference, documentReference, user, AWM_FIELD, "anchor1", xdom1);
+            .sendNotification(
+                new MentionNotificationParameters(authorReference, documentReference, user, AWM_FIELD, "anchor1",
+                    xdom1));
     }
 
     @Test

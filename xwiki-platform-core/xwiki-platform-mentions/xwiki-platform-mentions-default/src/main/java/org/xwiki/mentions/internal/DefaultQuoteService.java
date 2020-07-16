@@ -19,6 +19,8 @@
  */
 package org.xwiki.mentions.internal;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -29,11 +31,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.text.StringUtils;
 
 import static org.xwiki.rendering.block.Block.Axes.DESCENDANT;
 
@@ -54,32 +58,66 @@ public class DefaultQuoteService implements QuoteService
     @Override
     public Optional<String> extract(XDOM xdom, String anchorId)
     {
-        return Optional.<Block>ofNullable(xdom.getFirstBlock(mentionsBlocksMatcher(anchorId), DESCENDANT))
-                   .map(new RenderFunction());
+        List<Block> blockList = xdom.getBlocks(new ExactAnchorBlockMatcher(anchorId), DESCENDANT);
+
+        Optional<Block> firstBlock;
+        // Best effort selection of the mentions. In case of ambiguity we do not generation a quote 
+        // for the provided anchorId.
+        // Note that if xdoom contains a single empty anchor, it is not ambiguous and a quote will
+        // be extracted.
+        if (blockList.size() == 1) {
+            firstBlock = Optional.of(blockList.get(0));
+        } else {
+            firstBlock = Optional.empty();
+        }
+
+        return firstBlock
+                   .map(new RenderFunction())
+                   .map(it -> StringUtils.abbreviate(it, "...", 200));
     }
 
-    private BlockMatcher mentionsBlocksMatcher(String anchorId)
+    private static class ExactAnchorBlockMatcher implements BlockMatcher
     {
-        return block -> {
+        private final String anchorId;
+
+        ExactAnchorBlockMatcher(String anchorId)
+        {
+            this.anchorId = anchorId;
+        }
+
+        @Override
+        public boolean match(Block block)
+        {
             boolean ret;
             if (block instanceof MacroBlock) {
-                ret = ((MacroBlock) block).getId().equals("mention")
-                          && Optional.ofNullable(block.getParameter("anchor"))
-                                 .map(it -> it.equals(anchorId)).orElse(false);
+                ret =
+                    ((MacroBlock) block).getId().equals("mention")
+                        && Optional.ofNullable(block.getParameter("anchor"))
+                               .map(it -> it.equals(this.anchorId))
+                               .orElse(false);
             } else {
                 ret = false;
             }
             return ret;
-        };
+        }
     }
 
     private class RenderFunction implements Function<Block, String>
     {
         @Override
-        public String apply(Block block)
+        public String apply(Block mentionBlock)
         {
             WikiPrinter printer = new DefaultWikiPrinter();
-            DefaultQuoteService.this.renderer.render(block.getParent(), printer);
+            Block parent = mentionBlock.getParent();
+            Block block;
+            if (parent instanceof XDOM) {
+                // if the parent of the mention block is the XDOM, we instead select the previous and next  blocks
+                block = new ParagraphBlock(
+                    Arrays.asList(mentionBlock.getPreviousSibling(), mentionBlock, mentionBlock.getNextSibling()));
+            } else {
+                block = parent;
+            }
+            DefaultQuoteService.this.renderer.render(block, printer);
             return printer.toString();
         }
     }

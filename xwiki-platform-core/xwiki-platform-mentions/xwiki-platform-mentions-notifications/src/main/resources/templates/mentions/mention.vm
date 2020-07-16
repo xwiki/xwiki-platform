@@ -41,9 +41,15 @@
     <td class="description">$summary</td>
     #insertEventDate($event)
 </tr>
-    <tr>
-        <td colspan="3"><blockquote style="font-size: inherit">$!eventParams.getQuote()</blockquote></td>
-    </tr>
+#if($services.mentions.isQuoteActivated() && $eventParams.getQuote())
+  <tr>
+    <td colspan="3">
+      <blockquote style="font-size: inherit">
+        $eventParams.getQuote()
+      </blockquote>
+    </td>
+  </tr>
+#end
 #end
 
 #define ($content)

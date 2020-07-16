@@ -21,12 +21,11 @@ package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.Arrays;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -41,10 +40,6 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.UserProperties;
-import org.xwiki.user.UserPropertiesResolver;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
@@ -81,11 +76,7 @@ public class NotificationUserIteratorTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @MockComponent
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
-
-    @MockComponent
-    private UserPropertiesResolver userPropertiesResolver;
+    private DocumentAccessBridge documentAccessBridge;
 
     @BeforeEach
     void setUp()
@@ -112,31 +103,12 @@ public class NotificationUserIteratorTest
         when(this.resolver.resolve("XWiki.UserC", new WikiReference("wikiA"))).thenReturn(userC);
         when(this.resolver.resolve("XWiki.UserD", new WikiReference("wikiA"))).thenReturn(userD);
 
-        UserReference userAReference = mock(UserReference.class);
-        UserReference userBReference = mock(UserReference.class);
-        UserReference userCReference = mock(UserReference.class);
-        UserReference userDReference = mock(UserReference.class);
-        when(this.userReferenceResolver.resolve(userA)).thenReturn(userAReference);
-        when(this.userReferenceResolver.resolve(userB)).thenReturn(userBReference);
-        when(this.userReferenceResolver.resolve(userC)).thenReturn(userCReference);
-        when(this.userReferenceResolver.resolve(userD)).thenReturn(userDReference);
-        UserProperties userAProperties = mock(UserProperties.class);
-        UserProperties userBProperties = mock(UserProperties.class);
-        UserProperties userCProperties = mock(UserProperties.class);
-        UserProperties userDProperties = mock(UserProperties.class);
-        when(this.userPropertiesResolver.resolve(userAReference)).thenReturn(userAProperties);
-        when(this.userPropertiesResolver.resolve(userBReference)).thenReturn(userBProperties);
-        when(this.userPropertiesResolver.resolve(userCReference)).thenReturn(userCProperties);
-        when(this.userPropertiesResolver.resolve(userDReference)).thenReturn(userDProperties);
-
-        when(userAProperties.getProperty("interval", NotificationEmailInterval.DAILY))
-            .thenReturn(NotificationEmailInterval.WEEKLY);
-        when(userBProperties.getProperty("interval", NotificationEmailInterval.DAILY))
-            .thenReturn(NotificationEmailInterval.DAILY);
-        when(userCProperties.getProperty("interval", NotificationEmailInterval.DAILY))
-            .thenReturn(NotificationEmailInterval.DAILY);
-        when(userDProperties.getProperty("interval", NotificationEmailInterval.DAILY))
-            .thenReturn(NotificationEmailInterval.DAILY);
+        DocumentReference classReference = new DocumentReference("wikiA",
+            Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
+        when(documentAccessBridge.getProperty(userA, classReference, "interval")).thenReturn("weekly");
+        when(documentAccessBridge.getProperty(userB, classReference, "interval")).thenReturn("daily");
+        when(documentAccessBridge.getProperty(userC, classReference, "interval")).thenReturn(null);
+        when(documentAccessBridge.getProperty(userD, classReference, "interval")).thenReturn("daily");
 
         // Test with DAILY interval
         this.userIterator.initialize(NotificationEmailInterval.DAILY);

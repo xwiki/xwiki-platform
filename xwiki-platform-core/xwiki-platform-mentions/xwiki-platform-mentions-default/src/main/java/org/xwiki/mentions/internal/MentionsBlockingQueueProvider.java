@@ -17,26 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
+package org.xwiki.mentions.internal;
 
-import org.xwiki.notifications.NotificationFormat;
+import java.util.concurrent.BlockingQueue;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
+ * Blocking queue provider.
+ *
  * @version $Id$
- * @since 12.1RC1
+ * @since 12.6RC1
  */
-public class ForUserEventFilter extends AbstractForUserEventFilter
+@Role
+public interface MentionsBlockingQueueProvider
 {
     /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
+     * Initialize a blocking queue.
+     *
+     * @return The blocking queue
      */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
-    {
-        super("forUserEventFilter", format, read, false);
-    }
+    BlockingQueue<MentionsData> initBlockingQueue();
 }

@@ -17,26 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
+package org.xwiki.mentions.internal;
 
-import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mentions.internal.async.MentionsData;
+
+import com.xpn.xwiki.XWikiException;
 
 /**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
+ * Consume a mention data and analyse it.
+ *
  * @version $Id$
- * @since 12.1RC1
+ * @since 12.6RC1
  */
-public class ForUserEventFilter extends AbstractForUserEventFilter
+@Role
+public interface MentionsDataConsumer
 {
     /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
+     * Read the mention data to identify if mention notification needs to be save for the document or object 
+     * creation or modification.
+     *
+     * @param data the mention data
+     * @throws XWikiException in case of error during the analysis
      */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
-    {
-        super("forUserEventFilter", format, read, false);
-    }
+    void consume(MentionsData data) throws XWikiException;
 }

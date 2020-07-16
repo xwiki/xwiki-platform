@@ -1034,6 +1034,18 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # notifications.async.poolSize = 2
 
 #-------------------------------------------------------------------------------------
+# Mentions
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.6RC1]
+#-# The detection and notification for the user mentions in created or edited content is done asynchronously 
+#-# by a pool of consumers.
+#-# This properties controls the size of this pool.
+#-#
+#-# The default is :
+# mentions.poolSize = 1
+
+#-------------------------------------------------------------------------------------
 # Event Stream
 #-------------------------------------------------------------------------------------
 

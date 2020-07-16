@@ -175,7 +175,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
     {
         WikiReference eventWiki = event.getWiki();
 
-        if (CollectionUtils.isEmpty(event.getTarget())) {
+        if (CollectionUtils.isNotEmpty(event.getTarget())) {
             // The event explicitly indicate with which entities to associated it
 
             event.getTarget().forEach(entity -> {

@@ -84,10 +84,8 @@
             <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
             <id>default</id>
             <configuration>
-              <excludes>
-                <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/authorization/cache/internal/DefaultSecurityCache.java
-              </excludes>
+              <failsOnError>true</failsOnError>
+              <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
             </configuration>
           </execution>
         </executions>

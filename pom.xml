@@ -93,7 +93,7 @@
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.20</mysql.version>
+    <mysql.version>8.0.21</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>2.6.1</mariadb.version>
@@ -402,7 +402,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.5.0</version>
+        <version>5.6.0</version>
       </dependency>
 
       <dependency>
@@ -506,7 +506,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.1.15</version>
+        <version>2.1.16</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -516,7 +516,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.57</version>
+        <version>3.0.58</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

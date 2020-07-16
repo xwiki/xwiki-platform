@@ -44,6 +44,7 @@ import org.xwiki.test.docker.junit5.UITest;
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
         // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
@@ -51,7 +52,9 @@ import org.xwiki.test.docker.junit5.UITest;
         // Needed by the subwikis
         "org.xwiki.platform:xwiki-platform-wiki-script",
         "org.xwiki.platform:xwiki-platform-wiki-user-default",
-        "org.xwiki.platform:xwiki-platform-wiki-user-script"
+        "org.xwiki.platform:xwiki-platform-wiki-user-script",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     },
     extensionOverrides = {
         @ExtensionOverride(

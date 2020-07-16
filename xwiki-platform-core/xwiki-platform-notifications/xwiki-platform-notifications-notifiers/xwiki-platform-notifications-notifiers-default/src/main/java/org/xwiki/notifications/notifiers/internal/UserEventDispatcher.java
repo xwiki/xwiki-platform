@@ -26,6 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -42,10 +43,13 @@ import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.user.group.GroupException;
+import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.internal.group.UsersCache;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -77,7 +81,13 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
     private ExecutionContextManager ecm;
 
     @Inject
+    private DocumentReferenceResolver<String> resolver;
+
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private GroupManager groupManager;
 
     @Inject
     private EventStore events;
@@ -165,12 +175,38 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
     {
         WikiReference eventWiki = event.getWiki();
 
-        // Associated event with event's wiki users
-        dispatch(event, this.userCache.getUsers(eventWiki, true));
+        if (CollectionUtils.isEmpty(event.getTarget())) {
+            // The event explicitly indicate with which entities to associated it
 
-        // Also take into account global users (main wiki users) if the event is on a subwiki
-        if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
-            dispatch(event, this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true));
+            event.getTarget().forEach(entity -> {
+                DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
+
+                // Associated the entity
+                saveEventStatus(event, entity);
+                saveMailEntityEvent(event, entity);
+
+                // Also recursively associate the members of the entity if it's a group
+                try {
+                    this.groupManager.getMembers(entityReference, true).forEach(userReference -> {
+                        String userId = this.entityReferenceSerializer.serialize(userReference);
+                        saveEventStatus(event, userId);
+                        saveMailEntityEvent(event, userId);
+                    });
+                } catch (GroupException e) {
+                    this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            });
+        } else {
+            // Try to find users listening to this event
+
+            // Associated event with event's wiki users
+            dispatch(event, this.userCache.getUsers(eventWiki, true));
+
+            // Also take into account global users (main wiki users) if the event is on a subwiki
+            if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
+                dispatch(event, this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true));
+            }
         }
     }
 
@@ -183,7 +219,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
             if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
                 // Associate the event with the user
                 String userId = this.entityReferenceSerializer.serialize(user);
-                this.events.saveEventStatus(new DefaultEventStatus(event, userId, false));
+                saveEventStatus(event, userId);
             }
 
             // Make sure the notification module is allowed to send mails
@@ -191,11 +227,21 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
             if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
                 // Associate the event with the user
                 String userId = this.entityReferenceSerializer.serialize(user);
-                this.events.saveMailEntityEvent(new DefaultEntityEvent(event, userId));
+                saveMailEntityEvent(event, userId);
             }
         }
 
         // Remember we are done pre filtering this event
         this.events.prefilterEvent(event);
+    }
+
+    private void saveEventStatus(Event event, String entityId)
+    {
+        this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
+    }
+
+    private void saveMailEntityEvent(Event event, String entityId)
+    {
+        this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
     }
 }

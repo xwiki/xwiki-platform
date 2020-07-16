@@ -22,6 +22,7 @@ package org.xwiki.eventstream.store.solr.internal;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +166,26 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         saveEventStatus(status.getEvent().getId(), status.getEntityId(), false, false);
 
         return Optional.of(status);
+    }
+
+    @Override
+    protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(serializeCompareCondition(new CompareQueryCondition(Event.FIELD_DATE, date, CompareType.LESS_OR_EQUALS, false)));
+
+        builder.append(" AND ");
+
+        builder.append(serializeStatusCondition(new StatusQueryCondition(entityId, null, false)));
+
+        try {
+            this.client.deleteByQuery(builder.toString());
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to delete the event", e);
+        }
+
+        return null;
     }
 
     @Override
@@ -456,6 +477,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append(':');
                 builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
             } else {
+                builder.append('(');
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
                 builder.append(':');
                 builder.append("[* TO *]");
@@ -463,11 +485,13 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                 builder.append(':');
                 builder.append("[* TO *]");
+                builder.append(')');
             }
 
             return builder.toString();
         } else if (condition.getStatusEntityId() != null) {
             StringBuilder builder = new StringBuilder();
+            builder.append('(');
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
             builder.append(':');
             builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
@@ -475,6 +499,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
             builder.append(':');
             builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(')');
 
             return builder.toString();
         }

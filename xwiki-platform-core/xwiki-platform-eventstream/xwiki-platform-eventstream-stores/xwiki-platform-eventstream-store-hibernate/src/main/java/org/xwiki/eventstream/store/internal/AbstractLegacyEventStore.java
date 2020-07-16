@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.Date;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -111,6 +112,18 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
         }
 
         return Optional.of(status);
+    }
+
+    @Override
+    protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
+    {
+        try {
+            this.eventStatusManager.deleteAllForEntity(date, entityId);
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to delete the statuses from the old event store", e);
+        }
+
+        return null;
     }
 
     @Override

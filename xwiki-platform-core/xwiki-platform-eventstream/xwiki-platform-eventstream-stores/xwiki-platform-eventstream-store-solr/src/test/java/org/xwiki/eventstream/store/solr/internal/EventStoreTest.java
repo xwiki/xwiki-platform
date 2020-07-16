@@ -200,6 +200,56 @@ public class EventStoreTest
     }
 
     @Test
+    public void saveDeleteEventStatuses() throws Exception
+    {
+        Date date0 = new Date(0);
+        Date date10 = new Date(10);
+        Date date20 = new Date(20);
+        Date date30 = new Date(30);
+        Date date40 = new Date(40);
+
+        EVENT1.setDate(date10);
+        EVENT2.setDate(date20);
+        EVENT3.setDate(date30);
+        EVENT4.setDate(date40);
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2);
+        this.eventStore.saveEvent(EVENT3);
+        this.eventStore.saveEvent(EVENT4);
+
+        DefaultEventStatus status11 = eventstatus(EVENT1, "entity1", true);
+        DefaultEventStatus status12 = eventstatus(EVENT1, "entity2", false);
+        DefaultEventStatus status21 = eventstatus(EVENT2, "entity1", false);
+        DefaultEventStatus status22 = eventstatus(EVENT2, "entity3", true);
+        DefaultEventStatus status31 = eventstatus(EVENT3, "entity1", true);
+        DefaultEventStatus status41 = eventstatus(EVENT4, "entity1", true);
+
+        this.eventStore.saveEventStatus(status11);
+        this.eventStore.saveEventStatus(status12);
+        this.eventStore.saveEventStatus(status21);
+        this.eventStore.saveEventStatus(status22);
+        this.eventStore.saveEventStatus(status31);
+        this.eventStore.saveEventStatus(status41).get();
+
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
+
+        this.eventStore.deleteEventStatus(status12).get();
+
+        assertSearch(Arrays.asList(), new SimpleEventQuery().withStatus("entity2"));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+
+        this.eventStore.deleteEventStatuses("entity1", date0).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+
+        this.eventStore.deleteEventStatuses("entity1", date20).get();
+
+        assertSearch(Arrays.asList(EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+    }
+
+    @Test
     public void allSearch()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
@@ -424,7 +474,7 @@ public class EventStoreTest
         DefaultEventStatus status21 = eventstatus(EVENT2, "entity1", false);
         DefaultEventStatus status22 = eventstatus(EVENT2, "entity3", true);
 
-        this.eventStore.saveEventStatus(status11).get();
+        this.eventStore.saveEventStatus(status11);
         this.eventStore.saveEventStatus(status12);
         this.eventStore.saveEventStatus(status21);
         this.eventStore.saveEventStatus(status22).get();

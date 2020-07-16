@@ -162,6 +162,11 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** Additional rights implied by this right. */
     private final Set<Right> impliedRights;
 
+    /**
+     * Immutable instance of the Additional rights implied by this right.
+     */
+    private transient Set<Right> immutableImpliedRights;
+
     /** Additional rights implied by this right. */
     private final boolean isReadOnly;
 
@@ -181,6 +186,23 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     }
 
     /**
+     * Construct a new Right from its description.
+     * This is a package private constructor, the registration of a new right should be done using
+     * the {@link AuthorizationManager}
+     *
+     * @param description Description of the right to create.
+     * @param impliedByRights the already existing rights that imply this new right.
+     * @since 12.6RC1
+     */
+    Right(RightDescription description, Set<Right> impliedByRights)
+    {
+        this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
+            description.getInheritanceOverridePolicy(),
+            description.getImpliedRights(),
+            description.getTargetedEntityType(), description.isReadOnly(), impliedByRights);
+    }
+
+    /**
      * Construct a new Right.
      * @param name The string representation of this right.
      * @param defaultState The default state, in case no matching right is found at any level.
@@ -193,6 +215,26 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly)
+    {
+        this(name, defaultState, tieResolutionPolicy, inheritanceOverridePolicy, impliedRights, validEntityTypes,
+            isReadOnly, Collections.emptySet());
+    }
+
+    /**
+     * Construct a new Right.
+     * @param name The string representation of this right.
+     * @param defaultState The default state, in case no matching right is found at any level.
+     * @param tieResolutionPolicy Whether this right should be allowed or denied in case of a tie.
+     * @param inheritanceOverridePolicy Policy on how this right should be overridden by lower levels.
+     * @param impliedRights Additional rights implied by this right.
+     * @param validEntityTypes The type of entity where this right should be enabled.
+     * @param isReadOnly If true, this right could be allowed when the wiki is in read-only mode.
+     * @param impliedByRights Rights that imply the new right we are adding.
+     * @since 12.6RC1
+     */
+    private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
+        boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
+        boolean isReadOnly, Set<Right> impliedByRights)
     {
         checkIllegalArguments(name, defaultState, tieResolutionPolicy);
 
@@ -223,6 +265,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             } else {
                 // If enabled on a wiki, enable also on main wiki.
                 enableFor(FARM);
+            }
+
+            for (Right impliedByRight : impliedByRights) {
+                impliedByRight.impliedRights.add(this);
             }
         }
     }
@@ -269,21 +315,15 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /**
      * Clone implied Rights.
      * @param impliedRights the collection of rights to clone.
-     * @return the cloned collection or null if no valid implied right has been provided.
+     * @return the cloned collection or an empty RightSet.
      */
     private Set<Right> cloneImpliedRights(Set<Right> impliedRights)
     {
         if (impliedRights == null || impliedRights.size() == 0) {
-            return null;
+            return new RightSet();
         }
 
-        Set<Right> implied = new RightSet(impliedRights);
-
-        if (implied.size() > 0) {
-            return Collections.unmodifiableSet(implied);
-        } else {
-            return null;
-        }
+        return new RightSet(impliedRights);
     }
 
     /**
@@ -373,7 +413,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     @Override
     public Set<Right> getImpliedRights()
     {
-        return impliedRights;
+        if (this.immutableImpliedRights == null && !impliedRights.isEmpty()) {
+            this.immutableImpliedRights = Collections.unmodifiableSet(this.impliedRights);
+        }
+        return this.immutableImpliedRights;
     }
 
     @Override

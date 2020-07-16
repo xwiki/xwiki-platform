@@ -100,7 +100,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
 
-    /** The new entry being added */
+    /** The new entry being added. */
     private SecurityCacheEntry newEntry;
 
     /**
@@ -221,7 +221,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             SecurityCacheEntry parent1 = DefaultSecurityCache.this.getEntry(entry.getReference());
             if (parent1 == null) {
                 throw new ParentEntryEvictedException(String.format(
-                    "The first parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available in the cache.",
+                    "The first parent with reference [%s] for the entry [%s] with wiki [%s] is no longer "
+                        + "available in the cache.",
                     parent1, entry, wiki));
             }
             SecurityCacheEntry parent2 = (isSelf) ? parent1
@@ -229,7 +230,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     : DefaultSecurityCache.this.getEntry(entry.getUserReference());
             if (parent2 == null) {
                 throw new ParentEntryEvictedException(String.format(
-                    "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available in the cache.",
+                    "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available "
+                        + "in the cache.",
                     parent2, entry, wiki));
             }
             this.parents = (isSelf) ? Arrays.asList(parent1) : Arrays.asList(parent1, parent2);

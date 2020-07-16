@@ -22,6 +22,7 @@ package org.xwiki.eventstream.internal;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,6 +92,11 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         /**
          * @since 12.6RC1
          */
+        DELETE_STATUSES,
+
+        /**
+         * @since 12.6RC1
+         */
         DELETE_MAIL_ENTITY,
 
         /**
@@ -146,6 +152,19 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         public EventStoreTaskType getType()
         {
             return this.type;
+        }
+    }
+
+    private static class DeleteStatusesData
+    {
+        private final String entityId;
+
+        private final Date date;
+
+        DeleteStatusesData(String entityId, Date date)
+        {
+            this.entityId = entityId;
+            this.date = date;
         }
     }
 
@@ -239,6 +258,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     }
 
     @Override
+    public CompletableFuture<Void> deleteEventStatuses(String entityId, Date date)
+    {
+        return addTask(new DeleteStatusesData(entityId, date), EventStoreTaskType.DELETE_STATUSES);
+    }
+
+    @Override
     public CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event)
     {
         return addTask(event, EventStoreTaskType.DELETE_MAIL_ENTITY);
@@ -312,6 +337,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                     syncDeleteEventStatus((EventStatus) task.input));
                 break;
 
+            case DELETE_STATUSES:
+                EventStoreTask<Void, DeleteStatusesData> deleteStatusesTask =
+                    (EventStoreTask<Void, DeleteStatusesData>) task;
+                processTaskOutput(deleteStatusesTask,
+                    syncDeleteEventStatuses(deleteStatusesTask.input.entityId, deleteStatusesTask.input.date));
+                break;
+
             case SAVE_STATUS:
                 processTaskOutput((EventStoreTask<EventStatus, EventStatus>) task,
                     syncSaveEventStatus((EventStatus) task.input));
@@ -380,6 +412,10 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 this.observation.notify(new EventStatusDeletedEvent(), task.output);
                 break;
 
+            case DELETE_STATUSES:
+                this.observation.notify(new EventStatusDeletedEvent(), null);
+                break;
+
             case SAVE_STATUS:
                 this.observation.notify(new EventStatusAddOrUpdatedEvent(), task.output);
                 break;
@@ -423,6 +459,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
      * @param status the event status to save
      */
     protected abstract Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException;
+
+    /**
+     * @param entityId the id of the entity for which to remove the statuses
+     * @param date the date before which to remove the statuses
+     * @since 12.6RC1
+     */
+    protected abstract Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException;
 
     /**
      * @param event the event/entity relation to delete

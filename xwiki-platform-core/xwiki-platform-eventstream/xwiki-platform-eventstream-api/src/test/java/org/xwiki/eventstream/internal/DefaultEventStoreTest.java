@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -116,12 +117,24 @@ public class DefaultEventStoreTest
     }
 
     @Test
-    void deleteEventstatus() throws EventStreamException
+    void deleteEventStatus() throws EventStreamException
     {
         this.defaultStore.deleteEventStatus(EVENTSTATUS);
 
         verify(this.store).deleteEventStatus(EVENTSTATUS);
         verify(this.legacyStore).deleteEventStatus(EVENTSTATUS);
+    }
+
+    @Test
+    void deleteEventStatuses() throws EventStreamException
+    {
+        String entityId = "entity";
+        Date date = new Date();
+
+        this.defaultStore.deleteEventStatuses(entityId, date);
+
+        verify(this.store).deleteEventStatuses(entityId, date);
+        verify(this.legacyStore).deleteEventStatuses(entityId, date);
     }
 
     @Test

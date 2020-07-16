@@ -19,9 +19,12 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -82,4 +85,21 @@ public interface AuthorizationManager
      * the same right does not cause an exception and return the existing right.
      */
     Right register(RightDescription rightDescription) throws UnableToRegisterRightException;
+
+    /**
+     * Register a new custom {@link Right} and add it as an implied right to the given set of rights.
+     *
+     * @param rightDescription the full description of the new {@link Right}
+     * @param impliedByRights the rights that should imply the new right.
+     * @return the created {@link Right}
+     * @throws UnableToRegisterRightException if an error prevent creation of the new right. Registering exactly
+     * the same right does not cause an exception and return the existing right.
+     * @since 12.6RC1
+     */
+    @Unstable
+    default Right register(RightDescription rightDescription, Set<Right> impliedByRights)
+        throws UnableToRegisterRightException
+    {
+        return register(rightDescription);
+    }
 }

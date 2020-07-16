@@ -19,6 +19,9 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -174,8 +177,16 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     @Override
     public Right register(RightDescription rightDescription) throws UnableToRegisterRightException
     {
+        // By default Admin should imply any newly registered right.
+        return register(rightDescription, Collections.singleton(Right.ADMIN));
+    }
+
+    @Override
+    public Right register(RightDescription rightDescription, Set<Right> impliedByRights)
+        throws UnableToRegisterRightException
+    {
         try {
-            Right newRight = new Right(rightDescription);
+            Right newRight = new Right(rightDescription, impliedByRights);
             // cleanup the cache since a new right scheme enter in action
             securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
             return newRight;

@@ -28,18 +28,14 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.internal.async.MentionsUpdatedRequest;
-import org.xwiki.mentions.internal.async.jobs.MentionsUpdateJob;
-import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Listen to entities update. 
@@ -58,7 +54,10 @@ public class MentionsUpdatedEventListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private JobExecutor jobExecutor;
+    private MentionsEventExecutor executor;
+
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
 
     /**
      * Default constructor.
@@ -71,21 +70,14 @@ public class MentionsUpdatedEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        if (!(event instanceof DocumentUpdatedEvent) || this.remoteObservationManagerContext.isRemoteState()) {
+            return;
+        }
+
         this.logger.debug("Event [{}] received from [{}] with data [{}].",
             DocumentUpdatedEvent.class.getName(), source, data);
 
         XWikiDocument doc = (XWikiDocument) source;
-        XWikiContext ctx = (XWikiContext) data;
-        MentionsUpdatedRequest mentionsUpdatedRequest =
-            new MentionsUpdatedRequest(doc, doc.getOriginalDocument(), ctx.getUserReference());
-        mentionsUpdatedRequest.setVerbose(false);
-
-        try {
-            this.jobExecutor.execute(MentionsUpdateJob.ASYNC_REQUEST_TYPE, mentionsUpdatedRequest);
-        } catch (JobException e) {
-            this.logger.warn(
-                "Failed to create a Job for the Event [{}] received from [{}] with data [{}]. Cause: [{}]",
-                DocumentUpdatedEvent.class.getName(), source, data, getRootCauseMessage(e));
-        }
+        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
     }
 }

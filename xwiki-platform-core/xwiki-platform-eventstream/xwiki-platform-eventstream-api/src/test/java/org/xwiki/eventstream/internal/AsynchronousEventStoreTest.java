@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,6 +141,18 @@ public class AsynchronousEventStoreTest
             }
 
             return Optional.empty();
+        }
+
+        @Override
+        protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
+        {
+            this.events.forEach((eventId, entry) -> {
+                if (entry.event.getDate() != null && !entry.event.getDate().after(date)) {
+                    entry.statuses.remove(entityId);
+                }
+            });
+
+            return null;
         }
 
         @Override

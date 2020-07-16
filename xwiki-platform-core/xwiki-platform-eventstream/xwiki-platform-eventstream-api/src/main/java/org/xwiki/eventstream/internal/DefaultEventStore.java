@@ -273,6 +273,28 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
+    public CompletableFuture<Void> deleteEventStatuses(String entityId, Date date)
+    {
+        CompletableFuture<Void> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.deleteEventStatuses(entityId, date);
+        }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.deleteEventStatuses(entityId, date);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event)
     {
         CompletableFuture<Optional<EventStatus>> future = null;

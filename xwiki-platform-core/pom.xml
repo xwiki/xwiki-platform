@@ -183,6 +183,11 @@
                 <justification>Young API</justification>
               </item>
               <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.lang.Void&gt; org.xwiki.eventstream.EventStore::deleteEventStatuses(java.lang.String, java.util.Date)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
                 <code>java.method.removed</code>
                 <old>method void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)</old>
                 <justification>Young API</justification>

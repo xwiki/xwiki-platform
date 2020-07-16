@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionsConfiguration;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.mentions.internal.MentionsFormatter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -48,6 +49,9 @@ public class MentionsScriptService implements ScriptService
     @Inject
     private MentionsFormatter formatter;
 
+    @Inject
+    private MentionsEventExecutor eventExecutor;
+
     /**
      *
      * @see MentionsConfiguration#getMentionsColor()
@@ -67,6 +71,18 @@ public class MentionsScriptService implements ScriptService
     {
         return this.configuration.getSelfMentionsColor();
     }
+
+    /**
+     * @see MentionsEventExecutor#getQueueSize()
+     * @return the current size of the queue of elements (page, comments...) with mentions to analyze
+     * @since 12.6RC1
+     */
+    @Unstable
+    public long getQueueSize()
+    {
+        return this.eventExecutor.getQueueSize();
+    }
+
 
     /**
      *

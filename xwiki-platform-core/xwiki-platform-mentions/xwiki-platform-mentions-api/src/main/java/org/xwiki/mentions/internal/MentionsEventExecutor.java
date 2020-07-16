@@ -19,44 +19,36 @@
  */
 package org.xwiki.mentions.internal;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
 
 /**
- * A service for manipulating XDOM trees in the context of the mentions.
+ * Execution the notifications for the mentions asynchronously.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
 @Role
-public interface MentionXDOMService
+public interface MentionsEventExecutor
 {
     /**
-     * Search for the mentions macro inside an {@link XDOM}.
-     * @param xdom The xdom.
-     * @return The list of mentions macro found in the XDOM.
-     */
-    List<MacroBlock> listMentionMacros(XDOM xdom);
-
-    /**
-     * Count the number of mentions per reference.
+     * Looks for mentions in the content and creates notifications accordingly.
      *
-     * @param mentions the list of mentions.
-     * @return the map of anchors of mentions per reference. If the anchor is not specified, then the list must contain
-     *          an empty value (null or empty string).
+     * @param documentReference the document reference
+     * @param authorReference the author reference
+     * @param version the document version
+     *
      */
-    Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions);
+    void execute(DocumentReference documentReference, DocumentReference authorReference, String version);
 
     /**
      *
-     * @param payload the string to parse.
-     * @return The result of the parsing. Empty if the parsing failed.
+     * @return the current size of the queue of mentions to analyze.
      */
-    Optional<XDOM> parse(String payload);
+    long getQueueSize();
+
+    /**
+     * Start the threads of the mentions task consumers.
+     */
+    void startThreads();
 }

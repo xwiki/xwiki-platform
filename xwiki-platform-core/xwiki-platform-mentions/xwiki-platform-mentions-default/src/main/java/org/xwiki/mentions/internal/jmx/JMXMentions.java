@@ -17,41 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal.async;
+package org.xwiki.mentions.internal.jmx;
+
+import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.text.XWikiToStringBuilder;
-
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
- * Mention created request, send to create a mention analysis async job.
+ * Implementation of the Mentions JXM MBean.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-public class MentionsCreatedRequest extends AbstractRequest
+public class JMXMentions implements JMXMentionsMBean
 {
-    private final XWikiDocument doc;
+    private final Collection<MentionsData> queue;
+
+    private final Supplier<Integer> threadNumber;
 
     /**
-     *
-     * @param doc created document.
+     * Default construct.
+     * @param queue The mentions analysis task queue.
+     * @param threadNumber The current number of threads
      */
-    public MentionsCreatedRequest(XWikiDocument doc)
+    public JMXMentions(Collection<MentionsData> queue,
+        Supplier<Integer> threadNumber)
     {
-        this.doc = doc;
+        this.queue = queue;
+
+        this.threadNumber = threadNumber;
     }
 
-    /**
-     *
-     * @return created document
-     */
-    public XWikiDocument getDoc()
+    @Override
+    public int getQueueSize()
     {
-        return this.doc;
+        return this.queue.size();
+    }
+
+    @Override
+    public void clearQueue()
+    {
+        this.queue.clear();
+    }
+
+    @Override
+    public Integer getThreadNumber()
+    {
+        return this.threadNumber.get();
     }
 
     @Override
@@ -65,10 +80,11 @@ public class MentionsCreatedRequest extends AbstractRequest
             return false;
         }
 
-        MentionsCreatedRequest that = (MentionsCreatedRequest) o;
+        JMXMentions that = (JMXMentions) o;
 
         return new EqualsBuilder()
-                   .append(this.doc, that.doc)
+                   .append(this.queue, that.queue)
+                   .append(this.threadNumber, that.threadNumber)
                    .isEquals();
     }
 
@@ -76,15 +92,8 @@ public class MentionsCreatedRequest extends AbstractRequest
     public int hashCode()
     {
         return new HashCodeBuilder(17, 37)
-                   .append(this.doc)
+                   .append(this.queue)
+                   .append(this.threadNumber)
                    .toHashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return new XWikiToStringBuilder(this)
-                   .append("doc", this.getDoc())
-                   .build();
     }
 }

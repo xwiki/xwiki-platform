@@ -17,26 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
+package org.xwiki.mentions.internal.async;
 
-import org.xwiki.notifications.NotificationFormat;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.internal.MentionsThreadsProvider;
+
+import static java.lang.Thread.NORM_PRIORITY;
 
 /**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
+ * Default implementation of {@link MentionsThreadsProvider}.
+ *
  * @version $Id$
- * @since 12.1RC1
+ * @since 12.6RC1
  */
-public class ForUserEventFilter extends AbstractForUserEventFilter
+@Component
+@Singleton
+public class DefaultMentionsThreadsProvider implements MentionsThreadsProvider
 {
-    /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
-     */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
+    private static final String THREAD_NAME = "Mentions thread";
+
+    @Override
+    public Thread initializeThread(Runnable runnable)
     {
-        super("forUserEventFilter", format, read, false);
+        Thread thread = new Thread(runnable);
+        thread.setName(THREAD_NAME);
+        thread.setPriority(NORM_PRIORITY - 1);
+        return thread;
     }
 }

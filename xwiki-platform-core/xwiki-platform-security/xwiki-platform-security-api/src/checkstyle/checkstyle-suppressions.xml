@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,27 +18,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.notifications.filters.internal.status;
+-->
 
-import org.xwiki.notifications.NotificationFormat;
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.0//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
-/**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
- * @version $Id$
- * @since 12.1RC1
- */
-public class ForUserEventFilter extends AbstractForUserEventFilter
-{
-    /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
-     */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
-    {
-        super("forUserEventFilter", format, read, false);
-    }
-}
+<suppressions>
+  <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
+  <suppress checks="ClassFanOutComplexity" files="DefaultSecurityCache.java"/>
+
+  <!-- Error because of the usage of 8 parameters in private constructor. This is not easy to improve to avoid
+       duplicated code -->
+  <suppress checks="ParameterNumber" files="Right.java"/>
+</suppressions>

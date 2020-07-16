@@ -17,26 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
+package org.xwiki.mentions.internal;
 
-import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
+ * Provide a thread pool to analyze the mentions.
+ *
  * @version $Id$
- * @since 12.1RC1
+ * @since 12.6RC1
  */
-public class ForUserEventFilter extends AbstractForUserEventFilter
+@Role
+public interface MentionsThreadsProvider
 {
     /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
+     * Initialize a thead.
+     * @param runnable a runnable 
+     * @return a thread initialized with the runnable
      */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
-    {
-        super("forUserEventFilter", format, read, false);
-    }
+    Thread initializeThread(Runnable runnable);
 }

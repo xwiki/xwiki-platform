@@ -17,26 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
-
-import org.xwiki.notifications.NotificationFormat;
+package org.xwiki.mentions.internal.jmx;
 
 /**
- * Filter which select events which have been associated with a specific user by a pre filtering process.
- * 
+ * Interface of the Mentions JMX MBean.
+ *
  * @version $Id$
- * @since 12.1RC1
+ * @since 12.6RC1
  */
-public class ForUserEventFilter extends AbstractForUserEventFilter
+public interface JMXMentionsMBean
 {
     /**
-     * Construct an {@link ForUserEventFilter}.
-     * 
-     * @param format format on which the filter applies
-     * @param read true if only read status should be included, false for only unread
+     *
+     * @return the mentions analysis tasks queue size.
      */
-    public ForUserEventFilter(NotificationFormat format, Boolean read)
-    {
-        super("forUserEventFilter", format, read, false);
-    }
+    int getQueueSize();
+
+    /**
+     * Clear the mentions analysis tasks queue.
+     */
+    void clearQueue();
+
+    /**
+     * @return the current number of threads dedicated to user mentions analysis tasks
+     */
+    Integer getThreadNumber();
 }

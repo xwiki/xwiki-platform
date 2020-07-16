@@ -19,6 +19,8 @@
  */
 package org.xwiki.mentions.internal;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -30,8 +32,6 @@ import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
-
-import static java.util.Collections.singleton;
 
 /**
  * Default implementation of {@link MentionNotificationService}.
@@ -65,15 +65,18 @@ public class DefaultMentionNotificationService implements MentionNotificationSer
         } else {
             extractedQuote = null;
         }
+
         MentionEventParams params = new MentionEventParams()
-                                        .setUserReference(mentionNotificationParameters.getAuthorReference().toString())
-                                        .setDocumentReference(
-                                            mentionNotificationParameters.getDocumentReference().toString())
+                                        .setUserReference(this.serializer.serialize(
+                                            mentionNotificationParameters.getAuthorReference()))
+                                        .setDocumentReference(this.serializer.serialize(
+                                            mentionNotificationParameters.getDocumentReference()))
                                         .setLocation(mentionNotificationParameters.getLocation())
                                         .setAnchor(mentionNotificationParameters.getAnchorId())
                                         .setQuote(extractedQuote);
         MentionEvent event =
-            new MentionEvent(singleton(this.serializer.serialize(mentionNotificationParameters.getMentionedIdentity())),
+            new MentionEvent(
+                Collections.singleton(this.serializer.serialize(mentionNotificationParameters.getMentionedIdentity())),
                 params);
         this.observationManager.notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
     }

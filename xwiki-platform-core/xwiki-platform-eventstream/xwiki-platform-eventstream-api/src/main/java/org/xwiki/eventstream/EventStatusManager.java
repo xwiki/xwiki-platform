@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Handle the statuses for the events.
@@ -65,7 +64,7 @@ public interface EventStatusManager
     @Deprecated
     default void deleteEventStatus(EventStatus eventStatus) throws Exception
     {
-        
+
     }
 
     /**
@@ -73,8 +72,9 @@ public interface EventStatusManager
      * @param entityId the id of the entity concerned by the status
      * @throws Exception if an error occurs
      * @since 12.1RC1
+     * @deprecated since 12.6RC1, use {@link EventStore#deleteEventStatuses(String, Date)} instead
      */
-    @Unstable
+    @Deprecated
     default void deleteAllForEntity(Date startDate, String entityId) throws Exception
     {
     }

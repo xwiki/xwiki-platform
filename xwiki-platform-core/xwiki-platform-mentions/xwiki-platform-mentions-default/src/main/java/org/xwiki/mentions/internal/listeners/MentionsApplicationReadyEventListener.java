@@ -19,63 +19,41 @@
  */
 package org.xwiki.mentions.internal.listeners;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import static java.util.Collections.singletonList;
 
 /**
- * Listen to entities creation. 
+ * Listen for the application to be ready before starting the mentions task consumers.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
 @Component
 @Singleton
-@Named("MentionsCreatedEventListener")
-public class MentionsCreatedEventListener extends AbstractEventListener
+@Named("MentionsApplicationReadyEventListener")
+public class MentionsApplicationReadyEventListener extends AbstractEventListener
 {
-    private static final List<DocumentCreatedEvent> EVENTS = singletonList(new DocumentCreatedEvent());
-
     @Inject
-    private Logger logger;
-
-    @Inject
-    private MentionsEventExecutor executor;
-    
-    @Inject
-    private RemoteObservationManagerContext remoteObservationManagerContext;
+    private MentionsEventExecutor eventExecutor;
 
     /**
      * Default constructor.
      */
-    public MentionsCreatedEventListener()
+    public MentionsApplicationReadyEventListener()
     {
-        super("MentionsCreatedEventListener", EVENTS);
+        super("MentionsApplicationReadyEventListener", new ApplicationReadyEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (!(event instanceof DocumentCreatedEvent) || this.remoteObservationManagerContext.isRemoteState()) {
-            return;
-        }
-        this.logger.debug("Event [{}] received from [{}] with data [{}].",
-            DocumentCreatedEvent.class.getName(), source, data);
-        XWikiDocument doc = (XWikiDocument) source;
-        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
+        this.eventExecutor.startThreads();
     }
 }

@@ -163,7 +163,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private final Set<Right> impliedRights;
 
     /**
-     * Mutable instance of the Additional rights implied by this right.
+     * Immutable instance of the Additional rights implied by this right.
      */
     private transient Set<Right> immutableImpliedRights;
 

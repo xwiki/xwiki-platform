@@ -21,6 +21,7 @@ package org.xwiki.mentions.internal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -92,9 +93,7 @@ public class DefaultQuoteService implements QuoteService
             if (block instanceof MacroBlock) {
                 ret =
                     ((MacroBlock) block).getId().equals("mention")
-                        && Optional.ofNullable(block.getParameter("anchor"))
-                               .map(it -> it.equals(this.anchorId))
-                               .orElse(false);
+                        && Objects.equals(Objects.toString(block.getParameter("anchor"), ""), this.anchorId);
             } else {
                 ret = false;
             }

@@ -94,15 +94,13 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Override
     public void startThreads()
     {
-        if (!this.threadStarted) {
-            synchronized (this) {
-                if (!this.threadStarted) {
-                    int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
-                    for (int i = 0; i < nbThreads; i++) {
-                        startConsumer();
-                    }
-                    this.threadStarted = true;
+        synchronized (this) {
+            if (!this.threadStarted) {
+                int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
+                for (int i = 0; i < nbThreads; i++) {
+                    startConsumer();
                 }
+                this.threadStarted = true;
             }
         }
     }

@@ -32,13 +32,15 @@
   <name>XWiki Platform - Ratings - API</name>
   <description>API to rate wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.20</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       org.xwiki.contrib.ratings:application-ratings-api
     </xwiki.extension.features>
+    <!-- Needs to be installed on root to be able to use Solr Store -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>
@@ -59,6 +61,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
@@ -93,7 +100,8 @@
                 org/xwiki/ratings/ReputationException.java,
                 org/xwiki/ratings/internal/DefaultReputationAlgorithm.java,
                 org/xwiki/ratings/internal/SeparatePageRatingsManager.java,
-                org/xwiki/ratings/internal/SimpleReputationAlgorithm.java
+                org/xwiki/ratings/internal/SimpleReputationAlgorithm.java,
+                org/xwiki/ratings/internal/SolrRatingsManager.java
               </excludes>
             </configuration>
           </execution>

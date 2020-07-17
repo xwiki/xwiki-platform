@@ -37,73 +37,71 @@ import com.xpn.xwiki.XWiki;
 @Role
 public interface RatingsManager
 {
-    public static final String RATINGS_CLASSPAGE = "RatingsClass";
+    String RATINGS_CLASSPAGE = "RatingsClass";
 
-    public static final String RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + RATINGS_CLASSPAGE;
+    String RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + RATINGS_CLASSPAGE;
 
-    public static final LocalDocumentReference RATINGS_CLASSREFERENCE =
+    LocalDocumentReference RATINGS_CLASSREFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, RATINGS_CLASSPAGE);
 
-    public static final String AVERAGE_RATINGS_CLASSPAGE = "AverageRatingsClass";
+    String AVERAGE_RATINGS_CLASSPAGE = "AverageRatingsClass";
 
-    public static final String AVERAGE_RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + AVERAGE_RATINGS_CLASSPAGE;
+    String AVERAGE_RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + AVERAGE_RATINGS_CLASSPAGE;
 
-    public static final LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE =
+    LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE =
         new LocalDocumentReference("XWiki", AVERAGE_RATINGS_CLASSPAGE);
 
-    public static final String RATING_CLASS_FIELDNAME_DATE = "date";
+    String RATING_CLASS_FIELDNAME_DATE = "date";
 
-    public static final String RATING_CLASS_FIELDNAME_AUTHOR = "author";
+    String RATING_CLASS_FIELDNAME_AUTHOR = "author";
 
-    public static final String RATING_CLASS_FIELDNAME_VOTE = "vote";
+    String RATING_CLASS_FIELDNAME_VOTE = "vote";
 
-    public static final String RATING_CLASS_FIELDNAME_PARENT = "parent";
+    String RATING_CLASS_FIELDNAME_PARENT = "parent";
 
-    public static final String AVERAGERATING_CLASS_FIELDNAME_NBVOTES = "nbvotes";
+    String AVERAGERATING_CLASS_FIELDNAME_NBVOTES = "nbvotes";
 
-    public static final String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE = "averagevote";
+    String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE = "averagevote";
 
-    public static final String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD = "method";
+    String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD = "method";
 
-    public static final String RATING_REPUTATION_METHOD_BALANCED = "balanced";
+    String RATING_REPUTATION_METHOD_BALANCED = "balanced";
 
-    public static final String RATING_REPUTATION_METHOD_AVERAGE = "average";
+    String RATING_REPUTATION_METHOD_AVERAGE = "average";
 
-    public static final String RATING_REPUTATION_METHOD_DEFAULT = "average";
+    String RATING_REPUTATION_METHOD_DEFAULT = "average";
 
-    public static final String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.";
+    String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.";
 
-    public static final String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
+    String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
 
-    public static final LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE =
-        new LocalDocumentReference("XWiki", "RatingsConfig");
+    LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE = new LocalDocumentReference("XWiki", "RatingsConfig");
 
-    public static final String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
+    String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
 
-    public static final LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE =
-        new LocalDocumentReference("XWiki", "RatingsConfigClass");
+    LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE = new LocalDocumentReference("XWiki", "RatingsConfigClass");
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE = "storageSpace";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE = "storageSpace";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES = "storageSeparateSpaces";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES = "storageSeparateSpaces";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING = "storeAverageRating";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING = "storeAverageRating";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION = "reputation";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION = "reputation";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED = "reputationStored";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED = "reputationStored";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD = "reputationMethod";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD = "reputationMethod";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT = "reputationAlgorithmHint";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT = "reputationAlgorithmHint";
 
-    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM = "reputationCustomAlgorithm";
+    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM = "reputationCustomAlgorithm";
 
-    public static final String RATINGS_CONFIG_FIELDNAME_MANAGER_HINT = "managerHint";
+    String RATINGS_CONFIG_FIELDNAME_MANAGER_HINT = "managerHint";
 
-    public static final String RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT = "reputationAlgorithmHint";
+    String RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT = "reputationAlgorithmHint";
 
     /**
      * Gets the ratings class.
@@ -113,7 +111,8 @@ public interface RatingsManager
     String getRatingsClassName();
 
     /**
-     * Gets a list of ratings
+     * Gets a list of ratings.
+     * Note that if count and start are both 0, retrieve all ratings.
      * 
      * @param documentRef the document to which the ratings belong to
      * @param start the offset from where to fetch the ratings

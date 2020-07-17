@@ -46,7 +46,9 @@ public interface Rating
      *
      * @return BaseObject rating object
      * @throws RatingsException when an error occurs while fetching this average rating.
+     * @deprecated Since 12.7RC1 this method shouldn't be used anymore: Ratings are not necessarily stored as xobjects.
      */
+    @Deprecated
     BaseObject getAsObject() throws RatingsException;
 
     /**
@@ -126,7 +128,9 @@ public interface Rating
      * Store the rating information.
      *
      * @throws RatingsException when an error occurs while saving this average rating.
+     * @deprecated Since 12.7RC1: only {@link RatingsManager} should be responsible to save the ratings.
      */
+    @Deprecated
     void save() throws RatingsException;
 
     /**
@@ -134,7 +138,9 @@ public interface Rating
      * 
      * @return the status of the action
      * @throws RatingsException when an error occurs while removing this average rating
+     * @deprecated Since 12.7RC1: only {@link RatingsManager} should be responsible to remove the ratings.
      */
+    @Deprecated
     boolean remove() throws RatingsException;
 
     /**

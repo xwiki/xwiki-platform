@@ -91,7 +91,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>default|separate</values>
+      <values>default|separate|solr</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </managerHint>
     <reputation>

@@ -47,6 +47,8 @@ public class RatingsException extends XWikiException
 
     public static final int ERROR_RATINGS_SAVERATING_NULLDOCUMENT = 1120005;
 
+    public static final int ERROR_RATING_SOLR_CORE = 1120006;
+
     /**
      * RatingsException default constructor
      */

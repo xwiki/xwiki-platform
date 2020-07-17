@@ -80,6 +80,8 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Inject
     private ConfigurationSource configuration;
 
+    private boolean threadStarted;
+
     @Override
     public void initialize()
     {
@@ -92,9 +94,16 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Override
     public void startThreads()
     {
-        int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
-        for (int i = 0; i < nbThreads; i++) {
-            startConsumer();
+        if (!this.threadStarted) {
+            synchronized (this) {
+                if (!this.threadStarted) {
+                    int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
+                    for (int i = 0; i < nbThreads; i++) {
+                        startConsumer();
+                    }
+                    this.threadStarted = true;
+                }
+            }
         }
     }
 

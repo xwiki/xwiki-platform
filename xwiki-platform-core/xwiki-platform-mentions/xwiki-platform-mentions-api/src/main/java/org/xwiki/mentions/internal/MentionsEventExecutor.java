@@ -46,4 +46,9 @@ public interface MentionsEventExecutor
      * @return the current size of the queue of mentions to analyze.
      */
     long getQueueSize();
+
+    /**
+     * Start the threads of the mentions task consumers.
+     */
+    void startThreads();
 }

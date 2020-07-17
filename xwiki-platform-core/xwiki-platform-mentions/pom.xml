@@ -43,15 +43,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jetbrains</groupId>
-        <artifactId>annotations</artifactId>
-        <version>19.0.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <modules>
     <module>xwiki-platform-mentions-api</module>
     <module>xwiki-platform-mentions-notifications</module>

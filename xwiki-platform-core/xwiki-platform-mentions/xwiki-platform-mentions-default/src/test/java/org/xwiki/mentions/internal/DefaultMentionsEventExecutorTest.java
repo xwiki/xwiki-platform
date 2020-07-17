@@ -90,7 +90,6 @@ class DefaultMentionsEventExecutorTest
     void initialize()
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
-        verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
         verify(this.jmxRegistration).registerMBean(any(JMXMentions.class), eq("name=mentions"));
     }
 
@@ -124,7 +123,8 @@ class DefaultMentionsEventExecutorTest
                                  .setWikiId("xwiki")
                                  .setVersion("1.0");
         when(this.blockingQueue.poll()).thenReturn(value);
-
+        this.executor.startThreads();
+        verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
         this.executor.getConsumers().get(0).consume();
 
         assertEquals(1, this.logCapture.size());

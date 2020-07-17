@@ -727,6 +727,13 @@
         <artifactId>netty-buffer</artifactId>
         <version>${netty.version}</version>
       </dependency>
+
+      <!-- Jetbrain's annotations are used by several dependencies -->
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>19.0.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

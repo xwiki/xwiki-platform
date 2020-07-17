@@ -79,6 +79,8 @@ public class DefaultMentionNotificationParametersServiceTest
         when(this.serializer.serialize(mentionedIdentity)).thenReturn("xwiki:XWiki.U2");
         when(this.configuration.isQuoteActivated()).thenReturn(true);
         when(this.quote.extract(xdom, "anchor")).thenReturn(Optional.of("quote some content"));
+        when(this.serializer.serialize(authorReference)).thenReturn("xwiki:XWiki.Author");
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:XWiki.Doc");
 
         this.notificationService.sendNotification(
             new MentionNotificationParameters(authorReference, documentReference, mentionedIdentity,
@@ -109,6 +111,8 @@ public class DefaultMentionNotificationParametersServiceTest
         Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
         when(this.serializer.serialize(mentionedIdentity)).thenReturn("xwiki:XWiki.U2");
         when(this.configuration.isQuoteActivated()).thenReturn(false);
+        when(this.serializer.serialize(authorReference)).thenReturn("xwiki:XWiki.Author");
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:XWiki.Doc");
 
         this.notificationService.sendNotification(
             new MentionNotificationParameters(authorReference, documentReference, mentionedIdentity,

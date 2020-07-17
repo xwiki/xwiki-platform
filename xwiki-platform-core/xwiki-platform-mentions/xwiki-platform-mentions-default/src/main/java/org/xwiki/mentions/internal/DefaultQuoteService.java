@@ -19,11 +19,12 @@
  */
 package org.xwiki.mentions.internal;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -112,7 +113,10 @@ public class DefaultQuoteService implements QuoteService
             if (parent instanceof XDOM) {
                 // if the parent of the mention block is the XDOM, we instead select the previous and next  blocks
                 block = new ParagraphBlock(
-                    Arrays.asList(mentionBlock.getPreviousSibling(), mentionBlock, mentionBlock.getNextSibling()));
+                    Stream.of(mentionBlock.getPreviousSibling(), mentionBlock, mentionBlock.getNextSibling())
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                );
             } else {
                 block = parent;
             }

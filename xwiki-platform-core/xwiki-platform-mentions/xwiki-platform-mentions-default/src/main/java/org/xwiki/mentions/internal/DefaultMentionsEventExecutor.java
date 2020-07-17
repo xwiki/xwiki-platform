@@ -80,17 +80,29 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Inject
     private ConfigurationSource configuration;
 
+    private boolean threadStarted;
+
     @Override
     public void initialize()
     {
         this.queue = this.blockingQueueProvider.initBlockingQueue();
         this.consumers = new ArrayList<>();
-        int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
-        for (int i = 0; i < nbThreads; i++) {
-            startConsumer();
-        }
         JMXMentionsMBean mbean = new JMXMentions(this.queue, () -> this.consumers.size());
         this.jmxRegistration.registerMBean(mbean, MBEAN_NAME);
+    }
+
+    @Override
+    public void startThreads()
+    {
+        synchronized (this) {
+            if (!this.threadStarted) {
+                int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
+                for (int i = 0; i < nbThreads; i++) {
+                    startConsumer();
+                }
+                this.threadStarted = true;
+            }
+        }
     }
 
     private void startConsumer()

@@ -7,6 +7,7 @@ org.xwiki.mentions.internal.DefaultMentionsDataConsumer
 org.xwiki.mentions.internal.DefaultMentionsEventExecutor
 org.xwiki.mentions.internal.DefaultMentionXDOMService
 org.xwiki.mentions.internal.DefaultQuoteService
+org.xwiki.mentions.internal.listeners.MentionsApplicationReadyEventListener
 org.xwiki.mentions.internal.listeners.MentionsCreatedEventListener
 org.xwiki.mentions.internal.listeners.MentionsUpdatedEventListener
 org.xwiki.mentions.internal.MentionsConfigurationSource

@@ -49,7 +49,6 @@ public class DefaultMentionNotificationService implements MentionNotificationSer
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    // TODO: probably badly placed
     @Inject
     private QuoteService quote;
 

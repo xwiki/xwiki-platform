@@ -64,10 +64,13 @@ define(["polyfills"], function () {
 
       // listen to events
       this.logic.onEventWhere("filter",
-        function (data) {
-          return (data.property === self.propertyId) && (data.index === undefined || data.index === self.index);
+        function (detail) {
+          if (detail.type === "removeAll") {
+            return (detail.property === self.propertyId);
+          }
+          return (detail.oldEntry.property === self.propertyId) && detail.oldEntry.index === self.index;
         },
-        function (data) { self.filter(); }
+        function (detail) { self.filter(); }
       );
     };
 
@@ -96,7 +99,7 @@ define(["polyfills"], function () {
      * }
      */
     Filter.prototype._createParameters = function () {
-      var filterGroup = this.logic.getQueryFilter(this.propertyId) || {};
+      var filterGroup = this.logic.getQueryFilterGroup(this.propertyId) || {};
       // return the param object
       return {
         filterGroup: filterGroup,

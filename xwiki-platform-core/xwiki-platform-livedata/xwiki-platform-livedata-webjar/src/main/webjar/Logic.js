@@ -627,14 +627,27 @@ define([
 
 
     /**
-     * Get the filter query associated to a property id
+     * Get the filter in the query data object associated to a property id
      * @param {String} propertyId
+     * @returns {Object}
      */
-    getQueryFilter: function (propertyId) {
+    getQueryFilterGroup: function (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       return this.data.query.filters.find(function (filter) {
         return filter.property === propertyId;
       });
+    },
+
+
+    /**
+     * Get the filters in the query data object associated to a property id
+     * @param {String} propertyId
+     * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
+     */
+    getQueryFilters: function (propertyId) {
+      if (!this.isValidPropertyId(propertyId)) { return; }
+      var queryFilterGroup = this.getQueryFilterGroup(propertyId);
+      return queryFilterGroup && queryFilterGroup.constrains || [];
     },
 
 
@@ -653,6 +666,70 @@ define([
 
 
     /**
+     * Return an object containing the new and old filter entries corresponding to parameters
+     *  oldEntry: the filter entry to be modified
+     *  newEntrh: what this entry should be modified to
+     * @param {String} property The property to filter according to
+     * @param {String} index The index of the filter entry
+     * @param {String} filterEntry The filter data used to update the filter configuration
+     *  (see Logic.prototype.filter for more)
+     * @returns {Object} {oldEntry, newEntry}
+     *  with oldEntry / newEntry being {property, index, operator, value}
+     */
+    _computeFilterEntries: function (property, index, filterEntry) {
+      var self = this;
+      if (!this.isValidPropertyId(property)) { return; }
+      if (!this.isPropertyFilterable(property)) { return; }
+      // default indexes
+      index = index || 0;
+      if (index < 0) { return; }
+      if (filterEntry.index < 0) { filterEntry.index = -1; }
+      // old entry
+      var oldEntry = {
+        property: property,
+        index: (index < 0 ? -1 : index)
+      };
+      var queryFilters = this.getQueryFilters(property);
+      var currentEntry = queryFilters[index] || {};
+      oldEntry = $.extend({}, currentEntry, oldEntry);
+      // new entry
+      var newEntry = filterEntry || {};
+      var defaultEntry = {
+        property: property,
+        value: "",
+        get operator () { return self.getFilterDefaultOperator(this.property); },
+        index: 0,
+      };
+      newEntry = $.extend({}, defaultEntry, oldEntry, newEntry);
+      return {
+        oldEntry: oldEntry,
+        newEntry: newEntry,
+      };
+    },
+
+
+    /**
+     * Return the filtering type, based on oldEntry and newEntry
+     * @param {Object} oldEntry
+     * @param {Oject} newEntry
+     * @returns {String} "add" | "remove" | "move" | "modify"
+     */
+    _getFilteringType: function (oldEntry, newEntry) {
+      var queryFilter = this.getQueryFilterGroup(oldEntry.property);
+      if (queryFilter && oldEntry.index >= queryFilter.constrains.length) {
+        return "add";
+      }
+      if (newEntry.index === -1) {
+        return "remove";
+      }
+      if (oldEntry.index !== newEntry.index) {
+        return "move";
+      }
+      return "modify";
+    },
+
+
+    /**
      * Update filter configuration based on parameters, then fetch new data
      * @param {String} property The property to filter according to
      * @param {String} index The index of the filter entry
@@ -660,53 +737,44 @@ define([
      *  filterEntry = {property, operator, value}
      *  undefined values are defaulted to current values, then to default values.
      * @param {String} filterEntry.property The new property to filter according to
-     * @param {String} filter.operator The operator of the filter.
+     * @param {String} filterEntry.index The new index the filter should go. -1 delete filter
+     * @param {String} filterEntry.operator The operator of the filter.
      *  Should match the filter descriptor of the filter property
-     * @param {String} filter.value Value for the new filter entry
+     * @param {String} filterEntry.value Value for the new filter entry
      */
     filter: function (property, index, filterEntry) {
-      var self = this;
-      if (!this.isValidPropertyId(property)) { return; }
-      if (!this.isPropertyFilterable(property)) { return; }
-      // default index
-      index = index || 0;
-      if (index < 0) { return; }
-      // filter entry at current index
-      var queryFilterGroup = this.getQueryFilter(property) || {};
-      var queryFilter = queryFilterGroup.constrains || [];
-      var currentEntry = queryFilter[index] || {};
-      // default filterEntry
-      filterEntry = filterEntry || {};
-      var defaultFilterEntry = {
-        property: property,
-        value: "",
-        get operator () {
-          return self.getFilterDefaultOperator(this.property);
-        },
-      };
-      filterEntry = $.extend({}, defaultFilterEntry, currentEntry, filterEntry);
-      if (filterEntry.operator === undefined) { return; }
-      // apply filter
+      var filterEntries = this._computeFilterEntries(property, index, filterEntry);
+      if (!filterEntries) { return; }
+      var oldEntry = filterEntries.oldEntry;
+      var newEntry = filterEntries.newEntry;
+      var filteringType = this._getFilteringType(oldEntry, newEntry);
       // remove filter at current property and index
-      if (queryFilter[index]) {
-        queryFilter.splice(index, 1);
-      }
+      this.getQueryFilters(oldEntry.property).splice(index, 1);
       // add filter at new property and index
-      if (!this.getQueryFilter(filterEntry.property)) {
-        this.data.query.filters.push({
-          property: filterEntry.property,
-          matchAll: true,
-          constrains: [],
+      if (newEntry.index !== -1) {
+        // create filterGroup if not exists
+        if (!this.getQueryFilterGroup(newEntry.property)) {
+          this.data.query.filters.push({
+            property: newEntry.property,
+            matchAll: true,
+            constrains: [],
+          });
+        }
+        // add entry
+        this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+          operator: newEntry.operator,
+          value: newEntry.value,
         });
       }
-      this.getQueryFilter(filterEntry.property).constrains.splice(index, 0, filterEntry);
+      // remove filter group if empty
+      if (this.getQueryFilters(oldEntry.property).length === 0) {
+        this.removeAllFilters(oldEntry.property);
+      }
       // dispatch events
       this.triggerEvent("filter", {
-        type: "modify",
-        property: filterEntry.property,
-        operator: filterEntry.operator,
-        value: filterEntry.value,
-        index: index,
+        type: filteringType,
+        oldEntry: oldEntry,
+        newEntry: newEntry,
       });
 
       // CALL FUNCTION TO FETCH NEW DATA HERE
@@ -720,7 +788,7 @@ define([
      * @param {String} value Default value for the new filter entry
      */
     addFilter: function (property, operator, value) {
-      var index = ((this.getQueryFilter(property) || []).constrains || []).length;
+      var index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
       this.filter(property, index, {
         property: property,
         operator: operator,
@@ -735,24 +803,7 @@ define([
      * @param {String} index The index of the filter to remove. Undefined means last.
      */
     removeFilter: function (property, index) {
-      if (!this.isValidPropertyId(property)) { return; }
-      var filter = this.getQueryFilter(property);
-      if (!filter || filter.constrains.length === 0) { return; }
-      // default index
-      if (index === undefined) {
-        index = filter.constrains.length - 1;
-      }
-      if (index < 0) { return; }
-      // remove filter
-      var removedFilterArray = filter.constrains.splice(index, 1);
-      // dispatch events
-      this.triggerEvent("filter", {
-        type: "remove",
-        property: property,
-        index: index,
-        removedFilter: removedFilterArray[0],
-      });
-      // CALL FUNCTION TO FETCH NEW DATA HERE
+      this.filter(property, index, {index: -1});
     },
 
 

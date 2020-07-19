@@ -32,7 +32,7 @@
 
         <div class="filters">
           <livedata-advanced-panel-filter-entry
-            v-for="(filter, filterIdx) in logic.getQueryFilter(filterGroup.property).constrains"
+            v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
             :key="filterIdx"
             :logic="logic"
             :filter="filter"
@@ -123,7 +123,7 @@ define([
       unfilteredProperties: function () {
         var self = this;
         return this.logic.getFilterablePropertyDescriptors().filter(function (propertyDescriptor) {
-          var filter = self.logic.getQueryFilter(propertyDescriptor.id);
+          var filter = self.logic.getQueryFilterGroup(propertyDescriptor.id);
           return !filter || filter.constrains.length === 0;
         });
       },

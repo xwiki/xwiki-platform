@@ -106,7 +106,7 @@ define([
       eventName = "xwiki:livedata:" + eventName;
       eventData = {
         bubbles: true,
-        detail: $.extend({}, defaultData, eventData),
+        detail: $.extend(defaultData, eventData),
       };
       var event = new CustomEvent(eventName, eventData);
       // dispatch event
@@ -162,8 +162,23 @@ define([
      */
 
 
+    /**
+     * Return the list of all property ids (from propertyDescriptors)
+     * @returns {Array}
+     */
+    getPropertyIds: function () {
+      return this.data.meta.propertyDescriptors.map(function (propertyDescriptor) {
+        return propertyDescriptor.id;
+      });
+    },
+
+
+    /**
+     * Return whether the specified property id is valid (i.e. the property has a descriptor)
+     * @param {String} propertyId
+     */
     isValidPropertyId: function (propertyId) {
-      return this.data.query.properties.indexOf(propertyId) !== -1;
+      return this.getPropertyIds().indexOf(propertyId) !== -1;
     },
 
 
@@ -195,6 +210,7 @@ define([
      */
     getPropertyTypeDescriptor: function (propertyId) {
       var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      if (!propertyDescriptor) { return; }
       return this.data.meta.propertyTypes.find(function (typeDescriptor) {
         return typeDescriptor.id === propertyDescriptor.type;
       });
@@ -221,9 +237,11 @@ define([
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      if (!propertyDescriptor) { return; }
       var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
       // property type descriptor config
       var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      if (!typeDescriptor) { return; }
       var typeDescriptorDisplayer = typeDescriptor.displayer || {};
       // default displayer config
       var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
@@ -243,9 +261,11 @@ define([
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      if (!propertyDescriptor) { return; }
       var propertyDescriptorFilter = propertyDescriptor.filter || {};
       // property type descriptor config
       var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      if (!typeDescriptor) { return; }
       var typeDescriptorFilter = typeDescriptor.filter || {};
       // default filter config
       var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
@@ -361,7 +381,7 @@ define([
       var self = this;
       return new Promise (function (resolve, reject) {
         if (pageIndex < 0 || pageIndex >= self.getPageCount()) { return void reject(); }
-        var previousPageIndex = self.data.query.offset;
+        var previousPageIndex = self.getPageIndex();
         self.data.query.offset = self.getFirstIndexOfPage(pageIndex);
         self.triggerEvent("pageChange", {
           pageIndex: pageIndex,
@@ -417,6 +437,7 @@ define([
       return new Promise (function (resolve, reject) {
         if (pageSize < 0) { return void reject(); }
         var previousPageSize = self.data.query.limit;
+        if (pageSize === previousPageSize) { return void resolve(); }
         self.data.query.limit = pageSize;
         self.triggerEvent("pageSizeChange", {
           pageSize: pageSize,
@@ -648,7 +669,7 @@ define([
       // old entry
       var oldEntry = {
         property: property,
-        index: (index < 0 ? -1 : index)
+        index: index,
       };
       var queryFilters = this.getQueryFilters(property);
       var currentEntry = queryFilters[index] || {};
@@ -783,14 +804,14 @@ define([
     removeAllFilters: function (property) {
       var self = this;
       return new Promise (function (resolve, reject) {
-        if (!this.isValidPropertyId(property)) { return; }
-        var filterIndex = this.data.query.filters.findIndex(function (filterGroup, i) {
+        if (!self.isValidPropertyId(property)) { return; }
+        var filterIndex = self.data.query.filters.findIndex(function (filterGroup, i) {
           return filterGroup.property === property;
         });
         if (filterIndex === -1) { return void reject(); }
-        var removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
+        var removedFilterGroups = self.data.query.filters.splice(filterIndex, 1);
         // dispatch events
-        this.triggerEvent("filter", {
+        self.triggerEvent("filter", {
           type: "removeAll",
           property: property,
           removedFilters: removedFilterGroups[0].constrains,

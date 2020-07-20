@@ -45,7 +45,6 @@ define([], {
 
   methods: {
     applyFilter: function (newValue) {
-      console.log("apply!", newValue);
       this.logic.filter(this.propertyId, this.index, {value: newValue});
     },
   },

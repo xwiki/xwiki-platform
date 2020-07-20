@@ -11,6 +11,8 @@
 
         <!-- Column name -->
         <tr class="column-header">
+          <!-- Entry Select All-->
+          <th class="entry-selector"></th>
           <th
             v-for="col in cols"
             :key="col.id"
@@ -35,6 +37,7 @@
 
         <!-- Column filter -->
         <tr class="column-filters">
+          <th class="entry-selector"></th>
           <th
             v-for="col in cols"
             :key="col.id"
@@ -57,6 +60,14 @@
           v-for="(row, rowId) in rows"
           :key="rowId"
         >
+
+          <!-- Entry Select All-->
+          <td class="entry-selector">
+            <livedata-entry-selector
+              :entry="row"
+              :logic="logic"
+            ></livedata-entry-selector>
+          </td>
 
           <td
             class="cell"
@@ -104,6 +115,7 @@ define([
   "vue!" + BASE_PATH + "livedata-topbar.html",
   "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
   "vue!" + BASE_PATH + "/filters/livedata-filter.html",
+  "vue!" + BASE_PATH + "/livedata-entry-selector.html",
 ], function (
   Vue
 ) {
@@ -164,6 +176,11 @@ define([
   padding-left: 8px;
   padding-right: 8px;
   width: 100%;
+}
+
+.livedata-layout-table .entry-selector {
+    padding: 0;
+    height: 100%;
 }
 
 .livedata-layout-table .cell {

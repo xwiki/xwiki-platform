@@ -66,6 +66,7 @@ define([
   var Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    this.selectedEntries = [];
     element.removeAttribute("data-data");
     // create Vuejs instance
     new Vue({
@@ -448,6 +449,51 @@ define([
       });
     },
 
+
+
+
+    /**
+     * ---------------------------------------------------------------
+     * ACTIONS
+     */
+
+
+    /**
+     * Select the specified entry (to perform action afterward)
+     * @param {Object} entry
+     */
+    selectEntry: function (entry) {
+      if (this.selectedEntries.indexOf(entry) !== -1) { return; }
+      this.selectedEntries.push(entry);
+    },
+
+
+    /**
+     * Unselect the specified entry
+     * @param {Object} entry
+     */
+    unselectEntry: function (entry) {
+      var index = this.selectedEntries.indexOf(entry);
+      if (index === -1) { return; }
+      this.selectedEntries.splice(index, 1);
+    },
+
+
+    /**
+     * Toggle the selection of the specified entry
+     * @param {Object} entry
+     * @param {Boolean} select Whether to seelct or not the entry. Undefined toggle current state
+     */
+    toggleSelectEntry: function (entry, select) {
+      if (select === undefined) {
+        select = this.selectedEntries.indexOf(entry) === -1;
+      }
+      if (select) {
+        this.selectEntry(entry);
+      } else {
+        this.unselectEntry(entry);
+      }
+    },
 
 
 

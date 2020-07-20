@@ -12,13 +12,23 @@
         v-for="(entry, entryId) in entries"
         :key="entryId"
       >
-        <h2 v-if="!!titlePropertyId">
-          <livedata-displayer
-            :property-id="titlePropertyId"
+        <!-- Cartd title-->
+        <div class="card-title">
+          <livedata-entry-selector
             :entry="entry"
             :logic="logic"
-          ></livedata-displayer>
-        </h2>
+          ></livedata-entry-selector>
+
+          <h2 v-if="!!titlePropertyId">
+            <livedata-displayer
+              :property-id="titlePropertyId"
+              :entry="entry"
+              :logic="logic"
+            ></livedata-displayer>
+          </h2>
+        </div>
+
+        <!-- Card properties-->
         <div
           class="card-property"
           v-for="property in displayedProperties"
@@ -68,6 +78,7 @@ define([
   "Vue",
   "vue!" + BASE_PATH + "livedata-topbar.html",
   "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
+  "vue!" + BASE_PATH + "/livedata-entry-selector.html",
 ], function (
   Vue
 ) {
@@ -122,10 +133,22 @@ define([
   transition: height 0.5s;
 }
 
+.livedata-layout-cards .card-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.livedata-layout-cards .livedata-entry-selector {
+  width: unset;
+  padding: 10px;
+  margin-left: -10px;
+}
 .livedata-layout-cards h2 {
   margin-top: 10px;
   font-size: 20px;
 }
+
 
 .livedata-layout-cards .property-name {
   margin-right: 0.5em;

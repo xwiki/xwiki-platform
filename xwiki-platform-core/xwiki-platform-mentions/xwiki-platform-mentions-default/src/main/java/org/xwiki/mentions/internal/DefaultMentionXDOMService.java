@@ -29,12 +29,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
@@ -42,6 +43,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of {@link MentionXDOMService}.
@@ -63,8 +65,7 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     private Logger logger;
 
     @Inject
-    @Named("xwiki/2.1")
-    private Parser parser;
+    private ComponentManager componentManager;
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
@@ -97,15 +98,21 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     }
 
     @Override
-    public Optional<XDOM> parse(String payload)
+    public Optional<XDOM> parse(String payload, Syntax syntax)
     {
         Optional<XDOM> oxdom;
         try {
-            XDOM xdom = this.parser.parse(new StringReader(payload));
+            Parser instance = this.componentManager.getInstance(Parser.class, syntax.toIdString());
+            XDOM xdom = instance.parse(new StringReader(payload));
             oxdom = Optional.of(xdom);
         } catch (ParseException e) {
             this.logger
                 .warn("Failed to parse the payload [{}]. Cause [{}].", payload, ExceptionUtils.getRootCauseMessage(e));
+            oxdom = Optional.empty();
+        } catch (ComponentLookupException e) {
+            this.logger
+                .warn("Failed to get the parser instance [{}]. Cause [{}].", syntax,
+                    ExceptionUtils.getRootCauseMessage(e));
             oxdom = Optional.empty();
         }
         return oxdom;

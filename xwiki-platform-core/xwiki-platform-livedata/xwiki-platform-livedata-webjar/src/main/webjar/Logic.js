@@ -423,53 +423,6 @@ define([
 
     /**
      * ---------------------------------------------------------------
-     * DISPLAYERS
-     */
-
-
-    /**
-     * Return a new displayer widget based on the specified property and row data
-     * @param {String} propertyId The id of the property of the entry
-     * @param {Object} entry The entry data object
-     * @param {String} displayerId
-     * @returns {Promise}
-     */
-    createDisplayer: function (propertyId, entry, displayerId) {
-      var self = this;
-
-      return new Promise (function (resolve, reject) {
-        // default displayerId
-        if (displayerId === undefined) {
-          displayerId = self.getDisplayerDescriptor(propertyId).id;
-        }
-
-        var componentName = "displayer-" + displayerId;
-
-        // load success callback
-        var loadDisplayerSuccess = function () {
-          resolve(componentName);
-        };
-
-        // load error callback
-        var loadDisplayerFailure = function (err) {
-          console.warn(err);
-          reject();
-        };
-
-        // load displayer based on it's id
-        require(["vue!" + BASE_PATH + "displayers/" + componentName + ".html"],
-          loadDisplayerSuccess,
-          loadDisplayerFailure
-        );
-
-      });
-    },
-
-
-
-
-    /**
-     * ---------------------------------------------------------------
      * SORT
      */
 

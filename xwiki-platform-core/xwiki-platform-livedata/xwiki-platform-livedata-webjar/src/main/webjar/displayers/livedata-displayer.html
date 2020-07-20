@@ -1,11 +1,11 @@
 <template>
-    <component
-      v-if="componentName"
-      :is="componentName"
-      :property-id="propertyId"
-      :entry="entry"
-      :logic="logic"
-    ></component>
+  <component
+    v-if="componentName"
+    :is="componentName"
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  ></component>
 </template>
 
 
@@ -53,15 +53,48 @@ define([
       };
     },
 
+    computed: {
+      displayerId: function () {
+        return this.logic.getDisplayerDescriptor(this.propertyId).id;
+      },
+    },
+
+    methods: {
+      loadDisplayer: function (displayerId) {
+        var self = this;
+        return new Promise (function (resolve, reject) {
+
+          var componentName = "displayer-" + displayerId;
+
+          // load success callback
+          var loadDisplayerSuccess = function () {
+            self.componentName = componentName;
+            resolve();
+          };
+
+          // load error callback
+          var loadDisplayerFailure = function (err) {
+            console.warn(err);
+            reject();
+          };
+
+          // load displayer based on it's id
+          require(["vue!" + BASE_PATH + "displayers/" + componentName + ".html"],
+            loadDisplayerSuccess,
+            loadDisplayerFailure
+          );
+        });
+
+      },
+    },
+
     mounted: function () {
       var self = this;
-
-      this.logic.createDisplayer(this.propertyId, this.entry)
-      .then(function (componentName) {
-        self.componentName = componentName;
-      })
-      .catch(function () {
-        self.componentName = "base-displayer";
+      // load displayer
+      this.loadDisplayer(this.displayerId).catch(function () {
+        self.loadDisplayer("default").catch(function (err) {
+          console.error(err);
+        });
       });
     },
 

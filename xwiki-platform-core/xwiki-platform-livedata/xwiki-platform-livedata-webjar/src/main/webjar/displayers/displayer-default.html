@@ -1,3 +1,19 @@
+<template>
+  <base-displayer
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  >
+
+    <template #viewer></template>
+
+    <template #editor></template>
+
+  </base-displayer>
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,49 +33,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define([], {
+define([
+  "Vue",
+  BASE_PATH + "displayers/displayer-mixin.js",
+  "vue!" + BASE_PATH + "displayers/base-displayer.html",
+], function (
+  Vue,
+  displayerMixin
+) {
 
-  directives: {
-    autofocus: {
-      inserted: function (el) { el.focus(); }
-    },
-  },
+  Vue.component("displayer-default", {
 
-  props: {
-    propertyId: String,
-    entry: Object,
-    logic: Object,
-  },
+    name: "displayer-default",
 
-  computed: {
-    value: function () {
-      return this.entry[this.propertyId];
-    },
-    propertyDescriptor: function () {
-      return this.logic.getPropertyDescriptor(this.propertyId);
-    },
-    config: function () {
-      return this.logic.getDisplayerDescriptor(this.propertyId);
-    },
-    data: function () {
-      return this.logic.data;
-    },
-  },
+    template: template,
 
-  methods: {
+    mixins: [displayerMixin],
 
-    applyEdit: function (newValue) {
-      // TODO: should call the logic API instead, but this is just for quick prove of concept
-      this.entry[this.propertyId] = newValue;
-      this.$el.__vue__.view();
-    },
-
-    cancelEdit: function () {
-      this.$el.__vue__.view();
-    },
-
-  },
-
-
+  });
 
 });
+</script>
+
+
+<style>
+
+</style>

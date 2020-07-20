@@ -4,7 +4,6 @@
       'livedata-displayer',
       isView ? 'view' : 'edit',
     ]"
-
     tabindex="0"
     @dblclick="edit"
     @keypress.self.enter="edit"
@@ -20,8 +19,6 @@
     <slot
       name="editor"
       v-if="!isView"
-      @change="applyEdit"
-      @cancel="abortEdit"
     >
       <input
         class="default-input"
@@ -31,7 +28,7 @@
         :value="value"
         @focusout="applyEdit($event.target.value)"
         @keypress.enter="applyEdit($event.target.value)"
-        @keydown.esc="abortEdit"
+        @keydown.esc="cancelEdit"
       />
     </slot>
 
@@ -61,8 +58,10 @@
    */
   define([
     "Vue",
+    BASE_PATH + "displayers/displayer-mixin.js",
   ], function (
-    Vue
+    Vue,
+    displayerMixin
   ) {
 
     Vue.component("base-displayer", {
@@ -71,37 +70,13 @@
 
       template: template,
 
-      directives: {
-        autofocus: {
-          inserted: function (el) { el.focus(); }
-        },
-      },
+      mixins: [displayerMixin],
 
-      props: {
-        propertyId: String,
-        entry: Object,
-        logic: Object,
-      },
 
       data: function () {
         return {
           isView: true,
         };
-      },
-
-      computed: {
-        value: function () {
-          return this.entry[this.propertyId];
-        },
-        propertyDescriptor: function () {
-          return this.logic.getPropertyDescriptor(this.propertyId);
-        },
-        config: function () {
-          return this.logic.getDisplayerDescriptor(this.propertyId);
-        },
-        data: function () {
-          return this.logic.data;
-        },
       },
 
 
@@ -110,23 +85,12 @@
         view: function () {
           if (this.isView) { return; }
           this.isView = true;
+          this.$el.focus();
         },
 
         edit: function () {
           if (!this.isView) { return; }
           this.isView = false;
-        },
-
-        applyEdit: function (newValue) {
-          // TODO: should call the logic API instead, but this is just for quick prove of concept
-          this.entry[this.propertyId] = newValue;
-          this.view();
-          this.$el.focus();
-        },
-
-        abortEdit: function () {
-          this.view();
-          this.$el.focus();
         },
 
       },

@@ -87,6 +87,9 @@ define({
         id: "age",
         name: "Age",
         type: "number",
+        displayer: {
+          id: 'number',
+        },
       },
       {
         id: "job",

@@ -820,51 +820,6 @@ define([
     },
 
 
-    /**
-     * Return a new filter widget based on the specified property
-     * @param {String} propertyId The id of the property of the entry
-     * @param {Number} index The index of the filter among the property filters
-     * @param {String} filterId
-     * @returns {Promise}
-     */
-    createFilter: function (propertyId, index, filterId) {
-      var self = this;
-
-      return new Promise (function (resolve, reject) {
-        // default filterId
-        if (filterId === undefined) {
-          filterId = self.getFilterDescriptor(propertyId).id;
-        }
-
-        // load success callback
-        var loadFilterSuccess = function (Filter) {
-          var filter = new Filter(propertyId, index, self);
-          resolve(filter);
-        };
-
-        // load error callback
-        var loadFilterFailure = function (err) {
-          // try to load the default filter instead
-          if (filterId !== "default") {
-            self.createFilter(propertyId, index, "default").then(function (filter) {
-              resolve(filter);
-            }, function () {
-              reject();
-            });
-          } else {
-            console.error(err);
-            reject();
-          }
-        };
-
-        // load filter based on it's id
-        require([BASE_PATH + "filters/" + filterId + "Filter.js"],
-          loadFilterSuccess,
-          loadFilterFailure
-        );
-
-      });
-    },
 
 
   };

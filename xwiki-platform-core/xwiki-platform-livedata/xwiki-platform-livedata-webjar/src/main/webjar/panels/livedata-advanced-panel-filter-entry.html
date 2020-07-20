@@ -18,7 +18,11 @@
       ></option>
     </select>
 
-    <div ref="filter"></div>
+    <livedata-filter
+      :property-id="propertyId"
+      :index="filterIdx"
+      :logic="logic"
+    ></livedata-filter>
 
     <a
       class="delete-filter"
@@ -58,8 +62,9 @@
 
 define([
   "Vue",
+  "vue!" + BASE_PATH + "/filters/livedata-filter.html",
 ], function (
-  Vue,
+  Vue
 ) {
 
   Vue.component("livedata-advanced-panel-filter-entry", {
@@ -73,14 +78,6 @@ define([
       filter: Object,
       filterIdx: Number,
       propertyId: String,
-    },
-
-    mounted: function () {
-      var self = this;
-      this.logic.createFilter(this.propertyId, this.filterIdx)
-      .then(function (filter) {
-        self.$refs.filter.parentNode.replaceChild(filter.element, self.$refs.filter);
-      })
     },
 
   });

@@ -17,15 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define([], {
 
-  .livedata-filter {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    min-height: 1em;
-  }
+  props: {
+    propertyId: String,
+    index: Number,
+    logic: Object,
+  },
 
-  .livedata-filter > * {
-    width: 100%;
-    height: 100%;
-  }
+  computed: {
+    filterGroup: function () {
+      return this.logic.getQueryFilterGroup(this.propertyId) || {};
+    },
+    filterEntry: function () {
+        return (this.filterGroup.constrains || [])[this.index] || {};
+    },
+    propertyDescriptor: function () {
+      return this.logic.getPropertyDescriptor(this.propertyId);
+    },
+    config: function () {
+      return this.logic.getFilterDescriptor(this.propertyId);
+    },
+    data: function () {
+      return this.logic.data;
+    },
+  },
+
+  methods: {
+    applyFilter: function (newValue) {
+      console.log("apply!", newValue);
+      this.logic.filter(this.propertyId, this.index, {value: newValue});
+    },
+  },
+
+});

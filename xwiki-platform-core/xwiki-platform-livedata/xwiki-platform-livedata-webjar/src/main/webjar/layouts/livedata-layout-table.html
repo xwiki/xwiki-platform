@@ -39,10 +39,12 @@
             v-for="col in cols"
             :key="col.id"
           >
-            <div
+            <livedata-filter
               v-if="logic.isPropertyFilterable(col.id)"
-              v-filter="col.id"
-            ></div>
+              :property-id="col.id"
+              :index="0"
+              :logic="logic"
+            ></livedata-filter>
           </th>
         </tr>
 
@@ -101,6 +103,7 @@ define([
   "Vue",
   "vue!" + BASE_PATH + "livedata-topbar.html",
   "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
+  "vue!" + BASE_PATH + "/filters/livedata-filter.html",
 ], function (
   Vue
 ) {
@@ -110,18 +113,6 @@ define([
     name: "livedata-layout-table",
 
     template: template,
-
-    directives: {
-      // vue directive to automatically create and insert filters
-      filter: {
-        bind: function (el, binding, vnode) {
-          vnode.context.$parent.logic.createFilter(binding.value, 0)
-          .then(function (filter) {
-            el.appendChild(filter.element);
-          });
-        },
-      },
-    },
 
     props: {
       logic: Object,

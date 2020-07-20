@@ -1,0 +1,292 @@
+##
+## Empty configuration
+##
+{}
+---
+{
+  "query":{},
+  "meta":{}
+}
+##
+## Invalid query and meta
+## 
+{
+  "query":23,
+  "meta":[],
+  "foo":"bar"
+}
+---
+{
+  "query":{},
+  "meta":{},
+  "foo":"bar"
+}
+##
+## Invalid query (properties, source, sort, filters, limit, offset)
+##
+{
+  "query":{
+    "properties":{"foo":"bar"},
+    "source":13,
+    "sort":true,
+    "filters":"test",
+    "limit":{"one":1},
+    "offset":[false],
+    "alice":"bob"
+  }
+}
+---
+{
+  "query":{
+    "alice":"bob"
+  },
+  "meta":{}
+}
+##
+## Sort and source as text, filters as object
+##
+{
+  "query":{
+    "properties":["doc.title","doc.location"],
+    "source":"foo",
+    "sort":"publishDate",
+    "filters":{
+      "doc.author":"mflorea"
+    }
+  }
+}
+---
+{
+  "query":{
+    "properties":["doc.title","doc.location"],
+    "source":{
+      "id":"foo"
+    },
+    "sort":[{
+      "property":"publishDate",
+      "descending":false
+    }],
+    "filters":[{
+      "property":"doc.author",
+      "value":"mflorea"
+    }]
+  },
+  "meta":{}
+}
+##
+## Sort as object
+##
+{
+  "query":{
+    "sort":{
+      "property":"publishDate"
+    }
+  }
+}
+---
+{
+  "query":{
+    "sort":[{
+      "property":"publishDate"
+    }]
+  },
+  "meta":{}
+}
+##
+## Sort as array of string
+##
+{
+  "query":{
+    "sort":["publishDate",{"property":"doc.name","descending":true}]
+  }
+}
+---
+{
+  "query":{
+    "sort":[
+      {
+        "property":"publishDate",
+        "descending":false
+      },
+      {
+        "property":"doc.name",
+        "descending":true
+      }
+    ]
+  },
+  "meta":{}
+}
+##
+## Invalid property descriptors and types
+##
+{
+  "meta":{
+    "foo":"bar",
+    "propertyDescriptors":{"two":2},
+    "propertyTypes":"test"
+  }
+}
+---
+{
+  "meta":{
+    "foo":"bar",
+    "propertyDescriptors":[],
+    "propertyTypes":[]
+  },
+  "query":{}
+}
+##
+## Invalid icon, displayer and filter 
+##
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"test",
+        "icon":[34],
+        "displayer":12,
+        "filter":true
+      }
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"test"
+      }
+    ],
+    "propertyTypes":[]
+  },
+  "query":{}
+}
+##
+## Icon, displayer and filter as string
+##
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "icon":"file",
+        "displayer":"link",
+        "filter":"text"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "filter":false
+      }
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "displayer":{"id":"link"},
+        "filter":{"id":"text"}
+      }
+    ],
+    "propertyTypes":[
+      {
+        "filter":{"id":"none"}
+      }
+    ]
+  },
+  "query":{}
+}
+##
+## Merge default configuration
+##
+{
+  "query":{
+    "source":"test"
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "sortable":false,
+        "displayer":{
+          "propertyHref":"bar"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "displayer":"html",
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "query":{
+    "source":{"id":"test"}
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "sortable":false,
+        "displayer":{
+          "propertyHref":"bar",
+          "id":"link"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo",
+        "description":"The title of the book",
+        "icon":{
+          "iconSetType":"font",
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o"
+        },
+        "type":"String"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "displayer":{"id":"html"},
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        },
+        "description":"A string property",
+        "icon":{
+          "iconSetType":"font",
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o"
+        },
+        "sortable":true
+      }
+    ]
+  }
+}

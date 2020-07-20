@@ -1,0 +1,3 @@
+org.xwiki.livedata.internal.script.LiveDataConfigHelper
+org.xwiki.livedata.internal.DefaultLiveDataSourceManager
+org.xwiki.livedata.script.LiveDataScriptService

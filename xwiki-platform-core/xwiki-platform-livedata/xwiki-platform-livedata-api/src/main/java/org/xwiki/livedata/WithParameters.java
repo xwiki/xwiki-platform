@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,26 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.livedata;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>12.5-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-livedata</artifactId>
-  <name>XWiki Platform - Live Data</name>
-  <packaging>pom</packaging>
-  <description>Display dynamic lists of data</description>
-  <modules>
-    <module>xwiki-platform-livedata-api</module>
-    <module>xwiki-platform-livedata-webjar</module>
-  </modules>
-</project>
+import java.util.Map;
+
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Interface used by components that have parameters. Should be used only for components that have
+ * {@link ComponentInstantiationStrategy#PER_LOOKUP}.
+ * 
+ * @version $Id$
+ * @since 12.6RC1
+ */
+@Unstable
+public interface WithParameters
+{
+    /**
+     * @return the parameters of this component
+     */
+    Map<String, Object> getParameters();
+}

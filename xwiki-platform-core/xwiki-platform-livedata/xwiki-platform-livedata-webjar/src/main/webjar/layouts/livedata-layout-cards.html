@@ -12,9 +12,16 @@
         v-for="(entry, entryId) in entries"
         :key="entryId"
       >
+        <h2 v-if="!!titlePropertyId">
+          <livedata-displayer
+            :property-id="titlePropertyId"
+            :entry="entry"
+            :logic="logic"
+          ></livedata-displayer>
+        </h2>
         <div
           class="card-property"
-          v-for="property in properties"
+          v-for="property in displayedProperties"
           :key="property.id"
         >
           <strong class="property-name">{{ property.name }}:</strong>
@@ -91,7 +98,18 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       entries: function () { return this.logic.data.data.entries; },
-      properties: function () { return this.logic.data.meta.propertyDescriptors; },
+      properties: function () {
+        return this.logic.data.meta.propertyDescriptors;
+      },
+      displayedProperties: function () {
+        var self = this;
+        return this.properties.filter(function (propertyDescriptor) {
+          return propertyDescriptor.id !== self.titlePropertyId;
+        });
+      },
+      titlePropertyId: function () {
+        return this.logic.getLayoutDescriptor("cards").titleProperty;
+      },
     },
 
   });
@@ -115,6 +133,11 @@ define([
   justify-content: flex-start;
   align-items: center;
   transition: height 0.5s;
+}
+
+.livedata-layout-cards h2 {
+  margin-top: 10px;
+  font-size: 20px;
 }
 
 .livedata-layout-cards .property-name {

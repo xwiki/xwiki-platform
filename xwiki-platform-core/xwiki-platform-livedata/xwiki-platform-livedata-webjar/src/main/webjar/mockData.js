@@ -70,6 +70,7 @@ define({
         id: "cards",
         name: "Cards",
         icon: "fa fa-th",
+        titleProperty: "doc_title",
       },
     ],
 

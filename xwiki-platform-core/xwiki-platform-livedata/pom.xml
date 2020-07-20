@@ -35,6 +35,7 @@
     <module>xwiki-platform-livedata-api</module>
     <module>xwiki-platform-livedata-livetable</module>
     <module>xwiki-platform-livedata-macro</module>
+    <module>xwiki-platform-livedata-rest</module>
     <module>xwiki-platform-livedata-webjar</module>
   </modules>
 </project>

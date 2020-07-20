@@ -1,0 +1,65 @@
+{
+  "id": "deletedBatch",
+  "columns": ["doc.name", "doc.location", "_actions"],
+  "columnProperties": {
+    "doc.name": {"link": "view", "filterable": false, "sortable": false},
+    "doc.location": {"type": "text", "link": false, "filterable": true, "html": true},
+    "_actions": {"actions": ["restore", "delete"]}
+  },
+  "options": {
+    "url": "/xwiki/bin/get/Test/WebHome?xpage=getdeleteddocuments&doc.batchId=2872cd20-6cbf-4dad-af1d-77a30ba52ce8",
+    "translationPrefix": "core.restore.batch.",
+    "outputOnlyHtml": true,
+    "selectedColumn": "doc.location"
+  }
+}
+---
+{
+  "id":"deletedBatch",
+  "query":{
+    "properties":["doc.name","doc.location","_actions"],
+    "source":{
+      "template":"getdeleteddocuments",
+      "translationPrefix":"core.restore.batch.",
+      "id":"liveTable",
+      "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
+    },
+    "sort":[
+      {"property":"doc.location"}
+    ]
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"doc.name",
+        "displayer":{
+          "id":"link",
+          "propertyHref":"doc.url"
+        },
+        "filter":{
+          "id":"none"
+        }
+      },
+      {
+        "id":"doc.location",
+        "sortable":true,
+        "displayer":{
+          "id":"html"
+        },
+        "filter":{
+          "id":"text"
+        }
+      },
+      {
+        "id":"_actions",
+        "displayer":{
+          "actions":["restore","delete"],
+          "id":"actions"
+        },
+        "filter":{
+          "id":"none"
+        }
+      }
+    ]
+  }
+}

@@ -33,6 +33,7 @@
   <description>Display dynamic lists of data</description>
   <modules>
     <module>xwiki-platform-livedata-api</module>
+    <module>xwiki-platform-livedata-livetable</module>
     <module>xwiki-platform-livedata-webjar</module>
   </modules>
 </project>

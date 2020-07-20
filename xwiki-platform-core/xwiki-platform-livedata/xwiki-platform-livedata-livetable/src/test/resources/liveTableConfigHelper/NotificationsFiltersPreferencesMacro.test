@@ -1,0 +1,58 @@
+{
+  "id": "notificationFilterPreferencesLiveTable",
+  "columns": ["name", "filterType", "eventTypes", "notificationFormats", "isEnabled", "_actions"],
+  "columnProperties": {
+    "name": {"sortable": false, "html": true, "filterable": false},
+    "filterType": {"sortable": false, "filterable": false},
+    "eventTypes": {"sortable": false, "html": true, "filterable": false},
+    "notificationFormats": {"sortable": false, "html": true, "filterable": false},
+    "isEnabled": {"sortable": false, "html" : true, "filterable": false},
+    "_actions": {"sortable": false, "actions": ["delete"], "filterable": false}
+  },
+  "options": {
+    "resultPage": "XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
+    "rowCount": 10,
+    "description": "This table lists every filter registered for the current user.",
+    "translationPrefix": "notifications.settings.filters.preferences.table.",
+    "extraParams": "eventType=&format=&user=xwiki%3AXWiki.mflorea",
+    "outputOnlyHtml": true
+  }
+}
+---
+{
+  "id":"notificationFilterPreferencesLiveTable",
+  "query":{
+    "properties":["name","filterType","eventTypes","notificationFormats","isEnabled","_actions"],
+    "source":{
+      "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
+      "translationPrefix":"notifications.settings.filters.preferences.table.",
+      "id":"liveTable"
+    },
+    "hiddenFilters":[
+      {"property":"format","constraints":[{"value":""}]},
+      {"property":"eventType","constraints":[{"value":""}]},
+      {"property":"user","constraints":[{"value":"xwiki:XWiki.mflorea"}]}
+    ],
+    "sort":[
+      {"property":"name"}
+    ],
+    "limit":10
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {"id":"name","displayer":{"id":"html"},"filter":{"id":"none"}},
+      {"id":"filterType","filter":{"id":"none"}},
+      {"id":"eventTypes","displayer":{"id":"html"},"filter":{"id":"none"}},
+      {"id":"notificationFormats","displayer":{"id":"html"},"filter":{"id":"none"}},
+      {"id":"isEnabled","displayer":{"id":"html"},"filter":{"id":"none"}},
+      {
+        "id":"_actions",
+        "displayer":{
+          "actions":["delete"],
+          "id":"actions"
+        },
+        "filter":{"id":"none"}
+      }
+    ]
+  }
+}

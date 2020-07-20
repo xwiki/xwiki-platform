@@ -1,0 +1,57 @@
+{
+  "id": "panels",
+  "columns": ["name", "description", "type", "category", "_actions"],
+  "columnProperties": {
+    "name": {"type": "text", "link": "view"},
+    "description": {"type": "text", "html": "true"},
+    "type": {"type": "list"},
+    "category": {"type": "list"},
+    "_actions": {"html": true, "sortable": false, "actions": ["edit", "delete"]}
+  },
+  "options": {
+    "className": "Panels.PanelClass",
+    "selectedColumn": "name",
+    "defaultOrder": "asc",
+    "translationPrefix": "panels.",
+    "rowCount": 30,
+    "queryFilters": "currentlanguage"
+  }
+}
+---
+{
+  "id":"panels",
+  "query":{
+    "properties":["name","description","type","category","_actions"],
+    "source":{
+      "translationPrefix":"panels.",
+      "queryFilters":"currentlanguage",
+      "className":"Panels.PanelClass",
+      "id":"liveTable"
+    },
+    "sort":[
+      {"property":"name"}
+    ],
+    "limit":30
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"name",
+        "sortable":true,
+        "displayer":{"id":"link","propertyHref":"doc.url"},
+        "filter":{"id":"text"}
+      },
+      {"id":"description","sortable":true,"filter":{"id":"text"}},
+      {"id":"type","sortable":true,"filter":{"id":"list"}},
+      {"id":"category","sortable":true,"filter":{"id":"list"}},
+      {
+        "id":"_actions",
+        "displayer":{
+          "actions":["edit","delete"],
+          "id":"actions"
+        },
+        "filter":{"id":"none"}
+      }
+    ]
+  }
+}

@@ -1,0 +1,163 @@
+<template>
+  <div
+    :class="[
+      'livedata-displayer',
+      isView ? 'view' : 'edit',
+    ]"
+
+    tabindex="0"
+    @dblclick="edit"
+    @keypress.self.enter="edit"
+  >
+
+    <slot
+      name="viewer"
+      v-if="isView"
+    >
+      <div>{{ value }}</div>
+    </slot>
+
+    <slot
+      name="editor"
+      v-if="!isView"
+      @change="applyEdit"
+      @cancel="abortEdit"
+    >
+      <input
+        class="default-input"
+        type="text"
+        size="1"
+        v-autofocus
+        :value="value"
+        @focusout="applyEdit($event.target.value)"
+        @keypress.enter="applyEdit($event.target.value)"
+        @keydown.esc="abortEdit"
+      />
+    </slot>
+
+  </div>
+</template>
+
+
+<script>
+  /*
+   * See the NOTICE file distributed with this work for additional
+   * information regarding copyright ownership.
+   *
+   * This is free software; you can redistribute it and/or modify it
+   * under the terms of the GNU Lesser General Public License as
+   * published by the Free Software Foundation; either version 2.1 of
+   * the License, or (at your option) any later version.
+   *
+   * This software is distributed in the hope that it will be useful,
+   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   * Lesser General Public License for more details.
+   *
+   * You should have received a copy of the GNU Lesser General Public
+   * License along with this software; if not, write to the Free
+   * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+   */
+  define([
+    "Vue",
+  ], function (
+    Vue
+  ) {
+
+    Vue.component("base-displayer", {
+
+      name: "base-displayer",
+
+      template: template,
+
+      directives: {
+        autofocus: {
+          inserted: function (el) { el.focus(); }
+        },
+      },
+
+      props: {
+        propertyId: String,
+        entry: Object,
+        logic: Object,
+      },
+
+      data: function () {
+        return {
+          isView: true,
+        };
+      },
+
+      computed: {
+        value: function () {
+          return this.entry[this.propertyId];
+        },
+        propertyDescriptor: function () {
+          return this.logic.getPropertyDescriptor(this.propertyId);
+        },
+        config: function () {
+          return this.logic.getDisplayerDescriptor(this.propertyId);
+        },
+        data: function () {
+          return this.logic.data;
+        },
+      },
+
+
+      methods: {
+
+        view: function () {
+          if (this.isView) { return; }
+          this.isView = true;
+        },
+
+        edit: function () {
+          if (!this.isView) { return; }
+          this.isView = false;
+        },
+
+        applyEdit: function (newValue) {
+          // TODO: should call the logic API instead, but this is just for quick prove of concept
+          this.entry[this.propertyId] = newValue;
+          this.view();
+          this.$el.focus();
+        },
+
+        abortEdit: function () {
+          this.view();
+          this.$el.focus();
+        },
+
+      },
+
+    });
+
+  });
+</script>
+
+
+<style>
+
+.livedata-displayer {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  min-height: 1em;
+}
+
+.livedata-displayer > * {
+  width: 100%;
+  height: 100%;
+}
+
+.livedata-displayer:focus {
+  outline: 2px lightblue solid;
+  position: relative;
+}
+
+.livedata-displayer .default-input {
+  width: 100%;
+}
+
+</style>

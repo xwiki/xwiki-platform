@@ -443,29 +443,21 @@ define([
           displayerId = self.getDisplayerDescriptor(propertyId).id;
         }
 
+        var componentName = "displayer-" + displayerId;
+
         // load success callback
-        var loadDisplayerSuccess = function (Displayer) {
-          var displayer = new Displayer(propertyId, entry, self);
-          resolve(displayer);
+        var loadDisplayerSuccess = function () {
+          resolve(componentName);
         };
 
         // load error callback
         var loadDisplayerFailure = function (err) {
-          // try to load the default displayer instead
-          if (displayerId !== "default") {
-            self.createDisplayer(propertyId, entry, "default").then(function (displayer) {
-              resolve(displayer);
-            }, function () {
-              reject();
-            });
-          } else {
-            console.error(err);
-            reject();
-          }
+          console.warn(err);
+          reject();
         };
 
         // load displayer based on it's id
-        require([BASE_PATH + "displayers/" + displayerId + "Displayer.js"],
+        require(["vue!" + BASE_PATH + "displayers/" + componentName + ".html"],
           loadDisplayerSuccess,
           loadDisplayerFailure
         );

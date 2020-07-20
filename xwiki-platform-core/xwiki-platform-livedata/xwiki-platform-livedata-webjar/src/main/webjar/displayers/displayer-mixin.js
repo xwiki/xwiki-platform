@@ -17,28 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define([], {
 
-define([
-    BASE_PATH + "displayers/defaultDisplayer.js",
-    "polyfills",
-  ], function (
-    DefaultDisplayer
-  ) {
+  directives: {
+    autofocus: {
+      inserted: function (el) { el.focus(); }
+    },
+  },
+
+  props: {
+    propertyId: String,
+    entry: Object,
+    logic: Object,
+  },
+
+  computed: {
+    value: function () {
+      return this.entry[this.propertyId];
+    },
+    propertyDescriptor: function () {
+      return this.logic.getPropertyDescriptor(this.propertyId);
+    },
+    config: function () {
+      return this.logic.getDisplayerDescriptor(this.propertyId);
+    },
+    data: function () {
+      return this.logic.data;
+    },
+  },
 
 
-    /**
-     * Create an text displayer for a property of an entry
-     * Extends the default displayer class
-     */
-    var TextDisplayer = function (propertyId, entryData, logic) {
-      DefaultDisplayer.call(this, propertyId, entryData, logic);
-    };
-    TextDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
-    TextDisplayer.prototype.constructor = TextDisplayer;
-
-
-    /* This text displayer is very simple so it doesn't need to override default methods */
-
-
-    return TextDisplayer;
-  });
+});

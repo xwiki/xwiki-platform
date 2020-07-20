@@ -1,3 +1,24 @@
+<template>
+  <base-displayer
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  >
+
+    <template #viewer>
+        <div
+            class="html-wrapper"
+            v-html="value"
+        ></div>
+    </template>
+
+    <template #editor></template>
+
+  </base-displayer>
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,44 +38,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 define([
-  BASE_PATH + "displayers/defaultDisplayer.js",
-  "polyfills"
+  "Vue",
+  BASE_PATH + "displayers/displayer-mixin.js",
+  "vue!" + BASE_PATH + "displayers/base-displayer.html",
 ], function (
-  DefaultDisplayer
+  Vue,
+  displayerMixin
 ) {
 
+  Vue.component("displayer-html", {
 
-  /**
-   * Create an HTML displayer for a property of an entry
-   * Extends the default displayer class
-   */
-  var HTMLDisplayer = function (propertyId, entryData, logic) {
-    DefaultDisplayer.call(this, propertyId, entryData, logic);
-  };
-  HTMLDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
-  HTMLDisplayer.prototype.constructor = HTMLDisplayer;
+    name: "displayer-html",
 
+    template: template,
 
-  /**
-   * Create html viewer element for the displayer
-   * Override the default inherted method
-   */
-  HTMLDisplayer.prototype.createView = function (params) {
-    return new Promise (function (resolve, reject) {
+    mixins: [displayerMixin],
 
-      var element = document.createElement("div");
-      if (params.value !== undefined && params.value !== null) {
-        element.innerHTML = params.value;
-      }
+  });
 
-      resolve(element);
-
-    });
-
-  };
-
-
-  return HTMLDisplayer;
 });
+</script>
+
+
+<style>
+
+</style>

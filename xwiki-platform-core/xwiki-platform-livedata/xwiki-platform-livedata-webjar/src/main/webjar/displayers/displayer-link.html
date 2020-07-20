@@ -1,3 +1,29 @@
+<template>
+  <base-displayer
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  >
+
+    <template #viewer>
+        <a
+          :href="href"
+        >
+          {{ value }}
+          <span
+            class="explicit-empty-value"
+            v-if="!value"
+          >(no value)</span>
+        </a>
+    </template>
+
+    <template #editor></template>
+
+  </base-displayer>
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,42 +43,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define([
+  "Vue",
+  BASE_PATH + "displayers/displayer-mixin.js",
+  "vue!" + BASE_PATH + "displayers/base-displayer.html",
+], function (
+  Vue,
+  displayerMixin
+) {
+
+  Vue.component("displayer-link", {
+
+    name: "displayer-link",
+
+    template: template,
+
+    mixins: [displayerMixin],
+
+    computed: {
+      href: function () {
+        return this.config.propertyHref && this.entry[this.config.propertyHref] || "#";
+      },
+    },
+
+  });
+
+});
+</script>
 
 
-@keyframes waiting {
-  from { background-position-x: 100%; }
-  to { background-position-x: -100%; }
-}
+<style>
 
-.livedata-displayer:empty {
-  animation: waiting 2s linear infinite;
-  --c1: transparent;
-  --c2: #ccc4;
-  background: linear-gradient(135deg, var(--c1) 25%, var(--c2) 50%, var(--c1) 75%);
-  background-repeat: repeat;
-  background-size: 200% 100%;
-}
-
-.livedata-displayer {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  min-height: 1em;
-}
-
-.livedata-displayer > * {
-  width: 100%;
-  height: 100%;
-}
-
-.livedata-displayer:focus {
-  outline: 2px lightblue solid;
-  position: relative;
-}
-
-
-.livedata-displayer .explicit-empty-value::before {
-  content: attr(data-text);
+.livedata-displayer .explicit-empty-value {
   font-style: italic;
   color: grey;
 }
+
+</style>

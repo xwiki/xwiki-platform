@@ -20,8 +20,13 @@
           <strong class="property-name">{{ property.name }}:</strong>
           <span
             class="value"
-            v-displayer="{property: property, entry: entry}"
-          ></span>
+          >
+            <livedata-displayer
+              :property-id="property.id"
+              :entry="entry"
+              :logic="logic"
+            ></livedata-displayer>
+          </span>
         </div>
       </div>
 
@@ -55,6 +60,7 @@
 define([
   "Vue",
   "vue!" + BASE_PATH + "livedata-topbar.html",
+  "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
 ], function (
   Vue
 ) {

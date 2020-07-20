@@ -60,8 +60,12 @@
             class="cell"
             v-for="col in cols"
             :key="col.id"
-            v-displayer="{col: col, row: row}"
-            >
+          >
+            <livedata-displayer
+              :property-id="col.id"
+              :entry="row"
+              :logic="logic"
+            ></livedata-displayer>
           </td>
 
         </tr>
@@ -96,6 +100,7 @@
 define([
   "Vue",
   "vue!" + BASE_PATH + "livedata-topbar.html",
+  "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
 ], function (
   Vue
 ) {
@@ -107,16 +112,6 @@ define([
     template: template,
 
     directives: {
-      // vue directive to automatically create and insert the displayer inside the element
-      displayer: {
-        bind: function (el, binding, vnode) {
-          vnode.context.$parent.logic.createDisplayer(binding.value.col.id, binding.value.row)
-          .then(function (displayer) {
-            el.appendChild(displayer.element);
-            displayer.view();
-          });
-        },
-      },
       // vue directive to automatically create and insert filters
       filter: {
         bind: function (el, binding, vnode) {

@@ -41,9 +41,9 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of {@link MentionXDOMService}.
@@ -69,9 +69,6 @@ public class DefaultMentionXDOMService implements MentionXDOMService
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private ExtendedRenderingConfiguration configuration;
 
     private static boolean matchMentionMacro(Block block)
     {
@@ -101,12 +98,11 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     }
 
     @Override
-    public Optional<XDOM> parse(String payload)
+    public Optional<XDOM> parse(String payload, Syntax syntax)
     {
         Optional<XDOM> oxdom;
-        String roleHint = this.configuration.getDefaultContentSyntax().toIdString();
         try {
-            Parser instance = this.componentManager.getInstance(Parser.class, roleHint);
+            Parser instance = this.componentManager.getInstance(Parser.class, syntax.toIdString());
             XDOM xdom = instance.parse(new StringReader(payload));
             oxdom = Optional.of(xdom);
         } catch (ParseException e) {
@@ -115,7 +111,7 @@ public class DefaultMentionXDOMService implements MentionXDOMService
             oxdom = Optional.empty();
         } catch (ComponentLookupException e) {
             this.logger
-                .warn("Failed to get the parser instance [{}]. Cause [{}].", roleHint,
+                .warn("Failed to get the parser instance [{}]. Cause [{}].", syntax,
                     ExceptionUtils.getRootCauseMessage(e));
             oxdom = Optional.empty();
         }

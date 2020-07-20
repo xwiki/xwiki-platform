@@ -40,10 +40,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -58,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.MARKDOWN_1_1;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 import static org.xwiki.test.LogLevel.WARN;
 
 /**
@@ -80,9 +80,6 @@ public class DefaultMentionXDOMServiceTest
 
     @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @MockComponent
-    private ExtendedRenderingConfiguration configuration;
 
     private DocumentReference documentReferenceA;
 
@@ -179,15 +176,15 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parse() throws Exception
     {
-        when(this.configuration.getDefaultContentSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+
         Parser parser = mock(Parser.class);
-        when(this.componentManager.getInstance(Parser.class, Syntax.MARKDOWN_1_1.toIdString())).thenReturn(
+        when(this.componentManager.getInstance(Parser.class, MARKDOWN_1_1.toIdString())).thenReturn(
             parser);
 
         XDOM xdom = new XDOM(emptyList());
         when(parser.parse(ArgumentMatchers.any(Reader.class))).thenReturn(xdom);
 
-        Optional<XDOM> actual = this.xdomService.parse("ABC");
+        Optional<XDOM> actual = this.xdomService.parse("ABC", MARKDOWN_1_1);
 
         assertEquals(Optional.of(xdom), actual);
     }
@@ -195,13 +192,12 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parseError() throws Exception
     {
-        when(this.configuration.getDefaultContentSyntax()).thenReturn(Syntax.XWIKI_2_1);
         Parser parser = mock(Parser.class);
-        when(this.componentManager.getInstance(Parser.class, Syntax.XWIKI_2_1.toIdString())).thenReturn(
+        when(this.componentManager.getInstance(Parser.class, XWIKI_2_1.toIdString())).thenReturn(
             parser);
         when(parser.parse(ArgumentMatchers.any(Reader.class))).thenThrow(new ParseException(""));
 
-        Optional<XDOM> actual = this.xdomService.parse("ABC");
+        Optional<XDOM> actual = this.xdomService.parse("ABC", XWIKI_2_1);
 
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());

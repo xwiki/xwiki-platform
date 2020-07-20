@@ -59,6 +59,7 @@ import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
  * Test of {@link DefaultMentionsDataConsumer}.
@@ -184,7 +185,7 @@ class DefaultMentionsDataConsumerTest
         value.put(user1, Arrays.asList("anchor1", "anchor2"));
         value.put(authorReference, Arrays.asList("", null));
         when(this.xdomService.countByIdentifier(mentions)).thenReturn(value);
-        when(this.xdomService.parse("some content with mentions")).thenReturn(Optional.of(xdom));
+        when(this.xdomService.parse("some content with mentions", XWIKI_2_1)).thenReturn(Optional.of(xdom));
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.U2")).thenReturn(authorReference);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -273,8 +274,8 @@ class DefaultMentionsDataConsumerTest
 
         XDOM newCommentXDOM = new XDOM(singletonList(new MacroBlock("mention", new HashMap<>(), false)));
         XDOM oldCommentXDOM = new XDOM(emptyList());
-        when(this.xdomService.parse("COMMENT 1 CONTENT")).thenReturn(Optional.of(newCommentXDOM));
-        when(this.xdomService.parse("COMMENT 0 CONTENT")).thenReturn(Optional.of(oldCommentXDOM));
+        when(this.xdomService.parse("COMMENT 1 CONTENT", XWIKI_2_1)).thenReturn(Optional.of(newCommentXDOM));
+        when(this.xdomService.parse("COMMENT 0 CONTENT", XWIKI_2_1)).thenReturn(Optional.of(oldCommentXDOM));
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("reference", "XWiki.U1");
@@ -289,6 +290,7 @@ class DefaultMentionsDataConsumerTest
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
 
         XWikiDocument doc = mock(XWikiDocument.class);
+        when(doc.getSyntax()).thenReturn(XWIKI_2_1);
         when(this.documentRevisionProvider.getRevision(documentReference, "1.3")).thenReturn(doc);
         when(doc.getDocumentReference()).thenReturn(documentReference);
         when(doc.getAuthorReference()).thenReturn(authorReference);
@@ -339,7 +341,7 @@ class DefaultMentionsDataConsumerTest
         xObjects.put(new DocumentReference("xwiki", "XWiki", "NewComment"), singletonList(newComment));
 
         XDOM newCommentXDOM = new XDOM(emptyList());
-        when(this.xdomService.parse("COMMENT 1 CONTENT")).thenReturn(Optional.of(newCommentXDOM));
+        when(this.xdomService.parse("COMMENT 1 CONTENT", XWIKI_2_1)).thenReturn(Optional.of(newCommentXDOM));
         Map<String, String> parameters = new HashMap<>();
         parameters.put("reference", "XWiki.U1");
         List<MacroBlock> newCommentNewMentions = singletonList(new MacroBlock("comment", parameters, false));
@@ -364,6 +366,7 @@ class DefaultMentionsDataConsumerTest
         when(doc.getXObjects()).thenReturn(newXObjects);
 
         XWikiDocument oldDoc = mock(XWikiDocument.class);
+        when(doc.getSyntax()).thenReturn(XWIKI_2_1);
         when(this.documentRevisionProvider.getRevision(documentReference, "1.2")).thenReturn(oldDoc);
         when(oldDoc.getXDOM()).thenReturn(new XDOM(emptyList()));
         Map<DocumentReference, List<BaseObject>> oldXObjects = new HashMap<>();

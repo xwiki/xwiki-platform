@@ -44,6 +44,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -129,6 +130,7 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
             this.initContext(author, data.getWikiId());
             DocumentReference dr = this.documentReferenceResolver.resolve(data.getDocumentReference());
             XWikiDocument doc = this.documentRevisionProvider.getRevision(dr, data.getVersion());
+            Syntax syntax = doc.getSyntax();
             XWikiDocument oldDoc;
             if (doc.getPreviousVersion() != null) {
                 oldDoc = this.documentRevisionProvider.getRevision(dr, doc.getPreviousVersion());
@@ -141,12 +143,13 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
             if (oldDoc == null) {
                 // CREATE
                 handleOnCreate(doc.getXDOM(), documentReference, authorReference, MentionLocation.DOCUMENT);
-                traverseXObjectsOnCreate(doc.getXObjects(), documentReference, authorReference);
+                traverseXObjectsOnCreate(doc.getXObjects(), documentReference, authorReference, syntax);
             } else {
                 // UPDATE
                 handleOnUpdate(oldDoc.getXDOM(), doc.getXDOM(), documentReference, authorReference,
                     MentionLocation.DOCUMENT);
-                traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(), documentReference, authorReference);
+                traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(), documentReference, authorReference,
+                    syntax);
             }
         } catch (ExecutionContextException e) {
             this.logger.warn("Failed to initalize the context of the mention update runnable. Cause [{}]",
@@ -157,8 +160,7 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     }
 
     private void traverseXObjectsOnCreate(Map<DocumentReference, List<BaseObject>> xObjects,
-        DocumentReference documentReference,
-        DocumentReference authorReference)
+        DocumentReference documentReference, DocumentReference authorReference, Syntax syntax)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
             for (BaseObject baseObject : entry.getValue()) {
@@ -167,7 +169,7 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                         if (o instanceof LargeStringProperty) {
                             String content = ((LargeStringProperty) o).getValue();
                             this.xdomService
-                                .parse(content)
+                                .parse(content, syntax)
                                 .ifPresent(xdom -> handleOnCreate(xdom, documentReference, authorReference, AWM_FIELD));
                         }
                     }
@@ -177,13 +179,13 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     }
 
     private void traverseXObjectsOnUpdate(Map<DocumentReference, List<BaseObject>> oldXObjects,
-        Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference documentReferenceStr,
-        DocumentReference authorReferenceStr)
+        Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference documentReference,
+        DocumentReference authorReference, Syntax syntax)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
             List<BaseObject> oldEntry = oldXObjects.get(entry.getKey());
             for (BaseObject baseObject : entry.getValue()) {
-                handBaseObject(oldEntry, baseObject, documentReferenceStr, authorReferenceStr);
+                handBaseObject(oldEntry, baseObject, documentReference, authorReference, syntax);
             }
         }
     }
@@ -209,9 +211,8 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         }
     }
 
-    private void handleOnUpdate(XDOM oldXDOM, XDOM newXDOM, DocumentReference documentReferenceStr,
-        DocumentReference authorReferenceStr,
-        MentionLocation location)
+    private void handleOnUpdate(XDOM oldXDOM, XDOM newXDOM, DocumentReference documentReference,
+        DocumentReference authorReference, MentionLocation location)
     {
         List<MacroBlock> oldMentions = this.xdomService.listMentionMacros(oldXDOM);
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXDOM);
@@ -235,14 +236,14 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                sendNotif(new MentionNotificationParameters(authorReferenceStr, documentReferenceStr, key, location, "",
+                sendNotif(new MentionNotificationParameters(authorReference, documentReference, key, location, "",
                     newXDOM));
             }
 
             // Notify all new mentions with new anchors.
             for (String anchorId : anchorsToNotify) {
                 sendNotif(
-                    new MentionNotificationParameters(authorReferenceStr, documentReferenceStr, key, location, anchorId,
+                    new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
                         newXDOM));
             }
         }
@@ -263,9 +264,8 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                         newXdom))));
     }
 
-    private void handBaseObject(List<BaseObject> oldEntry, BaseObject baseObject,
-        DocumentReference documentReferenceStr,
-        DocumentReference authorReferenceStr)
+    private void handBaseObject(List<BaseObject> oldEntry, BaseObject baseObject, DocumentReference documentReference,
+        DocumentReference authorReference, Syntax syntax)
     {
         Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
             optOldEntries -> optOldEntries
@@ -287,13 +287,13 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                                                     .getField(SELECTION_FIELD)
                                                     .toFormString());
                         MentionLocation location = isComment ? COMMENT : ANNOTATION;
-                        handleField(oldBaseObject, lsp, location, documentReferenceStr, authorReferenceStr);
+                        handleField(oldBaseObject, lsp, location, documentReference, authorReference, syntax);
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
                     if (o instanceof LargeStringProperty) {
-                        handleField(oldBaseObject, (LargeStringProperty) o, AWM_FIELD, documentReferenceStr,
-                            authorReferenceStr);
+                        handleField(oldBaseObject, (LargeStringProperty) o, AWM_FIELD, documentReference,
+                            authorReference, syntax);
                     }
                 }
             }
@@ -301,16 +301,17 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     }
 
     private void handleField(Optional<BaseObject> oldBaseObject, LargeStringProperty lsp, MentionLocation location,
-        DocumentReference documentReferenceStr, DocumentReference authorReferenceStr)
+        DocumentReference documentReference, DocumentReference authorReference, Syntax syntax)
     {
         Optional<XDOM> oldDom = oldBaseObject.flatMap(it -> ofNullable(it.getField(lsp.getName())))
                                     .filter(it -> it instanceof LargeStringProperty)
-                                    .flatMap(it -> this.xdomService.parse(((LargeStringProperty) it).getValue()));
-        this.xdomService.parse(lsp.getValue()).ifPresent(xdom -> {
+                                    .flatMap(
+                                        it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
+        this.xdomService.parse(lsp.getValue(), syntax).ifPresent(xdom -> {
             // can be replaced by ifPresentOrElse for in java 9+ 
-            oldDom.ifPresent(od -> handleOnUpdate(od, xdom, documentReferenceStr, authorReferenceStr, location));
+            oldDom.ifPresent(od -> handleOnUpdate(od, xdom, documentReference, authorReference, location));
             if (!oldDom.isPresent()) {
-                handleMissing(xdom, documentReferenceStr, authorReferenceStr, location);
+                handleMissing(xdom, documentReference, authorReference, location);
             }
         });
     }

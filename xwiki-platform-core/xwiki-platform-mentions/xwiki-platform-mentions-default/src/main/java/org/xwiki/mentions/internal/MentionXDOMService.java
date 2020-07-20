@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * A service for manipulating XDOM trees in the context of the mentions.
@@ -55,8 +56,9 @@ public interface MentionXDOMService
 
     /**
      *
-     * @param payload the string to parse.
-     * @return The result of the parsing. Empty if the parsing failed.
+     * @param payload the string to parse
+     * @param syntax the syntax of the payload
+     * @return The result of the parsing. Empty if the parsing failed
      */
-    Optional<XDOM> parse(String payload);
+    Optional<XDOM> parse(String payload, Syntax syntax);
 }

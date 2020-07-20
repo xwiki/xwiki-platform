@@ -29,17 +29,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -63,11 +65,13 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     private Logger logger;
 
     @Inject
-    @Named("xwiki/2.1")
-    private Parser parser;
+    private ComponentManager componentManager;
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private ExtendedRenderingConfiguration configuration;
 
     private static boolean matchMentionMacro(Block block)
     {
@@ -100,12 +104,19 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     public Optional<XDOM> parse(String payload)
     {
         Optional<XDOM> oxdom;
+        String roleHint = this.configuration.getDefaultContentSyntax().toIdString();
         try {
-            XDOM xdom = this.parser.parse(new StringReader(payload));
+            Parser instance = this.componentManager.getInstance(Parser.class, roleHint);
+            XDOM xdom = instance.parse(new StringReader(payload));
             oxdom = Optional.of(xdom);
         } catch (ParseException e) {
             this.logger
                 .warn("Failed to parse the payload [{}]. Cause [{}].", payload, ExceptionUtils.getRootCauseMessage(e));
+            oxdom = Optional.empty();
+        } catch (ComponentLookupException e) {
+            this.logger
+                .warn("Failed to get the parser instance [{}]. Cause [{}].", roleHint,
+                    ExceptionUtils.getRootCauseMessage(e));
             oxdom = Optional.empty();
         }
         return oxdom;

@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentMatchers;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.GroupBlock;
@@ -40,8 +40,10 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -54,7 +56,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.test.LogLevel.WARN;
 
@@ -74,14 +76,18 @@ public class DefaultMentionXDOMServiceTest
     LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @MockComponent
-    @Named("xwiki/2.1")
-    private Parser parser;
+    private ComponentManager componentManager;
 
     @MockComponent
-    private DocumentReferenceResolver<String> resolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @MockComponent
+    private ExtendedRenderingConfiguration configuration;
 
     private DocumentReference documentReferenceA;
+
     private DocumentReference documentReferenceB;
+
     private DocumentReference documentReferenceC;
 
     @BeforeEach
@@ -90,9 +96,9 @@ public class DefaultMentionXDOMServiceTest
         this.documentReferenceA = new DocumentReference("xwiki", "A", "A");
         this.documentReferenceB = new DocumentReference("ywiki", "B", "B");
         this.documentReferenceC = new DocumentReference("xwiki", "C", "C");
-        when(this.resolver.resolve("A")).thenReturn(this.documentReferenceA);
-        when(this.resolver.resolve("B")).thenReturn(this.documentReferenceB);
-        when(this.resolver.resolve("C")).thenReturn(this.documentReferenceC);
+        when(this.documentReferenceResolver.resolve("A")).thenReturn(this.documentReferenceA);
+        when(this.documentReferenceResolver.resolve("B")).thenReturn(this.documentReferenceB);
+        when(this.documentReferenceResolver.resolve("C")).thenReturn(this.documentReferenceC);
     }
 
     @Test
@@ -173,8 +179,13 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parse() throws Exception
     {
+        when(this.configuration.getDefaultContentSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        Parser parser = mock(Parser.class);
+        when(this.componentManager.getInstance(Parser.class, Syntax.MARKDOWN_1_1.toIdString())).thenReturn(
+            parser);
+
         XDOM xdom = new XDOM(emptyList());
-        when(this.parser.parse(any(Reader.class))).thenReturn(xdom);
+        when(parser.parse(ArgumentMatchers.any(Reader.class))).thenReturn(xdom);
 
         Optional<XDOM> actual = this.xdomService.parse("ABC");
 
@@ -184,7 +195,11 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parseError() throws Exception
     {
-        when(this.parser.parse(any(Reader.class))).thenThrow(new ParseException(""));
+        when(this.configuration.getDefaultContentSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        Parser parser = mock(Parser.class);
+        when(this.componentManager.getInstance(Parser.class, Syntax.XWIKI_2_1.toIdString())).thenReturn(
+            parser);
+        when(parser.parse(ArgumentMatchers.any(Reader.class))).thenThrow(new ParseException(""));
 
         Optional<XDOM> actual = this.xdomService.parse("ABC");
 

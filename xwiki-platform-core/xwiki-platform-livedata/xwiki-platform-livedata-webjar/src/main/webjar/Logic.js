@@ -355,17 +355,21 @@ define([
     /**
      * Set page index (0-based index), then fetch new data
      * @param {Number} pageIndex
-     * @returns {Number}
+     * @returns {Promise}
      */
     setPageIndex: function (pageIndex) {
-      if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return; }
-      var previousPageIndex = this.data.query.offset;
-      this.data.query.offset = this.getFirstIndexOfPage(pageIndex);
-      this.triggerEvent("pageChange", {
-        pageIndex: pageIndex,
-        previousPageIndex: previousPageIndex,
+      var self = this;
+      return new Promise (function (resolve, reject) {
+        if (pageIndex < 0 || pageIndex >= self.getPageCount()) { return void reject(); }
+        var previousPageIndex = self.data.query.offset;
+        self.data.query.offset = self.getFirstIndexOfPage(pageIndex);
+        self.triggerEvent("pageChange", {
+          pageIndex: pageIndex,
+          previousPageIndex: previousPageIndex,
+        });
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
       });
-      // CALL FUNCTION TO FETCH NEW DATA HERE
     },
 
 
@@ -406,16 +410,21 @@ define([
     /**
      * Set the pagination page size, then fetch new data
      * @param {Number} pageSize
+     * @returns {Promise}
      */
     setPageSize: function (pageSize) {
-      if (pageSize < 0) { return; }
-      var previousPageSize = this.data.query.limit;
-      this.data.query.limit = pageSize;
-      this.triggerEvent("pageSizeChange", {
-        pageSize: pageSize,
-        previousPageSize: previousPageSize,
+      var self = this;
+      return new Promise (function (resolve, reject) {
+        if (pageSize < 0) { return void reject(); }
+        var previousPageSize = self.data.query.limit;
+        self.data.query.limit = pageSize;
+        self.triggerEvent("pageSizeChange", {
+          pageSize: pageSize,
+          previousPageSize: previousPageSize,
+        });
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
       });
-      // CALL FUNCTION TO FETCH NEW DATA HERE
     },
 
 
@@ -471,44 +480,49 @@ define([
      *   Undefined means current. Negative value removes property sort.
      * @param {String} descending Specify whether the sort should be descending or not.
      *   Undefined means toggle current direction
+     * @returns {Promise}
      */
     sort: function (property, level, descending) {
-      if (!this.isValidPropertyId(property)) { return; }
-      if (!this.isPropertySortable(property)) { return; }
-      // find property current sort level
-      var currentLevel = this.data.query.sort.findIndex(function (sortObject) {
-        return sortObject.property === property;
-      });
-      // default level
-      if (level === undefined) {
-        level = (currentLevel !== -1) ? currentLevel : 0;
-      } else if (level < 0) {
-        level = -1;
-      }
-      // default descending
-      if (descending === undefined) {
-        descending = (currentLevel !== -1) ? !this.data.query.sort[currentLevel].descending : false;
-      }
-      // create sort object
-      var sortObject = {
-        property: property,
-        descending: descending,
-      };
-      // apply sort
-      if (level !== -1) {
-        this.data.query.sort.splice(level, 1, sortObject);
-      }
-      if (currentLevel !== -1 && currentLevel !== level) {
-        this.data.query.sort.splice(currentLevel, 1);
-      }
-      // dispatch events
-      this.triggerEvent("sort", {
-        property: property,
-        level: level,
-        descending: descending,
-      });
+      var self = this;
+      return new Promise (function (resolve, reject) {
+        if (!self.isValidPropertyId(property)) { return void reject(); }
+        if (!self.isPropertySortable(property)) { return void reject(); }
+        // find property current sort level
+        var currentLevel = self.data.query.sort.findIndex(function (sortObject) {
+          return sortObject.property === property;
+        });
+        // default level
+        if (level === undefined) {
+          level = (currentLevel !== -1) ? currentLevel : 0;
+        } else if (level < 0) {
+          level = -1;
+        }
+        // default descending
+        if (descending === undefined) {
+          descending = (currentLevel !== -1) ? !self.data.query.sort[currentLevel].descending : false;
+        }
+        // create sort object
+        var sortObject = {
+          property: property,
+          descending: descending,
+        };
+        // apply sort
+        if (level !== -1) {
+          self.data.query.sort.splice(level, 1, sortObject);
+        }
+        if (currentLevel !== -1 && currentLevel !== level) {
+          self.data.query.sort.splice(currentLevel, 1);
+        }
+        // dispatch events
+        self.triggerEvent("sort", {
+          property: property,
+          level: level,
+          descending: descending,
+        });
 
-      // CALL FUNCTION TO FETCH NEW DATA HERE
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
+      });
     },
 
 
@@ -518,6 +532,7 @@ define([
      * @param {String} property The property to add to the sort
      * @param {String} descending Specify whether the sort should be descending or not.
      *   Undefined means toggle current direction
+     * @returns {Promise}
      */
     addSort: function (property, descending) {
       var currentLevel = -1;
@@ -527,17 +542,18 @@ define([
           return;
         }
       });
-      if (currentLevel !== -1) { return; }
-      this.sort(property, this.data.query.sort.length, descending);
+      if (currentLevel !== -1) { return Promise.reject(); }
+      return this.sort(property, this.data.query.sort.length, descending);
     },
 
 
     /**
      * Remove a sort entry, shorthand of sort:
      * @param {String} property The property to remove to the sort
+     * @returns {Promise}
      */
     removeSort: function (property) {
-      this.sort(property, -1);
+      return this.sort(property, -1);
     },
 
 
@@ -686,43 +702,48 @@ define([
      * @param {String} filterEntry.operator The operator of the filter.
      *  Should match the filter descriptor of the filter property
      * @param {String} filterEntry.value Value for the new filter entry
+     * @returns {Promise}
      */
     filter: function (property, index, filterEntry) {
-      var filterEntries = this._computeFilterEntries(property, index, filterEntry);
-      if (!filterEntries) { return; }
-      var oldEntry = filterEntries.oldEntry;
-      var newEntry = filterEntries.newEntry;
-      var filteringType = this._getFilteringType(oldEntry, newEntry);
-      // remove filter at current property and index
-      this.getQueryFilters(oldEntry.property).splice(index, 1);
-      // add filter at new property and index
-      if (newEntry.index !== -1) {
-        // create filterGroup if not exists
-        if (!this.getQueryFilterGroup(newEntry.property)) {
-          this.data.query.filters.push({
-            property: newEntry.property,
-            matchAll: true,
-            constrains: [],
+      var self = this;
+      return new Promise (function (resolve, reject) {
+        var filterEntries = self._computeFilterEntries(property, index, filterEntry);
+        if (!filterEntries) { return void reject(); }
+        var oldEntry = filterEntries.oldEntry;
+        var newEntry = filterEntries.newEntry;
+        var filteringType = self._getFilteringType(oldEntry, newEntry);
+        // remove filter at current property and index
+        self.getQueryFilters(oldEntry.property).splice(index, 1);
+        // add filter at new property and index
+        if (newEntry.index !== -1) {
+          // create filterGroup if not exists
+          if (!self.getQueryFilterGroup(newEntry.property)) {
+            self.data.query.filters.push({
+              property: newEntry.property,
+              matchAll: true,
+              constrains: [],
+            });
+          }
+          // add entry
+          self.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+            operator: newEntry.operator,
+            value: newEntry.value,
           });
         }
-        // add entry
-        this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
-          operator: newEntry.operator,
-          value: newEntry.value,
+        // remove filter group if empty
+        if (self.getQueryFilters(oldEntry.property).length === 0) {
+          self.removeAllFilters(oldEntry.property);
+        }
+        // dispatch events
+        self.triggerEvent("filter", {
+          type: filteringType,
+          oldEntry: oldEntry,
+          newEntry: newEntry,
         });
-      }
-      // remove filter group if empty
-      if (this.getQueryFilters(oldEntry.property).length === 0) {
-        this.removeAllFilters(oldEntry.property);
-      }
-      // dispatch events
-      this.triggerEvent("filter", {
-        type: filteringType,
-        oldEntry: oldEntry,
-        newEntry: newEntry,
-      });
 
-      // CALL FUNCTION TO FETCH NEW DATA HERE
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
+      });
     },
 
 
@@ -731,10 +752,11 @@ define([
      * @param {String} property Which property to add the filter to
      * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
      * @param {String} value Default value for the new filter entry
+     * @returns {Promise}
      */
     addFilter: function (property, operator, value) {
       var index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
-      this.filter(property, index, {
+      return this.filter(property, index, {
         property: property,
         operator: operator,
         value: value
@@ -746,30 +768,36 @@ define([
      * Remove a filter entry in the configuration, then fetch new data
      * @param {String} property Property to remove the filter to
      * @param {String} index The index of the filter to remove. Undefined means last.
+     * @returns {Promise}
      */
     removeFilter: function (property, index) {
-      this.filter(property, index, {index: -1});
+      return this.filter(property, index, {index: -1});
     },
 
 
     /**
      * Remove all the filters associated to a property
      * @param {String} property Property to remove the filters to
+     * @returns {Promise}
      */
     removeAllFilters: function (property) {
-      if (!this.isValidPropertyId(property)) { return; }
-      var filterIndex = this.data.query.filters.findIndex(function (filterGroup, i) {
-        return filterGroup.property === property;
+      var self = this;
+      return new Promise (function (resolve, reject) {
+        if (!this.isValidPropertyId(property)) { return; }
+        var filterIndex = this.data.query.filters.findIndex(function (filterGroup, i) {
+          return filterGroup.property === property;
+        });
+        if (filterIndex === -1) { return void reject(); }
+        var removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
+        // dispatch events
+        this.triggerEvent("filter", {
+          type: "removeAll",
+          property: property,
+          removedFilters: removedFilterGroups[0].constrains,
+        });
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
       });
-      if (filterIndex === -1) { return; }
-      var removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
-      // dispatch events
-      this.triggerEvent("filter", {
-        type: "removeAll",
-        property: property,
-        removedFilters: removedFilterGroups[0].constrains,
-      });
-      // CALL FUNCTION TO FETCH NEW DATA HERE
     },
 
 

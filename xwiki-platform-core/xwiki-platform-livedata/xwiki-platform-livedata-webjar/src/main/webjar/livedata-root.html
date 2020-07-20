@@ -3,11 +3,13 @@
 
         <livedata-advanced-panels :logic="logic"></livedata-advanced-panels>
 
-        <component
-          v-if="data.query.currentLayout"
-          :is="currentLayoutComponentName"
-          :logic="logic"
-        ></component>
+        <keep-alive>
+          <component
+            v-if="data.query.currentLayout"
+            :is="currentLayoutComponentName"
+            :logic="logic"
+          ></component>
+        </keep-alive>
 
     </div>
   </template>

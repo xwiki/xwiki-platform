@@ -122,6 +122,6 @@ public class NotificationScriptEventHelper
     public void clearAllStatus(Date startDate) throws Exception
     {
         String userId = this.entityReferenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
-        this.eventStatusManager.deleteAllForEntity(startDate, userId);
+        this.eventStore.deleteEventStatuses(userId, startDate);
     }
 }

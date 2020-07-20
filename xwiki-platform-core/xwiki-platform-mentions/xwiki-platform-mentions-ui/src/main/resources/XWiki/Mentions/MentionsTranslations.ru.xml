@@ -49,7 +49,5 @@ org.xwiki.mentions.DisplayStyle.FIRST_NAME=Только имя пользова�
 org.xwiki.mentions.DisplayStyle.LOGIN=Имя пользователя
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Цвет упоминания
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Цвет упоминаний для текущего пользователя (Примечание: используется в качестве значения атрибута css background-color).
-XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Цвета самоупоминания
-XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Цвет упоминаний для текущего пользователя (Примечание: используется в качестве значения атрибута css background-color).</content>
-  
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Цвета самоупоминания</content>
 </xwikidoc>

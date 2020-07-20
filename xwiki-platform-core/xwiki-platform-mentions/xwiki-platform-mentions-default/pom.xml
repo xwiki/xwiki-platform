@@ -32,11 +32,12 @@
   <packaging>jar</packaging>
   <description>Default implementation of the Mentions components.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- This component must be installed at the farm level because
     org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
     org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -53,6 +54,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- third party-->
+    <dependency>
+      <!-- Persistent queue implementations. Used to persist on disk the queue of documents to analyze for mentions.  -->
+      <groupId>ch.rasc</groupId>
+      <artifactId>xodus-queue</artifactId>
+      <version>1.0.1</version>
     </dependency>
   </dependencies>
 </project>

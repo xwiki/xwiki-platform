@@ -78,13 +78,15 @@ class DefaultMentionsNotificationsObjectMapperTest
                 .setLocation(MentionLocation.COMMENT)
                 .setUserReference("xwiki:XWiki.User")
                 .setDocumentReference("xwiki:XWiki.Doc")
-                .setAnchor("anchor"));
+                .setAnchor("anchor")
+                .setQuote("quote @User ..."));
         assertTrue(actual.isPresent());
         assertEquals(
             "{\"userReference\":\"xwiki:XWiki.User\","
                 + "\"documentReference\":\"xwiki:XWiki.Doc\","
                 + "\"location\":\"COMMENT\","
-                + "\"anchor\":\"anchor\"}",
+                + "\"anchor\":\"anchor\","
+                + "\"quote\":\"quote @User ...\"}",
             actual.get());
     }
 }

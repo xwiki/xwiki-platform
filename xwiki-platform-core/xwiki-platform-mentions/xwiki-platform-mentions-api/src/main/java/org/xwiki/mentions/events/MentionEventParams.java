@@ -43,9 +43,11 @@ public class MentionEventParams
 
     private String anchor;
 
+    private String quote;
+
     /**
      *
-     * @return The the user doing the mention.
+     * @return The the user doing the mention
      */
     public String getUserReference()
     {
@@ -54,8 +56,8 @@ public class MentionEventParams
 
     /**
      *
-     * @param userReference the user doing the mention.
-     * @return the current object.
+     * @param userReference the user doing the mention
+     * @return the current object
      */
     public MentionEventParams setUserReference(String userReference)
     {
@@ -65,7 +67,7 @@ public class MentionEventParams
 
     /**
      *
-     * @return the document in which then mention occurs.
+     * @return the document in which then mention occurs
      */
     public String getDocumentReference()
     {
@@ -74,8 +76,8 @@ public class MentionEventParams
 
     /**
      *
-     * @param documentReference the document in which then mention occurs.
-     * @return the current object.
+     * @param documentReference the document in which then mention occurs
+     * @return the current object
      */
     public MentionEventParams setDocumentReference(String documentReference)
     {
@@ -85,7 +87,7 @@ public class MentionEventParams
 
     /**
      *
-     * @return the location of the mention.
+     * @return the location of the mention
      */
     public MentionLocation getLocation()
     {
@@ -94,8 +96,8 @@ public class MentionEventParams
 
     /**
      *
-     * @param location the location of the mention.
-     * @return the current object.
+     * @param location the location of the mention
+     * @return the current object
      */
     public MentionEventParams setLocation(MentionLocation location)
     {
@@ -104,21 +106,41 @@ public class MentionEventParams
     }
 
     /**
-     * @return the anchor to be used for the link to the mention.
+     * @return the anchor to be used for the link to the mention
      */
     public String getAnchor()
     {
-        return anchor;
+        return this.anchor;
     }
 
     /**
      *
-     * @param anchor the anchor to be used to link to the mention.
-     * @return the current object.
+     * @param anchor the anchor to be used to link to the mention
+     * @return the current object
      */
     public MentionEventParams setAnchor(String anchor)
     {
         this.anchor = anchor;
+        return this;
+    }
+
+    /**
+     *
+     * @return the mention quote
+     */
+    public String getQuote()
+    {
+        return this.quote;
+    }
+
+    /**
+     *
+     * @param quote the mention quote
+     * @return the current object
+     */
+    public MentionEventParams setQuote(String quote)
+    {
+        this.quote = quote;
         return this;
     }
 
@@ -140,6 +162,7 @@ public class MentionEventParams
                    .append(this.documentReference, that.documentReference)
                    .append(this.location, that.location)
                    .append(this.anchor, that.anchor)
+                   .append(this.quote, that.quote)
                    .isEquals();
     }
 
@@ -151,6 +174,7 @@ public class MentionEventParams
                    .append(this.documentReference)
                    .append(this.location)
                    .append(this.anchor)
+                   .append(this.quote)
                    .toHashCode();
     }
 
@@ -162,6 +186,7 @@ public class MentionEventParams
                    .append("documentReference", this.getDocumentReference())
                    .append("location", this.getLocation())
                    .append("anchorId", this.getAnchor())
+                   .append("quote", this.getQuote())
                    .build();
     }
 }

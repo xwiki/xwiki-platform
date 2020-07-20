@@ -50,5 +50,6 @@ org.xwiki.mentions.DisplayStyle.LOGIN=Nom d'utilisateur
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Couleur des mentions
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=La couleur des mentions à l'utilisateur courant (note: utilisé comme valeur d'un attribut css background-color).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Couleurs des mentions pour sois même
-XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=La couleur des mentions à l'utilisateur courant (note: utilisé comme valeur d'un attribut css background-color).</content>
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activer les citations
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Définit si une citation du texte entourant une mention est incluse dans les notifications de mention d'utilisateur.</content>
 </xwikidoc>

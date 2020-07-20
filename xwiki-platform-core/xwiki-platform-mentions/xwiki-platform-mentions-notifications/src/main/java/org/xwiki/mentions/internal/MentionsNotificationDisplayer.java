@@ -34,9 +34,9 @@ import javax.script.ScriptContext;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.Event;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.mentions.events.MentionEventParams;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
@@ -145,7 +145,8 @@ public class MentionsNotificationDisplayer implements NotificationDisplayer
                                           .setAuthorURL(authorURL)
                                           .setDocumentURL(documentURL)
                                           .setDocument(document)
-                                          .setLocation(mentionEventParams.getLocation().name());
+                                          .setLocation(mentionEventParams.getLocation().name())
+                                          .setQuote(mentionEventParams.getQuote());
             return Optional.of(mentionView);
         } catch (Exception e) {
             this.logger

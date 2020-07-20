@@ -271,6 +271,9 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(targetDocument, context);
 
+            // Avoid messing with the cache before the document is saved
+            document = document.clone();
+
             for (NotificationPreference notificationPreference : notificationPreferences) {
 
                 // Ensure that the notification preference has an event type to save

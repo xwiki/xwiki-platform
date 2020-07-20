@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -81,7 +82,7 @@ public interface EventStore
      * @param event the event to remove from the store
      * @return the new {@link CompletableFuture} providing the deleted {@link Event} or empty if none could be found
      * @since 12.5RC1
-     * @see #saveEventStatus(EventStatus)
+     * @see #saveEvent(Event)
      */
     CompletableFuture<Optional<Event>> deleteEvent(Event event);
 
@@ -92,9 +93,20 @@ public interface EventStore
      * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
      *         found
      * @since 12.5RC1
-     * @see #saveMailEntityEvent(EntityEvent)
+     * @see #saveEventStatus(EventStatus)
      */
     CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status);
+
+    /**
+     * Asynchronously delete from the store all the status associated with the passed entity and before the passed date.
+     * 
+     * @param entityId the id of the entity for which to remove the statuses
+     * @param date the date before which to remove the statuses
+     * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
+     *         found
+     * @since 12.6RC1
+     */
+    CompletableFuture<Void> deleteEventStatuses(String entityId, Date date);
 
     /**
      * Asynchronously delete from the store the given mail status.
@@ -103,6 +115,7 @@ public interface EventStore
      * @return the new {@link CompletableFuture} providing the deleted {@link EntityEvent} or empty if none could be
      *         found
      * @since 12.5RC1
+     * @see #saveMailEntityEvent(EntityEvent)
      */
     CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event);
 

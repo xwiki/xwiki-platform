@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= General =
+
+== Introducción ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Introduction ===
+
+La sintaxis XWiki 1.0 fue el primer intento de implementar una sintaxis estilo Wiki. Tiene algunas limitaciones y hay algunos formatos que solo se pueden llevar a cabo insertando HTML directamente. Recomendamos utilizar las sintaxis más modernas; solo se soporta la sintaxis XWiki 1.0 por compatibilidad.
+
+Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.0 Introduction ===
+
+Con la versión 1.7 de XWiki Enterprise, hemos introducido una sintaxis wiki nueva. Hemos llamado a la sintaxis antigua //Sintaxis XWiki 1.0// y, lógicamente, la sintaxis nueva se llama //Sintaxis XWiki 2.0//. Las razones principales para introducir la sintaxis nueva han sido:
+* Solucionar las limitaciones y ambigüedades de la Sintaxis XWiki 1.0 (inspirada en Radeox, el motor de renderizado interno, y TWiki).
+** Sin símbolos óptimos. Por ejemplo, el símbolo de la negrita eran asteriscos sencillos. Esto creaba problemas cuando los usuarios tecleaban texto que contenía asteriscos, ya que ese texto se consideraba en negrita por error cuando no lo estaba. Por lo tanto, hemos racionalizado la sintaxis utilizando al menos caracteres dobles en todas partes.
+** Ambigüedades. Por ejemplo, había una ambigüedad entre un elemento en negrita que comenzaba una línea y una lista de viñetas. Se requería resolver las ambigüedades para reescribir el editor WYSIWYG de modo que pudiera ser determinista.
+* Estar más cerca de la [[Sintaxis Creole 1.0 &gt;&gt; http://www.wikicreole.org/]] que se está convirtiendo en un estándar para la sintaxis wiki. Además, la comunidad Creole ha dedicado tiempo a analizar todas las sintaxis wiki existentes antes de decidir sobre los símbolos. Las elecciones hechas son, por lo tanto, muy buenas.
+
+Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.1 Introduction ===
+
+La Sintaxis XWiki 2.0 ha demostrado ser bastante útil y robusta en general; sin embargo, desde su introducción se han encontrado algunas deficiencias. Las mejoras correspondientes se han consolidado en la Sintaxis XWiki 2.1. Algunas características nuevas de esta sintaxis son:
+* Homogenización de la sintaxis de enlaces e imágenes para una mayor claridad, consistencia y extensibilidad.
+* Se ha añadido la capacidad de mostrar iconos, incrustar imágenes a través del esquema URI Data, vincular archivos usando la notación UNC y vincular a URLs relativas.
+
+{{info}}Como la Sintaxis XWiki 2.1 se basa en la Sintaxis XWiki 2.0, toda la Sintaxis XWiki 2.0 es válida a menos que las especificaciones de la 2.1 indiquen lo contrario.{{/info}}
+
+Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
+  
+</xwikidoc>

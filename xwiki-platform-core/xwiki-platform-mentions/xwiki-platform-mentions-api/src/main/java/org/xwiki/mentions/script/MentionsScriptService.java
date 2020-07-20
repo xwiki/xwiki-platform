@@ -24,7 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionsConfiguration;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.mentions.internal.MentionsFormatter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -42,6 +45,12 @@ public class MentionsScriptService implements ScriptService
 {
     @Inject
     private MentionsConfiguration configuration;
+
+    @Inject
+    private MentionsFormatter formatter;
+
+    @Inject
+    private MentionsEventExecutor eventExecutor;
 
     /**
      *
@@ -61,5 +70,41 @@ public class MentionsScriptService implements ScriptService
     public String getSelfMentionsColor()
     {
         return this.configuration.getSelfMentionsColor();
+    }
+
+    /**
+     * @see MentionsEventExecutor#getQueueSize()
+     * @return the current size of the queue of elements (page, comments...) with mentions to analyze
+     * @since 12.6RC1
+     */
+    @Unstable
+    public long getQueueSize()
+    {
+        return this.eventExecutor.getQueueSize();
+    }
+
+
+    /**
+     *
+     * @see MentionsConfiguration#isQuoteActivated()
+     * @return true if the mentions quote feature is activated.
+     * @since 12.6RC1
+     */
+    public boolean isQuoteActivated()
+    {
+        return this.configuration.isQuoteActivated();
+    }
+
+    /**
+     * Format a user mention.
+     *
+     * @see MentionsFormatter#formatMention(String, DisplayStyle)
+     * @param userReference the user reference
+     * @param style the display style
+     * @return the formatted mention
+     */
+    public String format(String userReference, DisplayStyle style)
+    {
+        return this.formatter.formatMention(userReference, style);
     }
 }

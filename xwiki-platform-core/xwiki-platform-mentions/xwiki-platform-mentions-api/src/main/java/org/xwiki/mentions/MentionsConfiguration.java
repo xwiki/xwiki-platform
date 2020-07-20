@@ -42,4 +42,10 @@ public interface MentionsConfiguration
      * @return the color for the mentions to the current user.
      */
     String getSelfMentionsColor();
+
+    /**
+     * 
+     * @return true if the mentions quote feature is activated.
+     */
+    boolean isQuoteActivated();
 }

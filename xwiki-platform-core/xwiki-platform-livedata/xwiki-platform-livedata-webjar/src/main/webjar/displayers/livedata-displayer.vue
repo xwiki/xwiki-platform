@@ -1,13 +1,11 @@
 <template>
-  <div class="livedata-filter">
-    <component
-      v-if="componentName"
-      :is="componentName"
-      :property-id="propertyId"
-      :index="index"
-      :logic="logic"
-    ></component>
-  </div>
+  <component
+    v-if="componentName"
+    :is="componentName"
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  ></component>
 </template>
 
 
@@ -37,15 +35,15 @@ define([
   Vue
 ) {
 
-  Vue.component("livedata-filter", {
+  Vue.component("livedata-displayer", {
 
-    name: "livedata-filter",
+    name: "livedata-displayer",
 
     template: template,
 
     props: {
       propertyId: String,
-      index: Number,
+      entry: Object,
       logic: Object,
     },
 
@@ -56,45 +54,46 @@ define([
     },
 
     computed: {
-      filterId: function () {
-        return this.logic.getFilterDescriptor(this.propertyId).id;
+      data: function () { return this.logic.data; },
+      displayerId: function () {
+        return this.logic.getDisplayerDescriptor(this.propertyId).id;
       },
     },
 
     methods: {
-      loadFilter: function (filterId) {
+      loadDisplayer: function (displayerId) {
         var self = this;
         return new Promise (function (resolve, reject) {
 
-          var componentName = "filter-" + filterId;
+          var componentName = "displayer-" + displayerId;
 
           // load success callback
-          var loadFilterSuccess = function () {
+          var loadDisplayerSuccess = function () {
             self.componentName = componentName;
             resolve();
           };
 
           // load error callback
-          var loadFilterFailure = function (err) {
+          var loadDisplayerFailure = function (err) {
             console.warn(err);
             reject();
           };
 
-          // load filter based on it's id
-          require(["vue!" + BASE_PATH + "filters/" + componentName + ".html"],
-            loadFilterSuccess,
-            loadFilterFailure
+          // load displayer based on it's id
+          require(["vue!" + BASE_PATH + "displayers/" + componentName + ".vue"],
+            loadDisplayerSuccess,
+            loadDisplayerFailure
           );
-
         });
+
       },
     },
 
     mounted: function () {
       var self = this;
-      // load filter
-      this.loadFilter(this.filterId).catch(function () {
-        self.loadFilter("default").catch (function (err) {
+      // load displayer
+      this.loadDisplayer(this.displayerId).catch(function () {
+        self.loadDisplayer(self.data.meta.defaultDisplayer).catch(function (err) {
           console.error(err);
         });
       });
@@ -120,18 +119,6 @@ define([
   background: linear-gradient(135deg, var(--c1) 25%, var(--c2) 50%, var(--c1) 75%);
   background-repeat: repeat;
   background-size: 200% 100%;
-}
-
-.livedata-filter {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  min-height: 1em;
-}
-
-.livedata-filter > * {
-  width: 100%;
-  height: 100%;
 }
 
 </style>

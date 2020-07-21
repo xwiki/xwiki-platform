@@ -22,7 +22,7 @@
 define([
   "jquery",
   "Vue",
-  "vue!" + BASE_PATH + "livedata-root.html",
+  "vue!" + BASE_PATH + "livedata-root.vue",
   "polyfills"
 ], function (
   $,
@@ -66,6 +66,7 @@ define([
   var Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    this.currentLayout = "";
     this.selectedEntries = [];
     element.removeAttribute("data-data");
     // create Vuejs instance
@@ -233,48 +234,66 @@ define([
     /**
      * Get the displayer descriptor associated to a property id
      * @param {String} propertyId
+     * @returns {Object}
      */
     getDisplayerDescriptor: function (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      if (!propertyDescriptor) { return; }
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      if (!typeDescriptor) { return; }
+      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorDisplayer = typeDescriptor.displayer || {};
-      // default displayer config
-      var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
+      // merge property and/or type displayer descriptors
+      var highLevelDisplayer;
+      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
+        highLevelDisplayer = $.extend({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+      } else {
+        highLevelDisplayer = $.extend({}, propertyDescriptorDisplayer);
+      }
+      // displayer config
+      var displayerId = highLevelDisplayer.id;
       var displayer = this.data.meta.displayers.find(function (displayer) {
         return displayer.id === displayerId;
       });
-
-      return $.extend({}, displayer, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+      // default displayer config
+      var defaultDisplayer = { id: this.data.meta.defaultDisplayer };
+      // merge all displayers
+      var mergedDisplayer = $.extend({}, defaultDisplayer, displayer, highLevelDisplayer);
+      return mergedDisplayer;
     },
 
 
     /**
      * Get the filter descriptor associated to a property id
      * @param {String} propertyId
+     * @returns {Object}
      */
     getFilterDescriptor: function (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      if (!propertyDescriptor) { return; }
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       var propertyDescriptorFilter = propertyDescriptor.filter || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      if (!typeDescriptor) { return; }
+      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorFilter = typeDescriptor.filter || {};
-      // default filter config
-      var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
+      // merge property and/or type filter descriptors
+      var highLevelFilter;
+      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
+        highLevelFilter = $.extend({}, typeDescriptorFilter, propertyDescriptorFilter);
+      } else {
+        highLevelFilter = $.extend({}, propertyDescriptorFilter);
+      }
+      // filter filter config
+      var filterId = highLevelFilter.id;
       var filter = this.data.meta.filters.find(function (filter) {
         return filter.id === filterId;
       });
-
-      return $.extend({}, filter, typeDescriptorFilter, propertyDescriptorFilter);
+      // default filter config
+      var defaultFilter = { id: this.data.meta.defaultFilter };
+      // merge all filters
+      var mergedFilter = $.extend({}, defaultFilter, filter, highLevelFilter);
+      return mergedFilter;
     },
 
 
@@ -297,7 +316,7 @@ define([
 
         layoutId = layoutId || self.data.meta.defaultLayout;
         // layout already loaded
-        if (layoutId === self.data.query.currentLayout) {
+        if (layoutId === self.currentLayout) {
           return void resolve(layoutId);
         }
         // bad layout
@@ -307,8 +326,8 @@ define([
 
         // requirejs success callback
         var loadLayoutSuccess = function () {
-          var previousLayoutId = self.data.query.currentLayout;
-          self.data.query.currentLayout = layoutId;
+          var previousLayoutId = self.currentLayout;
+          self.currentLayout = layoutId;
           // dispatch events
           self.triggerEvent("layoutChange", {
             layoutId: layoutId,
@@ -334,7 +353,7 @@ define([
         };
 
         // load layout based on it's filename
-        require(["vue!" + BASE_PATH + "layouts/livedata-layout-" + layoutId + ".html"],
+        require(["vue!" + BASE_PATH + "layouts/livedata-layout-" + layoutId + ".vue"],
           loadLayoutSuccess,
           loadLayoutFailure
         );
@@ -638,7 +657,10 @@ define([
      * @returns {Boolean}
      */
     isPropertyFilterable: function (propertyId) {
-      return !!this.getFilterDescriptor(propertyId).id;
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return propertyDescriptor.filterable ||
+        (propertyDescriptor.filterable === undefined && propertyTypeDescriptor.filterable);
     },
 
 
@@ -696,7 +718,7 @@ define([
     /**
      * Return an object containing the new and old filter entries corresponding to parameters
      *  oldEntry: the filter entry to be modified
-     *  newEntrh: what this entry should be modified to
+     *  newEntry: what this entry should be modified to
      * @param {String} property The property to filter according to
      * @param {String} index The index of the filter entry
      * @param {String} filterEntry The filter data used to update the filter configuration

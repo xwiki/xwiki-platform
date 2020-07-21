@@ -5,12 +5,7 @@
     :logic="logic"
   >
 
-    <template #viewer>
-        <div
-            class="html-wrapper"
-            v-html="value"
-        ></div>
-    </template>
+    <template #viewer></template>
 
     <template #editor></template>
 
@@ -41,15 +36,15 @@
 define([
   "Vue",
   BASE_PATH + "displayers/displayer-mixin.js",
-  "vue!" + BASE_PATH + "displayers/base-displayer.html",
+  "vue!" + BASE_PATH + "displayers/base-displayer.vue",
 ], function (
   Vue,
   displayerMixin
 ) {
 
-  Vue.component("displayer-html", {
+  Vue.component("displayer-text", {
 
-    name: "displayer-html",
+    name: "displayer-text",
 
     template: template,
 

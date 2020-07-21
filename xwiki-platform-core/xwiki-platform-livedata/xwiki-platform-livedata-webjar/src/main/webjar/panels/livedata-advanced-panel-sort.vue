@@ -104,7 +104,7 @@
 */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "/panels/livedata-base-advanced-panel.html",
+  "vue!" + BASE_PATH + "/panels/livedata-base-advanced-panel.vue",
 ], function (
   Vue
 ) {
@@ -126,8 +126,8 @@ define([
       unsortedProperties: function () {
         var self = this;
         return this.logic.getSortablePropertyDescriptors().filter(function (propertyDescriptor) {
-        var sort = self.logic.getQuerySort(propertyDescriptor.id);
-        return !sort;
+          var sort = self.logic.getQuerySort(propertyDescriptor.id);
+          return !sort;
         });
       },
     },

@@ -49,8 +49,6 @@ define({
     offset: 0,
     limit: 25,
 
-    currentLayout: null,
-
   },
 
 
@@ -64,12 +62,12 @@ define({
       {
         id: "table",
         name: "Table",
-        icon: "fa fa-table",
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
       },
       {
         id: "cards",
         name: "Cards",
-        icon: "fa fa-th",
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
         titleProperty: "doc_title",
       },
     ],
@@ -110,9 +108,7 @@ define({
           id: "html",
         },
         sortable: false,
-        filter: {
-          id: false,
-        },
+        filterable: false,
       },
     ],
 
@@ -124,6 +120,7 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'text'
         },
@@ -135,11 +132,14 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'number'
         },
       },
     ],
+
+    defaultFilter: 'text',
 
     filters: [
       {
@@ -161,10 +161,9 @@ define({
       },
     ],
 
+    defaultDisplayer: 'text',
+
     displayers: [
-      {
-        id: "default",
-      },
       {
         id: "text",
       },

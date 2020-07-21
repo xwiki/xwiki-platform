@@ -34,8 +34,8 @@
   */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "/panels/livedata-advanced-panel-sort.html",
-  "vue!" + BASE_PATH + "/panels/livedata-advanced-panel-filter.html",
+  "vue!" + BASE_PATH + "/panels/livedata-advanced-panel-sort.vue",
+  "vue!" + BASE_PATH + "/panels/livedata-advanced-panel-filter.vue",
 ], function (
   Vue
 ) {

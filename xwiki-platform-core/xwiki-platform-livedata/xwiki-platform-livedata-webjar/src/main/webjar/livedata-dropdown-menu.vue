@@ -16,7 +16,7 @@
         v-for="layout in data.meta.layouts"
       >
         <a href="#" @click.prevent="logic.changeLayout(layout)">
-          <span :class="logic.getLayoutDescriptor(layout).icon"></span>
+          <xwiki-icon :icon-descriptor="logic.getLayoutDescriptor(layout).icon"></xwiki-icon>
           {{ logic.getLayoutDescriptor(layout).name }}
         </a>
       </li>
@@ -62,7 +62,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(["Vue"], function (Vue) {
+define([
+  "Vue",
+  "vue!" + BASE_PATH + "xwiki-icon.vue"
+], function (
+  Vue
+) {
   Vue.component("livedata-dropdown-menu", {
 
     name: "livedata-dropdown-menu",

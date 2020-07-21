@@ -28,11 +28,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.GroupBlock;
@@ -54,8 +58,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.MARKDOWN_1_1;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 import static org.xwiki.test.LogLevel.WARN;
 
 /**
@@ -74,14 +80,19 @@ public class DefaultMentionXDOMServiceTest
     LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @MockComponent
-    @Named("xwiki/2.1")
-    private Parser parser;
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManager;
+
+    @Mock
+    private ComponentManager componentManager;
 
     @MockComponent
-    private DocumentReferenceResolver<String> resolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     private DocumentReference documentReferenceA;
+
     private DocumentReference documentReferenceB;
+
     private DocumentReference documentReferenceC;
 
     @BeforeEach
@@ -90,9 +101,10 @@ public class DefaultMentionXDOMServiceTest
         this.documentReferenceA = new DocumentReference("xwiki", "A", "A");
         this.documentReferenceB = new DocumentReference("ywiki", "B", "B");
         this.documentReferenceC = new DocumentReference("xwiki", "C", "C");
-        when(this.resolver.resolve("A")).thenReturn(this.documentReferenceA);
-        when(this.resolver.resolve("B")).thenReturn(this.documentReferenceB);
-        when(this.resolver.resolve("C")).thenReturn(this.documentReferenceC);
+        when(this.documentReferenceResolver.resolve("A")).thenReturn(this.documentReferenceA);
+        when(this.documentReferenceResolver.resolve("B")).thenReturn(this.documentReferenceB);
+        when(this.documentReferenceResolver.resolve("C")).thenReturn(this.documentReferenceC);
+        when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }
 
     @Test
@@ -173,10 +185,15 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parse() throws Exception
     {
-        XDOM xdom = new XDOM(emptyList());
-        when(this.parser.parse(any(Reader.class))).thenReturn(xdom);
 
-        Optional<XDOM> actual = this.xdomService.parse("ABC");
+        Parser parser = mock(Parser.class);
+        when(this.componentManager.getInstance(Parser.class, MARKDOWN_1_1.toIdString())).thenReturn(
+            parser);
+
+        XDOM xdom = new XDOM(emptyList());
+        when(parser.parse(ArgumentMatchers.any(Reader.class))).thenReturn(xdom);
+
+        Optional<XDOM> actual = this.xdomService.parse("ABC", MARKDOWN_1_1);
 
         assertEquals(Optional.of(xdom), actual);
     }
@@ -184,9 +201,12 @@ public class DefaultMentionXDOMServiceTest
     @Test
     void parseError() throws Exception
     {
-        when(this.parser.parse(any(Reader.class))).thenThrow(new ParseException(""));
+        Parser parser = mock(Parser.class);
+        when(this.componentManager.getInstance(Parser.class, XWIKI_2_1.toIdString())).thenReturn(
+            parser);
+        when(parser.parse(ArgumentMatchers.any(Reader.class))).thenThrow(new ParseException(""));
 
-        Optional<XDOM> actual = this.xdomService.parse("ABC");
+        Optional<XDOM> actual = this.xdomService.parse("ABC", XWIKI_2_1);
 
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());

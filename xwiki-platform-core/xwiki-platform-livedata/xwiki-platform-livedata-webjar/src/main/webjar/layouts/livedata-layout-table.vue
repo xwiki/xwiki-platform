@@ -1,7 +1,14 @@
 <template>
   <div class="livedata-layout-table">
 
-    <livedata-topbar :logic="logic"></livedata-topbar>
+    <livedata-topbar :logic="logic">
+      <template #left>
+        <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
+      </template>
+      <template #right>
+        <livedata-pagination :logic="logic"></livedata-pagination>
+      </template>
+    </livedata-topbar>
 
     <!-- Table component -->
     <table class="livedata-table">
@@ -12,7 +19,11 @@
         <!-- Column name -->
         <tr class="column-header">
           <!-- Entry Select All-->
-          <th class="entry-selector"></th>
+          <th class="entry-selector">
+            <livedata-entry-selector-all
+              :logic="logic"
+            ></livedata-entry-selector-all>
+          </th>
           <th
             v-for="col in cols"
             :key="col.id"
@@ -113,9 +124,12 @@
 define([
   "Vue",
   "vue!livedata-topbar",
+  "vue!livedata-dropdown-menu",
+  "vue!livedata-pagination",
   "vue!displayers/livedata-displayer",
   "vue!filters/livedata-filter",
   "vue!livedata-entry-selector",
+  "vue!livedata-entry-selector-all",
 ], function (
   Vue
 ) {
@@ -178,11 +192,6 @@ define([
   width: 100%;
 }
 
-.livedata-layout-table .entry-selector {
-    padding: 0;
-    height: 100%;
-}
-
 .livedata-layout-table .cell {
   padding: 0;
   height: 100%;
@@ -191,5 +200,20 @@ define([
   padding: 8px;
 }
 
+.livedata-layout-table .entry-selector {
+    padding: 0;
+    height: 100%;
+    width: 0;
+}
+.livedata-layout-table .livedata-entry-selector-all .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
+}
+.livedata-layout-table  .livedata-entry-selector {
+    justify-content: flex-start;
+    padding: 0 2rem;
+}
 
 </style>

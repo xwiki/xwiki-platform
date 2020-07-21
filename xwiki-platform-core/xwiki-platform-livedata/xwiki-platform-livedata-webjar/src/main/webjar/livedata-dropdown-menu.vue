@@ -89,10 +89,6 @@ define([
 
 <style>
 
-.livedata-dropdown-menu {
-  margin-bottom: 1rem;
-}
-
 .livedata-dropdown-menu .btn-default {
   background-color: #f8f8f8;
   background-image: none;

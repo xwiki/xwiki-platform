@@ -67,6 +67,11 @@ define([
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
     this.currentLayout = "";
+    this.entrySelection = {
+      selected: [],
+      unselected: [],
+      isGlobal: false,
+    };
     this.selectedEntries = [];
     element.removeAttribute("data-data");
     // create Vuejs instance
@@ -478,41 +483,92 @@ define([
 
 
     /**
-     * Select the specified entry (to perform action afterward)
+     * Return whether the entry is currently selected
      * @param {Object} entry
+     * @returns {Boolean}
      */
-    selectEntry: function (entry) {
-      if (this.selectedEntries.indexOf(entry) !== -1) { return; }
-      this.selectedEntries.push(entry);
-    },
-
-
-    /**
-     * Unselect the specified entry
-     * @param {Object} entry
-     */
-    unselectEntry: function (entry) {
-      var index = this.selectedEntries.indexOf(entry);
-      if (index === -1) { return; }
-      this.selectedEntries.splice(index, 1);
-    },
-
-
-    /**
-     * Toggle the selection of the specified entry
-     * @param {Object} entry
-     * @param {Boolean} select Whether to seelct or not the entry. Undefined toggle current state
-     */
-    toggleSelectEntry: function (entry, select) {
-      if (select === undefined) {
-        select = this.selectedEntries.indexOf(entry) === -1;
-      }
-      if (select) {
-        this.selectEntry(entry);
+    isEntrySelected: function (entry) {
+      if (this.entrySelection.isGlobal) {
+        return this.entrySelection.unselected.indexOf(entry) === -1;
       } else {
-        this.unselectEntry(entry);
+        return this.entrySelection.selected.indexOf(entry) !== -1;
       }
     },
+
+
+    /**
+     * Select the specified entries
+     * @param {Object|Array} entries
+     */
+    selectEntries: function (entries) {
+      var self = this;
+      var entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(function (entry) {
+        if (self.entrySelection.isGlobal) {
+          var index = self.entrySelection.unselected.indexOf(entry);
+          if (index === -1) { return; }
+          self.entrySelection.unselected.splice(index, 1);
+        }
+        else {
+          if (self.entrySelection.selected.indexOf(entry) !== -1) { return; }
+          self.entrySelection.selected.push(entry);
+        }
+      });
+    },
+
+
+    /**
+     * Unselect the specified entries
+     * @param {Object|Array} entries
+     */
+    unselectEntries: function (entries) {
+      var self = this;
+      var entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(function (entry) {
+        if (self.entrySelection.isGlobal) {
+          if (self.entrySelection.unselected.indexOf(entry) !== -1) { return; }
+          self.entrySelection.unselected.push(entry);
+        }
+        else {
+          var index = self.entrySelection.selected.indexOf(entry);
+          if (index === -1) { return; }
+          self.entrySelection.selected.splice(index, 1);
+        }
+      });
+    },
+
+
+    /**
+     * Toggle the selection of the specified entries
+     * @param {Object|Array} entries
+     * @param {Boolean} select Whether to seelct or not the entries. Undefined toggle current state
+     */
+    toggleSelectEntries: function (entries, select) {
+      var self = this;
+      var entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(function (entry) {
+        if (select === undefined) {
+          select = !self.isEntrySelected(entry);
+        }
+        if (select) {
+          self.selectEntries(entry);
+        } else {
+          self.unselectEntries(entry);
+        }
+      });
+    },
+
+
+    /**
+     * Set the entry selection globally accross pages
+     * @param {Boolean} bool
+     */
+    setEntrySelectGlobal: function (bool) {
+      this.entrySelection.isGlobal = bool;
+      this.entrySelection.selected.splice(0);
+      this.entrySelection.unselected.splice(0);
+    },
+
 
 
 

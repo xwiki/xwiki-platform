@@ -1,11 +1,13 @@
 <template>
   <div class="livedata-topbar">
 
-    <!-- Drowpdown -->
-    <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
+    <div class="livedata-topbar-left">
+      <slot name="left"></slot>
+    </div>
 
-    <!-- Pagination -->
-    <livedata-pagination :logic="logic"></livedata-pagination>
+    <div class="livedata-topbar-right">
+      <slot name="right"></slot>
+    </div>
 
   </div>
 </template>
@@ -33,8 +35,6 @@
   */
 define([
   "Vue",
-  "vue!livedata-dropdown-menu",
-  "vue!livedata-pagination",
 ], function (
   Vue,
 ) {
@@ -60,6 +60,20 @@ define([
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1rem;
 }
+
+.livedata-topbar-left,
+.livedata-topbar-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.livedata-dropdown-menu {
+  margin-right: 1rem;
+}
+
 
 </style>

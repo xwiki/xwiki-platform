@@ -7,7 +7,7 @@
       ref="checkbox"
       type="checkbox"
       :checked="selected"
-      @change="logic.toggleSelectEntry(entry)"
+      @change="logic.toggleSelectEntries(entry)"
     />
   </div>
 </template>
@@ -54,13 +54,13 @@ define([
       data: function () { return this.logic.data; },
 
       selected: function () {
-        return this.logic.selectedEntries.indexOf(this.entry) !== -1;
+        return this.logic.isEntrySelected(this.entry);
       },
 
     },
 
     destroyed: function () {
-      this.logic.unselectEntry(this.entry);
+      this.logic.unselectEntries(this.entry);
     },
 
   });

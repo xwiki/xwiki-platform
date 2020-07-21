@@ -1,7 +1,15 @@
 <template>
   <div class="livedata-layout-cards">
 
-    <livedata-topbar :logic="logic"></livedata-topbar>
+    <livedata-topbar :logic="logic">
+      <template #left>
+        <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
+        <livedata-entry-selector-all :logic="logic"></livedata-entry-selector-all>
+      </template>
+      <template #right>
+        <livedata-pagination :logic="logic"></livedata-pagination>
+      </template>
+    </livedata-topbar>
 
     <!-- Cards component -->
     <div class="livedata-cards">
@@ -77,6 +85,9 @@
 define([
   "Vue",
   "vue!livedata-topbar.vue",
+  "vue!livedata-dropdown-menu",
+  "vue!livedata-entry-selector-all",
+  "vue!livedata-pagination",
   "vue!displayers/livedata-displayer.vue",
   "vue!livedata-entry-selector.vue",
 ], function (

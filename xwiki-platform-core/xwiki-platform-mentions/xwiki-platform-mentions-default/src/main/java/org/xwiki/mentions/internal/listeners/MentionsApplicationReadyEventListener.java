@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -48,7 +50,8 @@ public class MentionsApplicationReadyEventListener extends AbstractEventListener
      */
     public MentionsApplicationReadyEventListener()
     {
-        super("MentionsApplicationReadyEventListener", new ApplicationReadyEvent());
+        super("MentionsApplicationReadyEventListener", new ApplicationReadyEvent(),
+            new ExtensionInstalledEvent(new ExtensionId("org.xwiki.platform:xwiki-platform-mentions-default"), null));
     }
 
     @Override

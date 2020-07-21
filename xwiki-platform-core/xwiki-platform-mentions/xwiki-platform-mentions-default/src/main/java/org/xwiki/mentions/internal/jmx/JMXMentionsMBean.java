@@ -31,7 +31,7 @@ public interface JMXMentionsMBean
      *
      * @return the mentions analysis tasks queue size.
      */
-    int getQueueSize();
+    long getQueueSize();
 
     /**
      * Clear the mentions analysis tasks queue.

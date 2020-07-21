@@ -47,6 +47,8 @@ public class MentionsData
 
     private final boolean stop;
 
+    private long attempts;
+
     /**
      * Default constructor.
      */
@@ -166,6 +168,23 @@ public class MentionsData
     {
         this.wikiId = wikiId;
         return this;
+    }
+
+    /**
+     * Increase the attempts counter.
+     */
+    public void increaseAttempts()
+    {
+        this.attempts++;
+    }
+
+    /**
+     *
+     * @return true if the number of attempts for the current data has reached 10. 
+     */
+    public boolean isFailed()
+    {
+        return this.attempts > 10;
     }
 
     @Override

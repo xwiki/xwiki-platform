@@ -21,6 +21,7 @@ package org.xwiki.mentions.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 import javax.inject.Inject;
@@ -45,7 +46,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  * This class is in charge of the management of mentions task analysis.
  * First, when {@link DefaultMentionsEventExecutor#execute(DocumentReference, DocumentReference, String)} is called,
  * a {@link MentionsData} is added to a queue.
- * Then, a pool of {@link MentionsConsumer} workers is consuming the queue and delegate the actual analyis to
+ * Then, a pool of {@link MentionsConsumer} workers is consuming the queue and delegate the actual analysis to
  * {@link MentionsDataConsumer#consume(MentionsData)} which deals with actual implementation of the user mentions 
  * analysis.  
  *
@@ -87,8 +88,13 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     {
         this.queue = this.blockingQueueProvider.initBlockingQueue();
         this.consumers = new ArrayList<>();
-        JMXMentionsMBean mbean = new JMXMentions(this.queue, () -> this.consumers.size());
+        JMXMentionsMBean mbean = new JMXMentions(this::getQueueSize, this::clearQueue, () -> this.consumers.size());
         this.jmxRegistration.registerMBean(mbean, MBEAN_NAME);
+    }
+
+    private void clearQueue()
+    {
+        this.queue.clear();
     }
 
     @Override
@@ -131,16 +137,17 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Override
     public void execute(DocumentReference documentReference, DocumentReference authorReference, String version)
     {
+        MentionsData data = new MentionsData()
+                                .setDocumentReference(documentReference.toString())
+                                .setAuthorReference(Objects.toString(authorReference.toString(), ""))
+                                .setVersion(version)
+                                .setWikiId(documentReference.getWikiReference().getName());
         try {
-            this.queue.put(new MentionsData()
-                               .setDocumentReference(documentReference.toString())
-                               .setAuthorReference(authorReference.toString())
-                               .setVersion(version)
-                               .setWikiId(documentReference.getWikiReference().getName())
-            );
+            this.queue.put(data);
         } catch (InterruptedException e) {
             this.logger
-                .warn("Error while adding a task to the mentions analysis queue. Cause [{}]", getRootCauseMessage(e));
+                .warn("Error while adding a task to the mentions analysis queue. Cause [{}]",
+                    getRootCauseMessage(e));
         }
     }
 
@@ -174,13 +181,13 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
             try {
                 data = DefaultMentionsEventExecutor.this.queue.poll();
                 if (data != null) {
+                    data.increaseAttempts();
                     if (data.isStop()) {
                         this.halt = true;
                     } else if (!data.isDeprecated()) {
                         DefaultMentionsEventExecutor.this.logger
                             .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(),
-                                data.getVersion(),
-                                DefaultMentionsEventExecutor.this.queue.size());
+                                data.getVersion(), getQueueSize());
 
                         DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
                     }
@@ -189,13 +196,18 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
                 DefaultMentionsEventExecutor.this.logger
                     .warn("Error during mention analysis of task [{}]. Cause [{}].", data, getRootCauseMessage(e));
                 if (data != null) {
-                    // push back the failed task at the beginning of the queue.
-                    try {
-                        DefaultMentionsEventExecutor.this.queue.put(data);
-                    } catch (InterruptedException interruptedException) {
+                    if (!data.isFailed()) {
+                        // push back the failed task at the beginning of the queue.
+                        try {
+                            DefaultMentionsEventExecutor.this.queue.put(data);
+                        } catch (InterruptedException interruptedException) {
+                            DefaultMentionsEventExecutor.this.logger
+                                .error("Error when adding back a fail failed task [{}]. Cause [{}].", data,
+                                    getRootCauseMessage(e));
+                        }
+                    } else {
                         DefaultMentionsEventExecutor.this.logger
-                            .error("Error when adding back a fail failed task [{}]. Cause [{}].", data,
-                                getRootCauseMessage(e));
+                            .error("[{}] abandoned because it has failed to many time", data);
                     }
                 }
             }

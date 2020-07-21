@@ -40,18 +40,18 @@
   },
   "meta":{
     "propertyDescriptors":[
-      {"id":"name","displayer":{"id":"html"},"filter":{"id":"none"}},
-      {"id":"filterType","filter":{"id":"none"}},
-      {"id":"eventTypes","displayer":{"id":"html"},"filter":{"id":"none"}},
-      {"id":"notificationFormats","displayer":{"id":"html"},"filter":{"id":"none"}},
-      {"id":"isEnabled","displayer":{"id":"html"},"filter":{"id":"none"}},
+      {"id":"name","displayer":{"id":"html"},"filter":{"id":""}},
+      {"id":"filterType","filter":{"id":""}},
+      {"id":"eventTypes","displayer":{"id":"html"},"filter":{"id":""}},
+      {"id":"notificationFormats","displayer":{"id":"html"},"filter":{"id":""}},
+      {"id":"isEnabled","displayer":{"id":"html"},"filter":{"id":""}},
       {
         "id":"_actions",
         "displayer":{
           "actions":["delete"],
           "id":"actions"
         },
-        "filter":{"id":"none"}
+        "filter":{"id":""}
       }
     ]
   }

@@ -116,7 +116,8 @@ public class LiveTableLiveDataPropertyTypeStore implements LiveDataPropertyDescr
 
     private LiveDataPropertyDescriptor createTypeDescriptor(String id, String displayer)
     {
-        return createTypeDescriptor(id, displayer, "none");
+        // Create a type of property that cannot be filtered.
+        return createTypeDescriptor(id, displayer, "");
     }
 
     private LiveDataPropertyDescriptor createTypeDescriptor(String id, String displayer, String filter)

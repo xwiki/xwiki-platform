@@ -197,7 +197,7 @@
     ],
     "propertyTypes":[
       {
-        "filter":{"id":"none"}
+        "filter":{"id":""}
       }
     ]
   },

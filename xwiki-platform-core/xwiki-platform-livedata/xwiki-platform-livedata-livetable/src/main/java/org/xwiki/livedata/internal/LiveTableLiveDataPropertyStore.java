@@ -95,7 +95,8 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
                 property.getDisplayer().put(ID, displayer);
             }
             if (!sortable) {
-                property.getFilter().put(ID, "none");
+                // If we cannot sort on this property then we cannot filter either.
+                property.getFilter().put(ID, "");
             }
             property.setSortable(sortable);
             add(property);

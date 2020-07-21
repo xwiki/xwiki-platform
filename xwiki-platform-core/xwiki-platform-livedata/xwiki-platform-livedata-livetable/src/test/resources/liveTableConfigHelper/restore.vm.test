@@ -36,9 +36,7 @@
           "id":"link",
           "propertyHref":"doc.url"
         },
-        "filter":{
-          "id":"none"
-        }
+        "filter":{"id":""}
       },
       {
         "id":"doc.location",
@@ -56,9 +54,7 @@
           "actions":["restore","delete"],
           "id":"actions"
         },
-        "filter":{
-          "id":"none"
-        }
+        "filter":{"id":""}
       }
     ]
   }

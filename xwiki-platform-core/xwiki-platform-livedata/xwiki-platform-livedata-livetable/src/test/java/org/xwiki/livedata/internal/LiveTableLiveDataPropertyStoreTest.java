@@ -191,12 +191,12 @@ class LiveTableLiveDataPropertyStoreTest
         json.append("{'id':'doc.creator','type':'Users','sortable':true,'displayer':{'id':'text'}},");
         json.append("{'id':'doc.author','type':'Users','sortable':true,"
             + "'displayer':{'propertyHref':'doc.author_url','id':'link'}},");
-        json.append("{'id':'doc.objectCount','type':'Number','filter':{'id':'none'}},");
-        json.append("{'id':'_images','type':'String','displayer':{'id':'html'},'filter':{'id':'none'}},");
-        json.append("{'id':'_attachments','type':'String','displayer':{'id':'html'},'filter':{'id':'none'}},");
+        json.append("{'id':'doc.objectCount','type':'Number','filter':{'id':''}},");
+        json.append("{'id':'_images','type':'String','displayer':{'id':'html'},'filter':{'id':''}},");
+        json.append("{'id':'_attachments','type':'String','displayer':{'id':'html'},'filter':{'id':''}},");
         json.append("{'id':'_actions','type':'String','displayer':{'id':'actions','actions':['edit','delete']},"
-            + "'filter':{'id':'none'}},");
-        json.append("{'id':'_avatar','type':'String','displayer':{'id':'html'},'filter':{'id':'none'}}");
+            + "'filter':{'id':''}},");
+        json.append("{'id':'_avatar','type':'String','displayer':{'id':'html'},'filter':{'id':''}}");
         return json.toString().replace('\'', '"');
     }
 }

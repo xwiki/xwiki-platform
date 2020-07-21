@@ -313,7 +313,7 @@ public class LiveDataConfigHelper
             JsonNode filter = propertyDescriptor.path(FILTER);
             if (filter.isBoolean() && !filter.booleanValue()) {
                 ObjectNode filterObj = objectMapper.createObjectNode();
-                filterObj.put(ID, "none");
+                filterObj.put(ID, "");
                 propertyDescriptor.set(FILTER, filterObj);
             } else if (filter.isTextual()) {
                 ObjectNode filterObj = objectMapper.createObjectNode();

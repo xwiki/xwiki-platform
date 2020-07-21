@@ -58,7 +58,7 @@ class LiveTableLiveDataPropertyTypeStoreTest
     {
         StringBuilder expectedJSON = new StringBuilder("[");
         expectedJSON.append("{'id':'Boolean','displayer':{'id':'boolean'},'filter':{'id':'boolean'}},");
-        expectedJSON.append("{'id':'ComputedField','displayer':{'id':'html'},'filter':{'id':'none'}},");
+        expectedJSON.append("{'id':'ComputedField','displayer':{'id':'html'},'filter':{'id':''}},");
         expectedJSON.append("{'id':'DBList','filter':{'id':'suggest'}},");
         expectedJSON.append("{'id':'DBTreeList','filter':{'id':'suggest'}},");
         expectedJSON.append("{'id':'Date','displayer':{'id':'date'},'filter':{'id':'date'}},");
@@ -66,7 +66,7 @@ class LiveTableLiveDataPropertyTypeStoreTest
         expectedJSON.append("{'id':'Groups','displayer':{'id':'html'},'filter':{'id':'suggest'}},");
         expectedJSON.append("{'id':'Number','displayer':{'id':'number'},'filter':{'id':'number'}},");
         expectedJSON.append("{'id':'Page','displayer':{'id':'html'},'filter':{'id':'suggest'}},");
-        expectedJSON.append("{'id':'Password','filter':{'id':'none'}},");
+        expectedJSON.append("{'id':'Password','filter':{'id':''}},");
         expectedJSON.append("{'id':'StaticList','filter':{'id':'list'}},");
         expectedJSON.append("{'id':'String','filter':{'id':'text'}},");
         expectedJSON.append("{'id':'TextArea','displayer':{'id':'html'},'filter':{'id':'text'}},");

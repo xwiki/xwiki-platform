@@ -50,7 +50,7 @@
           "actions":["edit","delete"],
           "id":"actions"
         },
-        "filter":{"id":"none"}
+        "filter":{"id":""}
       }
     ]
   }

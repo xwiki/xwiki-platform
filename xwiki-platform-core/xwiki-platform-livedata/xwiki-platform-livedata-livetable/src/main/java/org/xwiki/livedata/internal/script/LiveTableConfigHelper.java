@@ -385,7 +385,8 @@ public class LiveTableConfigHelper
                 }
             }
         } else {
-            filterConfig.put(ID, "none");
+            // Column cannot be filtered.
+            filterConfig.put(ID, "");
         }
         return filterConfig;
     }

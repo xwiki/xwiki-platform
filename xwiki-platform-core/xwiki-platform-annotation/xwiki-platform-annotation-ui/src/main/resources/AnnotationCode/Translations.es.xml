@@ -48,7 +48,7 @@ annotations.settings.error.notarget=No se ha especificado ninguna página de la 
 annotations.annotated.loading=Cargando página con anotaciones
 annotations.annotated.loaderror=Error:
 annotations.annotated.loaderror.wrongresponse=Respuesta del servidor mal formateada
-annotations.annotated.error.noannotatedelement=No se han podido cargar las anotaciones  porque el contenido no está disponible.
+annotations.annotated.error.noannotatedelement=Las anotaciones no han podido cargarse porque el contenido no está disponible.
 annotations.annotated.error.wrongsyntax=Las anotaciones no están disponibles para las páginas con sintaxis XWiki/1.0.
 
 annotations.action.edit.text=[Editar]

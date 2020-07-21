@@ -62,13 +62,12 @@ define({
       {
         id: "table",
         name: "Table",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'}
-        ,
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
       },
       {
         id: "cards",
         name: "Cards",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'}
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
       },
     ],
 

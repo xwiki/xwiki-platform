@@ -5,7 +5,7 @@
 
         <keep-alive>
           <component
-            v-if="data.query.currentLayout"
+            v-if="logic.currentLayout"
             :is="currentLayoutComponentName"
             :logic="logic"
           ></component>
@@ -55,7 +55,7 @@
         data: function () { return this.logic.data; },
 
         currentLayoutComponentName: function () {
-          return "livedata-layout-" + this.data.query.currentLayout;
+          return "livedata-layout-" + this.logic.currentLayout;
         },
       },
 

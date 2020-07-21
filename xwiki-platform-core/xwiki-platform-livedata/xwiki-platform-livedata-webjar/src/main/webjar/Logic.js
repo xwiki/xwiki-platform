@@ -66,6 +66,7 @@ define([
   var Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    this.currentLayout = "";
     element.removeAttribute("data-data");
     // create Vuejs instance
     new Vue({
@@ -232,16 +233,15 @@ define([
     /**
      * Get the displayer descriptor associated to a property id
      * @param {String} propertyId
+     * @returns {Object}
      */
     getDisplayerDescriptor: function (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      if (!propertyDescriptor) { return; }
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      if (!typeDescriptor) { return; }
+      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorDisplayer = typeDescriptor.displayer || {};
       // default displayer config
       var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
@@ -256,16 +256,15 @@ define([
     /**
      * Get the filter descriptor associated to a property id
      * @param {String} propertyId
+     * @returns {Object}
      */
     getFilterDescriptor: function (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      if (!propertyDescriptor) { return; }
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       var propertyDescriptorFilter = propertyDescriptor.filter || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      if (!typeDescriptor) { return; }
+      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorFilter = typeDescriptor.filter || {};
       // default filter config
       var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
@@ -296,7 +295,7 @@ define([
 
         layoutId = layoutId || self.data.meta.defaultLayout;
         // layout already loaded
-        if (layoutId === self.data.query.currentLayout) {
+        if (layoutId === self.currentLayout) {
           return void resolve(layoutId);
         }
         // bad layout
@@ -306,8 +305,8 @@ define([
 
         // requirejs success callback
         var loadLayoutSuccess = function () {
-          var previousLayoutId = self.data.query.currentLayout;
-          self.data.query.currentLayout = layoutId;
+          var previousLayoutId = self.currentLayout;
+          self.currentLayout = layoutId;
           // dispatch events
           self.triggerEvent("layoutChange", {
             layoutId: layoutId,
@@ -650,7 +649,7 @@ define([
     /**
      * Return an object containing the new and old filter entries corresponding to parameters
      *  oldEntry: the filter entry to be modified
-     *  newEntrh: what this entry should be modified to
+     *  newEntry: what this entry should be modified to
      * @param {String} property The property to filter according to
      * @param {String} index The index of the filter entry
      * @param {String} filterEntry The filter data used to update the filter configuration

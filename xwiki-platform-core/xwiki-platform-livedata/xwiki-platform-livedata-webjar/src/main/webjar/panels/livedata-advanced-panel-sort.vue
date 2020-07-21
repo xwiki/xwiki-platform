@@ -104,7 +104,7 @@
 */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "/panels/livedata-base-advanced-panel.vue",
+  "vue!panels/livedata-base-advanced-panel",
 ], function (
   Vue
 ) {

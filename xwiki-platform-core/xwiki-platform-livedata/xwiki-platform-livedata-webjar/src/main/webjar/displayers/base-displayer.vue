@@ -58,7 +58,7 @@
    */
   define([
     "Vue",
-    BASE_PATH + "displayers/displayer-mixin.js",
+    "displayers/displayer-mixin",
   ], function (
     Vue,
     displayerMixin

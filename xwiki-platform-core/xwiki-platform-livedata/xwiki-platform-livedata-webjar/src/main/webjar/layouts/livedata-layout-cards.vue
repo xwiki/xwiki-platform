@@ -76,9 +76,9 @@
  */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "livedata-topbar.vue",
-  "vue!" + BASE_PATH + "/displayers/livedata-displayer.vue",
-  "vue!" + BASE_PATH + "/livedata-entry-selector.vue",
+  "vue!livedata-topbar.vue",
+  "vue!displayers/livedata-displayer.vue",
+  "vue!livedata-entry-selector.vue",
 ], function (
   Vue
 ) {

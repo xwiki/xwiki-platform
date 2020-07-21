@@ -33,8 +33,8 @@
   */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "livedata-dropdown-menu.vue",
-  "vue!" + BASE_PATH + "livedata-pagination.vue",
+  "vue!livedata-dropdown-menu",
+  "vue!livedata-pagination",
 ], function (
   Vue,
 ) {

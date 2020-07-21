@@ -80,7 +80,7 @@ define([
           };
 
           // load displayer based on it's id
-          require(["vue!" + BASE_PATH + "displayers/" + componentName + ".vue"],
+          require(["vue!displayers/" + componentName],
             loadDisplayerSuccess,
             loadDisplayerFailure
           );

@@ -22,7 +22,7 @@
 define([
   "jquery",
   "Vue",
-  "vue!" + BASE_PATH + "livedata-root.vue",
+  "vue!livedata-root",
   "polyfills"
 ], function (
   $,
@@ -353,7 +353,7 @@ define([
         };
 
         // load layout based on it's filename
-        require(["vue!" + BASE_PATH + "layouts/livedata-layout-" + layoutId + ".vue"],
+        require(["vue!layouts/livedata-layout-" + layoutId],
           loadLayoutSuccess,
           loadLayoutFailure
         );

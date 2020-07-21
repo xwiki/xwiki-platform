@@ -62,7 +62,7 @@
 
 define([
   "Vue",
-  "vue!" + BASE_PATH + "/filters/livedata-filter.vue",
+  "vue!filters/livedata-filter",
 ], function (
   Vue
 ) {

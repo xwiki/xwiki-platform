@@ -37,7 +37,7 @@
  */
 define([
   "Vue",
-  BASE_PATH + "filters/filter-mixin.js",
+  "filters/filter-mixin",
 ], function (
   Vue,
   filterMixin

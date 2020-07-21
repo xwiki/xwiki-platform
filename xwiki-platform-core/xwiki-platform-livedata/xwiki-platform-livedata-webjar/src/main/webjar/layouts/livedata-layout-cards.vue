@@ -59,8 +59,8 @@
  */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "livedata-topbar.html",
-  "vue!" + BASE_PATH + "/displayers/livedata-displayer.html",
+  "vue!" + BASE_PATH + "livedata-topbar.vue",
+  "vue!" + BASE_PATH + "/displayers/livedata-displayer.vue",
 ], function (
   Vue
 ) {

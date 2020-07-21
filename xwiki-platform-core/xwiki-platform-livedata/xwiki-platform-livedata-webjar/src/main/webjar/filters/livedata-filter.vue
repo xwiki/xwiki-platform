@@ -82,7 +82,7 @@ define([
           };
 
           // load filter based on it's id
-          require(["vue!" + BASE_PATH + "filters/" + componentName + ".html"],
+          require(["vue!" + BASE_PATH + "filters/" + componentName + ".vue"],
             loadFilterSuccess,
             loadFilterFailure
           );

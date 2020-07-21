@@ -37,7 +37,7 @@
     */
   define([
     "Vue",
-    "vue!" + BASE_PATH + "panels/livedata-advanced-panels.html",
+    "vue!" + BASE_PATH + "panels/livedata-advanced-panels.vue",
   ], function (
     Vue,
   ) {

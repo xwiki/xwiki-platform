@@ -64,7 +64,7 @@
  */
 define([
   "Vue",
-  "vue!" + BASE_PATH + "xwiki-icon.html"
+  "vue!" + BASE_PATH + "xwiki-icon.vue"
 ], function (
   Vue
 ) {

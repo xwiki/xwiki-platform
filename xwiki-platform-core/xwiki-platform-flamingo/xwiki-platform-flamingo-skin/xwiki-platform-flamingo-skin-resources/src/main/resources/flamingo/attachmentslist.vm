@@ -19,10 +19,4 @@
 ## ---------------------------------------------------------------------------
 #if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
 #template('attachment_macros.vm')
-#set ($attachments = $doc.attachmentList)
-#sortAttachments($attachments $request.sortAttachmentsBy)
-#if ($attachments.size() > 0)
-  #displayAttachments($attachments)
-#else
-  <p class="noitems">$services.localization.render('core.viewers.attachments.noAttachments')</p>
-#end
+#livetable('docAttachments' $columns $columnsProperties $options)

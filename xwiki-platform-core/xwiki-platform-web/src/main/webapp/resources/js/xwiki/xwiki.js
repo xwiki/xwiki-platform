@@ -505,6 +505,29 @@ Object.extend(XWiki, {
   },
 
   /**
+   * Add required skin extensions to html head.
+   *
+   * @param requiredSkinExtensions required extensions taken from request header
+   */
+  loadRequiredSkinExtensions : function(requiredSkinExtensions) {
+    require(['jquery'], function($) {
+        var existingSkinExtensions;
+        var getExistingSkinExtensions = function() {
+            return $('link, script').map(function() {
+                return $(this).attr('href') || $(this).attr('src');
+            }).get();
+        };
+        $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
+        if (!existingSkinExtensions) {
+            existingSkinExtensions = getExistingSkinExtensions();
+        }
+        var url = $(this).attr('href') || $(this).attr('src');
+        return existingSkinExtensions.indexOf(url) < 0;
+        }).appendTo('head');
+    });
+  },
+
+  /**
    * Watchlist methods.
    * 
    * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not 
@@ -1859,4 +1882,25 @@ document.observe("xwiki:dom:loaded", function() {
       element.__fm_ghost.hide();
     }
   }
+});
+
+/**
+ * Pull the skin extensions required whenever an Ajax request completes successfully.
+ */
+Ajax.Responders.register({
+  onComplete: function(event, XHR) {
+      var requiredSkinExtensions = XHR.getResponseHeader('X-XWIKI-HTML-HEAD');
+      if (XHR.status == 200 && requiredSkinExtensions) {
+          XWiki.loadRequiredSkinExtensions(requiredSkinExtensions);
+      }
+  }
+});
+
+require(['jquery'], function($) {
+  $(document).ajaxSuccess(function(event, jqXHR) {
+      var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
+      if (requiredSkinExtensions) {
+          XWiki.loadRequiredSkinExtensions(requiredSkinExtensions);
+      }
+  });
 });

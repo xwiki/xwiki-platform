@@ -17,6 +17,9 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#template('attachment_macros.vm')
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
 $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
@@ -26,6 +29,26 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###
 ### TODO: web service?
 ###
+#set ($columns = ['mimeType', 'filename', 'version', 'filesize', 'date', 'author', '_actions'])
+#set ($columnsProperties = {
+  'mimeType': {'type': 'list', "html":true, 'class': 'XWiki.AllAttachments'},
+  'filename': {'type': 'text', 'link': 'auto'},
+  'version': {'type': 'text', 'link': 'auto'},
+  'filesize': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'},
+  'date': {'type': 'date'},
+  'author': {'type': 'text', 'html': true},
+  '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['delete']}
+})
+#set ($options = {
+  'translationPrefix': 'core.viewers.attachments.',
+  'url': $doc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
+  'selectedColumn': 'filename',
+  'javascriptName': 'docAttachmentsLivetable',
+  'outputOnlyHtml': true
+})
+##
+##
+##
 #set($showactions = 0)
 <div id="attachmentscontent" class="xwikiintracontent">
 <div id="attw">
@@ -55,4 +78,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   </form>
 #end
 </div> ## attw
+<div id='attachmentsUploadContainer' class='hidden'></div>
 </div> ## attachmentscontent
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

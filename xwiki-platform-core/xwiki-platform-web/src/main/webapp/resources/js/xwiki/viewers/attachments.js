@@ -61,7 +61,7 @@ viewers.Attachments = Class.create({
     if (typeof(XWiki.FileUploader) != 'undefined') {
       input.multiple = true;
       return new XWiki.FileUploader(input, {
-        'responseContainer' : $('_attachments'),
+        'responseContainer' : $('attachmentsUploadContainer'),
         'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1'),
         'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
       });
@@ -181,17 +181,19 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Getting the button that triggers the modal.
    */
   $(document).on('show.bs.modal', '#deleteAttachment', function(event) {
-    $(this).data('relatedTarget', $(event.relatedTarget));
+    if (event.relatedTarget) {
+      $(this).data('relatedTarget', $(event.relatedTarget));
+    }
   });
   /**
    * Event on deleteAttachment button.
    */
   $(document).on('click', '#deleteAttachment input.btn-danger', function() {
     var modal = $('#deleteAttachment');
-    var button = modal.data('relatedTarget');
+    var button = $(modal.data('relatedTarget'));
     var notification;
     /**
-     * Ajax request made for deleting an attachment. Delete the HTML element on succes. Disable the delete button
+     * Ajax request made for deleting an attachment. Refresh livetable on success. Disable the delete button
      * before the request is send, so the user cannot resend it in case it takes longer.
      * Display error message on failure.
      */
@@ -203,9 +205,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           "$services.localization.render('core.viewers.attachments.delete.inProgress')", 'inprogress');
       },
       success : function() {
-        var attachment = button.closest('.attachment');
-        // Remove the corresponding HTML element from the UI and update the attachment count.
-        attachment.remove();
+        docAttachmentsLivetable.refresh();
         updateCount();
         notification.replace(new XWiki.widgets.Notification(
           "$services.localization.render('core.viewers.attachments.delete.done')", 'done'));
@@ -218,29 +218,46 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       }
     })
   });
+  $(document).on("xwiki:livetable:loadingComplete", function(event, data) {
+    if (data.tableId == 'docAttachments') {
+      $(document).on('click', '#docAttachments .actiondelete', function(event) {
+        event.preventDefault();
+        $('#deleteAttachment').data('relatedTarget', event.currentTarget);
+        $('#deleteAttachment').modal('show');
+      });
+
+      updateCount();
+    }
+  })
   /**
    * Updating the number of files in AttachmentsTab and in More actions menu.
    */
   var updateCount = function() {
-    var itemCount = $('#Attachmentstab').find('.itemCount');
-    var attachmentsNumber = $("#Attachmentspane .attachment").size();
-    if(itemCount) {
-      itemCount.text(
-        "$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", attachmentsNumber));
-    };
-    if($('#tmAttachments').length) {
-      // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
-      $('#tmAttachments')[0].normalize();
-      var attachmentsLabel = " $services.localization.render('docextra.attachments') ";
-      var label = attachmentsLabel + "$services.localization.render('docextra.extranb', ['__number__'])";
-      label = label.replace("__number__", attachmentsNumber);
-      $('#tmAttachments').contents().last()[0].nodeValue=label;
-    }
+    $.ajax({
+      url: XWiki.currentDocument.getURL('get', 'xpage=xpart&vm=attachmentsjson.vm'),
+      success: function(data) {
+        var itemCount = $('#Attachmentstab').find('.itemCount');
+        var attachmentsNumber = data.totalrows;
+        if(itemCount) {
+          itemCount.text(
+            "$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", attachmentsNumber));
+        };
+        if($('#tmAttachments').length) {
+          // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
+          $('#tmAttachments')[0].normalize();
+          var attachmentsLabel = " $services.localization.render('docextra.attachments') ";
+          var label = attachmentsLabel + "$services.localization.render('docextra.extranb', ['__number__'])";
+          label = label.replace("__number__", attachmentsNumber);
+          $('#tmAttachments').contents().last()[0].nodeValue=label;
+        }
+      }
+    });
   };
   /**
    * Firing updateCount event when an attachment is successfully uploaded.
    */
   $(document).on('xwiki:html5upload:done', function() {
+    docAttachmentsLivetable.refresh();
     updateCount();
   });
 });

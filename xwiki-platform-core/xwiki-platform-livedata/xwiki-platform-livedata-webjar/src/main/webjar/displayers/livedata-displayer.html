@@ -54,6 +54,7 @@ define([
     },
 
     computed: {
+      data: function () { return this.logic.data; },
       displayerId: function () {
         return this.logic.getDisplayerDescriptor(this.propertyId).id;
       },
@@ -92,7 +93,7 @@ define([
       var self = this;
       // load displayer
       this.loadDisplayer(this.displayerId).catch(function () {
-        self.loadDisplayer("default").catch(function (err) {
+        self.loadDisplayer(self.data.meta.defaultDisplayer).catch(function (err) {
           console.error(err);
         });
       });

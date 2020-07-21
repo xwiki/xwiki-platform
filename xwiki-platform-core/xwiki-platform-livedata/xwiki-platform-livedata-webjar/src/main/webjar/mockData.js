@@ -107,9 +107,7 @@ define({
           id: "html",
         },
         sortable: false,
-        filter: {
-          id: null,
-        },
+        filterable: false,
       },
     ],
 
@@ -121,6 +119,7 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'text'
         },
@@ -132,11 +131,14 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'number'
         },
       },
     ],
+
+    defaultFilter: 'text',
 
     filters: [
       {
@@ -158,10 +160,9 @@ define({
       },
     ],
 
+    defaultDisplayer: 'text',
+
     displayers: [
-      {
-        id: "default",
-      },
       {
         id: "text",
       },

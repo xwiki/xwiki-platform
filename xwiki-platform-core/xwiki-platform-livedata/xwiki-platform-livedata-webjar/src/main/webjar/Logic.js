@@ -243,13 +243,23 @@ define([
       // property type descriptor config
       var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorDisplayer = typeDescriptor.displayer || {};
-      // default displayer config
-      var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
+      // merge property and/or type displayer descriptors
+      var highLevelDisplayer;
+      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
+        highLevelDisplayer = $.extend({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+      } else {
+        highLevelDisplayer = $.extend({}, propertyDescriptorDisplayer);
+      }
+      // displayer config
+      var displayerId = highLevelDisplayer.id;
       var displayer = this.data.meta.displayers.find(function (displayer) {
         return displayer.id === displayerId;
       });
-
-      return $.extend({}, displayer, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+      // default displayer config
+      var defaultDisplayer = { id: this.data.meta.defaultDisplayer };
+      // merge all displayers
+      var mergedDisplayer = $.extend({}, defaultDisplayer, displayer, highLevelDisplayer);
+      return mergedDisplayer;
     },
 
 
@@ -266,13 +276,23 @@ define([
       // property type descriptor config
       var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
       var typeDescriptorFilter = typeDescriptor.filter || {};
-      // default filter config
-      var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
+      // merge property and/or type filter descriptors
+      var highLevelFilter;
+      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
+        highLevelFilter = $.extend({}, typeDescriptorFilter, propertyDescriptorFilter);
+      } else {
+        highLevelFilter = $.extend({}, propertyDescriptorFilter);
+      }
+      // filter filter config
+      var filterId = highLevelFilter.id;
       var filter = this.data.meta.filters.find(function (filter) {
         return filter.id === filterId;
       });
-
-      return $.extend({}, filter, typeDescriptorFilter, propertyDescriptorFilter);
+      // default filter config
+      var defaultFilter = { id: this.data.meta.defaultFilter };
+      // merge all filters
+      var mergedFilter = $.extend({}, defaultFilter, filter, highLevelFilter);
+      return mergedFilter;
     },
 
 
@@ -591,7 +611,10 @@ define([
      * @returns {Boolean}
      */
     isPropertyFilterable: function (propertyId) {
-      return !!this.getFilterDescriptor(propertyId).id;
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return propertyDescriptor.filterable ||
+        (propertyDescriptor.filterable === undefined && propertyTypeDescriptor.filterable);
     },
 
 

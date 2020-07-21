@@ -56,6 +56,7 @@ define([
     },
 
     computed: {
+      data: function () { return this.logic.data; },
       filterId: function () {
         return this.logic.getFilterDescriptor(this.propertyId).id;
       },
@@ -94,7 +95,7 @@ define([
       var self = this;
       // load filter
       this.loadFilter(this.filterId).catch(function () {
-        self.loadFilter("default").catch (function (err) {
+        self.loadFilter(self.data.meta.defaultFilter).catch (function (err) {
           console.error(err);
         });
       });

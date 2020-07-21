@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -65,7 +67,8 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     private Logger logger;
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
@@ -102,7 +105,7 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     {
         Optional<XDOM> oxdom;
         try {
-            Parser instance = this.componentManager.getInstance(Parser.class, syntax.toIdString());
+            Parser instance = this.componentManager.get().getInstance(Parser.class, syntax.toIdString());
             XDOM xdom = instance.parse(new StringReader(payload));
             oxdom = Optional.of(xdom);
         } catch (ParseException e) {

@@ -27,11 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -76,6 +80,10 @@ public class DefaultMentionXDOMServiceTest
     LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManager;
+
+    @Mock
     private ComponentManager componentManager;
 
     @MockComponent
@@ -96,6 +104,7 @@ public class DefaultMentionXDOMServiceTest
         when(this.documentReferenceResolver.resolve("A")).thenReturn(this.documentReferenceA);
         when(this.documentReferenceResolver.resolve("B")).thenReturn(this.documentReferenceB);
         when(this.documentReferenceResolver.resolve("C")).thenReturn(this.documentReferenceC);
+        when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }
 
     @Test

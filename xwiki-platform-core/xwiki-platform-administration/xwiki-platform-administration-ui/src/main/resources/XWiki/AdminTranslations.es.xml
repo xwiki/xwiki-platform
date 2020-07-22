@@ -87,8 +87,8 @@ XWiki.XWikiPreferences_iconTheme.hint=Especifique el tema del icono que se utili
 XWiki.XWikiPreferences_colorTheme.hint=Especifique el tema de color que se utilizará de forma predeterminada.
 
 # Editing Sections
-admin.edit=Editando
-admin.edit.description=Configure el modo de edición, el editor WYSIWYG y las sintaxis disponibles.
+admin.edit=Edición
+admin.edit.description=Configura el modo de edición, el editor WYSIWYG y las sintaxis disponibles.
 admin.title=Título
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Evitar que los usuarios creen páginas wiki con títulos vacíos.
 XWiki.XWikiPreferences_editor.hint=Seleccione el tipo de editor que se utilizará de forma predeterminada para editar el contenido de la página.

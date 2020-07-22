@@ -21,7 +21,6 @@ package org.xwiki.mentions.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 import javax.inject.Inject;
@@ -37,6 +36,7 @@ import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.mentions.internal.jmx.JMXMentionsMBean;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -80,6 +80,9 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
 
     @Inject
     private ConfigurationSource configuration;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     private boolean threadStarted;
 
@@ -133,20 +136,24 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         }
     }
 
-
     @Override
     public void execute(DocumentReference documentReference, DocumentReference authorReference, String version)
     {
-        MentionsData data = new MentionsData()
-                                .setDocumentReference(documentReference.toString())
-                                .setAuthorReference(Objects.toString(authorReference.toString(), ""))
+        MentionsData mentionsData = new MentionsData()
+                                        .setDocumentReference(this.serializer.serialize(documentReference));
+        if (authorReference != null) {
+            mentionsData = mentionsData
+                               .setAuthorReference(this.serializer.serialize(authorReference));
+        }
+
+        MentionsData data = mentionsData
                                 .setVersion(version)
                                 .setWikiId(documentReference.getWikiReference().getName());
         try {
             this.queue.put(data);
         } catch (InterruptedException e) {
             this.logger
-                .warn("Error while adding a task to the mentions analysis queue. Cause [{}]",
+                .warn("Error while adding the task [{}] to the mentions analysis queue. Cause [{}]", data,
                     getRootCauseMessage(e));
         }
     }
@@ -196,7 +203,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
                 DefaultMentionsEventExecutor.this.logger
                     .warn("Error during mention analysis of task [{}]. Cause [{}].", data, getRootCauseMessage(e));
                 if (data != null) {
-                    if (!data.isFailed()) {
+                    if (!data.tooManyAttempts()) {
                         // push back the failed task at the beginning of the queue.
                         try {
                             DefaultMentionsEventExecutor.this.queue.put(data);
@@ -207,7 +214,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
                         }
                     } else {
                         DefaultMentionsEventExecutor.this.logger
-                            .error("[{}] abandoned because it has failed to many time", data);
+                            .error("[{}] abandoned because it has failed to many times.", data);
                     }
                 }
             }

@@ -140,7 +140,7 @@ public class MentionsData
 
     /**
      *
-     * @return true if the current object is {@link MentionsData#STOP}.  
+     * @return {@code true} if the current object is {@link MentionsData#STOP}.  
      */
     public boolean isStop()
     {
@@ -151,7 +151,7 @@ public class MentionsData
      * Check if the stop flag is relevant. 
      * The stop flag is deprecated when the server restarts.
      *
-     * @return true if the stop flag is still relevant.
+     * @return {@code true} if the stop flag is still relevant.
      */
     public boolean isDeprecated()
     {
@@ -180,9 +180,9 @@ public class MentionsData
 
     /**
      *
-     * @return true if the number of attempts for the current data has reached 10. 
+     * @return {@code true} if the number of attempts for the current data has reached 10. 
      */
-    public boolean isFailed()
+    public boolean tooManyAttempts()
     {
         return this.attempts > 10;
     }

@@ -32,11 +32,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.mentions.events.MentionEventParams;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
@@ -118,23 +118,24 @@ public class MentionsNotificationDisplayerTest
         String anchor = "myAnchor";
 
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(context.getURLFactory()).thenReturn(urlFactory);
-        when(urlFactory.createExternalURL(any(), eq("Doc"), eq("view"), isNull(), eq(anchor), eq(context)))
+        when(this.context.getURLFactory()).thenReturn(urlFactory);
+        when(urlFactory.createExternalURL(any(), eq("Doc"), eq("view"), isNull(), eq(anchor), eq(this.context)))
             .thenReturn(new URL("http://wiki/page/1#myAnchor"));
 
         DefaultEvent mentionEvent = new DefaultEvent();
         HashMap<String, String> eventParameters = new HashMap<>();
         String mpValue = "{ \"userReference\": \"xwiki:XWiki.U1\", "
-            + "\"documentReference\": \"xwiki:XWiki.Doc\", "
-            + "\"anchor\":\"" + anchor + "\" }";
+                             + "\"documentReference\": \"xwiki:XWiki.Doc\", "
+                             + "\"anchor\":\"" + anchor + "\" }";
         eventParameters.put(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY, mpValue);
         mentionEvent.setParameters(eventParameters);
 
         when(this.templateManager.execute("mentions/mention.vm")).thenReturn(new XDOM(emptyList()));
 
         MentionEventParams mentionEventParams =
-            new MentionEventParams().setDocumentReference(documentReference.toString())
-                .setUserReference(userReference.toString())
+            new MentionEventParams()
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setUserReference("xwiki:XWiki.U1")
                 .setLocation(MentionLocation.DOCUMENT)
                 .setAnchor(anchor);
         when(this.objectMapper.unserialize(mpValue)).thenReturn(Optional.of(mentionEventParams));

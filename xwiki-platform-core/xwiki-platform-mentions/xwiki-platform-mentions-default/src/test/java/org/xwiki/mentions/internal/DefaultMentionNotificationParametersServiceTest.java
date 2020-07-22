@@ -89,8 +89,8 @@ public class DefaultMentionNotificationParametersServiceTest
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
-                .setUserReference(authorReference.toString())
-                .setDocumentReference(documentReference.toString())
+                .setUserReference("xwiki:XWiki.Author")
+                .setDocumentReference("xwiki:XWiki.Doc")
                 .setLocation(MentionLocation.COMMENT)
                 .setAnchor("anchor")
                 .setQuote("quote some content")
@@ -121,8 +121,8 @@ public class DefaultMentionNotificationParametersServiceTest
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
-                .setUserReference(authorReference.toString())
-                .setDocumentReference(documentReference.toString())
+                .setUserReference("xwiki:XWiki.Author")
+                .setDocumentReference("xwiki:XWiki.Doc")
                 .setLocation(MentionLocation.COMMENT)
                 .setAnchor("anchor")
         );

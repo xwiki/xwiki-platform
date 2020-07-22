@@ -78,7 +78,7 @@ platform.wiki.currentwiki.invitationCancelFailure=Error, no puedes cancelar esta
 platform.wiki.currentwiki.candidateReviewFailure=Error, no puedes cancelar esta invitación.
 
 # LABELS
-platform.wiki.currentwiki.prop.wikiprettyname.label=Nombre "amigable"
+platform.wiki.currentwiki.prop.wikiprettyname.label=Nombre elegante
 platform.wiki.currentwiki.prop.description.label=Descripción
 platform.wiki.currentwiki.prop.owner.label=Propietario
 platform.wiki.currentwiki.prop.membershipType.label=Tipo de afiliación

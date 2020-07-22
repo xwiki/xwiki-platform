@@ -60,11 +60,11 @@ notifications.filters.name.ownEventsNotificationFilter=Filtro de Eventos Propios
 notifications.filters.description.ownEventsNotificationFilter=Ocultar notificaciones sobre su propia actividad
 notifications.filters.name.eventReadAlertFilter=Leer filtro de eventos (Alerta)
 notifications.filters.description.eventReadAlertFilter=Ocultar las notificaciones que ha marcado como leídas
-notifications.filters.name.eventReadEmailFilter=Leer el Filtro de Eventos (Email)
+notifications.filters.name.eventReadEmailFilter=Leer el filtro de eventos (Correo electrónico)
 notifications.filters.description.eventReadEmailFilter=Ocultar las notificaciones que ha marcado como leídas
 notifications.filters.name.minorEventAlertNotificationFilter=Evento Menor (Alerta)
 notifications.filters.description.minorEventAlertNotificationFilter=Ocultar notificaciones sobre cambios menores en las páginas
-notifications.filters.name.minorEventEmailNotificationFilter=Evento Menor (Email)
+notifications.filters.name.minorEventEmailNotificationFilter=Evento Menor (Correo electrónico)
 notifications.filters.description.minorEventEmailNotificationFilter=Ocultar notificaciones sobre cambios menores en las páginas
 
 ## Filter Types
@@ -99,7 +99,7 @@ notifications.toggle.disabled.hint=Necesita habilitar las notificaciones en su c
 
 ## Notifications formats
 notifications.format.alert=Alerta
-notifications.format.email=Email
+notifications.format.email=Correo electrónico
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Filtros
@@ -123,15 +123,15 @@ notifications.settings.title=Configuración de notificaciones
 notifications.settings.error.notAdmin=Debe ser administrador para ver esto.
 notifications.settings.menu=Menú de notificaciones
 notifications.settings.menu.hint=El menú de notificación se encuentra en la parte superior derecha de la página, y se puede ver haciendo clic en la campana ({0})
-notifications.settings.email=Email
+notifications.settings.email=Correo electrónico
 notifications.settings.email.forGuest=Inicie sesión o regístrese para gestionar su configuración de notificaciones.
-notifications.settings.email.disabled=Las notificaciones por email están deshabilitadas. Póngase en contacto con su administrador.
-notifications.settings.email.hint=Se enviará regularmente un correo electrónico con un resumen de lo que sucedió en el wiki
-notifications.settings.email.title=Configuración de Email
-notifications.settings.email.frequency=Frecuencia de email
-notifications.settings.email.frequency.hint=Elija la frecuencia con la que desea recibir un correo electrónico con el resumen de lo que ocurrió en el wiki.
-notifications.settings.email.diffType.hint=Seleccione el nivel de detalle que desea recibir sobre todos los cambios en el correo electrónico.
-notifications.settings.saving=Sus ajustes se están guardando....
+notifications.settings.email.disabled=Las notificaciones por correo electrónico están deshabilitadas. Póngase en contacto con su administrador.
+notifications.settings.email.hint=Recibirás periódicamente un mensaje de correo electrónico con un resumen de lo que pasó en la wiki
+notifications.settings.email.title=Configuración de correo electrónico
+notifications.settings.email.frequency=Frecuencia del correo electrónico
+notifications.settings.email.frequency.hint=Escoge la frecuencia con la que quieres recibir un mensaje de correo electrónico con el resumen de lo que pasó en la wiki.
+notifications.settings.email.diffType.hint=Selecciona el nivel de detalle con el que quieres recibir todos los cambios en el mensaje de correo electrónico.
+notifications.settings.saving=Tus ajustes se están guardando....
 notifications.settings.saved=¡Guardado!
 notifications.settings.savingfailed=No se ha podido guardar la configuración
 notifications.settings.filters=Filtros ({0})
@@ -165,7 +165,7 @@ notifications.rss.feedLinkDescription=Canal de eventos para notificaciones
 notifications.rss.feedTitle=Canal de notificaciones RSS
 notifications.rss.feedDescription=Este canal RSS se puede personalizar en su página de perfil.
 notifications.rss.seeChanges=Cambios: {0}
-notifications.globalsettings.email=Email de notificaciones
+notifications.globalsettings.email=Dirección de correo electrónico de notificaciones
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Diariamente
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Cada hora
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Semanalmente

@@ -37,20 +37,20 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.email=Correo electrónico
-admin.email.description=Configure los parámetros de envío de correo electrónico y vea sus estados.
+admin.email.description=Configura los parámetros de envío de correo electrónico y mira sus estados.
 admin.emailgeneral=Avanzado
-admin.emailgeneral.description=Configurar parámetros de correo electrónico avanzados, como la ofuscación de direcciones de correo electrónico.
+admin.emailgeneral.description=Configura parámetros de correo electrónico avanzados, como la ofuscación de direcciones de correo electrónico.
 admin.emailsend=Enviando correo electrónico
-admin.emailsend.description=Configure los parámetros de envío de correo electrónico.
-admin.emailstatus=Estado del envío de correo electrónico
-admin.emailstatus.description=Ver la situación de los mensajes de correo electrónico enviados y reenviar los correos fallidos.
-admin.emailstatus.hint=Si no puedes encontrar el estado de un mensaje de correo electrónico,  podría ser porque en una propiedad del envío de correo electrónico no especificó que se almacenara el estado.
+admin.emailsend.description=Configura los parámetros de envío de correo electrónico.
+admin.emailstatus=Situación del envío de correo electrónico
+admin.emailstatus.description=Ver la situación de los mensajes de correo electrónico enviados y reenviar los correos que no se pudieron entregar.
+admin.emailstatus.hint=Si no puedes encontrar el estado de un mensaje de correo electrónico, puede que la propiedad que envío el mensaje no especificó que se almacenara el estado.
 Mail.GeneralMailConfigClass_obfuscate=Ofuscar direcciones de correo electrónico
 Mail.GeneralMailConfigClass_obfuscate.hint=Esto sólo afecta a las direcciones de correo electrónico almacenadas en las propiedades de objeto del tipo Email, siempre y cuando no se sobrescriba el visor personalizado predeterminado para el tipo de propiedad Email. Ejemplo: a...@dominio.org
-Mail.SendMailConfigClass_from=Dirección de correo electrónico desde la que se enviará
+Mail.SendMailConfigClass_from=Dirección de correo electrónico del remitente
 Mail.SendMailConfigClass_from.hint=La dirección de correo electrónico predeterminada que se utiliza para enviar mensajes de notificación
-Mail.SendMailConfigClass_bcc=Direcciones de correo electrónico BCC
-Mail.SendMailConfigClass_bcc.hint=Una lista separada por comas predeterminada de las direcciones de correo electrónico BCC que se utilizarán al enviar correo electrónico
+Mail.SendMailConfigClass_bcc=Direcciones de correo electrónico de copia oculta
+Mail.SendMailConfigClass_bcc.hint=Una lista separada por comas predeterminada de las direcciones de correo electrónico de copia oculta que se utilizarán al enviar correo electrónico
 Mail.SendMailConfigClass_host=Servidor de correo electrónico
 Mail.SendMailConfigClass_host.hint=El servidor SMTP al que enviar. Por defecto es "localhost"
 Mail.SendMailConfigClass_port=Puerto del servidor de correo electrónico
@@ -64,7 +64,7 @@ Mail.SendMailConfigClass_properties.hint=La lista de propiedades adicionales de 
 Mail.SendMailConfigClass_sendWaitTime=Tiempo de espera de envío
 Mail.SendMailConfigClass_sendWaitTime.hint=El retraso entre cada correo que se envía, en milisegundos (8 segundos de forma predeterminada)
 Mail.SendMailConfigClass_discardSuccessStatuses=¿Descartar los registros de estado exitosos?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=No importa si los estados del correo electrónico se mantienen o no para mensajes que se han enviado con éxito ("true" de forma predeterminada)
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=No importa si se guarda o no la situación de envío del correo electrónico que se ha enviado exitosamente ("true" de forma predeterminada)
 Mail.SendMailStatus_livetable.date=Fecha
 Mail.SendMailStatus_livetable.batchId=ID de grupo de envíos
 Mail.SendMailStatus_livetable.type=Tipo
@@ -74,7 +74,7 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Acciones
 Mail.SendMailStatus_livetable.resend=Reenviar
-mailSender.admin.resendSuccess=Se ha reenviado el correo exitosamente
-mailSender.admin.resendFailure=Error al reenviar. Haga clic para más detalles.</content>
+mailSender.admin.resendSuccess=El mensaje de correo electrónico se ha reenviado exitosamente
+mailSender.admin.resendFailure=Error al reenviar. Clica para más detalles.</content>
   
 </xwikidoc>

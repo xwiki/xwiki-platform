@@ -766,11 +766,22 @@ define([
      * @returns {String}
      */
     getFilterDefaultOperator: function (propertyId) {
+      // get valid operator descriptor
       var filterDescriptor = this.getFilterDescriptor(propertyId);
       if (!filterDescriptor) { return; }
       var filterOperators = filterDescriptor.operators;
       if (!(filterOperators instanceof Array)) { return; }
-      return filterOperators[0].id;
+      if (filterOperators.length === 0) { return; }
+      // get default operator
+      var defaultOperator = filterDescriptor.defaultOperator;
+      var isDefaultOperatorValid = !!filterOperators.find(function (operator) {
+        return operator.id === defaultOperator;
+      });
+      if (defaultOperator && isDefaultOperatorValid) {
+        return defaultOperator;
+      } else {
+        return filterOperators[0].id;
+      }
     },
 
 

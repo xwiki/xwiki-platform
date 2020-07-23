@@ -83,7 +83,7 @@ class LiveDataMacroTest
     @Test
     void executeWithoutParams() throws Exception
     {
-        String expectedConfig = json("{'query':{'limit':15}}");
+        String expectedConfig = json("{'query':{'source':{}}}");
         String expected = "<div class=\"liveData\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);

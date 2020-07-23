@@ -185,19 +185,20 @@ define([
   padding-left: 0;
   padding-right: 0;
   font-weight: normal;
+  vertical-align: middle;
+  width: 100vw;
 }
-.livedata-layout-table .column-filters input {
-  padding-left: 8px;
-  padding-right: 8px;
-  width: 100%;
+.livedata-layout-table .column-filters th.entry-selector {
+  width: 0;
 }
+
 
 .livedata-layout-table .cell {
   padding: 0;
   height: 100%;
 }
 .livedata-layout-table .cell .livedata-displayer.view {
-  padding: 8px;
+  padding: 8px 12px;
 }
 
 .livedata-layout-table .entry-selector {
@@ -211,7 +212,7 @@ define([
     justify-content: flex-start;
     padding-left: 2rem;
 }
-.livedata-layout-table  .livedata-entry-selector {
+.livedata-layout-table .livedata-entry-selector {
     justify-content: flex-start;
     padding: 0 2rem;
 }

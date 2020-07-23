@@ -64,7 +64,7 @@
  */
 define([
   "Vue",
-  "vue!xwiki-icon"
+  "vue!utilities/xwiki-icon"
 ], function (
   Vue
 ) {

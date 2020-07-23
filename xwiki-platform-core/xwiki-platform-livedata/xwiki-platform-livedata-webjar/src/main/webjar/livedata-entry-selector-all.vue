@@ -21,7 +21,7 @@
         <span class="caret"></span>
     </button>
 
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <ul class="dropdown-menu">
       <li>
         <a href="#" @click.prevent="logic.setEntrySelectGlobal(true)">
           Select in all pages
@@ -114,6 +114,7 @@ define([
 .livedata-entry-selector-all .btn {
   display: flex;
   align-items: center;
+  background-color: unset;
 }
 
 .livedata-entry-selector-all-checkbox {

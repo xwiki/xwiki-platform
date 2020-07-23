@@ -478,6 +478,56 @@ define([
 
     /**
      * ---------------------------------------------------------------
+     * DISPLAY
+     */
+
+
+    /**
+     * Returns whether a certain property is displayable
+     * @param {String} propertyId
+     * @returns {Boolean}
+     */
+    isPropertyDisplayable: function (propertyId) {
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return (propertyDescriptor.hidden !== undefined && !propertyDescriptor.hidden) ||
+        (propertyDescriptor.hidden === undefined && !propertyTypeDescriptor.hidden);
+    },
+
+
+    /**
+     * Returns the property descriptors of displayable properties
+     * @returns {Array}
+     */
+    getDisplayablePropertyDescriptors: function () {
+      var self = this;
+      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
+        return self.isPropertyDisplayable(propertyDescriptor.id);
+      });
+    },
+
+
+    /**
+     * Returns the property descriptors of displayed properties
+     * @returns {Array}
+     */
+    getDisplayedPropertyDescriptors: function () {
+      var displayablePropertyDescriptors = this.getDisplayablePropertyDescriptors();
+      var displayedPropertyDescriptors = displayablePropertyDescriptors.filter(function (propertyDescriptor) {
+        // TODO: should check the column visibility
+        return true;
+      });
+      return displayedPropertyDescriptors;
+    },
+
+
+
+
+
+
+
+    /**
+     * ---------------------------------------------------------------
      * ACTIONS
      */
 

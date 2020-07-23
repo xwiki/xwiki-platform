@@ -39,7 +39,7 @@
         <!-- Card properties-->
         <div
           class="card-property"
-          v-for="property in displayedProperties"
+          v-for="property in cardBodyProperties"
           :key="property.id"
         >
           <strong class="property-name">{{ property.name }}:</strong>
@@ -108,9 +108,9 @@ define([
       data: function () { return this.logic.data; },
       entries: function () { return this.logic.data.data.entries; },
       properties: function () {
-        return this.logic.data.meta.propertyDescriptors;
+        return this.logic.getDisplayedPropertyDescriptors();
       },
-      displayedProperties: function () {
+      cardBodyProperties: function () {
         var self = this;
         return this.properties.filter(function (propertyDescriptor) {
           return propertyDescriptor.id !== self.titlePropertyId;

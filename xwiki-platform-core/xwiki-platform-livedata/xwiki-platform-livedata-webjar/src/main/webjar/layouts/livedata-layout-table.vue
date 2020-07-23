@@ -147,7 +147,7 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
-      cols: function () { return this.logic.data.meta.propertyDescriptors; },
+      cols: function () { return this.logic.getDisplayedPropertyDescriptors(); },
       sortLevel1: function () { return this.data.query.sort[0] || {}; },
     },
 

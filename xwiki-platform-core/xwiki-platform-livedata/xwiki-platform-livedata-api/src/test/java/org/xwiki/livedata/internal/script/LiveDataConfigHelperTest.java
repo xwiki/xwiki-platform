@@ -97,10 +97,10 @@ class LiveDataConfigHelperTest
         propertyDescriptor.setSortable(true);
         propertyDescriptor.setType("String");
         propertyDescriptor.getIcon().putAll(fileIconMetaData);
-        propertyDescriptor.getDisplayer().put("id", "link");
+        propertyDescriptor.getDisplayer().setId("link");
         propertyDescriptor.getDisplayer().put("propertyHref", "doc_url");
-        propertyDescriptor.getFilter().put("id", "text");
-        propertyDescriptor.getFilter().put("defaultOperator", "contains");
+        propertyDescriptor.getFilter().setId("text");
+        propertyDescriptor.getFilter().setDefaultOperator("contains");
 
         when(propertyStore.get()).thenReturn(Arrays.asList(propertyDescriptor));
 
@@ -110,10 +110,10 @@ class LiveDataConfigHelperTest
         propertyType.setName("String");
         propertyType.setSortable(true);
         propertyType.getIcon().putAll(fileIconMetaData);
-        propertyType.getDisplayer().put("id", "link");
+        propertyType.getDisplayer().setId("link");
         propertyType.getDisplayer().put("propertyHref", "doc_url");
-        propertyType.getFilter().put("id", "text");
-        propertyType.getFilter().put("defaultOperator", "contains");
+        propertyType.getFilter().setId("text");
+        propertyType.getFilter().setDefaultOperator("contains");
 
         when(propertyTypeStore.get()).thenReturn(Arrays.asList(propertyType));
     }

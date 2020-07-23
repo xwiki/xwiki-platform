@@ -26,12 +26,15 @@ import java.util.stream.Stream;
 
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * The query used to get the live data.
  * 
  * @version $Id$
  * @since 12.6RC1
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Unstable
 public class LiveDataQuery
 {

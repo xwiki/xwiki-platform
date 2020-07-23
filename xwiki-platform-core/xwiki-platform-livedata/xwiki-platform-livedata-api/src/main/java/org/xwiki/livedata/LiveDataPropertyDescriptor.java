@@ -19,10 +19,14 @@
  */
 package org.xwiki.livedata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.stability.Unstable;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Describes how the user interacts with a given property.
@@ -30,9 +34,184 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.6RC1
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Unstable
 public class LiveDataPropertyDescriptor
 {
+    private static final String ID = "id";
+
+    private static final String NAME = "name";
+
+    private static final String DEFAULT_OPERATOR = "defaultOperator";
+
+    private static final String OPERATORS = "operators";
+
+    /**
+     * Holds the filter configuration.
+     */
+    public static class FilterDescriptor extends HashMap<String, Object>
+    {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * @return the filter id
+         */
+        public String getId()
+        {
+            return (String) get(ID);
+        }
+
+        /**
+         * Sets the filter id.
+         * 
+         * @param id the new filter id
+         * @return the previous filter id
+         */
+        public String setId(String id)
+        {
+            return (String) put(ID, id);
+        }
+
+        /**
+         * @return the list of operators supported by this filter
+         */
+        @SuppressWarnings("unchecked")
+        public List<OperatorDescriptor> getOperators()
+        {
+            Object operators = get(OPERATORS);
+            if (!(operators instanceof List)) {
+                operators = new ArrayList<>();
+                put(OPERATORS, operators);
+            }
+            return (List<OperatorDescriptor>) operators;
+        }
+
+        /**
+         * Adds a new supported operator.
+         * 
+         * @param id the operator id
+         * @param name the operator pretty name
+         * @return the added operator
+         */
+        public OperatorDescriptor addOperator(String id, String name)
+        {
+            OperatorDescriptor operator = new OperatorDescriptor(id, name);
+            getOperators().add(operator);
+            return operator;
+        }
+
+        /**
+         * @return the default operator to use when the user doesn't specify one
+         */
+        public String getDefaultOperator()
+        {
+            return (String) get(DEFAULT_OPERATOR);
+        }
+
+        /**
+         * Sets the default operator to use.
+         * 
+         * @param operator the new default operator to use
+         * @return the previous default operator
+         */
+        public String setDefaultOperator(String operator)
+        {
+            return (String) put(DEFAULT_OPERATOR, operator);
+        }
+    }
+
+    /**
+     * An operator to use when filtering the live data.
+     */
+    public static class OperatorDescriptor extends HashMap<String, Object>
+    {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Default constructor.
+         */
+        public OperatorDescriptor()
+        {
+        }
+
+        /**
+         * Creates a new operator with the specified id and name.
+         * 
+         * @param id the operator id
+         * @param name the operator name
+         */
+        public OperatorDescriptor(String id, String name)
+        {
+            setId(id);
+            setName(name);
+        }
+
+        /**
+         * @return the operator id
+         */
+        public String getId()
+        {
+            return (String) get(ID);
+        }
+
+        /**
+         * Sets the operator id.
+         * 
+         * @param id the new operator id
+         * @return the previous operator id
+         */
+        public String setId(String id)
+        {
+            return (String) put(ID, id);
+        }
+
+        /**
+         * @return the operator pretty name
+         */
+        public String getName()
+        {
+            return (String) get(NAME);
+        }
+
+        /**
+         * Sets the operator pretty name.
+         * 
+         * @param name the new operator pretty name
+         * @return the previous operator pretty name
+         */
+        public String setName(String name)
+        {
+            return (String) put(NAME, name);
+        }
+    }
+
+    /**
+     * Holds the displayer configuration.
+     */
+    public static class DisplayerDescriptor extends HashMap<String, Object>
+    {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * @return the displayer id
+         */
+        public String getId()
+        {
+            return (String) get(ID);
+        }
+
+        /**
+         * Sets the displayer id.
+         * 
+         * @param id the new displayer id
+         * @return the previous displayer id
+         */
+        public String setId(String id)
+        {
+            return (String) put(ID, id);
+        }
+    }
+
     /**
      * Identifies the property that this descriptor corresponds to.
      */
@@ -62,17 +241,27 @@ public class LiveDataPropertyDescriptor
     /**
      * Whether the user can sort on this property or not.
      */
-    private boolean sortable;
+    private Boolean sortable;
+
+    /**
+     * Whether this property should be displayed or not.
+     */
+    private Boolean hidden;
+
+    /**
+     * Whether the user can filter by this property or not.
+     */
+    private Boolean filterable;
 
     /**
      * Displayer configuration, specifies how the property value should be displayed or edited.
      */
-    private final Map<String, Object> displayer = new HashMap<>();
+    private final DisplayerDescriptor displayer = new DisplayerDescriptor();
 
     /**
      * Filter configuration, specifies how the user can filter the values of this property.
      */
-    private final Map<String, Object> filter = new HashMap<>();
+    private final FilterDescriptor filter = new FilterDescriptor();
 
     /**
      * Optional CSS class name to add to the HTML element used to display this property.
@@ -152,9 +341,10 @@ public class LiveDataPropertyDescriptor
     }
 
     /**
-     * @return whether this property can be used to sort the live data or not
+     * @return whether this property can be used to sort the live data or not; use {@code null} to inherit from the
+     *         property type descriptor
      */
-    public boolean isSortable()
+    public Boolean isSortable()
     {
         return sortable;
     }
@@ -162,9 +352,10 @@ public class LiveDataPropertyDescriptor
     /**
      * Sets whether this property can be used to sort the live data.
      * 
-     * @param sortable whether this property can be used to sort the live data
+     * @param sortable whether this property can be used to sort the live data; pass {@code null} to inherit from the
+     *            property type descriptor
      */
-    public void setSortable(boolean sortable)
+    public void setSortable(Boolean sortable)
     {
         this.sortable = sortable;
     }
@@ -196,17 +387,59 @@ public class LiveDataPropertyDescriptor
     }
 
     /**
+     * @return whether this property should be displayed or not; the returned value can be {@code null} in which case
+     *         the value should be inherited from the property type descriptor
+     */
+    public Boolean isHidden()
+    {
+        return hidden;
+    }
+
+    /**
+     * Sets whether this property should be displayed or not. Pass {@code null} to inherit from the property type
+     * descriptor.
+     * 
+     * @param hidden {@code true} to hide this property, {@code false} to display this property, {@code null} to inherit
+     *            from the property type descriptor
+     */
+    public void setHidden(Boolean hidden)
+    {
+        this.hidden = hidden;
+    }
+
+    /**
      * @return the displayer configuration
      */
-    public Map<String, Object> getDisplayer()
+    public DisplayerDescriptor getDisplayer()
     {
         return displayer;
     }
 
     /**
+     * @return whether the user can filter by this property or not; the returned value can be {@code null} in which case
+     *         the value should be inherited from the property type descriptor
+     */
+    public Boolean isFilterable()
+    {
+        return filterable;
+    }
+
+    /**
+     * Sets whether the user can filter by this property or not. Pass {@code null} to inherit from the property type
+     * descriptor.
+     * 
+     * @param filterable {@code true} if the user can filter by this property, {@code false} if the user can't filter by
+     *            this property, {@code null} to inherit from the property descriptor type
+     */
+    public void setFilterable(Boolean filterable)
+    {
+        this.filterable = filterable;
+    }
+
+    /**
      * @return the filter configuration
      */
-    public Map<String, Object> getFilter()
+    public FilterDescriptor getFilter()
     {
         return filter;
     }

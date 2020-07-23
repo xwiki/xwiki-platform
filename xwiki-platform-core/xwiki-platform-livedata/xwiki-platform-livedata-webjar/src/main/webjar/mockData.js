@@ -25,7 +25,7 @@
 define({
 
   query: {
-    properties: ["doc_title", "age", "country", "job", "other"],
+    properties: ["doc_title", "age", "country", "tag", "other"],
 
     source: {
       id: "...",
@@ -86,14 +86,14 @@ define({
         id: "age",
         name: "Age",
         type: "number",
-        displayer: {
-          id: 'number',
-        },
       },
       {
-        id: "job",
-        name: "Job",
-        type: "string",
+        id: "tags",
+        name: "Tags",
+        type: "list",
+        filter: {
+          options: ["Tag 1", "Tag 2", "Tag 3"],
+        },
       },
       {
         id: "country",
@@ -129,12 +129,24 @@ define({
         id: 'number',
         name: 'Number',
         displayer: {
-          id: 'text',
+          id: 'number',
         },
         sortable: true,
         filterable: true,
         filter: {
           id: 'number'
+        },
+      },
+      {
+        id: 'list',
+        name: 'List',
+        displayer: {
+          id: 'list',
+        },
+        sortable: true,
+        filterable: true,
+        filter: {
+          id: 'list'
         },
       },
     ],
@@ -148,6 +160,13 @@ define({
           { id: "contains", name: "Contains", },
           { id: "equals", name: "Equals", },
           { id: "nequals", name: "Not Equals", },
+        ],
+      },
+      {
+        id: "list",
+        operators: [
+          { id: "is", name: "Is", },
+          { id: "nis", name: "Is Not", },
         ],
       },
       {
@@ -202,7 +221,7 @@ define({
         "doc_creationDate": "2020/03/27 13:21",
         "doc_creator": "Creator 1",
         "age": 48,
-        "job": "Job 1",
+        "tags": ["Tag 1"],
         "country": "France",
         "other": "<em>lorem ipsum<em>",
       },
@@ -215,7 +234,7 @@ define({
         "doc_creationDate": "2020/04/22 14:06",
         "doc_creator": "Creator 2",
         "age": 24,
-        "job": "Job 2",
+        "tags": ["Tag 2"],
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
       },
@@ -228,7 +247,7 @@ define({
         "doc_creationDate": "2020/03/27 14:34",
         "doc_creator": "Creator 3",
         "age": 12,
-        "job": "Job 3",
+        "tags": ["Tag 3"],
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
       },

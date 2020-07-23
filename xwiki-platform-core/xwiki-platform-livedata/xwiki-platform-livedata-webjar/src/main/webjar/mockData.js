@@ -156,6 +156,7 @@ define({
     filters: [
       {
         id: "text",
+        defaultOperator: "contains",
         operators: [
           { id: "contains", name: "Contains", },
           { id: "equals", name: "Equals", },
@@ -164,6 +165,7 @@ define({
       },
       {
         id: "list",
+        defaultOperator: "is",
         operators: [
           { id: "is", name: "Is", },
           { id: "nis", name: "Is Not", },
@@ -171,6 +173,7 @@ define({
       },
       {
         id: "number",
+        defaultOperator: "equals",
         operators: [
           { id: "equals", name: "=", },
           { id: "nequals", name: "≠", },

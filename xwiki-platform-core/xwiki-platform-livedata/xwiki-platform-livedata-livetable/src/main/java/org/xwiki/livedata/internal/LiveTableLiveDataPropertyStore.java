@@ -23,11 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -40,8 +36,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
-import org.xwiki.livedata.WithParameters;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -49,8 +43,8 @@ import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.ComputedFieldClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
@@ -63,7 +57,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Component
 @Named("liveTable/property")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescriptorStore, WithParameters
+public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDescriptorStore
 {
     private static final String STRING = "String";
 
@@ -75,8 +69,6 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
 
     private static final String HTML = "html";
 
-    private static final String ID = "id";
-
     private static final String ACTIONS = "actions";
 
     private static final String PROPERTY_HREF = "propertyHref";
@@ -86,17 +78,17 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
     @SuppressWarnings("serial")
     private static class PropertyDescriptorList extends ArrayList<LiveDataPropertyDescriptor>
     {
-        protected LiveDataPropertyDescriptor add(String id, String type, String displayer, boolean sortable)
+        protected LiveDataPropertyDescriptor add(String id, String type, String displayer, Boolean sortable)
         {
             LiveDataPropertyDescriptor property = new LiveDataPropertyDescriptor();
             property.setId(id);
             property.setType(type);
             if (displayer != null) {
-                property.getDisplayer().put(ID, displayer);
+                property.getDisplayer().setId(displayer);
             }
-            if (!sortable) {
+            if (Boolean.FALSE.equals(sortable)) {
                 // If we cannot sort on this property then we cannot filter either.
-                property.getFilter().put(ID, "");
+                property.setFilterable(false);
             }
             property.setSortable(sortable);
             add(property);
@@ -104,38 +96,15 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
         }
     }
 
-    private final Map<String, Object> parameters = new HashMap<>();
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Inject
-    private ContextualLocalizationManager l10n;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private ContextualAuthorizationManager authorization;
-
-    @Override
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
-    }
-
-    @Override
-    public boolean add(LiveDataPropertyDescriptor propertyDescriptor)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<LiveDataPropertyDescriptor> get(String propertyId) throws LiveDataException
-    {
-        return get().stream().filter(property -> Objects.equals(property.getId(), propertyId)).findFirst();
-    }
 
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
@@ -151,34 +120,22 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
         return properties;
     }
 
-    @Override
-    public boolean update(LiveDataPropertyDescriptor propertyDescriptor)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<LiveDataPropertyDescriptor> remove(String propertyId)
-    {
-        throw new UnsupportedOperationException();
-    }
-
     @SuppressWarnings("serial")
     private List<LiveDataPropertyDescriptor> getDocumentProperties()
     {
         return new PropertyDescriptorList()
         {
             {
-                add("doc.name", STRING, LINK, true);
-                add("doc.title", STRING, LINK, true);
-                add("doc.space", STRING, LINK, true).getDisplayer().put(PROPERTY_HREF, "doc.space_url");
-                add("doc.location", STRING, HTML, true);
-                add("doc.fullName", STRING, LINK, true);
+                add("doc.name", STRING, LINK, null);
+                add("doc.title", STRING, LINK, null);
+                add("doc.space", STRING, LINK, null).getDisplayer().put(PROPERTY_HREF, "doc.space_url");
+                add("doc.location", STRING, HTML, null);
+                add("doc.fullName", STRING, LINK, null);
                 // Display as text because the returned value is the formatted date.
-                add("doc.creationDate", DATE, TEXT, true);
-                add("doc.date", DATE, TEXT, true);
-                add("doc.creator", USERS, TEXT, true);
-                add("doc.author", USERS, LINK, true).getDisplayer().put(PROPERTY_HREF, "doc.author_url");
+                add("doc.creationDate", DATE, TEXT, null);
+                add("doc.date", DATE, TEXT, null);
+                add("doc.creator", USERS, TEXT, null);
+                add("doc.author", USERS, LINK, null).getDisplayer().put(PROPERTY_HREF, "doc.author_url");
                 add("doc.objectCount", "Number", null, false);
 
                 add("_images", STRING, HTML, false);
@@ -220,26 +177,18 @@ public class LiveTableLiveDataPropertyStore implements LiveDataPropertyDescripto
         descriptor.setName(xproperty.getTranslatedPrettyName(xcontext));
         descriptor.setDescription(xproperty.getHint());
         descriptor.setType(xproperty.getClassType());
-        descriptor.setSortable(!(xproperty instanceof ComputedFieldClass || xproperty instanceof PasswordClass));
+        // List properties are sortable by default, but only if they have single selection.
+        if (xproperty instanceof ListClass && ((ListClass) xproperty).isMultiSelect()) {
+            descriptor.setSortable(false);
+        }
         // The returned property value is the displayer output.
-        descriptor.getDisplayer().put(ID, HTML);
+        descriptor.getDisplayer().setId(HTML);
+        if (xproperty.newProperty() instanceof StringListProperty) {
+            // The default live table results page currently supports only exact matching for list properties with
+            // multiple selection and no relational storage (selected values are stored concatenated on a single
+            // database column).
+            descriptor.getFilter().getOperators().add(createOperator("equals"));
+        }
         return descriptor;
-    }
-
-    private List<LiveDataPropertyDescriptor> translate(List<LiveDataPropertyDescriptor> properties)
-    {
-        return properties.stream().map(this::translate).collect(Collectors.toList());
-    }
-
-    private LiveDataPropertyDescriptor translate(LiveDataPropertyDescriptor property)
-    {
-        String translationPrefix = String.valueOf(getParameters().getOrDefault("translationPrefix", ""));
-        if (property.getName() == null) {
-            property.setName(this.l10n.getTranslationPlain(translationPrefix + property.getId()));
-        }
-        if (property.getDescription() == null) {
-            property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
-        }
-        return property;
     }
 }

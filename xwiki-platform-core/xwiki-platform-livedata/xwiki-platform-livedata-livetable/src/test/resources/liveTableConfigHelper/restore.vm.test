@@ -10,7 +10,9 @@
     "url": "/xwiki/bin/get/Test/WebHome?xpage=getdeleteddocuments&doc.batchId=2872cd20-6cbf-4dad-af1d-77a30ba52ce8",
     "translationPrefix": "core.restore.batch.",
     "outputOnlyHtml": true,
-    "selectedColumn": "doc.location"
+    "selectedColumn": "doc.location",
+    "maxPages": 5,
+    "pageSizeBounds": [5, 25, 10]
   }
 }
 ---
@@ -32,15 +34,17 @@
     "propertyDescriptors":[
       {
         "id":"doc.name",
+        "sortable":false,
+        "filterable":false,
         "displayer":{
           "id":"link",
           "propertyHref":"doc.url"
-        },
-        "filter":{"id":""}
+        }
       },
       {
         "id":"doc.location",
         "sortable":true,
+        "filterable":true,
         "displayer":{
           "id":"html"
         },
@@ -50,12 +54,18 @@
       },
       {
         "id":"_actions",
+        "sortable":false,
+        "filterable":false,
         "displayer":{
           "actions":["restore","delete"],
           "id":"actions"
-        },
-        "filter":{"id":""}
+        }
       }
-    ]
+    ],
+    "pagination":{
+      "maxShownPages":5,
+      "showPageSizeDropdown":true,
+      "pageSizes":[5,15,25]
+    }
   }
 }

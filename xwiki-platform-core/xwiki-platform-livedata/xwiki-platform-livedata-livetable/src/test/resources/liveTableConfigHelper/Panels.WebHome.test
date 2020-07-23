@@ -4,7 +4,7 @@
   "columnProperties": {
     "name": {"type": "text", "link": "view"},
     "description": {"type": "text", "html": "true"},
-    "type": {"type": "list"},
+    "type": {"type": "list", "match": "exact"},
     "category": {"type": "list"},
     "_actions": {"html": true, "sortable": false, "actions": ["edit", "delete"]}
   },
@@ -38,20 +38,35 @@
       {
         "id":"name",
         "sortable":true,
+        "filterable":true,
         "displayer":{"id":"link","propertyHref":"doc.url"},
         "filter":{"id":"text"}
       },
-      {"id":"description","sortable":true,"filter":{"id":"text"}},
-      {"id":"type","sortable":true,"filter":{"id":"list"}},
-      {"id":"category","sortable":true,"filter":{"id":"list"}},
+      {"id":"description","sortable":true,"filterable":true,"filter":{"id":"text"}},
+      {
+        "id":"type",
+        "sortable":true,
+        "filterable":true,
+        "filter":{
+          "id":"list",
+          "defaultOperator":"equals"
+        }
+      },
+      {"id":"category","sortable":true,"filterable":true,"filter":{"id":"list"}},
       {
         "id":"_actions",
+        "sortable":false,
+        "filterable":false,
         "displayer":{
           "actions":["edit","delete"],
           "id":"actions"
-        },
-        "filter":{"id":""}
+        }
       }
-    ]
+    ],
+    "pagination":{
+      "maxShownPages":10,
+      "showPageSizeDropdown":true,
+      "pageSizes":[10,20,30,40,50,60,70,80,90,100]
+    }
   }
 }

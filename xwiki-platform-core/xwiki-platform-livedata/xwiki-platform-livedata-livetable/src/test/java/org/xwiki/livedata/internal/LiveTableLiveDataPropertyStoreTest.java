@@ -19,12 +19,14 @@
  */
 package org.xwiki.livedata.internal;
 
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -43,9 +45,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -123,13 +127,24 @@ class LiveTableLiveDataPropertyStoreTest
         when(dateField.getHint()).thenReturn("The date when you were born.");
         when(dateField.getClassType()).thenReturn("Date");
 
-        when(xclass.getEnabledProperties()).thenReturn(Arrays.asList(dateField, computedField));
+        StaticListClass listField = mock(StaticListClass.class);
+        when(listField.getName()).thenReturn("status");
+        when(listField.getTranslatedPrettyName(this.xcontext)).thenReturn("Status");
+        when(listField.getHint()).thenReturn("The status.");
+        when(listField.getClassType()).thenReturn("List");
+        when(listField.newProperty()).thenReturn(new StringListProperty());
+        when(listField.isMultiSelect()).thenReturn(true);
+
+        when(xclass.getEnabledProperties()).thenReturn(Arrays.asList(dateField, computedField, listField));
 
         StringBuilder expectedClassProps = new StringBuilder();
         expectedClassProps.append("{'id':'birthdate','name':'Birthdate','description':'The date when you were born.'"
-            + ",'type':'Date','sortable':true,'displayer':{'id':'html'}},");
+            + ",'type':'Date','displayer':{'id':'html'}},");
         expectedClassProps.append("{'id':'total','name':'Total','description':'The computed total amount.',"
-            + "'type':'Computed','displayer':{'id':'html'}}");
+            + "'type':'Computed','displayer':{'id':'html'}},");
+        expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
+            + "'type':'List','sortable':false,'displayer':{'id':'html'},"
+            + "'filter':{'operators':[{'name':'equals','id':'equals'}]}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 
@@ -177,26 +192,11 @@ class LiveTableLiveDataPropertyStoreTest
         assertEquals("The page title", property.getDescription());
     }
 
-    private String getExpectedDocPropsJSON()
+    private String getExpectedDocPropsJSON() throws Exception
     {
-        StringBuilder json = new StringBuilder();
-        json.append("{'id':'doc.name','type':'String','sortable':true,'displayer':{'id':'link'}},");
-        json.append("{'id':'doc.title','type':'String','sortable':true,'displayer':{'id':'link'}},");
-        json.append("{'id':'doc.space','type':'String','sortable':true,"
-            + "'displayer':{'propertyHref':'doc.space_url','id':'link'}},");
-        json.append("{'id':'doc.location','type':'String','sortable':true,'displayer':{'id':'html'}},");
-        json.append("{'id':'doc.fullName','type':'String','sortable':true,'displayer':{'id':'link'}},");
-        json.append("{'id':'doc.creationDate','type':'Date','sortable':true,'displayer':{'id':'text'}},");
-        json.append("{'id':'doc.date','type':'Date','sortable':true,'displayer':{'id':'text'}},");
-        json.append("{'id':'doc.creator','type':'Users','sortable':true,'displayer':{'id':'text'}},");
-        json.append("{'id':'doc.author','type':'Users','sortable':true,"
-            + "'displayer':{'propertyHref':'doc.author_url','id':'link'}},");
-        json.append("{'id':'doc.objectCount','type':'Number','filter':{'id':''}},");
-        json.append("{'id':'_images','type':'String','displayer':{'id':'html'},'filter':{'id':''}},");
-        json.append("{'id':'_attachments','type':'String','displayer':{'id':'html'},'filter':{'id':''}},");
-        json.append("{'id':'_actions','type':'String','displayer':{'id':'actions','actions':['edit','delete']},"
-            + "'filter':{'id':''}},");
-        json.append("{'id':'_avatar','type':'String','displayer':{'id':'html'},'filter':{'id':''}}");
-        return json.toString().replace('\'', '"');
+        String docPropsJSON = IOUtils.toString(new FileReader("src/test/resources/docProperties.json"));
+        docPropsJSON = docPropsJSON.replaceAll("\\n\\s*", "");
+        // Remove the array wrapper because we want to concatenate other properties.
+        return docPropsJSON.substring(1, docPropsJSON.length() - 1);
     }
 }

@@ -2,10 +2,10 @@
   "id": "notificationFilterPreferencesLiveTable",
   "columns": ["name", "filterType", "eventTypes", "notificationFormats", "isEnabled", "_actions"],
   "columnProperties": {
-    "name": {"sortable": false, "html": true, "filterable": false},
+    "name": {"sortable": false, "html": true, "filterable": "false"},
     "filterType": {"sortable": false, "filterable": false},
-    "eventTypes": {"sortable": false, "html": true, "filterable": false},
-    "notificationFormats": {"sortable": false, "html": true, "filterable": false},
+    "eventTypes": {"sortable": "false", "html": true, "filterable": false},
+    "notificationFormats": {"type": "hidden"},
     "isEnabled": {"sortable": false, "html" : true, "filterable": false},
     "_actions": {"sortable": false, "actions": ["delete"], "filterable": false}
   },
@@ -15,7 +15,8 @@
     "description": "This table lists every filter registered for the current user.",
     "translationPrefix": "notifications.settings.filters.preferences.table.",
     "extraParams": "eventType=&format=&user=xwiki%3AXWiki.mflorea",
-    "outputOnlyHtml": true
+    "outputOnlyHtml": true,
+    "pageSize": false
   }
 }
 ---
@@ -40,19 +41,24 @@
   },
   "meta":{
     "propertyDescriptors":[
-      {"id":"name","displayer":{"id":"html"},"filter":{"id":""}},
-      {"id":"filterType","filter":{"id":""}},
-      {"id":"eventTypes","displayer":{"id":"html"},"filter":{"id":""}},
-      {"id":"notificationFormats","displayer":{"id":"html"},"filter":{"id":""}},
-      {"id":"isEnabled","displayer":{"id":"html"},"filter":{"id":""}},
+      {"id":"name","sortable":false,"filterable":false,"displayer":{"id":"html"}},
+      {"id":"filterType","sortable":false,"filterable":false},
+      {"id":"eventTypes","sortable":false,"filterable":false,"displayer":{"id":"html"}},
+      {"id":"notificationFormats","sortable":true,"hidden":true,"filterable":true},
+      {"id":"isEnabled","sortable":false,"filterable":false,"displayer":{"id":"html"}},
       {
         "id":"_actions",
+        "sortable":false,
+        "filterable":false,
         "displayer":{
           "actions":["delete"],
           "id":"actions"
-        },
-        "filter":{"id":""}
+        }
       }
-    ]
+    ],
+    "pagination":{
+      "maxShownPages":10,
+      "showPageSizeDropdown":false
+    }
   }
 }

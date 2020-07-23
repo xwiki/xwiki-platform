@@ -19,8 +19,10 @@
  */
 package org.xwiki.livedata.internal;
 
+import java.io.FileReader;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -56,31 +58,19 @@ class LiveTableLiveDataPropertyTypeStoreTest
     @Test
     void getAll() throws Exception
     {
-        StringBuilder expectedJSON = new StringBuilder("[");
-        expectedJSON.append("{'id':'Boolean','displayer':{'id':'boolean'},'filter':{'id':'boolean'}},");
-        expectedJSON.append("{'id':'ComputedField','displayer':{'id':'html'},'filter':{'id':''}},");
-        expectedJSON.append("{'id':'DBList','filter':{'id':'suggest'}},");
-        expectedJSON.append("{'id':'DBTreeList','filter':{'id':'suggest'}},");
-        expectedJSON.append("{'id':'Date','displayer':{'id':'date'},'filter':{'id':'date'}},");
-        expectedJSON.append("{'id':'Email','displayer':{'id':'html'},'filter':{'id':'text'}},");
-        expectedJSON.append("{'id':'Groups','displayer':{'id':'html'},'filter':{'id':'suggest'}},");
-        expectedJSON.append("{'id':'Number','displayer':{'id':'number'},'filter':{'id':'number'}},");
-        expectedJSON.append("{'id':'Page','displayer':{'id':'html'},'filter':{'id':'suggest'}},");
-        expectedJSON.append("{'id':'Password','filter':{'id':''}},");
-        expectedJSON.append("{'id':'StaticList','filter':{'id':'list'}},");
-        expectedJSON.append("{'id':'String','filter':{'id':'text'}},");
-        expectedJSON.append("{'id':'TextArea','displayer':{'id':'html'},'filter':{'id':'text'}},");
-        expectedJSON.append("{'id':'Users','displayer':{'id':'html'},'filter':{'id':'suggest'}}");
-        expectedJSON.append("]");
+        String expectedJSON = IOUtils.toString(new FileReader("src/test/resources/propertyTypes.json"));
+        expectedJSON = expectedJSON.replaceAll("\\n\\s*", "");
 
         Collection<LiveDataPropertyDescriptor> types = this.typeStore.get();
-        assertEquals(expectedJSON.toString().replace('\'', '"'), objectMapper.writeValueAsString(types));
+        assertEquals(expectedJSON, objectMapper.writeValueAsString(types));
     }
 
     @Test
     void getOne() throws Exception
     {
-        String expectedJSON = "{'id':'Page','displayer':{'id':'html'},'filter':{'id':'suggest'}}";
+        String expectedJSON = "{'id':'Page','sortable':true,'filterable':true,'displayer':{'id':'html'},'filter':{"
+            + "'operators':[{'name':'equals','id':'equals'},{'name':'startsWith','id':'startsWith'},"
+            + "{'name':'contains','id':'contains'}],'id':'suggest'}}";
         LiveDataPropertyDescriptor pageType = this.typeStore.get("Page").get();
         assertEquals(expectedJSON.replace('\'', '"'), objectMapper.writeValueAsString(pageType));
     }

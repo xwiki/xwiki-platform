@@ -20,12 +20,9 @@
 package org.xwiki.livedata.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -33,8 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
-import org.xwiki.livedata.WithParameters;
 
 /**
  * {@link LiveDataPropertyDescriptorStore} implementation that exposes the known live table column types as live data
@@ -46,89 +43,66 @@ import org.xwiki.livedata.WithParameters;
 @Component
 @Named("liveTable/propertyType")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataPropertyTypeStore implements LiveDataPropertyDescriptorStore, WithParameters
+public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataPropertyDescriptorStore
 {
-    private static final String ID = "id";
-
     private static final String SUGGEST = "suggest";
 
     private static final String HTML = "html";
 
     private static final String TEXT = "text";
 
-    private final Map<String, Object> parameters = new HashMap<>();
-
-    @Override
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
-    }
-
-    @Override
-    public boolean add(LiveDataPropertyDescriptor propertyDescriptor)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<LiveDataPropertyDescriptor> get(String typeId)
-    {
-        return get().stream().filter(property -> Objects.equals(property.getId(), typeId)).findFirst();
-    }
-
     @Override
     public Collection<LiveDataPropertyDescriptor> get()
     {
+        OperatorDescriptor equals = createOperator("equals");
+        OperatorDescriptor contains = createOperator("contains");
+        OperatorDescriptor startsWith = createOperator("startsWith");
+        OperatorDescriptor isBetween = createOperator("isBetween");
+
+        OperatorDescriptor[] stringOperators = new OperatorDescriptor[] {contains, startsWith, equals};
+        OperatorDescriptor[] listOperators = new OperatorDescriptor[] {equals, startsWith, contains};
+
         List<LiveDataPropertyDescriptor> types = new ArrayList<>();
-        types.add(createTypeDescriptor("Boolean"));
-        types.add(createTypeDescriptor("ComputedField", HTML));
-        types.add(createTypeDescriptor("DBList", null, SUGGEST));
-        types.add(createTypeDescriptor("DBTreeList", null, SUGGEST));
-        types.add(createTypeDescriptor("Date"));
-        types.add(createTypeDescriptor("Email", HTML, TEXT));
-        types.add(createTypeDescriptor("Groups", HTML, SUGGEST));
-        types.add(createTypeDescriptor("Number"));
-        types.add(createTypeDescriptor("Page", HTML, SUGGEST));
-        types.add(createTypeDescriptor("Password", null));
-        types.add(createTypeDescriptor("StaticList", null, "list"));
-        types.add(createTypeDescriptor("String", null, TEXT));
-        types.add(createTypeDescriptor("TextArea", HTML, TEXT));
-        types.add(createTypeDescriptor("Users", HTML, SUGGEST));
+        types.add(createTypeDescriptor("Boolean", equals));
+        types.add(createTypeDescriptor("ComputedField", HTML, null));
+        types.add(createTypeDescriptor("DBList", null, SUGGEST, listOperators));
+        types.add(createTypeDescriptor("DBTreeList", null, SUGGEST, listOperators));
+        types.add(createTypeDescriptor("Date", isBetween, contains));
+        types.add(createTypeDescriptor("Email", HTML, TEXT, stringOperators));
+        types.add(createTypeDescriptor("Groups", HTML, SUGGEST, listOperators));
+        types.add(createTypeDescriptor("Number", equals));
+        types.add(createTypeDescriptor("Page", HTML, SUGGEST, listOperators));
+        types.add(createTypeDescriptor("Password", null, (String) null));
+        types.add(createTypeDescriptor("StaticList", null, "list", listOperators));
+        types.add(createTypeDescriptor("String", null, TEXT, stringOperators));
+        types.add(createTypeDescriptor("TextArea", HTML, TEXT, stringOperators));
+        types.add(createTypeDescriptor("Users", HTML, SUGGEST, listOperators));
         return types;
     }
 
-    @Override
-    public boolean update(LiveDataPropertyDescriptor propertyDescriptor)
+    private LiveDataPropertyDescriptor createTypeDescriptor(String id, OperatorDescriptor... operators)
     {
-        throw new UnsupportedOperationException();
+        return createTypeDescriptor(id, id.toLowerCase(), id.toLowerCase(), operators);
     }
 
-    @Override
-    public Optional<LiveDataPropertyDescriptor> remove(String propertyId)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    private LiveDataPropertyDescriptor createTypeDescriptor(String id)
-    {
-        return createTypeDescriptor(id, id.toLowerCase(), id.toLowerCase());
-    }
-
-    private LiveDataPropertyDescriptor createTypeDescriptor(String id, String displayer)
-    {
-        // Create a type of property that cannot be filtered.
-        return createTypeDescriptor(id, displayer, "");
-    }
-
-    private LiveDataPropertyDescriptor createTypeDescriptor(String id, String displayer, String filter)
+    private LiveDataPropertyDescriptor createTypeDescriptor(String id, String displayer, String filter,
+        OperatorDescriptor... operators)
     {
         LiveDataPropertyDescriptor type = new LiveDataPropertyDescriptor();
         type.setId(id);
         if (displayer != null) {
-            type.getDisplayer().put(ID, displayer);
+            type.getDisplayer().setId(displayer);
         }
         if (filter != null) {
-            type.getFilter().put(ID, filter);
+            type.setSortable(true);
+            type.setFilterable(true);
+            type.getFilter().setId(filter);
+            if (operators != null) {
+                type.getFilter().getOperators().addAll(Arrays.asList(operators));
+            }
+        } else {
+            type.setSortable(false);
+            type.setFilterable(false);
         }
         return type;
     }

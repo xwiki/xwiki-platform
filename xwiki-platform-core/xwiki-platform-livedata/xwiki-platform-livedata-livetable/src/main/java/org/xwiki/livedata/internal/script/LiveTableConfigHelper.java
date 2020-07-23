@@ -71,9 +71,9 @@ public class LiveTableConfigHelper
 
     private static final String ACTIONS = "actions";
 
-    private static final String HIDDEN = "hidden";
-
     private static final String TYPE = "type";
+
+    private static final String HIDDEN = "hidden";
 
     @SuppressWarnings("serial")
     private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
@@ -311,9 +311,12 @@ public class LiveTableConfigHelper
             propertyDescriptor.setName(displayName.asText());
         }
 
-        JsonNode sortable = columnProperties.path("sortable");
-        propertyDescriptor
-            .setSortable((!sortable.isBoolean() && !columnProperties.has(ACTIONS)) || sortable.booleanValue());
+        // The live table macro considers all columns, except for "actions", as sortable by default.
+        propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
+
+        if (HIDDEN.equals(columnProperties.path(TYPE).asText())) {
+            propertyDescriptor.setHidden(true);
+        }
 
         ObjectNode displayer = getDisplayerConfig(column, columnProperties, objectMapper);
         try {
@@ -322,6 +325,9 @@ public class LiveTableConfigHelper
             this.logger.warn("Failed to extract displayer information from column properties [{}]. Root cause is [{}].",
                 columnProperties, ExceptionUtils.getRootCauseMessage(e));
         }
+
+        // The live table macro considers all columns, except for "actions", as filterable by default.
+        propertyDescriptor.setFilterable(columnProperties.path("filterable").asBoolean(!columnProperties.has(ACTIONS)));
 
         ObjectNode filter = getFilterConfig(columnProperties, objectMapper);
         try {
@@ -335,7 +341,7 @@ public class LiveTableConfigHelper
 
         JsonNode className = columnProperties.path("class");
         if (className.isTextual()) {
-            // TODO: Extract more information from the specified XWiki class.
+            // TODO: Extract more information from the specified XWiki class (the property type).
         }
 
         return objectMapper.valueToTree(propertyDescriptor);
@@ -344,9 +350,7 @@ public class LiveTableConfigHelper
     private ObjectNode getDisplayerConfig(String column, ObjectNode columnProperties, ObjectMapper objectMapper)
     {
         ObjectNode displayerConfig = objectMapper.createObjectNode();
-        if (HIDDEN.equals(columnProperties.path(TYPE).asText())) {
-            displayerConfig.put(ID, HIDDEN);
-        } else if (columnProperties.path(ACTIONS).isArray()) {
+        if (columnProperties.path(ACTIONS).isArray()) {
             displayerConfig.put(ID, ACTIONS);
             displayerConfig.set(ACTIONS, columnProperties.get(ACTIONS));
         } else if (columnProperties.path(LINK).isTextual()) {
@@ -371,47 +375,47 @@ public class LiveTableConfigHelper
     private ObjectNode getFilterConfig(ObjectNode columnProperties, ObjectMapper objectMapper)
     {
         ObjectNode filterConfig = objectMapper.createObjectNode();
-        JsonNode filterable = columnProperties.path("filterable");
-        if ((!filterable.isBoolean() && !columnProperties.has(ACTIONS)) || filterable.booleanValue()) {
-            JsonNode filterId = columnProperties.path(TYPE);
-            if (filterId.isTextual()) {
-                filterConfig.put(ID, filterId.asText());
-            }
-            JsonNode match = columnProperties.path("match");
-            if (match.isTextual()) {
-                String defaultOperator = DEFAULT_OPERATOR.get(match.asText());
-                if (defaultOperator != null) {
-                    filterConfig.put("defaultOperator", defaultOperator);
-                }
-            }
-        } else {
-            // Column cannot be filtered.
-            filterConfig.put(ID, "");
+
+        JsonNode filterId = columnProperties.path(TYPE);
+        if (filterId.isTextual() && !HIDDEN.equals(filterId.asText())) {
+            filterConfig.put(ID, filterId.asText());
         }
+
+        JsonNode match = columnProperties.path("match");
+        if (match.isTextual()) {
+            String defaultOperator = DEFAULT_OPERATOR.get(match.asText());
+            if (defaultOperator != null) {
+                filterConfig.put("defaultOperator", defaultOperator);
+            }
+        }
+
         return filterConfig;
     }
 
     private ObjectNode getPaginationConfig(ObjectNode options, ObjectMapper objectMapper)
     {
         ObjectNode pagination = objectMapper.createObjectNode();
-        JsonNode maxPages = options.path("maxPages");
-        if (maxPages.isNumber()) {
-            pagination.put("maxShownPages", maxPages.asInt());
-        }
-        JsonNode pageSize = options.path("pageSize");
+        pagination.put("maxShownPages", options.path("maxPages").asInt(10));
+        boolean showPageSizeDropdown = options.path("pageSize").asBoolean(true);
+        pagination.put("showPageSizeDropdown", showPageSizeDropdown);
+
         JsonNode pageSizeBounds = options.path("pageSizeBounds");
-        if (pageSize.booleanValue() && pageSizeBounds.isArray() && pageSizeBounds.size() == 3) {
-            int min = pageSizeBounds.get(0).asInt();
-            int max = pageSizeBounds.get(1).asInt();
-            int step = pageSizeBounds.get(2).asInt();
-            if (min <= max && step > 0) {
-                List<Integer> pageSizes = new ArrayList<>();
-                for (int i = min; i <= max; i += step) {
-                    pageSizes.add(i);
-                }
-                pagination.set("pageSizes", objectMapper.valueToTree(pageSizes));
-            }
+        int min = 10;
+        int max = 100;
+        int step = 10;
+        if (pageSizeBounds.isArray() && pageSizeBounds.size() == 3) {
+            min = pageSizeBounds.get(0).asInt();
+            max = pageSizeBounds.get(1).asInt();
+            step = pageSizeBounds.get(2).asInt();
         }
+        if (showPageSizeDropdown && min <= max && step > 0) {
+            List<Integer> pageSizes = new ArrayList<>();
+            for (int i = min; i <= max; i += step) {
+                pageSizes.add(i);
+            }
+            pagination.set("pageSizes", objectMapper.valueToTree(pageSizes));
+        }
+
         return pagination;
     }
 }

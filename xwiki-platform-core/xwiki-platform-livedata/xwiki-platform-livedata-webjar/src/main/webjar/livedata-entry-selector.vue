@@ -60,7 +60,7 @@ define([
     },
 
     destroyed: function () {
-      this.logic.unselectEntries(this.entry);
+      this.logic.deselectEntries(this.entry);
     },
 
   });

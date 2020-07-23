@@ -206,6 +206,12 @@ define({
       showPageSizeDropdown: false,
     },
 
+
+    entryDescriptor: {
+      idProperty: "doc_url",
+      propertySaveHref: "save_url",
+    },
+
   },
 
 

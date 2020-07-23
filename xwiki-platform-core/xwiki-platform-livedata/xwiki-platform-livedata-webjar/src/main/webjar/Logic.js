@@ -69,7 +69,7 @@ define([
     this.currentLayout = "";
     this.entrySelection = {
       selected: [],
-      unselected: [],
+      deselected: [],
       isGlobal: false,
     };
     this.selectedEntries = [];
@@ -482,16 +482,32 @@ define([
      */
 
 
+     /**
+      * Return the id of the specified entry
+      * @param {Object} entry
+      * @returns {String}
+      */
+     getEntryId: function (entry) {
+       var idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+       if (entry[idProperty] === undefined) {
+         console.warn("Entry has no id (at peroperty [" + idProperty + "]", entry);
+         return;
+       }
+       return entry[idProperty];
+     },
+
+
     /**
      * Return whether the entry is currently selected
      * @param {Object} entry
      * @returns {Boolean}
      */
     isEntrySelected: function (entry) {
+      var entryId = this.getEntryId(entry);
       if (this.entrySelection.isGlobal) {
-        return this.entrySelection.unselected.indexOf(entry) === -1;
+        return this.entrySelection.deselected.indexOf(entryId) === -1;
       } else {
-        return this.entrySelection.selected.indexOf(entry) !== -1;
+        return this.entrySelection.selected.indexOf(entryId) !== -1;
       }
     },
 
@@ -504,36 +520,44 @@ define([
       var self = this;
       var entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(function (entry) {
+        var entryId = self.getEntryId(entry);
         if (self.entrySelection.isGlobal) {
-          var index = self.entrySelection.unselected.indexOf(entry);
+          var index = self.entrySelection.deselected.indexOf(entryId);
           if (index === -1) { return; }
-          self.entrySelection.unselected.splice(index, 1);
+          self.entrySelection.deselected.splice(index, 1);
         }
         else {
-          if (self.entrySelection.selected.indexOf(entry) !== -1) { return; }
-          self.entrySelection.selected.push(entry);
+          if (self.entrySelection.selected.indexOf(entryId) !== -1) { return; }
+          self.entrySelection.selected.push(entryId);
         }
+        self.triggerEvent("select", {
+          entry: entry,
+        });
       });
     },
 
 
     /**
-     * Unselect the specified entries
+     * Deselect the specified entries
      * @param {Object|Array} entries
      */
-    unselectEntries: function (entries) {
+    deselectEntries: function (entries) {
       var self = this;
       var entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(function (entry) {
+        var entryId = self.getEntryId(entry);
         if (self.entrySelection.isGlobal) {
-          if (self.entrySelection.unselected.indexOf(entry) !== -1) { return; }
-          self.entrySelection.unselected.push(entry);
+          if (self.entrySelection.deselected.indexOf(entryId) !== -1) { return; }
+          self.entrySelection.deselected.push(entryId);
         }
         else {
-          var index = self.entrySelection.selected.indexOf(entry);
+          var index = self.entrySelection.selected.indexOf(entryId);
           if (index === -1) { return; }
           self.entrySelection.selected.splice(index, 1);
         }
+        self.triggerEvent("deselect", {
+          entry: entry,
+        });
       });
     },
 
@@ -553,7 +577,7 @@ define([
         if (select) {
           self.selectEntries(entry);
         } else {
-          self.unselectEntries(entry);
+          self.deselectEntries(entry);
         }
       });
     },
@@ -566,7 +590,10 @@ define([
     setEntrySelectGlobal: function (bool) {
       this.entrySelection.isGlobal = bool;
       this.entrySelection.selected.splice(0);
-      this.entrySelection.unselected.splice(0);
+      this.entrySelection.deselected.splice(0);
+      this.triggerEvent("selectGlobal", {
+        state: bool,
+      });
     },
 
 

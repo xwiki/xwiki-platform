@@ -1,7 +1,7 @@
 <template>
 
   <!--
-    Should be type="text" but current style.css apply custom input style
+    Should be type="number" but current style.css apply custom input style
     for type="text" or type="password"
   -->
   <input

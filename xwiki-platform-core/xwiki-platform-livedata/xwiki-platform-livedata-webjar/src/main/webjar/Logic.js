@@ -72,7 +72,6 @@ define([
       unselected: [],
       isGlobal: false,
     };
-    this.selectedEntries = [];
     element.removeAttribute("data-data");
     // create Vuejs instance
     new Vue({
@@ -261,11 +260,13 @@ define([
       var displayer = this.data.meta.displayers.find(function (displayer) {
         return displayer.id === displayerId;
       });
-      // default displayer config
-      var defaultDisplayer = { id: this.data.meta.defaultDisplayer };
-      // merge all displayers
-      var mergedDisplayer = $.extend({}, defaultDisplayer, displayer, highLevelDisplayer);
-      return mergedDisplayer;
+      // merge displayers
+      if (highLevelDisplayer.id) {
+        return $.extend({}, displayer, highLevelDisplayer);
+      } else {
+        // default displayer
+        return { id: this.data.meta.defaultDisplayer };
+      }
     },
 
 
@@ -294,11 +295,13 @@ define([
       var filter = this.data.meta.filters.find(function (filter) {
         return filter.id === filterId;
       });
-      // default filter config
-      var defaultFilter = { id: this.data.meta.defaultFilter };
-      // merge all filters
-      var mergedFilter = $.extend({}, defaultFilter, filter, highLevelFilter);
-      return mergedFilter;
+      // merge filters
+      if (highLevelFilter.id) {
+        return $.extend({}, filter, highLevelFilter);
+      } else {
+        // default filter
+        return { id: this.data.meta.defaultFilter };
+      }
     },
 
 
@@ -541,7 +544,7 @@ define([
     /**
      * Toggle the selection of the specified entries
      * @param {Object|Array} entries
-     * @param {Boolean} select Whether to seelct or not the entries. Undefined toggle current state
+     * @param {Boolean} select Whether to select or not the entries. Undefined toggle current state
      */
     toggleSelectEntries: function (entries, select) {
       var self = this;

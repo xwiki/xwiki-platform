@@ -21,7 +21,7 @@
 #template('attachment_macros.vm')
 #set ($columns = ['mimeType', 'filename', 'version', 'filesize', 'date', 'author', '_actions'])
 #set ($columnsProperties = {
-  'mimeType': {'type': 'list', "html":true, 'class': 'XWiki.AllAttachments'},
+  'mimeType': {'type': 'list', "html": true, 'class': 'XWiki.AllAttachments'},
   'filename': {'type': 'text', 'link': 'auto'},
   'version': {'type': 'text', 'link': 'auto'},
   'filesize': {'type': 'list', 'html': true,  'class': 'XWiki.AllAttachments'},

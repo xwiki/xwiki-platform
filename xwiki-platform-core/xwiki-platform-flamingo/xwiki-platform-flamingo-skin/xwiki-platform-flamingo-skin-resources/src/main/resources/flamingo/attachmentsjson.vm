@@ -15,12 +15,11 @@
   ## Apply live table filters.
   ##
   #set ($constraints = ['attachment.docId = doc.id', 'doc.id = :docId'])
-  #set ($queryParameters = [])
-  #set ($discard = $queryParameters.add({
+  #set ($queryParameters = [{
     'name': 'docId',
     'match': 'exact',
     'value': $doc.getId()
-  }))
+  }])
   #maybeApplyStringFilter('parent' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
   #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
@@ -56,8 +55,7 @@
   ##
   ## Compute the final query.
   ##
-  #set ($query =  $services.query.hql(
-    "$whereClause $orderByClause"))
+  #set ($query =  $services.query.hql("$whereClause $orderByClause"))
   #set ($discard = $query.addFilter('attachment').addFilter('hidden'))
   #set ($discard = $query.setLimit($limit).setOffset($offset))
   #foreach ($queryParameter in $queryParameters)

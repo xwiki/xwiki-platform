@@ -176,6 +176,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var saveAndView = function(editableProperty) {
     return save(editableProperty).then($.proxy(view, null, editableProperty));
   };
+});
 
 require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {

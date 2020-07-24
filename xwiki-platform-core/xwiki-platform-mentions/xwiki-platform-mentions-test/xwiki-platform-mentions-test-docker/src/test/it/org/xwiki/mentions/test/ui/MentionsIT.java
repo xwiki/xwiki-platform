@@ -22,14 +22,12 @@ package org.xwiki.mentions.test.ui;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
-import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.test.ui.po.BootstrapSwitch.State.ON;
 
 /**
  * Test of the mentions application UI.
@@ -46,10 +44,6 @@ public class MentionsIT
 
     public static final String U2_USERNAME = "U2";
 
-    public static final String APPLICATION_ID = "mentions.application.name";
-
-    public static final String ALTER_FORMAT = "alert";
-
     /**
      * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
      * @see  Runnable
@@ -65,9 +59,8 @@ public class MentionsIT
      *
      * <ul>
      *     <li>Superadmin creates U1 and U2.</li>
-     *     <li>U2 activates the mentions notifications.</li>
      *     <li>U1 adds a mention to U2.</li>
-     *     <li>U2 very that she has received a notification.</li>
+     *     <li>U2 verify that she has received a notification.</li>
      * </ul>
      *
      * @param setup The test setup.
@@ -85,13 +78,8 @@ public class MentionsIT
             setup.createUser(U2_USERNAME, USERS_PWD, null);
         });
 
-        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
-            // activate the notifications.
-            NotificationsUserProfilePage.gotoPage(U2_USERNAME)
-                .setApplicationState(APPLICATION_ID, ALTER_FORMAT, ON);
-        });
-
         runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
+            setup.deletePage(reference);
             setup.createPage(reference,
                 "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
                 pageName);
@@ -102,6 +90,7 @@ public class MentionsIT
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
+            assertEquals(1, tray.getNotificationsCount());
             assertEquals(1, tray.getUnreadNotificationsCount());
             assertEquals("mentions.mention", tray.getNotificationType(0));
             String notificationContent = tray.getNotificationContent(0);

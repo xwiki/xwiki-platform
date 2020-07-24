@@ -17,35 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal.listeners;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.mockito.Mockito.verify;
 
 /**
- * Gives access to the configuration settings of the mentions.
+ * Test of {@link MentionsApplicationReadyEventListener}.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Unstable
-@Role
-public interface MentionsConfiguration
+@ComponentTest
+class MentionsApplicationReadyEventListenerTest
 {
-    /**
-     * 
-     * @return the color for the mentions.
-     */
-    String getMentionsColor();
+    @InjectMockComponents
+    private MentionsApplicationReadyEventListener eventListener;
 
-    /**
-     * @return the color for the mentions to the current user.
-     */
-    String getSelfMentionsColor();
+    @MockComponent
+    private MentionsEventExecutor eventExecutor;
 
-    /**
-     * 
-     * @return {@code true} if the mentions quote feature is activated.
-     */
-    boolean isQuoteActivated();
+    @Test
+    void onEvent()
+    {
+        this.eventListener.onEvent(null, null, null);
+        verify(this.eventExecutor).startThreads();
+    }
 }

@@ -19,12 +19,7 @@
  */
 package org.xwiki.mentions.internal.jmx;
 
-import java.util.Collection;
 import java.util.function.Supplier;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
  * Implementation of the Mentions JXM MBean.
@@ -34,66 +29,40 @@ import org.xwiki.mentions.internal.async.MentionsData;
  */
 public class JMXMentions implements JMXMentionsMBean
 {
-    private final Collection<MentionsData> queue;
+    private final Supplier<Long> queueSize;
 
     private final Supplier<Integer> threadNumber;
 
+    private final Runnable clearQueue;
+
     /**
      * Default construct.
-     * @param queue The mentions analysis task queue.
+     * @param queueSize The mentions analysis task queue size.
+     * @param clearQueue The method to call on clear queue
      * @param threadNumber The current number of threads
      */
-    public JMXMentions(Collection<MentionsData> queue,
-        Supplier<Integer> threadNumber)
+    public JMXMentions(Supplier<Long> queueSize, Runnable clearQueue, Supplier<Integer> threadNumber)
     {
-        this.queue = queue;
-
+        this.queueSize = queueSize;
         this.threadNumber = threadNumber;
+        this.clearQueue = clearQueue;
     }
 
     @Override
-    public int getQueueSize()
+    public long getQueueSize()
     {
-        return this.queue.size();
+        return this.queueSize.get();
     }
 
     @Override
     public void clearQueue()
     {
-        this.queue.clear();
+        this.clearQueue.run();
     }
 
     @Override
     public Integer getThreadNumber()
     {
         return this.threadNumber.get();
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        JMXMentions that = (JMXMentions) o;
-
-        return new EqualsBuilder()
-                   .append(this.queue, that.queue)
-                   .append(this.threadNumber, that.threadNumber)
-                   .isEquals();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 37)
-                   .append(this.queue)
-                   .append(this.threadNumber)
-                   .toHashCode();
     }
 }

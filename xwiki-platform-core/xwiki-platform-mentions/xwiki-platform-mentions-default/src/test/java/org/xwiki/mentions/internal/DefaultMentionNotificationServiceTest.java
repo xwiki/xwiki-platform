@@ -69,16 +69,19 @@ public class DefaultMentionNotificationServiceTest
         when(this.serializer.serialize(authorReference)).thenReturn("xwiki:XWiki.Author");
         when(this.serializer.serialize(documentReference)).thenReturn("xwiki:XWiki.Doc");
 
-        this.notificationService.sendNotification(new MentionNotificationParameters(authorReference, documentReference, mentionedIdentity,
-            MentionLocation.COMMENT, "anchor", new XDOM(emptyList())));
+        MentionNotificationParameters anchor =
+            new MentionNotificationParameters(authorReference, documentReference, mentionedIdentity,
+                MentionLocation.COMMENT, "anchor", new XDOM(emptyList()));
+        this.notificationService.sendNotification(anchor);
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
-                .setUserReference(authorReference.toString())
-                .setDocumentReference(documentReference.toString())
+                .setUserReference("xwiki:XWiki.Author")
+                .setDocumentReference("xwiki:XWiki.Doc")
                 .setLocation(MentionLocation.COMMENT)
                 .setAnchor("anchor")
         );
-        verify(this.observationManager).notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
+        verify(this.observationManager)
+            .notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
     }
 }

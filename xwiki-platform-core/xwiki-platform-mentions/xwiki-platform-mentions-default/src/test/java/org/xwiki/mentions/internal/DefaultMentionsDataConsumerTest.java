@@ -91,7 +91,7 @@ class DefaultMentionsDataConsumerTest
         DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
-        HashMap<String, String> mentionParams = new HashMap<>();
+        Map<String, String> mentionParams = new HashMap<>();
         mentionParams.put("reference", "XWiki.U1");
         mentionParams.put("anchor", "anchor1");
         MacroBlock mention1 = new MacroBlock("mention", mentionParams, false);
@@ -133,8 +133,8 @@ class DefaultMentionsDataConsumerTest
             new MentionsData()
                 .setVersion("1.0")
                 .setWikiId("xwiki")
-                .setDocumentReference(documentReference.toString())
-                .setAuthorReference(authorReference.toString()));
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setAuthorReference("xwiki:XWiki.U2"));
         verify(this.notificationService)
             .sendNotification(
                 new MentionNotificationParameters(authorReference, documentReference, user1, DOCUMENT, "anchor1",
@@ -155,7 +155,7 @@ class DefaultMentionsDataConsumerTest
         DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
-        HashMap<String, String> mentionParams = new HashMap<>();
+        Map<String, String> mentionParams = new HashMap<>();
         mentionParams.put("reference", "XWiki.U1");
         mentionParams.put("anchor", "anchor1");
         MacroBlock mention1 = new MacroBlock("mention", mentionParams, false);
@@ -198,8 +198,8 @@ class DefaultMentionsDataConsumerTest
             new MentionsData()
                 .setVersion("1.0")
                 .setWikiId("xwiki")
-                .setDocumentReference(documentReference.toString())
-                .setAuthorReference(authorReference.toString()));
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setAuthorReference("xwiki:XWiki.U2"));
 
         verify(this.notificationService)
             .sendNotification(
@@ -242,8 +242,8 @@ class DefaultMentionsDataConsumerTest
             new MentionsData()
                 .setVersion("1.1")
                 .setWikiId("xwiki")
-                .setDocumentReference(documentReference.toString())
-                .setAuthorReference(authorReference.toString()));
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setAuthorReference("xwiki:XWiki.U2"));
 
         verify(this.notificationService, never()).sendNotification(any());
     }
@@ -282,9 +282,9 @@ class DefaultMentionsDataConsumerTest
         List<MacroBlock> newCommentNewMentions = singletonList(new MacroBlock("comment", parameters, false));
         when(this.xdomService.listMentionMacros(newCommentXDOM)).thenReturn(newCommentNewMentions);
 
-        DocumentReference U1 = new DocumentReference("xwiki", "XWiki", "U1");
+        DocumentReference documentReference1 = new DocumentReference("xwiki", "XWiki", "U1");
         Map<DocumentReference, List<String>> mentionsCount = new HashMap<>();
-        mentionsCount.put(U1, Collections.singletonList("anchor1"));
+        mentionsCount.put(documentReference1, Collections.singletonList("anchor1"));
         when(this.xdomService.countByIdentifier(newCommentNewMentions)).thenReturn(mentionsCount);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Creator")).thenReturn(authorReference);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
@@ -308,14 +308,15 @@ class DefaultMentionsDataConsumerTest
         when(oldDoc.getXObjects()).thenReturn(oldXObjects);
 
         this.dataConsumer.consume(new MentionsData()
-                                      .setAuthorReference(authorReference.toString())
-                                      .setDocumentReference(documentReference.toString())
+                                      .setAuthorReference("xwiki:XWiki.Creator")
+                                      .setDocumentReference("xwiki:XWiki.Doc")
                                       .setWikiId("xwiki")
                                       .setVersion("1.3")
         );
 
         verify(this.notificationService).sendNotification(
-            new MentionNotificationParameters(authorReference, documentReference, U1, COMMENT, "anchor1",
+            new MentionNotificationParameters(authorReference, documentReference, documentReference1, COMMENT,
+                "anchor1",
                 newCommentXDOM));
     }
 
@@ -347,9 +348,9 @@ class DefaultMentionsDataConsumerTest
         List<MacroBlock> newCommentNewMentions = singletonList(new MacroBlock("comment", parameters, false));
         when(this.xdomService.listMentionMacros(newCommentXDOM)).thenReturn(newCommentNewMentions);
 
-        DocumentReference U1 = new DocumentReference("xwiki", "XWiki", "U1");
+        DocumentReference documentReference1 = new DocumentReference("xwiki", "XWiki", "U1");
         Map<DocumentReference, List<String>> mentionsCount = new HashMap<>();
-        mentionsCount.put(U1, Collections.singletonList("anchor1"));
+        mentionsCount.put(documentReference1, Collections.singletonList("anchor1"));
         when(this.xdomService.countByIdentifier(newCommentNewMentions)).thenReturn(mentionsCount);
 
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Creator")).thenReturn(authorReference);
@@ -376,10 +377,11 @@ class DefaultMentionsDataConsumerTest
             new MentionsData()
                 .setVersion("3.4")
                 .setWikiId("xwiki")
-                .setDocumentReference(documentReference.toString())
-                .setAuthorReference(authorReference.toString()));
-        verify(this.notificationService)
-            .sendNotification(new MentionNotificationParameters(authorReference, documentReference, U1, ANNOTATION,
-                "anchor1", newCommentXDOM));
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setAuthorReference("xwiki:XWiki.Creator"));
+        MentionNotificationParameters anchor1 =
+            new MentionNotificationParameters(authorReference, documentReference, documentReference1, ANNOTATION,
+                "anchor1", newCommentXDOM);
+        verify(this.notificationService).sendNotification(anchor1);
     }
 }

@@ -1,21 +1,3 @@
-<template>
-
-  <!--
-    Should be type="number" but current style.css apply custom input style
-    for type="text" or type="password"
-  -->
-  <input
-    class="livedata-filter-number"
-    type="text"
-    size="1"
-    :value="filterEntry.value"
-    @change="applyFilter($event.target.value)"
-  />
-
-</template>
-
-
-<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -35,32 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define([
-  "Vue",
-  "filters/filter-mixin",
-], function (
-  Vue,
-  filterMixin
-) {
+package org.xwiki.livedata;
 
-  Vue.component("filter-number", {
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
-    name: "filter-number",
+/**
+ * The component that provides the live data entries and their meta data.
+ * 
+ * @version $Id$
+ * @since 12.6RC1
+ */
+@Role
+@Unstable
+public interface LiveDataSource
+{
+    /**
+     * @return the entry store
+     */
+    LiveDataEntryStore getEntries();
 
-    template: template,
+    /**
+     * @return the property store
+     */
+    LiveDataPropertyDescriptorStore getProperties();
 
-    mixins: [filterMixin],
-
-  });
-
-});
-</script>
-
-
-<style>
-
-.livedata-filter .livedata-filter-number {
-  width: 100%;
+    /**
+     * @return the property type store
+     */
+    LiveDataPropertyDescriptorStore getPropertyTypes();
 }
-
-</style>

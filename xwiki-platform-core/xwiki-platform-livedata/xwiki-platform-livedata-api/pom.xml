@@ -24,18 +24,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-livedata</artifactId>
     <version>12.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-livedata</artifactId>
-  <name>XWiki Platform - Live Data</name>
-  <packaging>pom</packaging>
-  <description>Display dynamic lists of data</description>
-  <modules>
-    <module>xwiki-platform-livedata-api</module>
-    <module>xwiki-platform-livedata-livetable</module>
-    <module>xwiki-platform-livedata-macro</module>
-    <module>xwiki-platform-livedata-rest</module>
-    <module>xwiki-platform-livedata-webjar</module>
-  </modules>
+  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-livedata-api</artifactId>
+  <name>XWiki Platform - Live Data - API</name>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Live Data API</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-icon-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

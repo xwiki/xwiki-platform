@@ -1,21 +1,3 @@
-<template>
-
-  <!--
-    Should be type="number" but current style.css apply custom input style
-    for type="text" or type="password"
-  -->
-  <input
-    class="livedata-filter-number"
-    type="text"
-    size="1"
-    :value="filterEntry.value"
-    @change="applyFilter($event.target.value)"
-  />
-
-</template>
-
-
-<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -35,32 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define([
-  "Vue",
-  "filters/filter-mixin",
-], function (
-  Vue,
-  filterMixin
-) {
+package org.xwiki.livedata;
 
-  Vue.component("filter-number", {
+import java.util.Map;
 
-    name: "filter-number",
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.stability.Unstable;
 
-    template: template,
-
-    mixins: [filterMixin],
-
-  });
-
-});
-</script>
-
-
-<style>
-
-.livedata-filter .livedata-filter-number {
-  width: 100%;
+/**
+ * Interface used by components that have parameters. Should be used only for components that have
+ * {@link ComponentInstantiationStrategy#PER_LOOKUP}.
+ * 
+ * @version $Id$
+ * @since 12.6RC1
+ */
+@Unstable
+public interface WithParameters
+{
+    /**
+     * @return the parameters of this component
+     */
+    Map<String, Object> getParameters();
 }
-
-</style>

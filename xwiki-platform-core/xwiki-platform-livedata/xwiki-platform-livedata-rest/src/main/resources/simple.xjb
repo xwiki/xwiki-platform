@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This enables the simple binding mode in JAXB.
+  See http://weblogs.java.net/blog/kohsuke/archive/2006/03/simple_and_bett.html
+-->
+<jaxb:bindings
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+  xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc" jaxb:extensionBindingPrefixes="xjc"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <jaxb:globalBindings>
+    <xjc:simple/>
+    <jaxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"
+        parseMethod="javax.xml.bind.DatatypeConverter.parseDate"
+        printMethod="javax.xml.bind.DatatypeConverter.printDate"
+        />
+  </jaxb:globalBindings>
+
+  <!-- We use an existing Java class because we want to control how the property value meta data is serialized in JSON
+    format. -->
+  <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'icon']">
+      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+    </jaxb:bindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'displayer']">
+      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+    </jaxb:bindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'filter']">
+      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+    </jaxb:bindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'values']">
+      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+    </jaxb:bindings>
+  </jaxb:bindings>
+</jaxb:bindings>

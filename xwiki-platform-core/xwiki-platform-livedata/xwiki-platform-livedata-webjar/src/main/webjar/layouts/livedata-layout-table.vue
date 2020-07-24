@@ -1,6 +1,7 @@
 <template>
   <div class="livedata-layout-table">
 
+    <!-- Topbar -->
     <livedata-topbar :logic="logic">
       <template #left>
         <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
@@ -9,6 +10,12 @@
         <livedata-pagination :logic="logic"></livedata-pagination>
       </template>
     </livedata-topbar>
+
+    <!-- Entry selector info bar -->
+    <livedata-entry-selector-info-bar
+      :logic="logic"
+    ></livedata-entry-selector-info-bar>
+
 
     <!-- Table component -->
     <table class="livedata-table">
@@ -130,6 +137,7 @@ define([
   "vue!filters/livedata-filter",
   "vue!livedata-entry-selector",
   "vue!livedata-entry-selector-all",
+  "vue!livedata-entry-selector-info-bar",
 ], function (
   Vue
 ) {

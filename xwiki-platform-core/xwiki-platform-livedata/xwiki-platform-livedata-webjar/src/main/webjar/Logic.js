@@ -188,6 +188,21 @@ define([
     },
 
 
+    /**
+     * Return the id of the given entry
+     * @param {Object} entry
+     * @returns {String}
+     */
+    getEntryId: function (entry) {
+      var idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+      if (entry[idProperty] === undefined) {
+        console.warn("Entry has no id (at peroperty [" + idProperty + "]", entry);
+        return;
+      }
+      return entry[idProperty];
+    },
+
+
 
 
 
@@ -535,21 +550,6 @@ define([
      */
 
 
-     /**
-      * Return the id of the specified entry
-      * @param {Object} entry
-      * @returns {String}
-      */
-     getEntryId: function (entry) {
-       var idProperty = this.data.meta.entryDescriptor.idProperty || "id";
-       if (entry[idProperty] === undefined) {
-         console.warn("Entry has no id (at peroperty [" + idProperty + "]", entry);
-         return;
-       }
-       return entry[idProperty];
-     },
-
-
     /**
      * Return whether the entry is currently selected
      * @param {Object} entry
@@ -633,6 +633,19 @@ define([
           self.deselectEntries(entry);
         }
       });
+    },
+
+
+    /**
+     * Get number of selected entries
+     * @returns {Number}
+     */
+    getSelectedEntriesCount: function () {
+      if (this.entrySelection.isGlobal) {
+        return this.data.data.count - this.entrySelection.deselected.length;
+      } else {
+        return this.entrySelection.selected.length;
+      }
     },
 
 

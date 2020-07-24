@@ -1,6 +1,7 @@
 <template>
   <div class="livedata-layout-cards">
 
+    <!-- Topbar -->
     <livedata-topbar :logic="logic">
       <template #left>
         <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
@@ -10,6 +11,12 @@
         <livedata-pagination :logic="logic"></livedata-pagination>
       </template>
     </livedata-topbar>
+
+    <!-- Entry selector info bar -->
+    <livedata-entry-selector-info-bar
+      :logic="logic"
+    ></livedata-entry-selector-info-bar>
+
 
     <!-- Cards component -->
     <div class="livedata-cards">
@@ -90,6 +97,7 @@ define([
   "vue!livedata-pagination",
   "vue!displayers/livedata-displayer.vue",
   "vue!livedata-entry-selector.vue",
+  "vue!livedata-entry-selector-info-bar",
 ], function (
   Vue
 ) {

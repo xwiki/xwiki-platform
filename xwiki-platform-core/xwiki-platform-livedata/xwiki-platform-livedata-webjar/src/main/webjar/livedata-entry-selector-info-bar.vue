@@ -1,14 +1,9 @@
 <template>
   <div
-    class="livedata-entry-selector"
-    @click.self="$refs.checkbox.click()"
+    class="livedata-entry-selector-info-bar"
+    v-if="selectedCount > 0"
   >
-    <input
-      ref="checkbox"
-      type="checkbox"
-      :checked="selected"
-      @change="logic.toggleSelectEntries(entry)"
-    />
+  {{ selectedCount }} / {{ data.data.count }} entries selected
   </div>
 </template>
 
@@ -39,24 +34,22 @@ define([
   Vue
 ) {
 
-  Vue.component("livedata-entry-selector", {
+  Vue.component("livedata-entry-selector-info-bar", {
 
-    name: "livedata-entry-selector",
+    name: "livedata-entry-selector-info-bar",
 
     template: template,
 
     props: {
-      entry: Object,
       logic: Object,
     },
 
     computed: {
       data: function () { return this.logic.data; },
 
-      selected: function () {
-        return this.logic.isEntrySelected(this.entry);
+      selectedCount: function () {
+        return this.logic.getSelectedEntriesCount();
       },
-
     },
 
   });
@@ -66,16 +59,11 @@ define([
 
 <style>
 
-.livedata-entry-selector {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-
-.livedata-entry-selector input {
-  bottom: 0;
+.livedata-entry-selector-info-bar {
+  margin-bottom: 1rem;
+  padding: 12px;
+  border-radius: 5px;
+  background-color: #ddd4;
 }
 
 </style>

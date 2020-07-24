@@ -13,9 +13,9 @@
           <input
             ref="checkbox"
             type="checkbox"
-            :checked="selected"
+            :checked="checked"
             @click.stop
-            @change="selectPageEntries"
+            @change="toggle"
           />
         </span>
         <span class="caret"></span>
@@ -69,37 +69,40 @@ define([
       logic: Object,
     },
 
-    data: function () {
-      return {
-        selected: false,
-      };
-    },
 
     computed: {
       data: function () { return this.logic.data; },
       entrySelection: function () { return this.logic.entrySelection; },
+
+      checked: function () {
+          var self = this;
+          var allPageEntriesSeleted = this.data.data.entries.every(function (entry) {
+            return self.logic.isEntrySelected(entry);
+          });
+          var allEntriesSelected = this.entrySelection.isGlobal && this.entrySelection.deselected.length === 0;
+          return allPageEntriesSeleted || allEntriesSelected;
+      },
+
+      indeterminate: function () {
+        var selectedCount = this.logic.getSelectedEntriesCount();
+          return selectedCount > 0 && !this.checked;
+      },
+
     },
 
     watch: {
-      entrySelection: {
-        immediate: true,
-        deep: true,
-        handler: function () {
-          var self = this;
-          var allPageEntriesSeleted =  this.data.data.entries.every(function (entry) {
-            return self.logic.isEntrySelected(entry);
-          });
-          this.selected = allPageEntriesSeleted || this.entrySelection.isGlobal;
-        },
+      "indeterminate": function () {
+        this.$refs.checkbox.indeterminate = this.indeterminate;
       },
     },
 
+
     methods: {
-      selectPageEntries: function () {
+      toggle: function () {
         if (this.entrySelection.isGlobal) {
           this.logic.setEntrySelectGlobal(false);
         } else {
-          this.logic.toggleSelectEntries(this.data.data.entries, !this.selected);
+          this.logic.toggleSelectEntries(this.data.data.entries, !this.checked);
         }
       },
     },

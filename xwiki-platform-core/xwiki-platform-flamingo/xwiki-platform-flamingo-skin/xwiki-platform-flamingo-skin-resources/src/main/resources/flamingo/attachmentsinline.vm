@@ -29,26 +29,6 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###
 ### TODO: web service?
 ###
-#set ($columns = ['mimeType', 'filename', 'version', 'filesize', 'date', 'author', '_actions'])
-#set ($columnsProperties = {
-  'mimeType': {'type': 'list', "html":true, 'class': 'XWiki.AllAttachments'},
-  'filename': {'type': 'text', 'link': 'auto'},
-  'version': {'type': 'text', 'link': 'auto'},
-  'filesize': {'type': 'list', 'html': true, 'class': 'XWiki.AllAttachments'},
-  'date': {'type': 'date'},
-  'author': {'type': 'text', 'html': true},
-  '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['delete']}
-})
-#set ($options = {
-  'translationPrefix': 'core.viewers.attachments.',
-  'url': $doc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
-  'selectedColumn': 'filename',
-  'javascriptName': 'docAttachmentsLivetable',
-  'outputOnlyHtml': true
-})
-##
-##
-##
 #set($showactions = 0)
 <div id="attachmentscontent" class="xwikiintracontent">
 <div id="attw">
@@ -61,8 +41,6 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   <div>
   ## CSRF prevention
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-  ## $redirect is defined in attachmentslist.vm
-  <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
     <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>
     ## Temporarily disabled, until we fix attachment name handling
@@ -78,7 +56,6 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
   </form>
 #end
 </div> ## attw
-<div id='attachmentsUploadContainer' class='hidden'></div>
 </div> ## attachmentscontent
 #getRequiredSkinExtensions($requiredSkinExtensions)
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

@@ -19,4 +19,21 @@
 ## ---------------------------------------------------------------------------
 #if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
 #template('attachment_macros.vm')
+#set ($columns = ['mimeType', 'filename', 'version', 'filesize', 'date', 'author', '_actions'])
+#set ($columnsProperties = {
+  'mimeType': {'type': 'list', "html":true, 'class': 'XWiki.AllAttachments'},
+  'filename': {'type': 'text', 'link': 'auto'},
+  'version': {'type': 'text', 'link': 'auto'},
+  'filesize': {'type': 'list', 'html': true,  'class': 'XWiki.AllAttachments'},
+  'date': {'type': 'date'},
+  'author': {'type': 'text', 'html': true},
+  '_actions': {'sortable': false,'filterable': false,'html': true,'actions': ['delete']}
+})
+#set ($options = {
+  'translationPrefix': 'core.viewers.attachments.',
+  'url': $doc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
+  'selectedColumn': 'filename',
+  'javascriptName': 'docAttachmentsLivetable',
+  'outputOnlyHtml': true
+})
 #livetable('docAttachments' $columns $columnsProperties $options)

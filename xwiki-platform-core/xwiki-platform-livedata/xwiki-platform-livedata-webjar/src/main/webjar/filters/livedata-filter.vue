@@ -7,6 +7,10 @@
       :index="index"
       :logic="logic"
     ></component>
+
+  <xwiki-loader
+    v-else
+  ></xwiki-loader>
   </div>
 </template>
 
@@ -33,6 +37,7 @@
   */
 define([
   "Vue",
+  "vue!utilities/xwiki-loader",
 ], function (
   Vue
 ) {

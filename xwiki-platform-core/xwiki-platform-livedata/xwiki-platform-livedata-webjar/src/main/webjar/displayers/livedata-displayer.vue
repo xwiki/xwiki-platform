@@ -6,6 +6,10 @@
     :entry="entry"
     :logic="logic"
   ></component>
+
+  <xwiki-loader
+    v-else
+  ></xwiki-loader>
 </template>
 
 
@@ -31,6 +35,7 @@
   */
 define([
   "Vue",
+  "vue!utilities/xwiki-loader",
 ], function (
   Vue
 ) {
@@ -106,19 +111,5 @@ define([
 
 
 <style>
-
-@keyframes waiting {
-  from { background-position-x: 100%; }
-  to { background-position-x: -100%; }
-}
-
-.livedata-displayer-container:empty {
-  animation: waiting 2s linear infinite;
-  --c1: transparent;
-  --c2: #ccc4;
-  background: linear-gradient(135deg, var(--c1) 25%, var(--c2) 50%, var(--c1) 75%);
-  background-repeat: repeat;
-  background-size: 200% 100%;
-}
 
 </style>

@@ -1,3 +1,19 @@
+<template>
+  <div
+    class="livedata-entry-selector"
+    @click.self="$refs.checkbox.click()"
+  >
+    <input
+      ref="checkbox"
+      type="checkbox"
+      :checked="selected"
+      @change="logic.toggleSelectEntries(entry)"
+    />
+  </div>
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,49 +33,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 define([
   "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-cards.html",
-  "Logic"
 ], function (
-  Vue,
-  livedataCards,
-  Logic
+  Vue
 ) {
 
-  return function (element) {
-    var logic = Logic(element);
+  Vue.component("livedata-entry-selector", {
 
-    // vue directive to automatically create and insert the displayer inside the element
-    Vue.directive("displayer", {
-      bind: function (el, binding) {
-        logic.createDisplayer(binding.value.property.id, binding.value.entry)
-        .then(function (displayer) {
-          el.appendChild(displayer.element);
-          displayer.view();
-        });
-      },
-    });
+    name: "livedata-entry-selector",
 
-    /**
-     * Create the cards layout from Vuejs
-     */
-    var vueCardsLayout = new Vue({
+    template: template,
 
-      // Constructs a livedata-cards component and passes it the data
-      template: '<livedata-cards :logic="logic"></livedata-cards>',
+    props: {
+      entry: Object,
+      logic: Object,
+    },
 
-      data: {
-        logic: logic,
+    computed: {
+      data: function () { return this.logic.data; },
+
+      selected: function () {
+        return this.logic.isEntrySelected(this.entry);
       },
 
-    }).$mount();
+    },
 
-    // return the HTML Element of the layout for the logic script
-    return vueCardsLayout.$el;
+    destroyed: function () {
+      this.logic.unselectEntries(this.entry);
+    },
 
-  };
-
-
+  });
 });
+</script>
+
+
+<style>
+
+.livedata-entry-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.livedata-entry-selector input {
+  bottom: 0;
+}
+
+</style>

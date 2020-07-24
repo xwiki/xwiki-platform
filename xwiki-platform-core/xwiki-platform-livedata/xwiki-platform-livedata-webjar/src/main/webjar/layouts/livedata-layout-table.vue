@@ -1,7 +1,14 @@
 <template>
-  <div class="livedata-table-layout">
+  <div class="livedata-layout-table">
 
-    <div ref="topbar"></div>
+    <livedata-topbar :logic="logic">
+      <template #left>
+        <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
+      </template>
+      <template #right>
+        <livedata-pagination :logic="logic"></livedata-pagination>
+      </template>
+    </livedata-topbar>
 
     <!-- Table component -->
     <table class="livedata-table">
@@ -11,13 +18,19 @@
 
         <!-- Column name -->
         <tr class="column-header">
+          <!-- Entry Select All-->
+          <th class="entry-selector">
+            <livedata-entry-selector-all
+              :logic="logic"
+            ></livedata-entry-selector-all>
+          </th>
           <th
             v-for="col in cols"
             :key="col.id"
           >
             <div
               class="column-name"
-              @click="logic.sort(col.id)"
+              @click="logic.sort(col.id, 0)"
             >
               <span>{{ col.name }}</span>
               <span
@@ -25,8 +38,8 @@
                 :class="[
                   'sort-icon',
                   'fa',
-                  { 'sorted': sorts[col.id] },
-                  (sorts[col.id] && sorts[col.id].descending) ? 'fa-caret-up' : 'fa-caret-down',
+                  { 'sorted': sortLevel1.property === col.id },
+                  (sortLevel1.property === col.id && sortLevel1.descending) ? 'fa-caret-up' : 'fa-caret-down',
                 ]"
               ></span>
             </div>
@@ -35,16 +48,17 @@
 
         <!-- Column filter -->
         <tr class="column-filters">
+          <th class="entry-selector"></th>
           <th
             v-for="col in cols"
             :key="col.id"
           >
-            <input
+            <livedata-filter
               v-if="logic.isPropertyFilterable(col.id)"
-              type="text" size="1"
-              :value="data.query.filters[col.id] && data.query.filters[col.id][0] && data.query.filters[col.id][0].value"
-              @change="logic.filter(col.id, 0, { value: $event.target.value })"
-            />
+              :property-id="col.id"
+              :index="0"
+              :logic="logic"
+            ></livedata-filter>
           </th>
         </tr>
 
@@ -58,12 +72,24 @@
           :key="rowId"
         >
 
+          <!-- Entry Select All-->
+          <td class="entry-selector">
+            <livedata-entry-selector
+              :entry="row"
+              :logic="logic"
+            ></livedata-entry-selector>
+          </td>
+
           <td
             class="cell"
             v-for="col in cols"
             :key="col.id"
-            v-displayer="{col: col, row: row}"
-            >
+          >
+            <livedata-displayer
+              :property-id="col.id"
+              :entry="row"
+              :logic="logic"
+            ></livedata-displayer>
           </td>
 
         </tr>
@@ -97,15 +123,20 @@
  */
 define([
   "Vue",
-  BASE_PATH + "topbar.js",
+  "vue!livedata-topbar",
+  "vue!livedata-dropdown-menu",
+  "vue!livedata-pagination",
+  "vue!displayers/livedata-displayer",
+  "vue!filters/livedata-filter",
+  "vue!livedata-entry-selector",
+  "vue!livedata-entry-selector-all",
 ], function (
-  Vue,
-  createTopbar,
+  Vue
 ) {
 
-  Vue.component("livedata-table", {
+  Vue.component("livedata-layout-table", {
 
-    name: "livedata-table",
+    name: "livedata-layout-table",
 
     template: template,
 
@@ -113,26 +144,11 @@ define([
       logic: Object,
     },
 
-
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
       cols: function () { return this.logic.data.meta.propertyDescriptors; },
-      sorts: function () {
-        let sorts = {};
-        this.data.query.sort.forEach( function (sortObject, level) {
-          sorts[sortObject.property] = {
-            level: level,
-            descending: sortObject.descending,
-          };
-        });
-        return sorts;
-      },
-    },
-
-    mounted: function () {
-      var topbar = createTopbar(this.logic);
-      this.$refs.topbar.append(topbar);
+      sortLevel1: function () { return this.data.query.sort[0] || {}; },
     },
 
   });
@@ -142,11 +158,11 @@ define([
 
 <style>
 
-.livedata-table-layout table {
+.livedata-layout-table table {
   height: 100%;
 }
 
-.livedata-table-layout .column-name {
+.livedata-layout-table .column-name {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -154,35 +170,50 @@ define([
   cursor: pointer;
 }
 
-.livedata-table-layout .sort-icon {
+.livedata-layout-table .sort-icon {
   color: currentColor;
   opacity: 0;
 }
-.livedata-table-layout .sort-icon.sorted {
+.livedata-layout-table .sort-icon.sorted {
   opacity: 1;
 }
-.livedata-table-layout .column-name:hover .sort-icon:not(.sorted) {
+.livedata-layout-table .column-name:hover .sort-icon:not(.sorted) {
   opacity: 0.5;
 }
 
-.livedata-table-layout .column-filters th {
+.livedata-layout-table .column-filters th {
   padding-left: 0;
   padding-right: 0;
   font-weight: normal;
 }
-.livedata-table-layout .column-filters input {
+.livedata-layout-table .column-filters input {
   padding-left: 8px;
   padding-right: 8px;
   width: 100%;
 }
 
-.livedata-table-layout .cell {
+.livedata-layout-table .cell {
   padding: 0;
   height: 100%;
 }
-.livedata-table-layout .cell .livedata-displayer.view {
+.livedata-layout-table .cell .livedata-displayer.view {
   padding: 8px;
 }
 
+.livedata-layout-table .entry-selector {
+    padding: 0;
+    height: 100%;
+    width: 0;
+}
+.livedata-layout-table .livedata-entry-selector-all .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
+}
+.livedata-layout-table  .livedata-entry-selector {
+    justify-content: flex-start;
+    padding: 0 2rem;
+}
 
 </style>

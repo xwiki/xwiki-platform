@@ -1,3 +1,17 @@
+<template>
+
+  <input
+    class="livedata-filter-text"
+    type="text"
+    size="1"
+    :value="filterEntry.value"
+    @change="applyFilter($event.target.value)"
+  />
+
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,35 +31,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 define([
-    "Vue",
-    "vue!" + BASE_PATH + "dropdown-menu.html?evaluate=true",
-  ], function (
-    Vue,
-    dropdownMenu
-  ) {
+  "Vue",
+  "filters/filter-mixin",
+], function (
+  Vue,
+  filterMixin
+) {
 
-    return function (logic) {
+  Vue.component("filter-text", {
 
-      /**
-       * Create the dropdown menu from Vuejs
-       */
-      var vueDropdownMenu = new Vue({
+    name: "filter-text",
 
-        // Constructs a dropdown-menu component and passes it the data
-        template: '<dropdown-menu :logic="logic"></dropdown-menu>',
+    template: template,
 
-        data: {
-          logic: logic,
-        },
-
-      }).$mount();
-
-      // return the HTML Element of the dropdown menu for the layout
-      return vueDropdownMenu.$el;
-
-    };
-
+    mixins: [filterMixin],
 
   });
+
+});
+</script>
+
+
+<style>
+
+.livedata-filter .livedata-filter-text {
+  width: 100%;
+}
+
+</style>

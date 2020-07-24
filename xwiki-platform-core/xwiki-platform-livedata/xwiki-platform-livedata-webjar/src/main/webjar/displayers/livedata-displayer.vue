@@ -1,0 +1,124 @@
+<template>
+  <component
+    v-if="componentName"
+    :is="componentName"
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  ></component>
+</template>
+
+
+<script>
+/*
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  */
+define([
+  "Vue",
+], function (
+  Vue
+) {
+
+  Vue.component("livedata-displayer", {
+
+    name: "livedata-displayer",
+
+    template: template,
+
+    props: {
+      propertyId: String,
+      entry: Object,
+      logic: Object,
+    },
+
+    data: function () {
+      return {
+        componentName: undefined,
+      };
+    },
+
+    computed: {
+      data: function () { return this.logic.data; },
+      displayerId: function () {
+        return this.logic.getDisplayerDescriptor(this.propertyId).id;
+      },
+    },
+
+    methods: {
+      loadDisplayer: function (displayerId) {
+        var self = this;
+        return new Promise (function (resolve, reject) {
+
+          var componentName = "displayer-" + displayerId;
+
+          // load success callback
+          var loadDisplayerSuccess = function () {
+            self.componentName = componentName;
+            resolve();
+          };
+
+          // load error callback
+          var loadDisplayerFailure = function (err) {
+            console.warn(err);
+            reject();
+          };
+
+          // load displayer based on it's id
+          require(["vue!displayers/" + componentName],
+            loadDisplayerSuccess,
+            loadDisplayerFailure
+          );
+        });
+
+      },
+    },
+
+    mounted: function () {
+      var self = this;
+      // load displayer
+      this.loadDisplayer(this.displayerId).catch(function () {
+        self.loadDisplayer(self.data.meta.defaultDisplayer).catch(function (err) {
+          console.error(err);
+        });
+      });
+    },
+
+  });
+
+});
+</script>
+
+
+<style>
+
+@keyframes waiting {
+  from { background-position-x: 100%; }
+  to { background-position-x: -100%; }
+}
+
+.livedata-displayer-container:empty {
+  animation: waiting 2s linear infinite;
+  --c1: transparent;
+  --c2: #ccc4;
+  background: linear-gradient(135deg, var(--c1) 25%, var(--c2) 50%, var(--c1) 75%);
+  background-repeat: repeat;
+  background-size: 200% 100%;
+}
+
+</style>

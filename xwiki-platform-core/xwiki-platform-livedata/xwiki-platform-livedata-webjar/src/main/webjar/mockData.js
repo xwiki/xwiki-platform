@@ -34,11 +34,15 @@ define({
 
     hiddenFilters: {},
 
-    filters: {
-      country: [
-        {operator: "equals", value: "france"},
-      ],
-    },
+    filters: [
+      {
+        property: "country",
+        matchAll: true,
+        constrains: [
+          {operator: "equals", value: "france"},
+        ],
+      },
+    ],
 
     sort: [ {property: "age", descending: false} ],
 
@@ -54,6 +58,20 @@ define({
     layouts: ["table", "cards"],
     defaultLayout: "table",
 
+    layoutDescriptors: [
+      {
+        id: "table",
+        name: "Table",
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
+      },
+      {
+        id: "cards",
+        name: "Cards",
+        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
+        titleProperty: "doc_title",
+      },
+    ],
+
     propertyDescriptors: [
       {
         id: "doc_title",
@@ -68,8 +86,8 @@ define({
         id: "age",
         name: "Age",
         type: "number",
-        filter: {
-          id: false,
+        displayer: {
+          id: 'number',
         },
       },
       {
@@ -90,6 +108,7 @@ define({
           id: "html",
         },
         sortable: false,
+        filterable: false,
       },
     ],
 
@@ -101,6 +120,7 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'text'
         },
@@ -112,27 +132,40 @@ define({
           id: 'text',
         },
         sortable: true,
+        filterable: true,
         filter: {
           id: 'number'
         },
       },
     ],
 
+    defaultFilter: 'text',
+
     filters: [
       {
         id: "text",
-        operators: ["equals", "nequals"],
+        defaultOperator: "contains",
+        operators: [
+          { id: "contains", name: "Contains", },
+          { id: "equals", name: "Equals", },
+          { id: "nequals", name: "Not Equals", },
+        ],
       },
       {
         id: "number",
-        operators: ["equals", "nequals", "greater", "lower"],
+        defaultOperator: "equals",
+        operators: [
+          { id: "equals", name: "=", },
+          { id: "nequals", name: "≠", },
+          { id: "lower", name: "<", },
+          { id: "greater", name: ">", },
+        ],
       },
     ],
 
+    defaultDisplayer: 'text',
+
     displayers: [
-      {
-        id: "default",
-      },
       {
         id: "text",
       },
@@ -144,23 +177,13 @@ define({
       },
     ],
 
-    layoutDescriptors: {
-      table: {
-        name: "Table",
-        icon: "fa fa-table",
-        file: "tableLayout.js",
-      },
-      cards: {
-        name: "Cards",
-        icon: "fa fa-th",
-        file: "cardsLayout.js",
-      },
-    },
-
 
     pagination: {
       maxShownPages: 10,
       pageSizes: [10, 25, 50, 100, 250],
+      showNextPrevious: true,
+      showFirstLast: false,
+      showPageSizeDropdown: false,
     },
 
   },

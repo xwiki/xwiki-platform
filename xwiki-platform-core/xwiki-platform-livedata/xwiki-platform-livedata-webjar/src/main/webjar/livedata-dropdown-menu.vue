@@ -1,5 +1,5 @@
 <template>
-  <div class="livedata-dropdown btn-group">
+  <div class="livedata-dropdown-menu btn-group">
 
     <!-- Drowpdown button-->
     <a class="btn btn-default dropdown-toggle" title="More Actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
@@ -11,20 +11,28 @@
 
       <!-- Change layout-->
       <li class="dropdown-header">Change Layout</li>
+
       <li
         v-for="layout in data.meta.layouts"
       >
         <a href="#" @click.prevent="logic.changeLayout(layout)">
-          <span :class="data.meta.layoutDescriptors[layout].icon"></span>
-          {{ data.meta.layoutDescriptors[layout].name }}
+          <xwiki-icon :icon-descriptor="logic.getLayoutDescriptor(layout).icon"></xwiki-icon>
+          {{ logic.getLayoutDescriptor(layout).name }}
         </a>
       </li>
 
       <!-- Common actions -->
       <li class="dropdown-header">Actions</li>
+
       <li>
-        <a href="#" @click.prevent="logic.triggerEvent('toggleSortPanel')">
-          <span class="fa fa-sort"></span> Toggle Sort Panel
+        <a href="#" @click.prevent="logic.triggerEvent('triggerSortPanel')">
+          <span class="fa fa-sort"></span> Advanced Sorting
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="logic.triggerEvent('triggerFilterPanel')">
+          <span class="fa fa-filter"></span> Advanced Filtering
         </a>
       </li>
 
@@ -54,10 +62,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(["Vue"], function (Vue) {
-  Vue.component("dropdown-menu", {
+define([
+  "Vue",
+  "vue!xwiki-icon"
+], function (
+  Vue
+) {
+  Vue.component("livedata-dropdown-menu", {
 
-    name: "dropdown-menu",
+    name: "livedata-dropdown-menu",
 
     template: template,
 
@@ -76,11 +89,7 @@ define(["Vue"], function (Vue) {
 
 <style>
 
-.livedata-dropdown {
-  margin-bottom: 1rem;
-}
-
-.livedata-dropdown .btn-default {
+.livedata-dropdown-menu .btn-default {
   background-color: #f8f8f8;
   background-image: none;
   border-color: #e5e5e5;
@@ -89,7 +98,7 @@ define(["Vue"], function (Vue) {
   text-shadow: none;
 }
 
-.livedata-dropdown .btn-default span {
+.livedata-dropdown-menu .btn-default span {
   vertical-align: middle;
 }
 

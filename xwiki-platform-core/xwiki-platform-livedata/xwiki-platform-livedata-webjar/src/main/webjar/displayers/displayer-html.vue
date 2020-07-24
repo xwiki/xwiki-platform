@@ -1,3 +1,24 @@
+<template>
+  <base-displayer
+    :property-id="propertyId"
+    :entry="entry"
+    :logic="logic"
+  >
+
+    <template #viewer>
+        <div
+            class="html-wrapper"
+            v-html="value"
+        ></div>
+    </template>
+
+    <template #editor></template>
+
+  </base-displayer>
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,35 +38,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 define([
   "Vue",
-  "vue!" + BASE_PATH + "livedata-topbar.html",
+  "displayers/displayer-mixin",
+  "vue!displayers/base-displayer",
 ], function (
   Vue,
-  topbar
+  displayerMixin
 ) {
 
-  return function (logic) {
+  Vue.component("displayer-html", {
 
-    /**
-     * Create the top bar from Vuejs
-     */
-    var vueTopbar = new Vue({
+    name: "displayer-html",
 
-      // Constructs a top bar component and passes it the data
-      template: '<livedata-topbar :logic="logic"></livedata-topbar>',
+    template: template,
 
-      data: {
-        logic: logic,
-      },
+    mixins: [displayerMixin],
 
-    }).$mount();
-
-    // return the HTML Element of the top bar for the layout
-    return vueTopbar.$el;
-
-  };
-
+  });
 
 });
+</script>
+
+
+<style>
+
+</style>

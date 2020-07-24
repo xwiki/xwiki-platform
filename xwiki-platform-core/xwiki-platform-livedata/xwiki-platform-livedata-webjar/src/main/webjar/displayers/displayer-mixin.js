@@ -17,42 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define([], {
+
+  directives: {
+    autofocus: {
+      inserted: function (el) { el.focus(); }
+    },
+  },
+
+  props: {
+    propertyId: String,
+    entry: Object,
+    logic: Object,
+  },
+
+  computed: {
+    value: function () {
+      return this.entry[this.propertyId];
+    },
+    propertyDescriptor: function () {
+      return this.logic.getPropertyDescriptor(this.propertyId);
+    },
+    config: function () {
+      return this.logic.getDisplayerDescriptor(this.propertyId);
+    },
+    data: function () {
+      return this.logic.data;
+    },
+  },
+
+  methods: {
+
+    applyEdit: function (newValue) {
+      // TODO: should call the logic API instead, but this is just for quick prove of concept
+      this.entry[this.propertyId] = newValue;
+      this.$el.__vue__.view();
+    },
+
+    cancelEdit: function () {
+      this.$el.__vue__.view();
+    },
+
+  },
 
 
-@keyframes waiting {
-  from { background-position-x: 100%; }
-  to { background-position-x: -100%; }
-}
 
-.livedata-displayer:empty {
-  animation: waiting 2s linear infinite;
-  --c1: transparent;
-  --c2: #ccc4;
-  background: linear-gradient(135deg, var(--c1) 25%, var(--c2) 50%, var(--c1) 75%);
-  background-repeat: repeat;
-  background-size: 200% 100%;
-}
-
-.livedata-displayer {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  min-height: 1em;
-}
-
-.livedata-displayer > * {
-  width: 100%;
-  height: 100%;
-}
-
-.livedata-displayer:focus {
-  outline: 2px lightblue solid;
-  position: relative;
-}
-
-
-.livedata-displayer .explicit-empty-value::before {
-  content: attr(data-text);
-  font-style: italic;
-  color: grey;
-}
+});

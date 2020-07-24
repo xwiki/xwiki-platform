@@ -1,3 +1,21 @@
+<template>
+
+  <!--
+    Should be type="number" but current style.css apply custom input style
+    for type="text" or type="password"
+  -->
+  <input
+    class="livedata-filter-number"
+    type="text"
+    size="1"
+    :value="filterEntry.value"
+    @change="applyFilter($event.target.value)"
+  />
+
+</template>
+
+
+<script>
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,50 +35,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 define([
   "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-table.html",
-  "Logic"
+  "filters/filter-mixin",
 ], function (
   Vue,
-  livedataTable,
-  Logic
+  filterMixin
 ) {
 
-  return function (element) {
-    var logic = Logic(element);
+  Vue.component("filter-number", {
 
-    // vue directive to automatically create and insert the displayer inside the element
-    Vue.directive("displayer", {
-      bind: function (el, binding) {
-        logic.createDisplayer(binding.value.col.id, binding.value.row)
-        .then(function (displayer) {
-          el.appendChild(displayer.element);
-          displayer.view();
-        });
-      },
-    });
+    name: "filter-number",
 
+    template: template,
 
-    /**
-     * Create the table layout from Vuejs
-     */
-    var vueTableLayout = new Vue({
+    mixins: [filterMixin],
 
-      // Constructs a livedata-table component and passes it the data
-      template: '<livedata-table :logic="logic"></livedata-table>',
-
-      data: {
-        logic: logic,
-      },
-
-    }).$mount();
-
-    // return the HTML Element of the layout for the logic script
-    return vueTableLayout.$el;
-
-  };
-
+  });
 
 });
+</script>
+
+
+<style>
+
+.livedata-filter .livedata-filter-number {
+  width: 100%;
+}
+
+</style>

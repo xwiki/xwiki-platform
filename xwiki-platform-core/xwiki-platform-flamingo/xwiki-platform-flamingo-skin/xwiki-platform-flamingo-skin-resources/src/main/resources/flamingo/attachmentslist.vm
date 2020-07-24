@@ -30,7 +30,7 @@
   '_actions': {'sortable': false,'filterable': false,'html': true,'actions': ['delete']}
 })
 #set ($options = {
-  'translationPrefix': 'core.viewers.attachments.',
+  'translationPrefix': 'core.viewers.attachments.livetable.',
   'url': $doc.getURL('get', "xpage=xpart&vm=attachmentsjson.vm"),
   'selectedColumn': 'filename',
   'javascriptName': 'docAttachmentsLivetable',

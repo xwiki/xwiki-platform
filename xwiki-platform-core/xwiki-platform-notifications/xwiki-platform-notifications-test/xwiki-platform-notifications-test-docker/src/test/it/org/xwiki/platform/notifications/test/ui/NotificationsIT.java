@@ -57,8 +57,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
-    }
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    },
+    servletEngine = ServletEngine.EXTERNAL
 )
 public class NotificationsIT
 {

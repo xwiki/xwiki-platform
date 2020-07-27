@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,6 +62,13 @@ public class CommentAsAdminTest extends AbstractTest
         definePreferedEditor("Wysiwyg");
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), CONTENT, TITLE);
         this.commentsTab = vp.openCommentsDocExtraPane();
+    }
+
+    @After
+    public void after()
+    {
+        // Restore the default preferred editor.
+        definePreferedEditor("");
     }
 
     @Test

@@ -35,7 +35,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 12.5RC1
  */
-@UITest
+@UITest(
+    properties = {
+        // Required for filters preferences
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    }, resolveExtraJARs = true)
 public class MentionsIT
 {
     public static final String U1_USERNAME = "U1";

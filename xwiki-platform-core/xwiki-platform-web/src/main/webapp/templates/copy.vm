@@ -62,7 +62,7 @@
       ##-----------------------------------------------------------
       #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
           && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
-        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        #warning($services.localization.render('core.copy.alreadyExists', [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <form action="$xwiki.relativeRequestURL" class="xform third">
           ## CSRF prevention
           <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -82,7 +82,7 @@
         </form>
       #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
         #warning($services.localization.render('core.copy.editRightsForbidden',
-        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <div class="buttons">
           <span class="buttonwrapper">
               <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">

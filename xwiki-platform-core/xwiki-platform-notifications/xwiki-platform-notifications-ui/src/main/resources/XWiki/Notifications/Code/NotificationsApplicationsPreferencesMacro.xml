@@ -144,12 +144,17 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
   /**
    * Page initialization
    */
-  var preferenceInit = function() {
+  var preferenceInit = function (event) {
 
     var applications = [];
+    if (event.data &amp;&amp; event.data.elements) {
+      var container = $(event.data.elements);
+    } else {
+      var container = $(document);
+    }
 
     // Create application widgets
-    $('.applicationElem').each(function() {
+    container.find('.applicationElem').each(function() {
       applications.push(new ApplicationWidget($(this)));
     });
 
@@ -536,11 +541,13 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       self.updateSwitches();
       self.updateTypesOnChange = true;
       // Handle collapsing
-      self.collapseButton.click(function() {
+      // Make sure the click listener is registered only once.
+      self.collapseButton.off('click.toggleVisibility').on('click.toggleVisibility', function() {
         for (var i = 0; i &lt; self.eventTypes.length; ++i) {
           self.eventTypes[i].toggleVisibility();
         }
       });
+
       // Handle switch change
       self.switchAlert.on('switchChange.bootstrapSwitch', function(event, state) {
         for (var i = 0; i &lt; self.eventTypes.length; ++i) {

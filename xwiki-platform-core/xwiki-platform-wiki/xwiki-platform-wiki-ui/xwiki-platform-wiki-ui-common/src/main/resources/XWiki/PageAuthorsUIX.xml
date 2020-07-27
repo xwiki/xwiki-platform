@@ -222,7 +222,7 @@
       <name>org.xwiki.platform.wiki.ui.common.contentFooter.authors</name>
     </property>
     <property>
-      <parameters>order=1</parameters>
+      <parameters>order=200</parameters>
     </property>
     <property>
       <scope>wiki</scope>

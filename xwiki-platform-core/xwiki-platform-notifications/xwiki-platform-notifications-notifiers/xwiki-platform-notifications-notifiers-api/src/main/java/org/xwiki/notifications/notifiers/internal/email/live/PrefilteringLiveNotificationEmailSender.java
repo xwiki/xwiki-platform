@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.CompositeMailListener;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
@@ -78,6 +79,7 @@ public class PrefilteringLiveNotificationEmailSender
         MailListener mailListener = mailListenerProvider.get();
 
         // Pass it to the message sender to send it asynchronously.
-        this.mailSender.sendAsynchronously(liveNotificationMessageIterator, session, mailListener);
+        this.mailSender.sendAsynchronously(liveNotificationMessageIterator, session,
+            new CompositeMailListener(mailListener, liveNotificationMessageIterator.getMailListener()));
     }
 }

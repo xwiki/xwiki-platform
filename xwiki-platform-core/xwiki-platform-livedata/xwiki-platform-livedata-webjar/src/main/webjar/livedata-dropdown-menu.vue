@@ -36,6 +36,12 @@
         </a>
       </li>
 
+      <li>
+        <a href="#" @click.prevent="logic.triggerEvent('triggerPropertiesPanel')">
+          <span class="fa fa-list-ul"></span> Advanced Properties
+        </a>
+      </li>
+
     </ul>
 
   </div>

@@ -72,6 +72,7 @@ define([
       deselected: [],
       isGlobal: false,
     };
+    this.hiddenProperties = [];
     element.removeAttribute("data-data");
     // create Vuejs instance
     new Vue({
@@ -526,16 +527,46 @@ define([
 
 
     /**
-     * Returns the property descriptors of displayed properties
+     * Returns whether a certain property is visible
+     * @param {String} propertyId
+     * @returns {Boolean}
+     */
+    isPropertyVisible: function (propertyId) {
+      return this.isPropertyDisplayable(propertyId) &&
+        this.hiddenProperties.indexOf(propertyId) === -1;
+    },
+
+
+    /**
+     * Set whether the given property should be visible
+     * @param {String} propertyId
+     * @param {Boolean} bool
+     */
+    setPropertyVisibility: function (propertyId, bool) {
+      if (!this.isPropertyDisplayable(propertyId)) { return; }
+      if (bool) {
+        var idx = this.hiddenProperties.indexOf(propertyId);
+        if (idx !== -1) {
+          this.hiddenProperties.splice(idx, 1);
+        }
+      } else {
+        if (this.hiddenProperties.indexOf(propertyId) === -1) {
+          this.hiddenProperties.push(propertyId);
+        }
+      }
+    },
+
+
+
+    /**
+     * Returns the property descriptors of visible properties
      * @returns {Array}
      */
-    getDisplayedPropertyDescriptors: function () {
-      var displayablePropertyDescriptors = this.getDisplayablePropertyDescriptors();
-      var displayedPropertyDescriptors = displayablePropertyDescriptors.filter(function (propertyDescriptor) {
-        // TODO: should check the column visibility
-        return true;
+    getVisiblePropertyDescriptors: function () {
+      var self = this;
+      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
+        return self.isPropertyVisible(propertyDescriptor.id);
       });
-      return displayedPropertyDescriptors;
     },
 
 

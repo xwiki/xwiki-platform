@@ -34,7 +34,7 @@
             :logic="logic"
           ></livedata-entry-selector>
 
-          <h2 v-if="!!titlePropertyId">
+          <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
             <livedata-displayer
               :property-id="titlePropertyId"
               :entry="entry"
@@ -116,7 +116,7 @@ define([
       data: function () { return this.logic.data; },
       entries: function () { return this.logic.data.data.entries; },
       properties: function () {
-        return this.logic.getDisplayedPropertyDescriptors();
+        return this.logic.getVisiblePropertyDescriptors();
       },
       cardBodyProperties: function () {
         var self = this;

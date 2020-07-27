@@ -8,6 +8,9 @@
     <!-- Filter Panel -->
     <livedata-advanced-panel-filter :logic="logic"></livedata-advanced-panel-filter>
 
+    <!-- Properties Panel -->
+    <livedata-advanced-panel-properties :logic="logic"></livedata-advanced-panel-properties>
+
   </div>
 </template>
 
@@ -36,6 +39,7 @@ define([
   "Vue",
   "vue!panels/livedata-advanced-panel-sort",
   "vue!panels/livedata-advanced-panel-filter",
+  "vue!panels/livedata-advanced-panel-properties",
 ], function (
   Vue
 ) {

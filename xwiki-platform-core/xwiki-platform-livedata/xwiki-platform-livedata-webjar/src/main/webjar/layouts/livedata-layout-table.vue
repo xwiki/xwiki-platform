@@ -155,7 +155,7 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
-      cols: function () { return this.logic.getDisplayedPropertyDescriptors(); },
+      cols: function () { return this.logic.getVisiblePropertyDescriptors(); },
       sortLevel1: function () { return this.data.query.sort[0] || {}; },
     },
 

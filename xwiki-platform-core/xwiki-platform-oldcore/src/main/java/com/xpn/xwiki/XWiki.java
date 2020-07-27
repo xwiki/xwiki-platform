@@ -501,10 +501,10 @@ public class XWiki implements EventListener
         return this.spaceConfiguration;
     }
 
-    private UserPropertiesResolver getUserPropertiesResolver()
+    private UserPropertiesResolver getAllUserPropertiesResolver()
     {
         if (this.userPropertiesResolver == null) {
-            this.userPropertiesResolver = Utils.getComponent(UserPropertiesResolver.class);
+            this.userPropertiesResolver = Utils.getComponent(UserPropertiesResolver.class, "all");
         }
 
         return this.userPropertiesResolver;
@@ -2975,7 +2975,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         String result =
-            getUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
+            getAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
         return result != null ? result : "";
     }

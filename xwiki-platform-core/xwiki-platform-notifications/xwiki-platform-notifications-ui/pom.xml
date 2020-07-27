@@ -36,6 +36,13 @@
     <xwiki.extension.name>Notifications Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- We should keep notifications-preferences-default as first dependency since it declares DefaultModelBridge
+      which is needed by some other modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
@@ -57,11 +64,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -54,6 +54,7 @@
       <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- FIXME: We shouldn't rely on hibernate store since the default in the Solr store now -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>

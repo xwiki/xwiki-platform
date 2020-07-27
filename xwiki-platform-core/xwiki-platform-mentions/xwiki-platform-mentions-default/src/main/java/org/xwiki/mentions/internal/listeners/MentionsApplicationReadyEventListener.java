@@ -21,15 +21,18 @@ package org.xwiki.mentions.internal.listeners;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Listen for the application to be ready before starting the mentions task consumers.
@@ -40,23 +43,37 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named("MentionsApplicationReadyEventListener")
-public class MentionsApplicationReadyEventListener extends AbstractEventListener
+public class MentionsApplicationReadyEventListener extends AbstractEventListener implements Initializable
 {
     @Inject
     private MentionsEventExecutor eventExecutor;
+
+    @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Default constructor.
      */
     public MentionsApplicationReadyEventListener()
     {
-        super("MentionsApplicationReadyEventListener", new ApplicationReadyEvent(),
-            new ExtensionInstalledEvent(new ExtensionId("org.xwiki.platform:xwiki-platform-mentions-default"), null));
+        super("MentionsApplicationReadyEventListener", new ApplicationReadyEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        // In case of ApplicationReadyEvent (when the wiki starts)
         this.eventExecutor.startThreads();
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // If the application is already initialized we start the threads immediately
+        // (e.g. in case of extension install).
+        if (this.contextProvider.get() != null) {
+            this.eventExecutor.startThreads();
+        }
     }
 }

@@ -37,6 +37,15 @@
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
+    <!-- Notifications UI should be declared first so that all components are initialized before the Mentions are
+    processed -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mentions-default</artifactId>
@@ -47,13 +56,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mentions-notifications</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

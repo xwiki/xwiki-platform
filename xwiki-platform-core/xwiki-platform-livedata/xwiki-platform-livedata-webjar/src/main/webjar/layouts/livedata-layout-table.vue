@@ -31,9 +31,11 @@
               :logic="logic"
             ></livedata-entry-selector-all>
           </th>
+
           <th
             v-for="col in cols"
             :key="col.id"
+            v-show="logic.isPropertyVisible(col.id)"
           >
             <div
               class="column-name"
@@ -51,6 +53,7 @@
               ></span>
             </div>
           </th>
+
         </tr>
 
         <!-- Column filter -->
@@ -79,7 +82,7 @@
           :key="rowId"
         >
 
-          <!-- Entry Select All-->
+          <!-- Entry Select -->
           <td class="entry-selector">
             <livedata-entry-selector
               :entry="row"
@@ -91,6 +94,7 @@
             class="cell"
             v-for="col in cols"
             :key="col.id"
+            v-show="logic.isPropertyVisible(col.id)"
           >
             <livedata-displayer
               :property-id="col.id"
@@ -155,7 +159,7 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
-      cols: function () { return this.logic.getVisiblePropertyDescriptors(); },
+      cols: function () { return this.logic.getDisplayablePropertyDescriptors(); },
       sortLevel1: function () { return this.data.query.sort[0] || {}; },
     },
 

@@ -91,10 +91,9 @@ define([
     computed: {
       data: function () { return this.logic.data; },
 
-      dragOptions() {
+      dragOptions: function () {
         return {
           animation: 200,
-          group: "advanced-panel-properties",
           handle: ".handle",
         };
       },

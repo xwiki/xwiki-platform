@@ -44,23 +44,33 @@
         </div>
 
         <!-- Card properties-->
-        <div
-          class="card-property"
-          v-for="property in cardBodyProperties"
-          :key="property.id"
+
+        <draggable
+          v-model="data.meta.propertyDescriptors"
+          v-bind="dragOptions"
         >
-          <strong class="property-name">{{ property.name }}:</strong>
-          <span
-            class="value"
+          <div
+            class="card-property"
+            v-for="property in properties"
+            :key="property.id"
+            v-show="logic.isPropertyVisible(property.id) && property.id !== titlePropertyId"
           >
-            <livedata-displayer
-              :property-id="property.id"
-              :entry="entry"
-              :logic="logic"
-            ></livedata-displayer>
-          </span>
+            <div class="handle">
+              <span class="fa fa-ellipsis-v"></span>
+            </div>
+            <strong class="property-name">{{ property.name }}:</strong>
+            <span
+              class="value"
+            >
+              <livedata-displayer
+                :property-id="property.id"
+                :entry="entry"
+                :logic="logic"
+              ></livedata-displayer>
+            </span>
+          </div>
         </div>
-      </div>
+      </draggable>
 
 
     </div>
@@ -91,6 +101,7 @@
  */
 define([
   "Vue",
+  "vuedraggable",
   "vue!livedata-topbar.vue",
   "vue!livedata-dropdown-menu",
   "vue!livedata-entry-selector-all",
@@ -99,7 +110,8 @@ define([
   "vue!livedata-entry-selector.vue",
   "vue!livedata-entry-selector-info-bar",
 ], function (
-  Vue
+  Vue,
+  vuedraggable
 ) {
 
   Vue.component("livedata-layout-cards", {
@@ -108,6 +120,10 @@ define([
 
     template: template,
 
+    components: {
+      "draggable": vuedraggable,
+    },
+
     props: {
       logic: Object,
     },
@@ -115,18 +131,22 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       entries: function () { return this.logic.data.data.entries; },
+
       properties: function () {
         return this.logic.getVisiblePropertyDescriptors();
       },
-      cardBodyProperties: function () {
-        var self = this;
-        return this.properties.filter(function (propertyDescriptor) {
-          return propertyDescriptor.id !== self.titlePropertyId;
-        });
-      },
+
       titlePropertyId: function () {
         return this.logic.getLayoutDescriptor("cards").titleProperty;
       },
+
+      dragOptions: function () {
+        return {
+          animation: 200,
+          handle: ".handle",
+        };
+      },
+
     },
 
   });
@@ -144,6 +164,13 @@ define([
   border-radius: 1rem;
 }
 
+.livedata-layout-cards .card-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .livedata-layout-cards .card-property {
   display: flex;
   flex-direction: row;
@@ -152,12 +179,22 @@ define([
   transition: height 0.5s;
 }
 
-.livedata-layout-cards .card-title {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+.livedata-layout-cards .handle {
+  height: 100%;
+  margin-left: -8px;
+  padding: 0px 8px;
+  cursor: pointer; /* IE */
+  cursor: grab;
+  opacity: 0;
 }
+.livedata-layout-cards .card-property:hover .handle {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.livedata-layout-cards .handle .fa {
+  vertical-align: middle;
+}
+
 .livedata-layout-cards .livedata-entry-selector {
   width: unset;
   padding: 10px;

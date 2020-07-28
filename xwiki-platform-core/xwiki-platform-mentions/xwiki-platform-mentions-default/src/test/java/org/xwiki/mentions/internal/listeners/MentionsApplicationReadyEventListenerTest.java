@@ -19,13 +19,22 @@
  */
 package org.xwiki.mentions.internal.listeners;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiContext;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of {@link MentionsApplicationReadyEventListener}.
@@ -40,12 +49,36 @@ class MentionsApplicationReadyEventListenerTest
     private MentionsApplicationReadyEventListener eventListener;
 
     @MockComponent
+    @Named("readonly")
+    private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
     private MentionsEventExecutor eventExecutor;
+
+    @BeforeComponent("onEvent")
+    void beforeOnEvent()
+    {
+        // Ensure that the context is not mocked for the onEvent test so that startThreads is not called during
+        // initialize method.
+        when(this.contextProvider.get()).thenReturn(null);
+    }
 
     @Test
     void onEvent()
     {
         this.eventListener.onEvent(null, null, null);
+        verify(this.eventExecutor).startThreads();
+    }
+
+    @BeforeComponent("initialize")
+    void beforeInitialize()
+    {
+        when(this.contextProvider.get()).thenReturn(mock(XWikiContext.class));
+    }
+
+    @Test
+    void initialize()
+    {
         verify(this.eventExecutor).startThreads();
     }
 }

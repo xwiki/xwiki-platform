@@ -207,7 +207,7 @@ define([
     getEntryId: function (entry) {
       var idProperty = this.data.meta.entryDescriptor.idProperty || "id";
       if (entry[idProperty] === undefined) {
-        console.warn("Entry has no id (at peroperty [" + idProperty + "]", entry);
+        console.warn("Entry has no id (at property [" + idProperty + "]", entry);
         return;
       }
       return entry[idProperty];

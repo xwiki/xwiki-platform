@@ -82,7 +82,7 @@ define([
         var self = this;
         return new Promise (function (resolve, reject) {
 
-          var componentName = "livedata-layout-" + layoutId;
+          var componentName = "layout-" + layoutId;
 
           // load success callback
           var loadLayoutSuccess = function () {
@@ -96,7 +96,7 @@ define([
           };
 
           // load layout based on it's filename
-          require(["vue!layouts/" + componentName],
+          require(["vue!layouts/" + layoutId + "/" + componentName],
             loadLayoutSuccess,
             loadLayoutFailure
           );

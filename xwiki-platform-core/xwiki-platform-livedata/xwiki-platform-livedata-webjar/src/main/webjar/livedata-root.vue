@@ -3,13 +3,10 @@
 
       <livedata-advanced-panels :logic="logic"></livedata-advanced-panels>
 
-      <keep-alive>
-        <component
-          v-if="logic.currentLayout"
-          :is="currentLayoutComponentName"
-          :logic="logic"
-        ></component>
-      </keep-alive>
+      <livedata-layout
+        :layout-id="layoutId"
+        :logic="logic"
+      ></livedata-layout>
 
   </div>
 </template>
@@ -38,6 +35,7 @@
 define([
   "Vue",
   "vue!panels/livedata-advanced-panels",
+  "vue!layouts/livedata-layout",
 ], function (
   Vue,
 ) {
@@ -53,10 +51,7 @@ define([
 
     computed: {
       data: function () { return this.logic.data; },
-
-      currentLayoutComponentName: function () {
-        return "livedata-layout-" + this.logic.currentLayout;
-      },
+      layoutId: function () { return this.logic.currentLayoutId; }
     },
 
   });

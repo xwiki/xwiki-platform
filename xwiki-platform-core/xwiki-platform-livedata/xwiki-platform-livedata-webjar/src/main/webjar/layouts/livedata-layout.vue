@@ -1,15 +1,15 @@
 <template>
-  <component
-    v-if="componentName"
-    :is="componentName"
-    :property-id="propertyId"
-    :entry="entry"
-    :logic="logic"
-  ></component>
+  <div class="livedata-layout">
 
-  <xwiki-loader
-    v-else
-  ></xwiki-loader>
+      <keep-alive>
+        <component
+          v-if="componentName"
+          :is="componentName"
+          :logic="logic"
+        ></component>
+      </keep-alive>
+
+  </div>
 </template>
 
 
@@ -35,20 +35,18 @@
   */
 define([
   "Vue",
-  "vue!utilities/xwiki-loader",
+  "vue!panels/livedata-advanced-panels",
 ], function (
-  Vue
+  Vue,
 ) {
+  Vue.component("livedata-layout", {
 
-  Vue.component("livedata-displayer", {
-
-    name: "livedata-displayer",
+    name: "livedata-layout",
 
     template: template,
 
     props: {
-      propertyId: String,
-      entry: Object,
+      layoutId: String,
       logic: Object,
     },
 
@@ -60,56 +58,60 @@ define([
 
     computed: {
       data: function () { return this.logic.data; },
-      displayerId: function () {
-        return this.logic.getDisplayerDescriptor(this.propertyId).id;
+    },
+
+    watch: {
+      layoutId: {
+        immediate: true,
+        handler: function (n ,o) {
+          var self = this;
+          this.loadLayout(this.layoutId).catch(function (err) {
+            if (self.layoutId && self.layoutId !== self.data.meta.defaultLayout) {
+              console.warn(err);
+              self.logic.changeLayout(self.data.meta.defaultLayout);
+            } else {
+              console.error(err);
+            }
+          });
+        },
       },
     },
 
     methods: {
-      loadDisplayer: function (displayerId) {
+      loadLayout: function (layoutId) {
         var self = this;
         return new Promise (function (resolve, reject) {
 
-          var componentName = "displayer-" + displayerId;
+          var componentName = "livedata-layout-" + layoutId;
 
           // load success callback
-          var loadDisplayerSuccess = function () {
+          var loadLayoutSuccess = function () {
             self.componentName = componentName;
-            resolve();
+            resolve(layoutId);
           };
 
           // load error callback
-          var loadDisplayerFailure = function (err) {
+          var loadLayoutFailure = function (err) {
             reject(err);
           };
 
-          // load displayer based on it's id
-          require(["vue!displayers/" + componentName],
-            loadDisplayerSuccess,
-            loadDisplayerFailure
+          // load layout based on it's filename
+          require(["vue!layouts/" + componentName],
+            loadLayoutSuccess,
+            loadLayoutFailure
           );
+
         });
 
       },
     },
 
-    mounted: function () {
-      var self = this;
-      // load displayer
-      this.loadDisplayer(this.displayerId).catch(function (err) {
-        console.warn(err);
-        self.loadDisplayer(self.data.meta.defaultDisplayer).catch(function (err) {
-          console.error(err);
-        });
-      });
-    },
-
   });
-
 });
 </script>
 
 
 <style>
+
 
 </style>

@@ -8,9 +8,9 @@
       :logic="logic"
     ></component>
 
-  <xwiki-loader
-    v-else
-  ></xwiki-loader>
+    <xwiki-loader
+      v-else
+    ></xwiki-loader>
   </div>
 </template>
 
@@ -82,8 +82,7 @@ define([
 
           // load error callback
           var loadFilterFailure = function (err) {
-            console.warn(err);
-            reject();
+            reject(err);
           };
 
           // load filter based on it's id
@@ -99,7 +98,8 @@ define([
     mounted: function () {
       var self = this;
       // load filter
-      this.loadFilter(this.filterId).catch(function () {
+      this.loadFilter(this.filterId).catch(function (err) {
+        console.warn(err);
         self.loadFilter(self.data.meta.defaultFilter).catch (function (err) {
           console.error(err);
         });

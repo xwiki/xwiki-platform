@@ -49,8 +49,6 @@ define([
       // create a new logic object associated to the element
       var logic = new Logic(element);
       instancesMap.set(element, logic);
-
-      logic.changeLayout();
     }
 
     return instancesMap.get(element);
@@ -66,7 +64,8 @@ define([
   var Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
-    this.currentLayout = "";
+    this.currentLayoutId = "";
+    this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
       selected: [],
       deselected: [],
@@ -346,53 +345,18 @@ define([
      * @returns {Promise}
      */
     changeLayout: function (layoutId) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-
-        layoutId = layoutId || self.data.meta.defaultLayout;
-        // layout already loaded
-        if (layoutId === self.currentLayout) {
-          return void resolve(layoutId);
-        }
-        // bad layout
-        if (self.getLayoutIds().indexOf(layoutId) === -1) { return void reject(); }
-        var layoutDescriptor = self.getLayoutDescriptor(layoutId);
-        if (!layoutDescriptor) { return void reject(); }
-
-        // requirejs success callback
-        var loadLayoutSuccess = function () {
-          var previousLayoutId = self.currentLayout;
-          self.currentLayout = layoutId;
-          // dispatch events
-          self.triggerEvent("layoutChange", {
-            layoutId: layoutId,
-            previousLayoutId: previousLayoutId,
-          });
-          resolve(layoutId);
-        };
-
-        // requirejs error callback
-        var loadLayoutFailure = function (err) {
-          console.warn(err);
-          // try to load default layout instead
-          if (layoutId !== self.data.meta.defaultLayout) {
-            self.changeLayout(self.data.meta.defaultLayout).then(function (layout) {
-              resolve(layout);
-            }, function () {
-              reject();
-            });
-          } else {
-            console.error(err);
-            reject();
-          }
-        };
-
-        // load layout based on it's filename
-        require(["vue!layouts/livedata-layout-" + layoutId],
-          loadLayoutSuccess,
-          loadLayoutFailure
-        );
-
+      // bad layout
+      if (!this.getLayoutDescriptor(layoutId)) {
+        console.error("Layout of id `" + layoutId + "` does not have a descriptor");
+        return;
+      }
+      // set layout
+      var previousLayoutId = this.currentLayoutId;
+      this.currentLayoutId = layoutId;
+      // dispatch events
+      this.triggerEvent("layoutChange", {
+        layoutId: layoutId,
+        previousLayoutId: previousLayoutId,
       });
     },
 

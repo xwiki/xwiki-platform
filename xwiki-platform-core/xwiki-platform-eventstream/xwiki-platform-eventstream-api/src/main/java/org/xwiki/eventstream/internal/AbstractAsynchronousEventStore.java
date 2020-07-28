@@ -183,6 +183,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     @Inject
     private Execution execution;
 
+    private Thread thread;
+
     private BlockingQueue<EventStoreTask<?, ?>> queue;
 
     private boolean notifyEach;
@@ -499,10 +501,10 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         this.queue = new LinkedBlockingQueue<>(queueSize);
 
-        Thread thread = new Thread(this::run);
-        thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");
-        thread.setPriority(Thread.NORM_PRIORITY - 1);
-        thread.start();
+        this.thread = new Thread(this::run);
+        this.thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");
+        this.thread.setPriority(Thread.NORM_PRIORITY - 1);
+        this.thread.start();
     }
 
     @Override
@@ -512,5 +514,15 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         // Make sure to wake up the thread
         addTask(EventStoreTask.STOP);
+
+        // Wait for the processing to be over but not more than 10s in case it's stuck for some reason
+        try {
+            this.thread.join(10000);
+        } catch (InterruptedException e) {
+            this.logger.warn("The thread handling asynchronous storage for event store [{}] has been interrupted",
+                this.descriptor.getRoleHint(), e);
+
+            this.thread.interrupt();
+        }
     }
 }

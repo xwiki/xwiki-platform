@@ -48,6 +48,7 @@ import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrResourceLoader;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -64,6 +65,8 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 @Component
 @Named(EmbeddedSolr.TYPE)
 @Singleton
+//Make sure the Solr store is disposed at the end in case some components needs it for their own dispose
+@DisposePriority(10000)
 public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializable
 {
     /**

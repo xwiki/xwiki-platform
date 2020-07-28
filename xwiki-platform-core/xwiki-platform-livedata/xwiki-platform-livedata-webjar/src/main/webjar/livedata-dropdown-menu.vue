@@ -13,7 +13,7 @@
       <li class="dropdown-header">Change Layout</li>
 
       <li
-        v-for="layout in data.meta.layouts"
+        v-for="layout in logic.getLayoutIds()"
       >
         <a href="#" @click.prevent="logic.changeLayout(layout)">
           <xwiki-icon :icon-descriptor="logic.getLayoutDescriptor(layout).icon"></xwiki-icon>

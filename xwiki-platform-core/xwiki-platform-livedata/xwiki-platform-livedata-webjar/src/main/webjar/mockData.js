@@ -55,10 +55,9 @@ define({
 
   meta: {
 
-    layouts: ["table", "cards"],
     defaultLayout: "table",
 
-    layoutDescriptors: [
+    layouts: [
       {
         id: "table",
         name: "Table",

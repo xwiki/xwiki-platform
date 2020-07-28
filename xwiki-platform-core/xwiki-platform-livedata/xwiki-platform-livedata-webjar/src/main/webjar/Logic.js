@@ -181,6 +181,17 @@ define([
 
 
     /**
+     * Return the list of layout ids
+     * @returns {Array}
+     */
+    getLayoutIds: function () {
+      return this.data.meta.layouts.map(function (layoutDescriptor) {
+        return layoutDescriptor.id;
+      });
+    },
+
+
+    /**
      * Return whether the specified property id is valid (i.e. the property has a descriptor)
      * @param {String} propertyId
      */
@@ -245,7 +256,7 @@ define([
      * @returns {Object}
      */
     getLayoutDescriptor: function (layoutId) {
-      return this.data.meta.layoutDescriptors.find(function (layoutDescriptor) {
+      return this.data.meta.layouts.find(function (layoutDescriptor) {
         return layoutDescriptor.id === layoutId;
       });
     },
@@ -344,7 +355,7 @@ define([
           return void resolve(layoutId);
         }
         // bad layout
-        if (self.data.meta.layouts.indexOf(layoutId) === -1) { return void reject(); }
+        if (self.getLayoutIds().indexOf(layoutId) === -1) { return void reject(); }
         var layoutDescriptor = self.getLayoutDescriptor(layoutId);
         if (!layoutDescriptor) { return void reject(); }
 

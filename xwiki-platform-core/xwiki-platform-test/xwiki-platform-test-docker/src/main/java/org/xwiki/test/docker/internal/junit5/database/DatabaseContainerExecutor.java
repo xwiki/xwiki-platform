@@ -33,6 +33,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.junit5.RuntimeUtils;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -148,11 +149,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
             Container.ExecResult result = databaseContainer.execInContainer("mysql",
-                "--defaults-extra-file=credentials.cnf", "-e",
+                "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
             } else {
+                // Trying to debug the following error:
+                //   ERROR 2002 (HY000): Can't connect to local MySQL server through socket
+                //      '/var/run/mysqld/mysqld.sock'
+                LOGGER.info(RuntimeUtils.run("ps -ef | grep mysql"));
                 String errorMessage = result.getStderr().isEmpty() ? result.getStdout() : result.getStderr();
                 if (i == maxRetries) {
                     throw new RuntimeException(String.format("Failed to grant all privileges to user [%s] on MySQL "
@@ -259,10 +264,17 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startDatabaseContainer(JdbcDatabaseContainer<?> databaseContainer, int port,
         TestConfiguration testConfiguration) throws Exception
     {
+        // Note: default startup and connect timeout are at 120s (2mn) but we've noticed cases when it was taking
+        // a lot longer than that and thus our SQL code in grantMySQLPrivileges() is failing because after the timeout
+        // is reached, TC considers that the DB container is started and thus our SQL code is executed even though the
+        // DB is not started, and this, it fails. We've increased the timeouts to 15mn which is a lot and we might need
+        // to debug to find out why MySQL is taking so long to start in these cases.
         databaseContainer
             .withExposedPorts(port)
             .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+            .withNetworkAliases("xwikidb")
+            .withStartupTimeoutSeconds(900)
+            .withConnectTimeoutSeconds(900);
 
         start(databaseContainer, testConfiguration);
 

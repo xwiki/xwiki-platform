@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -66,16 +66,17 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <!-- Remove once the CSS4J project uploads its artifacts to Maven Central, see http://bit.ly/2rbTJoc -->
+    <!-- Move out of this section once the CSS4J project uploads its artifacts to Maven Central,
+         see http://bit.ly/2rbTJoc -->
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>2.0.2</version>
+      <version>2.0.4</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>2.0.2</version>
+      <version>2.0.4</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -275,7 +276,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

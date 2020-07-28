@@ -712,8 +712,12 @@ define('editInPlace', [
 
   var loadActionButtons = function(actionButtons) {
     $(document).on('xwiki:actions:view', function() {
-      // Hide the action buttons and disable the shortcut keys (by disabling the buttons).
-      actionButtons.hide().find(':input').prop('disabled', true);
+      // Blur the action buttons first to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit
+      // shortcut), then disable the action buttons in order to disable their shortcut keys while we're not editing
+      // in-place (e.g. prevent the Save shortcut while the user is only viewing the page). Finally hide the action
+      // buttons to have them ready for the next editing session (the user can save or cancel and then edit again
+      // without reloading the page).
+      actionButtons.find(':input').blur().prop('disabled', true).end().hide();
       // Hide the translate button because it can be used only in edit mode for the moment.
       $('#tmTranslate').addClass('hidden');
     });
@@ -776,13 +780,21 @@ define('editInPlace', [
       }, {});
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
       var formData = {
-        title: xwikiDocument.title,
-        content: xwikiDocument.renderedContent,
-        RequiresHTMLConversion: 'content',
-        content_syntax: xwikiDocument.syntax,
+        title: xwikiDocument.rawTitle,
         language: xwikiDocument.getRealLocale(),
         isNew: xwikiDocument.isNew
       };
+      if (xwikiDocument.content != xwikiDocument.originalDocument.content) {
+        // Submit the raw (source) content. No syntax conversion is needed in this case.
+        formData.content = xwikiDocument.content;
+      } else {
+        // Submit the rendered content (HTML), but make sure it is converted to the document syntax on the server.
+        $.extend(formData, {
+          content: xwikiDocument.renderedContent,
+          RequiresHTMLConversion: 'content',
+          content_syntax: xwikiDocument.syntax
+        });
+      }
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
         formData.previousVersion = xwikiDocument.version;
@@ -834,7 +846,7 @@ define('editInPlace', [
   var initTitleEditor = function(xwikiDocument) {
     var label = $('&lt;label for="document-title-input" class="sr-only"/&gt;')
       .text($jsontool.serialize($services.localization.render('core.editors.content.titleField.label')));
-    var input = $('&lt;input type="text" id="document-title-input"/&gt;').val(xwikiDocument.title);
+    var input = $('&lt;input type="text" id="document-title-input"/&gt;').val(xwikiDocument.rawTitle);
     var placeholder = xwikiDocument.documentReference.name;
     if (placeholder === 'WebHome') {
       placeholder = xwikiDocument.documentReference.parent.name;
@@ -842,12 +854,12 @@ define('editInPlace', [
     input.attr('placeholder', placeholder);
     $('#document-title h1').addClass('editable').empty().append([label, input]);
     $(document).on('xwiki:actions:beforeSave.titleEditor', function(event) {
-      xwikiDocument.title = input.val();
+      xwikiDocument.rawTitle = input.val();
     });
     $(document).one('xwiki:actions:view', function(event, data) {
       // Destroy the title editor.
       $(document).off('xwiki:actions:beforeSave.titleEditor');
-      $('#document-title h1').removeClass('editable').text(xwikiDocument.title);
+      $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);
     });
     return xwikiDocument;
   };
@@ -869,7 +881,11 @@ define('editInPlace', [
       editMode: 'wysiwyg',
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
-      deferred: $.Deferred()
+      deferred: $.Deferred(),
+      // We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
+      // could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so
+      // the content editor cannot enable the source mode by default).
+      enableSourceMode: true
     };
     var editContentPromise = data.deferred.promise();
     editContentPromise.done(function() {
@@ -907,6 +923,11 @@ define('editInPlace', [
 });
 
 require(['jquery'], function($) {
+  // We can edit in-place only if the #xwikicontent element is present.
+  if (!$('#xwikicontent').length) {
+    return;
+  }
+
   var inplaceEditingConfig = $('div[data-inplace-editing-config]').data('inplaceEditingConfig') || {};
   var wysiwygEditorModule = 'xwiki-' + inplaceEditingConfig.wysiwygEditor + '-inline';
 
@@ -1133,6 +1154,11 @@ input#document-title-input:focus,
 }
 #xwikicontent {
   padding-top: @line-height-computed * 0.75;
+}
+
+.sticky-buttons-wrapper {
+  /* Leave some space for the bottom box shadow of the editing area. */
+  margin-top: 7px;
 }</code>
     </property>
     <property>
@@ -1274,7 +1300,7 @@ input#document-title-input:focus,
     <property>
       <content>{{velocity}}
 {{html clean="false"}}
-#if ($xcontext.action == 'view' &amp;&amp; !$doc.isNew())
+#if ($services.edit.document.inPlaceEditingEnabled() &amp;&amp; $hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.isNew())
   ## We support in-place editing only for the WYSIWYG edit mode ATM.
   #getDefaultDocumentEditor($defaultEditMode)
   #if ($defaultEditMode == 'wysiwyg')
@@ -1436,8 +1462,8 @@ input#document-title-input:focus,
 ## * we're loading the original document version
 ## * the original document version has a locale specified (it doesn't make sense to translate technical documents)
 ## * the current UI locale doesn't match the original document locale
-#if ($xwiki.isMultiLingual() &amp;&amp; $tdoc.realLocale == $doc.realLocale &amp;&amp; "$!doc.realLocale" != ''
-    &amp;&amp; $doc.realLocale != $xcontext.locale)
+#if ($services.edit.document.inPlaceEditingEnabled() &amp;&amp; $hasEdit &amp;&amp; $xwiki.isMultiLingual()
+    &amp;&amp; $tdoc.realLocale == $doc.realLocale &amp;&amp; "$!doc.realLocale" != '' &amp;&amp; $doc.realLocale != $xcontext.locale)
   #set ($url = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
   #set ($hint = $services.localization.render('edit.inplace.page.translate.hint',
     [$xcontext.locale.getDisplayName($xcontext.locale)]))

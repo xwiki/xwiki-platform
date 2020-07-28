@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,13 +18,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -182,38 +180,60 @@
             -->
             <revapi.ignore>
               <item>
-                <code>java.annotation.added</code>
-                <old>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</old>
-                <new>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</new>
-                <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.user.UserReference.class})</annotation>
-                <justification>Not a breakage for using the User Avatar macro.</justification>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.util.Optional&lt;org.xwiki.eventstream.EventStatus&gt;&gt; org.xwiki.eventstream.EventStore::deleteMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.Event&gt; org.xwiki.eventstream.EventStore::prefilterEvent(org.xwiki.eventstream.Event)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.EventStatus&gt; org.xwiki.eventstream.EventStore::saveMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                <old>class org.xwiki.eventstream.query.StatusQueryCondition</old>
+                <new>class org.xwiki.eventstream.query.StatusQueryCondition</new>
+                <justification>Young API</justification>
               </item>
               <item>
                 <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
+                <old>method boolean org.xwiki.notifications.NotificationConfiguration::isEventPreFilteringEnabled()</old>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.lang.Void&gt; org.xwiki.eventstream.EventStore::deleteEventStatuses(java.lang.String, java.util.Date)</new>
+                <justification>Young API</justification>
               </item>
               <item>
                 <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
+                <old>method void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)</old>
+                <justification>Young API</justification>
               </item>
               <item>
-                <code>java.method.removed</code>
-                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.mentions.notifications.MentionNotificationParameters)</new>
+                <justification>Young API</justification>
               </item>
-
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method boolean org.xwiki.mentions.MentionsConfiguration::isQuoteActivated()</new>
+                <justification>Young API</justification>
+              </item>
             </revapi.ignore>
-            </analysisConfiguration>
-          </configuration>
-        </plugin>
-      </plugins>
-    </build>
-    <modules>
+          </analysisConfiguration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
       <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
-    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -261,6 +281,7 @@
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
@@ -298,7 +319,6 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-vfs</module>
-    <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>

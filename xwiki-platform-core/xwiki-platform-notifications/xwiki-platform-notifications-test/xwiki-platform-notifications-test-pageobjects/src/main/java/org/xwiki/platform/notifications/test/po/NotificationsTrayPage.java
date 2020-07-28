@@ -69,18 +69,6 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
-        pageOnlyWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
-                getDriver()
-        );
-        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
-            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
-            getDriver()
-        );
-        wikiWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
-                getDriver()
-        );
     }
 
     /**
@@ -89,6 +77,20 @@ public class NotificationsTrayPage extends ViewPage
     public boolean isMenuOpen()
     {
         return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
+    }
+
+    /**
+     * @return {@code true} only if the notification menu icon (small bell) is displayed.
+     * @since 12.6RC1
+     * @since 12.5.1
+     */
+    public boolean isNotificationMenuVisible()
+    {
+        try {
+            return notificationsButton.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 
     /**
@@ -178,6 +180,18 @@ public class NotificationsTrayPage extends ViewPage
             }
             return false;
         });
+        pageOnlyWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
+            getDriver()
+        );
+        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
+            getDriver()
+        );
+        wikiWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
+            getDriver()
+        );
     }
 
     private List<WebElement> getNotifications()

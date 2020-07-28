@@ -36,8 +36,8 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -73,12 +73,13 @@ public class LiveNotificationEmailSender
     /**
      * Send live notification e-mails regarding the given event for the users that are concerned by this event and that
      * have enabled live notifications.
+     * 
      * @param event the event that should be sent to the users
      */
     public void sendEmails(CompositeEvent event)
     {
         DocumentReference templateReference = new DocumentReference(this.wikiDescriptorManager.getCurrentWikiId(),
-                Arrays.asList("XWiki", "Notifications"), "MailTemplate");
+            Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         // Get a list of users that have enabled the live e-mail notifications.
         NotificationUserIterator notificationUserIterator = this.notificationUserIteratorProvider.get();
@@ -88,9 +89,9 @@ public class LiveNotificationEmailSender
         liveNotificationMessageIterator.initialize(notificationUserIterator, new HashMap<>(), event, templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
-        MailListener mailListener = mailListenerProvider.get();
+        MailListener mailListener = this.mailListenerProvider.get();
 
         // Pass it to the message sender to send it asynchronously.
-        mailSender.sendAsynchronously(liveNotificationMessageIterator, session, mailListener);
+        this.mailSender.sendAsynchronously(liveNotificationMessageIterator, session, mailListener);
     }
 }

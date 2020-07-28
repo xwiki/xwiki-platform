@@ -45,7 +45,7 @@ extension.repository.category=Categoría
 extension.repository.authors=Autores
 extension.repository.doc.creationDate=Creado el
 extension.repository.doc.date=Última modificación
-extension.repository.rating=Valoración
+extension.repository.rating=Calificación
 extension.repository.installedCount=Instalaciones
 
 ## Administration UI

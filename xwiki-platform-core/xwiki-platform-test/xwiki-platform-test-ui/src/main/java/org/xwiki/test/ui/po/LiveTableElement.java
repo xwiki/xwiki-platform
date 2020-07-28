@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -51,9 +52,13 @@ public class LiveTableElement extends BaseElement
      */
     public boolean isReady()
     {
-        Object result = getDriver().executeJavascript("return Element.hasClassName('"
-            + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
-        return result instanceof Boolean ? (Boolean) result : false;
+        try {
+            Object result = getDriver().executeJavascript("return (Element.hasClassName) && Element.hasClassName('"
+                + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
+            return result instanceof Boolean ? (Boolean) result : false;
+        } catch (JavascriptException e) {
+            return false;
+        }
     }
 
     /**

@@ -96,7 +96,7 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
         NotificationFormat format)
     {
         if (user != null && type == NotificationFilterType.EXCLUSIVE && format == this.format) {
-            ForUserNode node = new ForUserNode(user, this.read);
+            ForUserNode node = new ForUserNode(user, this.read, this.format);
 
             return this.not ? not(node) : node;
         }

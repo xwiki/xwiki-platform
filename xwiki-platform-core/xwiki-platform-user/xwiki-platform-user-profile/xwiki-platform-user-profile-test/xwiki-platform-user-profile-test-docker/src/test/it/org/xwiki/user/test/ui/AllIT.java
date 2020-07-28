@@ -29,9 +29,9 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 11.10
  * @version $Id$
  */
-// Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
-// runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
+@UITest(extraJARs = {
+    // The Solr store is not ready yet to be installed as extension
+    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"})
 public class AllIT
 {
     @Nested

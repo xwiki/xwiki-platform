@@ -20,6 +20,7 @@
 require.config({
   paths: {
     'export-tree': 'uicomponents/exporter/exporter',
+    'export-tree-filter': 'uicomponents/exporter/exporter',
     'entityReference': 'uicomponents/model/entityReference',
     'prototype': 'js/prototype/prototype'
   },
@@ -49,25 +50,51 @@ var $services = {
   }
 };
 
-define(['jquery', 'entityReference', 'export-tree'], function($) {
+define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], function($) {
+  var dataURLPrefix = 'data:application/json';
+
   // Ignore parameters when data URI is used.
   var originalGet = $.get;
   $.get = function() {
-    if (arguments[0].substring(0, 22) === 'data:application/json,') {
-      // PhantomJS, used to run the tests in headless mode, doesn't seem to support AJAX requests to data URIs.
-      return $.Deferred().resolve(JSON.parse(arguments[0].substring(22))).promise();
+    var url = arguments[0];
+    // PhantomJS, used to run the tests in headless mode, doesn't seem to support AJAX requests to data URIs.
+    if (url.substring(0, dataURLPrefix.length) === dataURLPrefix) {
+      var jsonStart = url.indexOf(',') + 1;
+      var data = JSON.parse(url.substring(jsonStart));
+      var matches = url.match(/filters=(\w+)[,;]/);
+      if (matches) {
+        data = data[matches[1]];
+      }
+      // We also need to handle the tree pagination.
+      // See XWIKI-17425: A tree node with checkboxes and pagination is removed from the tree when you open it
+      if ($.isArray(data)) {
+        var offset = (arguments[1] || {}).offset || 0;
+        data = extractPage(data, offset);
+      }
+      return $.Deferred().resolve(data).promise();
     } else {
       return originalGet.apply(this, arguments);
     }
   };
 
-  var createExportTree = function(data) {
+  var extractPage = function(data, offset) {
+    var page = [];
+    for (var i = offset; i < data.length; i++) {
+      page.push(data[i]);
+      if ((data[i].data || {}).type === 'pagination') {
+        break;
+      }
+    }
+    return page;
+  };
+
+  var createExportTree = function(data, filter, $element) {
     var deferred = $.Deferred();
     // The 'data-url' attribute is mandatory for dynamic trees (otherwise the tree is static).
-    var dataURL = 'data:application/json,' + JSON.stringify(data);
+    var dataURL = dataURLPrefix + ';filters=' + (filter || '') + ',' + JSON.stringify(data);
     // The root node type and reference (id) are required in order to be able to express the selection of the top level
     // pages using exclusions (we have to use exclusions if there is a top level pagination node that is checked).
-    $('<div>').attr('data-url', dataURL).data('root', {
+    ($element || $('<div>')).attr('data-url', dataURL).data('root', {
       id: 'xwiki',
       type: 'wiki'
     }).one('ready.jstree', function(event, data) {
@@ -132,7 +159,17 @@ define(['jquery', 'entityReference', 'export-tree'], function($) {
             text: 'More...',
             children: false,
             data: {
-              type: 'pagination'
+              type: 'pagination',
+              offset: 3
+            }
+          },
+          {
+            id: 'document:xwiki:B.F',
+            text: 'F',
+            children: false,
+            data: {
+              id: 'xwiki:B.F',
+              type: 'document'
             }
           }
         ])
@@ -169,12 +206,6 @@ define(['jquery', 'entityReference', 'export-tree'], function($) {
       }
     }
   ];
-
-  var assertSelection = function(state, exportPages) {
-    return createExportTree(data).done(function(tree) {
-      expect(exportPages).toBe(tree.getExportPages());
-    });
-  };
 
   describe('Export Tree', function() {
     it('All nodes enabled', function(done) {
@@ -443,6 +474,156 @@ define(['jquery', 'entityReference', 'export-tree'], function($) {
               });
 
               done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  var createExportTreeWithFilter = function(data, defaultFilter) {
+    var container = $([
+      '<div class="export-tree-container">',
+        '<ul class="export-tree-filter"></ul>',
+        '<div class="export-tree"></div>',
+      '</div>'
+    ].join('')).appendTo(document.body);
+
+    // Add the filters.
+    Object.keys(data).forEach(function(filterId) {
+      var filterList = container.find('ul.export-tree-filter');
+      $('<li><a href="#"/></li>').appendTo(filterList).find('a').attr('data-filter', filterId).text(filterId);
+    });
+    
+    return createExportTree(data, defaultFilter, container.find('.export-tree'));
+  };
+
+  var treeDataWithFilters = {
+    'alice': [
+      {
+        id: 'document:xwiki:A.WebHome',
+        text: 'A',
+        children: false,
+        data: {
+          id: 'xwiki:A.WebHome',
+          type: 'document'
+        }
+      },
+      {
+        id: 'document:xwiki:C.WebHome',
+        text: 'C',
+        children: true,
+        data: {
+          id: 'xwiki:C.WebHome',
+          type: 'document',
+          validChildren: ['document', 'pagination'],
+          childrenURL: 'data:application/json,' + JSON.stringify([
+            {
+              id: 'document:xwiki:C.H',
+              text: 'H',
+              children: false,
+              data: {
+                id: 'xwiki:C.H',
+                type: 'document'
+              }
+            },
+            {
+              id: 'document:xwiki:C.I.WebHome',
+              text: 'I',
+              children: false,
+              data: {
+                id: 'xwiki:C.I.WebHome',
+                type: 'document'
+              }
+            }
+          ])
+        }
+      }
+    ],
+    'carol': [
+      {
+        id: 'document:xwiki:C.WebHome',
+        text: 'C',
+        children: true,
+        data: {
+          id: 'xwiki:C.WebHome',
+          type: 'document',
+          validChildren: ['document', 'pagination'],
+          childrenURL: 'data:application/json,' + JSON.stringify([
+            {
+              id: 'document:xwiki:C.G.WebHome',
+              text: 'G',
+              children: false,
+              data: {
+                id: 'xwiki:C.G.WebHome',
+                type: 'document'
+              }
+            },
+            {
+              id: 'document:xwiki:C.H',
+              text: 'H',
+              children: false,
+              data: {
+                id: 'xwiki:C.H',
+                type: 'document'
+              }
+            },
+            {
+              id: 'document:xwiki:C.I.WebHome',
+              text: 'I',
+              children: false,
+              data: {
+                id: 'xwiki:C.I.WebHome',
+                type: 'document'
+              }
+            }
+          ])
+        }
+      }
+    ]
+  };
+
+  var applyFilter = function(tree, filterId) {
+    var deferred = $.Deferred();
+    tree.get_container().one('refresh.jstree', function() {
+      // Resolve after all the other refresh event listeners have been called.
+      setTimeout(function() {
+        deferred.resolve();
+      }, 0);
+    }).closest('.export-tree-container')
+      .find('.export-tree-filter a[data-filter="' + filterId + '"]').click();
+    return deferred.promise();
+  };
+
+  describe('Export Tree Filter', function() {
+    it('Switch filters back and forth', function(done) {
+      createExportTreeWithFilter(treeDataWithFilters, 'carol').done(function(tree) {
+        tree.open_node('document:xwiki:C.WebHome', function() {
+          tree.deselect_node('document:xwiki:C.G.WebHome');
+          tree.deselect_node('document:xwiki:C.H');
+          expect(tree.getExportPages()).toEqual({'xwiki:C.%': ['xwiki:C.G.WebHome', 'xwiki:C.H']});
+
+          // Change the current tree filter.
+          applyFilter(tree, 'alice').done(function() {
+            // C.H is not excluded because its node is not yet loaded for this filter.
+            expect(tree.getExportPages()).toEqual({'xwiki:C.%': []});
+
+            tree.open_node('document:xwiki:C.WebHome', function() {
+              // C.H is still not excluded because when a selected node is loaded, all its children are selected.
+              expect(tree.getExportPages()).toEqual({'xwiki:C.%': []});
+
+              tree.select_node('document:xwiki:A.WebHome');
+              tree.deselect_node('document:xwiki:C.I.WebHome');
+              expect(tree.getExportPages()).toEqual({'xwiki:A.WebHome': [], 'xwiki:C.%': ['xwiki:C.I.WebHome']});
+
+              // Switch back to the initial filter.
+              applyFilter(tree, 'carol').done(function() {
+                // C.G.WebHome preserves its state from this filter because the previous filter didn't have this node.
+                // C.I.WebHome inherits the state from the previous filter because both filters have this node.
+                expect(tree.getExportPages()).toEqual({'xwiki:C.%': ['xwiki:C.G.WebHome', 'xwiki:C.I.WebHome']});
+
+                done();
+              });
             });
           });
         });

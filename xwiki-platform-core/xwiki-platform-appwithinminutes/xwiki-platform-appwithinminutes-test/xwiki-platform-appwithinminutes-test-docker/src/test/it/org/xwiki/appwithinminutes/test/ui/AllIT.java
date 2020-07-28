@@ -37,4 +37,10 @@ public class AllIT
     class NestedAppsLiveTableIT extends AppsLiveTableIT
     {
     }
+
+    @Nested
+    @DisplayName("Application wizard test")
+    class NestedWizardIT extends WizardIT
+    {
+    }
 }

@@ -24,36 +24,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
-import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.expression.EmptyNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserProperties;
-import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -66,72 +58,32 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 /**
  * @version $Id$
  */
-@ComponentList({
-    ExpressionNodeToHQLConverter.class,
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultSymbolScheme.class
-})
-public class QueryGeneratorTest
+@ComponentList({ExpressionNodeToHQLConverter.class, DefaultStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class, QueryExpressionGenerator.class})
+public class QueryGeneratorTest extends AbstractQueryGeneratorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<QueryGenerator> mocker =
-            new MockitoComponentMockingRule<>(QueryGenerator.class);
+    @InjectMockComponents
+    private QueryGenerator queryGenerator;
 
+    @MockComponent
     private QueryManager queryManager;
-    private WikiDescriptorManager wikiDescriptorManager;
-    private NotificationFilterManager notificationFilterManager;
-    private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
-    private UserPropertiesResolver userPropertiesResolver;
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
-    private DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
-    private Date startDate;
+
     private String startDateParamName;
-    private Date pref1StartDate;
+
     private String pref1StartDateParamName;
 
-    private NotificationFilterPreference fakeFilterPreference;
-    private NotificationPreference pref1;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        queryManager = mocker.getInstance(QueryManager.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
-        recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
-        userPropertiesResolver = mocker.getInstance(UserPropertiesResolver.class);
-        userReferenceResolver = mocker.getInstance(
-            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        super.beforeEach();
 
-        startDate = new Date(10);
         this.startDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.startDate.toString()));
-
-        query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
-
-        pref1StartDate = new Date(100000000);
         this.pref1StartDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.pref1StartDate.toString()));
 
-        pref1 = mock(NotificationPreference.class);
-        when(pref1.getProperties()).thenReturn(Collections.singletonMap(
-                NotificationPreferenceProperty.EVENT_TYPE, "create"));
-        when(pref1.getFormat()).thenReturn(NotificationFormat.ALERT);
-        when(pref1.getStartDate()).thenReturn(pref1StartDate);
-        when(pref1.isNotificationEnabled()).thenReturn(true);
-
-        fakeFilterPreference = mock(NotificationFilterPreference.class);
-        when(fakeFilterPreference.isActive()).thenReturn(true);
-
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
-
-        when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
-
-        UserProperties userProperties = mock(UserProperties.class);
-        when(userProperties.displayHiddenDocuments()).thenReturn(false);
-        when(userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
-        when(userReferenceResolver.resolve(userDocumentReference)).thenReturn(mock(UserReference.class));
+        this.query = mock(Query.class);
+        when(this.queryManager.createQuery(anyString(), anyString())).thenReturn(query);
     }
 
     @Test
@@ -139,30 +91,24 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC",
-            node.toString());
+        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(parameters);
+        this.queryGenerator.generateQuery(parameters);
 
-        verify(this.queryManager).createQuery(
-            "where ((" +
-                "event.date >= :" + this.startDateParamName + ") " +
-                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
-                "AND (event.hidden <> true) " +
-                "ORDER BY event.date DESC",
-            Query.HQL);
+        verify(this.queryManager).createQuery("where ((" + "event.date >= :" + this.startDateParamName + ") "
+            + "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) "
+            + "AND (event.date >= :" + this.pref1StartDateParamName + "))) " + "AND (event.hidden <> true) "
+            + "ORDER BY event.date DESC", Query.HQL);
         verify(this.query).bindValue(this.startDateParamName, this.startDate);
         verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
         verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
@@ -180,27 +126,24 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
-            "ORDER BY DATE DESC", node.toString());
+        assertEquals("(DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) " + "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(parameters);
+        this.queryGenerator.generateQuery(parameters);
 
         verify(this.queryManager).createQuery(
-            "where (" +
-                "event.date >= :" + this.startDateParamName + ") " +
-                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                "AND (event.date >= :" + this.pref1StartDateParamName + ")) " +
-                "ORDER BY event.date DESC",
+            "where (" + "event.date >= :" + this.startDateParamName + ") "
+                + "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) "
+                + "AND (event.date >= :" + this.pref1StartDateParamName + ")) " + "ORDER BY event.date DESC",
             Query.HQL);
         verify(this.query).bindValue(eq(this.startDateParamName), eq(this.startDate));
         verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
@@ -213,29 +156,24 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC", node.toString());
+        assertEquals("((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(parameters);
+        this.queryGenerator.generateQuery(parameters);
 
-        verify(this.queryManager).createQuery(
-            "where ((" +
-                "event.date >= :" + this.startDateParamName + ") " +
-                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
-                "AND (event.hidden <> true) " +
-                "ORDER BY event.date DESC",
-            Query.HQL);
+        verify(this.queryManager).createQuery("where ((" + "event.date >= :" + this.startDateParamName + ") "
+            + "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) "
+            + "AND (event.date >= :" + this.pref1StartDateParamName + "))) " + "AND (event.hidden <> true) "
+            + "ORDER BY event.date DESC", Query.HQL);
     }
 
     @Test
@@ -246,32 +184,26 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.endDate = untilDate;
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
-            "AND DATE <= \"" + untilDate.toString() + "\") AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC", node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) " + "AND DATE <= \"" + untilDate.toString()
+            + "\") AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(parameters);
+        this.queryGenerator.generateQuery(parameters);
 
-        verify(this.queryManager).createQuery(
-            "where (((" +
-                "event.date >= :" + this.startDateParamName + ") " +
-                "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
-                "AND (event.date >= :" + this.pref1StartDateParamName + "))) " +
-                "AND (event.date <= :" + untilDateParamName + ")) " +
-                "AND (event.hidden <> true) " +
-                "ORDER BY event.date DESC",
-            Query.HQL);
+        verify(this.queryManager).createQuery("where (((" + "event.date >= :" + this.startDateParamName + ") "
+            + "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) "
+            + "AND (event.date >= :" + this.pref1StartDateParamName + "))) " + "AND (event.date <= :"
+            + untilDateParamName + ")) " + "AND (event.hidden <> true) " + "ORDER BY event.date DESC", Query.HQL);
         verify(this.query).bindValue(this.startDateParamName, this.startDate);
         verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
         verify(this.query).bindValue(untilDateParamName, untilDate);
@@ -285,22 +217,18 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.endDate = untilDate;
         parameters.blackList = Arrays.asList("event1", "event2");
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("((((TYPE = \"create\" " +
-            "AND DATE >= \"" + this.pref1StartDate.toString() + "\") " +
-            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-            "AND DATE <= \"" + untilDate.toString() + "\") " +
-            "AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC",
-            node.toString());
+        assertEquals("((((TYPE = \"create\" " + "AND DATE >= \"" + this.pref1StartDate.toString() + "\") "
+            + "AND NOT (ID IN (\"event1\", \"event2\"))) " + "AND DATE <= \"" + untilDate.toString() + "\") "
+            + "AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
     }
 
     @Test
@@ -309,19 +237,17 @@ public class QueryGeneratorTest
         // Test
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
-        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" "
-            + "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) "
-            + "AND WIKI = \"Wiki xwiki\") "
-            + "ORDER BY DATE DESC",
-            node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) AND HIDDEN <> true) " + "AND WIKI = \"Wiki xwiki\") "
+            + "ORDER BY DATE DESC", node.toString());
     }
 
     @Test
@@ -332,37 +258,34 @@ public class QueryGeneratorTest
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
-                any(NotificationPreference.class)))
+            any(NotificationPreference.class)))
                 .thenReturn(value(EventProperty.PAGE).eq(value("someValue1")).and(value("1").eq(value("1"))));
 
         when(notificationFilter2.filterExpression(any(DocumentReference.class), any(Collection.class),
-                any(NotificationPreference.class)))
+            any(NotificationPreference.class)))
                 .thenReturn(value(EventProperty.TYPE).eq(value("someValue2")).and(value("2").eq(value("2"))));
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
-                any(NotificationPreference.class))).thenAnswer(
-                        invocationOnMock -> ((Collection)invocationOnMock.getArgument(0)).stream());
+            any(NotificationPreference.class)))
+                .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
         parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
-        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (((TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\") " +
-            "AND (PAGE = \"someValue1\" AND \"1\" = \"1\")) " +
-            "AND (TYPE = \"someValue2\" AND \"2\" = \"2\"))) " +
-            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-            "AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC", node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (((TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\") " + "AND (PAGE = \"someValue1\" AND \"1\" = \"1\")) "
+            + "AND (TYPE = \"someValue2\" AND \"2\" = \"2\"))) " + "AND NOT (ID IN (\"event1\", \"event2\"))) "
+            + "AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
     }
 
     @Test
@@ -373,28 +296,24 @@ public class QueryGeneratorTest
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
-                any(NotificationPreference.class)))
-                .thenReturn(new EmptyNode());
+            any(NotificationPreference.class))).thenReturn(new EmptyNode());
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
         parameters.filters = Collections.singleton(notificationFilter1);
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
-        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " +
-            "AND (TYPE = \"create\" AND DATE >= \"" + this.pref1StartDate.toString() + "\")) " +
-            "AND NOT (ID IN (\"event1\", \"event2\"))) " +
-            "AND HIDDEN <> true) " +
-            "ORDER BY DATE DESC",
-            node.toString());
+        assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
+            + this.pref1StartDate.toString() + "\")) " + "AND NOT (ID IN (\"event1\", \"event2\"))) "
+            + "AND HIDDEN <> true) " + "ORDER BY DATE DESC", node.toString());
     }
 
     @Test
@@ -404,26 +323,26 @@ public class QueryGeneratorTest
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
-                any(NotificationPreference.class)))
+            any(NotificationPreference.class)))
                 .thenReturn(value(EventProperty.PAGE).eq(value("someValue1")).and(value("1").eq(value("1"))));
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
-                any(NotificationPreference.class))).thenAnswer(
-                invocationOnMock -> ((Collection)invocationOnMock.getArgument(0)).stream());
+            any(NotificationPreference.class)))
+                .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
 
         // No matching descriptor
-        when(recordableEventDescriptorHelper.hasDescriptor("create", userDocumentReference)).thenReturn(false);
+        when(recordableEventDescriptorHelper.hasDescriptor("create", USER_REFERENCE)).thenReturn(false);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userDocumentReference;
+        parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.filters = Arrays.asList(notificationFilter1);
         parameters.preferences = Arrays.asList(pref1);
         parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
+        ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Expectation: no filters on "create" event type because it has no descriptor
         assertEquals("(DATE >= \"" + this.startDate.toString() + "\" AND HIDDEN <> true) ORDER BY DATE DESC",

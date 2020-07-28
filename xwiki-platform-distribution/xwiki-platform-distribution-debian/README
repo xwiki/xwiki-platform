@@ -1,1 +1,10 @@
 Debian/Ubuntu Package(s) of XWiki built using Apache Maven.
+
+= Deploy a patched version
+
+* `checkout` the tag to patch
+* apply the patch (generally by cherry-picking the fix from the branch)
+* add a `<version>` to `xwiki-platform-distribution-debian`
+* update the version to reflect the patch: ```mvn versions:set -DnewVersion=11.10.2-1```
+* replace `${project.version}` in `xwiki-platform-distribution-debian` and `xwiki-platform-distribution-debian-common` (2) with the XWiki version (so without the `-<counter>` part)
+* `mvn clean deploy`

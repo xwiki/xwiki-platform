@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
+define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
   //
   // Toggle between raw and rendered changes.
   //
@@ -198,3 +198,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   init($(document.body));
 });
+
+// Execute the code when this file is loaded with $xwiki.jsfx.use(). This is not needed if the file is loaded with
+// RequireJS but it shoudn't hurt either. We do this in order to ensure that the module code is executed only once.
+require(['xwiki-diff'], function() {});

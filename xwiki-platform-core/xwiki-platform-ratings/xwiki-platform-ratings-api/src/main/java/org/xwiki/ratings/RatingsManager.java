@@ -19,11 +19,14 @@
  */
 package org.xwiki.ratings;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWiki;
 
@@ -114,12 +117,30 @@ public interface RatingsManager
      * 
      * @param documentRef the document to which the ratings belong to
      * @param start the offset from where to fetch the ratings
-     * @param count how may ratings to fetch
+     * @param count how many ratings to fetch
      * @param asc sort the results in ascending order or not
      * @return a list of Rating objects
      * @throws RatingsException when an error occurs while fetching the list of ratings
      */
     List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc) throws RatingsException;
+
+    /**
+     * Retrieve the ratings performed by the given user.
+     *
+     * @param userReference the user who performed ratings.
+     * @param start the offset from where to fetch the ratings
+     * @param count how many ratings to fetch
+     * @param asc if {@code true} sort the results in ascending date order else in descending date order.
+     * @return a list of Rating objects made by the given user.
+     * @throws RatingsException when an error occurs while fetching the list of ratings
+     * @since 12.6RC1
+     */
+    @Unstable
+    default List<Rating> getRatings(UserReference userReference, int start, int count, boolean asc)
+        throws RatingsException
+    {
+        return Collections.emptyList();
+    }
 
     /**
      * Gets a rating based on its id.

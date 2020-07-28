@@ -30,8 +30,10 @@ import org.xwiki.query.QueryException;
  * 
  * @version $Id$
  * @since 3.0M2
+ * @deprecated since 12.5RC1, use {@link EventStore} instead
  */
 @Role
+@Deprecated
 public interface EventStream
 {
     /**
@@ -51,7 +53,9 @@ public interface EventStream
      * @param query a query stub
      * @return the list of events matched by the query
      * @throws QueryException if the query is malformed or cannot be executed
+     * @deprecated since 12.5RC1, use {@link EventStore#search(EventQuery)} instead
      */
+    @Deprecated
     List<Event> searchEvents(Query query) throws QueryException;
 
     /**

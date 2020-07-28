@@ -150,20 +150,16 @@ public class DefaultModelBridge implements ModelBridge
                         Map<NotificationPreferenceProperty, Object> properties =
                                 extractNotificationPreferenceProperties(obj);
 
-                        notificationPreferenceBuilder.prepare();
-                        notificationPreferenceBuilder.setProperties(properties);
-                        notificationPreferenceBuilder.setStartDate(
-                                (objStartDate != null) ? objStartDate : doc.getCreationDate());
-                        notificationPreferenceBuilder.setFormat(StringUtils.isNotBlank(objFormat)
+                        preferences.add(notificationPreferenceBuilder.prepare()
+                            .setProperties(properties)
+                            .setStartDate((objStartDate != null) ? objStartDate : doc.getCreationDate())
+                            .setFormat(StringUtils.isNotBlank(objFormat)
                                 ? NotificationFormat.valueOf(objFormat.toUpperCase())
-                                : NotificationFormat.ALERT);
-                        notificationPreferenceBuilder.setTarget(document);
-                        notificationPreferenceBuilder.setProviderHint(providerHint);
-                        notificationPreferenceBuilder.setEnabled(
-                                obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
-                        notificationPreferenceBuilder.setCategory(NotificationPreferenceCategory.DEFAULT);
-
-                        preferences.add(notificationPreferenceBuilder.build());
+                                : NotificationFormat.ALERT)
+                            .setTarget(document)
+                            .setProviderHint(providerHint)
+                            .setEnabled(obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0)
+                            .setCategory(NotificationPreferenceCategory.DEFAULT).build());
                     }
                 }
             }
@@ -211,18 +207,18 @@ public class DefaultModelBridge implements ModelBridge
             if (preference.getFormat() == NotificationFormat.EMAIL) {
                 continue;
             }
-            // Duplicate the preference to be able to change its content
-            notificationPreferenceBuilder.prepare();
-            notificationPreferenceBuilder.setCategory(preference.getCategory());
-            notificationPreferenceBuilder.setEnabled(true);
-            notificationPreferenceBuilder.setFormat(NotificationFormat.ALERT);
-            notificationPreferenceBuilder.setProperties(preference.getProperties());
-            notificationPreferenceBuilder.setProviderHint(preference.getProviderHint());
-            notificationPreferenceBuilder.setTarget(userReference);
-            // Change the field we are interested in
-            notificationPreferenceBuilder.setStartDate(startDate);
-            // Save it
-            toSave.add(notificationPreferenceBuilder.build());
+
+            // Duplicate the preference to be able to change its content and Save it
+            toSave.add(notificationPreferenceBuilder.prepare()
+                .setCategory(preference.getCategory())
+                .setEnabled(true)
+                .setFormat(NotificationFormat.ALERT)
+                .setProperties(preference.getProperties())
+                .setProviderHint(preference.getProviderHint())
+                .setTarget(userReference)
+                // Change the field we are interested in
+                .setStartDate(startDate)
+                .build());
         }
 
         // Now that we have a list of updated preferences to save, we need to save them!
@@ -274,6 +270,9 @@ public class DefaultModelBridge implements ModelBridge
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(targetDocument, context);
+
+            // Avoid messing with the cache before the document is saved
+            document = document.clone();
 
             for (NotificationPreference notificationPreference : notificationPreferences) {
 

@@ -164,7 +164,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                 rulesInvalidator.resume();
             }
             String message = String.format("Failed to load the cache in %d attempts. Giving up.", retries);
-            this.logger.error(message);
+            this.logger.error(String.format("%s For user [%s] and entity [%s].", message, user, entity));
             throw new AuthorizationException(user.getOriginalDocumentReference(), entity.getOriginalReference(),
                 message, lastException);
         }

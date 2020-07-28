@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -346,6 +346,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-script</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed for Jobs components -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-default</artifactId>
+      <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
 

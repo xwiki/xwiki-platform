@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-ui</artifactId>
   <name>XWiki Platform - Notifications - UI</name>
@@ -36,6 +36,13 @@
     <xwiki.extension.name>Notifications Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- We should keep notifications-preferences-default as first dependency since it declares DefaultModelBridge
+      which is needed by some other modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
@@ -61,17 +68,23 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-filters-watch</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Include the two default event stores -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
 

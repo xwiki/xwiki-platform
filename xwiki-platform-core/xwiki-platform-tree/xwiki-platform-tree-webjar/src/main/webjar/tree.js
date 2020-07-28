@@ -132,7 +132,13 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   var addMoreChildren = function(tree, paginationNode) {
     // Mark the pagination node as loading to prevent multiple pagination requests for the same offset.
     var paginationElement = tree.get_node(paginationNode.id, true);
-    if (paginationElement.hasClass('jstree-loading')) return;
+    if (!paginationElement.length || paginationElement.hasClass('jstree-loading')) {
+      // The pagination element could be missing, even if the pagination node is present in the tree model, if the
+      // pagination node was not yet drawn, i.e. if we call this function too early (e.g. the pagination node was just
+      // added to the tree model but the tree was not re-rendered). This function needs to be called after the
+      // pagination node is drawn.
+      return;
+    }
     paginationElement.addClass('jstree-loading');
     // Replace the pagination node with the nodes from the next page.
     var parent = tree.get_node(paginationNode.parent);
@@ -484,7 +490,10 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     return this.on('select_node.jstree', function(event, data) {
       var tree = data.instance;
       var selectedNode = data.node;
-      if (selectedNode.data && selectedNode.data.type === 'pagination') {
+      // Load more child nodes when the pagination node is selected, if the selection is a result of an action performed
+      // by the user (e.g click on the pagination node). We need to make this distinction because sometimes we want to
+      // select the pagination node without activating it (i.e. without replacing it with the next child nodes).
+      if (selectedNode.data && selectedNode.data.type === 'pagination' && data.event) {
         addMoreChildren(tree, selectedNode);
       } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
           $(data.event.target).closest('.jstree-no-links').length === 0) {

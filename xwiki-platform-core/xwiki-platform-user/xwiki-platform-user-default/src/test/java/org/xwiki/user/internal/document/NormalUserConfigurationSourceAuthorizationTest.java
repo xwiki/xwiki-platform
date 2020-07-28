@@ -45,6 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +58,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class NormalUserConfigurationSourceAuthorizationTest
 {
+    private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
     @InjectMockComponents
     private NormalUserConfigurationSourceAuthorization authorization;
 
@@ -114,7 +117,7 @@ public class NormalUserConfigurationSourceAuthorizationTest
 
         // Current document and last author.
         this.lastAuthorDocumentReference = new DocumentReference("wiki", "space", "lastauthor");
-        when(this.currentDocument.getAuthorReference()).thenReturn(this.lastAuthorDocumentReference);
+        when(this.xcontext.getAuthorReference()).thenReturn(this.lastAuthorDocumentReference);
         when(this.xcontext.getDoc()).thenReturn(this.currentDocument);
         DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "currentdoc");
         when(this.currentDocument.getDocumentReference()).thenReturn(currentDocumentReference);

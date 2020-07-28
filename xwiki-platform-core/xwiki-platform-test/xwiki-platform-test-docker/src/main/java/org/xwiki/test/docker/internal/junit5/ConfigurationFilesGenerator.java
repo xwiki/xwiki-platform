@@ -65,6 +65,8 @@ public class ConfigurationFilesGenerator
 
     private static final String SKIN = "flamingo";
 
+    private static final String LOGBACK_FILE = "logback.xml";
+
     private TestConfiguration testConfiguration;
 
     private RepositoryResolver repositoryResolver;
@@ -118,6 +120,26 @@ public class ConfigurationFilesGenerator
             }
         } catch (Exception e) {
             throw new Exception("Failed to extract configuration files", e);
+        }
+
+
+        // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
+        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // problems.
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+            copyLogbackConfigFile(configurationFileTargetDirectory);
+        }
+    }
+
+    private void copyLogbackConfigFile(File configurationFileTargetDirectory) throws Exception
+    {
+        File outputDirectory = new File(configurationFileTargetDirectory, "classes");
+        File outputFile = new File(outputDirectory, LOGBACK_FILE);
+        if (this.testConfiguration.isVerbose()) {
+            LOGGER.info("... Generating logging configuration: {}", outputFile);
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            IOUtils.copy(getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE), fos);
         }
     }
 
@@ -289,6 +311,21 @@ public class ConfigurationFilesGenerator
             xwikiDbHbmFeeds = "feeds.hbm.xml";
         }
         props.setProperty("xwikiDbHbmFeeds", xwikiDbHbmFeeds);
+
+        // Increase the connection pool size since it appears that on slow CI agents, the default 50 connections is too
+        // small, especially at startup. I haven't proved it but I think we're doing more stuff at startup that require
+        // DB connections. compared  to in the past. When the tests succeed, xwiki starts in about 1mn20s. When they
+        // fail xwiki takes over 5mn to start, showing how slow the machine is. When it succeeds the connection cool
+        // is used up to 40 connections (out of 50) so already close to the max. When it fails, it goes quickly to 50.
+        // Basically the connections are not released fast enough becauase the SQL queries take longer to execute.
+        // Thus trying with 300 max connections to see if that's the problem.
+        props.setProperty("xwikiDbDbcpMaxTotal", "300");
+
+        // Set the xwikiDbDbcpMaxOpenPreparedStatements to unlimited (default) since we saw the message
+        // "Data source rejected establishment of connection,  message from server: "Too many connections"" and at
+        // that time the number of connections (95) was well under the maximum allowed (300). Thus, as a hunch, we're
+        // trying to increase the pooled statement maximum too.
+        props.setProperty("xwikiDbDbcpMaxOpenPreparedStatements", "-1");
 
         return props;
     }

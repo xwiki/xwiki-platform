@@ -21,106 +21,108 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-eventstream-stores</artifactId>
-        <version>12.5-SNAPSHOT</version>
-    </parent>
-    <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
-    <name>XWiki Platform - Event Stream - Store - Solr</name>
-    <description>Solr based events storage</description>
-    <properties>
-        <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
-        <!-- Name to display by the Extension Manager -->
-        <xwiki.extension.name>Solr Event Stream Store</xwiki.extension.name>
-        <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-        <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-eventstream-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-search-solr-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- Dependency to make sure there is a default implementation of RecordableEventConverter -->
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-eventstream-default</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-component-wiki</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-model-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.commons</groupId>
-            <artifactId>xwiki-commons-observation-api</artifactId>
-            <version>${commons.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-annotation-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-scheduler-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-wiki-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-eventstream-stores</artifactId>
+    <version>12.6-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
+  <name>XWiki Platform - Event Stream - Store - Solr</name>
+  <description>Solr based events storage</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Solr Event Stream Store</xwiki.extension.name>
+    <!-- TODO: Remove once the tests have been fixed to not output anything 
+      to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Dependency to make sure there is a default implementation of RecordableEventConverter -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-wiki</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-        <!-- Test Dependencies -->
-        <dependency>
-            <groupId>org.xwiki.commons</groupId>
-            <artifactId>xwiki-commons-tool-test-component</artifactId>
-            <version>${commons.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-search-solr-api</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <configuration>
-                            <excludes>
-                                org/xwiki/eventstream/store/solr/internal/SolrEventStore.java
-                            </excludes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/eventstream/store/solr/internal/SolrEventStore.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

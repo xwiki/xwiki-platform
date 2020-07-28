@@ -1241,7 +1241,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             }
         } catch (Exception e) {
             if (fallback) {
-                LOGGER.warn("Failed to create a nex sutom class instance ([{}]). Fallbacking on BaseObject.",
+                LOGGER.warn("Failed to create a new custom class instance ([{}]). Fallbacking on BaseObject.",
                     ExceptionUtils.getRootCauseMessage(e));
 
                 return new BaseObject();

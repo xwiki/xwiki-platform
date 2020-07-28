@@ -135,16 +135,14 @@ public class NotificationPreferenceScriptService implements ScriptService
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
 
-                targetableNotificationPreferenceBuilder.prepare();
-                targetableNotificationPreferenceBuilder.setEnabled(enabled);
-                targetableNotificationPreferenceBuilder.setFormat(format);
-                targetableNotificationPreferenceBuilder.setProviderHint(providerHint);
-                targetableNotificationPreferenceBuilder.setProperties(
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
-                targetableNotificationPreferenceBuilder.setTarget(target);
-                targetableNotificationPreferenceBuilder.setCategory(category);
-
-                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.build();
+                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.prepare()
+                    .setEnabled(enabled)
+                    .setFormat(format)
+                    .setProviderHint(providerHint)
+                    .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType))
+                    .setTarget(target)
+                    .setCategory(category)
+                    .build();
 
                 // This part is explained by the long comment below
                 NotificationPreference correspondingPreference = getCorrespondingPreference(existingPreferences,

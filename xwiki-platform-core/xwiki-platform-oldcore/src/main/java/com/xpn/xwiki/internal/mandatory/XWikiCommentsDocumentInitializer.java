@@ -29,7 +29,6 @@ import org.xwiki.model.reference.RegexEntityReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Update XWiki.XWikiComments document with all required informations.
@@ -85,8 +84,6 @@ public class XWikiCommentsDocumentInitializer extends AbstractCommentsDocumentIn
 
         xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         xclass.addNumberField("replyto", "Reply To", 5, "integer");
-        // Use the Text editor for backwards compatibility (e.g. the annotation module which uses the comment class
-        // doesn't expect the WYSIWYG editor).
-        xclass.addTextAreaField("comment", "Comment", 40, 5, EditorType.TEXT);
+        xclass.addTextAreaField("comment", "Comment", 40, 5);
     }
 }

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -34,7 +35,6 @@ import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -134,8 +134,8 @@ public class DefaultMessageStream implements MessageStream
     private void saveEvent(Event event)
     {
         try {
-            this.eventStore.saveEvent(event);
-        } catch (EventStreamException e) {
+            this.eventStore.saveEvent(event).get();
+        } catch (Exception e) {
             this.logger.error("Failed to save the message", e);
         }
     }
@@ -163,10 +163,8 @@ public class DefaultMessageStream implements MessageStream
     {
         List<Event> result = new ArrayList<Event>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'personalMessage'"
-                    + " and event.user = :user order by event.date desc",
-                Query.XWQL);
+            Query q = this.qm.createQuery("where event.application = 'MessageStream' and event.type = 'personalMessage'"
+                + " and event.user = :user order by event.date desc", Query.XWQL);
             q.bindValue("user", this.serializer.serialize(author));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
             result = this.stream.searchEvents(q);
@@ -187,10 +185,8 @@ public class DefaultMessageStream implements MessageStream
     {
         List<Event> result = new ArrayList<Event>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'directMessage'"
-                    + " and event.stream = :targetUser order by event.date desc",
-                Query.XWQL);
+            Query q = this.qm.createQuery("where event.application = 'MessageStream' and event.type = 'directMessage'"
+                + " and event.stream = :targetUser order by event.date desc", Query.XWQL);
             q.bindValue("targetUser", this.serializer.serialize(this.bridge.getCurrentUserReference()));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
 
@@ -213,10 +209,8 @@ public class DefaultMessageStream implements MessageStream
     {
         List<Event> result = new ArrayList<Event>();
         try {
-            Query q = this.qm.createQuery(
-                "where event.application = 'MessageStream' and event.type = 'groupMessage'"
-                    + " and event.stream = :group order by event.date desc",
-                Query.XWQL);
+            Query q = this.qm.createQuery("where event.application = 'MessageStream' and event.type = 'groupMessage'"
+                + " and event.stream = :group order by event.date desc", Query.XWQL);
             q.bindValue("group", this.serializer.serialize(group));
             q.setLimit(limit > 0 ? limit : 30).setOffset(offset >= 0 ? offset : 0);
 
@@ -242,12 +236,12 @@ public class DefaultMessageStream implements MessageStream
             if (events == null || events.isEmpty()) {
                 throw new IllegalArgumentException("This message does not exist");
             } else if (events.get(0).getUser().equals(this.bridge.getCurrentUserReference())) {
-                this.eventStore.deleteEvent(events.get(0));
+                this.eventStore.deleteEvent(events.get(0)).get();
             } else {
                 throw new IllegalArgumentException("You are not authorized to delete this message");
             }
-        } catch (QueryException | EventStreamException ex) {
-            this.logger.warn("Failed to delete message: {}", ex.getMessage());
+        } catch (Exception e) {
+            this.logger.warn("Failed to delete message: {}", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -256,7 +250,7 @@ public class DefaultMessageStream implements MessageStream
      * It also fills in the provided message body and type.
      * 
      * @param message the message to store in the event; at most 2000 characters are stored, longer messages are
-     *        automatically trimmed
+     *            automatically trimmed
      * @param messageType the type of message
      * @return the initialized event object
      */
@@ -264,8 +258,8 @@ public class DefaultMessageStream implements MessageStream
     {
         Event e = this.factory.createEvent();
         e.setApplication("MessageStream");
-        e.setDocument(new DocumentReference(this.context.getCurrentEntityReference().getRoot().getName(), "XWiki",
-            e.getId()));
+        e.setDocument(
+            new DocumentReference(this.context.getCurrentEntityReference().getRoot().getName(), "XWiki", e.getId()));
         e.setBody(StringUtils.left(message, 2000));
         e.setType(messageType);
         return e;

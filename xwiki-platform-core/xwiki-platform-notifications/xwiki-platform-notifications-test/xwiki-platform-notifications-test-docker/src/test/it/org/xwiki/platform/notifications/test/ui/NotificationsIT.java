@@ -57,8 +57,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
-    }
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    },
+    servletEngine = ServletEngine.EXTERNAL
 )
 public class NotificationsIT
 {
@@ -240,10 +244,16 @@ public class NotificationsIT
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));
-        assertTrue(tray.getNotificationDescription(0).startsWith(String.format("commented by %s", FIRST_USER_NAME)));
+        String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
+        String obtainedComment = tray.getNotificationDescription(0);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
-        assertTrue(tray.getNotificationDescription(1).startsWith(String.format("edited by %s", FIRST_USER_NAME)));
+        expectedComment = String.format("edited by %s", FIRST_USER_NAME);
+        obtainedComment = tray.getNotificationDescription(1);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();
@@ -357,5 +367,16 @@ public class NotificationsIT
             // Clean up
             testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
         }
+    }
+
+    @Test
+    @Order(5)
+    public void guestUsersDontSeeNotificationPanel(TestUtils testUtils)
+    {
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        testUtils.gotoPage("Main", "WebHome");
+        assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
+        testUtils.forceGuestUser();
+        assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());
     }
 }

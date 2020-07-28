@@ -323,7 +323,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
 
     // Update the location with whatever the initial value of the title is.
-    if (nameInput.val() !== undefined && !nameInput.val()) {
+    if (nameInput.val() !== undefined && !nameInput.val() && titleInput.val()) {
       updateLocationAndNameFromTitleInput();
     } else {
       updateLocationFromTitleInput();

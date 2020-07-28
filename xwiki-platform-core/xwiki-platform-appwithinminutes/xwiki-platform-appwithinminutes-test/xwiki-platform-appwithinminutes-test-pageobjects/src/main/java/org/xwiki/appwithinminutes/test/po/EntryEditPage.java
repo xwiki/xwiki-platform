@@ -65,7 +65,7 @@ public class EntryEditPage extends InlinePage
      */
     public List<String> getFieldNames()
     {
-        List<String> fieldNames = new ArrayList<String>();
+        List<String> fieldNames = new ArrayList<>();
         for (WebElement field : getForm().findElements(By.xpath("//*[contains(@name, '_0_')]"))) {
             fieldNames.add(StringUtils.substringAfter(field.getAttribute("name"), "_0_"));
         }

@@ -20,6 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+
 <Configure>
   <New id="byteBufferPool" class="org.eclipse.jetty.io.ArrayByteBufferPool">
     <Arg type="int"><Property name="jetty.byteBufferPool.minCapacity" default="0"/></Arg>

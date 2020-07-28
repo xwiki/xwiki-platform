@@ -39,6 +39,6 @@ public class NotificationAsyncRendererConfigurationTest
             new NotificationAsyncRendererConfiguration(parameters, true);
         assertTrue(configuration.isCount());
         assertSame(parameters, configuration.getNotificationParameters());
-        assertEquals(new HashSet<>(Arrays.asList("user", "wiki")), configuration.getContextEntries());
+        assertEquals(new HashSet<>(Arrays.asList("user", "request.wiki")), configuration.getContextEntries());
     }
 }

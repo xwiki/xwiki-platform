@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Used as return value for {@link AsyncRendererExecutor#render(AsyncRenderer, java.util.Set)}.
+ * Used as return value for {@link AsyncRendererExecutor#render(AsyncRenderer, AsyncRendererConfiguration)}.
  * 
  * @version $Id$
  * @since 10.10RC1

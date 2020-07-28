@@ -225,8 +225,15 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             List<String> aliases = descriptor.getAliases();
             for (int i = 1; i < aliases.size(); ++i) {
                 String alias = aliases.get(i);
+                // We use failover = false, otherwise it fall backs to the first SERVER_CLASS object of the document
+                // instead of creating a new one.
                 BaseObject objAlias = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS,
-                    XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
+                    XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, false);
+                if (objAlias == null) {
+                    // Manually create a new alias
+                    objAlias = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS,
+                        descriptorDoc.createXObject(DefaultWikiDescriptor.SERVER_CLASS, context));
+                }
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 

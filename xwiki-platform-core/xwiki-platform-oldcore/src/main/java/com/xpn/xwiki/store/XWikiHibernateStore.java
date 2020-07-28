@@ -862,12 +862,24 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         saveXWikiDoc(doc, context, true);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This implementation of rename relies on {@link #saveXWikiDoc(XWikiDocument, XWikiContext, boolean)}
+     * and {@link #deleteXWikiDoc(XWikiDocument, XWikiContext, boolean)}. The idea here is that the document reference
+     * has many impacts everywhere and it's actually safer to keep relying on existing save method. Now all the benefit
+     * of this rename, is to call those methods in the same transaction when both old and new reference belong
+     * to the same wiki (same database). If the references belong to different databases we are force to use two
+     * transactions.
+     */
     @Override
     public void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext inputxcontext)
         throws XWikiException
     {
         WikiReference sourceWikiReference = doc.getDocumentReference().getWikiReference();
         WikiReference targetWikiReference = newReference.getWikiReference();
+
+        // perform the change in same session only if the new and old reference belongs to same wiki (same database)
         boolean sameSession = sourceWikiReference.equals(targetWikiReference);
 
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -881,20 +893,30 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         try {
             if (sameSession) {
+                // We execute the whole call with a commit at the end,
+                // but we ensure to not commit at each step (save and delete)
                 this.execute(context, true, (callBack) -> {
                     this.saveXWikiDoc(newDocument, context, false);
+
+                    // Since the save documment is called without a commit, the information are not flushed
+                    // in the session either. However we need the new information in the session for the delete
+                    // in particular to know the possible changes made in the spaces.
                     getSession(context).flush();
                     this.deleteXWikiDoc(doc, context, false);
                     return true;
                 });
             } else {
+                // Execute the save on the right DB with a commit at the end
                 context.setWikiReference(targetWikiReference);
                 this.execute(context, true, (callBack) -> {
                     this.saveXWikiDoc(newDocument, context, false);
                     return true;
                 });
+
+                // to be able to rollback in case of problem during delete
                 copyPerformed = true;
 
+                // Execute the delete on the right DB with a commit at the end
                 context.setWikiReference(sourceWikiReference);
                 this.execute(context, true, (callBack) -> {
                     this.deleteXWikiDoc(doc, context, false);
@@ -902,7 +924,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 });
             }
         } catch (Exception e) {
+            // We only need to perform special actions in case of different sessions,
+            // and if the first step has been executed. In all other cases nothing should have been committed.
             if (!sameSession && copyPerformed) {
+
+                // Ensure to delete the doc that has been copied already.
+                // Note that in case of problem there, the exception is directly thrown.
                 this.execute(context, true, (callBack) -> {
                     this.deleteXWikiDoc(newDocument, context, false);
                     return true;

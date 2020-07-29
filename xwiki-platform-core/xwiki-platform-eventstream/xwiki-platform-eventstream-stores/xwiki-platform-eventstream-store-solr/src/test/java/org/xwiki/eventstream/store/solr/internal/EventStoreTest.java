@@ -70,7 +70,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the initialization of the Solr instance.
+ * Validate {@link SolrEventStore} and {@link EventsSolrCoreInitializer}.
  * 
  * @version $Id$
  */

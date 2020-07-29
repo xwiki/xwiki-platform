@@ -72,7 +72,7 @@ public interface EventStatusManager
      * @param entityId the id of the entity concerned by the status
      * @throws Exception if an error occurs
      * @since 12.1RC1
-     * @deprecated since @since 12.6, use {@link EventStore#deleteEventStatuses(String, Date)} instead
+     * @deprecated since 12.6, use {@link EventStore#deleteEventStatuses(String, Date)} instead
      */
     @Deprecated
     default void deleteAllForEntity(Date startDate, String entityId) throws Exception

@@ -21,6 +21,7 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EntityEvent;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -40,6 +41,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class PrefilteringLiveNotificationEmailListenerTest
 {
+    private static final EventStreamAddedEvent EVENT = new EventStreamAddedEvent();
+
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailListener listener;
 
@@ -62,7 +65,7 @@ public class PrefilteringLiveNotificationEmailListenerTest
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
         when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
-        this.listener.onEvent(null, event, null);
+        this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(true);
@@ -70,7 +73,7 @@ public class PrefilteringLiveNotificationEmailListenerTest
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
         when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
-        this.listener.onEvent(null, event, null);
+        this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(false);
@@ -78,7 +81,7 @@ public class PrefilteringLiveNotificationEmailListenerTest
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
         when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
-        this.listener.onEvent(null, event, null);
+        this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(false);
@@ -86,7 +89,7 @@ public class PrefilteringLiveNotificationEmailListenerTest
         when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(false);
         when(this.notificationConfiguration.isEventPrefilteringEnabled()).thenReturn(true);
 
-        this.listener.onEvent(null, event, null);
+        this.listener.onEvent(EVENT, event, null);
         verify(this.manager, times(1)).addEvent(event);
 
         when(this.remoteState.isRemoteState()).thenReturn(false);

@@ -26,6 +26,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
@@ -449,6 +451,42 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         this.sorts.add(new SortClause(property, order));
 
         return this;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getLimit());
+        builder.append(getOffset());
+        builder.append(getSorts());
+
+        return builder.build();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof SimpleEventQuery) {
+            SimpleEventQuery query = (SimpleEventQuery) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.appendSuper(super.equals(obj));
+            builder.append(getLimit(), query.getLimit());
+            builder.append(getOffset(), query.getOffset());
+            builder.append(getSorts(), query.getSorts());
+
+            return builder.build();
+        }
+
+        return false;
     }
 
     @Override

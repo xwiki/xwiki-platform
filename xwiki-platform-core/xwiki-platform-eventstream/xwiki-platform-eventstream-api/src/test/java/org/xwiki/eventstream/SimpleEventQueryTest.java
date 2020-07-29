@@ -319,4 +319,43 @@ public class SimpleEventQueryTest
         assertEquals(new CompareQueryCondition("property3", "value3", CompareType.EQUALS),
             group1.getConditions().get(1));
     }
+
+    @Test
+    void equalsandhascode()
+    {
+        SimpleEventQuery query1 = new SimpleEventQuery();
+        SimpleEventQuery query1bis = new SimpleEventQuery();
+
+        SimpleEventQuery query2 = new SimpleEventQuery();
+        query2.setLimit(42);
+        SimpleEventQuery query2bis = new SimpleEventQuery();
+        query2bis.setLimit(42);
+
+        SimpleEventQuery query3 = new SimpleEventQuery();
+        query3.setOffset(42);
+        SimpleEventQuery query3bis = new SimpleEventQuery();
+        query3bis.setOffset(42);
+
+        SimpleEventQuery query4 = new SimpleEventQuery();
+        query4.eq("prop", "value");
+        SimpleEventQuery query4bis = new SimpleEventQuery();
+        query4bis.eq("prop", "value");
+
+        assertTrue(query1.equals(query1));
+        assertTrue(query1bis.equals(query1bis));
+
+        assertTrue(query2.equals(query2));
+        assertTrue(query2bis.equals(query2bis));
+
+        assertTrue(query3.equals(query3));
+        assertTrue(query3bis.equals(query3bis));
+
+        assertTrue(query4.equals(query4));
+        assertTrue(query4bis.equals(query4bis));
+
+        assertFalse(query1.equals(query2));
+        assertFalse(query1.equals(query3));
+        assertFalse(query1.equals(query4));
+        assertFalse(query1.equals(null));
+    }
 }

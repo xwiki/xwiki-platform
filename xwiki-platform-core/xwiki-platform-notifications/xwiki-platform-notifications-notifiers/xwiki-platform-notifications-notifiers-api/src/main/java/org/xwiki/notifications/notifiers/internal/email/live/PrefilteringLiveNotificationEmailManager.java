@@ -44,7 +44,7 @@ import org.xwiki.notifications.preferences.NotificationEmailInterval;
  * Dispatch events to users with live email notifications enabled.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = PrefilteringLiveNotificationEmailManager.class)
 @Singleton

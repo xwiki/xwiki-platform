@@ -61,7 +61,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     /**
      * The name of the field containing the list of users who should get this event by mail.
      * 
-     * @since 12.6RC1
+     * @since 12.6
      */
     public static final String SOLR_FIELD_MAILLISTENERS = "mailListeners";
 

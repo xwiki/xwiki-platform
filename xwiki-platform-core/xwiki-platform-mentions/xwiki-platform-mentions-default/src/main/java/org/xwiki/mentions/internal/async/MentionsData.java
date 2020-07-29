@@ -27,7 +27,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * Object storing the minimal data required to analyse the mentions asynchronously.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class MentionsData
 {

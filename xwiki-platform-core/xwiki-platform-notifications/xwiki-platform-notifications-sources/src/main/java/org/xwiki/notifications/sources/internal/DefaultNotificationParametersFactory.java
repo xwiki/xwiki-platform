@@ -373,7 +373,7 @@ public class DefaultNotificationParametersFactory
      * 
      * @param parameters the parameters
      * @throws NotificationException if error happens
-     * @since 12.6RC1
+     * @since 12.6
      */
     public void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {

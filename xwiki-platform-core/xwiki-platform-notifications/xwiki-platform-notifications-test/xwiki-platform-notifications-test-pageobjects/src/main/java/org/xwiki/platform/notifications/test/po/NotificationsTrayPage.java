@@ -81,7 +81,7 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * @return {@code true} only if the notification menu icon (small bell) is displayed.
-     * @since 12.6RC1
+     * @since 12.6
      * @since 12.5.1
      */
     public boolean isNotificationMenuVisible()

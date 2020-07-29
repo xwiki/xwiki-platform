@@ -28,7 +28,7 @@ import org.xwiki.rendering.block.XDOM;
  * Extract a quote around a mention.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface QuoteService

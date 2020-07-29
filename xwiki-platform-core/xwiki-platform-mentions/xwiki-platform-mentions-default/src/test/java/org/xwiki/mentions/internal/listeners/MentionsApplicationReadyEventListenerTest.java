@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link MentionsApplicationReadyEventListener}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class MentionsApplicationReadyEventListenerTest

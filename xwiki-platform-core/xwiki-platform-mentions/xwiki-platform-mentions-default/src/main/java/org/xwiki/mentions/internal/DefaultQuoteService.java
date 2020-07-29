@@ -47,7 +47,7 @@ import static org.xwiki.rendering.block.Block.Axes.DESCENDANT;
  * Default implementation of {@link QuoteService}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton

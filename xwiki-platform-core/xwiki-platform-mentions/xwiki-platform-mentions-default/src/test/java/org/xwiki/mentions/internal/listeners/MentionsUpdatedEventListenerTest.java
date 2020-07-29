@@ -43,7 +43,7 @@ import static org.xwiki.test.LogLevel.DEBUG;
  * Test of {@link MentionsUpdatedEventListener}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 public class MentionsUpdatedEventListenerTest

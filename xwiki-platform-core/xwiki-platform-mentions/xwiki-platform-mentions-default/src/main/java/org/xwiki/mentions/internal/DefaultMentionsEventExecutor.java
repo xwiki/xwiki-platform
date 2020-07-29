@@ -51,7 +51,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  * analysis.  
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton

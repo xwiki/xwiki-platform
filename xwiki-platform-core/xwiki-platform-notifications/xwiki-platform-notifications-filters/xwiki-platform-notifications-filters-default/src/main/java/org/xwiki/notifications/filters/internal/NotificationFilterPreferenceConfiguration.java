@@ -29,7 +29,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * The configuration of the default Notification Filter Preference implementation.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = NotificationFilterPreferenceConfiguration.class)
 @Singleton

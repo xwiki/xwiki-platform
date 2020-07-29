@@ -50,7 +50,7 @@ public class ForUserNode extends AbstractOperatorNode
      * @param user the user
      * @param read true if only read status should be included, false for only unread status and null for all
      * @param format
-     * @since 12.6RC1
+     * @since 12.6
      */
     public ForUserNode(DocumentReference user, Boolean read, NotificationFormat format)
     {
@@ -77,7 +77,7 @@ public class ForUserNode extends AbstractOperatorNode
 
     /**
      * @return the format
-     * @since 12.6RC1
+     * @since 12.6
      */
     public NotificationFormat getFormat()
     {

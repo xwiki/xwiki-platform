@@ -192,7 +192,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      *
      * @param description Description of the right to create.
      * @param impliedByRights the already existing rights that imply this new right.
-     * @since 12.6RC1
+     * @since 12.6
      */
     Right(RightDescription description, Set<Right> impliedByRights)
     {
@@ -230,7 +230,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param validEntityTypes The type of entity where this right should be enabled.
      * @param isReadOnly If true, this right could be allowed when the wiki is in read-only mode.
      * @param impliedByRights Rights that imply the new right we are adding.
-     * @since 12.6RC1
+     * @since 12.6
      */
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,

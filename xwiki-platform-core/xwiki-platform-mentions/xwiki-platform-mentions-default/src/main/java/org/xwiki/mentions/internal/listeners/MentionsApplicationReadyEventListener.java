@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * Listen for the application to be ready before starting the mentions task consumers.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton

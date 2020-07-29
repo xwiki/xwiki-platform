@@ -25,7 +25,7 @@ import java.util.Map;
  * A {@link MailListener} doing nothing.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class VoidMailListener implements MailListener
 {

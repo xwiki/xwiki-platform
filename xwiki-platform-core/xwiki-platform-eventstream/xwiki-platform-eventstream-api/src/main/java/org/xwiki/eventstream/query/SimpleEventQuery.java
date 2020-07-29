@@ -423,7 +423,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      * 
      * @param entityId the identifier of the entity that should receive the mail
      * @return this {@link SimpleEventQuery}
-     * @since 12.6RC1
+     * @since 12.6
      */
     public SimpleEventQuery withMail(String entityId)
     {

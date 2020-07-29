@@ -34,7 +34,7 @@ import org.xwiki.notifications.CompositeEvent;
  * MimeMessageIterator for sending pre filtered live mail notifications.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface PrefilteringMimeMessageIterator extends Iterator<MimeMessage>, Iterable<MimeMessage>

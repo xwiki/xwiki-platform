@@ -61,7 +61,7 @@ public interface EventStore
      * 
      * @param event the status to save
      * @return the new {@link CompletableFuture} providing the added {@link EntityEvent}
-     * @since 12.6RC1
+     * @since 12.6
      * @see #deleteMailEntityEvent(EntityEvent)
      */
     CompletableFuture<EventStatus> saveMailEntityEvent(EntityEvent event);
@@ -104,7 +104,7 @@ public interface EventStore
      * @param date the date before which to remove the statuses
      * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
      *         found
-     * @since 12.6RC1
+     * @since 12.6
      */
     CompletableFuture<Void> deleteEventStatuses(String entityId, Date date);
 
@@ -124,7 +124,7 @@ public interface EventStore
      * 
      * @param event the event to update
      * @return the new {@link CompletableFuture} providing the updated {@link Event}
-     * @since 12.6RC1
+     * @since 12.6
      */
     CompletableFuture<Event> prefilterEvent(Event event);
 

@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Provide a thread pool to analyze the mentions.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface MentionsThreadsProvider

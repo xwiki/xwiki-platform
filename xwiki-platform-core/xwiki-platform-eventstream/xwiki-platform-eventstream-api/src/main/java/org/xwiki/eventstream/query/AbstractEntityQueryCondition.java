@@ -28,7 +28,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * A condition related to an entity associated with and event.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public abstract class AbstractEntityQueryCondition extends QueryCondition
 {

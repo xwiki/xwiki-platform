@@ -97,7 +97,7 @@ public class RatingsException extends XWikiException
      *
      * @param message the message of the exception.
      * @param throwable the parent cause.
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     public RatingsException(String message, Throwable throwable)

@@ -26,7 +26,7 @@ import java.util.Iterator;
  * An empty {@link EmptyMailStatusResult}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class EmptyMailStatusResult implements MailStatusResult
 {

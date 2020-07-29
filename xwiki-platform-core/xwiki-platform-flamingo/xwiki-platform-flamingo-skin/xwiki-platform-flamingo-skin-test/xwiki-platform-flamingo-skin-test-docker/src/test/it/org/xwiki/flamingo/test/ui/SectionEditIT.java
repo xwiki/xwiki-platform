@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Test the section editing feature.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @UITest
 public class SectionEditIT

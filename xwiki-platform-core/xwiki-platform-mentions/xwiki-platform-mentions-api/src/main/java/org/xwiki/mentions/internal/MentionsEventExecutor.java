@@ -26,7 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
  * Execution the notifications for the mentions asynchronously.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface MentionsEventExecutor

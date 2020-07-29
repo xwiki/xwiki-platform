@@ -23,7 +23,7 @@ package org.xwiki.mentions.internal.jmx;
  * Interface of the Mentions JMX MBean.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public interface JMXMentionsMBean
 {

@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.Right;
 /**
  * Default implementation for {@link PrefilteringMimeMessageIterator}.
  *
- * @since 12.6RC1
+ * @since 12.6
  * @version $Id$
  */
 @Component

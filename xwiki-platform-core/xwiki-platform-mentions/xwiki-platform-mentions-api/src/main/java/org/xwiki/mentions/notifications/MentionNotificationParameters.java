@@ -30,7 +30,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 /**
  * Object holding the parameters of the users mentions.
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Unstable
 public class MentionNotificationParameters

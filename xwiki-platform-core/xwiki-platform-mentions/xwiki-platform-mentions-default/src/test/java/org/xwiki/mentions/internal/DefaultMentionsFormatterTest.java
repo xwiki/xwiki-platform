@@ -41,7 +41,7 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * Test of {@link DefaultMentionsFormatter}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class DefaultMentionsFormatterTest

@@ -52,7 +52,7 @@ import static org.mockito.Mockito.verify;
  * Test of {@link DefaultQuoteService}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class DefaultQuoteServiceTest

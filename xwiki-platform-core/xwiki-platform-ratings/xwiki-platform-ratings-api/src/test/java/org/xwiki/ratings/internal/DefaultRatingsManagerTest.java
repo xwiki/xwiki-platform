@@ -62,7 +62,7 @@ import static org.xwiki.ratings.RatingsManager.RATING_CLASS_FIELDNAME_PARENT;
  * Tests for {@link DefaultRatingsManager}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 public class DefaultRatingsManagerTest

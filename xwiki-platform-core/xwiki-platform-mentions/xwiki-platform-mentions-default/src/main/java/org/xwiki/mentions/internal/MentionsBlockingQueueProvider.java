@@ -28,7 +28,7 @@ import org.xwiki.mentions.internal.async.MentionsData;
  * Blocking queue provider.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface MentionsBlockingQueueProvider

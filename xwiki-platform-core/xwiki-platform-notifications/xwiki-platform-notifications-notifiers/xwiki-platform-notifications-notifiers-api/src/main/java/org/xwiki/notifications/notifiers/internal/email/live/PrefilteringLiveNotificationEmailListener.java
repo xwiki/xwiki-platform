@@ -38,7 +38,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 /**
  * This listener is responsible of sending mails to users who enabled live mails.
  *
- * @since 12.6RC1
+ * @since 12.6
  * @version $Id$
  */
 @Component

@@ -23,7 +23,7 @@ package org.xwiki.eventstream;
  * Associated an event to an entity.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public interface EntityEvent
 {

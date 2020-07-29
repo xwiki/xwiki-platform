@@ -133,7 +133,7 @@ public interface RatingsManager
      * @param asc if {@code true} sort the results in ascending date order else in descending date order.
      * @return a list of Rating objects made by the given user.
      * @throws RatingsException when an error occurs while fetching the list of ratings
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     default List<Rating> getRatings(UserReference userReference, int start, int count, boolean asc)

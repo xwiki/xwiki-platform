@@ -30,7 +30,7 @@ import static java.lang.Thread.NORM_PRIORITY;
  * Default implementation of {@link MentionsThreadsProvider}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton

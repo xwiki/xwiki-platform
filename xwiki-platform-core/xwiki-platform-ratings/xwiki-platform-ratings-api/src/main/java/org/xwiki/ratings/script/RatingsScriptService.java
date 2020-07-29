@@ -423,7 +423,7 @@ public class RatingsScriptService implements ScriptService
      * @param count maximum number of ratings to retrieve.
      * @param asc if the results should be ordered in ascending or descending order.
      * @return a list of ratings.
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     public List<RatingApi> getCurrentUserRatings(int start, int count, boolean asc)

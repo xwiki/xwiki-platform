@@ -41,7 +41,7 @@ import ch.rasc.xodusqueue.XodusBlockingQueue;
  * is loaded with the elements stored in disk.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton

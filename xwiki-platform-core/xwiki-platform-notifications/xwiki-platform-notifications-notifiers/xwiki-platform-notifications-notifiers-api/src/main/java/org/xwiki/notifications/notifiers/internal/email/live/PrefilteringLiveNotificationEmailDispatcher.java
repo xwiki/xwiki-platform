@@ -50,7 +50,7 @@ import org.xwiki.notifications.internal.SimilarityCalculator;
  * Dispatch events to users with live email notifications enabled.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = PrefilteringLiveNotificationEmailDispatcher.class)
 @Singleton

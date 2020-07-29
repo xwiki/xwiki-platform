@@ -94,7 +94,7 @@ public interface AuthorizationManager
      * @return the created {@link Right}
      * @throws UnableToRegisterRightException if an error prevent creation of the new right. Registering exactly
      * the same right does not cause an exception and return the existing right.
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     default Right register(RightDescription rightDescription, Set<Right> impliedByRights)

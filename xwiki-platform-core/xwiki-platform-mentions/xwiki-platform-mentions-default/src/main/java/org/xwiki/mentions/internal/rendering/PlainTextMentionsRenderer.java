@@ -37,7 +37,7 @@ import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
  * Plain text rendered with a specialization to display well formatted user mentions.  
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("plainmentions/1.0")

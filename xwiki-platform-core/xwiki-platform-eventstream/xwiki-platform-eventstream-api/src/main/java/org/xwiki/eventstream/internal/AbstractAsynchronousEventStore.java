@@ -74,12 +74,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         SAVE_EVENT,
 
         /**
-         * @since 12.6RC1
+         * @since 12.6
          */
         SAVE_STATUS,
 
         /**
-         * @since 12.6RC1
+         * @since 12.6
          */
         SAVE_MAIL_ENTITY,
 
@@ -90,17 +90,17 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         DELETE_STATUS,
 
         /**
-         * @since 12.6RC1
+         * @since 12.6
          */
         DELETE_STATUSES,
 
         /**
-         * @since 12.6RC1
+         * @since 12.6
          */
         DELETE_MAIL_ENTITY,
 
         /**
-         * @since 12.6RC1
+         * @since 12.6
          */
         PREFILTER_EVENT
     }
@@ -442,7 +442,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     /**
      * @param event the event/entity relation to save
-     * @since 12.6RC1
+     * @since 12.6
      */
     protected abstract EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException;
 
@@ -453,7 +453,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     /**
      * @param event the event to save update
-     * @since 12.6RC1
+     * @since 12.6
      */
     protected abstract Event syncPrefilterEvent(Event event) throws EventStreamException;
 
@@ -465,13 +465,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     /**
      * @param entityId the id of the entity for which to remove the statuses
      * @param date the date before which to remove the statuses
-     * @since 12.6RC1
+     * @since 12.6
      */
     protected abstract Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException;
 
     /**
      * @param event the event/entity relation to delete
-     * @since 12.6RC1
+     * @since 12.6
      */
     protected abstract Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException;
 

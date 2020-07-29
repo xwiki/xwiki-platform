@@ -46,7 +46,7 @@ import org.xwiki.query.QueryManager;
  * 
  * @version $Id$
  * @since 11.10.6
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = IntervalUsersManager.class)
 @Singleton

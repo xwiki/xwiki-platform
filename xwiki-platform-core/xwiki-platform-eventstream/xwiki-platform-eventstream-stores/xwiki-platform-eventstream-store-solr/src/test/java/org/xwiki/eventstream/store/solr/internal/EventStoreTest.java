@@ -297,6 +297,13 @@ public class EventStoreTest
         this.eventStore.prefilterEvent(EVENT1).get();
 
         assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setLimit(-1));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setOffset(-1));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setOffset(0));
+
+        assertSearch(Arrays.asList(), new SimpleEventQuery().setLimit(0));
+        assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().setOffset(1).addSort(Event.FIELD_ID, Order.ASC));
 
         SimpleEventQuery query = new SimpleEventQuery();
         query.eq(Event.FIELD_ID, "id1");

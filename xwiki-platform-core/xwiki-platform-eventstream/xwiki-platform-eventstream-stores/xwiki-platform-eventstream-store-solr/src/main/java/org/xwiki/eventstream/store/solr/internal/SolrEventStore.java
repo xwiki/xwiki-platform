@@ -411,7 +411,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 solrQuery.setStart((int) pageableQuery.getOffset());
             }
 
-            if (pageableQuery.getLimit() > 0) {
+            if (pageableQuery.getLimit() >= 0) {
                 solrQuery.setRows((int) pageableQuery.getLimit());
             }
         }

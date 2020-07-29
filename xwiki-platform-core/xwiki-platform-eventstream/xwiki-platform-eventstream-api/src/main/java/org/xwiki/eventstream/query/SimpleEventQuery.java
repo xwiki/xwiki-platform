@@ -82,7 +82,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
-     * @return limit the maximum number of events to return
+     * @return limit the maximum number of events to return, -1 for no limit (0 return no results)
      * @see #setLimit(long)
      */
     @Override
@@ -92,7 +92,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
-     * @param limit the maximum number of events to return
+     * @param limit the maximum number of events to return, -1 for no limit (0 return no results)
      * @return this query.
      */
     public SimpleEventQuery setLimit(long limit)

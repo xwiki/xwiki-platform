@@ -24,43 +24,34 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.CompositeConfigurationSource;
 
 /**
- * Looks in the "user" {@link ConfigurationSource} to get User properties (i.e. no fallbacks) and returns a secure
- * {@link org.xwiki.user.UserProperties} object that performs permissions checks when reading/writing properties.
+ * Provide configuration data (including all inherited ones) for the Guest user.
  *
  * @version $Id$
- * @since 12.4RC1
+ * @since 12.6
  */
 @Component
-@Named("secure")
+@Named("allsuperadminuser")
 @Singleton
-public class SecureUserPropertiesResolver extends AbstractUserPropertiesResolver
+public class AllSuperAdminConfigurationSource extends CompositeConfigurationSource implements Initializable
 {
     @Inject
     @Named("superadminuser")
     private ConfigurationSource superAdminConfigurationSource;
 
     @Inject
-    @Named("guestuser")
-    private ConfigurationSource guestConfigurationSource;
+    @Named("documents")
+    private ConfigurationSource documentsPreferencesSource;
 
     @Override
-    protected String getUnderlyingConfigurationSourceHint()
+    public void initialize()
     {
-        return "secure/user";
-    }
-
-    @Override
-    protected ConfigurationSource getSuperAdminConfigurationSource()
-    {
-        return this.superAdminConfigurationSource;
-    }
-
-    @Override
-    protected ConfigurationSource getGuestConfigurationSource()
-    {
-        return this.guestConfigurationSource;
+        // First source is searched first when a property value is requested.
+        addConfigurationSource(this.superAdminConfigurationSource);
+        addConfigurationSource(this.documentsPreferencesSource);
     }
 }

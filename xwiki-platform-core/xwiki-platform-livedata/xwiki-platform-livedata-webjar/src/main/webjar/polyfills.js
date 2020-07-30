@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
- define(["promise-polyfill"], function () {
+ define([
+   "promise-polyfill",
+   "url"
+  ], function () {
 
 
   /**

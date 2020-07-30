@@ -8,6 +8,8 @@
         :logic="logic"
       ></livedata-layout>
 
+      <persistent-configuration :logic=logic></persistent-configuration>
+
   </div>
 </template>
 
@@ -36,6 +38,7 @@ define([
   "Vue",
   "vue!panels/livedata-advanced-panels",
   "vue!layouts/livedata-layout",
+  "vue!persistent-configuration",
 ], function (
   Vue,
 ) {

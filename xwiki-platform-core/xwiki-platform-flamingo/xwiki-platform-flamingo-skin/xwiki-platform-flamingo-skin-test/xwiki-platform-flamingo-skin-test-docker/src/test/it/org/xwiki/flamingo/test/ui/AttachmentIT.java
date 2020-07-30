@@ -131,6 +131,7 @@ public class AttachmentIT
         // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
         setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
+        attachmentsPane.waitForAttachmentsLivetable();
 
         attachmentsPane.deleteAttachmentByFileByName(firstAttachment);
         assertEquals(1, attachmentsPane.getNumberOfAttachments());

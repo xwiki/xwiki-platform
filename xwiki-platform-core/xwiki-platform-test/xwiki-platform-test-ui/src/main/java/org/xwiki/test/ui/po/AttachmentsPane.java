@@ -23,8 +23,10 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the actions possible on the Attachment Pane at the bottom of a page.
@@ -40,11 +42,30 @@ public class AttachmentsPane extends BaseElement
     @FindBy(xpath = "//input[@value='Add another file']")
     private WebElement addAnotherFile;
 
+    private LiveTableElement attachmentsLivetable;
+
     private ConfirmationModal confirmDelete;
+
+    AttachmentsPane()
+    {
+        this.attachmentsLivetable = new LiveTableElement("docAttachments");
+    }
 
     public boolean isOpened()
     {
-        return getDriver().findElementWithoutWaiting(By.id("attachmentscontent")).isDisplayed();
+        return this.attachmentsLivetable.isReady();
+    }
+
+    public void waitForAttachmentsLivetable()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return attachmentsLivetable.isReady();
+            }
+        });
     }
 
     /**
@@ -84,14 +105,19 @@ public class AttachmentsPane extends BaseElement
             .click();
     }
 
+    public int getAttachmentRowNb(String attachmentName)
+    {
+        return Integer.parseInt(getDriver()
+            .findElement(By.xpath("//tbody[@id='docAttachments-display']//tr[td//a[text()='" + attachmentName + "']]"))
+            .getAttribute("data-index"));
+    }
+
     /**
      * @since 3.2M3
      */
     public WebElement getAttachmentLink(String attachmentName)
     {
-        return getDriver().findElement(
-            By.xpath("//div[@id='_attachments']//a[@title = 'Download this attachment' and contains(@href, '"
-                + attachmentName + "')]"));
+        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 2).findElement(By.tagName("a"));
     }
 
     /**
@@ -103,12 +129,19 @@ public class AttachmentsPane extends BaseElement
     {
         // We initialize before so we can remove the animation before the modal is shown
         this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
-        getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
+        int attachmentsNumber = getNumberOfAttachments();
+        this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 7)
+            .findElement(By.className("actiondelete")).click();
         this.confirmDelete.clickOk();
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
-        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
+
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return getNumberOfAttachments() == attachmentsNumber - 1;
+            }
+        });
     }
 
     /**
@@ -116,19 +149,21 @@ public class AttachmentsPane extends BaseElement
      */
     public void deleteFirstAttachment()
     {
-        String tmp = getDriver()
-            .findElement(By.xpath("//div[@id='_attachments']/*[1]/div[@class='information']/span[@class='name']"))
-            .getText();
-        getDriver()
-            .findElement(By
-                .xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"))
-            .click();
+        // We initialize before so we can remove the animation before the modal is shown
+        this.confirmDelete = new ConfirmationModal(By.id("deleteAttachment"));
+        int attachmentsNumber = getNumberOfAttachments();
+        this.attachmentsLivetable.getCell(1, 7).findElement(By.className("actiondelete")).click();
+        this.confirmDelete.clickOk();
 
-        getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        getDriver().waitUntilElementDisappears(
-            By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp + "']/../../span[2]/a[@class='deletelink']"));
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return getNumberOfAttachments() == attachmentsNumber - 1;
+            }
+        });
+
     }
 
     /**
@@ -152,36 +187,30 @@ public class AttachmentsPane extends BaseElement
 
     public String getUploaderOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='publisher']/span[@class='wikilink']")).getText();
+        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 6).getText();
     }
 
     public String getLatestVersionOfAttachment(String attachmentName)
     {
-        return getDriver()
-            .findElement(By.xpath(
-                "//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[@class='version']/a"))
-            .getText();
+        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 3).getText();
     }
 
     public String getSizeOfAttachment(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='size']")).getText().replaceAll("[()]", "");
+        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 4).getText();
 
     }
 
     public String getDateOfLastUpload(String attachmentName)
     {
-        return getDriver().findElement(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-            + "']/../../div[@class='meta']/span[@class='date']")).getText().replaceFirst("on", "");
+        return this.attachmentsLivetable.getCell(getAttachmentRowNb(attachmentName), 5).getText();
     }
 
     public boolean attachmentExistsByFileName(String attachmentName)
     {
         try {
-            getDriver()
-                .findElement(By.xpath("//a[@title = 'Download this attachment' and . = '" + attachmentName + "']"));
+            getDriver().findElement(
+                By.xpath("//tbody[@id='docAttachments-display']//tr[td//a[text()='" + attachmentName + "']]"));
         } catch (NoSuchElementException e) {
             return false;
         }

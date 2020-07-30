@@ -202,6 +202,21 @@
                 <new>method boolean org.xwiki.mentions.MentionsConfiguration::isQuoteActivated()</new>
                 <justification>Young API</justification>
               </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method &lt;T&gt; T org.xwiki.search.solr.SolrUtils::get(java.lang.String, org.apache.solr.common.SolrDocument, T)</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method org.xwiki.eventstream.EventSearchResult org.xwiki.eventstream.EventStore::search(org.xwiki.eventstream.EventQuery, java.util.Set&lt;java.lang.String&gt;) throws org.xwiki.eventstream.EventStreamException</new>
+                <justification>Young API</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.search.solr.SolrUtils::setString(java.lang.String, java.lang.Object, java.lang.reflect.Type, org.apache.solr.common.SolrInputDocument)</new>
+                <justification>Young API</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

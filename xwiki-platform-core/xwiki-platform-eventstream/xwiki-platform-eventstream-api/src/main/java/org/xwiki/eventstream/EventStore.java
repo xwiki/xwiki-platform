@@ -21,6 +21,7 @@ package org.xwiki.eventstream;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
@@ -147,4 +148,15 @@ public interface EventStore
      * @throws EventStreamException when failing to execute the search
      */
     EventSearchResult search(EventQuery query) throws EventStreamException;
+
+    /**
+     * Search for event according to condition provided by the {@link EventQuery}.
+     * 
+     * @param query the query containing the filtering conditions
+     * @param fields the fields included in the result, null or empty means all fields
+     * @return the result of the search
+     * @throws EventStreamException when failing to execute the search
+     * @since 12.6
+     */
+    EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException;
 }

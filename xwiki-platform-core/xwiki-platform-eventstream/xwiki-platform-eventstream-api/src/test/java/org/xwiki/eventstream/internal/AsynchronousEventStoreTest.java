@@ -22,6 +22,7 @@ package org.xwiki.eventstream.internal;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -86,6 +87,13 @@ public class AsynchronousEventStoreTest
 
         @Override
         public EventSearchResult search(EventQuery query) throws EventStreamException
+        {
+            // Not needed for the test
+            return null;
+        }
+
+        @Override
+        public EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException
         {
             // Not needed for the test
             return null;

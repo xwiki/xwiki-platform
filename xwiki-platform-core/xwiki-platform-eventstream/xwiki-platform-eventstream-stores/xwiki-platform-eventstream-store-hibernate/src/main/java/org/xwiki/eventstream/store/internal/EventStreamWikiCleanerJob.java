@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package org.xwiki.eventstream.store.internal;
 
 import java.util.List;
 
@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
@@ -59,9 +58,6 @@ public class EventStreamWikiCleanerJob
     private EventStream eventStream;
 
     @Inject
-    private EventStore eventStore;
-
-    @Inject
     private QueryManager queryManager;
 
     @Override
@@ -79,7 +75,7 @@ public class EventStreamWikiCleanerJob
                 // EventStreamDeletedEvent would not be triggered for each deleted event.
                 eventsToDelete = eventStream.searchEvents(query);
                 for (org.xwiki.eventstream.Event toDelete : eventsToDelete) {
-                    eventStore.deleteEvent(toDelete);
+                    eventStream.deleteEvent(toDelete);
                 }
             } catch (Exception e) {
                 logger.error("Failed to delete events related to the deleted wiki [{}] in the event stream.", wikiId,

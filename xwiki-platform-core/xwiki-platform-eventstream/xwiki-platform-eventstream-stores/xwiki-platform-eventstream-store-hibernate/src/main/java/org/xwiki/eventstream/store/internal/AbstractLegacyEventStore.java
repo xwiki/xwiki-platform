@@ -21,6 +21,7 @@ package org.xwiki.eventstream.store.internal;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -152,6 +153,13 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
 
     @Override
     public EventSearchResult search(EventQuery query) throws EventStreamException
+    {
+        // TODO
+        return EmptyEventSearchResult.INSTANCE;
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException
     {
         // TODO
         return EmptyEventSearchResult.INSTANCE;

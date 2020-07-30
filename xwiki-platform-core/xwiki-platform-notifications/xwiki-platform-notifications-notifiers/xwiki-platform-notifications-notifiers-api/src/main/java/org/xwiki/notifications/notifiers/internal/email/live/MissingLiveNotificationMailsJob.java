@@ -51,7 +51,7 @@ public class MissingLiveNotificationMailsJob
     /**
      * The id of the job.
      */
-    public static final String JOBTYPE = "solr.indexer";
+    public static final String JOBTYPE = "notificatiion.livemails.resume";
 
     @Inject
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;

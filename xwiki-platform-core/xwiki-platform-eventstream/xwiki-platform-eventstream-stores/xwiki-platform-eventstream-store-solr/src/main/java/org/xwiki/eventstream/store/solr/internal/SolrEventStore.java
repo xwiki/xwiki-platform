@@ -27,11 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -106,6 +108,10 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Named("compact")
     private EntityReferenceSerializer<String> compact;
 
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactwiki;
+
     private SolrClient client;
 
     @Override
@@ -173,7 +179,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(serializeCompareCondition(new CompareQueryCondition(Event.FIELD_DATE, date, CompareType.LESS_OR_EQUALS, false)));
+        builder.append(serializeCompareCondition(
+            new CompareQueryCondition(Event.FIELD_DATE, date, CompareType.LESS_OR_EQUALS, false)));
 
         builder.append(" AND ");
 
@@ -281,7 +288,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.set(Event.FIELD_HIDDEN, event.getHidden(), document);
         this.utils.set(Event.FIELD_PREFILTERED, event.isPrefiltered(), document);
         this.utils.setString(Event.FIELD_IMPORTANCE, event.getImportance(), document);
-        this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), document);
+        this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), EntityReference.class, document);
         this.utils.setString(Event.FIELD_SPACE, event.getSpace(), document);
         this.utils.set(Event.FIELD_STREAM, event.getStream(), document);
         this.utils.set(Event.FIELD_TARGET, event.getTarget(), document);
@@ -297,7 +304,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (event.getDocument() != null) {
             this.utils.set(EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX,
                 Arrays.asList(this.serializer.serialize(event.getDocument()),
-                    this.compact.serialize(event.getDocument(), event.getWiki()),
+                    this.compactwiki.serialize(event.getDocument(), event.getWiki()),
                     this.compact.serialize(event.getDocument(), event.getSpace())),
                 document);
         }
@@ -382,8 +389,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setDocumentTitle(this.utils.get(Event.FIELD_DOCUMENTTITLE, document));
         event.setDocumentVersion(this.utils.get(Event.FIELD_DOCUMENTVERSION, document));
         event.setGroupId(this.utils.get(Event.FIELD_GROUPID, document));
-        event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document));
-        event.setPrefiltered(this.utils.get(Event.FIELD_PREFILTERED, document));
         event.setImportance(this.utils.get(Event.FIELD_IMPORTANCE, document, Importance.class));
         event.setRelatedEntity(this.utils.get(Event.FIELD_RELATEDENTITY, document, EntityReference.class));
         event.setSpace(this.utils.get(Event.FIELD_SPACE, document, SpaceReference.class));
@@ -395,14 +400,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setUser(this.utils.get(Event.FIELD_USER, document, DocumentReference.class));
         event.setWiki(this.utils.get(Event.FIELD_WIKI, document, WikiReference.class));
 
+        event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document, false));
+        event.setPrefiltered(this.utils.get(Event.FIELD_PREFILTERED, document, false));
+
         event.setParameters(this.utils.getMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, document));
 
         return event;
     }
 
-    private SolrQuery toSolrQuery(EventQuery query)
+    private SolrQuery toSolrQuery(EventQuery query, Set<String> fields)
     {
         SolrQuery solrQuery = new SolrQuery();
+
+        if (CollectionUtils.isNotEmpty(fields)) {
+            fields.forEach(solrQuery::setFields);
+        }
 
         if (query instanceof PageableEventQuery) {
             PageableEventQuery pageableQuery = (PageableEventQuery) query;
@@ -640,7 +652,13 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Override
     public EventSearchResult search(EventQuery query) throws EventStreamException
     {
-        SolrQuery solrQuery = toSolrQuery(query);
+        return search(query, null);
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException
+    {
+        SolrQuery solrQuery = toSolrQuery(query, fields);
 
         QueryResponse response;
         try {

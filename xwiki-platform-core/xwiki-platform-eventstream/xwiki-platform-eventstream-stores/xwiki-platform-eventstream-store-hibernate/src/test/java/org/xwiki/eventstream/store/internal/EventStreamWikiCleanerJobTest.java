@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package org.xwiki.eventstream.store.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,31 +50,43 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Validate {@link EventStreamWikiCleanerJob}.
+ * 
+ * @version $Id$
+ */
 public class EventStreamWikiCleanerJobTest
 {
     @Rule
     public MockitoComponentMockingRule<EventStreamWikiCleanerJob> mocker =
-            new MockitoComponentMockingRule<>(EventStreamWikiCleanerJob.class);
+        new MockitoComponentMockingRule<>(EventStreamWikiCleanerJob.class);
 
     private EventStream eventStream;
-    private EventStore eventStore;
+
     private QueryManager queryManager;
 
     private ObservationManager observationManager;
+
     private LoggerManager loggerManager;
+
     private JobStatusStore store;
+
     private Provider<Execution> executionProvider;
+
     private Provider<ExecutionContextManager> executionContextManagerProvider;
+
     private JobContext jobContext;
+
     private JobProgressManager progressManager;
+
     private Execution execution = new DefaultExecution();
+
     private ExecutionContextManager executionContextManager;
 
     @Before
     public void setUp() throws Exception
     {
         eventStream = mocker.getInstance(EventStream.class);
-        eventStore = mocker.getInstance(EventStore.class);
         queryManager = mocker.getInstance(QueryManager.class);
 
         observationManager = mocker.getInstance(ObservationManager.class);
@@ -82,11 +94,11 @@ public class EventStreamWikiCleanerJobTest
         store = mocker.getInstance(JobStatusStore.class);
         executionProvider = mock(Provider.class);
         mocker.registerComponent(new DefaultParameterizedType(null, Provider.class, Execution.class),
-                executionProvider);
+            executionProvider);
         when(executionProvider.get()).thenReturn(execution);
         executionContextManagerProvider = mock(Provider.class);
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class,
-                ExecutionContextManager.class), executionContextManagerProvider);
+        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class, ExecutionContextManager.class),
+            executionContextManagerProvider);
         executionContextManager = mock(ExecutionContextManager.class);
         when(executionContextManagerProvider.get()).thenReturn(executionContextManager);
         jobContext = mocker.getInstance(JobContext.class);
@@ -106,7 +118,7 @@ public class EventStreamWikiCleanerJobTest
         Event event4 = mock(Event.class);
 
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Arrays.asList(event3, event4),
-                Collections.emptyList());
+            Collections.emptyList());
 
         // Test
         EventStreamWikiCleanerJobRequest request = new EventStreamWikiCleanerJobRequest("someWiki");
@@ -115,10 +127,10 @@ public class EventStreamWikiCleanerJobTest
         job.runInternal();
 
         // Verify
-        verify(eventStore).deleteEvent(event1);
-        verify(eventStore).deleteEvent(event2);
-        verify(eventStore).deleteEvent(event3);
-        verify(eventStore).deleteEvent(event4);
+        verify(eventStream).deleteEvent(event1);
+        verify(eventStream).deleteEvent(event2);
+        verify(eventStream).deleteEvent(event3);
+        verify(eventStream).deleteEvent(event4);
         verify(query, times(3)).bindValue("wiki", "someWiki");
     }
 

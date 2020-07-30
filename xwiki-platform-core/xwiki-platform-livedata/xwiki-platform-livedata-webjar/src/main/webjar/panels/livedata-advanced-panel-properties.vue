@@ -13,12 +13,13 @@
     <template #body>
 
       <draggable
-        v-model="data.meta.propertyDescriptors"
+        :value="logic.propertyOrder"
+        @change="reorderProperty"
         v-bind="dragOptions"
       >
         <div
           class="property"
-          v-for="property in data.meta.propertyDescriptors"
+          v-for="property in logic.getDisplayablePropertyDescriptors()"
           :key="property.id"
         >
           <div class="handle">
@@ -98,6 +99,12 @@ define([
         };
       },
 
+    },
+
+    methods: {
+      reorderProperty: function (e) {
+        this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
+      },
     },
 
 

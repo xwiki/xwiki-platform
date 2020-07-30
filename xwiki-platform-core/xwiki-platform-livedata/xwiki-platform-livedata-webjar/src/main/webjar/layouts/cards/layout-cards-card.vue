@@ -19,7 +19,8 @@
     <!-- Card properties-->
 
     <draggable
-      v-model="data.meta.propertyDescriptors"
+      :value="logic.propertyOrder"
+      @change="reorderProperty"
       v-bind="dragOptions"
     >
       <div
@@ -97,7 +98,7 @@ define([
       data: function () { return this.logic.data; },
 
       properties: function () {
-        return this.logic.getVisiblePropertyDescriptors();
+        return this.logic.getDisplayablePropertyDescriptors();
       },
 
       titlePropertyId: function () {
@@ -111,6 +112,13 @@ define([
         };
       },
 
+    },
+
+
+    methods: {
+      reorderProperty: function (e) {
+        this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
+      },
     },
 
   });

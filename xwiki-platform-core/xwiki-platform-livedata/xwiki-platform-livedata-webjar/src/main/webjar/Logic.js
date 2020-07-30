@@ -62,6 +62,8 @@ define([
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   var Logic = function (element) {
+    var self = this;
+
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
 
@@ -73,6 +75,13 @@ define([
       isGlobal: false,
     };
     this.hiddenProperties = [];
+    this.propertyOrder = this.data.meta.propertyDescriptors
+    .filter(function (propertyDescriptor) {
+      return self.isPropertyDisplayable(propertyDescriptor.id);
+    })
+    .map(function (propertyDescriptor) {
+      return propertyDescriptor.id;
+    });
     this.openedPanels = [];
 
     element.removeAttribute("data-data");
@@ -530,8 +539,12 @@ define([
      */
     getDisplayablePropertyDescriptors: function () {
       var self = this;
-      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
+      return this.data.meta.propertyDescriptors
+      .filter(function (propertyDescriptor) {
         return self.isPropertyDisplayable(propertyDescriptor.id);
+      })
+      .sort(function (descriptorA, descriptorB) {
+        return self.propertyOrder.indexOf(descriptorA.id) - self.propertyOrder.indexOf(descriptorB.id);
       });
     },
 
@@ -564,19 +577,13 @@ define([
     },
 
 
-    /**
-     * Returns the property descriptors of visible properties
-     * @returns {Array}
-     */
-    getVisiblePropertyDescriptors: function () {
-      var self = this;
-      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
-        return self.isPropertyVisible(propertyDescriptor.id);
-      });
+    reorderProperty: function (propertyId, toIndex) {
+      if (!this.isValidPropertyId(propertyId)) { return; }
+      if (toIndex < 0) { toIndex = 0; }
+      var fromIndex = this.propertyOrder.indexOf(propertyId);
+      if (fromIndex === -1) { return; }
+      this.propertyOrder.splice(toIndex, 0, this.propertyOrder.splice(fromIndex, 1)[0]);
     },
-
-
-
 
 
 

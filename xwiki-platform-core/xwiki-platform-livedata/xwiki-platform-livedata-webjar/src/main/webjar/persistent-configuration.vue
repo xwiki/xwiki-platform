@@ -94,6 +94,7 @@ define([
           limit: ["integer"],
           currentLayoutId: this.encodingSpecsCurrentLayoutId,
           hiddenProperties: ["array", this.encodingSpecsProperties],
+          propertyOrder: ["array", this.encodingSpecsProperties],
         };
       },
 

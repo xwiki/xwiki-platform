@@ -69,7 +69,6 @@ public class SpaceReferenceConverterTest
     private EntityReferenceResolver<EntityReference> mockReferenceResolver;
 
     @MockComponent
-    @Named("compact")
     private EntityReferenceSerializer<String> mockSerialier;
 
     @BeforeEach

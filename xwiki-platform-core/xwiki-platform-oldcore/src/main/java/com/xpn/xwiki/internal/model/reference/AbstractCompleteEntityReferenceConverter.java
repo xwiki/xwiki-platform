@@ -48,7 +48,6 @@ public abstract class AbstractCompleteEntityReferenceConverter<R extends EntityR
     private EntityReferenceResolver<EntityReference> referenceResolver;
 
     @Inject
-    @Named("compact")
     private EntityReferenceSerializer<String> serializer;
 
     private final EntityType type;

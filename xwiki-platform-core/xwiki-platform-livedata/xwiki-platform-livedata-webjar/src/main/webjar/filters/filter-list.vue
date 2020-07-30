@@ -74,13 +74,13 @@ define([
       },
 
       values: function () {
-        return this.filterEntry.value || [];
+        return JSON.parse(this.filterEntry.value || "[]");
       },
     },
 
     methods: {
       changeHandler: function (selected) {
-        this.logic.filter(this.propertyId, this.index, {value: selected});
+        this.logic.filter(this.propertyId, this.index, {value: JSON.stringify(selected)});
       },
     },
 

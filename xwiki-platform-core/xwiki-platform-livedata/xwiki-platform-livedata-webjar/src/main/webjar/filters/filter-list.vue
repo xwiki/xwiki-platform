@@ -74,7 +74,17 @@ define([
       },
 
       values: function () {
-        return JSON.parse(this.filterEntry.value || "[]");
+        try {
+          var values = JSON.parse(this.filterEntry.value || "[]");
+          if (values instanceof Array) {
+            return values;
+          } else {
+            return [];
+          }
+        } catch (err) {
+          console.warn(err);
+          return [];
+        }
       },
     },
 

@@ -532,7 +532,6 @@ define([
     },
 
 
-
     /**
      * Returns the property descriptors of visible properties
      * @returns {Array}
@@ -725,9 +724,10 @@ define([
      */
     sort: function (property, level, descending) {
       var self = this;
+      var err = new Error("Property `" + property + "` is not sortable");
       return new Promise (function (resolve, reject) {
-        if (!self.isValidPropertyId(property)) { return void reject(); }
-        if (!self.isPropertySortable(property)) { return void reject(); }
+        if (!self.isValidPropertyId(property)) { return void reject(err); }
+        if (!self.isPropertySortable(property)) { return void reject(err); }
         // find property current sort level
         var currentLevel = self.data.query.sort.findIndex(function (sortObject) {
           return sortObject.property === property;
@@ -961,9 +961,10 @@ define([
      */
     filter: function (property, index, filterEntry) {
       var self = this;
+      var err = new Error("Property `" + property + "` is not filterable");
       return new Promise (function (resolve, reject) {
         var filterEntries = self._computeFilterEntries(property, index, filterEntry);
-        if (!filterEntries) { return void reject(); }
+        if (!filterEntries) { return void reject(err); }
         var oldEntry = filterEntries.oldEntry;
         var newEntry = filterEntries.newEntry;
         var filteringType = self._getFilteringType(oldEntry, newEntry);

@@ -100,7 +100,7 @@ define([
       // load filter
       this.loadFilter(this.filterId).catch(function (err) {
         console.warn(err);
-        self.loadFilter(self.data.meta.defaultFilter).catch (function (err) {
+        self.loadFilter(self.data.meta.defaultFilter).catch(function (err) {
           console.error(err);
         });
       });

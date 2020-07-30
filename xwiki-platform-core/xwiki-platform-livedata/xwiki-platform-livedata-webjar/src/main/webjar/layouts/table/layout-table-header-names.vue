@@ -14,7 +14,7 @@
     >
       <div
         class="column-name"
-        @click="logic.sort(property.id, 0)"
+        @click="sort(property)"
       >
         <span>{{ property.name }}</span>
         <span
@@ -74,6 +74,14 @@ define([
       data: function () { return this.logic.data; },
       properties: function () { return this.logic.getDisplayablePropertyDescriptors(); },
       firstSortLevel: function () { return this.data.query.sort[0] || {}; },
+    },
+
+    methods: {
+      sort: function (property) {
+        this.logic.sort(property.id, 0).catch(function (err) {
+          console.warn(err);
+        });
+      },
     },
 
   });

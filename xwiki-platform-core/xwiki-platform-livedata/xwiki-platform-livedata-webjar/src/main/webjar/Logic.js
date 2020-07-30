@@ -214,6 +214,38 @@ define([
     },
 
 
+    /**
+     * Return whether the array has the given item
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayHas: function (uniqueArray, item) {
+      return uniqueArray.indexOf(item) !== -1;
+    },
+
+
+    /**
+     * Add the given item if not present in the array, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayAdd: function (uniqueArray, item) {
+      if (this.uniqueArrayHas(uniqueArray, item)) { return; }
+      uniqueArray.push(item);
+    },
+
+
+    /**
+     * Remove the given item from the array if present, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayRemove: function (uniqueArray, item) {
+      var index = uniqueArray.indexOf(item);
+      if (index === -1) { return; }
+      uniqueArray.splice(index, 1);
+    },
+
 
 
 
@@ -508,7 +540,7 @@ define([
      */
     isPropertyVisible: function (propertyId) {
       return this.isPropertyDisplayable(propertyId) &&
-        this.hiddenProperties.indexOf(propertyId) === -1;
+        !this.uniqueArrayHas(this.hiddenProperties, propertyId);
     },
 
 
@@ -520,14 +552,11 @@ define([
     setPropertyVisibility: function (propertyId, bool) {
       if (!this.isPropertyDisplayable(propertyId)) { return; }
       if (bool) {
-        var idx = this.hiddenProperties.indexOf(propertyId);
-        if (idx !== -1) {
-          this.hiddenProperties.splice(idx, 1);
-        }
+        // set visible
+        this.uniqueArrayRemove(this.hiddenProperties, propertyId);
       } else {
-        if (this.hiddenProperties.indexOf(propertyId) === -1) {
-          this.hiddenProperties.push(propertyId);
-        }
+        // set hidden
+        this.uniqueArrayAdd(this.hiddenProperties, propertyId);
       }
     },
 
@@ -563,9 +592,9 @@ define([
     isEntrySelected: function (entry) {
       var entryId = this.getEntryId(entry);
       if (this.entrySelection.isGlobal) {
-        return this.entrySelection.deselected.indexOf(entryId) === -1;
+        return !this.uniqueArrayHas(this.entrySelection.deselected, entryId);
       } else {
-        return this.entrySelection.selected.indexOf(entryId) !== -1;
+        return this.uniqueArrayHas(this.entrySelection.selected, entryId);
       }
     },
 
@@ -580,13 +609,10 @@ define([
       entryArray.forEach(function (entry) {
         var entryId = self.getEntryId(entry);
         if (self.entrySelection.isGlobal) {
-          var index = self.entrySelection.deselected.indexOf(entryId);
-          if (index === -1) { return; }
-          self.entrySelection.deselected.splice(index, 1);
+          self.uniqueArrayRemove(self.entrySelection.deselected, entryId);
         }
         else {
-          if (self.entrySelection.selected.indexOf(entryId) !== -1) { return; }
-          self.entrySelection.selected.push(entryId);
+          self.uniqueArrayAdd(self.entrySelection.selected, entryId);
         }
         self.triggerEvent("select", {
           entry: entry,
@@ -605,13 +631,10 @@ define([
       entryArray.forEach(function (entry) {
         var entryId = self.getEntryId(entry);
         if (self.entrySelection.isGlobal) {
-          if (self.entrySelection.deselected.indexOf(entryId) !== -1) { return; }
-          self.entrySelection.deselected.push(entryId);
+          self.uniqueArrayAdd(self.entrySelection.deselected, entryId);
         }
         else {
-          var index = self.entrySelection.selected.indexOf(entryId);
-          if (index === -1) { return; }
-          self.entrySelection.selected.splice(index, 1);
+          self.uniqueArrayRemove(self.entrySelection.selected, entryId);
         }
         self.triggerEvent("deselect", {
           entry: entry,

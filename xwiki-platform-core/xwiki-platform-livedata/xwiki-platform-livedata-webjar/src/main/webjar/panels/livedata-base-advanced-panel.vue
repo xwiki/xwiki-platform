@@ -9,7 +9,7 @@
       </span>
       <span
         class="close-button"
-        @click="panelOpened = false"
+        @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
       >
         <span class="fa fa-times"></span>
       </span>
@@ -56,27 +56,16 @@ define([
 
     props: {
       logic: Object,
-      triggerEventName: String,
-    },
-
-    data: function () {
-      return {
-        panelOpened: false,
-      };
+      panelId: String,
     },
 
     computed: {
       data: function () { return this.logic.data; },
-    },
 
-    mounted: function () {
-      var self = this;
-      // listen for event from the dropdown
-      this.logic.onEvent(this.triggerEventName, function () {
-        self.panelOpened = !self.panelOpened;
-      });
+      panelOpened: function () {
+        return this.logic.uniqueArrayHas(this.logic.openedPanels, this.panelId);
+      },
     },
-
 
   });
 });

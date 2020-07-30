@@ -2,7 +2,7 @@
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-properties"
     :logic="logic"
-    trigger-event-name="triggerPropertiesPanel"
+    panel-id="propertiesPanel"
   >
 
     <template #header>

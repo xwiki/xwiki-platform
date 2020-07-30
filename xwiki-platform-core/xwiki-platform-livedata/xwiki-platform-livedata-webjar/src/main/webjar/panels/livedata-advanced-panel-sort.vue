@@ -2,7 +2,7 @@
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-sort"
     :logic="logic"
-    trigger-event-name="triggerSortPanel"
+    panel-id="sortPanel"
   >
 
     <template #header>

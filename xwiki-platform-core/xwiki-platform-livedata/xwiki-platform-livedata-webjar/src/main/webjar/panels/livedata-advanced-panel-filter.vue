@@ -2,7 +2,7 @@
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-filter"
     :logic="logic"
-    trigger-event-name="triggerFilterPanel"
+    panel-id="filterPanel"
   >
 
     <template #header>

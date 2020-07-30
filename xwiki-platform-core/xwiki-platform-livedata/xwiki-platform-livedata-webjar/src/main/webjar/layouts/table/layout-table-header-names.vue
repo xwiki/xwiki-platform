@@ -1,5 +1,12 @@
 <template>
-  <tr class="column-header">
+  <tr
+    class="column-header-names"
+      is="draggable"
+      :value="logic.propertyOrder"
+      @change="reorderProperty"
+      v-bind="dragOptions"
+      tag="tr"
+  >
     <!-- Entry Select All-->
     <th class="entry-selector">
       <livedata-entry-selector-all
@@ -8,6 +15,7 @@
     </th>
 
     <th
+      class="column-name-container"
       v-for="property in properties"
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
@@ -16,7 +24,11 @@
         class="column-name"
         @click="sort(property)"
       >
+        <div class="handle">
+          <span class="fa fa-ellipsis-v"></span>
+        </div>
         <span>{{ property.name }}</span>
+        <span class="flex-spacer"></span>
         <span
           v-if="logic.isPropertySortable(property.id)"
           :class="[
@@ -55,9 +67,11 @@
  */
 define([
   "Vue",
+  "vuedraggable",
   "vue!livedata-entry-selector-all",
 ], function (
-  Vue
+  Vue,
+  vuedraggable,
 ) {
 
   Vue.component("layout-table-header-names", {
@@ -66,22 +80,50 @@ define([
 
     template: template,
 
+    components: {
+      "draggable": vuedraggable,
+    },
+
     props: {
       logic: Object,
     },
 
+
     computed: {
       data: function () { return this.logic.data; },
-      properties: function () { return this.logic.getDisplayablePropertyDescriptors(); },
-      firstSortLevel: function () { return this.data.query.sort[0] || {}; },
+
+      properties: function () {
+        return this.logic.getDisplayablePropertyDescriptors();
+      },
+
+      firstSortLevel: function () {
+        return this.data.query.sort[0] || {};
+      },
+
+      dragOptions: function () {
+        return {
+          animation: 200,
+          draggable: ".column-name-container",
+          handle: ".handle",
+          ghostClass: "ordered",
+        };
+      },
+
     },
 
+
     methods: {
+
       sort: function (property) {
         this.logic.sort(property.id, 0).catch(function (err) {
           console.warn(err);
         });
       },
+
+      reorderProperty: function (e) {
+        this.logic.reorderProperty(e.moved.oldIndex - 2, e.moved.newIndex - 2);
+      },
+
     },
 
   });
@@ -94,9 +136,29 @@ define([
 .layout-table .column-name {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   cursor: pointer;
+}
+
+.layout-table .handle {
+  height: 100%;
+  margin-left: -8px;
+  padding: 0px 8px;
+  cursor: pointer; /* IE */
+  cursor: grab;
+  opacity: 0;
+}
+.layout-table .column-name:hover .handle {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.layout-table .handle .fa {
+  vertical-align: middle;
+}
+
+.layout-table .column-name .flex-spacer {
+  flex-grow: 1;
 }
 
 .layout-table .sort-icon {

@@ -158,7 +158,7 @@ define([
           var decoded = u.decode(this.coders, uncompressed);
           return decoded;
         } catch (err) {
-          console.error(err);
+          console.warn(err);
         }
       },
 

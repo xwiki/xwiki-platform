@@ -577,11 +577,23 @@ define([
     },
 
 
-    reorderProperty: function (propertyId, toIndex) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
-      if (toIndex < 0) { toIndex = 0; }
-      var fromIndex = this.propertyOrder.indexOf(propertyId);
-      if (fromIndex === -1) { return; }
+    /**
+     * Move a property to a certain index in the property order list
+     * @param {String|Number} from The id or index of the property to move
+     * @param {*} toIndex
+     */
+    reorderProperty: function (from, toIndex) {
+      var fromIndex;
+      if (typeof from === "number") {
+        fromIndex = from;
+      } else if (typeof from === "string") {
+        if (!this.isValidPropertyId(from)) { return; }
+        if (toIndex < 0) { toIndex = 0; }
+        fromIndex = this.propertyOrder.indexOf(from);
+      } else {
+        return;
+      }
+      if (fromIndex <= -1 || toIndex <= -1) { return; }
       this.propertyOrder.splice(toIndex, 0, this.propertyOrder.splice(fromIndex, 1)[0]);
     },
 

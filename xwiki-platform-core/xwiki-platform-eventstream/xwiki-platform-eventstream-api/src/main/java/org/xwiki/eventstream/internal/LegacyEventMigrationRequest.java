@@ -20,53 +20,64 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.Date;
+import java.util.List;
 
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 
 /**
- * The request used to configure {@link LegacyEventSynchornizationJob}.
+ * The request used to configure {@link LegacyEventMigrationJob}.
  * 
  * @version $Id$
  * @since 12.6RC1
  */
-public class LegacyEventSynchornizationRequest extends AbstractRequest
+public class LegacyEventMigrationRequest extends AbstractRequest
 {
     /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
 
-    private static final String AFTER_ID = "after";
+    private static final String SINCE_ID = "after";
 
     /**
      * The default constructor.
      */
-    public LegacyEventSynchornizationRequest()
+    public LegacyEventMigrationRequest()
     {
     }
 
     /**
      * @param request the request to copy
      */
-    public LegacyEventSynchornizationRequest(Request request)
+    public LegacyEventMigrationRequest(Request request)
     {
         super(request);
     }
 
     /**
-     * @return the date after which to copy the events
+     * @param since the date after which to copy the events
+     * @param id the identifier used to access the job
      */
-    public Date getAfter()
+    public LegacyEventMigrationRequest(Date since, List<String> id)
     {
-        return this.getProperty(AFTER_ID);
+        setSince(since);
+        setId(id);
     }
 
     /**
-     * @param after the date after which to copy the events
+     * @return the date after which to copy the events
      */
-    public void setAfter(Date after)
+    public Date getSince()
     {
-        setProperty(AFTER_ID, after);
+        return this.getProperty(SINCE_ID);
+    }
+
+    /**
+     * @param since the date after which to copy the events
+     */
+    public void setSince(Date since)
+    {
+        setProperty(SINCE_ID, since);
     }
 }

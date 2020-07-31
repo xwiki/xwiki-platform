@@ -22,8 +22,10 @@ package org.xwiki.eventstream.store.solr.internal;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,19 +179,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Override
     protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
     {
-        StringBuilder builder = new StringBuilder();
+        SimpleEventQuery query = new SimpleEventQuery();
+        query.withStatus(entityId);
+        query.lessOrEq(Event.FIELD_DATE, date);
+        //query.before(date);
+        EventSearchResult results = search(query, Collections.singleton(Event.FIELD_ID));
 
-        builder.append(serializeCompareCondition(
-            new CompareQueryCondition(Event.FIELD_DATE, date, CompareType.LESS_OR_EQUALS, false)));
+        for (Iterator<Event> it = results.stream().iterator(); it.hasNext();) {
+            Event event = it.next();
 
-        builder.append(" AND ");
-
-        builder.append(serializeStatusCondition(new StatusQueryCondition(entityId, null, false)));
-
-        try {
-            this.client.deleteByQuery(builder.toString());
-        } catch (Exception e) {
-            throw new EventStreamException("Failed to delete the event", e);
+            saveEventStatus(event.getId(), entityId, false, false);
         }
 
         return null;

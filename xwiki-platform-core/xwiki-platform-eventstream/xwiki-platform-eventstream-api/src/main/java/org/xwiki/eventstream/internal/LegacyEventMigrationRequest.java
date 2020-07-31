@@ -29,7 +29,7 @@ import org.xwiki.job.Request;
  * The request used to configure {@link LegacyEventMigrationJob}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class LegacyEventMigrationRequest extends AbstractRequest
 {

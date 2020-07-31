@@ -19,64 +19,43 @@
  */
 package org.xwiki.livedata;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
 /**
- * The live data to display.
+ * Base class for various live data configuration descriptors.
  * 
  * @version $Id$
  * @since 12.6
  */
 @Unstable
-public class LiveData extends WithParameters
+public class BaseDescriptor extends WithParameters
 {
-    /**
-     * The total number of entries available. This is used for pagination.
-     */
-    private long count;
+    private String id;
 
     /**
-     * The live data entries. Could be all or just a subset. Each entry is a mapping between property names and property
-     * values. Property names are specific to each live data source.
+     * @return the id
      */
-    private final List<Map<String, Object>> entries = new LinkedList<>();
-
-    /**
-     * @return the total number of entries available
-     */
-    public long getCount()
+    public String getId()
     {
-        return count;
+        return id;
     }
 
     /**
-     * Set the total number of entries available.
+     * Set the id.
      * 
-     * @param count the new entry count
+     * @param id the new id
      */
-    public void setCount(long count)
+    public void setId(String id)
     {
-        this.count = count;
-    }
-
-    /**
-     * @return the live data entries
-     */
-    public List<Map<String, Object>> getEntries()
-    {
-        return entries;
+        this.id = id;
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder().append(getCount()).append(getEntries()).build();
+        return new HashCodeBuilder().appendSuper(super.hashCode()).append(getId()).build();
     }
 
     @Override
@@ -86,18 +65,11 @@ public class LiveData extends WithParameters
             return true;
         }
 
-        if (obj instanceof LiveData) {
-            LiveData liveData = (LiveData) obj;
-            return new EqualsBuilder().append(getCount(), liveData.getCount())
-                .append(getEntries(), liveData.getEntries()).build();
+        if (obj instanceof BaseDescriptor) {
+            BaseDescriptor other = (BaseDescriptor) obj;
+            return new EqualsBuilder().appendSuper(super.equals(other)).append(getId(), other.getId()).build();
         }
 
         return false;
-    }
-
-    @Override
-    public String toString()
-    {
-        return getCount() + ", " + getEntries().toString();
     }
 }

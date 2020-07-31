@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * The interface used to store and retrieve live data entries.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 @Unstable

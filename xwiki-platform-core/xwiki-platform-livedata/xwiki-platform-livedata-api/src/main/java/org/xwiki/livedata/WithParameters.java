@@ -19,23 +19,70 @@
  */
 package org.xwiki.livedata;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+
 /**
- * Interface used by components that have parameters. Should be used only for components that have
+ * Base class for components and POJOs that can have unknown parameters. When extended by POJOs the unknown parameters
+ * are serialized as JSON side by side with the other (known) POJO fields. When extended by components, they should have
  * {@link ComponentInstantiationStrategy#PER_LOOKUP}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Unstable
-public interface WithParameters
+public class WithParameters
 {
+    private final Map<String, Object> parameters = new HashMap<>();
+
     /**
-     * @return the parameters of this component
+     * @return the parameters
      */
-    Map<String, Object> getParameters();
+    @JsonAnyGetter
+    public Map<String, Object> getParameters()
+    {
+        return this.parameters;
+    }
+
+    /**
+     * Set the value of a parameter.
+     * 
+     * @param key the parameter name
+     * @param value the parameter value
+     * @return the previous parameter value
+     */
+    @JsonAnySetter
+    public Object setParameter(String key, Object value)
+    {
+        return this.parameters.put(key, value);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(getParameters()).build();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof WithParameters) {
+            WithParameters other = (WithParameters) obj;
+            return new EqualsBuilder().append(getParameters(), other.getParameters()).build();
+        }
+
+        return false;
+    }
 }

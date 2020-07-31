@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultLiveDataSourceManager}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class DefaultLiveDataSourceManagerTest
@@ -82,8 +82,8 @@ class DefaultLiveDataSourceManagerTest
     @Named("bob")
     private ComponentDescriptor<LiveDataSource> bob;
 
-    @Mock(extraInterfaces = {WithParameters.class})
-    private LiveDataSource source;
+    @Mock(extraInterfaces = {LiveDataSource.class})
+    private WithParameters source;
 
     @BeforeEach
     void before()
@@ -121,7 +121,7 @@ class DefaultLiveDataSourceManagerTest
     {
         Source sourceInfo = new Source();
         sourceInfo.setId("test");
-        sourceInfo.put("key", "value");
+        sourceInfo.setParameter("key", "value");
 
         when(this.contextComponentManager.hasComponent(LiveDataSource.class, "test")).thenReturn(true);
         when(this.contextComponentManager.getInstance(LiveDataSource.class, "test")).thenReturn(this.source);

@@ -17,51 +17,58 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.internal.script;
+package org.xwiki.livedata.internal;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.icon.IconManager;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link LiveDataConfigHelper}.
+ * Unit tests for {@link DefaultLiveDataConfigurationResolver}.
  * 
  * @version $Id$
+ * @since 12.6
  */
 @ComponentTest
-class LiveDataConfigHelperTest
+@ComponentList(StringLiveDataConfigurationResolver.class)
+class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigurationResolverTest
 {
     @InjectMockComponents
-    private LiveDataConfigHelper configHelper;
+    private DefaultLiveDataConfigurationResolver resolver;
 
     @MockComponent
     private LiveDataSourceManager sourceManager;
+
+    @MockComponent
+    private ContextualLocalizationManager l10n;
 
     @MockComponent
     private IconManager iconManager;
@@ -69,16 +76,11 @@ class LiveDataConfigHelperTest
     @Mock
     private LiveDataSource liveDataSource;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
-    void configure() throws Exception
+    void before() throws Exception
     {
-        Map<String, Object> fileIconMetaData = new HashMap<>();
-        fileIconMetaData.put(IconManager.META_DATA_ICON_SET_TYPE, "font");
-        fileIconMetaData.put(IconManager.META_DATA_ICON_SET_NAME, "Font Awesome");
-        fileIconMetaData.put(IconManager.META_DATA_CSS_CLASS, "fa fa-file-o");
-
-        when(this.iconManager.getMetaData("file")).thenReturn(fileIconMetaData);
-
         Source source = new Source();
         source.setId("test");
         when(this.sourceManager.get(source)).thenReturn(Optional.of(this.liveDataSource));
@@ -90,16 +92,21 @@ class LiveDataConfigHelperTest
             mock(LiveDataPropertyDescriptorStore.class, "propertyTypes");
         when(this.liveDataSource.getPropertyTypes()).thenReturn(propertyTypeStore);
 
+        Map<String, Object> fileIconMetaData = new HashMap<>();
+        fileIconMetaData.put(IconManager.META_DATA_ICON_SET_TYPE, "font");
+        fileIconMetaData.put(IconManager.META_DATA_ICON_SET_NAME, "Font Awesome");
+        fileIconMetaData.put(IconManager.META_DATA_CSS_CLASS, "fa fa-file-o");
+
         LiveDataPropertyDescriptor propertyDescriptor = new LiveDataPropertyDescriptor();
         propertyDescriptor.setId("title");
         propertyDescriptor.setDescription("The title of the book");
         propertyDescriptor.setName("Title");
         propertyDescriptor.setSortable(true);
         propertyDescriptor.setType("String");
-        propertyDescriptor.getIcon().putAll(fileIconMetaData);
-        propertyDescriptor.getDisplayer().setId("link");
-        propertyDescriptor.getDisplayer().put("propertyHref", "doc_url");
-        propertyDescriptor.getFilter().setId("text");
+        propertyDescriptor.setIcon(fileIconMetaData);
+        propertyDescriptor.setDisplayer(new DisplayerDescriptor("link"));
+        propertyDescriptor.getDisplayer().setParameter("propertyHref", "doc_url");
+        propertyDescriptor.setFilter(new FilterDescriptor("text"));
         propertyDescriptor.getFilter().setDefaultOperator("contains");
 
         when(propertyStore.get()).thenReturn(Arrays.asList(propertyDescriptor));
@@ -109,81 +116,26 @@ class LiveDataConfigHelperTest
         propertyType.setDescription("A string property");
         propertyType.setName("String");
         propertyType.setSortable(true);
-        propertyType.getIcon().putAll(fileIconMetaData);
-        propertyType.getDisplayer().setId("link");
-        propertyType.getDisplayer().put("propertyHref", "doc_url");
-        propertyType.getFilter().setId("text");
+        propertyType.setIcon(fileIconMetaData);
+        propertyType.setDisplayer(new DisplayerDescriptor("link"));
+        propertyType.getDisplayer().setParameter("propertyHref", "doc_url");
+        propertyType.setFilter(new FilterDescriptor("text"));
         propertyType.getFilter().setDefaultOperator("contains");
 
         when(propertyTypeStore.get()).thenReturn(Arrays.asList(propertyType));
     }
 
     @ParameterizedTest
-    @MethodSource("getEffectiveConfigTestData")
-    void effectiveConfig(String message, String input, String output) throws Exception
+    @MethodSource("getTestData")
+    void resolve(String message, String input, String output) throws Exception
     {
-        assertEquals(output, this.configHelper.effectiveConfig(input), message);
+        LiveDataConfiguration liveDataConfig = this.objectMapper.readValue(input, LiveDataConfiguration.class);
+
+        assertEquals(output, this.objectMapper.writeValueAsString(this.resolver.resolve(liveDataConfig)), message);
     }
 
-    private static Stream<String[]> getEffectiveConfigTestData() throws Exception
+    private static Stream<String[]> getTestData() throws Exception
     {
-        return getTestData(new File("src/test/resources/effectiveConfig.txt"));
-    }
-
-    private static Stream<String[]> getTestData(File file) throws Exception
-    {
-        List<String[]> testData = new ArrayList<>();
-        ListIterator<String> linesIterator = IOUtils.readLines(new FileReader(file)).listIterator();
-        while (linesIterator.hasNext()) {
-            String message = readTestMessage(linesIterator);
-            String input = readTestInput(linesIterator);
-            String output = readTestOutput(linesIterator);
-            testData.add(new String[] {message, input, output});
-        }
-        return testData.stream();
-    }
-
-    private static String readTestMessage(ListIterator<String> linesIterator)
-    {
-        StringBuilder message = new StringBuilder();
-        while (linesIterator.hasNext()) {
-            String line = linesIterator.next();
-            if (line.startsWith("##")) {
-                message.append(line.substring(2).trim());
-            } else {
-                linesIterator.previous();
-                break;
-            }
-        }
-        return message.toString();
-    }
-
-    private static String readTestInput(ListIterator<String> linesIterator)
-    {
-        StringBuilder input = new StringBuilder();
-        while (linesIterator.hasNext()) {
-            String line = linesIterator.next();
-            if (!line.equals("---")) {
-                input.append(line.trim());
-            } else {
-                break;
-            }
-        }
-        return input.toString();
-    }
-
-    private static String readTestOutput(ListIterator<String> linesIterator)
-    {
-        StringBuilder output = new StringBuilder();
-        while (linesIterator.hasNext()) {
-            String line = linesIterator.next();
-            if (!line.startsWith("##")) {
-                output.append(line.trim());
-            } else {
-                linesIterator.previous();
-                break;
-            }
-        }
-        return output.toString();
+        return getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));
     }
 }

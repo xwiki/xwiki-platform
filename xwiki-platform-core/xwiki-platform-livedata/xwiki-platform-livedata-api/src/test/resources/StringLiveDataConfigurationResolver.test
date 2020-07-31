@@ -3,10 +3,7 @@
 ##
 {}
 ---
-{
-  "query":{},
-  "meta":{}
-}
+{}
 ##
 ## Invalid query and meta
 ## 
@@ -17,8 +14,6 @@
 }
 ---
 {
-  "query":{},
-  "meta":{},
   "foo":"bar"
 }
 ##
@@ -39,8 +34,7 @@
 {
   "query":{
     "alice":"bob"
-  },
-  "meta":{}
+  }
 }
 ##
 ## Sort and source as text, filters as object
@@ -62,16 +56,14 @@
     "source":{
       "id":"foo"
     },
-    "sort":[{
-      "property":"publishDate",
-      "descending":false
-    }],
     "filters":[{
       "property":"doc.author",
-      "value":"mflorea"
+      "constraints":[{"value":"mflorea"}]
+    }],
+    "sort":[{
+      "property":"publishDate"
     }]
-  },
-  "meta":{}
+  }
 }
 ##
 ## Sort as object
@@ -89,8 +81,7 @@
     "sort":[{
       "property":"publishDate"
     }]
-  },
-  "meta":{}
+  }
 }
 ##
 ## Sort as array of string
@@ -105,16 +96,14 @@
   "query":{
     "sort":[
       {
-        "property":"publishDate",
-        "descending":false
+        "property":"publishDate"
       },
       {
         "property":"doc.name",
         "descending":true
       }
     ]
-  },
-  "meta":{}
+  }
 }
 ##
 ## Invalid property descriptors and types
@@ -129,11 +118,8 @@
 ---
 {
   "meta":{
-    "foo":"bar",
-    "propertyDescriptors":[],
-    "propertyTypes":[]
-  },
-  "query":{}
+    "foo":"bar"
+  }
 }
 ##
 ## Invalid icon, displayer and filter 
@@ -145,7 +131,7 @@
         "id":"test",
         "icon":[34],
         "displayer":12,
-        "filter":true
+        "filterable":true
       }
     ]
   }
@@ -155,12 +141,11 @@
   "meta":{
     "propertyDescriptors":[
       {
-        "id":"test"
+        "id":"test",
+        "filterable":true
       }
-    ],
-    "propertyTypes":[]
-  },
-  "query":{}
+    ]
+  }
 }
 ##
 ## Icon, displayer and filter as string
@@ -176,7 +161,7 @@
     ],
     "propertyTypes":[
       {
-        "filter":false
+        "filterable":false
       }
     ]
   }
@@ -197,96 +182,92 @@
     ],
     "propertyTypes":[
       {
-        "filter":{"id":""}
+        "filterable":false
       }
     ]
-  },
-  "query":{}
+  }
 }
 ##
-## Merge default configuration
+## Filter operators as string
 ##
 {
-  "query":{
-    "source":"test"
-  },
   "meta":{
     "propertyDescriptors":[
       {
-        "id":"title",
-        "name":"Book Title",
-        "sortable":false,
-        "displayer":{
-          "propertyHref":"bar"
-        },
         "filter":{
-          "id":"text",
-          "defaultOperator":"equals"
-        },
-        "styleName":"foo"
+          "operators":["equals"]
+        }
       }
     ],
-    "propertyTypes":[
+    "filters":[
       {
-        "id":"String",
-        "name":"Small Text",
-        "displayer":"html",
-        "filter":{
-          "id":"text",
-          "defaultOperator":"prefix",
-          "foo":"bar"
-        }
+        "operators":["contains"]
       }
     ]
   }
 }
 ---
 {
-  "query":{
-    "source":{"id":"test"}
-  },
   "meta":{
     "propertyDescriptors":[
       {
-        "id":"title",
-        "name":"Book Title",
-        "sortable":false,
-        "displayer":{
-          "propertyHref":"bar",
-          "id":"link"
-        },
         "filter":{
-          "id":"text",
-          "defaultOperator":"equals"
-        },
-        "styleName":"foo",
-        "description":"The title of the book",
-        "icon":{
-          "iconSetType":"font",
-          "iconSetName":"Font Awesome",
-          "cssClass":"fa fa-file-o"
-        },
-        "type":"String"
+          "operators":[
+            {"id":"equals"}
+          ]
+        }
       }
     ],
-    "propertyTypes":[
+    "filters":[
       {
-        "id":"String",
-        "name":"Small Text",
-        "displayer":{"id":"html"},
-        "filter":{
-          "id":"text",
-          "defaultOperator":"prefix",
-          "foo":"bar"
-        },
-        "description":"A string property",
-        "icon":{
-          "iconSetType":"font",
-          "iconSetName":"Font Awesome",
-          "cssClass":"fa fa-file-o"
-        },
-        "sortable":true
+        "operators":[
+          {"id":"contains"}
+        ]
       }
+    ]
+  }
+}
+##
+## Layouts as string
+##
+{
+  "meta":{
+    "layouts":["table","cards"]
+  }
+}
+---
+{
+  "meta":{
+    "layouts":[
+      {"id":"table"},
+      {"id":"cards"}
+    ]
+  }
+}
+##
+## Layout icon as string
+##
+{
+  "meta":{
+    "layouts":[
+      {"id":"table","icon":"table"},
+      {"id":"cards","icon":"th"}
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "layouts":[
+      {
+        "id":"table",
+        "icon":{
+          "iconSetName":"Silk",
+          "iconSetType":"image",
+          "url":"/path/to/table.png"
+        }
+      },
+      {"id":"cards","icon":{}}
     ]
   }
 }

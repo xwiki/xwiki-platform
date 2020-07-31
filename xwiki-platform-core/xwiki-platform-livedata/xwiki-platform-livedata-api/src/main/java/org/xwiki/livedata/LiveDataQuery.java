@@ -20,7 +20,6 @@
 package org.xwiki.livedata;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,43 +31,40 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * The query used to get the live data.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
-public class LiveDataQuery
+public class LiveDataQuery extends WithParameters
 {
     /**
      * Specifies where to take the data from. Represents the "from" clause.
      */
-    public static class Source extends HashMap<String, Object>
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Source extends BaseDescriptor
     {
-        private static final long serialVersionUID = 1L;
-
-        private static final String ID = "id";
-
         /**
-         * @return the source identifier, usually the hint of the {@link LiveDataSource} component
+         * Default constructor.
          */
-        public String getId()
+        public Source()
         {
-            return (String) getOrDefault(ID, "default");
         }
 
         /**
-         * Sets the source identifier, usually the hint of the {@link LiveDataSource} component.
+         * Creates a source with the given id.
          * 
-         * @param id the new source identifier
+         * @param id the source id
          */
-        public void setId(String id)
+        public Source(String id)
         {
-            put(ID, id);
+            setId(id);
         }
     }
 
     /**
      * A set of constraints to apply to a given property.
      */
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class Filter
     {
         /**
@@ -196,6 +192,7 @@ public class LiveDataQuery
     /**
      * A constraint to apply to a property value.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Constraint
     {
         /**
@@ -277,6 +274,7 @@ public class LiveDataQuery
     /**
      * A sort entry.
      */
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class SortEntry
     {
         /**
@@ -358,37 +356,37 @@ public class LiveDataQuery
     /**
      * The list of properties whose values we want to fetch. You can view this as the "select" clause of an SQL query.
      */
-    private final List<String> properties = new ArrayList<>();
+    private List<String> properties;
 
     /**
      * Where to fetch the data from. You can view this as the "from" clause of an SQL query.
      */
-    private final Source source = new Source();
+    private Source source;
 
     /**
      * The filters to apply on the property values. You can view this as the "where" clause of an SQL query.
      */
-    private final List<Filter> filters = new ArrayList<>();
+    private List<Filter> filters;
 
     /**
      * The list of properties to sort on, along with their corresponding sort direction.
      */
-    private final List<SortEntry> sort = new ArrayList<>();
+    private List<SortEntry> sort;
 
     /**
      * Indicates where the current page starts.
      */
-    private long offset;
+    private Long offset;
 
     /**
      * The number of entries to fetch (the page size).
      */
-    private int limit = 15;
+    private Integer limit;
 
     /**
      * @return the index where the current page of entries starts
      */
-    public long getOffset()
+    public Long getOffset()
     {
         return offset;
     }
@@ -398,7 +396,7 @@ public class LiveDataQuery
      * 
      * @param offset the new offset
      */
-    public void setOffset(long offset)
+    public void setOffset(Long offset)
     {
         this.offset = offset;
     }
@@ -406,7 +404,7 @@ public class LiveDataQuery
     /**
      * @return the number of entries to fetch (the page size)
      */
-    public int getLimit()
+    public Integer getLimit()
     {
         return limit;
     }
@@ -416,7 +414,7 @@ public class LiveDataQuery
      * 
      * @param limit the new limit
      */
-    public void setLimit(int limit)
+    public void setLimit(Integer limit)
     {
         this.limit = limit;
     }
@@ -430,11 +428,31 @@ public class LiveDataQuery
     }
 
     /**
+     * Sets the list of properties to fetch.
+     * 
+     * @param properties the list of properties to fetch
+     */
+    public void setProperties(List<String> properties)
+    {
+        this.properties = properties;
+    }
+
+    /**
      * @return where to take the data from
      */
     public Source getSource()
     {
         return source;
+    }
+
+    /**
+     * Specifies the live data source to take the data from.
+     * 
+     * @param source the new live data source configuration
+     */
+    public void setSource(Source source)
+    {
+        this.source = source;
     }
 
     /**
@@ -446,10 +464,49 @@ public class LiveDataQuery
     }
 
     /**
+     * Sets the filters to apply on property values.
+     * 
+     * @param filters the new filters to apply on property values
+     */
+    public void setFilters(List<Filter> filters)
+    {
+        this.filters = filters;
+    }
+
+    /**
      * @return the list of properties to sort on, along with their corresponding sort direction
      */
     public List<SortEntry> getSort()
     {
         return sort;
+    }
+
+    /**
+     * Sets the list of properties to sort on.
+     * 
+     * @param sort the list of properties to sort on
+     */
+    public void setSort(List<SortEntry> sort)
+    {
+        this.sort = sort;
+    }
+
+    /**
+     * Prevent {@code null} values where it's possible.
+     */
+    public void initialize()
+    {
+        if (this.properties == null) {
+            this.properties = new ArrayList<>();
+        }
+        if (this.source == null) {
+            this.source = new Source();
+        }
+        if (this.filters == null) {
+            this.filters = new ArrayList<>();
+        }
+        if (this.sort == null) {
+            this.sort = new ArrayList<>();
+        }
     }
 }

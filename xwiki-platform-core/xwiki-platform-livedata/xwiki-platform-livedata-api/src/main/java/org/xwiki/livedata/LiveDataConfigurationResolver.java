@@ -19,40 +19,26 @@
  */
 package org.xwiki.livedata;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Exception related to live data processing.
- *
+ * Resolves {@link LiveDataConfiguration} from some input.
+ * 
+ * @param <T> the input type
  * @version $Id$
  * @since 12.6
  */
+@Role
 @Unstable
-public class LiveDataException extends Exception
+public interface LiveDataConfigurationResolver<T>
 {
     /**
-     * Serialization identifier.
+     * Resolves {@link LiveDataConfiguration} from the given input.
+     * 
+     * @param input the live data configuration to resolve
+     * @return the resolved live data configuration
+     * @throws LiveDataException if the given input cannot be resolved as a live data configuration
      */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Creates a new instance that wraps the specified source throwable.
-     *
-     * @param source source of the error
-     */
-    public LiveDataException(Throwable source)
-    {
-        super(source);
-    }
-
-    /**
-     * Creates a new instance with the specified message and source.
-     *
-     * @param message message to store in the exception
-     * @param source source of the error
-     */
-    public LiveDataException(String message, Throwable source)
-    {
-        super(message, source);
-    }
+    LiveDataConfiguration resolve(T input) throws LiveDataException;
 }

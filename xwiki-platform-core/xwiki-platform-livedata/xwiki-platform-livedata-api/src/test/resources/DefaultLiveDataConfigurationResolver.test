@@ -1,0 +1,156 @@
+##
+## Merge default configuration
+##
+{
+  "query":{
+    "source":"test"
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "sortable":false,
+        "displayer":{
+          "propertyHref":"bar"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "displayer":"html",
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        }
+      }
+    ]
+  }
+}
+---
+{
+  "query":{
+    "properties":[],
+    "source":{"id":"test"},
+    "filters":[],
+    "sort":[],
+    "limit":15
+  },
+  "data":{
+    "count":0,
+    "entries":[]
+  },
+  "meta":{
+    "layouts":[
+      {"id":"table","name":"table","icon":{}},
+      {"id":"cards","name":"cards","icon":{}}
+    ],
+    "defaultLayout":"table",
+    "propertyDescriptors":[
+      {
+        "id":"title",
+        "name":"Book Title",
+        "description":"The title of the book",
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "type":"String",
+        "sortable":false,
+        "displayer":{
+          "id":"link",
+          "propertyHref":"bar"
+        },
+        "filter":{
+          "id":"text",
+          "defaultOperator":"equals"
+        },
+        "styleName":"foo"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "id":"String",
+        "name":"Small Text",
+        "description":"A string property",
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "sortable":true,
+        "displayer":{"id":"html"},
+        "filter":{
+          "id":"text",
+          "defaultOperator":"prefix",
+          "foo":"bar"
+        }
+      }
+    ],
+    "filters":[
+      {
+        "id":"text",
+        "operators":[
+          {"id":"contains","name":"contains"},
+          {"id":"startsWith","name":"startsWith"},
+          {"id":"equals","name":"equals"},
+          {"id":"notEquals","name":"notEquals"}
+        ]
+      },
+      {
+        "id":"number",
+        "operators":[
+          {"id":"equals","name":"="},
+          {"id":"notEquals","name":"≠"},
+          {"id":"isLower","name":"<"},
+          {"id":"isGreater","name":">"}
+        ]
+      },
+      {
+        "id":"date",
+        "operators":[
+          {"id":"isBetween","name":"isBetween"},
+          {"id":"contains","name":"contains"}
+        ]
+      },
+      {
+        "id":"list",
+        "operators":[
+          {"id":"equals","name":"equals"},
+          {"id":"startsWith","name":"startsWith"},
+          {"id":"contains","name":"contains"}
+        ]
+      },
+      {
+        "id":"suggest",
+        "operators":[
+          {"id":"equals","name":"equals"},
+          {"id":"startsWith","name":"startsWith"},
+          {"id":"contains","name":"contains"}
+        ]
+      }
+    ],
+    "defaultFilter":"text",
+    "displayers":[
+      {"id":"text"},
+      {"id":"link"},
+      {"id":"html"},
+      {"id":"actions"}
+    ],
+    "defaultDisplayer":"text",
+    "pagination":{
+      "maxShownPages":10,
+      "pageSizes":[15,25,50,100],
+      "showNextPrevious":true
+    }
+  }
+}

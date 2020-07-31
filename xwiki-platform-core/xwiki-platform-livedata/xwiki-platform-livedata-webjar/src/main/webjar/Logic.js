@@ -580,7 +580,7 @@ define([
     /**
      * Move a property to a certain index in the property order list
      * @param {String|Number} from The id or index of the property to move
-     * @param {*} toIndex
+     * @param {Number} toIndex
      */
     reorderProperty: function (from, toIndex) {
       var fromIndex;
@@ -588,7 +588,6 @@ define([
         fromIndex = from;
       } else if (typeof from === "string") {
         if (!this.isValidPropertyId(from)) { return; }
-        if (toIndex < 0) { toIndex = 0; }
         fromIndex = this.propertyOrder.indexOf(from);
       } else {
         return;
@@ -840,6 +839,35 @@ define([
      */
     removeSort: function (property) {
       return this.sort(property, -1);
+    },
+
+
+    /**
+     * Move a sort entry to a certain index in the query sort list
+     * @param {String} property The property to reorder the sort
+     * @param {Number} toIndex
+     */
+    reorderSort: function (propertyId, toIndex) {
+      var self = this;
+      var err = new Error("Property `" + propertyId + "` is not sortable");
+      return new Promise (function (resolve, reject) {
+        if (!self.isValidPropertyId(propertyId)) { return void reject(err); }
+        var fromIndex = self.data.query.sort.findIndex(function (querySort) {
+          return querySort.property === propertyId;
+        });
+        if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
+        self.data.query.sort.splice(toIndex, 0, self.data.query.sort.splice(fromIndex, 1)[0]);
+
+        // dispatch events
+        self.triggerEvent("sort", {
+          type: "move",
+          property: propertyId,
+          level: toIndex,
+        });
+
+        // CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
+      });
     },
 
 

@@ -59,12 +59,12 @@
  */
 define([
   "Vue",
-  "vue!livedata-topbar.vue",
+  "vue!livedata-topbar",
   "vue!livedata-dropdown-menu",
   "vue!livedata-entry-selector-all",
   "vue!livedata-pagination",
   "vue!livedata-entry-selector-info-bar",
-  "vue!layouts/cards/layout-cards-card.vue",
+  "vue!layouts/cards/layout-cards-card",
 ], function (
   Vue,
   vuedraggable

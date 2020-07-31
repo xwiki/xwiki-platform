@@ -34,8 +34,8 @@
           :class="[
             'sort-icon',
             'fa',
-            { 'sorted': firstSortLevel.property === property.id },
-            (firstSortLevel.property === property.id && firstSortLevel.descending) ? 'fa-caret-up' : 'fa-caret-down',
+            { 'sorted': isFirstSortLevel(property) },
+            (isFirstSortLevel(property) && firstSortLevel.descending) ? 'fa-caret-up' : 'fa-caret-down',
           ]"
         ></span>
       </div>
@@ -113,6 +113,10 @@ define([
 
 
     methods: {
+
+      isFirstSortLevel: function (property) {
+        return this.firstSortLevel.property === property.id
+      },
 
       sort: function (property) {
         this.logic.sort(property.id, 0).catch(function (err) {

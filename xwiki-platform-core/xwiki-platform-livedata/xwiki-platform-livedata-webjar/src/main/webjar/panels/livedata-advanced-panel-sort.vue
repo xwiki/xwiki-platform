@@ -11,50 +11,57 @@
 
     <template #body>
 
-      <!-- A sort entry -->
-      <div
-        class="sort-entry"
-        v-for="(sortEntry, level) in data.query.sort"
-        :key="level"
+      <draggable
+        :value="data.query.sort"
+        @change="reorderSorts"
+        v-bind="dragOptions"
       >
-        <!-- property select -->
-        <span>Level {{ level + 1 }}</span>
-        <span style="margin: 0 1rem"> - </span>
-        <!-- property select -->
-        <select
-          @change="logic.sort($event.target.value, level)"
-        >
-          <option
-            v-for="(property, i) in logic.getSortablePropertyDescriptors()"
-            :key="i"
-            :value="property.id"
-            :selected="property.id === sortEntry.property"
-          >{{ property.name }}</option>
-        </select>
 
-        <!-- direction select -->
-        <select
-          @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+        <!-- A sort entry -->
+        <draggable-item
+          class="sort-entry"
+          v-for="(sortEntry, level) in data.query.sort"
+          :key="level"
         >
-          <option
-            value="false"
-            :selected="!sortEntry.descending"
-          >Ascending</option>
-          <option
-            value="true"
-            :selected="sortEntry.descending"
-          >Descending</option>
-        </select>
+          <span>Level {{ level + 1 }}</span>
+          <span style="margin: 0 1rem"> - </span>
+          <!-- property select -->
+          <select
+            @change="logic.sort($event.target.value, level)"
+          >
+            <option
+              v-for="(property, i) in logic.getSortablePropertyDescriptors()"
+              :key="i"
+              :value="property.id"
+              :selected="property.id === sortEntry.property"
+            >{{ property.name }}</option>
+          </select>
 
-        <a
-          class="delete-sort"
-          href="#"
-          @click.prevent="logic.removeSort(sortEntry.property)"
-          title="Delete Sort"
-        >
-          <span class="fa fa-trash-o"></span>
-        </a>
-      </div>
+          <!-- direction select -->
+          <select
+            @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+          >
+            <option
+              value="false"
+              :selected="!sortEntry.descending"
+            >Ascending</option>
+            <option
+              value="true"
+              :selected="sortEntry.descending"
+            >Descending</option>
+          </select>
+
+          <a
+            class="delete-sort"
+            href="#"
+            @click.prevent="logic.removeSort(sortEntry.property)"
+            title="Delete Sort"
+          >
+            <span class="fa fa-trash-o"></span>
+          </a>
+        </draggalbe-item>
+
+      </draggable>
 
       <!-- Add Sort -->
       <select
@@ -104,9 +111,11 @@
 */
 define([
   "Vue",
+  "vuedraggable",
   "vue!panels/livedata-base-advanced-panel",
 ], function (
-  Vue
+  Vue,
+  vuedraggable
 ) {
 
   Vue.component("livedata-advanced-panel-sort", {
@@ -114,6 +123,11 @@ define([
     name: "livedata-advanced-panel-sort",
 
     template: template,
+
+    components: {
+      "draggable": vuedraggable,
+    },
+
 
     props: {
       logic: Object,
@@ -130,6 +144,13 @@ define([
           return !sort;
         });
       },
+
+      dragOptions: function () {
+        return {
+          animation: 200,
+          handle: ".handle",
+        };
+      },
     },
 
     methods: {
@@ -137,6 +158,10 @@ define([
         if (value === "none") { return; }
         this.logic.addSort(value);
         this.$refs.selectPropertiesNone.selected = true;
+      },
+      reorderSorts: function (e) {
+        this.logic.reorderSort(e.moved.element.property, e.moved.newIndex)
+        .catch(function(err) { console.log(err); });
       },
     },
 

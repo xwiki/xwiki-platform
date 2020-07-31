@@ -79,9 +79,9 @@ define([
       encodingSpecsV1: function () {
         return {
           filters: ["array", {
-            "property": this.encodingSpecsProperties,
-            "matchAll": ["boolean"],
-            "constrains": ["array", {
+            property: this.encodingSpecsProperties,
+            matchAll: ["boolean"],
+            constrains: ["array", {
               operator: this.encodingSpecsFilterOperators,
               value: ["varchar"],
             }],

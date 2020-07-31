@@ -23,15 +23,15 @@
       @change="reorderProperty"
       v-bind="dragOptions"
     >
-      <div
+      <draggable-item
         class="card-property"
         v-for="property in properties"
         :key="property.id"
         v-show="logic.isPropertyVisible(property.id) && property.id !== titlePropertyId"
       >
-        <div class="handle">
+        <template #handle>
           <span class="fa fa-ellipsis-v"></span>
-        </div>
+        </template>
         <strong class="property-name">{{ property.name }}:</strong>
         <span
           class="value"
@@ -42,7 +42,7 @@
             :logic="logic"
           ></livedata-displayer>
         </span>
-      </div>
+      </draggable-item>
     </draggable>
   </div>
 
@@ -72,8 +72,9 @@
 define([
   "Vue",
   "vuedraggable",
-  "vue!livedata-entry-selector.vue",
-  "vue!displayers/livedata-displayer.vue",
+  "vue!livedata-entry-selector",
+  "vue!displayers/livedata-displayer",
+  "vue!utilities/draggable-item",
 ], function (
   Vue,
   vuedraggable

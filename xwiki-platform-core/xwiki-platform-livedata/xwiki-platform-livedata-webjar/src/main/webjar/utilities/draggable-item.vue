@@ -1,45 +1,13 @@
 <template>
-  <livedata-base-advanced-panel
-    class="livedata-advanced-panel-properties"
-    :logic="logic"
-    panel-id="propertiesPanel"
-  >
+  <div class="draggable-item">
+    <div class="handle">
+      <slot name="handle">
+        <span class="fa fa-bars"></span>
+      </slot>
+    </div>
 
-    <template #header>
-      <span class="fa fa-list-ul"></span> Properties
-    </template>
-
-
-    <template #body>
-
-      <draggable
-        :value="logic.propertyOrder"
-        @change="reorderProperty"
-        v-bind="dragOptions"
-      >
-        <draggable-item
-          class="property"
-          v-for="property in logic.getDisplayablePropertyDescriptors()"
-          :key="property.id"
-        >
-          <div
-            class="visibility"
-            @click.self="$event.currentTarget.querySelector('input').click()"
-          >
-            <input
-              type="checkbox"
-              :checked="logic.isPropertyVisible(property.id)"
-              @change="logic.setPropertyVisibility(property.id, $event.target.checked)"
-            />
-          </div>
-          <span class="property-name">{{ property.name }}</span>
-        </draggable-item>
-      </draggable>
-
-    </template>
-
-  </livedata-base-advanced-panel>
-
+    <slot></slot>
+  </div>
 </template>
 
 
@@ -67,15 +35,14 @@ define([
   "Vue",
   "vuedraggable",
   "vue!panels/livedata-base-advanced-panel",
-  "vue!utilities/draggable-item",
 ], function (
   Vue,
   vuedraggable
 ) {
 
-  Vue.component("livedata-advanced-panel-properties", {
+  Vue.component("draggable-item", {
 
-    name: "livedata-advanced-panel-properties",
+    name: "draggable-item",
 
     template: template,
 
@@ -114,33 +81,27 @@ define([
 <style>
 
 
-.livedata-advanced-panel-properties .property {
+.draggable-item  {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
 }
 
-.livedata-advanced-panel-properties .handle {
+.draggable-item .handle {
   padding: 6px;
   cursor: pointer; /* IE */
   cursor: grab;
   opacity: 0;
 }
-.livedata-advanced-panel-properties .property:hover .handle {
+
+.draggable-item:hover .handle {
   opacity: 1;
   transition: opacity 0.2s;
 }
 
-.livedata-advanced-panel-properties .visibility {
-  padding: 6px 1rem;
-}
-.livedata-advanced-panel-properties .visibility input {
-  margin: 0px;
-}
-
-.livedata-advanced-panel-properties .property-name {
-  padding: 6px 0px;
+.draggable-item .handle .fa {
+  vertical-align: middle;
 }
 
 </style>

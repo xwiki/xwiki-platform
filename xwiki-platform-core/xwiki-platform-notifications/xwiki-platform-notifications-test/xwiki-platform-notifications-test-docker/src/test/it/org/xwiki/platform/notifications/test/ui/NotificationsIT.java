@@ -27,6 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -339,6 +340,7 @@ public class NotificationsIT
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
+        DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
@@ -362,12 +364,19 @@ public class NotificationsIT
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             assertFalse(preferences.get(2).isEnabled());
             preferences.get(2).setEnabled(true);
+            testUtils.createPage(page2, "", "Page 2");
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             notificationsTrayPage = new NotificationsTrayPage();
-            assertEquals(0, notificationsTrayPage.getNotificationsCount());
+
+            // Ensure we only have the previous notification.
+            assertEquals(1, notificationsTrayPage.getNotificationsCount());
+            assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
+                notificationsTrayPage.getNotificationDescription(0));
+            assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
             testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
         }
     }
 

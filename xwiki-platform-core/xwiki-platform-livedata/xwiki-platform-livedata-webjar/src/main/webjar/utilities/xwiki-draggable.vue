@@ -1,13 +1,15 @@
 <template>
-  <div class="draggable-item">
-    <div class="handle">
-      <slot name="handle">
-        <span class="fa fa-bars"></span>
-      </slot>
-    </div>
-
+  <draggable
+    class="draggable-container"
+    v-bind="$attrs"
+    :animation="200"
+    handle=".handle"
+    draggable=".draggable-item"
+    ghostClass="ghost"
+    v-on="$listeners"
+  >
     <slot></slot>
-  </div>
+  </draggable>
 </template>
 
 
@@ -34,15 +36,14 @@
 define([
   "Vue",
   "vuedraggable",
-  "vue!panels/livedata-base-advanced-panel",
 ], function (
   Vue,
   vuedraggable
 ) {
 
-  Vue.component("draggable-item", {
+  Vue.component("xwiki-draggable", {
 
-    name: "draggable-item",
+    name: "xwiki-draggable",
 
     template: template,
 
@@ -50,58 +51,11 @@ define([
       "draggable": vuedraggable,
     },
 
-    props: {
-      logic: Object,
-    },
-
-    computed: {
-      data: function () { return this.logic.data; },
-
-      dragOptions: function () {
-        return {
-          animation: 200,
-          handle: ".handle",
-        };
-      },
-
-    },
-
-    methods: {
-      reorderProperty: function (e) {
-        this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
-      },
-    },
-
-
   });
 });
 </script>
 
 
 <style>
-
-
-.draggable-item  {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.draggable-item .handle {
-  padding: 6px;
-  cursor: pointer; /* IE */
-  cursor: grab;
-  opacity: 0;
-}
-
-.draggable-item:hover .handle {
-  opacity: 1;
-  transition: opacity 0.2s;
-}
-
-.draggable-item .handle .fa {
-  vertical-align: middle;
-}
 
 </style>

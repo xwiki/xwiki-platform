@@ -31,14 +31,23 @@
         </div>
 
         <div class="filters">
-          <livedata-advanced-panel-filter-entry
-            v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
-            :key="filterIdx"
-            :logic="logic"
-            :filter="filter"
-            :filter-idx="filterIdx"
-            :property-id="filterGroup.property"
-          ></livedata-advanced-panel-filter-entry>
+          <xwiki-draggable
+            class="filter-entries"
+            :value="logic.getQueryFilterGroup(filterGroup.property).constrains"
+            @change="reorderFilter($event, filterGroup)"
+          >
+            <xwiki-draggable-item
+                v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
+                :key="filterIdx"
+              >
+              <livedata-advanced-panel-filter-entry
+                :logic="logic"
+                :filter="filter"
+                :filter-idx="filterIdx"
+                :property-id="filterGroup.property"
+              ></livedata-advanced-panel-filter-entry>
+            </xwiki-draggable-item>
+          </xwiki-draggable>
 
           <a
             class="add-filter"
@@ -101,6 +110,8 @@
 define([
   "Vue",
   "vue!panels/livedata-base-advanced-panel",
+  "vue!utilities/xwiki-draggable",
+  "vue!utilities/xwiki-draggable-item",
   "vue!panels/livedata-advanced-panel-filter-entry",
 ], function (
   Vue
@@ -135,6 +146,12 @@ define([
         this.logic.addFilter(value);
         this.$refs.selectFilterPropertiesNone.selected = true;
       },
+      reorderFilter: function (e, filterGroup) {
+        this.logic.filter(filterGroup.property, e.moved.oldIndex, {
+          index: e.moved.newIndex,
+        })
+        .catch(function (err) { console.warn(err); });
+      },
     },
 
   });
@@ -145,40 +162,41 @@ define([
 <style>
 
 
-  .livedata-advanced-panel-filter .property-name {
-    display: inline-block;
-    margin-right: 0.5rem;
-    padding: 5px;
-    font-weight: bold;
-  }
-  .livedata-advanced-panel-filter .delete-filter-group {
-    display: none;
-    padding: 5px;
-    color: currentColor;
-  }
-  .livedata-advanced-panel-filter .filter-group-title:hover .delete-filter-group {
-    display: inline-block;
-  }
+.livedata-advanced-panel-filter .property-name {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 5px;
+  font-weight: bold;
+}
+.livedata-advanced-panel-filter .delete-filter-group {
+  display: none;
+  padding: 5px;
+  color: currentColor;
+}
+.livedata-advanced-panel-filter .filter-group-title:hover .delete-filter-group {
+  display: inline-block;
+}
 
-  .livedata-advanced-panel-filter .filters {
-    margin-left: 3rem;
-  }
+.livedata-advanced-panel-filter .draggable-item .handle {
+  width: 3rem;
+}
 
-  .livedata-advanced-panel-filter .add-filter {
-    display: inline-block;
-    margin-top: 3px;
-    font-style: italic;
-  }
-  .livedata-advanced-panel-filter .add-filter:hover {
-    text-decoration: none;
-  }
+.livedata-advanced-panel-filter .add-filter {
+  margin-left: 3rem;
+  display: inline-block;
+  margin-top: 3px;
+  font-style: italic;
+}
+.livedata-advanced-panel-filter .add-filter:hover {
+  text-decoration: none;
+}
 
-  .livedata-advanced-panel-filter .livedata-filter-group {
-    margin-bottom: 1rem;
-  }
+.livedata-advanced-panel-filter .livedata-filter-group {
+  margin-bottom: 1rem;
+}
 
-  .livedata-advanced-panel-filter .select-properties {
-    margin-top: 1rem;
-  }
+.livedata-advanced-panel-filter .select-properties {
+  margin-top: 1rem;
+}
 
 </style>

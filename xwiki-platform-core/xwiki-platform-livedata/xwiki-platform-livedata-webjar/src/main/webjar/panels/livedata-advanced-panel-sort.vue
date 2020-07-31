@@ -11,14 +11,13 @@
 
     <template #body>
 
-      <draggable
+      <xwiki-draggable
         :value="data.query.sort"
         @change="reorderSorts"
-        v-bind="dragOptions"
       >
 
         <!-- A sort entry -->
-        <draggable-item
+        <xwiki-draggable-item
           class="sort-entry"
           v-for="(sortEntry, level) in data.query.sort"
           :key="level"
@@ -59,9 +58,9 @@
           >
             <span class="fa fa-trash-o"></span>
           </a>
-        </draggalbe-item>
+        </xwiki-draggable-item>
 
-      </draggable>
+      </xwiki-draggable>
 
       <!-- Add Sort -->
       <select
@@ -111,11 +110,11 @@
 */
 define([
   "Vue",
-  "vuedraggable",
   "vue!panels/livedata-base-advanced-panel",
+  "vue!utilities/xwiki-draggable",
+  "vue!utilities/xwiki-draggable-item",
 ], function (
-  Vue,
-  vuedraggable
+  Vue
 ) {
 
   Vue.component("livedata-advanced-panel-sort", {
@@ -123,11 +122,6 @@ define([
     name: "livedata-advanced-panel-sort",
 
     template: template,
-
-    components: {
-      "draggable": vuedraggable,
-    },
-
 
     props: {
       logic: Object,
@@ -144,13 +138,6 @@ define([
           return !sort;
         });
       },
-
-      dragOptions: function () {
-        return {
-          animation: 200,
-          handle: ".handle",
-        };
-      },
     },
 
     methods: {
@@ -161,7 +148,7 @@ define([
       },
       reorderSorts: function (e) {
         this.logic.reorderSort(e.moved.element.property, e.moved.newIndex)
-        .catch(function(err) { console.log(err); });
+        .catch(function(err) { console.warn(err); });
       },
     },
 
@@ -172,33 +159,37 @@ define([
 
 <style>
 
+.livedata-advanced-panel-sort .sort-entry {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
 
-  .livedata-advanced-panel-sort .sort-entry {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-  }
+.livedata-advanced-panel-sort .draggable-item .handle {
+  width: 3rem;
+}
 
-  .livedata-advanced-panel-sort .delete-sort {
-    display: inline-block;
-    visibility: hidden;
-    margin-left: 5px;
-    padding: 6px 10px;
-    border-radius: 3px;
-    color: currentColor;
-  }
-  .livedata-advanced-panel-sort .sort-entry:hover .delete-sort {
-    visibility: visible;
-  }
-  .livedata-advanced-panel-sort .delete-sort:hover {
-    background-color: #ccc4;
-  }
-  .livedata-advanced-panel-sort .delete-sort:active {
-    background-color: unset;
-  }
+.livedata-advanced-panel-sort .delete-sort {
+  display: inline-block;
+  visibility: hidden;
+  margin-left: 5px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  color: currentColor;
+}
+.livedata-advanced-panel-sort .sort-entry:hover .delete-sort {
+  visibility: visible;
+}
+.livedata-advanced-panel-sort .delete-sort:hover {
+  background-color: #ccc4;
+}
+.livedata-advanced-panel-sort .delete-sort:active {
+  background-color: unset;
+}
 
-  .livedata-advanced-panel-sort .select-properties {
-    margin-top: 1rem;
-  }
+.livedata-advanced-panel-sort .select-properties {
+  margin-top: 1rem;
+}
+
 </style>

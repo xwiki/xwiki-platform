@@ -1,10 +1,9 @@
 <template>
   <tr
     class="column-header-names"
-      is="draggable"
+      is="xwiki-draggable"
       :value="logic.propertyOrder"
       @change="reorderProperty"
-      v-bind="dragOptions"
       tag="tr"
   >
     <!-- Entry Select All-->
@@ -15,7 +14,7 @@
     </th>
 
     <th
-      class="column-name-container"
+      class="draggable-item"
       v-for="property in properties"
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
@@ -67,11 +66,10 @@
  */
 define([
   "Vue",
-  "vuedraggable",
   "vue!livedata-entry-selector-all",
+  "vue!utilities/xwiki-draggable",
 ], function (
-  Vue,
-  vuedraggable,
+  Vue
 ) {
 
   Vue.component("layout-table-header-names", {
@@ -79,10 +77,6 @@ define([
     name: "layout-table-header-names",
 
     template: template,
-
-    components: {
-      "draggable": vuedraggable,
-    },
 
     props: {
       logic: Object,
@@ -98,15 +92,6 @@ define([
 
       firstSortLevel: function () {
         return this.data.query.sort[0] || {};
-      },
-
-      dragOptions: function () {
-        return {
-          animation: 200,
-          draggable: ".column-name-container",
-          handle: ".handle",
-          ghostClass: "ordered",
-        };
       },
 
     },
@@ -136,6 +121,10 @@ define([
 
 
 <style>
+
+th.draggable-item {
+  display: table-cell;
+}
 
 .layout-table .column-name {
   display: flex;

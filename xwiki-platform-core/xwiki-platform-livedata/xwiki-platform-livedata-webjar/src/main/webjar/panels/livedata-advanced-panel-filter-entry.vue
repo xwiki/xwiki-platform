@@ -93,6 +93,7 @@ define([
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    width: 100%;
   }
 
   .livedata-filter-container .delete-filter {

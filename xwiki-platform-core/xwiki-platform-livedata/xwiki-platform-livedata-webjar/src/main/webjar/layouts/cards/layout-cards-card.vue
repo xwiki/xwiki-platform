@@ -18,12 +18,11 @@
 
     <!-- Card properties-->
 
-    <draggable
+    <xwiki-draggable
       :value="logic.propertyOrder"
       @change="reorderProperty"
-      v-bind="dragOptions"
     >
-      <draggable-item
+      <xwiki-draggable-item
         class="card-property"
         v-for="property in properties"
         :key="property.id"
@@ -42,8 +41,8 @@
             :logic="logic"
           ></livedata-displayer>
         </span>
-      </draggable-item>
-    </draggable>
+      </xwiki-draggable-item>
+    </xwiki-draggable>
   </div>
 
 </template>
@@ -71,13 +70,12 @@
  */
 define([
   "Vue",
-  "vuedraggable",
   "vue!livedata-entry-selector",
   "vue!displayers/livedata-displayer",
-  "vue!utilities/draggable-item",
+  "vue!utilities/xwiki-draggable",
+  "vue!utilities/xwiki-draggable-item",
 ], function (
-  Vue,
-  vuedraggable
+  Vue
 ) {
 
   Vue.component("layout-cards-card", {
@@ -85,10 +83,6 @@ define([
     name: "layout-cards-card",
 
     template: template,
-
-    components: {
-      "draggable": vuedraggable,
-    },
 
     props: {
       logic: Object,
@@ -104,13 +98,6 @@ define([
 
       titlePropertyId: function () {
         return this.logic.getLayoutDescriptor("cards").titleProperty;
-      },
-
-      dragOptions: function () {
-        return {
-          animation: 200,
-          handle: ".handle",
-        };
       },
 
     },

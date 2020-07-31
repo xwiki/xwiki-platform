@@ -21,23 +21,22 @@
 }
 ---
 {
-  "id":"notificationFilterPreferencesLiveTable",
   "query":{
     "properties":["name","filterType","eventTypes","notificationFormats","isEnabled","_actions"],
     "source":{
+      "id":"liveTable",
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
-      "translationPrefix":"notifications.settings.filters.preferences.table.",
-      "id":"liveTable"
+      "translationPrefix":"notifications.settings.filters.preferences.table."
     },
+    "sort":[
+      {"property":"name"}
+    ],
+    "limit":10,
     "hiddenFilters":[
       {"property":"format","constraints":[{"value":""}]},
       {"property":"eventType","constraints":[{"value":""}]},
       {"property":"user","constraints":[{"value":"xwiki:XWiki.mflorea"}]}
-    ],
-    "sort":[
-      {"property":"name"}
-    ],
-    "limit":10
+    ]
   },
   "meta":{
     "propertyDescriptors":[
@@ -51,8 +50,8 @@
         "sortable":false,
         "filterable":false,
         "displayer":{
-          "actions":["delete"],
-          "id":"actions"
+          "id":"actions",
+          "actions":["delete"]
         }
       }
     ],
@@ -60,5 +59,6 @@
       "maxShownPages":10,
       "showPageSizeDropdown":false
     }
-  }
+  },
+  "id":"notificationFilterPreferencesLiveTable"
 }

@@ -19,9 +19,6 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,12 +34,12 @@ import org.xwiki.livedata.WithParameters;
  * {@link LiveDataSource} implementation that reuses existing live table data.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("liveTable")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataSource implements LiveDataSource, WithParameters
+public class LiveTableLiveDataSource extends WithParameters implements LiveDataSource
 {
     @Inject
     @Named("liveTable")
@@ -56,13 +53,11 @@ public class LiveTableLiveDataSource implements LiveDataSource, WithParameters
     @Named("liveTable/propertyType")
     private LiveDataPropertyDescriptorStore propertyTypeStore;
 
-    private final Map<String, Object> parameters = new HashMap<>();
-
     @Override
     public LiveDataEntryStore getEntries()
     {
         if (this.entryStore instanceof WithParameters) {
-            ((WithParameters) this.entryStore).getParameters().putAll(this.parameters);
+            ((WithParameters) this.entryStore).getParameters().putAll(this.getParameters());
         }
         return this.entryStore;
     }
@@ -71,7 +66,7 @@ public class LiveTableLiveDataSource implements LiveDataSource, WithParameters
     public LiveDataPropertyDescriptorStore getProperties()
     {
         if (this.propertyStore instanceof WithParameters) {
-            ((WithParameters) this.propertyStore).getParameters().putAll(this.parameters);
+            ((WithParameters) this.propertyStore).getParameters().putAll(this.getParameters());
         }
         return this.propertyStore;
     }
@@ -80,14 +75,8 @@ public class LiveTableLiveDataSource implements LiveDataSource, WithParameters
     public LiveDataPropertyDescriptorStore getPropertyTypes()
     {
         if (this.propertyTypeStore instanceof WithParameters) {
-            ((WithParameters) this.propertyTypeStore).getParameters().putAll(this.parameters);
+            ((WithParameters) this.propertyTypeStore).getParameters().putAll(this.getParameters());
         }
         return this.propertyTypeStore;
-    }
-
-    @Override
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
     }
 }

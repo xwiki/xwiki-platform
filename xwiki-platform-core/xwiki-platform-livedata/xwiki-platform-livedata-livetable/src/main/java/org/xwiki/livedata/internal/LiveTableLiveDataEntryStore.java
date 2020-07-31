@@ -20,8 +20,6 @@
 package org.xwiki.livedata.internal;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,56 +57,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.WrappingXWikiRequest;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * {@link LiveDataEntryStore} implementation that reuses existing live table data.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("liveTable")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithParameters
+public class LiveTableLiveDataEntryStore extends WithParameters implements LiveDataEntryStore
 {
-    private static class LiveTableRequest extends WrappingXWikiRequest
-    {
-        private final Map<String, String[]> parameters;
-
-        LiveTableRequest(XWikiRequest request, Map<String, String[]> parameters)
-        {
-            super(request);
-            this.parameters = parameters;
-        }
-
-        @Override
-        public Map<String, String[]> getParameterMap()
-        {
-            return this.parameters;
-        }
-
-        @Override
-        public String getParameter(String name)
-        {
-            return this.parameters.get(name)[0];
-        }
-
-        @Override
-        public String[] getParameterValues(String name)
-        {
-            return this.parameters.get(name);
-        }
-
-        @Override
-        public Enumeration<String> getParameterNames()
-        {
-            return Collections.enumeration(this.parameters.keySet());
-        }
-    }
-
     private static final String TEMPLATE = "template";
 
     private static final String RESULT_PAGE = "resultPage";
@@ -123,8 +84,6 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
         }
     };
 
-    private final Map<String, Object> parameters = new HashMap<>();
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -137,12 +96,6 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Override
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
-    }
 
     @Override
     public Optional<Object> add(Map<String, Object> entry)
@@ -188,8 +141,8 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
 
     private ObjectNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
     {
-        Object template = query.getSource().get(TEMPLATE);
-        Object resultPage = query.getSource().get(RESULT_PAGE);
+        Object template = query.getSource().getParameters().get(TEMPLATE);
+        Object resultPage = query.getSource().getParameters().get(RESULT_PAGE);
         String liveTableResultsJSON;
         if (template instanceof String) {
             liveTableResultsJSON = getLiveTableResultsFromTemplate((String) template, query);
@@ -225,8 +178,8 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
         requestParams.putAll(getRequestParameters(query));
         XWikiRequest originalRequest = wrapRequest(requestParams);
         try {
-            XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-            return document.getRenderedContent(Syntax.PLAIN_1_0, xcontext);
+            return xcontext.getWiki().getDocument(documentReference, xcontext).getRenderedContent(Syntax.PLAIN_1_0,
+                xcontext);
         } finally {
             xcontext.setAction(originalAction);
             xcontext.setRequest(originalRequest);
@@ -254,28 +207,15 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
         return entries;
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, String[]> getRequestParameters(LiveDataQuery query)
     {
         Map<String, String[]> requestParams = new HashMap<>();
 
         // Add source parameters.
-        for (Map.Entry<String, Object> entry : query.getSource().entrySet()) {
-            Stream<Object> stream;
-            if (entry.getValue() instanceof Collection) {
-                stream = ((Collection<Object>) entry.getValue()).stream();
-            } else {
-                // This should work for both single value and arrays.
-                stream = Stream.of(entry.getValue());
-            }
-            List<String> values = stream.filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
-            if (!values.isEmpty()) {
-                requestParams.put(entry.getKey(), values.toArray(new String[values.size()]));
-            }
-        }
+        addSourceRequestParameters(query, requestParams);
 
         // Remove internal source parameters.
-        Stream.of("id", TEMPLATE, RESULT_PAGE).forEach(requestParams::remove);
+        Stream.of(TEMPLATE, RESULT_PAGE).forEach(requestParams::remove);
 
         // Rename the className parameter.
         String[] className = requestParams.remove("className");
@@ -290,26 +230,60 @@ public class LiveTableLiveDataEntryStore implements LiveDataEntryStore, WithPara
         }
 
         // Add the list of columns.
-        requestParams.put("collist", new String[] {StringUtils.join(query.getProperties(), ",")});
+        if (query.getProperties() != null) {
+            requestParams.put("collist", new String[] {StringUtils.join(query.getProperties(), ",")});
+        }
 
         // Add the sort and direction.
-        List<String> sortList =
-            query.getSort().stream().map(sortEntry -> sortEntry.getProperty()).collect(Collectors.toList());
-        if (!sortList.isEmpty()) {
+        addSortRequestParameters(query, requestParams);
+
+        // Add the filters.
+        if (query.getFilters() != null) {
+            query.getFilters().stream().forEach(filter -> addFilterRequestParameters(filter, requestParams));
+        }
+
+        // Add offset and limit. Note that the default live table results expects the offset to start from 1.
+        if (query.getOffset() != null) {
+            requestParams.put("offset", new String[] {String.valueOf(query.getOffset() + 1)});
+        }
+        if (query.getLimit() != null) {
+            requestParams.put("limit", new String[] {String.valueOf(query.getLimit())});
+        }
+
+        return requestParams;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addSourceRequestParameters(LiveDataQuery query, Map<String, String[]> requestParams)
+    {
+        if (query.getSource() != null) {
+            for (Map.Entry<String, Object> entry : query.getSource().getParameters().entrySet()) {
+                Stream<Object> stream;
+                if (entry.getValue() instanceof Collection) {
+                    stream = ((Collection<Object>) entry.getValue()).stream();
+                } else {
+                    // This should work for both single value and arrays.
+                    stream = Stream.of(entry.getValue());
+                }
+                List<String> values =
+                    stream.filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+                if (!values.isEmpty()) {
+                    requestParams.put(entry.getKey(), values.toArray(new String[values.size()]));
+                }
+            }
+        }
+    }
+
+    private void addSortRequestParameters(LiveDataQuery query, Map<String, String[]> requestParams)
+    {
+        if (query.getSort() != null && !query.getSort().isEmpty()) {
+            List<String> sortList =
+                query.getSort().stream().map(sortEntry -> sortEntry.getProperty()).collect(Collectors.toList());
             requestParams.put("sort", sortList.toArray(new String[sortList.size()]));
             List<String> dirList = query.getSort().stream().map(sortEntry -> sortEntry.isDescending() ? "desc" : "asc")
                 .collect(Collectors.toList());
             requestParams.put("dir", dirList.toArray(new String[dirList.size()]));
         }
-
-        // Add the filters.
-        query.getFilters().stream().forEach(filter -> addFilterRequestParameters(filter, requestParams));
-
-        // Add offset and limit. Note that the default live table results expects the offset to start from 1.
-        requestParams.put("offset", new String[] {String.valueOf(query.getOffset() + 1)});
-        requestParams.put("limit", new String[] {String.valueOf(query.getLimit())});
-
-        return requestParams;
     }
 
     private void addFilterRequestParameters(Filter filter, Map<String, String[]> requestParams)

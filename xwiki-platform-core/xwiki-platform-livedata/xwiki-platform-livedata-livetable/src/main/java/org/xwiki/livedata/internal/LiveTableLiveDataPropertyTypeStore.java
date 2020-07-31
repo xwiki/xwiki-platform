@@ -30,6 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 
@@ -38,7 +40,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
  * property types.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("liveTable/propertyType")
@@ -91,14 +93,14 @@ public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataProperty
         LiveDataPropertyDescriptor type = new LiveDataPropertyDescriptor();
         type.setId(id);
         if (displayer != null) {
-            type.getDisplayer().setId(displayer);
+            type.setDisplayer(new DisplayerDescriptor(displayer));
         }
         if (filter != null) {
             type.setSortable(true);
             type.setFilterable(true);
-            type.getFilter().setId(filter);
+            type.setFilter(new FilterDescriptor(filter));
             if (operators != null) {
-                type.getFilter().getOperators().addAll(Arrays.asList(operators));
+                type.getFilter().setOperators(Arrays.asList(operators));
             }
         } else {
             type.setSortable(false);

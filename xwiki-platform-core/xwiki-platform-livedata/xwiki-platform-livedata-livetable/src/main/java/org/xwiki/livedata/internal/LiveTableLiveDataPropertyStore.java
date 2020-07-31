@@ -35,6 +35,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -52,7 +54,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * properties.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("liveTable/property")
@@ -84,7 +86,7 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
             property.setId(id);
             property.setType(type);
             if (displayer != null) {
-                property.getDisplayer().setId(displayer);
+                property.setDisplayer(new DisplayerDescriptor(displayer));
             }
             if (Boolean.FALSE.equals(sortable)) {
                 // If we cannot sort on this property then we cannot filter either.
@@ -120,30 +122,27 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
         return properties;
     }
 
-    @SuppressWarnings("serial")
     private List<LiveDataPropertyDescriptor> getDocumentProperties()
     {
-        return new PropertyDescriptorList()
-        {
-            {
-                add("doc.name", STRING, LINK, null);
-                add("doc.title", STRING, LINK, null);
-                add("doc.space", STRING, LINK, null).getDisplayer().put(PROPERTY_HREF, "doc.space_url");
-                add("doc.location", STRING, HTML, null);
-                add("doc.fullName", STRING, LINK, null);
-                // Display as text because the returned value is the formatted date.
-                add("doc.creationDate", DATE, TEXT, null);
-                add("doc.date", DATE, TEXT, null);
-                add("doc.creator", USERS, TEXT, null);
-                add("doc.author", USERS, LINK, null).getDisplayer().put(PROPERTY_HREF, "doc.author_url");
-                add("doc.objectCount", "Number", null, false);
+        PropertyDescriptorList props = new PropertyDescriptorList();
+        props.add("doc.name", STRING, LINK, null);
+        props.add("doc.title", STRING, LINK, null);
+        props.add("doc.space", STRING, LINK, null).getDisplayer().setParameter(PROPERTY_HREF, "doc.space_url");
+        props.add("doc.location", STRING, HTML, null);
+        props.add("doc.fullName", STRING, LINK, null);
+        // Display as text because the returned value is the formatted date.
+        props.add("doc.creationDate", DATE, TEXT, null);
+        props.add("doc.date", DATE, TEXT, null);
+        props.add("doc.creator", USERS, TEXT, null);
+        props.add("doc.author", USERS, LINK, null).getDisplayer().setParameter(PROPERTY_HREF, "doc.author_url");
+        props.add("doc.objectCount", "Number", null, false);
 
-                add("_images", STRING, HTML, false);
-                add("_attachments", STRING, HTML, false);
-                add("_actions", STRING, ACTIONS, false).getDisplayer().put(ACTIONS, Arrays.asList("edit", "delete"));
-                add("_avatar", STRING, HTML, false);
-            }
-        };
+        props.add("_images", STRING, HTML, false);
+        props.add("_attachments", STRING, HTML, false);
+        props.add("_actions", STRING, ACTIONS, false).getDisplayer().setParameter(ACTIONS,
+            Arrays.asList("edit", "delete"));
+        props.add("_avatar", STRING, HTML, false);
+        return props;
     }
 
     private List<LiveDataPropertyDescriptor> getClassProperties() throws Exception
@@ -182,12 +181,13 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
             descriptor.setSortable(false);
         }
         // The returned property value is the displayer output.
-        descriptor.getDisplayer().setId(HTML);
+        descriptor.setDisplayer(new DisplayerDescriptor(HTML));
         if (xproperty.newProperty() instanceof StringListProperty) {
             // The default live table results page currently supports only exact matching for list properties with
             // multiple selection and no relational storage (selected values are stored concatenated on a single
             // database column).
-            descriptor.getFilter().getOperators().add(createOperator("equals"));
+            descriptor.setFilter(new FilterDescriptor());
+            descriptor.getFilter().setOperators(Collections.singletonList(createOperator("equals")));
         }
         return descriptor;
     }

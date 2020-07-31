@@ -17,13 +17,12 @@
 }
 ---
 {
-  "id":"deletedBatch",
   "query":{
     "properties":["doc.name","doc.location","_actions"],
     "source":{
+      "id":"liveTable",
       "template":"getdeleteddocuments",
       "translationPrefix":"core.restore.batch.",
-      "id":"liveTable",
       "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
     },
     "sort":[
@@ -57,15 +56,16 @@
         "sortable":false,
         "filterable":false,
         "displayer":{
-          "actions":["restore","delete"],
-          "id":"actions"
+          "id":"actions",
+          "actions":["restore","delete"]
         }
       }
     ],
     "pagination":{
       "maxShownPages":5,
-      "showPageSizeDropdown":true,
-      "pageSizes":[5,15,25]
+      "pageSizes":[5,15,25],
+      "showPageSizeDropdown":true
     }
-  }
+  },
+  "id":"deletedBatch"
 }

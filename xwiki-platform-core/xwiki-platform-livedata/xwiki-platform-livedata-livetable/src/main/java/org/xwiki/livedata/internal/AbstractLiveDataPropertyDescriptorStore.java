@@ -19,9 +19,7 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,20 +37,13 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Base {@link LiveDataPropertyDescriptorStore} implementation.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
-public abstract class AbstractLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore, WithParameters
+public abstract class AbstractLiveDataPropertyDescriptorStore extends WithParameters
+    implements LiveDataPropertyDescriptorStore
 {
     @Inject
     private ContextualLocalizationManager l10n;
-
-    private final Map<String, Object> parameters = new HashMap<>();
-
-    @Override
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
-    }
 
     @Override
     public boolean add(LiveDataPropertyDescriptor propertyDescriptor)

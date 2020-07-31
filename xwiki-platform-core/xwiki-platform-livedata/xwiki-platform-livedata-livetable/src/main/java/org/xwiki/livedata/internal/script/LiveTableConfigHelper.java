@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfiguration.LiveDataMeta;
+import org.xwiki.livedata.LiveDataConfiguration.PaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
@@ -48,21 +55,18 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Helper component for converting the Live Table configuration into Live Data configuration.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = LiveTableConfigHelper.class)
 @Singleton
 public class LiveTableConfigHelper
 {
-    private static final String ID = "id";
-
     private static final String UTF8 = "UTF-8";
 
     private static final String HTML = "html";
@@ -100,11 +104,8 @@ public class LiveTableConfigHelper
     public Map<String, Object> getConfig(String id, List<String> columns, Map<String, Object> columnProperties,
         Map<String, Object> options) throws IOException
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode columnPropertiesJSON = objectMapper.valueToTree(columnProperties);
-        ObjectNode optionsJSON = objectMapper.valueToTree(options);
-        ObjectNode config = getConfig(id, columns, columnPropertiesJSON, optionsJSON, objectMapper);
-        return objectMapper.readerForMapOf(Object.class).readValue(config);
+        return new ObjectMapper().readerForMapOf(Object.class)
+            .readValue(getConfigJSON(id, columns, columnProperties, options));
     }
 
     /**
@@ -120,58 +121,46 @@ public class LiveTableConfigHelper
         Map<String, Object> options) throws IOException
     {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
         ObjectNode columnPropertiesJSON = objectMapper.valueToTree(columnProperties);
         ObjectNode optionsJSON = objectMapper.valueToTree(options);
-        ObjectNode config = getConfig(id, columns, columnPropertiesJSON, optionsJSON, objectMapper);
+        LiveDataConfiguration config = getConfig(id, columns, columnPropertiesJSON, optionsJSON);
         return objectMapper.writeValueAsString(config);
     }
 
-    private ObjectNode getConfig(String id, List<String> columns, ObjectNode columnProperties, ObjectNode options,
-        ObjectMapper objectMapper)
+    private LiveDataConfiguration getConfig(String id, List<String> columns, ObjectNode columnProperties,
+        ObjectNode options)
     {
-        ObjectNode config = objectMapper.createObjectNode();
-        config.put(ID, id);
-        config.set("query", getQueryConfig(columns, options, objectMapper));
-        config.set("meta", getMetaConfig(columnProperties, options, objectMapper));
+        LiveDataConfiguration config = new LiveDataConfiguration();
+        config.setParameter("id", id);
+        config.setQuery(getQueryConfig(columns, options));
+        config.setMeta(getMetaConfig(columnProperties, options));
         return config;
     }
 
-    private ObjectNode getQueryConfig(List<String> columns, ObjectNode options, ObjectMapper objectMapper)
+    private LiveDataQuery getQueryConfig(List<String> columns, ObjectNode options)
     {
-        ObjectNode queryConfig = objectMapper.createObjectNode();
-
-        if (!columns.isEmpty()) {
-            queryConfig.set("properties", objectMapper.valueToTree(columns));
-        }
-
-        queryConfig.set("source", getSourceConfig(options, objectMapper));
-
-        ArrayNode hiddenFilters = getHiddenFiltersConfig(options, objectMapper);
-        if (!hiddenFilters.isEmpty()) {
-            queryConfig.set("hiddenFilters", hiddenFilters);
-        }
-
-        ArrayNode sortConfig = getSortConfig(columns, options, objectMapper);
-        if (!sortConfig.isEmpty()) {
-            queryConfig.set("sort", sortConfig);
-        }
+        LiveDataQuery queryConfig = new LiveDataQuery();
+        queryConfig.setProperties(columns);
+        queryConfig.setSource(getSourceConfig(options));
+        queryConfig.setParameter("hiddenFilters", getHiddenFiltersConfig(options));
+        queryConfig.setSort(getSortConfig(columns, options));
 
         JsonNode rowCount = options.path("rowCount");
         if (rowCount.isNumber()) {
-            queryConfig.put("limit", rowCount.asInt());
+            queryConfig.setLimit(rowCount.asInt());
         }
 
         return queryConfig;
     }
 
-    private ObjectNode getSourceConfig(ObjectNode options, ObjectMapper objectMapper)
+    private Source getSourceConfig(ObjectNode options)
     {
         Source source = new Source();
         source.setId("liveTable");
         for (String parameter : Arrays.asList("className", "resultPage", "queryFilters", "translationPrefix")) {
             if (options.path(parameter).isTextual()) {
-                source.put(parameter, options.path(parameter).asText());
+                source.setParameter(parameter, options.path(parameter).asText());
             }
         }
 
@@ -186,7 +175,7 @@ public class LiveTableConfigHelper
             }
         }
 
-        return objectMapper.valueToTree(source);
+        return source;
     }
 
     private void addSourceParametersFromURL(Source source, String url)
@@ -195,14 +184,12 @@ public class LiveTableConfigHelper
         Map<String, List<String>> parameters = getURLParameters(url);
         List<String> xpage = parameters.remove("xpage");
         if (xpage != null && !xpage.isEmpty() && !StringUtils.isEmpty(xpage.get(0)) && !"plain".equals(xpage.get(0))) {
-            source.put("template", xpage.get(0));
-            // Make sure we don't overwrite the source id.
-            parameters.remove(ID);
+            source.setParameter("template", xpage.get(0));
             for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                 if (entry.getValue().size() > 1) {
-                    source.put(entry.getKey(), entry.getValue());
+                    source.setParameter(entry.getKey(), entry.getValue());
                 } else {
-                    source.put(entry.getKey(), entry.getValue().get(0));
+                    source.setParameter(entry.getKey(), entry.getValue().get(0));
                 }
             }
         }
@@ -231,11 +218,12 @@ public class LiveTableConfigHelper
         return parameters;
     }
 
-    private ArrayNode getHiddenFiltersConfig(ObjectNode options, ObjectMapper objectMapper)
+    private List<Filter> getHiddenFiltersConfig(ObjectNode options)
     {
-        List<Filter> filters = new ArrayList<>();
+        List<Filter> filters = null;
         JsonNode extraParamsNode = options.path("extraParams");
         if (extraParamsNode.isTextual()) {
+            filters = new ArrayList<>();
             String extraParams = extraParamsNode.asText();
             try {
                 Map<String, List<String>> parameters = getURLParameters('?' + extraParams);
@@ -251,10 +239,10 @@ public class LiveTableConfigHelper
                     + " Root cause is [{}].", extraParams, ExceptionUtils.getRootCauseMessage(e));
             }
         }
-        return objectMapper.valueToTree(filters);
+        return filters;
     }
 
-    private ArrayNode getSortConfig(List<String> columns, ObjectNode options, ObjectMapper objectMapper)
+    private List<SortEntry> getSortConfig(List<String> columns, ObjectNode options)
     {
         SortEntry sortEntry = new SortEntry();
         JsonNode selectedColumn = options.path("selectedColumn");
@@ -267,41 +255,32 @@ public class LiveTableConfigHelper
             if (firstNonSpecialColumn.isPresent()) {
                 sortEntry.setProperty(firstNonSpecialColumn.get());
             } else {
-                return objectMapper.createArrayNode();
+                return null;
             }
         }
         sortEntry.setDescending("desc".equals(options.path("defaultOrder").asText()));
-        return objectMapper.valueToTree(new SortEntry[] {sortEntry});
+        return Collections.singletonList(sortEntry);
     }
 
-    private ObjectNode getMetaConfig(ObjectNode columnProperties, ObjectNode options, ObjectMapper objectMapper)
+    private LiveDataMeta getMetaConfig(ObjectNode columnProperties, ObjectNode options)
     {
-        ObjectNode metaConfig = objectMapper.createObjectNode();
-
-        ArrayNode propertyDescriptors = getPropertyDescriptorsConfig(columnProperties, options, objectMapper);
-        if (!propertyDescriptors.isEmpty()) {
-            metaConfig.set("propertyDescriptors", propertyDescriptors);
-        }
-
-        ObjectNode pagination = getPaginationConfig(options, objectMapper);
-        if (!pagination.isEmpty()) {
-            metaConfig.set("pagination", pagination);
-        }
-
+        LiveDataMeta metaConfig = new LiveDataMeta();
+        metaConfig.setPropertyDescriptors(getPropertyDescriptorsConfig(columnProperties, options));
+        metaConfig.setPagination(getPaginationConfig(options));
         return metaConfig;
     }
 
-    private ArrayNode getPropertyDescriptorsConfig(ObjectNode columnProperties, ObjectNode options,
-        ObjectMapper objectMapper)
+    private List<LiveDataPropertyDescriptor> getPropertyDescriptorsConfig(ObjectNode columnProperties,
+        ObjectNode options)
     {
-        ArrayNode propertyDescriptors = objectMapper.createArrayNode();
+        List<LiveDataPropertyDescriptor> propertyDescriptors = new ArrayList<>();
         columnProperties.fields().forEachRemaining(field -> propertyDescriptors
-            .add(getPropertyDescriptor(field.getKey(), (ObjectNode) field.getValue(), options, objectMapper)));
+            .add(getPropertyDescriptor(field.getKey(), (ObjectNode) field.getValue(), options)));
         return propertyDescriptors;
     }
 
-    private ObjectNode getPropertyDescriptor(String column, ObjectNode columnProperties, ObjectNode options,
-        ObjectMapper objectMapper)
+    private LiveDataPropertyDescriptor getPropertyDescriptor(String column, ObjectNode columnProperties,
+        ObjectNode options)
     {
         LiveDataPropertyDescriptor propertyDescriptor = new LiveDataPropertyDescriptor();
         propertyDescriptor.setId(column);
@@ -318,24 +297,12 @@ public class LiveTableConfigHelper
             propertyDescriptor.setHidden(true);
         }
 
-        ObjectNode displayer = getDisplayerConfig(column, columnProperties, objectMapper);
-        try {
-            propertyDescriptor.getDisplayer().putAll(objectMapper.readerForMapOf(Object.class).readValue(displayer));
-        } catch (IOException e) {
-            this.logger.warn("Failed to extract displayer information from column properties [{}]. Root cause is [{}].",
-                columnProperties, ExceptionUtils.getRootCauseMessage(e));
-        }
+        propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
 
         // The live table macro considers all columns, except for "actions", as filterable by default.
         propertyDescriptor.setFilterable(columnProperties.path("filterable").asBoolean(!columnProperties.has(ACTIONS)));
 
-        ObjectNode filter = getFilterConfig(columnProperties, objectMapper);
-        try {
-            propertyDescriptor.getFilter().putAll(objectMapper.readerForMapOf(Object.class).readValue(filter));
-        } catch (IOException e) {
-            this.logger.warn("Failed to extract filter information from column properties [{}]. Root cause is [{}].",
-                columnProperties, ExceptionUtils.getRootCauseMessage(e));
-        }
+        propertyDescriptor.setFilter(getFilterConfig(columnProperties));
 
         propertyDescriptor.setStyleName(columnProperties.path("headerClass").asText(null));
 
@@ -344,17 +311,17 @@ public class LiveTableConfigHelper
             // TODO: Extract more information from the specified XWiki class (the property type).
         }
 
-        return objectMapper.valueToTree(propertyDescriptor);
+        return propertyDescriptor;
     }
 
-    private ObjectNode getDisplayerConfig(String column, ObjectNode columnProperties, ObjectMapper objectMapper)
+    private DisplayerDescriptor getDisplayerConfig(String column, ObjectNode columnProperties)
     {
-        ObjectNode displayerConfig = objectMapper.createObjectNode();
+        DisplayerDescriptor displayerConfig = new DisplayerDescriptor();
         if (columnProperties.path(ACTIONS).isArray()) {
-            displayerConfig.put(ID, ACTIONS);
-            displayerConfig.set(ACTIONS, columnProperties.get(ACTIONS));
+            displayerConfig.setId(ACTIONS);
+            displayerConfig.setParameter(ACTIONS, columnProperties.get(ACTIONS));
         } else if (columnProperties.path(LINK).isTextual()) {
-            displayerConfig.put(ID, LINK);
+            displayerConfig.setId(LINK);
             Map<String, String[]> propertyHref = new HashMap<>();
             String docURL = "doc.url";
             String columnURL = column + "_url";
@@ -365,39 +332,44 @@ public class LiveTableConfigHelper
             propertyHref.put("wiki", new String[] {"doc.wiki_url"});
             String linkType = columnProperties.get(LINK).asText();
             String[] values = propertyHref.getOrDefault(linkType, new String[] {docURL});
-            displayerConfig.put("propertyHref", values[0]);
+            displayerConfig.setParameter("propertyHref", values[0]);
         } else if (columnProperties.path(HTML).booleanValue()) {
-            displayerConfig.put(ID, HTML);
+            displayerConfig.setId(HTML);
+        } else {
+            displayerConfig = null;
         }
         return displayerConfig;
     }
 
-    private ObjectNode getFilterConfig(ObjectNode columnProperties, ObjectMapper objectMapper)
+    private FilterDescriptor getFilterConfig(ObjectNode columnProperties)
     {
-        ObjectNode filterConfig = objectMapper.createObjectNode();
+        FilterDescriptor filterConfig = new FilterDescriptor();
+        boolean hasFilter = false;
 
         JsonNode filterId = columnProperties.path(TYPE);
         if (filterId.isTextual() && !HIDDEN.equals(filterId.asText())) {
-            filterConfig.put(ID, filterId.asText());
+            filterConfig.setId(filterId.asText());
+            hasFilter = true;
         }
 
         JsonNode match = columnProperties.path("match");
         if (match.isTextual()) {
             String defaultOperator = DEFAULT_OPERATOR.get(match.asText());
             if (defaultOperator != null) {
-                filterConfig.put("defaultOperator", defaultOperator);
+                filterConfig.setDefaultOperator(defaultOperator);
+                hasFilter = true;
             }
         }
 
-        return filterConfig;
+        return hasFilter ? filterConfig : null;
     }
 
-    private ObjectNode getPaginationConfig(ObjectNode options, ObjectMapper objectMapper)
+    private PaginationConfiguration getPaginationConfig(ObjectNode options)
     {
-        ObjectNode pagination = objectMapper.createObjectNode();
-        pagination.put("maxShownPages", options.path("maxPages").asInt(10));
+        PaginationConfiguration pagination = new PaginationConfiguration();
+        pagination.setMaxShownPages(options.path("maxPages").asInt(10));
         boolean showPageSizeDropdown = options.path("pageSize").asBoolean(true);
-        pagination.put("showPageSizeDropdown", showPageSizeDropdown);
+        pagination.setShowPageSizeDropdown(showPageSizeDropdown);
 
         JsonNode pageSizeBounds = options.path("pageSizeBounds");
         int min = 10;
@@ -413,7 +385,7 @@ public class LiveTableConfigHelper
             for (int i = min; i <= max; i += step) {
                 pageSizes.add(i);
             }
-            pagination.set("pageSizes", objectMapper.valueToTree(pageSizes));
+            pagination.setPageSizes(pageSizes);
         }
 
         return pagination;

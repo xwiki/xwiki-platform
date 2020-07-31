@@ -37,6 +37,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.syntax.Syntax;
@@ -69,7 +70,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link LiveTableLiveDataEntryStore}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class LiveTableLiveDataEntryStoreTest
@@ -119,16 +120,17 @@ class LiveTableLiveDataEntryStoreTest
         //
 
         LiveDataQuery query = new LiveDataQuery();
-        query.getSource().put("id", "liveTable");
-        query.getSource().put("template", "getdocuments");
-        query.getSource().put("childrenOf", "Test");
-        query.getSource().put("queryFilters", "unique");
-        query.getSource().put("translationPrefix", "core.restore.batch.");
-        query.getProperties().addAll(Arrays.asList("doc.title", "status", "hidden", "doc.author"));
-        query.getSort().add(new SortEntry("doc.date", true));
-        query.getFilters().add(new Filter("doc.author", "contains", false, "mflorea", "tmortagne"));
+        query.setSource(new Source("liveTable"));
+        query.getSource().setParameter("template", "getdocuments");
+        query.getSource().setParameter("childrenOf", "Test");
+        query.getSource().setParameter("queryFilters", "unique");
+        query.getSource().setParameter("translationPrefix", "core.restore.batch.");
+        query.setProperties(Arrays.asList("doc.title", "status", "hidden", "doc.author"));
+        query.setSort(Collections.singletonList(new SortEntry("doc.date", true)));
+        query
+            .setFilters(Collections.singletonList(new Filter("doc.author", "contains", false, "mflorea", "tmortagne")));
         query.setLimit(5);
-        query.setOffset(13);
+        query.setOffset(13L);
 
         Map<String, Object> row = new HashMap<>();
         row.put("doc_title", "Some title");
@@ -189,8 +191,8 @@ class LiveTableLiveDataEntryStoreTest
     void getFromResultPageWhenAccessDenied() throws Exception
     {
         LiveDataQuery query = new LiveDataQuery();
-        query.getSource().put("id", "liveTable");
-        query.getSource().put("resultPage", "Some.Page");
+        query.setSource(new Source("liveTable"));
+        query.getSource().setParameter("resultPage", "Some.Page");
 
         DocumentReference documentReference = new DocumentReference("foo", "Some", "Page");
         when(this.currentDocumentReferenceResolver.resolve("Some.Page")).thenReturn(documentReference);
@@ -215,10 +217,10 @@ class LiveTableLiveDataEntryStoreTest
         //
 
         LiveDataQuery query = new LiveDataQuery();
-        query.getSource().put("id", "liveTable");
-        query.getSource().put("resultPage", "Panels.LiveTableResults");
-        query.getSource().put("className", "Panels.PanelClass");
-        query.getProperties().addAll(Arrays.asList("doc.title", "_actions"));
+        query.setSource(new Source("liveTable"));
+        query.getSource().setParameter("resultPage", "Panels.LiveTableResults");
+        query.getSource().setParameter("className", "Panels.PanelClass");
+        query.setProperties(Arrays.asList("doc.title", "_actions"));
 
         DocumentReference documentReference = new DocumentReference("foo", "Panels", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("Panels.LiveTableResults")).thenReturn(documentReference);
@@ -232,8 +234,6 @@ class LiveTableLiveDataEntryStoreTest
 
         Map<String, String[]> expectedRequestParams = new HashMap<>();
         expectedRequestParams.put("outputSyntax", new String[] {"plain"});
-        expectedRequestParams.put("offset", new String[] {"1"});
-        expectedRequestParams.put("limit", new String[] {"15"});
         expectedRequestParams.put("collist", new String[] {"doc.title,_actions"});
         expectedRequestParams.put("classname", new String[] {"Panels.PanelClass"});
 
@@ -260,7 +260,7 @@ class LiveTableLiveDataEntryStoreTest
     void getFromDefaultResultPage() throws Exception
     {
         LiveDataQuery query = new LiveDataQuery();
-        query.getSource().put("id", "liveTable");
+        query.setSource(new Source("liveTable"));
 
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);

@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link LiveTableLiveDataPropertyStore}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class LiveTableLiveDataPropertyStoreTest
@@ -144,7 +144,7 @@ class LiveTableLiveDataPropertyStoreTest
             + "'type':'Computed','displayer':{'id':'html'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
             + "'type':'List','sortable':false,'displayer':{'id':'html'},"
-            + "'filter':{'operators':[{'name':'equals','id':'equals'}]}}");
+            + "'filter':{'operators':[{'id':'equals','name':'equals'}]}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 

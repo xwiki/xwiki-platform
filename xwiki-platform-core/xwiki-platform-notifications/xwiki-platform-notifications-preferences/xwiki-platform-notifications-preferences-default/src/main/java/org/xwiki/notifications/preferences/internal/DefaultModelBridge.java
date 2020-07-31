@@ -317,8 +317,8 @@ public class DefaultModelBridge implements ModelBridge
             xwiki.saveDocument(document, "Update notification preferences.", true, context);
 
         } catch (XWikiException e) {
-            throw new NotificationException(String.format(
-                    "Failed to save the notification preference into [%s]", targetDocument));
+            throw new NotificationException(
+                String.format("Failed to save the notification preference into [%s]", targetDocument), e);
         }
     }
 }

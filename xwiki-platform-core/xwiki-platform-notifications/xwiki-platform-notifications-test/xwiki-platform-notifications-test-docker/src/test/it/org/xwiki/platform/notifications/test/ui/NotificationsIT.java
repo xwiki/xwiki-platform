@@ -152,6 +152,9 @@ public class NotificationsIT
         // Check that the badge is showing «20+»
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
+            PAGES_TOP_CREATION_COUNT);
+        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 

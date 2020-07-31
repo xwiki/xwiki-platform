@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-      <version>${debian.platform.version}</version>
+      <version>12.6-SNAPSHOT</version>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
@@ -70,7 +70,7 @@
                   <artifactItem>
                     <groupId>org.xwiki.platform</groupId>
                     <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-                    <version>${debian.platform.version}</version>
+                    <version>${platform.version}</version>
                     <type>zip</type>
                   </artifactItem>
                 </artifactItems>

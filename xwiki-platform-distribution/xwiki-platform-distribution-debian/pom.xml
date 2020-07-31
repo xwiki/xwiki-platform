@@ -40,7 +40,6 @@
     <module>xwiki-platform-distribution-debian-solr</module>
   </modules>
   <properties>
-    <debian.platform.version>${project.version}</debian.platform.version>
     <jdeb.version>1.8</jdeb.version>
     <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
     <debian.license>LGPL 2.1</debian.license>
@@ -67,7 +66,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-resources</artifactId>
-      <version>${debian.platform.version}</version>
+      <version>12.6-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>

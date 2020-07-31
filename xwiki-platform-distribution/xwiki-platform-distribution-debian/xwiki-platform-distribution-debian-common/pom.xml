@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>${debian.platform.version}</version>
+      <version>12.6-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -100,7 +100,7 @@
                   <artifactItem>
                     <groupId>org.xwiki.platform</groupId>
                     <artifactId>xwiki-platform-distribution-war</artifactId>
-                    <version>${debian.platform.version}</version>
+                    <version>${platform.version}</version>
                     <type>war</type>
                   </artifactItem>
                 </artifactItems>

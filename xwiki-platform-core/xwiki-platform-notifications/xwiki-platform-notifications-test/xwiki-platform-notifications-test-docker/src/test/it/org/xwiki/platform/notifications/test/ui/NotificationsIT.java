@@ -61,8 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    },
-    servletEngine = ServletEngine.EXTERNAL
+    }
 )
 public class NotificationsIT
 {

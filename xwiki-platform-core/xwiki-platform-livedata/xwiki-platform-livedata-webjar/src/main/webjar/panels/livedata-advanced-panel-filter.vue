@@ -35,6 +35,7 @@
             class="filter-entries"
             :value="logic.getQueryFilterGroup(filterGroup.property).constrains"
             @change="reorderFilter($event, filterGroup)"
+            :group="'filter-panel' + logic.getFilterDescriptor(filterGroup.property).id"
           >
             <xwiki-draggable-item
                 v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
@@ -127,7 +128,9 @@ define([
       logic: Object,
     },
 
+
     computed: {
+
       data: function () { return this.logic.data; },
 
       // property descriptors that does not have filters
@@ -138,20 +141,35 @@ define([
           return !filter || filter.constrains.length === 0;
         });
       },
+
     },
 
+
     methods: {
+
       addFilterGroup: function (value) {
         if (value === "none") { return; }
         this.logic.addFilter(value);
         this.$refs.selectFilterPropertiesNone.selected = true;
       },
+
       reorderFilter: function (e, filterGroup) {
-        this.logic.filter(filterGroup.property, e.moved.oldIndex, {
-          index: e.moved.newIndex,
-        })
-        .catch(function (err) { console.warn(err); });
+        if (e.moved) {
+          this.logic.filter(filterGroup.property, e.moved.oldIndex, {
+            index: e.moved.newIndex,
+          })
+          .catch(function (err) { console.warn(err); });
+        }
+        else if (e.added) {
+          this.logic.addFilter(filterGroup.property, e.added.element.operator, e.added.element.value, e.added.newIndex)
+          .catch(function (err) { console.warn(err); });
+        }
+        else if (e.removed) {
+          this.logic.removeFilter(filterGroup.property, e.removed.oldIndex)
+          .catch(function (err) { console.warn(err); });
+        }
       },
+
     },
 
   });

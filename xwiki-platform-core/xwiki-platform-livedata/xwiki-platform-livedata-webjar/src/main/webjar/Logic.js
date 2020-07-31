@@ -971,7 +971,7 @@ define([
       if (!this.isPropertyFilterable(property)) { return; }
       // default indexes
       index = index || 0;
-      if (index < 0) { return; }
+      if (index < 0) { index = -1; }
       if (filterEntry.index < 0) { filterEntry.index = -1; }
       // old entry
       var oldEntry = {
@@ -1005,7 +1005,7 @@ define([
      */
     _getFilteringType: function (oldEntry, newEntry) {
       var queryFilter = this.getQueryFilterGroup(oldEntry.property);
-      if (queryFilter && oldEntry.index >= queryFilter.constrains.length) {
+      if (queryFilter && oldEntry.index === -1) {
         return "add";
       }
       if (newEntry.index === -1) {
@@ -1042,7 +1042,9 @@ define([
         var newEntry = filterEntries.newEntry;
         var filteringType = self._getFilteringType(oldEntry, newEntry);
         // remove filter at current property and index
-        self.getQueryFilters(oldEntry.property).splice(index, 1);
+        if (oldEntry.index !== -1) {
+          self.getQueryFilters(oldEntry.property).splice(index, 1);
+        }
         // add filter at new property and index
         if (newEntry.index !== -1) {
           // create filterGroup if not exists
@@ -1081,14 +1083,18 @@ define([
      * @param {String} property Which property to add the filter to
      * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
      * @param {String} value Default value for the new filter entry
+     * @param {Number} index Index of new filter entry. Undefined means last
      * @returns {Promise}
      */
-    addFilter: function (property, operator, value) {
-      var index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
-      return this.filter(property, index, {
+    addFilter: function (property, operator, value, index) {
+      if (index === undefined) {
+        index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
+      }
+      return this.filter(property, -1, {
         property: property,
         operator: operator,
-        value: value
+        value: value,
+        index: index,
       });
     },
 

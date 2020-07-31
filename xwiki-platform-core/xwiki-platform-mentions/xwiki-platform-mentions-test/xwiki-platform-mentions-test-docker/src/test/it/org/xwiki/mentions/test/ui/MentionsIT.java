@@ -95,12 +95,11 @@ public class MentionsIT
             setup.createPage(reference,
                 "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
                 pageName);
-            // Yes we wait on a timer, but it's to be sure the Mention have time to be processed by the asynchronous
-            // thread pool, so that we can send the notification.
-            Thread.sleep(1000);
         });
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
+            setup.gotoPage("Main", "WebHome");
+            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
             setup.gotoPage("Main", "WebHome");
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();

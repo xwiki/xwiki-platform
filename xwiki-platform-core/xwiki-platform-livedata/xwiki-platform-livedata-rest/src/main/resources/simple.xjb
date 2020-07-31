@@ -26,13 +26,13 @@
 
   <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
     <jaxb:bindings node="//xs:element[@name = 'displayer']">
-      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+      <jaxb:class ref="org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor" />
     </jaxb:bindings>
   </jaxb:bindings>
 
   <jaxb:bindings schemaLocation="xwiki.rest.liveData.model.xsd">
     <jaxb:bindings node="//xs:element[@name = 'filter']">
-      <jaxb:class ref="org.xwiki.livedata.rest.model.jaxb.StringMap" />
+      <jaxb:class ref="org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor" />
     </jaxb:bindings>
   </jaxb:bindings>
 

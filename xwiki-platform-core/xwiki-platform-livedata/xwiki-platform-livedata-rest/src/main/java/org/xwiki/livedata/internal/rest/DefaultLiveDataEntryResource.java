@@ -38,10 +38,10 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
  * Default implementation of {@link LiveDataEntryResource}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
-@Named("org.xwiki.livedata.rest.internal.DefaultLiveDataEntryResource")
+@Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource")
 @Singleton
 public class DefaultLiveDataEntryResource extends AbstractLiveDataResource implements LiveDataEntryResource
 {

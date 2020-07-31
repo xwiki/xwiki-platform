@@ -67,7 +67,7 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this becuase we want to
+          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this because we want to
             control how the value (a Map) is serialized in JSON format. -->
           <element name="values" type="anyType"></element>
         </sequence>
@@ -91,7 +91,7 @@
       <extension base="xwiki:LinkCollection">
         <sequence>
           <element name="description" type="string"></element>
-          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this becuase we want to
+          <!-- We replace "anyType" with the actual type in the separate bindings file. We do this because we want to
             control how the value (a Map) is serialized in JSON format. -->
           <element name="icon" type="anyType"></element>
           <element name="displayer" type="anyType"></element>
@@ -100,7 +100,9 @@
         <attribute name="id" type="string"></attribute>
         <attribute name="name" type="string"></attribute>
         <attribute name="type" type="string"></attribute>
+        <attribute name="hidden" type="boolean" default="false"></attribute>
         <attribute name="sortable" type="boolean" default="false"></attribute>
+        <attribute name="filterable" type="boolean" default="false"></attribute>
         <attribute name="styleName" type="string"></attribute>
       </extension>
     </complexContent>

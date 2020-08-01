@@ -22,19 +22,10 @@
           v-for="(sortEntry, level) in data.query.sort"
           :key="level"
         >
-          <span>Level {{ level + 1 }}</span>
+          <!-- property name -->
+          <span>{{ logic.getPropertyDescriptor(sortEntry.property).name }}</span>
+
           <span style="margin: 0 1rem"> - </span>
-          <!-- property select -->
-          <select
-            @change="logic.sort($event.target.value, level)"
-          >
-            <option
-              v-for="(property, i) in logic.getSortablePropertyDescriptors()"
-              :key="i"
-              :value="property.id"
-              :selected="property.id === sortEntry.property"
-            >{{ property.name }}</option>
-          </select>
 
           <!-- direction select -->
           <select

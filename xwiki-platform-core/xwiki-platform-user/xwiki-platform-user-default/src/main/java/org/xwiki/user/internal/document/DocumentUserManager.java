@@ -23,10 +23,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -39,12 +49,45 @@ import org.xwiki.user.UserReference;
 @Singleton
 public class DocumentUserManager implements UserManager
 {
+    private static final EntityReference USERS_XCLASS =
+        new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
     @Inject
-    private DocumentAccessBridge dab;
+    private Logger logger;
+
+    @Inject
+    private Execution execution;
 
     @Override
     public boolean exists(UserReference userReference)
     {
-        return this.dab.exists(((DocumentUserReference) userReference).getReference());
+        boolean result;
+
+        // For the reference to point to an existing user it needs to satisfy 2 conditions:
+        // - the document exists
+        // - it contains an XWiki.XWikiUsers xobject
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+        DocumentReference userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        if (xwiki.exists(userDocumentReference, xcontext)) {
+            try {
+                XWikiDocument document = xwiki.getDocument(userDocumentReference, xcontext);
+                result = document.getXObject(USERS_XCLASS) != null;
+            } catch (Exception e) {
+                this.logger.warn(String.format("Failed to check if document [%s] holds an XWiki user or not. "
+                        + "Considering it's not the case. Root error: [%s]", userDocumentReference,
+                    ExceptionUtils.getRootCauseMessage(e)));
+                result = false;
+            }
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        ExecutionContext ec = this.execution.getContext();
+        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

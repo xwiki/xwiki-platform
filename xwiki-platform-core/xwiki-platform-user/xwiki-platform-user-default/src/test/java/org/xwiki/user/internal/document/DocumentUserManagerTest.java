@@ -19,10 +19,10 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -56,7 +56,7 @@ public class DocumentUserManagerTest
     private DocumentUserManager userManager;
 
     @MockComponent
-    private Execution execution;
+    private Provider<XWikiContext> contextProvider;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -68,9 +68,7 @@ public class DocumentUserManagerTest
         XWiki xwiki = mock(XWiki.class);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        ExecutionContext ec = new ExecutionContext();
-        ec.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(ec);
+        when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.exists(reference, xcontext)).thenReturn(true);
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
@@ -87,9 +85,7 @@ public class DocumentUserManagerTest
         XWiki xwiki = mock(XWiki.class);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        ExecutionContext ec = new ExecutionContext();
-        ec.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(ec);
+        when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.exists(reference, xcontext)).thenReturn(true);
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
@@ -106,9 +102,7 @@ public class DocumentUserManagerTest
         XWiki xwiki = mock(XWiki.class);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        ExecutionContext ec = new ExecutionContext();
-        ec.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(ec);
+        when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.exists(reference, xcontext)).thenReturn(false);
 
         assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
@@ -121,9 +115,7 @@ public class DocumentUserManagerTest
         XWiki xwiki = mock(XWiki.class);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        ExecutionContext ec = new ExecutionContext();
-        ec.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(ec);
+        when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.exists(reference, xcontext)).thenReturn(true);
         when(xwiki.getDocument(reference, xcontext)).thenThrow(new XWikiException(0, 0, "error"));
 

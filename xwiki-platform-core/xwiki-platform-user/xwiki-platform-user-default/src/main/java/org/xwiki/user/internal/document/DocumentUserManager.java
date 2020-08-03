@@ -21,13 +21,12 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -56,7 +55,7 @@ public class DocumentUserManager implements UserManager
     private Logger logger;
 
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xwikiContextProvider;
 
     @Override
     public boolean exists(UserReference userReference)
@@ -66,7 +65,7 @@ public class DocumentUserManager implements UserManager
         // For the reference to point to an existing user it needs to satisfy 2 conditions:
         // - the document exists
         // - it contains an XWiki.XWikiUsers xobject
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = this.xwikiContextProvider.get();
         XWiki xwiki = xcontext.getWiki();
         DocumentReference userDocumentReference = ((DocumentUserReference) userReference).getReference();
         if (xwiki.exists(userDocumentReference, xcontext)) {
@@ -83,11 +82,5 @@ public class DocumentUserManager implements UserManager
             result = false;
         }
         return result;
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        ExecutionContext ec = this.execution.getContext();
-        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

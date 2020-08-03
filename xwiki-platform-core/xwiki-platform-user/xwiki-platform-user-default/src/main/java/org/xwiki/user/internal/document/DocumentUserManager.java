@@ -27,9 +27,8 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
@@ -48,8 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DocumentUserManager implements UserManager
 {
-    private static final EntityReference USERS_XCLASS =
-        new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+    private static final LocalDocumentReference USERS_XCLASS_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Inject
     private Logger logger;
@@ -68,17 +67,13 @@ public class DocumentUserManager implements UserManager
         XWikiContext xcontext = this.xwikiContextProvider.get();
         XWiki xwiki = xcontext.getWiki();
         DocumentReference userDocumentReference = ((DocumentUserReference) userReference).getReference();
-        if (xwiki.exists(userDocumentReference, xcontext)) {
-            try {
-                XWikiDocument document = xwiki.getDocument(userDocumentReference, xcontext);
-                result = document.getXObject(USERS_XCLASS) != null;
-            } catch (Exception e) {
-                this.logger.warn(String.format("Failed to check if document [%s] holds an XWiki user or not. "
-                        + "Considering it's not the case. Root error: [%s]", userDocumentReference,
-                    ExceptionUtils.getRootCauseMessage(e)));
-                result = false;
-            }
-        } else {
+        try {
+            XWikiDocument document = xwiki.getDocument(userDocumentReference, xcontext);
+            result = !document.isNew() && document.getXObject(USERS_XCLASS_REFERENCE) != null;
+        } catch (Exception e) {
+            this.logger.warn(String.format("Failed to check if document [%s] holds an XWiki user or not. "
+                    + "Considering it's not the case. Root error: [%s]", userDocumentReference,
+                ExceptionUtils.getRootCauseMessage(e)));
             result = false;
         }
         return result;

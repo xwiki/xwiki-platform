@@ -39,4 +39,12 @@ public interface MentionsBlockingQueueProvider
      * @return The blocking queue
      */
     BlockingQueue<MentionsData> initBlockingQueue();
+
+    /**
+     * Close the queue.
+     *
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    void closeQueue();
 }

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
@@ -87,9 +88,13 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     private boolean threadStarted;
 
     @Override
-    public void initialize()
+    public void initialize() throws InitializationException
     {
-        this.queue = this.blockingQueueProvider.initBlockingQueue();
+        try {
+            this.queue = this.blockingQueueProvider.initBlockingQueue();
+        } catch (Exception e) {
+            throw new InitializationException("Failed to initialize the queue", e);
+        }
         this.consumers = new ArrayList<>();
         JMXMentionsMBean mbean = new JMXMentions(this::getQueueSize, this::clearQueue, () -> this.consumers.size());
         this.jmxRegistration.registerMBean(mbean, MBEAN_NAME);
@@ -134,6 +139,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
             consumer.halt();
             this.queue.add(MentionsData.STOP);
         }
+        this.blockingQueueProvider.closeQueue();
     }
 
     @Override

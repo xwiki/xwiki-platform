@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.management.JMXBeanRegistration;
+import org.xwiki.mentions.internal.DefaultMentionsEventExecutor.MentionsConsumer;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.model.reference.DocumentReference;
@@ -101,6 +102,19 @@ class DefaultMentionsEventExecutorTest
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
         verify(this.jmxRegistration).registerMBean(any(JMXMentions.class), eq("name=mentions"));
+    }
+
+    @Test
+    void dispose()
+    {
+        this.executor.dispose();
+
+        verify(this.jmxRegistration).unregisterMBean("name=mentions");
+        for (MentionsConsumer mentionsConsumer : this.executor.getConsumers()) {
+            verify(mentionsConsumer).consume();
+            verify(this.blockingQueue).add(MentionsData.STOP);
+        }
+        verify(this.blockingQueueProvider).closeQueue();
     }
 
     @Test

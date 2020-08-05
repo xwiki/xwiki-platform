@@ -20,15 +20,11 @@
 package org.xwiki.mentions.internal.async;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.concurrent.BlockingQueue;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -42,7 +38,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link DefaultMentionsBlockingQueueProvider}.
  *
  * @version $Id$
- * @since X.Y.Z
+ * @since 12.7RC1
  */
 @ComponentTest
 class DefaultMentionsBlockingQueueProviderTest
@@ -53,32 +49,18 @@ class DefaultMentionsBlockingQueueProviderTest
     @MockComponent
     private Environment environment;
 
-    private File tempDir;
-
-    @BeforeEach
-    void setUp() throws IOException
-    {
-        this.tempDir = Files.createTempDirectory("DefaultMentionsBlockingQueueProviderTest").toFile();
-    }
-
-    @AfterEach
-    void tearDown() throws IOException
-    {
-        FileUtils.deleteDirectory(this.tempDir);
-    }
-
     @Test
-    void initBlockingQueue()
+    void initBlockingQueue(@XWikiTempDir File tmpDir)
     {
-        when(this.environment.getPermanentDirectory()).thenReturn(this.tempDir);
+        when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
         assertTrue(actual instanceof XodusBlockingQueue);
     }
 
     @Test
-    void initBlockingQueueTwice()
+    void initBlockingQueueTwice(@XWikiTempDir File tmpDir)
     {
-        when(this.environment.getPermanentDirectory()).thenReturn(this.tempDir);
+        when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         this.provider.initBlockingQueue();
         this.provider.closeQueue();
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();

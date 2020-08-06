@@ -47,6 +47,8 @@ public class RatingsException extends XWikiException
 
     public static final int ERROR_RATINGS_SAVERATING_NULLDOCUMENT = 1120005;
 
+    public static final int ERROR_RATING_SOLR_CORE = 1120006;
+
     /**
      * RatingsException default constructor
      */
@@ -97,7 +99,7 @@ public class RatingsException extends XWikiException
      *
      * @param message the message of the exception.
      * @param throwable the parent cause.
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     public RatingsException(String message, Throwable throwable)

@@ -65,7 +65,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
  * Test of {@link DefaultMentionsDataConsumer}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class DefaultMentionsDataConsumerTest

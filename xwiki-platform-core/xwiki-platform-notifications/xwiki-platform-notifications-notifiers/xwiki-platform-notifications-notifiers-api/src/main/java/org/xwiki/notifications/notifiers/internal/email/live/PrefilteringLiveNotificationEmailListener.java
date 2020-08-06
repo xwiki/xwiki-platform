@@ -23,18 +23,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EntityEvent;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * This listener is responsible of sending mails to users who enabled live mails.
  *
- * @since 12.6RC1
+ * @since 12.6
  * @version $Id$
  */
 @Component
@@ -56,23 +60,38 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
     @Inject
     private PrefilteringLiveNotificationEmailManager manager;
 
+    @Inject
+    private WikiDescriptorManager wikis;
+
     /**
      * Constructs a new {@link LiveNotificationEmailListener}.
      */
     public PrefilteringLiveNotificationEmailListener()
     {
-        super(NAME, new MailEntityAddedEvent());
+        super(NAME, new MailEntityAddedEvent(), new ApplicationReadyEvent());
     }
 
     @Override
-    public void onEvent(Event event, Object o, Object o1)
+    public void onEvent(Event event, Object source, Object data)
     {
         // Check if the notifications are enabled in the wiki and if the mail option for the
         // notifications is enabled.
-        if (!this.remoteState.isRemoteState() && this.notificationConfiguration.isEnabled()
-            && this.notificationConfiguration.areEmailsEnabled()
+        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.areEmailsEnabled()
             && this.notificationConfiguration.isEventPrefilteringEnabled()) {
-            this.manager.addEvent((EntityEvent) o);
+            if (event instanceof EventStreamAddedEvent) {
+                if (!this.remoteState.isRemoteState()) {
+                    // Add the event to the queue of mails to send (if the associated user enabled live mails)
+                    this.manager.addEvent((EntityEvent) source);
+                }
+            } else if (event instanceof ApplicationReadyEvent) {
+                // Load all the events for which live mail was processing was not finished and send them
+                // Don't block the event thread
+                this.manager.addEvents(this.wikis.getMainWikiId());
+            } else if (event instanceof WikiReadyEvent) {
+                // Load all the events for which live mail was processing was not finished and send them
+                // Don't block the event thread
+                this.manager.addEvents(this.wikis.getMainWikiId());
+            }
         }
     }
 }

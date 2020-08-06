@@ -613,7 +613,7 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# using the default port.
 # solr.remote.baseURL=http://localhost:8983/solr
 
-#-# [Since 12.6RC1]
+#-# [Since 12.6]
 #-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
 #-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
 # solr.remote.corePrefix=xwiki
@@ -1037,7 +1037,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # Mentions
 #-------------------------------------------------------------------------------------
 
-#-# [Since 12.6RC1]
+#-# [Since 12.6]
 #-# The detection and notification for the user mentions in created or edited content is done asynchronously 
 #-# by a pool of consumers.
 #-# This properties controls the size of this pool.

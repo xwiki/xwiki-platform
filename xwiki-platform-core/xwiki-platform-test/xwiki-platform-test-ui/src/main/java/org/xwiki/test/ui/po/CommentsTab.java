@@ -127,7 +127,9 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(
+        // Comments are handled async so it makes sense to wait for the reply button to be ready if another comment
+        // has just been posted for example. That's why we don't use findElementWithoutWaiting here.
+        getDriver().findElement(
             By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }

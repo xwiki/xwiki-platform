@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * Implementation of the Mentions JXM MBean.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class JMXMentions implements JMXMentionsMBean
 {

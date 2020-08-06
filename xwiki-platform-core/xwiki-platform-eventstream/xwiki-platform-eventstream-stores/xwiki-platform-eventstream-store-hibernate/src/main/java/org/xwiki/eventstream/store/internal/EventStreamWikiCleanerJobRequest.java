@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package org.xwiki.eventstream.store.internal;
 
 import org.xwiki.job.AbstractRequest;
 

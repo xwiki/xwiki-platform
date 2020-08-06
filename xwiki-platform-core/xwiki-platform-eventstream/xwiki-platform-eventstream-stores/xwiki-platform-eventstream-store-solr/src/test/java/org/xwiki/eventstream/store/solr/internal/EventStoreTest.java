@@ -21,25 +21,32 @@ package org.xwiki.eventstream.store.solr.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStreamException;
@@ -48,11 +55,12 @@ import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
+import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
+import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.properties.converter.Converter;
+import org.xwiki.observation.EventListener;
 import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -62,20 +70,28 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
+import com.xpn.xwiki.internal.model.reference.SpaceReferenceConverter;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the initialization of the Solr instance.
+ * Validate {@link SolrEventStore}, {@link EventsSolrCoreInitializer} and {@link WikiDeletedListener}.
  * 
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(EventsSolrCoreInitializer.class)
+@ComponentList({EventsSolrCoreInitializer.class, WikiDeletedListener.class, WikiReferenceConverter.class,
+    SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class})
+@ReferenceComponentList
 @SolrComponentList
 public class EventStoreTest
 {
@@ -87,6 +103,36 @@ public class EventStoreTest
 
     private static final DefaultEvent EVENT4 = event("id4");
 
+    private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
+
+    private static final WikiReference WIKI1_REFERENCE = new WikiReference("wiki1");
+
+    private static final WikiReference WIKI2_REFERENCE = new WikiReference("wiki2");
+
+    private static final SpaceReference SPACE_REFERENCE = new SpaceReference("space", WIKI_REFERENCE);
+
+    private static final SpaceReference SPACE1_REFERENCE = new SpaceReference("space1", WIKI_REFERENCE);
+
+    private static final SpaceReference SPACE2_REFERENCE = new SpaceReference("space2", WIKI_REFERENCE);
+
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("document", SPACE_REFERENCE);
+
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("user", SPACE_REFERENCE);
+
+    private static final DocumentReference RELATED_REFERENCE = new DocumentReference("related", SPACE_REFERENCE);
+
+    private static final String SPACE_STRING = "wiki:space";
+
+    private static final String SPACE1_STRING = "wiki1:space1";
+
+    private static final String SPACE2_STRING = "wiki2:space2";
+
+    private static final String DOCUMENT_STRING = "wiki:space.document";
+
+    private static final String USER_STRING = "wiki:space.user";
+
+    private static final String RELATED_STRING = "wiki:space.related";
+
     @XWikiTempDir
     private File permanentDirectory;
 
@@ -95,20 +141,7 @@ public class EventStoreTest
     private Environment mockEnvironment;
 
     @MockComponent
-    private Converter<DocumentReference> documentConverter;
-
-    @MockComponent
-    private Converter<SpaceReference> spaceConverter;
-
-    @MockComponent
-    private Converter<WikiReference> wikiConverter;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> serializer;
-
-    @MockComponent
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactSerializer;
+    private WikiDescriptorManager wikis;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -170,6 +203,11 @@ public class EventStoreTest
         return result;
     }
 
+    private void assertEqualsResult(Collection<Event> expected, EventSearchResult result) throws EventStreamException
+    {
+        assertEquals(new HashSet<>(expected), result.stream().collect(Collectors.toSet()));
+    }
+
     // Tests
 
     @Test
@@ -179,10 +217,37 @@ public class EventStoreTest
 
         DefaultEvent event = event("id");
 
+        event.setApplication("application");
+        event.setBody("body");
+        event.setDate(new Date());
+        event.setDocument(DOCUMENT_REFERENCE);
+        event.setDocumentTitle("doctitle");
+        event.setDocumentVersion("version");
+        event.setGroupId("groupid");
+        event.setHidden(true);
+        event.setImportance(Importance.CRITICAL);
+        event.setPrefiltered(true);
+        event.setRelatedEntity(RELATED_REFERENCE);
+        event.setSpace(SPACE1_REFERENCE);
+        event.setStream("stream");
+        event.setTarget(SetUtils.hashSet("target1", "target2"));
+        event.setTitle("title");
+        event.setType("type");
+        event.setUrl(new URL("http://path"));
+        event.setUser(USER_REFERENCE);
+        event.setWiki(WIKI2_REFERENCE);
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("param1", "value1");
+        parameters.put("param2", "value2");
+        event.setParameters(parameters);
+
         this.eventStore.saveEvent(event).get();
 
         Optional<Event> storedEvent = this.eventStore.getEvent("id");
         assertTrue(storedEvent.isPresent());
+
+        assertEquals(event, storedEvent.get());
 
         this.eventStore.deleteEvent(event).get();
 
@@ -268,6 +333,10 @@ public class EventStoreTest
         // Reference
 
         searchReference();
+
+        // Fields
+
+        searchFields();
     }
 
     public void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
@@ -278,17 +347,9 @@ public class EventStoreTest
         EVENT4.setHidden(false);
 
         EVENT1.setUser(new DocumentReference("wiki", "space", "user1"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user1")).thenReturn(EVENT1.getUser());
-        when(this.documentConverter.convert(String.class, EVENT1.getUser())).thenReturn("wiki:space.user1");
         EVENT2.setUser(new DocumentReference("wiki", "space", "user2"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user2")).thenReturn(EVENT2.getUser());
-        when(this.documentConverter.convert(String.class, EVENT2.getUser())).thenReturn("wiki:space.user2");
         EVENT3.setUser(new DocumentReference("wiki", "space", "user3"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user3")).thenReturn(EVENT3.getUser());
-        when(this.documentConverter.convert(String.class, EVENT3.getUser())).thenReturn("wiki:space.user3");
         EVENT4.setUser(new DocumentReference("wiki", "space", "user4"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user4")).thenReturn(EVENT4.getUser());
-        when(this.documentConverter.convert(String.class, EVENT4.getUser())).thenReturn("wiki:space.user4");
 
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2);
@@ -297,6 +358,13 @@ public class EventStoreTest
         this.eventStore.prefilterEvent(EVENT1).get();
 
         assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setLimit(-1));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setOffset(-1));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().setOffset(0));
+
+        assertSearch(Arrays.asList(), new SimpleEventQuery().setLimit(0));
+        assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().setOffset(1).addSort(Event.FIELD_ID, Order.ASC));
 
         SimpleEventQuery query = new SimpleEventQuery();
         query.eq(Event.FIELD_ID, "id1");
@@ -416,47 +484,25 @@ public class EventStoreTest
 
     public void searchReference() throws EventStreamException, InterruptedException, ExecutionException
     {
-        WikiReference wiki = new WikiReference("wiki");
-        SpaceReference space = new SpaceReference("space", wiki);
-        DocumentReference document1 = new DocumentReference("document1", space);
-        DocumentReference document2 = new DocumentReference("document2", space);
-        String wikiString = "wiki";
-        String spaceString = "wiki:space";
+        DocumentReference document1 = new DocumentReference("document1", SPACE_REFERENCE);
+        DocumentReference document2 = new DocumentReference("document2", SPACE_REFERENCE);
         String documentString1 = "wiki:space.document1";
         String documentString2 = "wiki:space.document2";
 
-        when(this.compactSerializer.serialize(space, wiki)).thenReturn("space");
-        when(this.compactSerializer.serialize(document1, wiki)).thenReturn("space.document1");
-        when(this.compactSerializer.serialize(document1, space)).thenReturn("document1");
-        when(this.compactSerializer.serialize(document2, wiki)).thenReturn("space.document2");
-        when(this.compactSerializer.serialize(document2, space)).thenReturn("document2");
-        when(this.serializer.serialize(document1)).thenReturn("wiki:space.document1");
-        when(this.serializer.serialize(document2)).thenReturn("wiki:space.document2");
-        when(this.serializer.serialize(space)).thenReturn("wiki:space");
-
-        when(this.documentConverter.convert(DocumentReference.class, documentString1)).thenReturn(document1);
-        when(this.documentConverter.convert(String.class, document1)).thenReturn(documentString1);
-        when(this.documentConverter.convert(DocumentReference.class, documentString2)).thenReturn(document2);
-        when(this.documentConverter.convert(String.class, document2)).thenReturn(documentString2);
-        when(this.spaceConverter.convert(SpaceReference.class, spaceString)).thenReturn(space);
-        when(this.spaceConverter.convert(String.class, space)).thenReturn(spaceString);
-        when(this.wikiConverter.convert(WikiReference.class, wikiString)).thenReturn(wiki);
-        when(this.wikiConverter.convert(String.class, wiki)).thenReturn(wikiString);
-
-        EVENT1.setWiki(wiki);
-        EVENT1.setSpace(space);
+        EVENT1.setWiki(WIKI_REFERENCE);
+        EVENT1.setSpace(SPACE_REFERENCE);
         EVENT1.setDocument(document1);
-        EVENT2.setWiki(wiki);
-        EVENT2.setSpace(space);
+        EVENT2.setWiki(WIKI_REFERENCE);
+        EVENT2.setSpace(SPACE_REFERENCE);
         EVENT2.setDocument(document2);
 
         this.eventStore.saveEvent(EVENT1);
-        this.eventStore.saveEvent(EVENT2);
-        this.eventStore.saveEvent(EVENT3).get();
+        this.eventStore.saveEvent(EVENT2).get();
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_WIKI, wikiString));
-        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, spaceString));
-        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, space));
+        assertSearch(Arrays.asList(EVENT1, EVENT2),
+            new SimpleEventQuery().eq(Event.FIELD_WIKI, WIKI_REFERENCE.getName()));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, SPACE_STRING));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, SPACE_REFERENCE));
         assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, "space"));
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document1"));
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document1"));
@@ -528,5 +574,48 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withMail("entity2"));
 
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withMail("entity3"));
+    }
+
+    private void searchFields() throws EventStreamException
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        assertEqualsResult(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), this.eventStore.search(query, null));
+        assertEqualsResult(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            this.eventStore.search(query, Collections.emptySet()));
+
+        Map<String, Event> events = this.eventStore.search(query, Collections.singleton(Event.FIELD_ID)).stream()
+            .collect(Collectors.toMap(Event::getId, Function.identity()));
+
+        assertEquals(SetUtils.hashSet(EVENT1.getId(), EVENT2.getId(), EVENT3.getId(), EVENT4.getId()), events.keySet());
+
+        Event event1 = events.get(EVENT1.getId());
+
+        assertNotEquals(EVENT1, event1);
+        assertFalse(event1.isPrefiltered());
+        assertFalse(event1.getHidden());
+    }
+
+    @Test
+    public void deleteWiki()
+        throws EventStreamException, InterruptedException, ExecutionException, ComponentLookupException
+    {
+        EVENT1.setWiki(new WikiReference("wikia"));
+        EVENT2.setWiki(new WikiReference("wikia"));
+        EVENT3.setWiki(new WikiReference("wikib"));
+        EVENT4.setWiki(new WikiReference("wikic"));
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2);
+        this.eventStore.saveEvent(EVENT3);
+        this.eventStore.saveEvent(EVENT4).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery());
+
+        WikiDeletedListener listener = this.componentManager.getInstance(EventListener.class, WikiDeletedListener.NAME);
+
+        listener.onEvent(new WikiDeletedEvent("wikia"), null, null);
+
+        assertSearch(Arrays.asList(EVENT3, EVENT4), new SimpleEventQuery());
     }
 }

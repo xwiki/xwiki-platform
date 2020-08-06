@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package org.xwiki.eventstream.store.internal;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,11 +34,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
+/**
+ * Validate {@link WikiDeletedListener}.
+ * 
+ * @version $Id$
+ */
 public class WikiDeletedListenerTest
 {
     @Rule
     public MockitoComponentMockingRule<WikiDeletedListener> mocker =
-            new MockitoComponentMockingRule<>(WikiDeletedListener.class);
+        new MockitoComponentMockingRule<>(WikiDeletedListener.class);
 
     private JobExecutor jobExecutor;
 
@@ -51,15 +56,12 @@ public class WikiDeletedListenerTest
     @Test
     public void onEvent() throws Exception
     {
-        doAnswer(invocationOnMock ->  {
+        doAnswer(invocationOnMock -> {
             EventStreamWikiCleanerJobRequest request = invocationOnMock.getArgument(1);
             assertEquals("someWiki", request.getWikiId());
             assertEquals(Arrays.asList("EventStreamWikiCleanerJob", "someWiki"), request.getId());
             return null;
-        }).when(jobExecutor).execute(
-                eq("EventStreamWikiCleanerJob"),
-                any(EventStreamWikiCleanerJobRequest.class)
-        );
+        }).when(jobExecutor).execute(eq("EventStreamWikiCleanerJob"), any(EventStreamWikiCleanerJobRequest.class));
 
         WikiDeletedEvent wikiDeletedEvent = new WikiDeletedEvent("someWiki");
         mocker.getComponentUnderTest().onEvent(wikiDeletedEvent, null, null);

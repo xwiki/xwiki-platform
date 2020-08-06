@@ -39,7 +39,7 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * Default implementation of {@link MentionsFormatter}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Singleton
 @Component

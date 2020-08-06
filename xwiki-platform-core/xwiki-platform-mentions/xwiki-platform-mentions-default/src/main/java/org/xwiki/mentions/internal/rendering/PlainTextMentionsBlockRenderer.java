@@ -31,7 +31,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
  * Mentions specific plain text block renderer.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named("plainmentions/1.0")

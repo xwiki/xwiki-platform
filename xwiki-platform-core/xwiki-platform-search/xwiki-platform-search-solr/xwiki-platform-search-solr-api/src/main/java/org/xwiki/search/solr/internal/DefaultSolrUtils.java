@@ -309,6 +309,20 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public <T> T get(String fieldName, SolrDocument document, T def)
+    {
+        if (document.containsKey(fieldName)) {
+            if (def != null) {
+                return get(fieldName, document, def.getClass());
+            } else {
+                return (T) document.getFieldValue(fieldName);
+            }
+        }
+
+        return def;
+    }
+
+    @Override
     public void setId(Object fieldValue, SolrInputDocument document)
     {
         set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, fieldValue, document);
@@ -344,6 +358,19 @@ public class DefaultSolrUtils implements SolrUtils
             value = (String) fieldValue;
         } else {
             value = this.converter.convert(String.class, fieldValue);
+        }
+
+        document.setField(fieldName, value);
+    }
+
+    @Override
+    public void setString(String fieldName, Object fieldValue, Type valueType, SolrInputDocument document)
+    {
+        String value;
+        if (valueType == String.class && fieldValue instanceof String) {
+            value = (String) fieldValue;
+        } else {
+            value = this.converter.getConverter(valueType).convert(String.class, fieldValue);
         }
 
         document.setField(fieldName, value);

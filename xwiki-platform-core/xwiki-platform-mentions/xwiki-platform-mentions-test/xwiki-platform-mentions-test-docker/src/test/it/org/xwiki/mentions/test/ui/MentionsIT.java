@@ -99,6 +99,8 @@ public class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
+            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
+            setup.gotoPage("Main", "WebHome");
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();

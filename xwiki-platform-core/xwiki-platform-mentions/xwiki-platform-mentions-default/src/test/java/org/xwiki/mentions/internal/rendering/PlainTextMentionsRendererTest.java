@@ -37,7 +37,7 @@ import static org.xwiki.mentions.DisplayStyle.FULL_NAME;
  * Test if {@link PlainTextMentionsRenderer}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class PlainTextMentionsRendererTest

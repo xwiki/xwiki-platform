@@ -42,7 +42,7 @@ import org.xwiki.notifications.CompositeEvent;
  * Dispatch events to users with live email notifications enabled.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = PrefilteringLiveNotificationEmailSender.class)
 @Singleton

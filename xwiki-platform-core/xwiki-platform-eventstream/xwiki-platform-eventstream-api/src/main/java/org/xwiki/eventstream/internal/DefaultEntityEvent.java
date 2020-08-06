@@ -26,7 +26,7 @@ import org.xwiki.eventstream.Event;
  * Default implementation for {@link EntityEvent}.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class DefaultEntityEvent implements EntityEvent
 {

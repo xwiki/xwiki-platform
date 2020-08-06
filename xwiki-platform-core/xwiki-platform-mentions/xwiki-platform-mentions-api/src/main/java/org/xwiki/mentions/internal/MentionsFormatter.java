@@ -26,7 +26,7 @@ import org.xwiki.mentions.DisplayStyle;
  * Provides services to format the user mentions.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Role
 public interface MentionsFormatter

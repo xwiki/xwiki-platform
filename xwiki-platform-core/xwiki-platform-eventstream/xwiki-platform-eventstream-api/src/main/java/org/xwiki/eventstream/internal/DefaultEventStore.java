@@ -21,6 +21,7 @@ package org.xwiki.eventstream.internal;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -340,6 +341,20 @@ public class DefaultEventStore implements EventStore, Initializable
 
         if (this.legacyStore != null) {
             return this.legacyStore.search(query);
+        }
+
+        return EventSearchResult.EMPTY;
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException
+    {
+        if (this.store != null) {
+            return this.store.search(query, fields);
+        }
+
+        if (this.legacyStore != null) {
+            return this.legacyStore.search(query, fields);
         }
 
         return EventSearchResult.EMPTY;

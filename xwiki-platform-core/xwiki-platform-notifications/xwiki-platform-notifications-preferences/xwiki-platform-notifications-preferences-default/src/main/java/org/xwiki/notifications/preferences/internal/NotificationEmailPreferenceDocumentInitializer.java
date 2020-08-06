@@ -46,14 +46,14 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
     /**
      * The path to the class parent document.
      * 
-     * @since 12.6RC1
+     * @since 12.6
      */
     public static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
     /**
      * The reference of the class of the object holding the notification email preferences.
      * 
-     * @since 12.6RC1
+     * @since 12.6
      */
     public static final LocalDocumentReference REFERENCE =
         new LocalDocumentReference(PARENT_PATH, "NotificationEmailPreferenceClass");
@@ -61,14 +61,14 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
     /**
      * The reference of the class of the object holding the notification email preferences.
      * 
-     * @since 12.6RC1
+     * @since 12.6
      */
     public static final String REFERENCE_STRING = "XWiki.Notifications.Code.NotificationEmailPreferenceClass";
 
     /**
      * The name of the field containing the notification interval.
      * 
-     * @since 12.6RC1
+     * @since 12.6
      */
     public static final String FIELD_INTERVAL = "interval";
 

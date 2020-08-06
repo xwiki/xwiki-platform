@@ -87,7 +87,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
     /**
      * @return the class reference of the rating.
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     protected DocumentReference getRatingsClassReference()

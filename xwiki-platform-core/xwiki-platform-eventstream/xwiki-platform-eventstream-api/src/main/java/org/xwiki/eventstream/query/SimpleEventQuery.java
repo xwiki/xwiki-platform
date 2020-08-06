@@ -26,6 +26,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
@@ -80,7 +82,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
-     * @return limit the maximum number of events to return
+     * @return limit the maximum number of events to return, -1 for no limit (0 return no results)
      * @see #setLimit(long)
      */
     @Override
@@ -90,7 +92,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
-     * @param limit the maximum number of events to return
+     * @param limit the maximum number of events to return, -1 for no limit (0 return no results)
      * @return this query.
      */
     public SimpleEventQuery setLimit(long limit)
@@ -421,7 +423,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      * 
      * @param entityId the identifier of the entity that should receive the mail
      * @return this {@link SimpleEventQuery}
-     * @since 12.6RC1
+     * @since 12.6
      */
     public SimpleEventQuery withMail(String entityId)
     {
@@ -449,6 +451,42 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         this.sorts.add(new SortClause(property, order));
 
         return this;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getLimit());
+        builder.append(getOffset());
+        builder.append(getSorts());
+
+        return builder.build();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof SimpleEventQuery) {
+            SimpleEventQuery query = (SimpleEventQuery) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.appendSuper(super.equals(obj));
+            builder.append(getLimit(), query.getLimit());
+            builder.append(getOffset(), query.getOffset());
+            builder.append(getSorts(), query.getSorts());
+
+            return builder.build();
+        }
+
+        return false;
     }
 
     @Override

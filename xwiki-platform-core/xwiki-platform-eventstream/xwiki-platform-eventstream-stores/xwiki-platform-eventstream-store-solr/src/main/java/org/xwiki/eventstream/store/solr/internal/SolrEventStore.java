@@ -22,16 +22,20 @@ package org.xwiki.eventstream.store.solr.internal;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -106,6 +110,10 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Named("compact")
     private EntityReferenceSerializer<String> compact;
 
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactwiki;
+
     private SolrClient client;
 
     @Override
@@ -171,18 +179,15 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Override
     protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
     {
-        StringBuilder builder = new StringBuilder();
+        SimpleEventQuery query = new SimpleEventQuery();
+        query.withStatus(entityId);
+        query.lessOrEq(Event.FIELD_DATE, date);
+        EventSearchResult results = search(query, Collections.singleton(Event.FIELD_ID));
 
-        builder.append(serializeCompareCondition(new CompareQueryCondition(Event.FIELD_DATE, date, CompareType.LESS_OR_EQUALS, false)));
+        for (Iterator<Event> it = results.stream().iterator(); it.hasNext();) {
+            Event event = it.next();
 
-        builder.append(" AND ");
-
-        builder.append(serializeStatusCondition(new StatusQueryCondition(entityId, null, false)));
-
-        try {
-            this.client.deleteByQuery(builder.toString());
-        } catch (Exception e) {
-            throw new EventStreamException("Failed to delete the event", e);
+            saveEventStatus(event.getId(), entityId, false, false);
         }
 
         return null;
@@ -281,7 +286,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.set(Event.FIELD_HIDDEN, event.getHidden(), document);
         this.utils.set(Event.FIELD_PREFILTERED, event.isPrefiltered(), document);
         this.utils.setString(Event.FIELD_IMPORTANCE, event.getImportance(), document);
-        this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), document);
+        this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), EntityReference.class, document);
         this.utils.setString(Event.FIELD_SPACE, event.getSpace(), document);
         this.utils.set(Event.FIELD_STREAM, event.getStream(), document);
         this.utils.set(Event.FIELD_TARGET, event.getTarget(), document);
@@ -297,7 +302,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (event.getDocument() != null) {
             this.utils.set(EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX,
                 Arrays.asList(this.serializer.serialize(event.getDocument()),
-                    this.compact.serialize(event.getDocument(), event.getWiki()),
+                    this.compactwiki.serialize(event.getDocument(), event.getWiki()),
                     this.compact.serialize(event.getDocument(), event.getSpace())),
                 document);
         }
@@ -382,8 +387,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setDocumentTitle(this.utils.get(Event.FIELD_DOCUMENTTITLE, document));
         event.setDocumentVersion(this.utils.get(Event.FIELD_DOCUMENTVERSION, document));
         event.setGroupId(this.utils.get(Event.FIELD_GROUPID, document));
-        event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document));
-        event.setPrefiltered(this.utils.get(Event.FIELD_PREFILTERED, document));
         event.setImportance(this.utils.get(Event.FIELD_IMPORTANCE, document, Importance.class));
         event.setRelatedEntity(this.utils.get(Event.FIELD_RELATEDENTITY, document, EntityReference.class));
         event.setSpace(this.utils.get(Event.FIELD_SPACE, document, SpaceReference.class));
@@ -395,14 +398,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setUser(this.utils.get(Event.FIELD_USER, document, DocumentReference.class));
         event.setWiki(this.utils.get(Event.FIELD_WIKI, document, WikiReference.class));
 
+        event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document, false));
+        event.setPrefiltered(this.utils.get(Event.FIELD_PREFILTERED, document, false));
+
         event.setParameters(this.utils.getMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, document));
 
         return event;
     }
 
-    private SolrQuery toSolrQuery(EventQuery query)
+    private SolrQuery toSolrQuery(EventQuery query, Set<String> fields)
     {
         SolrQuery solrQuery = new SolrQuery();
+
+        if (CollectionUtils.isNotEmpty(fields)) {
+            fields.forEach(solrQuery::setFields);
+        }
 
         if (query instanceof PageableEventQuery) {
             PageableEventQuery pageableQuery = (PageableEventQuery) query;
@@ -411,7 +421,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 solrQuery.setStart((int) pageableQuery.getOffset());
             }
 
-            if (pageableQuery.getLimit() > 0) {
+            if (pageableQuery.getLimit() >= 0) {
                 solrQuery.setRows((int) pageableQuery.getLimit());
             }
         }
@@ -640,7 +650,13 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Override
     public EventSearchResult search(EventQuery query) throws EventStreamException
     {
-        SolrQuery solrQuery = toSolrQuery(query);
+        return search(query, null);
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query, Set<String> fields) throws EventStreamException
+    {
+        SolrQuery solrQuery = toSolrQuery(query, fields);
 
         QueryResponse response;
         try {

@@ -23,7 +23,7 @@ package org.xwiki.eventstream.query;
  * A condition related to the association indicating if an entity should receive a mail for an event.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class MailEntityQueryCondition extends AbstractEntityQueryCondition
 {

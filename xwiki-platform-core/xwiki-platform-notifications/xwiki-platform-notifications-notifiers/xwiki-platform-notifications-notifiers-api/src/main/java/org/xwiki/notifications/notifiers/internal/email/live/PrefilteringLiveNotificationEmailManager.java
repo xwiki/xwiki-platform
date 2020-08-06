@@ -33,6 +33,8 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.notifiers.internal.email.IntervalUsersManager;
@@ -42,7 +44,7 @@ import org.xwiki.notifications.preferences.NotificationEmailInterval;
  * Dispatch events to users with live email notifications enabled.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component(roles = PrefilteringLiveNotificationEmailManager.class)
 @Singleton
@@ -52,6 +54,9 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
 
     @Inject
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;
+
+    @Inject
+    private JobExecutor executor;
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
@@ -75,8 +80,6 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
         optimizeThreadthread.setPriority(Thread.NORM_PRIORITY - 1);
         optimizeThreadthread.setDaemon(true);
         optimizeThreadthread.start();
-
-        // TODO: Load and send missed events
     }
 
     @Override
@@ -100,13 +103,15 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
                 break;
             }
 
-            DocumentReference userDocumentReference =
-                this.resolver.resolve(event.getEntityId(), event.getEvent().getWiki());
+            if (event != STOP) {
+                DocumentReference userDocumentReference =
+                    this.resolver.resolve(event.getEntityId(), event.getEvent().getWiki());
 
-            // Check if live mail is enabled for this user
-            NotificationEmailInterval interval = this.intervals.getInterval(userDocumentReference);
-            if (interval == NotificationEmailInterval.LIVE) {
-                this.dispatcher.addEvent(event.getEvent(), userDocumentReference);
+                // Check if live mail is enabled for this user
+                NotificationEmailInterval interval = this.intervals.getInterval(userDocumentReference);
+                if (interval == NotificationEmailInterval.LIVE) {
+                    this.dispatcher.addEvent(event.getEvent(), userDocumentReference);
+                }
             }
         }
     }
@@ -122,6 +127,20 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
                 "The event [{}] could not be added to the queue of live notification mails. "
                     + "It generally means the queue was already full because more event are produced than sent.",
                 entityEvent);
+        }
+    }
+
+    /**
+     * @param wikiId the identifier of the wiki in which to search for user with enabled live notifications mails
+     * @since 12.6
+     */
+    public void addEvents(String wikiId)
+    {
+        try {
+            this.executor.execute(MissingLiveNotificationMailsJob.JOBTYPE,
+                new MissingLiveNotificationMailsRequest(wikiId));
+        } catch (JobException e) {
+            this.logger.error("Failed to start the processing of missed live notification events", e);
         }
     }
 }

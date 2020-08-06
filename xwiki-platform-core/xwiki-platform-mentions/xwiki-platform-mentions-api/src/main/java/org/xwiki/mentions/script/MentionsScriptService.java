@@ -75,7 +75,7 @@ public class MentionsScriptService implements ScriptService
     /**
      * @see MentionsEventExecutor#getQueueSize()
      * @return the current size of the queue of elements (page, comments...) with mentions to analyze
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     public long getQueueSize()
@@ -88,7 +88,7 @@ public class MentionsScriptService implements ScriptService
      *
      * @see MentionsConfiguration#isQuoteActivated()
      * @return {@code true} if the mentions quote feature is activated.
-     * @since 12.6RC1
+     * @since 12.6
      */
     public boolean isQuoteActivated()
     {

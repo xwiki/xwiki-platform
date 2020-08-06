@@ -41,7 +41,7 @@ import ch.rasc.xodusqueue.XodusBlockingQueue;
  * is loaded with the elements stored in disk.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton
@@ -50,10 +50,20 @@ public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQue
     @Inject
     private Environment environment;
 
+    private XodusBlockingQueue<MentionsData> queue;
+
     @Override
     public BlockingQueue<MentionsData> initBlockingQueue()
     {
         File queueDirectory = new File(new File(this.environment.getPermanentDirectory(), "mentions"), "queue");
-        return new XodusBlockingQueue<>(queueDirectory.getAbsolutePath(), MentionsData.class, Long.MAX_VALUE);
+        this.queue =
+            new XodusBlockingQueue<>(queueDirectory.getAbsolutePath(), MentionsData.class, Long.MAX_VALUE, true);
+        return this.queue;
+    }
+
+    @Override
+    public void closeQueue()
+    {
+        this.queue.close();
     }
 }

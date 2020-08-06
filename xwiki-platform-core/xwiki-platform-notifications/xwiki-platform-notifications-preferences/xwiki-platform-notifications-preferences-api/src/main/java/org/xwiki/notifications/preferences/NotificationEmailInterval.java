@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Several intervals to get notified by emails.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Unstable
 public enum NotificationEmailInterval

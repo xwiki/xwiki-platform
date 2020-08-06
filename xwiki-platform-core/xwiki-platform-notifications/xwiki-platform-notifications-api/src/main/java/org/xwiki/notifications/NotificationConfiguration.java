@@ -53,7 +53,7 @@ public interface NotificationConfiguration
 
     /**
      * @return true if pre filtering should be used for ALERT user notifications
-     * @since 12.6RC1
+     * @since 12.6
      */
     @Unstable
     default boolean isEventPrefilteringEnabled()

@@ -185,6 +185,19 @@ public interface SolrUtils
     void setString(String fieldName, Object fieldValue, SolrInputDocument document);
 
     /**
+     * Store in the document the value associated with the passed field name.
+     * <p>
+     * If the value is not of type {@link String} it's converted automatically.
+     * 
+     * @param fieldName the name of the field in the document
+     * @param fieldValue the value to store in the {@link SolrDocument}
+     * @param valueType the type to use as reference to serialize the value
+     * @param document the Solr document
+     * @since 12.6
+     */
+    void setString(String fieldName, Object fieldValue, Type valueType, SolrInputDocument document);
+
+    /**
      * Serialize the value into a value usable in a Solr filter query.
      * 
      * @param fieldValue the value of a field
@@ -202,6 +215,18 @@ public interface SolrUtils
      * @return the value associated with the passed field name in the document
      */
     <T> T get(String fieldName, SolrDocument document, Type targetType);
+
+    /**
+     * Extract from the document the value associated with the passed field name.
+     * 
+     * @param <T> the of the value to return
+     * @param fieldName the name of the field in the document
+     * @param document the Solr document
+     * @param def the default value if none is available
+     * @return the value associated with the passed field name in the document
+     * @since 12.6
+     */
+    <T> T get(String fieldName, SolrDocument document, T def);
 
     /**
      * Extract from the document the values associated with the passed field name.

@@ -63,7 +63,9 @@ public interface EventStream
      * 
      * @param e the event to search for
      * @return the event's group of related events
+     * @deprecated since 12.6, use {@link EventStore#search(EventQuery)} instead
      */
+    @Deprecated
     EventGroup getRelatedEvents(Event e);
 
     /**

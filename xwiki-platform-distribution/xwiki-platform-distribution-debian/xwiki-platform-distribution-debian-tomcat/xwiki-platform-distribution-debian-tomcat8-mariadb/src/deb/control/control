@@ -1,4 +1,4 @@
-Package: xwiki-tomcat8-mysql
+Package: xwiki-tomcat8-mariadb
 Version: [[version]]
 Section: java
 Priority: optional

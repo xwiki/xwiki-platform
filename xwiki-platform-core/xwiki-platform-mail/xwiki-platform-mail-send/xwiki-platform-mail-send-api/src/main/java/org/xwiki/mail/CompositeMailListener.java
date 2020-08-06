@@ -27,7 +27,7 @@ import java.util.Map;
  * A helper used to notify several {@link MailListener}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public class CompositeMailListener implements MailListener
 {

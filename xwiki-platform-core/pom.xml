@@ -93,23 +93,6 @@
             <suffix>.min</suffix>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>com.cj.jshintmojo</groupId>
-          <artifactId>jshint-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>lint</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <globals>require,define</globals>
-            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
-            <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

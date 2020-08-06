@@ -19,17 +19,17 @@
  */
 package com.xpn.xwiki.web.sx;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.MessageFormat;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-import com.yahoo.platform.yui.compressor.javascript.ErrorReporter;
-import com.yahoo.platform.yui.compressor.javascript.EvaluatorException;
+import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
 
 /**
  * JavaScript extension.
@@ -66,46 +66,38 @@ public class JsExtension implements Extension
         @Override
         public String compress(String source)
         {
-            try {
-                ErrorReporter reporter = new CustomErrorReporter();
-                JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
-                StringWriter out = new StringWriter();
-                compressor.compress(out, -1, true, false, false, false);
-                return out.toString();
-            } catch (IOException ex) {
-                LOGGER.info("Failed to write the compressed output: " + ex.getMessage());
-            } catch (EvaluatorException ex) {
-                LOGGER.info("Failed to parse the JS extension: " + ex.getMessage());
-            } catch (Exception ex) {
-                LOGGER.warn("Failed to compress JS extension: " + ex.getMessage());
+            Compiler compiler = new Compiler();
+
+            CompilerOptions options = new CompilerOptions();
+            options.setLanguageIn(LanguageMode.STABLE);
+            options.setLanguageOut(LanguageMode.ECMASCRIPT5_STRICT);
+            options.setRewritePolyfills(true);
+            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+
+            // The dummy input name "input.js" is used here so that any warnings or
+            // errors will cite line numbers in terms of input.js.
+            SourceFile input = SourceFile.fromCode("input.js", source);
+
+            // compile() returns a Result, but it is not needed here.
+            Result result = compiler.compile(Collections.emptyList(), Collections.singletonList(input), options);
+
+            compiler.getWarnings().forEach(warning -> LOGGER.warn("Warning at line {}, column {}: [{}]",
+                warning.getLineNumber(), warning.getCharno(), warning.getDescription()));
+
+            compiler.getErrors().forEach(error -> LOGGER.error("Error at line {}, column {}: [{}]",
+                error.getLineNumber(), error.getCharno(), error.getDescription()));
+
+            if (result.success) {
+                try {
+                    // The compiler is responsible for generating the compiled code; it is not
+                    // accessible via the Result.
+                    return compiler.toSource();
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to compress JS extension: " + e.getMessage());
+                }
             }
+
             return source;
-        }
-
-        /** A Javascript error reporter which logs errors with the XWiki logging system. */
-        private static class CustomErrorReporter implements ErrorReporter
-        {
-            @Override
-            public void error(String message, String filename, int lineNumber, String context, int column)
-            {
-                LOGGER.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
-                    message, context, lineNumber, column));
-            }
-
-            @Override
-            public EvaluatorException runtimeError(String message, String filename, int lineNumber,
-                String context, int column)
-            {
-                LOGGER.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
-                return null;
-            }
-
-            @Override
-            public void warning(String message, String filename, int lineNumber, String context, int column)
-            {
-                LOGGER.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
-                    message, context, lineNumber, column));
-            }
         }
     }
 }

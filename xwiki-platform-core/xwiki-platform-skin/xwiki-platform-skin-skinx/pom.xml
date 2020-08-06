@@ -77,6 +77,11 @@
            yuicompressor -->
       <version>2.4.7-xwiki</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.javascript</groupId>
+      <artifactId>closure-compiler-unshaded</artifactId>
+      <version>v20200719</version>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>

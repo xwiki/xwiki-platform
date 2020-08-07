@@ -80,4 +80,10 @@ public class LegacyEventStream implements EventStream
     {
         return legacyEventLoader.getEvent(eventId);
     }
+
+    @Override
+    public long countEvents() throws QueryException
+    {
+        return this.legacyEventLoader.countEvents();
+    }
 }

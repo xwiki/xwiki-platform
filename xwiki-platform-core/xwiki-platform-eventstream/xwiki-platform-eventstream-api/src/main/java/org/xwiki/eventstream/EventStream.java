@@ -91,4 +91,17 @@ public interface EventStream
     {
         return null;
     }
+
+    /**
+     * @return the total number of events in the legacy store
+     * @throws QueryException when failing to query the events
+     * @since 12.6.1
+     * @since 12.7RC1
+     * @deprecated since 12.6.1, use {@link EventStore#search(EventQuery)} instead
+     */
+    @Deprecated
+    default long countEvents() throws QueryException
+    {
+        return 0;
+    }
 }

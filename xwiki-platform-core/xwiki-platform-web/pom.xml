@@ -188,16 +188,10 @@
           </execution>
         </executions>
         <configuration>
-          <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
+          <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
           <customRunnerConfiguration>
             ${project.basedir}/src/test/resources/jasmine-require-config.txt
           </customRunnerConfiguration>
-          <preloadSources>
-            <source>/webjars/require.js</source>
-          </preloadSources>
-          <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
-          <timeout>10</timeout>
-          <debug>true</debug>
         </configuration>
       </plugin>
       <plugin>

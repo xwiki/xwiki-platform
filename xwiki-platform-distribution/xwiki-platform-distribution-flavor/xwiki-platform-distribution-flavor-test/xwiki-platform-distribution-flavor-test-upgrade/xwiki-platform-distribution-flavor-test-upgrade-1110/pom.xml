@@ -27,16 +27,12 @@
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
     <version>12.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-flavor-test-upgrade-84</artifactId>
+  <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1110</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
-    <upgradetest.previousflavor.name>XWiki Enterprise Flavor - Main Wiki</upgradetest.previousflavor.name>
-    <upgradetest.previousflavor.groupId>org.xwiki.enterprise</upgradetest.previousflavor.groupId>
-    <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
-    <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
-    <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
+    <upgradetest.previousflavor.version>11.10.8</upgradetest.previousflavor.version>
   </properties>
   <dependencies>
     <dependency>

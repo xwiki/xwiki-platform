@@ -67,6 +67,7 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-1110</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1011</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-911</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-84</module>

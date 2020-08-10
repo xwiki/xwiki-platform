@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,6 +57,8 @@ public class LegacyEventMigrationJob
      * The id of the job.
      */
     public static final String JOBTYPE = "eventstream.legacycopy";
+
+    private static final int BATCH_SIZE = 100;
 
     @Inject
     private EventStreamConfiguration configuration;
@@ -105,42 +108,60 @@ public class LegacyEventMigrationJob
             return;
         }
 
-        Query query = prepareQuery();
+        long legacyEventCount = this.eventStream.countEvents();
+        int stepCount = (int) (legacyEventCount / BATCH_SIZE) + (int) (legacyEventCount % BATCH_SIZE);
 
-        List<Event> events;
-        int offset = 0;
-        do {
-            events = this.eventStream.searchEvents(query);
+        this.progressManager.pushLevelProgress(stepCount, this);
 
-            if (getRequest().isVerbose()) {
-                this.logger.info("Synchronizing legacy events from index {} to {}", offset, offset + events.size());
-            }
+        try {
+            Query query = prepareQuery();
 
-            if (!events.isEmpty()) {
-                // Filter already existing events
-                List<Event> eventsToSave = getEventsToSave(events);
+            List<Event> events;
+            int offset = 0;
+            do {
+                this.progressManager.startStep(this);
 
-                // Save events
-                for (Iterator<Event> it = eventsToSave.iterator(); it.hasNext();) {
-                    Event event = it.next();
-
-                    CompletableFuture<Event> future = this.eventStore.saveEvent(event);
-                    if (!it.hasNext()) {
-                        // Wait until the last event of the batch is saved
-                        future.get();
-                    }
-                }
+                events = this.eventStream.searchEvents(query);
 
                 if (getRequest().isVerbose()) {
-                    this.logger.info("{} events were saved in the new store because they did not already existed",
-                        eventsToSave.size());
+                    this.logger.info("Synchronizing legacy events from index {} to {}", offset, offset + events.size());
                 }
 
-                // Update the offset
-                offset += 100;
-                query.setOffset(offset);
+                if (!events.isEmpty()) {
+                    migrate(events);
+
+                    // Update the offset
+                    offset += BATCH_SIZE;
+                    query.setOffset(offset);
+                }
+
+                this.progressManager.endStep(this);
+            } while (events.size() == BATCH_SIZE);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void migrate(List<Event> events) throws EventStreamException, InterruptedException, ExecutionException
+    {
+        // Filter already existing events
+        List<Event> eventsToSave = getEventsToSave(events);
+
+        // Save events
+        for (Iterator<Event> it = eventsToSave.iterator(); it.hasNext();) {
+            Event event = it.next();
+
+            CompletableFuture<Event> future = this.eventStore.saveEvent(event);
+            if (!it.hasNext()) {
+                // Wait until the last event of the batch is saved
+                future.get();
             }
-        } while (events.size() == 100);
+        }
+
+        if (getRequest().isVerbose()) {
+            this.logger.info("{} events were saved in the new store because they did not already existed",
+                eventsToSave.size());
+        }
     }
 
     private Query prepareQuery() throws QueryException

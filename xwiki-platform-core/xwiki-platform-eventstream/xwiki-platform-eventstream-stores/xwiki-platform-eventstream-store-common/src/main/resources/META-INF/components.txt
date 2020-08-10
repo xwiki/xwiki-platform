@@ -1,3 +1,4 @@
 org.xwiki.eventstream.store.internal.DocumentEventListener
 org.xwiki.eventstream.store.internal.DocumentEventRecorder
 org.xwiki.eventstream.store.internal.RecordableEventListener
+org.xwiki.eventstream.store.internal.UserDeletedEventListener

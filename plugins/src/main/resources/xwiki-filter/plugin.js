@@ -84,6 +84,9 @@
       if (originalRange) {
         nativeSelection.addRange(originalRange);
       }
+      // Ensure to not have focus anymore on the editor so that keyboard shortcuts are available again
+      // (see CKEDITOR-362)
+      container.blur();
       // Destroy the test editor and check the produced HTML.
       editor.destroy();
       hasNonBreakingSpaceIssue = container.html().indexOf('a&nbsp;c') >= 0;

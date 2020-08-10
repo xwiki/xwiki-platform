@@ -946,7 +946,7 @@
       <displayInSection>Notifications</displayInSection>
     </property>
     <property>
-      <heading>$services.localization.render('notifications.settings.migration.title')</heading>
+      <heading>$services.localization.render('platform.extension.distributionWizard.eventmigrationStepTitle')</heading>
     </property>
     <property>
       <iconAttachment/>

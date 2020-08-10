@@ -1,7 +1,6 @@
 <template>
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-properties"
-    :logic="logic"
     panel-id="propertiesPanel"
   >
 
@@ -77,9 +76,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

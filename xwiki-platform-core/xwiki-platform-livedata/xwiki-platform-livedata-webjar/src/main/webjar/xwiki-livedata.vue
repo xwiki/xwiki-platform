@@ -1,14 +1,11 @@
 <template>
-  <div class="livedata-root">
+  <div class="xwiki-livedata">
 
-      <livedata-advanced-panels :logic="logic"></livedata-advanced-panels>
+      <livedata-advanced-panels></livedata-advanced-panels>
 
-      <livedata-layout
-        :layout-id="layoutId"
-        :logic="logic"
-      ></livedata-layout>
+      <livedata-layout :layout-id="layoutId"></livedata-layout>
 
-      <persistent-configuration :logic=logic></persistent-configuration>
+      <persistent-configuration></persistent-configuration>
 
   </div>
 </template>
@@ -42,9 +39,9 @@ define([
 ], function (
   Vue,
 ) {
-  Vue.component("livedata-root", {
+  Vue.component("xwiki-livedata", {
 
-    name: "livedata-root",
+    name: "xwiki-livedata",
 
     template: template,
 
@@ -55,6 +52,12 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       layoutId: function () { return this.logic.currentLayoutId; }
+    },
+
+    provide: function () {
+      return {
+        logic: this.logic,
+      };
     },
 
   });

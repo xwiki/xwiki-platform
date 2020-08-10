@@ -8,9 +8,7 @@
   >
     <!-- Entry Select All-->
     <th class="entry-selector">
-      <livedata-entry-selector-all
-        :logic="logic"
-      ></livedata-entry-selector-all>
+      <livedata-entry-selector-all></livedata-entry-selector-all>
     </th>
 
     <th
@@ -78,10 +76,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
-
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

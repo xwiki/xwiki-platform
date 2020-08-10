@@ -2,19 +2,17 @@
   <div class="layout-table">
 
     <!-- Topbar -->
-    <livedata-topbar :logic="logic">
+    <livedata-topbar>
       <template #left>
-        <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
+        <livedata-dropdown-menu></livedata-dropdown-menu>
       </template>
       <template #right>
-        <livedata-pagination :logic="logic"></livedata-pagination>
+        <livedata-pagination></livedata-pagination>
       </template>
     </livedata-topbar>
 
     <!-- Entry selector info bar -->
-    <livedata-entry-selector-info-bar
-      :logic="logic"
-    ></livedata-entry-selector-info-bar>
+    <livedata-entry-selector-info-bar></livedata-entry-selector-info-bar>
 
 
     <!-- Table component -->
@@ -24,16 +22,10 @@
       <thead>
 
         <!-- Table property names -->
-        <tr
-          is="layout-table-header-names"
-          :logic="logic"
-        ></tr>
+        <tr is="layout-table-header-names"></tr>
 
         <!-- Table filters -->
-        <tr
-          is="layout-table-header-filters"
-          :logic="logic"
-        ></tr>
+        <tr is="layout-table-header-filters"></tr>
 
       </thead>
 
@@ -47,8 +39,8 @@
           v-for="entry in entries"
           :key="logic.getEntryId(entry)"
           :entry=entry
-          :logic="logic"
         ></tr>
+
       </tbody>
 
     </table>
@@ -96,9 +88,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

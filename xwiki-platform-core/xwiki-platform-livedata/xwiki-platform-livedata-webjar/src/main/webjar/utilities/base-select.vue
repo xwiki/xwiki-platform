@@ -111,10 +111,6 @@ define([
       }
     },
 
-    computed: {
-
-    },
-
     methods: {
       isSelected: function (option) {
         return this.selected.indexOf(option) !== -1;

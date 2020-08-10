@@ -4,14 +4,12 @@
     <div class="card-title">
       <livedata-entry-selector
         :entry="entry"
-        :logic="logic"
       ></livedata-entry-selector>
 
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
         <livedata-displayer
           :property-id="titlePropertyId"
           :entry="entry"
-          :logic="logic"
         ></livedata-displayer>
       </h2>
     </div>
@@ -38,7 +36,6 @@
           <livedata-displayer
             :property-id="property.id"
             :entry="entry"
-            :logic="logic"
           ></livedata-displayer>
         </span>
       </xwiki-draggable-item>
@@ -84,8 +81,9 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
-      logic: Object,
       entry: Object,
     },
 

@@ -2,20 +2,18 @@
   <div class="layout-cards">
 
     <!-- Topbar -->
-    <livedata-topbar :logic="logic">
+    <livedata-topbar>
       <template #left>
-        <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
-        <livedata-entry-selector-all :logic="logic"></livedata-entry-selector-all>
+        <livedata-dropdown-menu></livedata-dropdown-menu>
+        <livedata-entry-selector-all></livedata-entry-selector-all>
       </template>
       <template #right>
-        <livedata-pagination :logic="logic"></livedata-pagination>
+        <livedata-pagination></livedata-pagination>
       </template>
     </livedata-topbar>
 
     <!-- Entry selector info bar -->
-    <livedata-entry-selector-info-bar
-      :logic="logic"
-    ></livedata-entry-selector-info-bar>
+    <livedata-entry-selector-info-bar></livedata-entry-selector-info-bar>
 
 
     <!-- Cards component -->
@@ -26,10 +24,7 @@
         v-for="entry in entries"
         :key="logic.getEntryId(entry)"
         :entry="entry"
-        :logic="logic"
-      >
-      </layout-cards-card>
-
+      ></layout-cards-card>
 
     </div>
 
@@ -76,9 +71,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

@@ -50,9 +50,7 @@ define([
       "draggable": vuedraggable,
     },
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

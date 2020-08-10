@@ -19,10 +19,11 @@
  */
 define([], {
 
+  inject: ["logic"],
+
   props: {
     propertyId: String,
     index: Number,
-    logic: Object,
   },
 
   computed: {

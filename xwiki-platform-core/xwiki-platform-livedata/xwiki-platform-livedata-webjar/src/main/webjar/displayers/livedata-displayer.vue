@@ -4,7 +4,6 @@
     :is="componentName"
     :property-id="propertyId"
     :entry="entry"
-    :logic="logic"
   ></component>
 
   <xwiki-loader
@@ -46,10 +45,11 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
       propertyId: String,
       entry: Object,
-      logic: Object,
     },
 
     data: function () {

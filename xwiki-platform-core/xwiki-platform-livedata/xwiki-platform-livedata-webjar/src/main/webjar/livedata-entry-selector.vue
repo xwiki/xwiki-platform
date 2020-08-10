@@ -45,9 +45,10 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
       entry: Object,
-      logic: Object,
     },
 
     computed: {

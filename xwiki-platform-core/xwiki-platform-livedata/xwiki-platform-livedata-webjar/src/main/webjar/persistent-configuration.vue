@@ -38,9 +38,9 @@ define([
 
     template: template,
 
+    inject: ["logic"],
 
     props: {
-      logic: Object,
       urlHash: {
         type: Boolean,
         default: true,

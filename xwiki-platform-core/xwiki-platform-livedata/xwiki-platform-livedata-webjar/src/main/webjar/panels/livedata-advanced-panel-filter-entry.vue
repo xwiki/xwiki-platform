@@ -21,7 +21,6 @@
     <livedata-filter
       :property-id="propertyId"
       :index="filterIdx"
-      :logic="logic"
     ></livedata-filter>
 
     <a
@@ -73,8 +72,9 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
-      logic: Object,
       filter: Object,
       filterIdx: Number,
       propertyId: String,

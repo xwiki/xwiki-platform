@@ -54,8 +54,9 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
-      logic: Object,
       panelId: String,
     },
 

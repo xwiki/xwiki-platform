@@ -25,10 +25,11 @@ define([], {
     },
   },
 
+  inject: ["logic"],
+
   props: {
     propertyId: String,
     entry: Object,
-    logic: Object,
   },
 
   computed: {

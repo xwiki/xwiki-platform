@@ -1,7 +1,6 @@
 <template>
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-filter"
-    :logic="logic"
     panel-id="filterPanel"
   >
 
@@ -42,7 +41,6 @@
                 :key="filterIdx"
               >
               <livedata-advanced-panel-filter-entry
-                :logic="logic"
                 :filter="filter"
                 :filter-idx="filterIdx"
                 :property-id="filterGroup.property"
@@ -124,10 +122,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
-
+    inject: ["logic"],
 
     computed: {
 

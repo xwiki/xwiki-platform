@@ -5,7 +5,6 @@
     <td class="entry-selector">
       <livedata-entry-selector
         :entry="entry"
-        :logic="logic"
       ></livedata-entry-selector>
     </td>
 
@@ -19,7 +18,6 @@
       <livedata-displayer
         :property-id="property.id"
         :entry="entry"
-        :logic="logic"
       ></livedata-displayer>
     </td>
 
@@ -61,8 +59,9 @@ define([
 
     template: template,
 
+    inject: ["logic"],
+
     props: {
-      logic: Object,
       entry: Object,
     },
 

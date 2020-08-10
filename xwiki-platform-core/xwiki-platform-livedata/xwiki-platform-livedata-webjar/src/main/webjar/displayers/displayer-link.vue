@@ -2,7 +2,6 @@
   <base-displayer
     :property-id="propertyId"
     :entry="entry"
-    :logic="logic"
   >
 
     <template #viewer>

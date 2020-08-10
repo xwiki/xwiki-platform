@@ -1,7 +1,6 @@
 <template>
   <livedata-base-advanced-panel
     class="livedata-advanced-panel-sort"
-    :logic="logic"
     panel-id="sortPanel"
   >
 
@@ -114,9 +113,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
     computed: {
       data: function () { return this.logic.data; },

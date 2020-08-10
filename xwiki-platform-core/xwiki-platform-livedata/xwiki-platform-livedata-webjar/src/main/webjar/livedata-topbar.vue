@@ -44,9 +44,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
   });
 });

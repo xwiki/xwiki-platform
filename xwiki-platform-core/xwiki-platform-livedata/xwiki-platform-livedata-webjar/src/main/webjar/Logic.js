@@ -22,7 +22,7 @@
 define([
   "jquery",
   "Vue",
-  "vue!livedata-root",
+  "vue!xwiki-livedata",
   "polyfills"
 ], function (
   $,
@@ -88,7 +88,7 @@ define([
     // create Vuejs instance
     new Vue({
       el: this.element,
-      template: "<livedata-root :logic='logic'></livedata-root>",
+      template: "<xwiki-livedata :logic='logic'></xwiki-livedata>",
       data: {
         logic: this,
       },

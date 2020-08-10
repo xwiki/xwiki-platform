@@ -5,7 +5,6 @@
         <component
           v-if="componentName"
           :is="componentName"
-          :logic="logic"
         ></component>
       </keep-alive>
 
@@ -43,11 +42,12 @@ define([
 
     name: "livedata-layout",
 
+    inject: ["logic"],
+
     template: template,
 
     props: {
       layoutId: String,
-      logic: Object,
     },
 
     data: function () {

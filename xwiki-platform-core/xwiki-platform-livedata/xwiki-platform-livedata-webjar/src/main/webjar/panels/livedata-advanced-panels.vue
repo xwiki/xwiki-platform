@@ -3,13 +3,13 @@
 
 
     <!-- Sort Panel -->
-    <livedata-advanced-panel-sort :logic="logic"></livedata-advanced-panel-sort>
+    <livedata-advanced-panel-sort></livedata-advanced-panel-sort>
 
     <!-- Filter Panel -->
-    <livedata-advanced-panel-filter :logic="logic"></livedata-advanced-panel-filter>
+    <livedata-advanced-panel-filter></livedata-advanced-panel-filter>
 
     <!-- Properties Panel -->
-    <livedata-advanced-panel-properties :logic="logic"></livedata-advanced-panel-properties>
+    <livedata-advanced-panel-properties></livedata-advanced-panel-properties>
 
   </div>
 </template>
@@ -50,9 +50,7 @@ define([
 
     template: template,
 
-    props: {
-      logic: Object,
-    },
+    inject: ["logic"],
 
   });
 });

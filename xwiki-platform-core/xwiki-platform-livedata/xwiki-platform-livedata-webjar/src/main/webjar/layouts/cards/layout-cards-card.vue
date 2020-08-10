@@ -129,11 +129,15 @@ define([
   align-items: center;
 }
 
+.layout-cards .card-title h2 {
+  width: 100%;
+}
+
 .layout-cards .card-property {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   transition: height 0.5s;
 }
 
@@ -174,12 +178,6 @@ define([
 }
 
 @supports (display: grid) {
-
-  .layout-cards .livedata-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 30rem);
-    gap: 1.5rem;
-  }
 
   .layout-cards .card {
     margin: 0;

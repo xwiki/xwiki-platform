@@ -38,8 +38,10 @@
           is="layout-table-row"
           v-for="entry in entries"
           :key="logic.getEntryId(entry)"
-          :entry=entry
+          :entry="entry"
         ></tr>
+
+        <tr is="layout-table-new-row"></tr>
 
       </tbody>
 
@@ -78,6 +80,7 @@ define([
   "vue!layouts/table/layout-table-header-names",
   "vue!layouts/table/layout-table-header-filters",
   "vue!layouts/table/layout-table-row",
+  "vue!layouts/table/layout-table-new-row",
 ], function (
   Vue
 ) {

@@ -383,6 +383,39 @@ define([
      */
 
 
+    addEntry: function () {
+      var self = this;
+      var mockNewUrl = function () {
+        return self.getEntryId(self.data.data.entries.slice(-1)[0]) + "0";
+      };
+      // CALL FUNCTION TO CREATE NEW DATA HERE
+      Promise.resolve({ /* MOCK DATA */
+        "doc_url": mockNewUrl(),
+        "doc_name": undefined,
+        "doc_date": "2020/03/27 13:23",
+        "doc_title": undefined,
+        "doc_author": "Author 1",
+        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creator": "Creator 1",
+        "age": undefined,
+        "tags": undefined,
+        "country": undefined,
+        "other": undefined,
+      })
+      .then(function (newEntry) {
+        self.data.data.entries.push(newEntry);
+        self.data.data.count++; // TODO: remove when merging with backend
+      });
+    },
+
+
+
+    /**
+     * ---------------------------------------------------------------
+     * LAYOUT
+     */
+
+
     /**
      * Load a layout, or default layout if none specified
      * @param {String} layoutId The id of the layout to load with requireJS

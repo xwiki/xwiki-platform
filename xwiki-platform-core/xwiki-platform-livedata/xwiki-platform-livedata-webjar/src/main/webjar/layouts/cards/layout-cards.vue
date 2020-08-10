@@ -26,6 +26,8 @@
         :entry="entry"
       ></layout-cards-card>
 
+      <layout-cards-new-card></layout-cards-new-card>
+
     </div>
 
   </div>
@@ -60,6 +62,7 @@ define([
   "vue!livedata-pagination",
   "vue!livedata-entry-selector-info-bar",
   "vue!layouts/cards/layout-cards-card",
+  "vue!layouts/cards/layout-cards-new-card",
 ], function (
   Vue,
   vuedraggable
@@ -84,5 +87,16 @@ define([
 
 
 <style>
+
+@supports (display: grid) {
+
+  .layout-cards .livedata-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 30rem);
+    grid-auto-rows: min-content;
+    gap: 1.5rem;
+  }
+
+}
 
 </style>

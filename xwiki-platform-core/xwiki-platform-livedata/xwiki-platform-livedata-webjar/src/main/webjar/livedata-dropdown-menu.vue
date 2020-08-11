@@ -25,19 +25,19 @@
       <li class="dropdown-header">Actions</li>
 
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayAdd(logic.openedPanels, 'sortPanel')">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
           <span class="fa fa-sort"></span> Advanced Sorting
         </a>
       </li>
 
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayAdd(logic.openedPanels, 'filterPanel')">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
           <span class="fa fa-filter"></span> Advanced Filtering
         </a>
       </li>
 
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayAdd(logic.openedPanels, 'propertiesPanel')">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
           <span class="fa fa-list-ul"></span> Advanced Properties
         </a>
       </li>

@@ -265,6 +265,24 @@ define([
     },
 
 
+    /**
+     * Toggle the given item from the array, ensuring its uniqueness
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     * @param {Boolean} force Optional: true force add / false force remove
+     */
+    uniqueArrayToggle: function (uniqueArray, item, force) {
+      if (force === undefined) {
+        force = !this.uniqueArrayHas(uniqueArray, item);
+      }
+      if (force) {
+        this.uniqueArrayAdd(uniqueArray, item);
+      } else {
+        this.uniqueArrayRemove(uniqueArray, item);
+      }
+    },
+
+
 
 
     /**

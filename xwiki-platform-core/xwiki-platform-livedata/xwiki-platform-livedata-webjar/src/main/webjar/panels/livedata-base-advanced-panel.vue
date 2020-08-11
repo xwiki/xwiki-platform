@@ -4,18 +4,30 @@
     v-show="panelOpened"
   >
     <div class="panel-heading">
-      <span>
+      <span class="title">
         <slot name="header"></slot>
       </span>
-      <span
-        class="close-button"
-        @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
-      >
-        <span class="fa fa-times"></span>
-      </span>
+      <div class="actions">
+        <span
+          class="action collapse-button"
+          @click="collapsed = !collapsed"
+        >
+          <span v-if="!collapsed" class="fa fa-chevron-circle-down"></span>
+          <span v-else class="fa fa-chevron-circle-right"></span>
+        </span>
+        <span
+          class="action close-button"
+          @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
+        >
+          <span class="fa fa-times"></span>
+        </span>
+      </div>
     </div>
 
-    <div class="panel-body">
+    <div
+      class="panel-body"
+      v-if="!collapsed"
+    >
       <slot name="body"></slot>
     </div>
   </div>
@@ -60,11 +72,25 @@ define([
       panelId: String,
     },
 
+    data: function () {
+      return {
+        collapsed: false,
+      };
+    },
+
     computed: {
       data: function () { return this.logic.data; },
 
       panelOpened: function () {
         return this.logic.uniqueArrayHas(this.logic.openedPanels, this.panelId);
+      },
+    },
+
+    watch: {
+      panelOpened: function () {
+        if (this.panelOpened) {
+          this.collapsed = false;
+        }
       },
     },
 
@@ -75,23 +101,30 @@ define([
 
 <style>
 
-  .livedata-advanced-panel .panel-heading {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
+.livedata-advanced-panel .panel-heading {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 0;
+}
+.livedata-advanced-panel .panel-heading .title {
+  padding: 10px 15px;
+}
 
-  .close-button {
-    position: absolute;
-    top: 0; right: 0;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0 15px;
-    cursor: pointer;
-  }
+.livedata-advanced-panel .actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: stretch;
+}
+.livedata-advanced-panel .actions .action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  cursor: pointer;
+}
 
 </style>

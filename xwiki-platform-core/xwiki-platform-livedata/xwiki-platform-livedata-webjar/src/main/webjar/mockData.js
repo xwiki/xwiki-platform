@@ -25,7 +25,7 @@
 define({
 
   query: {
-    properties: ["doc_title", "age", "country", "tag", "other"],
+    properties: ["doc_title", "age", "country", "tags", "other"],
 
     source: {
       id: "...",

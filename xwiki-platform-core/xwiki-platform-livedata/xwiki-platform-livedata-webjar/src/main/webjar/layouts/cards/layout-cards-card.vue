@@ -17,7 +17,7 @@
     <!-- Card properties-->
 
     <xwiki-draggable
-      :value="logic.propertyOrder"
+      :value="data.query.properties"
       @change="reorderProperty"
     >
       <xwiki-draggable-item
@@ -91,7 +91,7 @@ define([
       data: function () { return this.logic.data; },
 
       properties: function () {
-        return this.logic.getDisplayablePropertyDescriptors();
+        return this.logic.getPropertyDescriptors();
       },
 
       titlePropertyId: function () {

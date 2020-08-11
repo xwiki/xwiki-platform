@@ -12,12 +12,12 @@
     <template #body>
 
       <xwiki-draggable
-        :value="logic.propertyOrder"
+        :value="data.query.properties"
         @change="reorderProperty"
       >
         <xwiki-draggable-item
           class="property"
-          v-for="property in logic.getDisplayablePropertyDescriptors()"
+          v-for="property in logic.getPropertyDescriptors()"
           :key="property.id"
         >
           <div
@@ -27,7 +27,7 @@
             <input
               type="checkbox"
               :checked="logic.isPropertyVisible(property.id)"
-              @change="logic.setPropertyVisibility(property.id, $event.target.checked)"
+              @change="logic.setPropertyVisibility(property.id, !$event.target.checked)"
             />
           </div>
           <span class="property-name">{{ property.name }}</span>

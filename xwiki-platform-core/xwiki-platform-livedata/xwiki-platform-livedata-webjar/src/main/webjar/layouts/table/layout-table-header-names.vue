@@ -2,7 +2,7 @@
   <tr
     class="column-header-names"
       is="xwiki-draggable"
-      :value="logic.propertyOrder"
+      :value="data.query.properties"
       @change="reorderProperty"
       tag="tr"
   >
@@ -82,7 +82,7 @@ define([
       data: function () { return this.logic.data; },
 
       properties: function () {
-        return this.logic.getDisplayablePropertyDescriptors();
+        return this.logic.getPropertyDescriptors();
       },
 
       firstSortLevel: function () {

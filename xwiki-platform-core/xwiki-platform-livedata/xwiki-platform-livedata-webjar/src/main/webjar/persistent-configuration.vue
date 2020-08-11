@@ -55,8 +55,12 @@ define([
     computed: {
       data: function () { return this.logic.data; },
 
+      propertyIds: function () {
+        return this.data.query.properties.slice().sort();
+      },
+
       encodingSpecsProperties: function () {
-        return ["oneOf"].concat(this.logic.getPropertyIds());
+        return ["oneOf"].concat(this.propertyIds);
       },
 
       encodingSpecsFilterOperators: function () {
@@ -94,7 +98,7 @@ define([
           limit: ["integer"],
           currentLayoutId: this.encodingSpecsCurrentLayoutId,
           hiddenProperties: ["array", this.encodingSpecsProperties],
-          propertyOrder: ["array", this.encodingSpecsProperties],
+          properties: ["array", this.encodingSpecsProperties],
         };
       },
 

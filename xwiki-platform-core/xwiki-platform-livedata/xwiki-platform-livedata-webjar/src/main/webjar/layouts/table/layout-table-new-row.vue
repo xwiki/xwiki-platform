@@ -60,7 +60,7 @@ define([
     computed: {
       data: function () { return this.logic.data; },
       colspan: function () {
-        return this.logic.getDisplayablePropertyDescriptors().length;
+        return this.logic.getPropertyDescriptors().length;
       },
     },
 

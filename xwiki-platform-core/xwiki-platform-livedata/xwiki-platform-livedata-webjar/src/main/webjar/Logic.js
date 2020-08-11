@@ -75,13 +75,6 @@ define([
       isGlobal: false,
     };
     this.hiddenProperties = [];
-    this.propertyOrder = this.data.meta.propertyDescriptors
-    .filter(function (propertyDescriptor) {
-      return self.isPropertyDisplayable(propertyDescriptor.id);
-    })
-    .map(function (propertyDescriptor) {
-      return propertyDescriptor.id;
-    });
     this.openedPanels = [];
 
     element.removeAttribute("data-data");
@@ -181,17 +174,6 @@ define([
 
 
     /**
-     * Return the list of all property ids (from propertyDescriptors)
-     * @returns {Array}
-     */
-    getPropertyIds: function () {
-      return this.data.meta.propertyDescriptors.map(function (propertyDescriptor) {
-        return propertyDescriptor.id;
-      });
-    },
-
-
-    /**
      * Return the list of layout ids
      * @returns {Array}
      */
@@ -207,7 +189,7 @@ define([
      * @param {String} propertyId
      */
     isValidPropertyId: function (propertyId) {
-      return this.getPropertyIds().indexOf(propertyId) !== -1;
+      return this.data.query.properties.indexOf(propertyId) !== -1;
     },
 
 
@@ -292,14 +274,30 @@ define([
 
 
     /**
+     * Returns the property descriptors of displayable properties
+     * @returns {Array}
+     */
+    getPropertyDescriptors: function () {
+      var self = this;
+      return this.data.query.properties.map(function (propertyId) {
+        return self.getPropertyDescriptor(propertyId);
+      });
+    },
+
+
+    /**
      * Return the property descriptor corresponding to a property id
      * @param {String} propertyId
      * @returns {Object}
      */
     getPropertyDescriptor: function (propertyId) {
-      return this.data.meta.propertyDescriptors.find(function (propertyDescriptor) {
+      var propertyDescriptor = this.data.meta.propertyDescriptors.find(function (propertyDescriptor) {
         return propertyDescriptor.id === propertyId;
       });
+      if (propertyDescriptor === undefined) {
+        console.error("Property descriptor of property `" + propertyId + "` does not exists");
+      }
+      return propertyDescriptor;
     },
 
 
@@ -600,42 +598,12 @@ define([
 
 
     /**
-     * Returns whether a certain property is displayable
-     * @param {String} propertyId
-     * @returns {Boolean}
-     */
-    isPropertyDisplayable: function (propertyId) {
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return (propertyDescriptor.hidden !== undefined && !propertyDescriptor.hidden) ||
-        (propertyDescriptor.hidden === undefined && !propertyTypeDescriptor.hidden);
-    },
-
-
-    /**
-     * Returns the property descriptors of displayable properties
-     * @returns {Array}
-     */
-    getDisplayablePropertyDescriptors: function () {
-      var self = this;
-      return this.data.meta.propertyDescriptors
-      .filter(function (propertyDescriptor) {
-        return self.isPropertyDisplayable(propertyDescriptor.id);
-      })
-      .sort(function (descriptorA, descriptorB) {
-        return self.propertyOrder.indexOf(descriptorA.id) - self.propertyOrder.indexOf(descriptorB.id);
-      });
-    },
-
-
-    /**
      * Returns whether a certain property is visible
      * @param {String} propertyId
      * @returns {Boolean}
      */
     isPropertyVisible: function (propertyId) {
-      return this.isPropertyDisplayable(propertyId) &&
-        !this.uniqueArrayHas(this.hiddenProperties, propertyId);
+      return !this.uniqueArrayHas(this.hiddenProperties, propertyId);
     },
 
 
@@ -645,14 +613,7 @@ define([
      * @param {Boolean} visible
      */
     setPropertyVisibility: function (propertyId, visible) {
-      if (!this.isPropertyDisplayable(propertyId)) { return; }
-      if (visible) {
-        // set visible
-        this.uniqueArrayRemove(this.hiddenProperties, propertyId);
-      } else {
-        // set hidden
-        this.uniqueArrayAdd(this.hiddenProperties, propertyId);
-      }
+      this.uniqueArrayToggle(this.hiddenProperties, propertyId, visible);
     },
 
 
@@ -667,12 +628,12 @@ define([
         fromIndex = from;
       } else if (typeof from === "string") {
         if (!this.isValidPropertyId(from)) { return; }
-        fromIndex = this.propertyOrder.indexOf(from);
+        fromIndex = this.data.query.properties.indexOf(from);
       } else {
         return;
       }
       if (fromIndex <= -1 || toIndex <= -1) { return; }
-      this.propertyOrder.splice(toIndex, 0, this.propertyOrder.splice(fromIndex, 1)[0]);
+      this.data.query.properties.splice(toIndex, 0, this.data.query.properties.splice(fromIndex, 1)[0]);
     },
 
 

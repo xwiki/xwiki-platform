@@ -67,7 +67,7 @@ define([
 
     computed: {
       data: function () { return this.logic.data; },
-      properties: function () { return this.logic.getDisplayablePropertyDescriptors(); },
+      properties: function () { return this.logic.getPropertyDescriptors(); },
     },
 
   });

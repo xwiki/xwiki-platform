@@ -64,13 +64,6 @@ define([
 
     },
 
-    methods: {
-      reorderProperty: function (e) {
-        this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
-      },
-    },
-
-
   });
 });
 </script>

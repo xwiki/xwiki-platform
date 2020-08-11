@@ -41,7 +41,7 @@ define([
     inject: ["logic"],
 
     props: {
-      urlHash: {
+      urlSearchParam: {
         type: Boolean,
         default: true,
       },
@@ -100,6 +100,7 @@ define([
 
       coders: function () {
         return [
+          // 1 is the spect version
           u.fromJson(1, this.encodingSpecsV1),
         ];
       },
@@ -163,8 +164,8 @@ define([
       },
 
       saveConfig: function () {
-        // url hash
-        if (this.urlHash) {
+        // url search param
+        if (this.urlSearchParam) {
           var url = new URL(window.location);
           url.searchParams.set("livedata-config", this.encodedConfig);
           history.replaceState(null, "", url.href);
@@ -177,8 +178,8 @@ define([
 
       getConfig: function () {
         var config = "";
-        // url hash
-        if (!config && this.urlHash) {
+        // url search param
+        if (!config && this.urlSearchParam) {
           config = (new URLSearchParams(window.location.search)).get("livedata-config");
         }
         // local storage
@@ -189,8 +190,8 @@ define([
       },
 
       deleteConfig: function () {
-        // url hash
-        if (this.urlHash) {
+        // url search param
+        if (this.urlSearchParam) {
           var url = new URL(window.location);
           url.searchParams.delete("livedata-config");
           history.replaceState(null, "", url.href);

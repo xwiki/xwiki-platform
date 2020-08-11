@@ -79,7 +79,7 @@ define([
           if (values instanceof Array) {
             return values;
           } else {
-            return [];
+            return [value];
           }
         } catch (err) {
           console.warn(err);

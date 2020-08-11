@@ -226,6 +226,12 @@ define([
     },
 
 
+    /*
+      As Sets are not reactive in Vue 2.x, if we want to create
+      a reactive collection of unique objects, we have to use arrays.
+      So here are some handy functions to do what Sets do, but with arrays
+    */
+
     /**
      * Return whether the array has the given item
      * @param {Array} uniqueArray An array of unique items
@@ -618,11 +624,11 @@ define([
     /**
      * Set whether the given property should be visible
      * @param {String} propertyId
-     * @param {Boolean} bool
+     * @param {Boolean} visible
      */
-    setPropertyVisibility: function (propertyId, bool) {
+    setPropertyVisibility: function (propertyId, visible) {
       if (!this.isPropertyDisplayable(propertyId)) { return; }
-      if (bool) {
+      if (visible) {
         // set visible
         this.uniqueArrayRemove(this.hiddenProperties, propertyId);
       } else {
@@ -755,14 +761,14 @@ define([
 
     /**
      * Set the entry selection globally accross pages
-     * @param {Boolean} bool
+     * @param {Boolean} global
      */
-    setEntrySelectGlobal: function (bool) {
-      this.entrySelection.isGlobal = bool;
+    setEntrySelectGlobal: function (global) {
+      this.entrySelection.isGlobal = global;
       this.entrySelection.selected.splice(0);
       this.entrySelection.deselected.splice(0);
       this.triggerEvent("selectGlobal", {
-        state: bool,
+        state: global,
       });
     },
 
@@ -1143,7 +1149,7 @@ define([
      */
     addFilter: function (property, operator, value, index) {
       if (index === undefined) {
-        index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
+        index = ((this.getQueryFilterGroup(property) || {}).constrains || []).length;
       }
       return this.filter(property, -1, {
         property: property,

@@ -63,7 +63,7 @@ define([
     watch: {
       layoutId: {
         immediate: true,
-        handler: function (n ,o) {
+        handler: function () {
           var self = this;
           this.loadLayout(this.layoutId).catch(function (err) {
             if (self.layoutId && self.layoutId !== self.data.meta.defaultLayout) {

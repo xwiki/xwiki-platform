@@ -105,6 +105,10 @@ define([
       },
 
       reorderProperty: function (e) {
+        // As the draggable plugin is taking in account every child it as for d&d
+        // and there is the select-entry-all component as first child
+        // we need to substract 2 to the indexes that the draggable plugin handles
+        // so that it matches the true property order
         this.logic.reorderProperty(e.moved.oldIndex - 2, e.moved.newIndex - 2);
       },
 

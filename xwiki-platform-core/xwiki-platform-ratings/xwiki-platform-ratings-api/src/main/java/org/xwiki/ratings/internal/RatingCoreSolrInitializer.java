@@ -52,7 +52,7 @@ public class RatingCoreSolrInitializer extends AbstractSolrCoreInitializer
         this.addStringField(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, false, false);
         this.addStringField(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, false, false);
         this.addPIntField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, false, false);
-        this.addStringField(SolrRatingsManager.RATING_ID_FIELDNAME, false, false);
+        this.addPIntField(SolrRatingsManager.RATING_ID_FIELDNAME, false, false);
     }
 
     @Override

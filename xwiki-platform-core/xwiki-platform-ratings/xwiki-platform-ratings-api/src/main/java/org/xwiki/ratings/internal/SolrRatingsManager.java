@@ -248,8 +248,9 @@ public class SolrRatingsManager extends AbstractRatingsManager
     public boolean removeRating(Rating rating) throws RatingsException
     {
         try {
-            UpdateResponse updateResponse = getSolrClient().deleteById(rating.getGlobalRatingId());
-            return (updateResponse.getStatus() > 0 && updateResponse.getStatus() < 300);
+            getSolrClient().deleteById(rating.getGlobalRatingId());
+            UpdateResponse updateResponse = getSolrClient().commit();
+            return (updateResponse.getStatus() >= 0 && updateResponse.getStatus() < 300);
         } catch (SolrServerException | IOException | SolrException e) {
             throw new RatingsException("Error while removing a rating", e);
         }

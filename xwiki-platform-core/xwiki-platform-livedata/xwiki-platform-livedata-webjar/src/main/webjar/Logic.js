@@ -383,6 +383,27 @@ define([
      */
 
 
+    fetchEntries: function () {
+      return new Promise(function (resolve, reject) {
+        var err = new Error("Error while fetching entries");
+        // TODO: FETCH ENTRIES FROM HERE
+        reject(err);
+      });
+    },
+
+
+    updateEntries: function () {
+      var self = this;
+      return this.fetchEntries()
+        .then(function (entries) {
+          self.data.data.entries = entries;
+        })
+        .catch(function (err) {
+          console.error(err);
+        });
+    },
+
+
     addEntry: function () {
       var self = this;
       var mockNewUrl = function () {
@@ -407,6 +428,7 @@ define([
         self.data.data.count++; // TODO: remove when merging with backend
       });
     },
+
 
 
 

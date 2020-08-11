@@ -6,6 +6,7 @@
       <template #left>
         <livedata-dropdown-menu></livedata-dropdown-menu>
         <livedata-entry-selector-all></livedata-entry-selector-all>
+        <livedata-refresh-button></livedata-refresh-button>
       </template>
       <template #right>
         <livedata-pagination></livedata-pagination>
@@ -59,6 +60,7 @@ define([
   "vue!livedata-topbar",
   "vue!livedata-dropdown-menu",
   "vue!livedata-entry-selector-all",
+  "vue!livedata-refresh-button",
   "vue!livedata-pagination",
   "vue!livedata-entry-selector-info-bar",
   "vue!layouts/cards/layout-cards-card",

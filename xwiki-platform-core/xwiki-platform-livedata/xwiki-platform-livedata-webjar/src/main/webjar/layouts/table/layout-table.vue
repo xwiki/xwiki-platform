@@ -5,6 +5,7 @@
     <livedata-topbar>
       <template #left>
         <livedata-dropdown-menu></livedata-dropdown-menu>
+        <livedata-refresh-button></livedata-refresh-button>
       </template>
       <template #right>
         <livedata-pagination></livedata-pagination>
@@ -75,6 +76,7 @@ define([
   "Vue",
   "vue!livedata-topbar",
   "vue!livedata-dropdown-menu",
+  "vue!livedata-refresh-button",
   "vue!livedata-pagination",
   "vue!livedata-entry-selector-info-bar",
   "vue!layouts/table/layout-table-header-names",

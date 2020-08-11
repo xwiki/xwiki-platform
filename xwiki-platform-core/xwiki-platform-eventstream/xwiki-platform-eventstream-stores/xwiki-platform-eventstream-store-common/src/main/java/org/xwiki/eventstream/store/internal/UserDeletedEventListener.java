@@ -20,6 +20,7 @@
 package org.xwiki.eventstream.store.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  */
 @Component
 @Singleton
+@Named(UserDeletedEventListener.NAME)
 public class UserDeletedEventListener extends AbstractEventListener
 {
     /**

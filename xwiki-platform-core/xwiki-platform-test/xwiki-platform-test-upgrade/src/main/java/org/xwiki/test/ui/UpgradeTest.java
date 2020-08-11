@@ -521,10 +521,10 @@ public class UpgradeTest extends AbstractTest
         assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
         assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
         assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
-        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
-        assertTrue(icons.get(STEP_ORPHANED_ID).isActive());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
         assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
-        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
         assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());

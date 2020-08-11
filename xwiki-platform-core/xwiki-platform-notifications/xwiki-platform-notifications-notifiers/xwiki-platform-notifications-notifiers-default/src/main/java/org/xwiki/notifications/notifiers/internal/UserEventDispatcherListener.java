@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
  */
 @Component
 @Singleton
+@Named(UserEventDispatcherListener.NAME)
 public class UserEventDispatcherListener extends AbstractEventListener
 {
     /**

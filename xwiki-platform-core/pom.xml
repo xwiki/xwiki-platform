@@ -81,18 +81,6 @@
             </systemProperties>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-            <jswarn>false</jswarn>
-            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-              currently more widely used in the JavaScript world. -->
-            <suffix>.min</suffix>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

@@ -535,6 +535,12 @@ viewers.Comments = Class.create({
           wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
           loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+          if ($("#commentCaptcha").size() > 0) {
+            // FIXME: this solution is not good right now since it implies to always display the CAPTCHA
+            // however since the idea is now to have a button "Add a comment", I won't got further: we should
+            // display the captcha when the user decide to add a comment.
+            $("#commentCaptcha").first().css('display', 'block');
+          }
           if (callback) {
             callback();
           }

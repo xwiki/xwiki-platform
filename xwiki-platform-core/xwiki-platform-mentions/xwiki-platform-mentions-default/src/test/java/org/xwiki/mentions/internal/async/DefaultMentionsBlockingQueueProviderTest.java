@@ -29,8 +29,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import ch.rasc.xodusqueue.XodusBlockingQueue;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +52,7 @@ class DefaultMentionsBlockingQueueProviderTest
     {
         when(this.environment.getPermanentDirectory()).thenReturn(tmpDir);
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
-        assertTrue(actual instanceof XodusBlockingQueue);
+        assertTrue(actual instanceof MapBasedLinkedBlockingQueue);
     }
 
     @Test
@@ -64,6 +62,6 @@ class DefaultMentionsBlockingQueueProviderTest
         this.provider.initBlockingQueue();
         this.provider.closeQueue();
         BlockingQueue<MentionsData> actual = this.provider.initBlockingQueue();
-        assertTrue(actual instanceof XodusBlockingQueue);
+        assertTrue(actual instanceof MapBasedLinkedBlockingQueue);
     }
 }

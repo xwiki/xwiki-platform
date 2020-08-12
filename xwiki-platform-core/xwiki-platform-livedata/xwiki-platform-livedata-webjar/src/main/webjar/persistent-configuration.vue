@@ -97,7 +97,6 @@ define([
           offset: ["integer"],
           limit: ["integer"],
           currentLayoutId: this.encodingSpecsCurrentLayoutId,
-          hiddenProperties: ["array", this.encodingSpecsProperties],
           properties: ["array", this.encodingSpecsProperties],
         };
       },

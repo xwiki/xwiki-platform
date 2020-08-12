@@ -62,11 +62,8 @@ define([
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   var Logic = function (element) {
-    var self = this;
-
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
-
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -74,7 +71,6 @@ define([
       deselected: [],
       isGlobal: false,
     };
-    this.hiddenProperties = [];
     this.openedPanels = [];
 
     element.removeAttribute("data-data");
@@ -603,7 +599,8 @@ define([
      * @returns {Boolean}
      */
     isPropertyVisible: function (propertyId) {
-      return !this.uniqueArrayHas(this.hiddenProperties, propertyId);
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      return propertyDescriptor.visible;
     },
 
 
@@ -612,8 +609,9 @@ define([
      * @param {String} propertyId
      * @param {Boolean} visible
      */
-    setPropertyVisibility: function (propertyId, visible) {
-      this.uniqueArrayToggle(this.hiddenProperties, propertyId, visible);
+    setPropertyVisible: function (propertyId, visible) {
+      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      propertyDescriptor.visible = visible;
     },
 
 

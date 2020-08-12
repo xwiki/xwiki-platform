@@ -76,6 +76,7 @@ define({
         id: "doc_title",
         name: "Name",
         type: "string",
+        visible: true,
         displayer: {
           id: 'link',
           propertyHref: "doc_url",
@@ -85,11 +86,13 @@ define({
         id: "age",
         name: "Age",
         type: "number",
+        visible: true,
       },
       {
         id: "tags",
         name: "Tags",
         type: "list",
+        visible: true,
         filter: {
           options: ["Tag 1", "Tag 2", "Tag 3"],
         },
@@ -98,11 +101,13 @@ define({
         id: "country",
         name: "Country",
         type: "string",
+        visible: true,
       },
       {
         id: "other",
         name: "Autre truc",
         type: "string",
+        visible: true,
         displayer: {
           id: "html",
         },

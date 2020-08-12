@@ -27,7 +27,7 @@
             <input
               type="checkbox"
               :checked="logic.isPropertyVisible(property.id)"
-              @change="logic.setPropertyVisibility(property.id, !$event.target.checked)"
+              @change="logic.setPropertyVisible(property.id, $event.target.checked)"
             />
           </div>
           <span class="property-name">{{ property.name }}</span>

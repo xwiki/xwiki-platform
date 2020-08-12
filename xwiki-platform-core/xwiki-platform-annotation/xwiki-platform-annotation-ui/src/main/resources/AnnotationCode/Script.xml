@@ -1238,6 +1238,8 @@ XWiki.Annotation = Class.create({
 
     // put the content in
     container.update(content);
+    // Initialize the widgets / editors used on the annotation popup.
+    document.fire('xwiki:dom:updated', {elements: [container]});
     return true;
   },
 
@@ -1277,6 +1279,9 @@ XWiki.Annotation = Class.create({
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand update
@@ -1546,8 +1551,6 @@ XWiki.Annotation = Class.create({
     this.createPanel.down('input[type=reset]').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
-    // Initialize the widgets / editors used on the annotation popup.
-    document.fire('xwiki:dom:updated', {elements: [container]});
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {

@@ -200,6 +200,14 @@ Generates:
     'sortable': false
   }))
 #end
+#if ("$!services.like" != "")
+  #set($discard = $collist.add('_likes'))
+  ## We can't make it sortable or filterable right now since it's not stored in DB.
+  #set($discard = $colprops.put('_likes', {
+    'filterable': false,
+    'sortable': false
+  }))
+#end
 #if ($collist.contains('doc.location'))
   #set ($discard = $options.put('selectedColumn','doc.location'))
 #end

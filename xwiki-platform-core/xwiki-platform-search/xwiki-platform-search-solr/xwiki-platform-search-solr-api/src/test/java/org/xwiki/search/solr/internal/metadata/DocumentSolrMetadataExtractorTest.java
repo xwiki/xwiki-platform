@@ -215,7 +215,7 @@ public class DocumentSolrMetadataExtractorTest
 
         // Date
         Date date = new Date();
-        when(this.document.getContentUpdateDate()).thenReturn(date);
+        when(this.document.getDate()).thenReturn(date);
 
         // Version
         String version = "1.1";

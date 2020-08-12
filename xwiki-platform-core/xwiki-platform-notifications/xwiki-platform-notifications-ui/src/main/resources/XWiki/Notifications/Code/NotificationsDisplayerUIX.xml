@@ -87,11 +87,11 @@ Get the actual notifications.
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area clearfix"&gt;
-{{/html}}
+  {{/html}}
 
-{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
+  {{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
 
-{{html}}
+  {{html clean="false"}}
   &lt;/div&gt;
   {{/html}}
   #end
@@ -101,7 +101,7 @@ Get the actual notifications.
 {{velocity wiki="false"}}
 #********************************************************
     Get the number of unread notifications as JSON
-********************************************************#
+********************************************************###
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
   #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
     #set ($discard = $response.setHeader('Content-Type', 'application/json'))

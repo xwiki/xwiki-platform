@@ -49,20 +49,18 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
 
     /**
      * A specific iterator class that relies on the internal queue.
-     * This iterator specifically does not handle the remove operation.
      */
     private class WrappedIterator implements Iterator<T>
     {
-        private Iterator<T> internalIterator;
+        private Iterator<Pair<Long, T>> internalIterator;
+        private Long lastReturnedKey;
 
         /**
          * Default constructor.
          */
         WrappedIterator()
         {
-            this.internalIterator = MapBasedLinkedBlockingQueue.this.internalQueue.stream()
-                .map(Pair::getValue)
-                .iterator();
+            this.internalIterator = MapBasedLinkedBlockingQueue.this.internalQueue.iterator();
         }
 
         @Override
@@ -74,7 +72,16 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
         @Override
         public T next()
         {
-            return this.internalIterator.next();
+            Pair<Long, T> lastElement = this.internalIterator.next();
+            this.lastReturnedKey = lastElement.getKey();
+            return lastElement.getValue();
+        }
+
+        @Override
+        public void remove()
+        {
+            MapBasedLinkedBlockingQueue.this.internalMap.remove(this.lastReturnedKey);
+            this.internalIterator.remove();
         }
     }
 
@@ -259,8 +266,17 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     @Override
     public boolean remove(Object o)
     {
-        boolean result = this.internalQueue.remove(o);
-        this.internalRemove(o);
+        boolean result = false;
+        if (o != null) {
+            Iterator<T> iterator = this.iterator();
+            while (iterator.hasNext()) {
+                T element = iterator.next();
+                if (element.equals(o)) {
+                    iterator.remove();
+                    return true;
+                }
+            }
+        }
         return result;
     }
 
@@ -298,7 +314,6 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     @Override
     public Iterator<T> iterator()
     {
-
         return new WrappedIterator();
     }
 
@@ -364,7 +379,8 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
         boolean result = false;
         for (T t : collection) {
             Long key = this.internalPut(t);
-            result = result || this.internalQueue.add(Pair.of(key, t));
+            boolean add = this.internalQueue.add(Pair.of(key, t));
+            result = result || add;
         }
 
         return result;
@@ -373,21 +389,27 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     @Override
     public boolean removeAll(Collection<?> collection)
     {
-        for (Object o : collection) {
-            this.internalRemove(o);
+        boolean result = false;
+        Iterator<T> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            if (collection.contains(element)) {
+                iterator.remove();
+                result = true;
+            }
         }
-
-        return this.internalQueue.removeAll(collection);
+        return result;
     }
 
     @Override
     public boolean retainAll(Collection<?> collection)
     {
         boolean result = false;
-        for (Map.Entry<Long, T> entry : this.internalMap.entrySet()) {
-            if (!collection.contains(entry.getValue())) {
-                this.internalRemove(Pair.of(entry));
-                this.internalQueue.remove(Pair.of(entry));
+        Iterator<T> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            if (!collection.contains(element)) {
+                iterator.remove();
                 result = true;
             }
         }

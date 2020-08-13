@@ -393,62 +393,57 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   };
 
   var extendQueryString = function(url, parameters) {
+    url = url || '';
     url += url.indexOf('?') < 0 ? '?': '&';
     return url + $.param(parameters);
   };
 
   var getDefaultParams = function(element) {
-    var baseParams = {
+    var defaultParams = {
       core: {
-        // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
-        force_text: true,
         // Turn off animations by default.
         animation: false,
+        check_callback: validateOperation,
+        // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
+        force_text: true,
         themes: {
           name: 'xwiki',
           responsive: element.attr('data-responsive') !== 'false',
           icons: element.attr('data-icons') !== 'false',
           dots: element.attr('data-edges') !== 'false'
         }
+      },
+      plugins: [],
+      contextmenu: {
+        items: getContextMenuItems
+      },
+      dnd: {
+        is_draggable: areDraggable
+      },
+      finder: {
+        url: extendQueryString(element.attr('data-url'), {
+          data: 'suggestions'
+        })
       }
     };
-    var plugins = [];
     if (element.attr('data-checkboxes') === 'true') {
-      plugins.push('checkbox');
+      defaultParams.plugins.push('checkbox');
+    }
+    if (element.attr('data-dragAndDrop') === 'true') {
+      defaultParams.plugins.push('dnd');
+    }
+    if (element.attr('data-contextMenu') === 'true') {
+      defaultParams.plugins.push('contextmenu');
+    }
+    if (element.attr('data-finder') === 'true') {
+      defaultParams.plugins.push('finder');
     }
     if (element.attr('data-url')) {
-      if (element.attr('data-dragAndDrop') === 'true') {
-        plugins.push('dnd');
-      }
-      if (element.attr('data-contextMenu') === 'true') {
-        plugins.push('contextmenu');
-      }
-      if (element.attr('data-finder') === 'true') {
-        plugins.push('finder');
-      }
-      return $.extend(true, baseParams, {
-        core: {
-          data: getChildren,
-          check_callback: validateOperation
-        },
-        plugins: plugins,
-        dnd: {
-          is_draggable: areDraggable
-        },
-        contextmenu: {
-          items: getContextMenuItems
-        },
-        finder: {
-          url: extendQueryString(element.attr('data-url'), {
-            data: 'suggestions'
-          })
-        }
-      });
-    } else {
-      // The tree structure is in-line.
-      baseParams.plugins = plugins;
-      return baseParams;
+      defaultParams.core.data = getChildren;
+    } else if (element.attr('data-json')) {
+      defaultParams.core.data = element.data('json');
     }
+    return $.extend(true, defaultParams, element.data('config'));
   };
 
   var customTreeAPI = {

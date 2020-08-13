@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.rest;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,6 +48,7 @@ public interface NotificationsResource
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
             @QueryParam("untilDate") String untilDate,
+            @QueryParam("untilDateIncluded") @DefaultValue("true") boolean untilDateIncluded,
             @QueryParam("blackList") String blackList,
             @QueryParam("pages") String pages,
             @QueryParam("spaces") String spaces,

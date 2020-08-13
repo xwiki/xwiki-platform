@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
@@ -144,6 +145,14 @@ public class DefaultNotificationParametersFactory
          * See {@link NotificationParameters#endDate}: accepted values are date serialized as a long.
          */
         UNTIL_DATE(true),
+
+        /**
+         * See {@link NotificationParameters#endDateIncluded}: accepted values are boolean.
+         * 
+         * @since 12.7RC1
+         * @since 12.6.1
+         */
+        UNTIL_DATE_INCLUDED(false),
 
         /**
          * See {@link NotificationParameters#blackList}: accepted values are list represented as a String with commas
@@ -329,7 +338,8 @@ public class DefaultNotificationParametersFactory
                         break;
 
                     case UNTIL_DATE:
-                        this.handleUntilDate(notificationParameters, parameterValue);
+                        this.handleUntilDate(notificationParameters, parameterValue, BooleanUtils
+                            .toBooleanObject(parameters.get(ParametersKey.UNTIL_DATE_INCLUDED)) != Boolean.FALSE);
                         break;
 
                     case BLACKLIST:
@@ -584,10 +594,12 @@ public class DefaultNotificationParametersFactory
         }
     }
 
-    private void handleUntilDate(NotificationParameters notificationParameters, String untilDate)
+    private void handleUntilDate(NotificationParameters notificationParameters, String untilDate,
+        boolean untilDateIncluded)
     {
         if (StringUtils.isNotBlank(untilDate)) {
             notificationParameters.endDate = new Date(Long.parseLong(untilDate));
+            notificationParameters.endDateIncluded = untilDateIncluded;
         }
     }
 }

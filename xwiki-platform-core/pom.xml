@@ -126,7 +126,178 @@
               </item>
             </revapi.ignore>
             -->
-            
+            <revapi.ignore>
+              <item>
+                <regex>true</regex>
+                <code>java.annotation.added</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===boolean===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===boolean===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotation>@javax.ws.rs.DefaultValue("true")</annotation>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, ===boolean===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"blackList"</oldValue>
+                <newValue>"untilDateIncluded"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"pages"</oldValue>
+                <newValue>"blackList"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"spaces"</oldValue>
+                <newValue>"pages"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"wikis"</oldValue>
+                <newValue>"spaces"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"users"</oldValue>
+                <newValue>"wikis"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"count"</oldValue>
+                <newValue>"users"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"displayOwnEvents"</oldValue>
+                <newValue>"count"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"displayMinorEvents"</oldValue>
+                <newValue>"displayOwnEvents"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"displaySystemEvents"</oldValue>
+                <newValue>"displayMinorEvents"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"displayReadEvents"</oldValue>
+                <newValue>"displaySystemEvents"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"displayReadStatus"</oldValue>
+                <newValue>"displayReadEvents"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"tags"</oldValue>
+                <newValue>"displayReadStatus"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"currentWiki"</oldValue>
+                <newValue>"tags"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"async"</oldValue>
+                <newValue>"currentWiki"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::getNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.String) throws java.lang.Exception</new>
+                <annotationType>javax.ws.rs.QueryParam</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"asyncId"</oldValue>
+                <newValue>"async"</newValue>
+                <justification>Not a breackage from REST point of view.</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.mentions.internal.async;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.text.XWikiToStringBuilder;
@@ -29,13 +31,15 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.6
  */
-public class MentionsData
+public class MentionsData implements Serializable
 {
     /**
      * Static object used to identify if elements has been persisted 
      * in the current JVM.
      */
     public static final MentionsData STOP = new MentionsData(true);
+
+    private static final long serialVersionUID = -6254703177038788112L;
 
     private String documentReference;
 

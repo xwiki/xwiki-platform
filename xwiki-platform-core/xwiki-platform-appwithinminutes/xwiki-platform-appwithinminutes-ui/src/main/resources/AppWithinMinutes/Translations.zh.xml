@@ -39,25 +39,25 @@
   <content>### Home page
 ### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
 ### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
-### Missing: platform.appwithinminutes.createAppButtonLabel=Create Application
+platform.appwithinminutes.createAppButtonLabel=创建应用
 platform.appwithinminutes.appsLiveTableHeading=应用
 platform.appwithinminutes.appsLiveTable.doc.title=应用
-### Missing: platform.appwithinminutes.appsLiveTable.doc.author=Last author
-### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
-### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
-### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
+platform.appwithinminutes.appsLiveTable.doc.author=上一个作者
+platform.appwithinminutes.appsLiveTable.doc.date=更新日期
+platform.appwithinminutes.appsLiveTable._actions=操作
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=授予空间管理权限。
 
 ### AWM Applications panel entry
-### Missing: platform.appwithinminutes.appPanelCreateEntry=Create your own!
+platform.appwithinminutes.appPanelCreateEntry=创建你自己的！
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
-### Missing: appWithinMinutes.wizardStep.name.name=Name
-### Missing: appWithinMinutes.wizardStep.name.title=Name your application
-### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
+platform.appwithinminutes.wizardStepHeading=第{0}—{1}步
+appWithinMinutes.wizardStep.name.name=名称
+appWithinMinutes.wizardStep.name.title=命名你的应用
+appWithinMinutes.wizardStep.name.description=选择应用名称
 ### Missing: appWithinMinutes.wizardStep.structure.name=Structure
 ### Missing: appWithinMinutes.wizardStep.structure.title=Structure your data
-### Missing: appWithinMinutes.wizardStep.structure.description=Describe the application data
+appWithinMinutes.wizardStep.structure.description=描述应用数据
 ### Missing: appWithinMinutes.wizardStep.entries.name=Entries
 ### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
 ### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data

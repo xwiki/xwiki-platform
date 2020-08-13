@@ -19,7 +19,10 @@
  */
 package org.xwiki.mentions.internal.async;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.hibernate.internal.util.collections.ConcurrentReferenceHashMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +61,7 @@ public class MapBasedLinkedBlockingQueueTest
         assertEquals("Bar", queue.poll());
         assertEquals("buz", queue.poll());
         assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
     }
 
     @Test
@@ -68,6 +72,7 @@ public class MapBasedLinkedBlockingQueueTest
         assertTrue(queue.offer("Ahaha"));
         assertTrue(queue.offer("Foo"));
         assertEquals(6, queue.size());
+        assertEquals(6, this.map.size());
         assertEquals(Integer.MAX_VALUE - 6, queue.remainingCapacity());
 
         assertEquals("Baz", queue.poll());
@@ -77,16 +82,19 @@ public class MapBasedLinkedBlockingQueueTest
         assertEquals("Ahaha", queue.poll());
         assertEquals("Foo", queue.poll());
         assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
     }
 
     @Test
     void putAndPeek() throws Exception
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(new ConcurrentReferenceHashMap());
+        ConcurrentReferenceHashMap localMap = new ConcurrentReferenceHashMap();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
         assertTrue(queue.isEmpty());
         queue.put("Something");
         queue.put("Else");
         assertEquals(2, queue.size());
+        assertEquals(2, localMap.size());
         assertFalse(queue.isEmpty());
 
         assertEquals("Something", queue.peek());
@@ -94,6 +102,7 @@ public class MapBasedLinkedBlockingQueueTest
         assertEquals(2, queue.size());
         assertEquals("Something", queue.poll());
         assertEquals(1, queue.size());
+        assertEquals(1, localMap.size());
     }
 
     @Test
@@ -106,6 +115,7 @@ public class MapBasedLinkedBlockingQueueTest
         assertEquals("Bar", queue.take());
         assertEquals("buz", queue.take());
         assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
     }
 
     @Test
@@ -116,12 +126,14 @@ public class MapBasedLinkedBlockingQueueTest
         assertFalse(queue.isEmpty());
         queue.clear();
         assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
     }
 
     @Test
     void addElementAndIterate()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(new ConcurrentReferenceHashMap());
+        ConcurrentReferenceHashMap localMap = new ConcurrentReferenceHashMap();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
         assertTrue(queue.isEmpty());
         queue.add("Something");
         queue.add("Foo");
@@ -147,5 +159,94 @@ public class MapBasedLinkedBlockingQueueTest
         }
         assertEquals(3, i);
         assertEquals(3, queue.size());
+        assertEquals(3, localMap.size());
+    }
+
+    @Test
+    void retainAll()
+    {
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        assertEquals(4, queue.size());
+        queue.add("Bar");
+        assertEquals(5, queue.size());
+        assertEquals(5, this.map.size());
+        assertTrue(queue.retainAll(Arrays.asList("Bar", "buz")));
+        assertEquals(3, queue.size());
+        assertEquals(3, this.map.size());
+        assertEquals("Bar", queue.poll());
+        assertEquals("buz", queue.poll());
+        assertEquals("Bar", queue.poll());
+        assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
+
+        queue.add("Foo");
+        queue.add("Bar");
+        assertFalse(queue.retainAll(Arrays.asList("Foo", "Bar")));
+        assertEquals(2, queue.size());
+        assertEquals(2, this.map.size());
+    }
+
+    @Test
+    void removeAll()
+    {
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        assertEquals(4, queue.size());
+        queue.add("Bar");
+        assertEquals(5, queue.size());
+        assertEquals(5, this.map.size());
+        assertTrue(queue.removeAll(Arrays.asList("Bar", "buz")));
+        assertEquals(2, queue.size());
+        assertEquals(2, this.map.size());
+        assertEquals("Baz", queue.poll());
+        assertEquals("Foo", queue.poll());
+        assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
+
+        queue.add("Foo");
+        queue.add("Bar");
+        assertFalse(queue.removeAll(Collections.singleton("Toto")));
+        assertEquals(2, queue.size());
+        assertEquals(2, this.map.size());
+    }
+
+    @Test
+    void remove()
+    {
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        assertEquals(4, queue.size());
+        queue.add("Bar");
+        assertEquals(5, queue.size());
+        assertTrue(queue.remove("Bar"));
+        assertEquals(4, queue.size());
+        assertEquals("Baz", queue.poll());
+        assertEquals("Foo", queue.poll());
+        assertEquals("buz", queue.poll());
+        assertEquals("Bar", queue.poll());
+        assertTrue(queue.isEmpty());
+        assertTrue(this.map.isEmpty());
+
+        queue.add("Foo");
+        queue.add("Bar");
+        assertFalse(queue.remove("Toto"));
+        assertEquals(2, queue.size());
+        assertEquals(2, this.map.size());
+    }
+
+    @Test
+    void addAll()
+    {
+        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        assertTrue(queue.isEmpty());
+
+        assertTrue(queue.addAll(Arrays.asList("Baz", "Foo", "buz", "Bar")));
+        assertEquals(4, queue.size());
+        assertEquals(4, localMap.size());
+        assertEquals("Baz", queue.poll());
+        assertEquals("Foo", queue.poll());
+        assertEquals("buz", queue.poll());
+        assertEquals("Bar", queue.poll());
+        assertTrue(queue.isEmpty());
+        assertTrue(localMap.isEmpty());
     }
 }

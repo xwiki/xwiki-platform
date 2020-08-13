@@ -98,12 +98,16 @@ public class NotificationsIT
 
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 0);
         p.disableAllParameters();
         // Enable own filter
         p.getNotificationFilterPreferences().get(2).setEnabled(true);
 
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
         p.disableAllParameters();
     }
 

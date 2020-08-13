@@ -21,6 +21,7 @@
       <input
         type="checkbox"
         :checked="option.checked"
+        @click.stop="option.toggle(option.value)"
         tabindex="-1"
       />
       {{ option.value }}

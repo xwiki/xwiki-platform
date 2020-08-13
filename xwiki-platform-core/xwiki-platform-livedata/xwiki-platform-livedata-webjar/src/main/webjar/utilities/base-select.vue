@@ -42,6 +42,7 @@
             name="option"
             :value="option"
             :checked="isSelected(option)"
+            :toggle="toggleSelect"
           >
             {{ option }}
           </slot>

@@ -29,7 +29,6 @@
   data-wysiwyg="true"></script>
 ##
 $xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
-$xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
 ## page. In order to help debugging we provide/bundle the individual files also and you can load them instead of the
 ## aggregated files by passing 'minify=false' in the request query string or setting debug.minify property in

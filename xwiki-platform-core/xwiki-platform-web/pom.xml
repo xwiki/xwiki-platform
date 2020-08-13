@@ -205,7 +205,6 @@
         <configuration>
           <excludes>
             <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
-            <exclude>src/**/yui/**/*.js</exclude>
             <exclude>src/**/scriptaculous/**/*.js</exclude>
             <exclude>src/**/prototype/**/*.js</exclude>
             <exclude>src/**/xwiki/accordion/accordion.js</exclude>

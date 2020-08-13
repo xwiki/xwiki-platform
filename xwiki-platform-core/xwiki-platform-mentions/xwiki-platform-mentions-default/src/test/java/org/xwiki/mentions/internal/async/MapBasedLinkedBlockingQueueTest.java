@@ -19,12 +19,8 @@
  */
 package org.xwiki.mentions.internal.async;
 
-import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.internal.util.collections.ConcurrentReferenceHashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

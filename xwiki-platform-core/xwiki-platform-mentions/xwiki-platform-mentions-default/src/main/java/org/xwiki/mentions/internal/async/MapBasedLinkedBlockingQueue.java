@@ -48,6 +48,37 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     private final LinkedBlockingQueue<Pair<Long, T>> internalQueue;
 
     /**
+     * A specific iterator class that relies on the internal queue.
+     * This iterator specifically does not handle the remove operation.
+     */
+    private class WrappedIterator implements Iterator<T>
+    {
+        private Iterator<T> internalIterator;
+
+        /**
+         * Default constructor.
+         */
+        WrappedIterator()
+        {
+            this.internalIterator = MapBasedLinkedBlockingQueue.this.internalQueue.stream()
+                .map(Pair::getValue)
+                .iterator();
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return this.internalIterator.hasNext();
+        }
+
+        @Override
+        public T next()
+        {
+            return this.internalIterator.next();
+        }
+    }
+
+    /**
      * Default constructor. It uses the provided map to populate the queue information, and then keep in sync the
      * map and the queue.
      *
@@ -267,13 +298,14 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     @Override
     public Iterator<T> iterator()
     {
-        return this.internalMap.entrySet().stream().sorted(new DefaultComparator()).map(Map.Entry::getValue).iterator();
+
+        return new WrappedIterator();
     }
 
     @Override
     public Object[] toArray()
     {
-        return this.internalMap.values().toArray();
+        return this.internalQueue.stream().map(a -> a.getValue()).toArray();
     }
 
     @Override

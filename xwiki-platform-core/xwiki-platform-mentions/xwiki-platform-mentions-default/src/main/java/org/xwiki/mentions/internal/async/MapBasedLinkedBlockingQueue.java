@@ -232,8 +232,12 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     public T poll(long l, TimeUnit timeUnit) throws InterruptedException
     {
         Pair<Long, T> result = this.internalQueue.poll(l, timeUnit);
-        this.internalRemove(result);
-        return result.getValue();
+        if (result != null) {
+            this.internalRemove(result);
+            return result.getValue();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -246,8 +250,12 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     public T poll()
     {
         Pair<Long, T> result = this.internalQueue.poll();
-        this.internalRemove(result);
-        return result.getValue();
+        if (result != null) {
+            this.internalRemove(result);
+            return result.getValue();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -260,7 +268,7 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     public T peek()
     {
         Pair<Long, T> result = this.internalQueue.peek();
-        return result.getValue();
+        return (result != null) ? result.getValue() : null;
     }
 
     @Override

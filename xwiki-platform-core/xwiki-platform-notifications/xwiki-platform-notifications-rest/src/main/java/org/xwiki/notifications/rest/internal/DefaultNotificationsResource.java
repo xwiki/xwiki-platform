@@ -108,10 +108,20 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             xcontext.setURLFactory(
                 xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
 
-            Notifications notifications = new Notifications(this.notificationsRenderer
-                .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+            // Make sure to rendering the notifications in the right wiki
+            String currentOriginalWiki = xcontext.getOriginalWikiId();
+            try {
+                if (currentWiki != null) {
+                    xcontext.setOriginalWikiId(currentWiki);
+                }
 
-            response = Response.ok(notifications);
+                Notifications notifications = new Notifications(this.notificationsRenderer
+                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+
+                response = Response.ok(notifications);
+            } finally {
+                xcontext.setOriginalWikiId(currentOriginalWiki);
+            }
         }
 
         // Add the "cache control" header.

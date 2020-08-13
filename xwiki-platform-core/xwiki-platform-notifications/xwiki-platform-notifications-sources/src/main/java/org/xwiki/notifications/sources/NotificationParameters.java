@@ -61,7 +61,7 @@ public class NotificationParameters
     public Date endDate;
 
     /**
-     * Don't get notifications that have been triggered after the following date.
+     * True if the end date should be included.
      * 
      * @since 12.6.1
      * @since 12.7RC1

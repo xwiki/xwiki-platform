@@ -256,9 +256,10 @@ public class QueryExpressionGenerator
     private AbstractOperatorNode handleEndDate(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
         if (parameters.endDate != null) {
-            return topNode.and(
-                new LesserThanNode(new PropertyValueNode(EventProperty.DATE), new DateValueNode(parameters.endDate)));
+            return topNode.and(new LesserThanNode(new PropertyValueNode(EventProperty.DATE),
+                new DateValueNode(parameters.endDate), parameters.endDateIncluded));
         }
+
         return topNode;
     }
 

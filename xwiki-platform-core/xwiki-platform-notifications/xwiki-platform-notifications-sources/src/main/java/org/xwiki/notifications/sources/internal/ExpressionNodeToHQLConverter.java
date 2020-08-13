@@ -241,11 +241,17 @@ public class ExpressionNodeToHQLConverter
                     parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), true, result));
         } else if (operator instanceof GreaterThanNode) {
-            returnValue = String.format("%s >= %s", parseBlock(operator.getLeftOperand(), result),
-                    parseBlock(operator.getRightOperand(), result));
+            GreaterThanNode greater = (GreaterThanNode) operator;
+            returnValue = String.format("%s %s %s",
+                parseBlock(greater.getLeftOperand(), result),
+                greater.isOrEquals() ? ">=" : ">",
+                parseBlock(greater.getRightOperand(), result));
         } else if (operator instanceof LesserThanNode) {
-            returnValue = String.format("%s <= %s", parseBlock(operator.getLeftOperand(), result),
-                    parseBlock(operator.getRightOperand(), result));
+            LesserThanNode lesser = (LesserThanNode) operator;
+            returnValue = String.format("%s %s %s",
+                parseBlock(lesser.getLeftOperand(), result),
+                lesser.isOrEquals() ? "<=" : "<",
+                parseBlock(lesser.getRightOperand(), result));
         } else {
             returnValue = StringUtils.EMPTY;
         }

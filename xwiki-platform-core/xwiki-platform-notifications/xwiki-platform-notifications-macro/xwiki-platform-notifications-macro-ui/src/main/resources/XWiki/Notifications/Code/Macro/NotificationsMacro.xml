@@ -312,6 +312,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       };
       if (untilDate) {
         params.untilDate = untilDate;
+        params.untilDateIncluded = false;
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();

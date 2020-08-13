@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -248,5 +249,21 @@ public class MapBasedLinkedBlockingQueueTest
         assertEquals("Bar", queue.poll());
         assertTrue(queue.isEmpty());
         assertTrue(localMap.isEmpty());
+    }
+
+    @Test
+    void pollEmpty()
+    {
+        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        assertNull(queue.poll());
+    }
+
+    @Test
+    void peekEmpty()
+    {
+        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        assertNull(queue.poll());
     }
 }

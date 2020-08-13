@@ -378,8 +378,7 @@ public class MapBasedLinkedBlockingQueue<T> implements BlockingQueue<T>
     {
         boolean result = false;
         for (T t : collection) {
-            Long key = this.internalPut(t);
-            boolean add = this.internalQueue.add(Pair.of(key, t));
+            boolean add = this.add(t);
             result = result || add;
         }
 

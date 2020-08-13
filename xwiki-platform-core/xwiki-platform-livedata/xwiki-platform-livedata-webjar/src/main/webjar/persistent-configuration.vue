@@ -55,6 +55,55 @@ define([
     computed: {
       data: function () { return this.logic.data; },
 
+      $_filters: {
+        get: function () { return this.data.query.filters; },
+        set: function (value) { this.data.query.filters = value; },
+      },
+
+      $_sort: {
+        get: function () { return this.data.query.sort; },
+        set: function (value) { this.data.query.sort = value; },
+      },
+
+      $_offset: {
+        get: function () { return this.data.query.offset; },
+        set: function (value) { this.data.query.offset = value; },
+      },
+
+      $_limit: {
+        get: function () { return this.data.query.limit; },
+        set: function (value) { this.data.query.limit = value; },
+      },
+
+      $_currentLayoutId: {
+        get: function () { return this.logic.currentLayoutId; },
+        set: function (value) { this.logic.currentLayoutId = value; },
+      },
+
+      $_propertyOrder: {
+        get: function () { return this.data.query.properties; },
+        set: function (value) { this.data.query.properties = value; },
+      },
+
+      $_propertyVisibility: {
+        get: function () {
+          var self = this;
+          // only return hidden props
+          return this.data.query.properties
+            .reduce(function (hiddenProperties, propertyId) {
+              return self.logic.isPropertyVisible(propertyId)
+                ? hiddenProperties
+                : hiddenProperties.concat(propertyId)
+            }, []);
+        },
+        set: function (value) {
+          var self = this;
+          this.data.query.properties.forEach(function (propertyId) {
+            self.logic.setPropertyVisible(propertyId, value.indexOf(propertyId) === -1);
+          });
+        }
+      },
+
       propertyIds: function () {
         return this.data.query.properties.slice().sort();
       },
@@ -82,7 +131,7 @@ define([
 
       encodingSpecsV1: function () {
         return {
-          filters: ["array", {
+          $_filters: ["array", {
             property: this.encodingSpecsProperties,
             matchAll: ["boolean"],
             constrains: ["array", {
@@ -90,14 +139,15 @@ define([
               value: ["varchar"],
             }],
           }],
-          sort: ["array", {
+          $_sort: ["array", {
             property: this.encodingSpecsProperties,
             descending: ["boolean"],
           }],
-          offset: ["integer"],
-          limit: ["integer"],
-          currentLayoutId: this.encodingSpecsCurrentLayoutId,
-          properties: ["array", this.encodingSpecsProperties],
+          $_offset: ["integer"],
+          $_limit: ["integer"],
+          $_currentLayoutId: this.encodingSpecsCurrentLayoutId,
+          $_propertyOrder: ["array", this.encodingSpecsProperties],
+          $_propertyVisibility: ["array", this.encodingSpecsProperties],
         };
       },
 
@@ -111,13 +161,17 @@ define([
       dataToSave: function () {
         var dataToSave = {};
         for (var key in this.encodingSpecsV1) {
-          dataToSave[key] = this.getDataParentObject(key)[key];
+          dataToSave[key] = this[key];
         }
         return dataToSave;
       },
 
       encodedConfig: function () {
         return this.encodeConfig(this.dataToSave);
+      },
+
+      saveKey: function () {
+        return "livedata-config-" + this.data.query.source.id;
       },
 
     },
@@ -134,14 +188,6 @@ define([
 
 
     methods: {
-
-      getDataParentObject: function (key) {
-        if (this.data.query.hasOwnProperty(key)) {
-          return this.data.query;
-        } else {
-          return this.logic;
-        }
-      },
 
       encodeConfig: function (config) {
         try {
@@ -170,12 +216,12 @@ define([
         // url search param
         if (this.urlSearchParam) {
           var url = new URL(window.location);
-          url.searchParams.set("livedata-config", this.encodedConfig);
+          url.searchParams.set(this.saveKey, this.encodedConfig);
           history.replaceState(null, "", url.href);
         }
         // local storage
         if (this.localStorage) {
-          window.localStorage.setItem("livedata-config", this.encodedConfig);
+          window.localStorage.setItem(this.saveKey, this.encodedConfig);
         }
       },
 
@@ -183,42 +229,45 @@ define([
         var config = "";
         // url search param
         if (!config && this.urlSearchParam) {
-          config = (new URLSearchParams(window.location.search)).get("livedata-config");
+          config = (new URLSearchParams(window.location.search)).get(this.saveKey);
         }
         // local storage
         if (!config && this.localStorage) {
-          config = window.localStorage.getItem("livedata-config");
+          config = window.localStorage.getItem(this.saveKey);
         }
         return config;
+      },
+
+      loadConfig: function (config) {
+        var self = this;
+        Object.keys(this.dataToSave).forEach(function (key) {
+          self[key] = config[key];
+        });
       },
 
       deleteConfig: function () {
         // url search param
         if (this.urlSearchParam) {
           var url = new URL(window.location);
-          url.searchParams.delete("livedata-config");
+          url.searchParams.delete(this.saveKey);
           history.replaceState(null, "", url.href);
         }
         // local storage
         if (this.localStorage) {
-          window.localStorage.removeItem("livedata-config");
+          window.localStorage.removeItem(this.saveKey);
         }
       },
     },
 
 
     mounted: function () {
-      var self = this;
       var config = this.decodeConfig(this.getConfig());
       if (!config) {
         this.deleteConfig();
         new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");
-        return
+        return;
       }
-
-      Object.keys(this.dataToSave).forEach(function (key) {
-        self.getDataParentObject(key)[key] = config[key];
-      });
+      this.loadConfig(config);
     },
 
 

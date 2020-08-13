@@ -312,7 +312,7 @@ define([
 
 
     /**
-     * Return the property type descriptor corresponding to a property id
+     * Return the layout descriptor corresponding to a layout id
      * @param {String} propertyId
      * @returns {Object}
      */

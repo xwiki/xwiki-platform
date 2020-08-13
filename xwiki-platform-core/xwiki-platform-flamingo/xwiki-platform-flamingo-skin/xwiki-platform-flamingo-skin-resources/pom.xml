@@ -164,11 +164,28 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 2: Verify and minify the JavaScript code. -->
+      <!-- Verify the JavaScript code. -->
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
       </plugin>
+      <!-- Minify and optimize the JavaScript code. -->
+      <plugin>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceDir>../resources</sourceDir>
+          <targetDir>../classes</targetDir>
+        </configuration>
+      </plugin>
+      <!-- Minify the CSS code. -->
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
@@ -180,7 +197,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Step 2: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
+      <!-- Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

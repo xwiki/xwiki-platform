@@ -88,38 +88,23 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Javascript and CSS files compression -->
+      <!-- Minify and optimize the JavaScript code. -->
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>minify</id>
             <goals>
-              <goal>compress</goal>
+              <goal>minify</goal>
             </goals>
           </execution>
-        </executions>
-        <configuration>
-          <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
-               with the original, uncompressed ones. -->
-          <webappDirectory>${project.build.directory}/minimized</webappDirectory>
-          <!-- We don't need the suffix (.min) because the minified files are put in a separate folder. -->
-          <nosuffix>true</nosuffix>
-          <excludes>
-            <!-- Exclude already minified files -->
-            <exclude>**/*-min.js</exclude>
-            <exclude>**/*-debug.js</exclude>
-            <exclude>**/langs/*.js</exclude>
-            <!-- Exclude files with complex Velocity code inside -->
-            <!-- This one iterates over xobjects of type XWiki.SearchSuggestSourceClass -->
-            <exclude>**/searchSuggest.js</exclude>
-          </excludes>
-          <aggregations>
-            <!-- Aggregate the JavaScript code that is loaded on every page. -->
-            <aggregation>
-              <insertNewLine>true</insertNewLine>
-              <inputDir>${project.build.directory}/minimized</inputDir>
-              <output>${project.build.directory}/minimized/resources/js/xwiki/xwiki-min.js</output>
+          <execution>
+            <id>merge</id>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+            <configuration>
               <includes>
                 <!-- entityReference.js is added first because it is used by xwiki.js -->
                 <include>**/entityReference.js</include>
@@ -132,18 +117,44 @@
                 <include>**/xlist.js</include>
                 <include>**/suggest.js</include>
               </includes>
-            </aggregation>
+              <skipMerge>false</skipMerge>
+              <targetDir>resources/js/xwiki</targetDir>
+              <outputFilename>xwiki.bundle.min.js</outputFilename>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- Disable strict mode because Scriptaculous uses "arguments.callee" and "with" statement.. -->
+          <closureStrictModeInput>false</closureStrictModeInput>
+          <closureWarningLevels>
+            <es5Strict>WARNING</es5Strict>
+          </closureWarningLevels>
+        </configuration>
+      </plugin>
+      <!-- Minify the CSS code. -->
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <aggregations>
             <!-- Aggregate the CSS code that is loaded on every page. -->
             <aggregation>
               <insertNewLine>true</insertNewLine>
-              <inputDir>${project.build.directory}/minimized</inputDir>
-              <output>${project.build.directory}/minimized/resources/css/xwiki-min.css</output>
+              <inputDir>${project.build.directory}/${project.build.finalName}/resources</inputDir>
+              <output>${project.build.directory}/${project.build.finalName}/resources/css/xwiki.bundle.min.css</output>
               <includes>
-                <include>**/modalPopup.css</include>
-                <include>**/jumpToPage.css</include>
-                <include>**/confirmationBox.css</include>
-                <include>**/notification.css</include>
-                <include>**/suggest.css</include>
+                <include>**/modalPopup.min.css</include>
+                <include>**/jumpToPage.min.css</include>
+                <include>**/confirmationBox.min.css</include>
+                <include>**/notification.min.css</include>
+                <include>**/suggest.min.css</include>
               </includes>
             </aggregation>
           </aggregations>
@@ -164,12 +175,6 @@
               <directory>${basedir}/src/main/webInfResources</directory>
               <targetPath>WEB-INF</targetPath>
               <filtering>true</filtering>
-            </resource>
-            <!-- Add minified resources -->
-            <resource>
-              <directory>${project.build.directory}/minimized</directory>
-              <targetPath>/</targetPath>
-              <filtering>false</filtering>
             </resource>
           </webResources>
           <!-- Exclude the LICENSE/NOTICE files from the classes/ directory since we're including them in META-INF/ at
@@ -214,37 +219,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <!-- This debug profile should be used to avoid JS/CSS compression. This is useful when debugging XWiki for
-           example since we can put breakpoints in our browsers on the JS. -->
-      <id>debug</id>
-      <properties>
-        <xwiki.minification.skip>true</xwiki.minification.skip>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <!-- Make sure the minimized dir exists, since it is expected by the war plugin and will not be created
-                 in this profile -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <mkdir dir="${project.build.directory}/minimized" />
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

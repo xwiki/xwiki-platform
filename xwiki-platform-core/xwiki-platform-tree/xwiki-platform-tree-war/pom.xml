@@ -33,14 +33,14 @@
   <description>Velocity macros and JavaScript files that can't be packaged in the WebJar</description>
   <build>
     <plugins>
-      <!-- Javascript and CSS files compression -->
+      <!-- Javascript compression -->
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
         <executions>
           <execution>
             <goals>
-              <goal>compress</goal>
+              <goal>minify</goal>
             </goals>
           </execution>
         </executions>

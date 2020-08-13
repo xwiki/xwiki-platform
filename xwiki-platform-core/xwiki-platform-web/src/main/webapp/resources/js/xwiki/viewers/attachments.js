@@ -158,7 +158,6 @@ viewers.Attachments = Class.create({
       if (event.memo.id == 'Attachments') {
         this.prepareForm();
         document.stopObserving("xwiki:docextra:loaded", listener);
-        delete listener;
       }
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);

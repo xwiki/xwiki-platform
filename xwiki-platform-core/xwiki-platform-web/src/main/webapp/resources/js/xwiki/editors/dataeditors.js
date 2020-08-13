@@ -396,7 +396,7 @@ editors.XDataEditors = Class.create({
    */
   _extractContents : function(element) {
     var documentFragment = element.ownerDocument.createDocumentFragment();
-    for(; element.firstChild; documentFragment.appendChild(element.firstChild));
+    for(; element.firstChild; documentFragment.appendChild(element.firstChild)) {};
     return documentFragment;
   },
   // ------------------------------------

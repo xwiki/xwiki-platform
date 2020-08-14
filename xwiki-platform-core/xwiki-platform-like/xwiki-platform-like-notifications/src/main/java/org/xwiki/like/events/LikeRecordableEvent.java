@@ -31,11 +31,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class LikeRecordableEvent implements RecordableEvent
 {
-    /**
-     * Event name.
-     */
-    public static final String NAME = "LikeRecordableEvent";
-
     @Override
     public boolean matches(Object otherEvent)
     {

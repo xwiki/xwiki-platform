@@ -34,7 +34,7 @@ import org.xwiki.like.events.LikeRecordableEvent;
  */
 @Component
 @Singleton
-@Named(LikeRecordableEvent.NAME)
+@Named("like")
 public class LikeEventDescriptor implements RecordableEventDescriptor
 {
     /**
@@ -45,7 +45,7 @@ public class LikeEventDescriptor implements RecordableEventDescriptor
     @Override
     public String getEventType()
     {
-        return LikeRecordableEvent.NAME;
+        return LikeRecordableEvent.class.getCanonicalName();
     }
 
     @Override

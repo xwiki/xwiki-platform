@@ -235,4 +235,13 @@ public class LikeScriptService implements ScriptService
     {
         this.asyncRendererCache.cleanCache(UIX_REFERENCE);
     }
+
+    /**
+     * @return the Like button behaviour.
+     * See {@link org.xwiki.like.LikeConfiguration.UIClickBehaviour} for more information on the values.
+     */
+    public String getUIClickBehaviour()
+    {
+        return this.likeConfiguration.getUIClickBehaviour().name();
+    }
 }

@@ -55,6 +55,24 @@
         'counter': $newCounterOptional.get().likeNumber
       })
     #end
+#elseif ($request.xaction == "getLikers" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+  #set ($documentReference = $services.model.resolveDocument($request.document))
+  #set ($optLikeRecord = $services.like.getLikes($documentReference))
+  #if ($optLikeRecord.isPresent())
+    #set ($likeRecord = $optLikeRecord.get())
+    {{html wiki="true"}}
+    #if ($likeRecord.likers.isEmpty())
+      $services.localization.render('like.likers.empty')
+    #else
+      $services.localization.render('like.likers.number', [$likeRecord.likers.size()])
+      #foreach($liker in $likeRecord.likers)
+         * #displayUserLink($liker)
+      #end
+    #end
+    {{/html}}
+  #else
+    No data.
+  #end
 #end
 {{/velocity}}</content>
   <object>
@@ -146,11 +164,41 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   var likeUIXReference = XWiki.Model.resolve('XWiki.Like.LikeUIX', XWiki.EntityType.DOCUMENT);
-  var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get', 'outputSyntax=plain');
+  var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   
+  var likeClick = function () {
+    likeClickStrategy = $('#like-click-strategy').val();
+    isLiked = $('#is-liked').val() == "true";
+    if ((likeClickStrategy == "LIKE_FIRST_AND_DISPLAY_LIKERS" || likeClickStrategy == "NEVER_DISPLAY_LIKERS") &amp;&amp; !isLiked) {
+      triggerLike();
+    } else if (likeClickStrategy == "NEVER_DISPLAY_LIKERS" &amp;&amp; isLiked) {
+      createUnlikeConfirmationModal();
+    } else {
+      displayModal();
+    }
+  };
+
+  var createUnlikeConfirmationModal = function () {
+    var text = "$services.localization.render('like.unlike.confirmation')";
+    $('#like-modal .modal-body').text(text);
+    $('#like-modal').modal('show');
+  };
+  
+  var displayModal = function () {
+    $.post(likeUIXurl, {
+      'xaction': 'getLikers',
+      'form_token': xm.form_token,
+      'document': XWiki.Model.serialize(xm.documentReference)
+    }).done(function(data) {
+      $('#like-modal .modal-body.likers').html(data);
+      $('#like-modal').modal('show');
+    }).fail(function(data) {
+      new XWiki.widgets.Notification('$services.localization.render('like.getLikers.error')', 'error');
+    });
+  };
 
   var triggerLike = function () {
-     var likeButton = $(this);
+     var likeButton = $('.like-button').first();
      $.post(likeUIXurl, {
         'xaction': 'like',
         'form_token': xm.form_token,
@@ -159,33 +207,39 @@
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
+       $('#modal-like-button').addClass('hidden');
+       $('#modal-unlike-button').removeClass('hidden');
+       $('#is-liked').val('true');
+       new XWiki.widgets.Notification('$services.localization.render('like.newlike.success')', 'done');
      }).fail(function(data) {
+       new XWiki.widgets.Notification('$services.localization.render('like.newlike.error')', 'error');
      });
+    $('#like-modal').modal('hide');
   };
 
   var triggerUnlike = function () {
-    var unlikeButton = $(this);
-    new XWiki.widgets.ConfirmationBox({
-      onYes : function() {
-        $.post(likeUIXurl, {
-          'xaction': 'unlike',
-          'form_token': xm.form_token,
-          'document': XWiki.Model.serialize(xm.documentReference)
-        }).done(function(data) {
-          unlikeButton.removeClass('btn-default');
-          unlikeButton.addClass('btn-primary');
-          unlikeButton.find('.like-number').text(data.counter);
-        }).fail(function(data) {
-        })
-      }
-    }, {
-      confirmationText : '$services.localization.render('like.unlike.confirmation')'
+    var unlikeButton = $('.like-button').first();
+    $.post(likeUIXurl, {
+      'xaction': 'unlike',
+      'form_token': xm.form_token,
+      'document': XWiki.Model.serialize(xm.documentReference)
+    }).done(function(data) {
+      unlikeButton.removeClass('btn-default');
+      unlikeButton.addClass('btn-primary');
+      unlikeButton.find('.like-number').text(data.counter);
+      $('#modal-like-button').removeClass('hidden');
+      $('#modal-unlike-button').addClass('hidden');
+      $('#is-liked').val('false');
+      new XWiki.widgets.Notification('$services.localization.render('like.unlike.success')', 'done');
+    }).fail(function(data) {
+      new XWiki.widgets.Notification('$services.localization.render('like.unlike.error')', 'error');
     });
-
+    $('#like-modal').modal('hide');
   };
   
-  $('.like-button.btn-primary:not(.disabled)').on('click', triggerLike);
-  $('.like-button.btn-default:not(.disabled)').on('click', triggerUnlike);
+  $('#modal-like-button').on('click', triggerLike);
+  $('#modal-unlike-button').on('click', triggerUnlike);
+  $('.like-button:not(.disabled)').on('click', likeClick);
 });</code>
     </property>
     <property>
@@ -327,12 +381,40 @@
     </property>
     <property>
       <content>{{velocity}}
-{{html}}
+{{html wiki="true"}}
+#macro(likeModal $likeRecord $displayLikers)
+&lt;div id="like-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;Likes on $doc.title&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body likers"&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-footer"&gt;
+        #set ($isLiked = $services.like.isLiked($doc))
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
+        #if ($services.like.isAuthorized($doc))
+        &lt;button type="button" id="modal-like-button" class="btn btn-primary #if($isLiked)hidden#end&gt;Like the page&lt;/button&gt;
+        &lt;button type="button" id="modal-unlike-button" class="btn btn-danger #if(!$isLiked)hidden#end"&gt;Unlike the page&lt;/button&gt;
+        #end
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+#end
 #if ($services.like.displayButton($doc))
-  #set ($likeRecord = $services.like.getLikes($doc))
-  #if ($likeRecord.isPresent())
+  #set ($optLikeRecord = $services.like.getLikes($doc))
+  #if ($optLikeRecord.isPresent())
+    #set ($likeRecord = $optLikeRecord.get())
     #set ($discard = $xwiki.jsx.use('XWiki.Like.LikeUIX'))
     &lt;div class="like-container"&gt;
+      #set ($clickBehaviour = $services.like.getUIClickBehaviour())
+      #set ($displayLikers = ($clickBehaviour == "ALWAYS_DISPLAY_LIKERS" || $clickBehaviour == "LIKE_FIRST_AND_DISPLAY_LIKERS"))
+      &lt;input id="like-click-strategy" type="hidden" value="$clickBehaviour" /&gt;
+      &lt;input id="is-liked" type="hidden" value="$services.like.isLiked($doc)" /&gt;
+      #likeModal($likeRecord $displayLikers)
       #if ($isGuest || $services.like.isLiked($doc))
         #set ($btnClass = "btn-default")
       #elseif (!$isGuest)
@@ -342,7 +424,9 @@
       #if (!$services.like.isAuthorized($doc))
         #set ($disabledButton = "disabled")
       #end
-      &lt;div class="like-button btn $btnClass $disabledButton"&gt;$services.icon.renderHTML('heart') Likes &lt;span class="like-number badge"&gt;$likeRecord.get().likeNumber&lt;/span&gt;&lt;/div&gt;
+      &lt;div class="like-button btn $btnClass $disabledButton" title="$services.localization.render('like.button.title', [$likeRecord.likeNumber])"&gt;
+          $services.icon.renderHTML('heart') &lt;span class="like-number badge"&gt;$likeRecord.likeNumber&lt;/span&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   #end
 #end

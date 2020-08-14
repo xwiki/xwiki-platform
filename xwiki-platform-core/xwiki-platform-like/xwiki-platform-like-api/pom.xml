@@ -31,7 +31,7 @@
   <name>XWiki Platform - Like - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>

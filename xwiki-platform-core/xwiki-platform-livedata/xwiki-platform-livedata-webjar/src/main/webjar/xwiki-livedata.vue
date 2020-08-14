@@ -5,7 +5,7 @@
 
       <livedata-layout :layout-id="layoutId"></livedata-layout>
 
-      <persistent-configuration></persistent-configuration>
+      <persistent-configuration v-if="data.id"></persistent-configuration>
 
   </div>
 </template>

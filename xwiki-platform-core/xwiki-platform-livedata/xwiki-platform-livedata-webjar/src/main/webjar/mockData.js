@@ -24,6 +24,8 @@
 
 define({
 
+  id: "LD0",
+
   query: {
     properties: ["doc_title", "age", "country", "tags", "other"],
 

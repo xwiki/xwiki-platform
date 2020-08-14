@@ -171,7 +171,7 @@ define([
       },
 
       saveKey: function () {
-        return "livedata-config-" + this.data.query.source.id;
+        return "livedata-config-" + this.data.id;
       },
 
     },
@@ -179,9 +179,9 @@ define([
     watch: {
       encodedConfig: function () {
         if (this.encodedConfig) {
-          this.saveConfig();
+          this.saveConfig(this.saveKey);
         } else {
-          this.deleteConfig();
+          this.deleteConfig(this.saveKey);
         }
       },
     },
@@ -212,28 +212,28 @@ define([
         }
       },
 
-      saveConfig: function () {
+      saveConfig: function (saveKey) {
         // url search param
         if (this.urlSearchParam) {
           var url = new URL(window.location);
-          url.searchParams.set(this.saveKey, this.encodedConfig);
+          url.searchParams.set(saveKey, this.encodedConfig);
           history.replaceState(null, "", url.href);
         }
         // local storage
         if (this.localStorage) {
-          window.localStorage.setItem(this.saveKey, this.encodedConfig);
+          window.localStorage.setItem(saveKey, this.encodedConfig);
         }
       },
 
-      getConfig: function () {
+      getConfig: function (saveKey) {
         var config = "";
         // url search param
         if (!config && this.urlSearchParam) {
-          config = (new URLSearchParams(window.location.search)).get(this.saveKey);
+          config = (new URLSearchParams(window.location.search)).get(saveKey);
         }
         // local storage
         if (!config && this.localStorage) {
-          config = window.localStorage.getItem(this.saveKey);
+          config = window.localStorage.getItem(saveKey);
         }
         return config;
       },
@@ -245,23 +245,23 @@ define([
         });
       },
 
-      deleteConfig: function () {
+      deleteConfig: function (saveKey) {
         // url search param
         if (this.urlSearchParam) {
           var url = new URL(window.location);
-          url.searchParams.delete(this.saveKey);
+          url.searchParams.delete(saveKey);
           history.replaceState(null, "", url.href);
         }
         // local storage
         if (this.localStorage) {
-          window.localStorage.removeItem(this.saveKey);
+          window.localStorage.removeItem(saveKey);
         }
       },
     },
 
 
     mounted: function () {
-      var config = this.decodeConfig(this.getConfig());
+      var config = this.decodeConfig(this.getConfig(this.saveKey));
       if (!config) {
         this.deleteConfig();
         new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");

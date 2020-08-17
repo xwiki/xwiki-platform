@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=页面树
+rendering.macro.documentTree.description=显示XWiki页面树。
+rendering.macro.documentTree.parameter.readOnly.name=只读
+rendering.macro.documentTree.parameter.readOnly.description=如果用户具有必要的权限，是否应该能够修改树结构？
+rendering.macro.documentTree.parameter.showWikis.name=显示Wiki
+rendering.macro.documentTree.parameter.showWikis.description=是否显示Wiki节点。这只能在主Wiki上使用，并且如果树源已经用编程权限保存。
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=显示Wiki全称
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=当显示Wiki节点时显示Wiki全称而不是Wiki编号。
+rendering.macro.documentTree.parameter.showSpaces.name=显示空间
+rendering.macro.documentTree.parameter.showSpaces.description=是否显示空间节点。如果显示空间节点，则页面按空间分组。
+rendering.macro.documentTree.parameter.showDocumentTitle.name=显示页面标题
+rendering.macro.documentTree.parameter.showDocumentTitle.description=显示页面节点时是否显示页面标题而不是页面名称。
+rendering.macro.documentTree.parameter.showTranslations.name=显示翻译
+rendering.macro.documentTree.parameter.showTranslations.description=是否显示页面的翻译。
+rendering.macro.documentTree.parameter.showAttachments.name=显示附件
+rendering.macro.documentTree.parameter.showAttachments.description=是否显示页面的附件。
+rendering.macro.documentTree.parameter.showObjects.name=显示对象
+rendering.macro.documentTree.parameter.showObjects.description=是否显示页面的对象。
+rendering.macro.documentTree.parameter.showClassProperties.name=显示类属性
+rendering.macro.documentTree.parameter.showClassProperties.description=是否显示定义类的页面的类属性。
+rendering.macro.documentTree.parameter.root.name=根
+rendering.macro.documentTree.parameter.root.description=根节点编号。如果您希望只显示给定节点（即特定根节点）的后代，这很有用。该树在第一层显示根节点的子节点，因此根节点实际上不会显示。如果未指定根节点，将显示整个树。节点标识符的格式是实体类型：实体引用，其中实体类型可以是例如Wiki、空间、文档，例如wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome。
+rendering.macro.documentTree.parameter.showRoot.name=显示根
+rendering.macro.documentTree.parameter.showRoot.description=是否显示根节点。默认情况下不显示根节点，因为它通常是由显示的树的上下文暗示（例如树前面的标签）。但是在某些情况下，您可能想要显示根节点：能够在根下创建一个新节点。
+rendering.macro.documentTree.parameter.compact.name=紧凑
+rendering.macro.documentTree.parameter.compact.description=如果你可用的水平空间有限，那么你应该把它设置为真。其效果是节点图标和连接它们的边缘将被隐藏。还将应用一些特殊的样式以确保树占用较少的水平空间，同时保持节点标签完全可见。
+rendering.macro.documentTree.parameter.links.name=链接
+rendering.macro.documentTree.parameter.links.description=指定节点标签是否应该看起来和行为像链接（锚）。
+rendering.macro.documentTree.parameter.checkboxes.name=复选框
+rendering.macro.documentTree.parameter.checkboxes.description=是否在每个树节点前显示复选框，以允许用户选择多个树节点。
+### Missing: rendering.macro.documentTree.parameter.openTo.name=Open to
+### Missing: rendering.macro.documentTree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also. The format of the node id is the one used for the root parameter.
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.name=Show only Viewable
+### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.description=Show only the wiki, space and page nodes for which the current user has view right. If this is set to false then the wiki, space and page nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).
+### Missing: rendering.macro.documentTree.parameter.filterByClass.name=Filter by Class
+### Missing: rendering.macro.documentTree.parameter.filterByClass.description=Show only the pages that have an object of the specified type. The value of this parameter is the full name of an XWiki page that holds a class definition. For example, 'Blog.CategoryClass' can be used to show only the pages that represent blog categories. Leave this parameter empty if you don't want to restrict the type of pages shown in the tree.
+### Missing: rendering.macro.documentTree.parameter.finder.name=Finder
+### Missing: rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.name=Page Hierarchy Mode
+### Missing: rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between pages. Possible values are "reference" (default) and "parentchild". If "reference" is used then the page hierarchy is defined using only the page reference, especially the nested spaces component of the page reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" page field from the database.
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
+### Missing: rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
+### Missing: rendering.macro.documentTree.parameter.limit.name=Limit
+### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
+### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+
+### Missing: index.documentTree.empty=No pages found
+### Missing: index.documentTree.more={0} more ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
+  
+</xwikidoc>

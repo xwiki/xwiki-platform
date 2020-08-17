@@ -39,7 +39,7 @@
   <content>{{velocity wiki="true"}}
 #********************************************************
 Get the actual notifications.
-********************************************************#
+********************************************************###
 ## We use POST since we are sending the reference of the document and we want to avoid special characters in the URL.
 #if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
   #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
@@ -87,11 +87,11 @@ Get the actual notifications.
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area clearfix"&gt;
-{{/html}}
+  {{/html}}
 
-{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
+  {{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
 
-{{html}}
+  {{html clean="false"}}
   &lt;/div&gt;
   {{/html}}
   #end
@@ -101,14 +101,14 @@ Get the actual notifications.
 {{velocity wiki="false"}}
 #********************************************************
     Get the number of unread notifications as JSON
-********************************************************#
+********************************************************###
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
   #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
     #set ($discard = $response.setHeader('Content-Type', 'application/json'))
     $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
-********************************************************#
+********************************************************###
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'read' == $request.action)
   #set ($eventIds = $request.eventIds.split(','))
   #set ($read = "$!request.read")
@@ -121,7 +121,7 @@ Get the actual notifications.
   #end
 #********************************************************
            Change the start date of the user
-********************************************************#
+********************************************************###
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'setStartDate' == $request.action)
   #set ($startDate = $datetool.date)
   #if ("$!request.date" != '')
@@ -131,7 +131,7 @@ Get the actual notifications.
   #set ($discard = $services.notification.filters.setStartDate($startDate))
 #********************************************************
            Clear all event status until a specific date for the user
-********************************************************#
+********************************************************###
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'clear' == $request.action)
   #set ($startDate = $datetool.date)
   #if ("$!request.date" != '')
@@ -142,7 +142,7 @@ Get the actual notifications.
   #set ($discard = $services.notification.clearAllStatus($startDate))
 #********************************************************
              Watch/Unwatch a location
-********************************************************#
+********************************************************###
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; ('watchLocation' == $request.action || 'unwatchLocation' == $request.action))
   #if ("$!request.type" == 'space')
     #set ($location = $services.model.resolveSpace($request.location))

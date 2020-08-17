@@ -205,26 +205,44 @@ public class ExpressionNodeToEventQueryConverter
             // TODO: Unsupported
             throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
         } else if (operator instanceof GreaterThanNode) {
+            GreaterThanNode greater = (GreaterThanNode) operator;
+            String property;
+            Object value;
             if (operator.getLeftOperand() instanceof PropertyValueNode) {
-                result.greaterOrEq(getProperty((PropertyValueNode) operator.getLeftOperand()),
-                    getValue((AbstractValueNode) operator.getRightOperand()));
+                property = getProperty((PropertyValueNode) operator.getLeftOperand());
+                value = getValue((AbstractValueNode) operator.getRightOperand());
             } else if (operator.getRightOperand() instanceof PropertyValueNode) {
-                result.greaterOrEq(getProperty((PropertyValueNode) operator.getRightOperand()),
-                    getValue((AbstractValueNode) operator.getLeftOperand()));
+                property = getProperty((PropertyValueNode) operator.getRightOperand());
+                value = getValue((AbstractValueNode) operator.getLeftOperand());
             } else {
                 // TODO: Unsupported
                 throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
             }
+
+            if (greater.isOrEquals()) {
+                result.greaterOrEq(property, value);
+            } else {
+                result.greater(property, value);
+            }
         } else if (operator instanceof LesserThanNode) {
-            if (operator.getLeftOperand() instanceof PropertyValueNode) {
-                result.lessOrEq(getProperty((PropertyValueNode) operator.getLeftOperand()),
-                    getValue((AbstractValueNode) operator.getRightOperand()));
-            } else if (operator.getRightOperand() instanceof PropertyValueNode) {
-                result.lessOrEq(getProperty((PropertyValueNode) operator.getRightOperand()),
-                    getValue((AbstractValueNode) operator.getLeftOperand()));
+            LesserThanNode lesser = (LesserThanNode) operator;
+            String property;
+            Object value;
+            if (lesser.getLeftOperand() instanceof PropertyValueNode) {
+                property = getProperty((PropertyValueNode) lesser.getLeftOperand());
+                value = getValue((AbstractValueNode) lesser.getRightOperand());
+            } else if (lesser.getRightOperand() instanceof PropertyValueNode) {
+                property = getProperty((PropertyValueNode) lesser.getRightOperand());
+                value = getValue((AbstractValueNode) lesser.getLeftOperand());
             } else {
                 // TODO: Unsupported
                 throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+            }
+
+            if (lesser.isOrEquals()) {
+                result.lessOrEq(property, value);
+            } else {
+                result.less(property, value);
             }
         } else {
             // TODO: Unsupported

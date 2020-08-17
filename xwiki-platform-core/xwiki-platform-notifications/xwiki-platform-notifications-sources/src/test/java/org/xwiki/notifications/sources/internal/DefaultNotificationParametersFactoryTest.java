@@ -249,6 +249,7 @@ public class DefaultNotificationParametersFactoryTest
         parametersMap.put(ParametersKey.USER_ID, USER_SERIALIZED_REFERENCE);
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, "true");
         parametersMap.put(ParametersKey.UNTIL_DATE, "4242");
+        parametersMap.put(ParametersKey.UNTIL_DATE_INCLUDED, "true");
         parametersMap.put(ParametersKey.MAX_COUNT, "1258");
         parametersMap.put(ParametersKey.ONLY_UNREAD, "true");
         parametersMap.put(ParametersKey.BLACKLIST, "foo,bar,baz");

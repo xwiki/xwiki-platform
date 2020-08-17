@@ -208,6 +208,7 @@
   {{html clean="false"}}
   #set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
   #set ($discard = $doc.use($liveTableObj))
+  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
   #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))

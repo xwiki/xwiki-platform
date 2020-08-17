@@ -426,6 +426,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the edit class form.
  *#
 #macro (displayEditForm)
+  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
   #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))

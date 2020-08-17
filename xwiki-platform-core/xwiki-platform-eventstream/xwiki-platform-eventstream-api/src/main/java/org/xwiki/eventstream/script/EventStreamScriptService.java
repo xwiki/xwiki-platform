@@ -27,17 +27,24 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.internal.LegacyEventMigrationJob;
 import org.xwiki.eventstream.internal.LegacyEventMigrationRequest;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.query.QueryException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -62,6 +69,17 @@ public class EventStreamScriptService implements ScriptService
 
     @Inject
     private JobStatusStore statuses;
+
+    @Inject
+    private EventStore eventStore;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
+    private EventStream eventStream;
 
     /**
      * @param allWikis load the descriptors from all the wikis of the farm if true
@@ -118,5 +136,40 @@ public class EventStreamScriptService implements ScriptService
         return this.jobs
             .execute(LegacyEventMigrationJob.JOBTYPE, new LegacyEventMigrationRequest(since, LEGACY_MIGRATOR_ID))
             .getStatus();
+    }
+
+    private EventStream getEventStream()
+    {
+        if (this.eventStream == null && this.componentManager.hasComponent(EventStream.class)) {
+            try {
+                this.eventStream = this.componentManager.getInstance(EventStream.class);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to lookup EventStream legacy component", e);
+            }
+        }
+
+        return this.eventStream;
+    }
+
+    /**
+     * @return the total number of events in the legacy store
+     * @throws QueryException when failing to query the events
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public long getLegacyEventCount() throws QueryException
+    {
+        return getEventStream() != null ? this.eventStream.countEvents() : 0;
+    }
+
+    /**
+     * @return the total number of event in the store
+     * @throws EventStreamException when failing to query the number of events
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public long getEventCount() throws EventStreamException
+    {
+        return this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
     }
 }

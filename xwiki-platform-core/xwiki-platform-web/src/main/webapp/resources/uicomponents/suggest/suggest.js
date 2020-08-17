@@ -434,7 +434,7 @@ var XWiki = (function(XWiki){
 
   _getNestedProperty: function(obj, path) {
     var properties = path.split('.');
-    while (properties.length && (obj = obj[properties.shift()]));
+    while (properties.length && (obj = obj[properties.shift()])) {};
     return properties.length > 0 ? null : obj;
   },
 

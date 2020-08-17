@@ -52,7 +52,7 @@
     <hsqldb.version>2.5.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.48</ckeditor.version>
+    <ckeditor.version>1.49</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.13</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -86,7 +86,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.19.Final</hibernate.version>
+    <hibernate.version>5.4.20.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>

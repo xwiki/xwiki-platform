@@ -1384,7 +1384,6 @@ $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)##
 $xwiki.jsx.use($xcontext.macro.doc.fullName)##
 $xwiki.ssx.use($xcontext.macro.doc.fullName)##
-$xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ## Integrates the optional Lightbox widget (from http://extensions.xwiki.org/xwiki/bin/view/Extension/Lightbox+Application )
 #if ($xwiki.exists('XWiki.Lightbox'))
   $xwiki.jsx.use('XWiki.Lightbox')

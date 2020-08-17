@@ -26,7 +26,6 @@ var accordion = Class.create({
   initialize: function(container, options) {
     if (!$(container)) {
       throw(container+" doesn't exist!");
-      return false;
     }
 
     this.options = Object.extend({

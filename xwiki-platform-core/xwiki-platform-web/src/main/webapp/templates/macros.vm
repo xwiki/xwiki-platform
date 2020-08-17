@@ -2889,3 +2889,25 @@ Recursive title display detected!##
   #set ($return = $NULL)
   #setVariable ("$return" $defaultDocumentEditor)
 #end
+
+#macro (displayUserLink $userReference)
+  #if ($userReference.class.simpleName == "DocumentUserReference")
+    #set ($docReference = $userReference.reference)
+    #set ($props = $services.user.getProperties($userReference))
+    #if ("$!props.firstName" == "" || "$!props.lastName" == "")
+      #set ($displayName = $docReference.name)
+    #else
+      #set ($displayName = "$props.firstName $props.lastName")
+    #end
+  #else
+    #set ($docReference = $userReference)
+    #set ($displayName = $docReference.name)
+  #end
+  <div class="user" data-reference="$escapetool.xml($docReference)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($docReference $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+    <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
+  </div>
+#end

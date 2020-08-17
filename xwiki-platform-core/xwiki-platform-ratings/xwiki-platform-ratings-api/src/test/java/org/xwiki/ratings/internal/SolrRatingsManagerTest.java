@@ -761,13 +761,15 @@ public class SolrRatingsManagerTest
         Rating rating = mock(Rating.class);
         when(rating.getGlobalRatingId()).thenReturn("globalRatingId");
         UpdateResponse updateResponse = mock(UpdateResponse.class);
-        when(this.solrClient.deleteById("globalRatingId")).thenReturn(updateResponse);
+        when(this.solrClient.commit()).thenReturn(updateResponse);
         when(updateResponse.getStatus()).thenReturn(200);
         assertTrue(this.solrRatingsManager.removeRating(rating));
         verify(this.solrClient).deleteById("globalRatingId");
+        verify(this.solrClient).commit();
 
         when(updateResponse.getStatus()).thenReturn(400);
         assertFalse(this.solrRatingsManager.removeRating(rating));
         verify(this.solrClient, times(2)).deleteById("globalRatingId");
+        verify(this.solrClient, times(2)).commit();
     }
 }

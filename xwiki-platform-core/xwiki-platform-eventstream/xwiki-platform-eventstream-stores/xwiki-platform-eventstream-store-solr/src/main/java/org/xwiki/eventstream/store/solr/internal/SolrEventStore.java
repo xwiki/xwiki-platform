@@ -181,7 +181,9 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SimpleEventQuery query = new SimpleEventQuery();
         query.withStatus(entityId);
-        query.lessOrEq(Event.FIELD_DATE, date);
+        if (date != null) {
+            query.lessOrEq(Event.FIELD_DATE, date);
+        }
         EventSearchResult results = search(query, Collections.singleton(Event.FIELD_ID));
 
         for (Iterator<Event> it = results.stream().iterator(); it.hasNext();) {

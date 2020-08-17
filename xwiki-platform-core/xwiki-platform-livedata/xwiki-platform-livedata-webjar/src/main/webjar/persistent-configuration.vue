@@ -1,5 +1,8 @@
 <template>
-  <div :v-show="false"></div>
+  <div
+    v-if="data.id"
+    v-show="false"
+  ></div>
 </template>
 
 
@@ -238,6 +241,18 @@ define([
         return config;
       },
 
+      hasConfig: function (saveKey) {
+        // url search param
+        if (this.urlSearchParam && new URLSearchParams(window.location.search).has(saveKey)) {
+          return true;
+        }
+        // local storage
+        if (this.localStorage && window.localStorage.getItm(saveKey) !== null) {
+          return true;
+        }
+        return false;
+      },
+
       loadConfig: function (config) {
         var self = this;
         Object.keys(this.dataToSave).forEach(function (key) {
@@ -261,6 +276,7 @@ define([
 
 
     mounted: function () {
+      if (!this.hasConfig(this.saveKey)) { return; }
       var config = this.decodeConfig(this.getConfig(this.saveKey));
       if (!config) {
         this.deleteConfig();

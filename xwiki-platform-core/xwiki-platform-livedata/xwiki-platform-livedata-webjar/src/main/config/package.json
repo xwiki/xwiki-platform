@@ -1,9 +1,9 @@
 {
-  "name": "liveData",
+  "name": "livedata-root",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build --target lib --formats umd,umd-min livedata-root.vue",
+    "build": "vue-cli-service build --target lib --formats umd livedata-root.vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

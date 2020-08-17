@@ -55,24 +55,40 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <!-- We keep the source files and the build configuration files in separate folders in the source tree but
-              we need them in the same folder when building the front-end. -->
-            <id>copy-frontend-resources</id>
+            <!-- We keep the Vue files and the build configuration files in separate folders in the source tree but
+              we need them in the same folder when building the Vue components. -->
+            <id>copy-vue-resources</id>
             <phase>validate</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/frontend</outputDirectory>
-              <resources>          
+              <outputDirectory>${project.build.directory}/vue</outputDirectory>
+              <resources>
                 <resource>
-                  <directory>src/main/webjar</directory>
+                  <directory>src/main/vue</directory>
                 </resource>
                 <resource>
                   <directory>src/main/config</directory>
                 </resource>
-              </resources>              
-            </configuration>            
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the generated Vue components to the WebJar folder. -->
+            <id>copy-vue-components</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/vue/dist</directory>
+                </resource>
+              </resources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -107,7 +123,7 @@
           </execution>
         </executions>
         <configuration>
-          <workingDirectory>${project.build.directory}/frontend</workingDirectory>
+          <workingDirectory>${project.build.directory}/vue</workingDirectory>
         </configuration>
       </plugin>
     </plugins>

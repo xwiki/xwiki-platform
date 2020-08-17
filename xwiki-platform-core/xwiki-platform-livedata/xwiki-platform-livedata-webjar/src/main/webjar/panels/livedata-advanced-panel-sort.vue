@@ -103,8 +103,8 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
 define([
-  "Vue",
-  "vue!panels/livedata-base-advanced-panel",
+  "vue",
+  "./livedata-base-advanced-panel",
 ], function (
   Vue
 ) {
@@ -112,8 +112,6 @@ define([
   Vue.component("livedata-advanced-panel-sort", {
 
     name: "livedata-advanced-panel-sort",
-
-    template: template,
 
     props: {
       logic: Object,

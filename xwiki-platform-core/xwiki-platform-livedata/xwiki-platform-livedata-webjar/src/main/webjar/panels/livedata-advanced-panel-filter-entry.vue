@@ -12,6 +12,7 @@
     >
       <option
         v-for="operator in logic.getFilterDescriptor(propertyId).operators"
+        :key="operator.id"
         :value="operator.id"
         v-text="operator.name"
         :selected="operator.id === filter.operator"
@@ -61,8 +62,8 @@
  */
 
 define([
-  "Vue",
-  "vue!filters/livedata-filter",
+  "vue",
+  "../filters/livedata-filter",
 ], function (
   Vue
 ) {
@@ -70,8 +71,6 @@ define([
   Vue.component("livedata-advanced-panel-filter-entry", {
 
     name: "livedata-advanced-panel-filter-entry",
-
-    template: template,
 
     props: {
       logic: Object,

@@ -34,15 +34,13 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
 define([
-  "Vue",
+  "vue",
 ], function (
   Vue,
 ) {
   Vue.component("livedata-topbar", {
 
     name: "livedata-topbar",
-
-    template: template,
 
     props: {
       logic: Object,

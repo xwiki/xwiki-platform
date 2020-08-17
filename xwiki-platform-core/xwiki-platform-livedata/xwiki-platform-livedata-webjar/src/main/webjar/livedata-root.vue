@@ -36,16 +36,14 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
 define([
-  "Vue",
-  "vue!panels/livedata-advanced-panels",
+  "vue",
+  "./panels/livedata-advanced-panels",
 ], function (
   Vue,
 ) {
   Vue.component("livedata-root", {
 
     name: "livedata-root",
-
-    template: template,
 
     props: {
       logic: Object,

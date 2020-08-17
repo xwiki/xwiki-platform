@@ -83,13 +83,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define([
-  "Vue",
-  "vue!livedata-topbar.vue",
-  "vue!livedata-dropdown-menu",
-  "vue!livedata-entry-selector-all",
-  "vue!livedata-pagination",
-  "vue!displayers/livedata-displayer.vue",
-  "vue!livedata-entry-selector.vue",
+  "vue",
+  "../livedata-topbar.vue",
+  "../livedata-dropdown-menu",
+  "../livedata-entry-selector-all",
+  "../livedata-pagination",
+  "../displayers/livedata-displayer.vue",
+  "../livedata-entry-selector.vue",
 ], function (
   Vue
 ) {
@@ -97,8 +97,6 @@ define([
   Vue.component("livedata-layout-cards", {
 
     name: "livedata-layout-cards",
-
-    template: template,
 
     props: {
       logic: Object,

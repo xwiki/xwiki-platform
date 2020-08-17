@@ -105,15 +105,13 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
 define([
-  "Vue",
+  "vue",
 ], function (
   Vue,
 ) {
   Vue.component("livedata-pagination", {
 
     name: "livedata-pagination",
-
-    template: template,
 
     props: {
       logic: Object,

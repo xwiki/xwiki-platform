@@ -34,9 +34,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define([
-  "Vue",
-  "displayers/displayer-mixin",
-  "vue!displayers/base-displayer",
+  "vue",
+  "./displayer-mixin",
+  "./base-displayer",
 ], function (
   Vue,
   displayerMixin
@@ -45,8 +45,6 @@ define([
   Vue.component("displayer-text", {
 
     name: "displayer-text",
-
-    template: template,
 
     mixins: [displayerMixin],
 

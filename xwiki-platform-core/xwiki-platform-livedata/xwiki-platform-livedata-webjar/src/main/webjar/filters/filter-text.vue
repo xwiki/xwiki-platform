@@ -32,8 +32,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define([
-  "Vue",
-  "filters/filter-mixin",
+  "vue",
+  "./filter-mixin",
 ], function (
   Vue,
   filterMixin
@@ -42,8 +42,6 @@ define([
   Vue.component("filter-text", {
 
     name: "filter-text",
-
-    template: template,
 
     mixins: [filterMixin],
 

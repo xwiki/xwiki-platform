@@ -63,16 +63,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define([
-  "Vue",
-  "vue!xwiki-icon"
+  "vue",
+  "./xwiki-icon"
 ], function (
   Vue
 ) {
   Vue.component("livedata-dropdown-menu", {
 
     name: "livedata-dropdown-menu",
-
-    template: template,
 
     props: {
       logic: Object,

@@ -99,9 +99,9 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 */
 define([
-  "Vue",
-  "vue!panels/livedata-base-advanced-panel",
-  "vue!panels/livedata-advanced-panel-filter-entry",
+  "vue",
+  "./livedata-base-advanced-panel",
+  "./livedata-advanced-panel-filter-entry",
 ], function (
   Vue
 ) {
@@ -109,8 +109,6 @@ define([
   Vue.component("livedata-advanced-panel-filter", {
 
     name: "livedata-advanced-panel-filter",
-
-    template: template,
 
     props: {
       logic: Object,

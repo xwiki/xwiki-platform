@@ -32,7 +32,7 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
 define([
-  "Vue",
+  "vue",
 ], function (
   Vue
 ) {
@@ -40,8 +40,6 @@ define([
   Vue.component("livedata-filter", {
 
     name: "livedata-filter",
-
-    template: template,
 
     props: {
       propertyId: String,
@@ -82,7 +80,7 @@ define([
           };
 
           // load filter based on it's id
-          require(["vue!filters/" + componentName],
+          require(["./" + componentName],
             loadFilterSuccess,
             loadFilterFailure
           );

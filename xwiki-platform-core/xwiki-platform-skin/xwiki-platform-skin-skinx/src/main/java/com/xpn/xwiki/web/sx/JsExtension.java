@@ -20,16 +20,22 @@
 package com.xpn.xwiki.web.sx;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.MessageFormat;
+import java.util.Collections;
 
+import javax.inject.Provider;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-import com.yahoo.platform.yui.compressor.javascript.ErrorReporter;
-import com.yahoo.platform.yui.compressor.javascript.EvaluatorException;
+import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * JavaScript extension.
@@ -60,52 +66,101 @@ public class JsExtension implements Extension
         return new JsCompressor();
     }
 
-    /** The JavaScript compressor which is returned by getCompressor. Currently implemented using YUI Compressor. */
-    private static class JsCompressor implements SxCompressor
+    /**
+     * The JavaScript compressor returned by {@link JsExtension#getCompressor()}. Currently implemented using Closure
+     * Compiler.
+     */
+    public static class JsCompressor implements SxCompressor
     {
+        private String sourceMap;
+
         @Override
         public String compress(String source)
         {
-            try {
-                ErrorReporter reporter = new CustomErrorReporter();
-                JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
-                StringWriter out = new StringWriter();
-                compressor.compress(out, -1, true, false, false, false);
-                return out.toString();
-            } catch (IOException ex) {
-                LOGGER.info("Failed to write the compressed output: " + ex.getMessage());
-            } catch (EvaluatorException ex) {
-                LOGGER.info("Failed to parse the JS extension: " + ex.getMessage());
-            } catch (Exception ex) {
-                LOGGER.warn("Failed to compress JS extension: " + ex.getMessage());
+            Compiler compiler = new Compiler();
+
+            // Configure the Closure Compiler. We should use as much as possible the same configuration we use for
+            // minifying JavaScript code at build time (with the corresponding Maven plugin).
+            CompilerOptions options = new CompilerOptions();
+
+            // Support the latest stable ECMAScript features (excludes drafts) as input.
+            options.setLanguageIn(LanguageMode.STABLE);
+
+            // The output language must match the highest ECMAScript version supported by all the browsers we support.
+            // See https://dev.xwiki.org/xwiki/bin/view/Community/SupportStrategy/BrowserSupportStrategy
+            // As long as we support IE11 we need to output a lower version of ECMAScript.
+            options.setLanguageOut(LanguageMode.ECMASCRIPT5_STRICT);
+
+            // Add support for using the latest JavaScript APIs by including the necessary polyfills in the output. Note
+            // that the polyfills won't be included if the JavaScript minification is disabled (e.g. from the debug
+            // configuration) so running the unminified code on browsers that don't support the latest APIs (e.g. IE11)
+            // won't work, if you use such APIs.
+            options.setRewritePolyfills(true);
+
+            // Generate the source map so that we have meaningful error messages. The specified path is not used. We
+            // just need to set a path in order to enable source map generation.
+            options.setSourceMapOutputPath(getSourceFileName() + ".map");
+
+            // Do some simple optimizations, besides removing the whitespace and renaming local variables. This includes
+            // removing dead code and generating warnings that can help us improve the JavaScript code.
+            CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+
+            // We don't have access to the name of the JavaScript extension that is being compressed so we use a fake
+            // name that will be referenced in the generated warning and error messages.
+            SourceFile input = SourceFile.fromCode(getSourceFileName(), source);
+
+            // Build the syntax tree from the source JavaScript.
+            Result result = compiler.compile(Collections.emptyList(), Collections.singletonList(input), options);
+
+            // Log the warning and the errors that occurred.
+            compiler.getWarnings().forEach(warning -> LOGGER.warn("Warning at line [{}], column [{}]: [{}]",
+                warning.getLineNumber(), warning.getCharno(), warning.getDescription()));
+
+            compiler.getErrors().forEach(error -> LOGGER.error("Error at line [{}], column [{}]: [{}]",
+                error.getLineNumber(), error.getCharno(), error.getDescription()));
+
+            if (result.success) {
+                try {
+                    // Generate the compressed JavaScript code and its source map.
+                    String compressed = compiler.toSource();
+                    // Store the source map to be used later. We have to do this after generating the compressed code
+                    // because otherwise the source map is empty.
+                    this.sourceMap = getSourceMap(compiler);
+                    return compressed;
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to compress JavaScript extension. Root cause is: [{}].",
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
             }
+
+            // Fall-back on the original source if the compression failed.
             return source;
         }
 
-        /** A Javascript error reporter which logs errors with the XWiki logging system. */
-        private static class CustomErrorReporter implements ErrorReporter
+        private String getSourceFileName()
         {
-            @Override
-            public void error(String message, String filename, int lineNumber, String context, int column)
-            {
-                LOGGER.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
-                    message, context, lineNumber, column));
-            }
+            // Return the reference of the current document on the XWiki context.
+            Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+            return xcontextProvider.get().getDoc().getDocumentReference().toString();
+        }
 
-            @Override
-            public EvaluatorException runtimeError(String message, String filename, int lineNumber,
-                String context, int column)
-            {
-                LOGGER.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
+        private String getSourceMap(Compiler compiler) throws IOException
+        {
+            if (compiler.getSourceMap() != null) {
+                StringBuilder sourceMapping = new StringBuilder();
+                compiler.getSourceMap().appendTo(sourceMapping, getSourceFileName());
+                return sourceMapping.toString();
+            } else {
                 return null;
             }
+        }
 
-            @Override
-            public void warning(String message, String filename, int lineNumber, String context, int column)
-            {
-                LOGGER.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
-                    message, context, lineNumber, column));
-            }
+        /**
+         * @return the last source map that was created by this compressor
+         */
+        public String getSourceMap()
+        {
+            return this.sourceMap;
         }
     }
 }

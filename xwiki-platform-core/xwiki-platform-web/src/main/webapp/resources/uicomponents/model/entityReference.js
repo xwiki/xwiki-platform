@@ -106,7 +106,7 @@ XWiki.EntityReference = Class.create({
     }
     if (j < baseComponents.length && j > 0 && baseComponents[j].type === baseComponents[j - 1].type && i > 0) {
       // If the current base entity type has not been fully matched then we need to add back the previously matched entity.
-      for(i--; i > 0 && components[i].type === components[i - 1].type; i--);
+      for(i--; i > 0 && components[i].type === components[i - 1].type; i--) {};
     }
     var relativeReference;
     for (; i < components.length; i++) {

@@ -81,35 +81,6 @@
             </systemProperties>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-            <jswarn>false</jswarn>
-            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-              currently more widely used in the JavaScript world. -->
-            <suffix>.min</suffix>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.cj.jshintmojo</groupId>
-          <artifactId>jshint-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>lint</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <globals>require,define</globals>
-            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
-            <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

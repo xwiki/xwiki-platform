@@ -19,8 +19,14 @@
  */
 package org.xwiki.mentions.test.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.mentions.test.po.MentionNotificationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -28,6 +34,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.waitOnNotificationCount;
 
 /**
  * Test of the mentions application UI.
@@ -67,6 +74,20 @@ public class MentionsIT
         void run() throws Exception;
     }
 
+    @AfterEach
+    void tearDown(TestUtils setup, TestReference reference) throws Exception
+    {
+        // clear all notifications between each test.
+        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
+            setup.gotoPage("Main", "WebHome");
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.clearAllNotifications();
+        });
+
+        // removes the page after each test.
+        runAsSuperAdmin(setup, () -> setup.deletePage(reference));
+    }
+
     /**
      *
      * <ul>
@@ -81,7 +102,7 @@ public class MentionsIT
      */
     @Test
     @Order(1)
-    void basic(TestUtils setup, TestReference reference) throws Exception
+    void documentBody(TestUtils setup, TestReference reference) throws Exception
     {
         String pageName = "Mention Test Page";
         runAsSuperAdmin(setup, () -> {
@@ -99,18 +120,85 @@ public class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
+            retry(2, () -> waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1));
             setup.gotoPage("Main", "WebHome");
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
-            assertEquals(1, tray.getNotificationsCount());
+            assertEquals(1, retry(2, tray::getNotificationsCount));
             assertEquals(1, tray.getUnreadNotificationsCount());
             assertEquals("mentions.mention", tray.getNotificationType(0));
             String notificationContent = tray.getNotificationContent(0);
             String expected = "You have received one mention.";
             assertTrue(notificationContent.contains(expected),
                 String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
+            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage();
+            mentionNotificationPage.openGroup(0);
+            assertEquals("mentioned you on page Mention Test Page", mentionNotificationPage.getText(0, 0));
+            assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
+            assertTrue(mentionNotificationPage.hasSummary(0, 0));
+            assertEquals("@U2", mentionNotificationPage.getSummary(0, 0));
+        });
+    }
+
+    /**
+     *
+     * <ul>
+     *     <li>Superadmin creates U1 and U2.</li>
+     *     <li>U1 adds a mention to U2.</li>
+     *     <li>U2 verify that she has received a notification.</li>
+     * </ul>
+     *
+     * @param setup The test setup.
+     * @param reference The test page reference.
+     * @throws Exception In case of error.
+     */
+    @Test
+    @Order(2)
+    void comment(TestUtils setup, TestReference reference) throws Exception
+    {
+        String pageName = "Mention Comment Test Page";
+        runAsSuperAdmin(setup, () -> {
+            // create the users.
+            setup.createUser(U1_USERNAME, USERS_PWD, null);
+            setup.createUser(U2_USERNAME, USERS_PWD, null);
+        });
+
+        runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
+            setup.deletePage(reference);
+            setup.createPage(reference, "", pageName);
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("author", "xwiki:XWiki.U1");
+            properties.put("date", "17/08/2020 14:55:18");
+            properties
+                .put("comment",
+                    "AAAAA\n\n" +
+                        "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" /}} XYZ\n\n" +
+                        "BBBBB");
+            setup.addObject(reference, "XWiki.XWikiComments", properties);
+        });
+
+        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
+            setup.gotoPage("Main", "WebHome");
+            retry(2, () -> waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1));
+            setup.gotoPage("Main", "WebHome");
+            // check that a notif is well received
+            NotificationsTrayPage tray = new NotificationsTrayPage();
+            tray.showNotificationTray();
+            assertEquals(1, retry(2, tray::getNotificationsCount));
+            assertEquals(1, tray.getUnreadNotificationsCount());
+            assertEquals("mentions.mention", tray.getNotificationType(0));
+            String notificationContent = tray.getNotificationContent(0);
+            String expected = "You have received one mention.";
+            assertTrue(notificationContent.contains(expected),
+                String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
+            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage();
+            mentionNotificationPage.openGroup(0);
+            assertEquals("mentioned you on a comment on page Mention Comment Test Page",
+                mentionNotificationPage.getText(0, 0));
+            assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
+            assertTrue(mentionNotificationPage.hasSummary(0, 0));
+            assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
         });
     }
 
@@ -140,5 +228,32 @@ public class MentionsIT
     {
         setup.loginAsSuperAdmin();
         actions.run();
+    }
+
+    private <T> T retry(int times, Callable<T> callable) throws Exception
+    {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            if (times > 1) {
+                retry(times - 1, callable);
+            } else {
+                throw e;
+            }
+        }
+        return null;
+    }
+
+    private void retry(int times, Runnable callable) throws Exception
+    {
+        try {
+            callable.run();
+        } catch (Exception e) {
+            if (times > 1) {
+                retry(times - 1, callable);
+            } else {
+                throw e;
+            }
+        }
     }
 }

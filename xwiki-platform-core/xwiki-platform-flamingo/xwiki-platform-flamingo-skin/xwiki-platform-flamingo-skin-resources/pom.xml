@@ -183,6 +183,16 @@
         <configuration>
           <sourceDir>../resources</sourceDir>
           <targetDir>../classes</targetDir>
+          <!-- Fix the path to the source file from the generated source map. This works ATM because all the JavaScript
+            source files are located in the same folder. Note that the source mapping is not going to be perfect if the
+            JavaScript code contains Velocity code. -->
+          <closureSourceMapLocationMappings>
+            <closureSourceMapLocationMapping>
+              <name>flamingo/</name>
+              <!-- We can't leave the value empty because it generates "null" in the path. -->
+              <value>./</value>
+            </closureSourceMapLocationMapping>
+          </closureSourceMapLocationMappings>
         </configuration>
       </plugin>
       <!-- Minify the CSS code. -->

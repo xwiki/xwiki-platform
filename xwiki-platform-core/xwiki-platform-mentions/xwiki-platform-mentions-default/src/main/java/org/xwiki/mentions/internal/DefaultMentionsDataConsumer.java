@@ -62,6 +62,7 @@ import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
 import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
+import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
 /**
  * Default implementation of {@link MentionsDataConsumer}.
@@ -130,26 +131,22 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
             this.initContext(author, data.getWikiId());
             DocumentReference dr = this.documentReferenceResolver.resolve(data.getDocumentReference());
             XWikiDocument doc = this.documentRevisionProvider.getRevision(dr, data.getVersion());
-            Syntax syntax = doc.getSyntax();
-            XWikiDocument oldDoc;
-            if (doc.getPreviousVersion() != null) {
-                oldDoc = this.documentRevisionProvider.getRevision(dr, doc.getPreviousVersion());
-            } else {
-                oldDoc = null;
-            }
-            DocumentReference documentReference = doc.getDocumentReference();
-            DocumentReference authorReference = doc.getAuthorReference();
+            if (doc != null) {
+                Syntax syntax = doc.getSyntax();
+                DocumentReference documentReference = doc.getDocumentReference();
+                DocumentReference authorReference = doc.getAuthorReference();
 
-            if (oldDoc == null) {
-                // CREATE
-                handleOnCreate(doc.getXDOM(), documentReference, authorReference, MentionLocation.DOCUMENT);
-                traverseXObjectsOnCreate(doc.getXObjects(), documentReference, authorReference, syntax);
-            } else {
-                // UPDATE
-                handleOnUpdate(oldDoc.getXDOM(), doc.getXDOM(), documentReference, authorReference,
-                    MentionLocation.DOCUMENT);
-                traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(), documentReference, authorReference,
-                    syntax);
+                if (doc.getPreviousVersion() == null) {
+                    // CREATE
+                    handleOnCreate(doc.getXDOM(), documentReference, authorReference, DOCUMENT);
+                    traverseXObjectsOnCreate(doc.getXObjects(), documentReference, authorReference, syntax);
+                } else {
+                    // UPDATE
+                    XWikiDocument oldDoc = this.documentRevisionProvider.getRevision(dr, doc.getPreviousVersion());
+                    handleOnUpdate(oldDoc.getXDOM(), doc.getXDOM(), documentReference, authorReference, DOCUMENT);
+                    traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(), documentReference,
+                        authorReference, syntax);
+                }
             }
         } catch (ExecutionContextException e) {
             this.logger.warn("Failed to initalize the context of the mention update runnable. Cause [{}]",
@@ -185,7 +182,9 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
             List<BaseObject> oldEntry = oldXObjects.get(entry.getKey());
             for (BaseObject baseObject : entry.getValue()) {
-                handBaseObject(oldEntry, baseObject, documentReference, authorReference, syntax);
+                if (baseObject != null) {
+                    handleBaseObject(oldEntry, baseObject, documentReference, authorReference, syntax);
+                }
             }
         }
     }
@@ -264,12 +263,13 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                         newXdom))));
     }
 
-    private void handBaseObject(List<BaseObject> oldEntry, BaseObject baseObject, DocumentReference documentReference,
+    private void handleBaseObject(List<BaseObject> oldEntry, BaseObject baseObject, DocumentReference documentReference,
         DocumentReference authorReference, Syntax syntax)
     {
         Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
             optOldEntries -> optOldEntries
                                  .stream()
+                                 .filter(Objects::nonNull)
                                  .filter(it -> it.getId() == baseObject.getId())
                                  .findAny());
         if (baseObject != null) {

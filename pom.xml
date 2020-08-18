@@ -624,6 +624,13 @@
         <version>3.12.4</version>
       </dependency>
 
+      <!-- Used by solr-core and closure-compiler -->
+      <dependency>
+        <groupId>com.google.re2j</groupId>
+        <artifactId>re2j</artifactId>
+        <version>1.4</version>
+      </dependency>
+
       <!-- Mails -->
       <dependency>
         <groupId>com.icegreen</groupId>

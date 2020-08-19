@@ -561,7 +561,7 @@ Object.extend(XWiki, {
      */
     initialize: function(container) {
         container = $(container || 'body');
-        for (button in XWiki.watchlist.actionsMap) {
+        for (var button in XWiki.watchlist.actionsMap) {
           var element = container.down('#' + button);
           if (element) {
             var self = this;
@@ -1015,7 +1015,7 @@ function checkAdvancedContent(message) {
  * Manage the keyboards shortcuts.
  * This object interfaces with the bundled Keypress JS library.
  */
-shortcut = new Object({
+window.shortcut = new Object({
 
     /**
      * @returns {Array} of registered shortcuts

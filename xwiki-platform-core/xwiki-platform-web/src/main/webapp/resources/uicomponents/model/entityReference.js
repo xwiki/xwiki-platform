@@ -95,7 +95,7 @@ XWiki.EntityReference = Class.create({
   relativeTo: function(baseReference) {
     var components = this.getReversedReferenceChain();
     var baseComponents = baseReference ? baseReference.getReversedReferenceChain() : [];
-    var i = j = 0;
+    var i, j = i = 0;
     while (i < components.length && j < baseComponents.length && components[i].type != baseComponents[j].type) {
       components[i].type > baseComponents[j].type ? j++ : i++;
     }

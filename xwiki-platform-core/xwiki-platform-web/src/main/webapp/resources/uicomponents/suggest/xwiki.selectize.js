@@ -131,11 +131,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       // Mark the picker as loading if the suggestions are retrieved asynchronously and there's no cached result for the
       // given value.
       var loading = typeof this.settings.load === 'function' && !this.loadedSearches.hasOwnProperty(value);
-      (this.$wrapper).toggleClass(this.settings.loadingClass, loading);
+      get$(this, 'wrapper').toggleClass(this.settings.loadingClass, loading);
     },
     onInitialize: function() {
-      var control = this.$control;
-      control.on('click', 'a.xwiki-selectize-option-label', function(event) {
+      get$(this, 'control').on('click', 'a.xwiki-selectize-option-label', function(event) {
         // Clicking on the label should select the option not follow the link.
         event.preventDefault();
       });
@@ -144,7 +143,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var loadSelectedValues = function() {
     var selectize = this.selectize;
-    var wrapper = selectize.$wrapper;
+    var wrapper = get$(selectize, 'wrapper');
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
     selectize.items.reduce(function(deferred, value) {
@@ -195,18 +194,18 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       // 'auto' means the dropdown width should be variable based on its content, but no less than the width of the
       // specified form field, otherwise the dropdown should have the same width as the form field.
       if (this.settings.dropdownWidth === 'auto') {
-        this['$dropdown'].css({
+        get$(this, 'dropdown').css({
           width: '',
-          'min-width': this['$control'][0].getBoundingClientRect().width
+          'min-width': get$(this, 'control')[0].getBoundingClientRect().width
         });
       }
     }
     setDropDownAlignment(this.selectize);
     if (this.selectize.settings.takeInputWidth) {
-      this.selectize['$control'].width($(this).data('initialWidth'));
+      get$(this.selectize, 'control').width($(this).data('initialWidth'));
     }
     // Set the title of the input field.
-    this.selectize['$control_input'].attr('title', $(this).attr('title'));
+    get$(this.selectize, 'control_input').attr('title', $(this).attr('title'));
   };
 
   var setDropDownAlignment = function(selectize) {
@@ -215,8 +214,13 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       dropdownAlignment = 'left';
     }
     if (dropdownAlignment) {
-      selectize['$dropdown'].addClass('selectize-dropdown-' + dropdownAlignment);
+      get$(selectize, 'dropdown').addClass('selectize-dropdown-' + dropdownAlignment);
     }
+  };
+
+  // Hack needed in order to be able to parse the minified version of this JavaScript file with Velocity.
+  var get$ = function(obj, key) {
+    return obj[$jsontool.serialize($escapetool.d) + key];
   };
 
   var getDefaultSettings = function(input) {

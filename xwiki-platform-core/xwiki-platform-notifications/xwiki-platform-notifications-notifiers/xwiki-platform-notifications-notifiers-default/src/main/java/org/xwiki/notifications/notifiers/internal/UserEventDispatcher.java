@@ -24,6 +24,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +49,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.user.UserManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.internal.group.UsersCache;
@@ -88,6 +92,13 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
 
     @Inject
     private GroupManager groupManager;
+
+    @Inject
+    private UserManager userManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     @Inject
     private EventStore events;
@@ -178,24 +189,26 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         if (CollectionUtils.isNotEmpty(event.getTarget())) {
             // The event explicitly indicate with which entities to associated it
 
+            boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
             event.getTarget().forEach(entity -> {
                 DocumentReference entityReference = this.resolver.resolve(entity, event.getWiki());
+                UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(entityReference);
 
-                // Associated the entity
-                saveEventStatus(event, entity);
-                saveMailEntityEvent(event, entity);
-
-                // Also recursively associate the members of the entity if it's a group
-                try {
-                    this.groupManager.getMembers(entityReference, true).forEach(userReference -> {
-                        String userId = this.entityReferenceSerializer.serialize(userReference);
-                        saveEventStatus(event, userId);
-                        saveMailEntityEvent(event, userId);
-                    });
-                } catch (GroupException e) {
-                    this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
-                        ExceptionUtils.getRootCauseMessage(e));
+                if (this.userManager.exists(userReference)) {
+                    dispatch(event, entityReference, mailEnabled);
+                } else {
+                    // Also recursively associate the members of the entity if it's a group
+                    try {
+                        this.groupManager.getMembers(entityReference, true).forEach(userDocumentReference -> {
+                            dispatch(event, userDocumentReference, mailEnabled);
+                        });
+                    } catch (GroupException e) {
+                        this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                            ExceptionUtils.getRootCauseMessage(e));
+                    }
                 }
+                // Remember we are done pre filtering this event
+                this.events.prefilterEvent(event);
             });
         } else {
             // Try to find users listening to this event
@@ -210,25 +223,30 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         }
     }
 
+    private void dispatch(Event event, DocumentReference user, boolean mailEnabled)
+    {
+        // Make sure the user asked to be alerted about this event
+        if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
+            // Associate the event with the user
+            String userId = this.entityReferenceSerializer.serialize(user);
+            saveEventStatus(event, userId);
+        }
+
+        // Make sure the notification module is allowed to send mails
+        // Make sure the user asked to receive mails about this event
+        if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
+            // Associate the event with the user
+            String userId = this.entityReferenceSerializer.serialize(user);
+            saveMailEntityEvent(event, userId);
+        }
+    }
+
     private void dispatch(Event event, List<DocumentReference> users)
     {
         boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
 
         for (DocumentReference user : users) {
-            // Make sure the user asked to be alerted about this event
-            if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
-                // Associate the event with the user
-                String userId = this.entityReferenceSerializer.serialize(user);
-                saveEventStatus(event, userId);
-            }
-
-            // Make sure the notification module is allowed to send mails
-            // Make sure the user asked to receive mails about this event
-            if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
-                // Associate the event with the user
-                String userId = this.entityReferenceSerializer.serialize(user);
-                saveMailEntityEvent(event, userId);
-            }
+            dispatch(event, user, mailEnabled);
         }
 
         // Remember we are done pre filtering this event

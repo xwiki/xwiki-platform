@@ -423,8 +423,12 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 solrQuery.setStart((int) pageableQuery.getOffset());
             }
 
+            // FIXME: this should probably be fixed in the future, we shouldn't allow to try retrieving unlimited
+            // results since it's not allowed by Solr API.
             if (pageableQuery.getLimit() >= 0) {
                 solrQuery.setRows((int) pageableQuery.getLimit());
+            } else {
+                solrQuery.setRows(Integer.MAX_VALUE - 1);
             }
         }
 

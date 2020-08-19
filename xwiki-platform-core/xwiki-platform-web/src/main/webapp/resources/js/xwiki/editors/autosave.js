@@ -115,17 +115,6 @@ editors.AutoSave = Class.create({
     container.appendChild(document.createTextNode(" "));
     // Insert in the editing UI
     $(document.body).down(".bottombuttons .buttons").insert({bottom : container});
-    // If we keep the autosave control in the form, the fast back-forward is broken in FF, so we lose the edited content
-    // when pressing the browser Back button, instead of the form Back to Edit. Catch the form submission and remove the
-    // controls.
-    this.form.observe("submit", function() {
-      container.remove();
-    });
-    // When hitting cancel, the form isn't submitted anymore, instead the location is changed directly. In order to fix
-    // the fastback problem above for Cancel, we need to also listen to this event:
-    document.observe("xwiki:actions:cancel", function() {
-      container.remove();
-    });
   },
 
   /**

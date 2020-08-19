@@ -27,7 +27,6 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EntityEvent;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
@@ -68,7 +67,7 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
      */
     public PrefilteringLiveNotificationEmailListener()
     {
-        super(NAME, new MailEntityAddedEvent(), new ApplicationReadyEvent());
+        super(NAME, new MailEntityAddedEvent(), new ApplicationReadyEvent(), new WikiReadyEvent());
     }
 
     @Override
@@ -78,7 +77,7 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
         // notifications is enabled.
         if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.areEmailsEnabled()
             && this.notificationConfiguration.isEventPrefilteringEnabled()) {
-            if (event instanceof EventStreamAddedEvent) {
+            if (event instanceof MailEntityAddedEvent) {
                 if (!this.remoteState.isRemoteState()) {
                     // Add the event to the queue of mails to send (if the associated user enabled live mails)
                     this.manager.addEvent((EntityEvent) source);

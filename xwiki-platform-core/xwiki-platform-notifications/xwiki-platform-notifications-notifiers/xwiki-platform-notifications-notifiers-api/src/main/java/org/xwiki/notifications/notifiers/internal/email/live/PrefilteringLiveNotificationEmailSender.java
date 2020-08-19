@@ -21,6 +21,7 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -73,7 +74,7 @@ public class PrefilteringLiveNotificationEmailSender
     public void sendMails(Map<DocumentReference, CompositeEvent> eventsToSend)
     {
         PrefilteringMimeMessageIterator liveNotificationMessageIterator = this.liveMimeMessageIteratorProvider.get();
-        liveNotificationMessageIterator.initialize(eventsToSend, Collections.emptyMap(), TEMPLATE);
+        liveNotificationMessageIterator.initialize(eventsToSend, new HashMap<>(), TEMPLATE);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();

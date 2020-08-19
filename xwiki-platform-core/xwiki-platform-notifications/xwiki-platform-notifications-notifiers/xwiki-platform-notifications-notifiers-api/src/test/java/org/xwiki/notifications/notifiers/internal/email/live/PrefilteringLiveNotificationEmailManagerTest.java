@@ -19,7 +19,12 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
@@ -27,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.notifiers.internal.email.IntervalUsersManager;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -55,6 +61,17 @@ public class PrefilteringLiveNotificationEmailManagerTest
 
     @MockComponent
     private IntervalUsersManager intervals;
+
+    @MockComponent
+    @Named("context")
+    private ComponentManager componentManager;
+
+    @BeforeComponent
+    void beforeComponent() throws ComponentLookupException
+    {
+        ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
+        when(this.componentManager.getInstance(ExecutionContextManager.class)).thenReturn(executionContextManager);
+    }
 
     @Test
     void addEvent() throws InterruptedException

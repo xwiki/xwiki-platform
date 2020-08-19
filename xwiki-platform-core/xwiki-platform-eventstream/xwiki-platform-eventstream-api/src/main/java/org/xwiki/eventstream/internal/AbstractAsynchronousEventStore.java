@@ -423,11 +423,11 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 break;
 
             case DELETE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityAddedEvent(), task.output);
+                this.observation.notify(new MailEntityDeleteEvent(), task.output);
                 break;
 
             case SAVE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityDeleteEvent(), task.output);
+                this.observation.notify(new MailEntityAddedEvent(), task.output);
                 break;
 
             default:

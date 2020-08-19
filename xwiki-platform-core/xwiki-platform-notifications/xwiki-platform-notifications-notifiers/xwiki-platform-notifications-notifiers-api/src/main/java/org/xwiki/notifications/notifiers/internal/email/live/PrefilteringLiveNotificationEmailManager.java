@@ -23,14 +23,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.job.JobException;
@@ -67,6 +70,10 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
     @Inject
     private Logger logger;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
     private final BlockingQueue<EntityEvent> preQueue = new LinkedBlockingQueue<>();
 
     private boolean disposed;
@@ -75,7 +82,7 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
     public void initialize() throws InitializationException
     {
         // Start the pre queue thread
-        Thread optimizeThreadthread = new Thread(this::prepare);
+        Thread optimizeThreadthread = new Thread(new ExecutionContextRunnable(this::prepare, this.componentManager));
         optimizeThreadthread.setName("Pre filtering Live mail notification obtimizer");
         optimizeThreadthread.setPriority(Thread.NORM_PRIORITY - 1);
         optimizeThreadthread.setDaemon(true);

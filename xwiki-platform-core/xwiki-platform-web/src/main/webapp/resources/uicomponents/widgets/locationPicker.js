@@ -185,7 +185,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var updateLocationAndNameFromTitleInput = function() {
       // ensure the buttons are disabled before we got the name answer
       disableButtons();
-      titleInputVal = titleInput.val();
+      var titleInputVal = titleInput.val();
       // Update the name field.
       getPageName(titleInputVal).done(function(data) {
         // Ensure that the input didn't change while we were waiting the answer.

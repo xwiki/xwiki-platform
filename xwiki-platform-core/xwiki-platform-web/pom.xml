@@ -103,6 +103,7 @@
                 <!-- See the next execution for the reason we exclude these files. -->
                 <exclude>**/prototype.js</exclude>
                 <exclude>**/scriptaculous/dragdrop.js</exclude>
+                <exclude>**/panelWizard.js</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -118,6 +119,8 @@
                 <include>**/prototype.js</include>
                 <!-- Uses "arguments.callee" and "with" statement. -->
                 <include>**/scriptaculous/dragdrop.js</include>
+                <!-- Sets many global variables. -->
+                <include>**/panelWizard.js</include>
               </includes>
               <closureStrictModeInput>false</closureStrictModeInput>
               <closureEmitUseStrict>false</closureEmitUseStrict>

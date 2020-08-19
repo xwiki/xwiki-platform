@@ -156,6 +156,8 @@
 )))## xwikirightshelp
 #panelfooter()
 )))## xwikirightshelppanel
+## accordion.js requires effects.js
+$xwiki.jsfx.use('js/scriptaculous/effects.js')##
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
 {{html clean="false"}}
 &lt;script type="text/javascript"&gt;

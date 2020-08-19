@@ -389,9 +389,10 @@ LiveValidation.prototype = {
     if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
       var className = this.validationFailed ? this.invalidClass : this.validClass;
-	  $(elementToInsert).addClassName( this.messageClass + ' ' + className );
-	  var parent = this.insertAfterWhatNode.up();
-      if( nxtSibling = this.insertAfterWhatNode.next()){
+      $(elementToInsert).addClassName(this.messageClass + ' ' + className);
+      var parent = this.insertAfterWhatNode.up();
+      var nxtSibling = this.insertAfterWhatNode.next();
+      if (nxtSibling) {
         parent.insertBefore(elementToInsert, nxtSibling);
       }else{
         parent.appendChild(elementToInsert);

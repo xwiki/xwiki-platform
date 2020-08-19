@@ -131,7 +131,9 @@ public class DefaultTargetableNotificationPreferenceBuilderTest
             .build();
         
         assertNotSame(preference1, preference2);
-        assertNotEquals(preference1, preference2);
-        assertNotEquals(preference1.hashCode(), preference2.hashCode());
+        // Those are expected to be equals: the target is not taken into account for checking equality of the
+        // preferences.
+        assertEquals(preference1, preference2);
+        assertEquals(preference1.hashCode(), preference2.hashCode());
     }
 }

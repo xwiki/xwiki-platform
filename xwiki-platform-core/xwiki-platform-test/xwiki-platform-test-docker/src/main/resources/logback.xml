@@ -86,9 +86,9 @@
   <logger name="org.jgroups" level="error"/>
 
   <!-- Special configuration for tests on the CI -->
-  <!-- Log DBCP connection pool operations in order to debug the issue:
+  <!-- Set the level to "debug" to log DBCP connection pool operations to debug the issue:
          "Cannot get a connection, pool error Timeout waiting for idle object" -->
-  <logger name="com.xpn.xwiki.store.DBCPConnectionProvider" level="debug"/>
+  <logger name="com.xpn.xwiki.store.DBCPConnectionProvider" level="error"/>
 
   <!-- By default everything that is of severity WARN, ERROR or FATAL is logged to the console.
        Since the console output is captured and redirected by the servlet container in most cases,

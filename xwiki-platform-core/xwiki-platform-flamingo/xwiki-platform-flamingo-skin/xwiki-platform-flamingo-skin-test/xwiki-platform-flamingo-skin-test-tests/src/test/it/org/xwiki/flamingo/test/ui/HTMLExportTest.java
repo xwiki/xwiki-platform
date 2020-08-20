@@ -177,9 +177,9 @@ public class HTMLExportTest extends AbstractTest
                 IOUtils.readLines(zis, Charset.defaultCharset());
             } else if (entry.getName().startsWith("skins/")) {
                 foundSkinsDirectory = true;
-                // Verify that the skin is correctly going to be applied by verifying the flamingo/style.css file is
+                // Verify that the skin is correctly going to be applied by verifying the flamingo/style.min.css file is
                 // found and is correctly referenced. This fixes https://jira.xwiki.org/browse/XWIKI-9145
-                if (entry.getName().equals("skins/flamingo/style.css")) {
+                if (entry.getName().equals("skins/flamingo/style.min.css")) {
                     assertSkinIsActive(IOUtils.readLines(zis, Charset.defaultCharset()));
                     foundSkinCSS = true;
                 } else {
@@ -199,7 +199,7 @@ public class HTMLExportTest extends AbstractTest
         }
         assertTrue("Failed to find the resources/ directory entry", foundResourcesDirectory);
         assertTrue("Failed to find the skins/ directory entry", foundSkinsDirectory);
-        assertTrue("Failed to find the link to colibri.css in style.css", foundSkinCSS);
+        assertTrue("Failed to find the link to colibri.css in style.min.css", foundSkinCSS);
         assertTrue("Failed to find webjar resources in the HTML export", foundWebjars);
 
         zis.close();
@@ -207,7 +207,7 @@ public class HTMLExportTest extends AbstractTest
 
     private void assertSkinIsActive(List<String> content) throws Exception
     {
-        assertTrue("style.css is not the one output by the flamingo skin", StringUtils.join(content.toArray())
+        assertTrue("style.min.css is not the one output by the flamingo skin", StringUtils.join(content.toArray())
             .contains("skin-flamingo"));
     }
 }

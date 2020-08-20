@@ -260,7 +260,7 @@ public class LiveTableElement extends BaseElement
      *
      * @since 9.1RC1
      */
-    // We need to decide if it's bettter to introduce this method or to globally increase the default timeout.
+    // We need to decide if it's better to introduce this method or to globally increase the default timeout.
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount, int timeout)
     {
         int originalTimeout = getDriver().getTimeout();

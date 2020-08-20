@@ -96,7 +96,7 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         this.dispatcher.addEvent(event, userReference);
 
         // Give enough time to wait for the grace period and process the event
-        Thread.sleep(200);
+        Thread.sleep(400);
 
         Map<DocumentReference, CompositeEvent> events = new HashMap<>();
         events.put(userReference, new CompositeEvent(event));
@@ -116,7 +116,7 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         this.dispatcher.addEvent(sameevent, user2Reference);
 
         // Give enough time to wait for the grace period and process the event
-        Thread.sleep(200);
+        Thread.sleep(400);
 
         events = new HashMap<>();
         events.put(userReference, new CompositeEvent(event));
@@ -143,7 +143,7 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         this.dispatcher.addEvent(otherevent, userReference);
 
         // Give enough time to wait for the grace period and process the event
-        Thread.sleep(200);
+        Thread.sleep(400);
 
         events = new HashMap<>();
         CompositeEvent composite = new CompositeEvent(event);

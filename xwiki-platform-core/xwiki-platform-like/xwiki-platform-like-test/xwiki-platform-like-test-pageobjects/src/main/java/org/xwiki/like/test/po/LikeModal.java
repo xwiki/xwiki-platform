@@ -34,7 +34,6 @@ import org.xwiki.test.ui.po.BaseElement;
 public class LikeModal extends BaseElement
 {
     private static final String MODAL_ID = "like-modal";
-    private static final String LIKE_BUTTON_ID = "modal-like-button";
     private static final String UNLIKE_BUTTON_ID = "modal-unlike-button";
 
     /**
@@ -48,28 +47,6 @@ public class LikeModal extends BaseElement
         } catch (NoSuchElementException e) {
             return false;
         }
-    }
-
-    /**
-     * @return {@code true} if a button is displayed to perform Like action.
-     */
-    public boolean isLikeButtonDisplayed()
-    {
-        try {
-            WebElement webElement = this.getDriver().findElementWithoutWaiting(By.id(LIKE_BUTTON_ID));
-            return webElement.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Click on the Like button and wait for a Like success message.
-     */
-    public void clickLikeButton()
-    {
-        this.getDriver().findElementWithoutWaiting(By.id(LIKE_BUTTON_ID)).click();
-        waitForNotificationSuccessMessage("The page has been liked.");
     }
 
     /**

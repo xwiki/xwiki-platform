@@ -93,13 +93,15 @@ public class LikeScriptService implements ScriptService
 
     /**
      * Check if current user is allowed to use Like on the given reference.
+     * Note that we explicitely deny the right for guests.
      * @param entityReference the reference on which to use like.
-     * @return {@code true} only if current user has Like right on the reference.
+     * @return {@code true} only if current user is not guest and has Like right on the reference.
      */
     public boolean isAuthorized(EntityReference entityReference)
     {
-        return this.authorizationManager.hasAccess(getLikeRight(),
-            this.contextProvider.get().getUserReference(), entityReference);
+        DocumentReference userReference = this.contextProvider.get().getUserReference();
+        return userReference != null && this.authorizationManager.hasAccess(getLikeRight(),
+            userReference, entityReference);
     }
 
     /**
@@ -234,14 +236,5 @@ public class LikeScriptService implements ScriptService
     public void cleanCacheUIX()
     {
         this.asyncRendererCache.cleanCache(UIX_REFERENCE);
-    }
-
-    /**
-     * @return the Like button behaviour.
-     * See {@link org.xwiki.like.LikeConfiguration.UIClickBehaviour} for more information on the values.
-     */
-    public String getUIClickBehaviour()
-    {
-        return this.likeConfiguration.getUIClickBehaviour().name();
     }
 }

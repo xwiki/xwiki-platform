@@ -55,24 +55,6 @@
         'counter': $newCounterOptional.get().likeNumber
       })
     #end
-#elseif ($request.xaction == "getLikers" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
-  #set ($documentReference = $services.model.resolveDocument($request.document))
-  #set ($optLikeRecord = $services.like.getLikes($documentReference))
-  #if ($optLikeRecord.isPresent())
-    #set ($likeRecord = $optLikeRecord.get())
-    {{html wiki="true"}}
-    #if ($likeRecord.likers.isEmpty())
-      $services.localization.render('like.likers.empty')
-    #else
-      $services.localization.render('like.likers.number', [$likeRecord.likers.size()])
-      #foreach($liker in $likeRecord.likers)
-         * #displayUserLink($liker)
-      #end
-    #end
-    {{/html}}
-  #else
-    No data.
-  #end
 #end
 {{/velocity}}</content>
   <object>
@@ -167,34 +149,12 @@
   var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   
   var likeClick = function () {
-    var likeClickStrategy = $('#like-click-strategy').val();
     var isLiked = $('#is-liked').val() == "true";
-    if ((likeClickStrategy == "LIKE_FIRST_AND_DISPLAY_LIKERS" || likeClickStrategy == "NEVER_DISPLAY_LIKERS") &amp;&amp; !isLiked) {
+    if (!isLiked) {
       triggerLike();
-    } else if (likeClickStrategy == "NEVER_DISPLAY_LIKERS" &amp;&amp; isLiked) {
-      createUnlikeConfirmationModal();
     } else {
-      displayModal();
-    }
-  };
-
-  var createUnlikeConfirmationModal = function () {
-    var text = "$services.localization.render('like.unlike.confirmation')";
-    $('#like-modal .modal-body').text(text);
-    $('#like-modal').modal('show');
-  };
-  
-  var displayModal = function () {
-    $.post(likeUIXurl, {
-      'xaction': 'getLikers',
-      'form_token': xm.form_token,
-      'document': XWiki.Model.serialize(xm.documentReference)
-    }).done(function(data) {
-      $('#like-modal .modal-body.likers').html(data);
       $('#like-modal').modal('show');
-    }).fail(function(data) {
-      new XWiki.widgets.Notification('$services.localization.render('like.getLikers.error')', 'error');
-    });
+    }
   };
 
   var triggerLike = function () {
@@ -250,6 +210,128 @@
     </property>
     <property>
       <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Like.LikeUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e16ca9a7-ec47-4090-87a6-d9c4637a18a1</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.like-button.btn-default.badge {
+  color: grey;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -382,23 +464,21 @@
     <property>
       <content>{{velocity}}
 {{html wiki="true"}}
-#macro(likeModal $likeRecord $displayLikers)
+#macro(likeModal)
 &lt;div id="like-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
         &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-        &lt;div class="modal-title"&gt;Likes on $doc.title&lt;/div&gt;
+        &lt;div class="modal-title"&gt;$services.localization.render('like.unlike.modal.title')&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="modal-body likers"&gt;
+      &lt;div class="modal-body"&gt;
+        $services.localization.render('like.unlike.modal.body', [$doc.title])
       &lt;/div&gt;
       &lt;div class="modal-footer"&gt;
-        #set ($isLiked = $services.like.isLiked($doc))
-        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
-        #if ($services.like.isAuthorized($doc))
-        &lt;button type="button" id="modal-like-button" class="btn btn-primary #if($isLiked)hidden#end&gt;Like the page&lt;/button&gt;
-        &lt;button type="button" id="modal-unlike-button" class="btn btn-danger #if(!$isLiked)hidden#end"&gt;Unlike the page&lt;/button&gt;
-        #end
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$services.localization.render('like.unlike.modal.closeButton')&lt;/button&gt;
+        &lt;a href="$doc.getURL('view', 'viewer=likers')" class="btn btn-primary"&gt;$services.localization.render('like.unlike.modal.viewLikersButton')&lt;/a&gt;
+        &lt;button type="button" id="modal-unlike-button" class="btn btn-danger"&gt;$services.localization.render('like.unlike.modal.unlikeButton')&lt;/button&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -408,13 +488,11 @@
   #set ($optLikeRecord = $services.like.getLikes($doc))
   #if ($optLikeRecord.isPresent())
     #set ($likeRecord = $optLikeRecord.get())
+    #set ($discard = $xwiki.ssx.use('XWiki.Like.LikeUIX'))
     #set ($discard = $xwiki.jsx.use('XWiki.Like.LikeUIX'))
     &lt;div class="like-container"&gt;
-      #set ($clickBehaviour = $services.like.getUIClickBehaviour())
-      #set ($displayLikers = ($clickBehaviour == "ALWAYS_DISPLAY_LIKERS" || $clickBehaviour == "LIKE_FIRST_AND_DISPLAY_LIKERS"))
-      &lt;input id="like-click-strategy" type="hidden" value="$clickBehaviour" /&gt;
       &lt;input id="is-liked" type="hidden" value="$services.like.isLiked($doc)" /&gt;
-      #likeModal($likeRecord $displayLikers)
+      #likeModal()
       #if ($isGuest || $services.like.isLiked($doc))
         #set ($btnClass = "btn-default")
       #elseif (!$isGuest)
@@ -424,8 +502,8 @@
       #if (!$services.like.isAuthorized($doc))
         #set ($disabledButton = "disabled")
       #end
-      &lt;div class="like-button btn $btnClass $disabledButton" title="$services.localization.render('like.button.title', [$likeRecord.likeNumber])"&gt;
-          $services.icon.renderHTML('heart') &lt;span class="like-number badge"&gt;$likeRecord.likeNumber&lt;/span&gt;
+      &lt;div class="like-button btn $btnClass $disabledButton badge" title="$services.localization.render('like.button.title', [$likeRecord.likeNumber])"&gt;
+          $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeRecord.likeNumber&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   #end

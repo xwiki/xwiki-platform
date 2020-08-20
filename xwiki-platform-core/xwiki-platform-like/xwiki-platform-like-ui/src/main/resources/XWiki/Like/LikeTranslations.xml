@@ -37,7 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rightsmanager.like=Like
-like.unlike.confirmation=Are you sure to remove your Like?
+like.unlike.modal.title=Unlike confirmation
+like.unlike.modal.body=Are you sure to remove your Like on page {0}?
+like.unlike.modal.closeButton=Close
+like.unlike.modal.unlikeButton=Unlike the page
+like.unlike.modal.viewLikersButton=View like informations
 like.newlike.success=The page has been liked.
 like.newlike.error=Error when trying to like the page.
 like.unlike.success=The page has been unliked.
@@ -49,12 +53,7 @@ like.likers.number={0} people like this page:
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display button
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have right to interact with it: use it if you want to always display the like numbers.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
-XWiki.Like.LikeConfigurationClass_uiClickBehaviour=Like button click behaviour
-XWiki.Like.LikeConfigurationClass_uiClickBehaviour.hint=Behaviour of the Like button when a user clicks on it.
-XWiki.Like.LikeConfigurationClass_uiClickBehaviour_ALWAYS_DISPLAY_LIKERS=Always display likers (open a pop-up for showing likers, even when not already liked)
-XWiki.Like.LikeConfigurationClass_uiClickBehaviour_NEVER_DISPLAY_LIKERS=Always perform directly like action (or unlike with a confirmation if already liked)
-XWiki.Like.LikeConfigurationClass_uiClickBehaviour_LIKE_FIRST_AND_DISPLAY_LIKERS=Like directly on first click and then display likers on a pop-up once liked</content>
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
   <object>
     <name>XWiki.Like.LikeTranslations</name>
     <number>0</number>

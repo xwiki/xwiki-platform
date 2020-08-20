@@ -19,11 +19,14 @@
  */
 package org.xwiki.like.test.ui;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
 import org.xwiki.like.test.po.LikeModal;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -49,6 +52,9 @@ public class LikeIT
 {
     private static final String USER1 = "LikeUser1";
     private static final String USER2 = "LikeUser2";
+    private static final DocumentReference LIKE_CONFIGURATION_REFERENCE =
+        new DocumentReference("xwiki", Arrays.asList("XWiki", "Like"), "LikeConfiguration");
+    private static final String LIKE_CONFIGURATION_CLASSNAME = "XWiki.Like.LikeConfigurationClass";
 
     @BeforeEach
     public void setup(TestUtils testUtils)
@@ -57,21 +63,47 @@ public class LikeIT
         testUtils.createUser(USER2, USER2, null);
     }
 
+    private void updateLikeConfiguration(TestUtils testUtils, Object... properties)
+    {
+        testUtils.updateObject(LIKE_CONFIGURATION_REFERENCE, LIKE_CONFIGURATION_CLASSNAME, 0, properties);
+    }
+
+    /**
+     * Check that guest user can only see the button if the configuration is set to force displaying it and
+     * can never interact with it.
+     */
     @Test
     @Order(1)
+    void guestUser(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.createPage(testReference, "some content");
+        updateLikeConfiguration(testUtils, "alwaysDisplayButton", 0);
+        testUtils.forceGuestUser();
+        testUtils.gotoPage(testReference);
+        LikeButton likeButton = new LikeButton();
+        assertFalse(likeButton.isDisplayed());
+
+        testUtils.loginAsSuperAdmin();
+        updateLikeConfiguration(testUtils, "alwaysDisplayButton", 1);
+        testUtils.forceGuestUser();
+        testUtils.gotoPage(testReference);
+        likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+        assertFalse(likeButton.canBeClicked());
+    }
+
+    @Test
+    @Order(2)
     void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.login(USER1, USER1);
         testUtils.createPage(testReference, "some content");
         LikeButton likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
+        assertTrue(likeButton.canBeClicked());
         assertEquals(0, likeButton.getLikeNumber());
-        LikeModal likeModal = likeButton.clickToOpenModal();
-        assertTrue(likeModal.isDisplayed());
-        assertTrue(likeModal.isLikeButtonDisplayed());
-        assertFalse(likeModal.isUnlikeButtonDisplayed());
-        likeModal.clickLikeButton();
-        assertFalse(likeModal.isDisplayed());
+        likeButton.clickToLike();
         assertEquals(1, likeButton.getLikeNumber());
 
         testUtils.login(USER2, USER2);
@@ -79,12 +111,7 @@ public class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
-        likeModal = likeButton.clickToOpenModal();
-        assertTrue(likeModal.isDisplayed());
-        assertTrue(likeModal.isLikeButtonDisplayed());
-        assertFalse(likeModal.isUnlikeButtonDisplayed());
-        likeModal.clickLikeButton();
-        assertFalse(likeModal.isDisplayed());
+        likeButton.clickToLike();
         assertEquals(2, likeButton.getLikeNumber());
 
         testUtils.login(USER1, USER1);
@@ -92,9 +119,8 @@ public class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(2, likeButton.getLikeNumber());
-        likeModal = likeButton.clickToOpenModal();
+        LikeModal likeModal = likeButton.clickToUnlike();
         assertTrue(likeModal.isDisplayed());
-        assertFalse(likeModal.isLikeButtonDisplayed());
         assertTrue(likeModal.isUnlikeButtonDisplayed());
         likeModal.clickUnlikeButton();
         assertFalse(likeModal.isDisplayed());

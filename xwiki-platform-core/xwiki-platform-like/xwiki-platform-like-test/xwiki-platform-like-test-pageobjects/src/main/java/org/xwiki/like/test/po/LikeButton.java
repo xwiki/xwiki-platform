@@ -55,6 +55,15 @@ public class LikeButton extends BaseElement
     }
 
     /**
+     * @return {@code true} if the button is not disabled.
+     */
+    public boolean canBeClicked()
+    {
+        WebElement button = getButton();
+        return !button.getAttribute("class").contains("disabled");
+    }
+
+    /**
      * @return the number of likes displayed in the button.
      */
     public int getLikeNumber()
@@ -75,14 +84,15 @@ public class LikeButton extends BaseElement
     }
 
     /**
-     * Click on the Like button and wait for Like Modal to be displayed.
-     * @return the Like modal instance.
+     * Click on the Like button and wait for the unlike confirmation modal to be displayed.
+     * @return the unlike confirmation modal.
      */
-    public LikeModal clickToOpenModal()
+    public LikeModal clickToUnlike()
     {
         getButton().click();
         LikeModal result = new LikeModal();
         getDriver().waitUntilCondition(driver -> result.isDisplayed());
         return result;
     }
+
 }

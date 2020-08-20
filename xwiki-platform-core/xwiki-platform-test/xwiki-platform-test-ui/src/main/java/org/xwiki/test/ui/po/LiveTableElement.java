@@ -247,15 +247,10 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                // Refresh the current page since we need the livetable to fetch the JSON again
-                driver.navigate().refresh();
-                return driver.findElements(by).size() >= minimalExpectedRowCount;
-            }
+        getDriver().waitUntilCondition(driver -> {
+            // Refresh the current page since we need the livetable to fetch the JSON again
+            driver.navigate().refresh();
+            return driver.findElements(by).size() >= minimalExpectedRowCount;
         });
     }
 

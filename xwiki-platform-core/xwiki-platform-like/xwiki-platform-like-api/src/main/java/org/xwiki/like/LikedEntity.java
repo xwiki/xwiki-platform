@@ -41,7 +41,6 @@ public interface LikedEntity extends Comparable<LikedEntity>
 
     /**
      * Retrieve and return the whole list of people who like the entity.
-     * Note that this list size should match the number of like returned by {@link #getLikeNumber()}.
      *
      * @return the list of users who liked this entity in the order of their likes.
      */

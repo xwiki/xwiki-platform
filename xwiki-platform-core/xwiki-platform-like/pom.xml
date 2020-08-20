@@ -43,4 +43,12 @@
     <module>xwiki-platform-like-ui</module>
     <module>xwiki-platform-like-notifications</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-like-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

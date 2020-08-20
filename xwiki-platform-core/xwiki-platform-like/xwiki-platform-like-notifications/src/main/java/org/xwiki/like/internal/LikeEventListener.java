@@ -75,7 +75,7 @@ public class LikeEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source != null && data != null) {
+        if (data != null) {
             LikedEntity likedEntity = (LikedEntity) data;
 
             try {

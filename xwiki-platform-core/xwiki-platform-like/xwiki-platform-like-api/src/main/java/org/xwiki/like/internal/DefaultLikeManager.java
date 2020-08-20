@@ -64,7 +64,6 @@ import org.xwiki.user.UserReferenceSerializer;
 public class DefaultLikeManager implements LikeManager, Initializable
 {
     private static final int DEFAULT_LIKE_VOTE = 1;
-    private static final int RATING_PAGINATION = 100;
     private static final String NOT_YET_IMPLEMENTED_MSG =
         "Like is not implemented yet for other references than Document.";
 

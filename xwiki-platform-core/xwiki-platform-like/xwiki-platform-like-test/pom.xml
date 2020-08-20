@@ -27,17 +27,19 @@
     <artifactId>xwiki-platform-like</artifactId>
     <version>12.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-like-notifications</artifactId>
-  <name>XWiki Platform - Like - Notifications</name>
-  <packaging>jar</packaging>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-like-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-like-test</artifactId>
+  <name>XWiki Platform - Like - Test - Parent POM</name>
+  <packaging>pom</packaging>
+  <modules>
+    <module>xwiki-platform-like-test-pageobjects</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-like-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

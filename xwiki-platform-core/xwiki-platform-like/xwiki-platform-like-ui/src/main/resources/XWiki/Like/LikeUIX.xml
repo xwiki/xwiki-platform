@@ -167,8 +167,8 @@
   var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   
   var likeClick = function () {
-    likeClickStrategy = $('#like-click-strategy').val();
-    isLiked = $('#is-liked').val() == "true";
+    var likeClickStrategy = $('#like-click-strategy').val();
+    var isLiked = $('#is-liked').val() == "true";
     if ((likeClickStrategy == "LIKE_FIRST_AND_DISPLAY_LIKERS" || likeClickStrategy == "NEVER_DISPLAY_LIKERS") &amp;&amp; !isLiked) {
       triggerLike();
     } else if (likeClickStrategy == "NEVER_DISPLAY_LIKERS" &amp;&amp; isLiked) {
@@ -388,7 +388,7 @@
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
         &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-        &lt;h4 class="modal-title"&gt;Likes on $doc.title&lt;/h4&gt;
+        &lt;div class="modal-title"&gt;Likes on $doc.title&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class="modal-body likers"&gt;
       &lt;/div&gt;

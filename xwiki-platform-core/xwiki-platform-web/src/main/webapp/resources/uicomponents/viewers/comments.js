@@ -69,7 +69,7 @@ viewers.Comments = Class.create({
     // replaces the comment button with the form on the first click.
     $("OpenCommentForm").observe('click', function (event) {
       event.stop();
-      this.toggleFormHidden(function () {
+      this.toggleFormHidden().then(function () {
         this.reloadEditor({
           callback: function () {
             this.getForm();
@@ -94,31 +94,19 @@ viewers.Comments = Class.create({
   // load the form only once, when it is first needed
   // the next calls to this method does nothing but calling the callback
   // function parameter.
-  toggleFormHidden: function (callback) {
-    if (!this.formToggled) {
-      require(['jquery'], function ($) {
-        var url = window.location.href;
-        $.ajax({
-          type: 'POST',
-          url: url,
-          data: {
-            'xpage': 'xpart',
-            'vm': 'commentform.vm',
-            'name': 'XWiki.XWikiComments'
-          },
-          success: function (data, textStatus, request) {
-            var placeHolder = $("#CommentFormPlaceholder");
-            placeHolder.replaceWith(data);
-            var button = $("#OpenCommentForm");
-            button.remove();
-            this.formToggled = true;
-            callback();
-          }.bind(this)
-        });
+  toggleFormHidden: function () {
+    return new Promise(function(resolve) {
+       require(['jquery'], function ($) {
+        if (!this.formToggled) {
+          var placeHolder = $("#CommentFormPlaceholder");
+          placeHolder.show();
+          var button = $("#OpenCommentForm");
+          button.remove();
+          this.formToggled = true;
+        }
+        resolve();
       }.bind(this));
-    } else {
-      callback();
-    }
+    }.bind(this));
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -144,7 +132,7 @@ viewers.Comments = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        this.toggleFormHidden(function () {
+        this.toggleFormHidden().then(function () {
           if (item.disabled) {
             // Do nothing if the button was already clicked and it's waiting for a response from the server.
             return;
@@ -191,7 +179,6 @@ viewers.Comments = Class.create({
                     this.reloadEditor({
                       commentNbr: commentNbr,
                       callback: function () {
-                        this.getForm();
                         this.addPreview(item._x_editForm);
                         item._x_editForm.down('a.cancel').observe('click',
                             this.cancelEdit.bindAsEventListener(this, item));
@@ -214,7 +201,7 @@ viewers.Comments = Class.create({
                   on0 : function (response) {
                     response.request.options.onFailure(response);
                   },
-                  onComplete : function() {
+                  onComplete: function() {
                     // In the end: re-enable the button
                     item.disabled = false;
                   }
@@ -256,10 +243,10 @@ viewers.Comments = Class.create({
     if (!item) {
       return;
     }
-    item.observe('click', function(event) {
+    item.observe('click', function (event) {
       item.blur();
       event.stop();
-      this.toggleFormHidden(function () {
+      this.toggleFormHidden().then(function () {
         this.getForm();
         // If the form was already displayed as a reply, re-enable the Reply button for the old location
         if (this.form.up('.commentthread')) {

@@ -132,7 +132,7 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
         Duration duration = Duration.between(Instant.now(), instant);
 
         this.processingService.schedule(new ExecutionContextRunnable(this::dispatch, this.componentManager),
-            duration.getNano(), TimeUnit.NANOSECONDS);
+            duration.getSeconds(), TimeUnit.SECONDS);
     }
 
     private void dispatch()

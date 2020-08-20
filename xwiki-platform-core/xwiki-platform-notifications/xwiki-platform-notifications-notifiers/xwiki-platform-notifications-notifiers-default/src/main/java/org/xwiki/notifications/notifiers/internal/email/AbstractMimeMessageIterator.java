@@ -53,7 +53,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -102,9 +101,6 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     @Inject
     private NotificationEmailRenderer defaultNotificationEmailRenderer;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private MailSenderConfiguration mailSenderConfiguration;
@@ -331,7 +327,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private String getUserEmail(DocumentReference user)
     {
         return (String) this.documentAccessBridge.getProperty(user,
-            new DocumentReference(this.wikiDescriptorManager.getCurrentWikiId(), "XWiki", "XWikiUsers"), 0,
+            new DocumentReference(user.getWikiReference().getName(), "XWiki", "XWikiUsers"), 0,
             EMAIL_PROPERTY);
     }
 

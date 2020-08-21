@@ -160,7 +160,7 @@
       </async_context>
     </property>
     <property>
-      <async_enabled>1</async_enabled>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
       <content>{{velocity}}

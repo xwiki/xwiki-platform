@@ -21,9 +21,7 @@ package org.xwiki.mentions.test.ui;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.mentions.test.po.MentionNotificationPage;
@@ -74,20 +72,6 @@ public class MentionsIT
         void run() throws Exception;
     }
 
-    @AfterEach
-    void tearDown(TestUtils setup, TestReference reference) throws Exception
-    {
-        // clear all notifications between each test.
-        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
-            setup.gotoPage("Main", "WebHome");
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.clearAllNotifications();
-        });
-
-        // removes the page after each test.
-        runAsSuperAdmin(setup, () -> setup.deletePage(reference));
-    }
-
     /**
      *
      * <ul>
@@ -120,12 +104,12 @@ public class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            retry(2, () -> waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1));
-            setup.gotoPage("Main", "WebHome");
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
+            reload(setup);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
-            assertEquals(1, retry(2, tray::getNotificationsCount));
+            assertEquals(1, tray.getNotificationsCount());
             assertEquals(1, tray.getUnreadNotificationsCount());
             assertEquals("mentions.mention", tray.getNotificationType(0));
             String notificationContent = tray.getNotificationContent(0);
@@ -138,6 +122,7 @@ public class MentionsIT
             assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
             assertEquals("@U2", mentionNotificationPage.getSummary(0, 0));
+            tray.clearAllNotifications();
         });
     }
 
@@ -180,12 +165,12 @@ public class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            retry(2, () -> waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1));
-            setup.gotoPage("Main", "WebHome");
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
+            reload(setup);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
-            assertEquals(1, retry(2, tray::getNotificationsCount));
+            assertEquals(1, tray.getNotificationsCount());
             assertEquals(1, tray.getUnreadNotificationsCount());
             assertEquals("mentions.mention", tray.getNotificationType(0));
             String notificationContent = tray.getNotificationContent(0);
@@ -199,7 +184,13 @@ public class MentionsIT
             assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
             assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
+            tray.clearAllNotifications();
         });
+    }
+
+    private void reload(TestUtils setup)
+    {
+        setup.getDriver().navigate().refresh();
     }
 
     /**
@@ -228,32 +219,5 @@ public class MentionsIT
     {
         setup.loginAsSuperAdmin();
         actions.run();
-    }
-
-    private <T> T retry(int times, Callable<T> callable) throws Exception
-    {
-        try {
-            return callable.call();
-        } catch (Exception e) {
-            if (times > 1) {
-                retry(times - 1, callable);
-            } else {
-                throw e;
-            }
-        }
-        return null;
-    }
-
-    private void retry(int times, Runnable callable) throws Exception
-    {
-        try {
-            callable.run();
-        } catch (Exception e) {
-            if (times > 1) {
-                retry(times - 1, callable);
-            } else {
-                throw e;
-            }
-        }
     }
 }

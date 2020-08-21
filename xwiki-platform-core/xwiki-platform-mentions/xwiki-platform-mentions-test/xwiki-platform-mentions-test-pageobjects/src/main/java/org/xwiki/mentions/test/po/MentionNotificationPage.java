@@ -19,9 +19,10 @@
  */
 package org.xwiki.mentions.test.po;
 
-import org.openqa.selenium.By;
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
 
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
@@ -32,45 +33,9 @@ import static org.openqa.selenium.By.xpath;
  * @version $Id$
  * @since 12.7RC1
  */
-public class MentionNotificationPage extends BaseElement
+public class MentionNotificationPage extends GroupedNotificationElementPage
 {
-    private static final String NOTIFICATION_EVENT_SELECTOR = "div.notification-event";
-
-    private static final String GROUP_SELECTOR =
-        "button.toggle-notification-event-details";
-
-    private static final String TEXT_SELECTOR = "tr td.description";
-
-    private static final String EMITTER_SELECTOR =
-        "tr td span.notification-event-user";
-
     private static final String SUMMARY_SELECTOR = "../following-sibling::tr/td/blockquote";
-
-    /**
-     * Opens a notification group.
-     * @param notificationNumber The notification index.
-     */
-    public void openGroup(int notificationNumber)
-    {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
-        WebElement group = notifications.findElement(cssSelector(GROUP_SELECTOR));
-        group.click();
-    }
-
-    /**
-     *
-     * @param notificationNumber The notification group number.
-     * @param groupIndex The index of the notification in the group.
-     * @return The mention text.
-     */
-    public String getText(int notificationNumber, int groupIndex)
-    {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
-        WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
-        return element.getText();
-    }
 
     /**
      *
@@ -80,10 +45,7 @@ public class MentionNotificationPage extends BaseElement
      */
     public boolean hasSummary(int notificationNumber, int groupIndex)
     {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
-        WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
-        return element.findElements(xpath(SUMMARY_SELECTOR)).size() > 0;
+        return !findSummaryElement(notificationNumber, groupIndex).isEmpty();
     }
 
     /**
@@ -96,23 +58,14 @@ public class MentionNotificationPage extends BaseElement
      */
     public String getSummary(int notificationNumber, int groupIndex)
     {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
-        WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
-        return element.findElements(xpath(SUMMARY_SELECTOR)).get(0).getText();
+        return findSummaryElement(notificationNumber, groupIndex).get(0).getText();
     }
 
-    /**
-     *
-     * @param notificationNumber The notification group number.
-     * @param groupIndex The index of the notification in the group.
-     * @return The mention emitter.
-     */
-    public String getEmitter(int notificationNumber, int groupIndex)
+    private List<WebElement> findSummaryElement(int notificationNumber, int groupIndex)
     {
         WebElement notifications =
             getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
-        WebElement emitter = notifications.findElements(cssSelector(EMITTER_SELECTOR)).get(groupIndex);
-        return emitter.findElement(By.tagName("a")).getText();
+        WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
+        return element.findElements(xpath(SUMMARY_SELECTOR));
     }
 }

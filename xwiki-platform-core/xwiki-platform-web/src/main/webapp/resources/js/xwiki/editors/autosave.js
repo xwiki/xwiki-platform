@@ -21,12 +21,10 @@ var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
 
 var editors = XWiki.editors = XWiki.editors || {};
+
 /**
  * Autosave feature.
  * TODO Improve i18n support
- * TODO Don't save if there were no changes
- * TODO Support for the WYSIWYG editors
- * TODO Don't show in the class editor, if there is no class defined
  */
 editors.AutoSave = Class.create({
   options : {
@@ -45,6 +43,7 @@ editors.AutoSave = Class.create({
      */
     form: undefined
   },
+
   /** Initialization */
   initialize : function(options) {
     this.options = Object.extend(Object.clone(this.options), options || { });
@@ -57,10 +56,9 @@ editors.AutoSave = Class.create({
       this.createUIElements();
       this.addListeners();
     }
-    if (this.options.enabled) {
-      this.startTimer();
-    }
+    this.toggleTimer();
   },
+
   /**
    * The metadata elements are the version comment input and the minor edit checkbox in the editor form.
    * They may be missing if the document is new or if the wiki was configured not to display them.
@@ -69,13 +67,15 @@ editors.AutoSave = Class.create({
    */
   initVersionMetadataElements : function() {
     var container = new Element("div", {"class" : "hidden"});
-    this.editComment = this.form.comment; // The element containing the edit comment from the edit form
+    // The element containing the edit comment (summary) from the edit form.
+    this.editComment = this.form.down('input[name="comment"]');
     if (!this.editComment) {
       this.editComment = new Element('input', {type : "hidden", name: "comment"});
       this.customMetadataElementsContainer = container;
       container.insert(this.editComment);
     }
-    this.minorEditCheckbox = this.form.minorEdit; // The minor edit checkbox from the edit form
+    // The minor edit checkbox from the edit form.
+    this.minorEditCheckbox = this.form.down('input[name="minorEdit"]');
     if (!this.minorEditCheckbox) {
       // Value already set, does not need to be switched on/off
       this.minorEditCheckbox = new Element('input', {type : "checkbox", name: "minorEdit", checked: true});
@@ -90,9 +90,19 @@ editors.AutoSave = Class.create({
    */
   createUIElements : function() {
     // Checkbox to enable/disable the autosave
-    this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.options.enabled, name: "doAutosave", id: "doAutosave"});
+    this.autosaveCheckbox = new Element('input', {
+      type: "checkbox",
+      checked: this.options.enabled,
+      name: "doAutosave",
+      id: "doAutosave"
+    });
     // Input for setting the autosave frequency
-    this.autosaveInput = new Element('input', {type: "text", value: this.options.frequency, size : "2", "class": "autosave-frequency"});
+    this.autosaveInput = new Element('input', {
+      type: "text",
+      value: this.options.frequency,
+      size: "2",
+      "class": "autosave-frequency"
+    });
     // Labels
     var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
     autosaveLabel.appendChild(this.autosaveCheckbox);
@@ -114,7 +124,7 @@ editors.AutoSave = Class.create({
     container.appendChild(frequencyLabel);
     container.appendChild(document.createTextNode(" "));
     // Insert in the editing UI
-    $(document.body).down(".bottombuttons .buttons").insert({bottom : container});
+    this.form.down('.buttons').insert(container);
   },
 
   /**
@@ -135,15 +145,9 @@ editors.AutoSave = Class.create({
 
     // Enable/disable autosave
     Event.observe(this.autosaveCheckbox, "click", function() {
-      this.options.enabled = this.autosaveCheckbox.checked;
-      if (this.options.enabled) {
-        this.startTimer();
-        this.autosaveInput.up("label").setOpacity('1.0');
-      } else {
-        this.stopTimer();
-        this.autosaveInput.up("label").setOpacity(this.options.disabledOpacity);
-      }
+      this.toggleTimer(this.autosaveCheckbox.checked);
     }.bindAsEventListener(this));
+
     // Set autosave frequency
     Event.observe(this.autosaveInput, "blur", function() {
       // is the given value valid?
@@ -153,7 +157,7 @@ editors.AutoSave = Class.create({
         this.options.frequency = newFrequency;
         this.setTimeUnit();
         // reset autosave loop
-        this.restartTimer();
+        this.startTimer();
       } else {
         // no: restore the previous value in the input
         this.autosaveInput.value = this.options.frequency;
@@ -162,10 +166,13 @@ editors.AutoSave = Class.create({
       // Since IE doesn't understand :focused, use a classname
       this.autosaveInput.removeClassName('focused');
     }.bindAsEventListener(this));
+
     // The input element should look like any input when focused
     Event.observe(this.autosaveInput, "focus", function() {
       this.autosaveInput.addClassName('focused');
     }.bindAsEventListener(this));
+
+    this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();
   },
 
   /**
@@ -182,12 +189,55 @@ editors.AutoSave = Class.create({
   },
 
   /**
+   * Stop the timer when the save button is disabled (e.g. because there is another save in progress or because the save
+   * button was hidden) and restart the timer, if needed, when the save button is enabled.
+   */
+  _toggleTimerWhenSaveButtonIsEnabledOrDisabled: function() {
+    var self = this;
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.target.disabled) {
+          self.stopTimer();
+        } else {
+          self.toggleTimer();
+        }
+      });
+    });
+    var saveButton = this.form.down('input[name="action_saveandcontinue"]');
+    observer.observe(saveButton, {
+      attributes: true,
+      attributeFilter: ['disabled']
+    });
+  },
+
+  toggleTimer: function(enabled) {
+    if (typeof enabled === 'boolean') {
+      this.options.enabled = enabled;
+    }
+    if (this.options.enabled) {
+      this.startTimer();
+      if (this.autosaveInput) {
+        this.autosaveInput.up('label').setOpacity('1.0');
+      }
+    } else {
+      this.stopTimer();
+      if (this.autosaveInput) {
+        this.autosaveInput.up('label').setOpacity(this.options.disabledOpacity);
+      }
+    }
+  },
+
+  /**
    * Start autosave timer when the autosave is enabled.
    * Every (this.options.frequency * 60) seconds, the callback function doAutosave is called.
    */
   startTimer : function() {
-    this.timer = new PeriodicalExecuter(this.doAutosave.bind(this), this.options.frequency * 60 /* seconds in a minute */);
+    // Make sure we stop the existing timer.
+    this.stopTimer();
+    this.timer = new PeriodicalExecuter(this.doAutosave.bind(this),
+      this.options.frequency * 60 /* seconds in a minute */);
   },
+
   /**
    * Stop the autosave loop when the autosave is disabled or when the autosave frequency is changed
    * and the loop needs to be restarted.
@@ -198,35 +248,32 @@ editors.AutoSave = Class.create({
       delete this.timer;
     }
   },
-  /**
-   * Restart the timer when the autosave frequency is changed, to take into account the new frequency.
-   */
-  restartTimer : function() {
-    this.stopTimer();
-    this.startTimer();
-  },
 
   /**
-   * The function that performs the actual automatic save, if the content has changed.
-   * It marks the version as minor and updates the version comment with "(Autosaved)".
-   * Then, it fires the custom event <tt>xwiki:actions:save</tt> to invoke the
-   * AjaxSaveAndContinue. Afterwards, it resets the version metadata elements to their
-   * previous state.
+   * The function that performs the actual automatic save, if the content has changed. It marks the version as minor and
+   * updates the version comment with "(Autosaved)". Then it clicks on the Save & Continue button. Afterwards, it resets
+   * the version metadata elements to their previous state.
    */
   doAutosave : function() {
     this.updateVersionMetadata();
-    // Hacks to force the rich text editors dump the data into the textarea
-    // TODO Write me!
-    // Call save and continue
-    document.fire("xwiki:actions:save", {"continue": true, form: this.editComment.form});
-    // Restore comment and minor edit to previous values
-    this.resetVersionMetadata();
+    try {
+      // Click the Save & Continue button. We don't trigger the save event ourselves because:
+      // * we don't want to save if the save button is disabled (e.g. if there's another save in progress or if there
+      //   are no changes)
+      // * the save button might have additional click event listeners, so custom behavior (e.g. validation) that we
+      //   want to execute.
+      this.form.down('input[name="action_saveandcontinue"]').click();
+    } finally {
+      // Restore comment and minor edit to previous values.
+      this.resetVersionMetadata();
+    }
   },
+
   /**
    * Marks the version as minor and updates the version comment with "(Autosaved)".
    */
   updateVersionMetadata : function() {
-    if(this.customMetadataElementsContainer) {
+    if (this.customMetadataElementsContainer) {
       this.form.insert(this.customMetadataElementsContainer);
     }
     this.userEditComment = this.editComment.value;
@@ -236,11 +283,12 @@ editors.AutoSave = Class.create({
     // Check the minor edit checkbox
     this.minorEditCheckbox.checked = true;
   },
+
   /**
    * Resets the version metadata elements to their previous state and the contentChanged to false.
    */
   resetVersionMetadata : function() {
-    if(this.customMetadataElementsContainer) {
+    if (this.customMetadataElementsContainer) {
       this.customMetadataElementsContainer.remove();
     }
     this.editComment.value = this.userEditComment;
@@ -249,14 +297,7 @@ editors.AutoSave = Class.create({
 });
 
 function init() {
-  // Make sure the AjaxSaveAndContinue class exist.
-  if (!XWiki.actionButtons || !XWiki.actionButtons.AjaxSaveAndContinue) {
-    if (console && console.warn) {
-      console.warn("[Autosave feature] Required class missing: XWiki.actionButtons.AjaxSaveAndContinue");
-    }
-  } else {
-    return new editors.AutoSave();
-  }
+  return new editors.AutoSave();
 }
 
 // When the document is loaded, create the Autosave control

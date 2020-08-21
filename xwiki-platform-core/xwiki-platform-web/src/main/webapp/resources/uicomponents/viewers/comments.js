@@ -26,6 +26,7 @@ var viewers = XWiki.viewers = XWiki.viewers || {};
 viewers.Comments = Class.create({
   commentNumberRegex : /.+_(\d+)/,
   xcommentSelector: ".xwikicomment",
+  commentPlaceHolderSelector: 'commentFormPlaceholder',
 
   /**
    * Extract the object number of the comment.
@@ -63,13 +64,17 @@ viewers.Comments = Class.create({
   },
   /** Enhance the Comments UI with JS behaviors. */
   startup : function () {
+    this.formDisplayed = false;
     this.loadIDs();
     this.addReplyListener();
     this.addEditListener();
     // replaces the comment button with the form on the first click.
-    $("OpenCommentForm").observe('click', function (event) {
-      event.stop();
-      this.toggleFormHidden().then(function () {
+
+    var openCommentForm = $('openCommentForm');
+    if(openCommentForm) {
+      openCommentForm.observe('click', function (event) {
+        event.stop();
+        this.displayHiddenForm()
         this.reloadEditor({
           callback: function () {
             this.getForm();
@@ -79,34 +84,30 @@ viewers.Comments = Class.create({
           }.bind(this)
         });
       }.bind(this));
-    }.bind(this));
-  },
-  // lazily load the form element
-  getForm: function () {
-    this.form = this.form || undefined;
-    var commentform = $("commentform");
-    if (this.form === undefined && commentform) {
-      this.form = commentform.up("form");
     }
   },
-  // the form must be loaded only once.
-  formToggled: false,
+  // update the form element reference
+  getForm: function () {
+    var commentform = $('commentform');
+    if (commentform) {
+      this.form = commentform.up('form');
+    } else {
+      this.form = undefined;
+    }
+  },
   // load the form only once, when it is first needed
   // the next calls to this method does nothing but calling the callback
   // function parameter.
-  toggleFormHidden: function () {
-    return new Promise(function(resolve) {
-       require(['jquery'], function ($) {
-        if (!this.formToggled) {
-          var placeHolder = $("#CommentFormPlaceholder");
-          placeHolder.show();
-          var button = $("#OpenCommentForm");
-          button.remove();
-          this.formToggled = true;
-        }
-        resolve();
-      }.bind(this));
-    }.bind(this));
+  displayHiddenForm: function () {
+    if (!this.formDisplayed) {
+      var placeHolder = $(this.commentPlaceHolderSelector);
+      placeHolder.removeClassName('hidden');
+      var button = $('openCommentForm');
+      if (button) {
+        button.remove();
+      }
+      this.formDisplayed = true;
+    }
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -132,83 +133,84 @@ viewers.Comments = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        this.toggleFormHidden().then(function () {
-          if (item.disabled) {
-            // Do nothing if the button was already clicked and it's waiting for a response from the server.
-            return;
-          } else if (item._x_editForm) {
-            // If the form was already fetched, but hidden after cancel, just show it again
-            // without making a new request
-            var comment = item.up(this.xcommentSelector);
-            comment.hide();
-            const commentNbr = this.extractCommentNumber(comment);
-            this.reloadEditor({
-              commentNbr: commentNbr,
-              callback: function () {
-                this.getForm();
-              }.bind(this)
-            });
-            item._x_editForm.show();
-          } else {
-            new Ajax.Request(
-                /* Ajax request URL */
-                item.readAttribute('href').replace('viewer=comments', 'xpage=xpart&vm=commentsinline.vm'),
-                /* Ajax request parameters */
-                {
-                  onCreate : function() {
-                    // Disable the button, to avoid a cascade of clicks from impatient users
-                    item.disabled = true;
-                    item._x_notification = new XWiki.widgets.Notification(
-                        "$services.localization.render('core.viewers.comments.editForm.fetch.inProgress')",
-                        "inprogress");
-                  },
-                  onSuccess : function(response) {
-                    // Hide other comment editing forms (allow only one comment to be edited at a time)
-                    if (this.editing) {
-                      this.cancelEdit(false, this.editing);
-                    }
-                    // Replace the comment text with a form for editing it
-                    var comment = item.up(this.xcommentSelector);
-                    comment.insert({before: response.responseText});
-                    item._x_editForm = comment.previous();
-                    this.addSubmitListener(item._x_editForm);
-
-                    // extract the comment number in the number parameter.
-                    const commentNbr = item.readAttribute('href').match(/number=(\d+)/)[1];
-
-                    this.reloadEditor({
-                      commentNbr: commentNbr,
-                      callback: function () {
-                        this.addPreview(item._x_editForm);
-                        item._x_editForm.down('a.cancel').observe('click',
-                            this.cancelEdit.bindAsEventListener(this, item));
-                        comment.hide();
-                        item._x_notification.hide();
-                        // Currently editing: this comment
-                        this.editing = item;
-                      }.bind(this)
-                    });
-                  }.bind(this),
-                  onFailure : function (response) {
-                    var failureReason = response.statusText;
-                    if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                      failureReason = 'Server not responding';
-                    }
-                    item._x_notification.replace(new XWiki.widgets.Notification(
-                        "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
-                        "error"));
-                  }.bind(this),
-                  on0 : function (response) {
-                    response.request.options.onFailure(response);
-                  },
-                  onComplete: function() {
-                    // In the end: re-enable the button
-                    item.disabled = false;
-                  }
+        this.displayHiddenForm()
+        if (item.disabled) {
+          // Do nothing if the button was already clicked and it's waiting for a response from the server.
+          return;
+        } else if (item._x_editForm) {
+          // If the form was already fetched, but hidden after cancel, just show it again
+          // without making a new request
+          var comment = item.up(this.xcommentSelector);
+          comment.hide();
+          const commentNbr = this.extractCommentNumber(comment);
+          this.reloadEditor({
+            commentNbr: commentNbr,
+            callback: function () {
+              this.getForm();
+            }.bind(this)
+          });
+          item._x_editForm.show();
+        } else {
+          new Ajax.Request(
+            /* Ajax request URL */
+            item.readAttribute('href').replace('viewer=comments', 'xpage=xpart&vm=commentsinline.vm'),
+            /* Ajax request parameters */
+            {
+              onCreate : function() {
+                // Disable the button, to avoid a cascade of clicks from impatient users
+                item.disabled = true;
+                item._x_notification = new XWiki.widgets.Notification(
+                    "$services.localization.render('core.viewers.comments.editForm.fetch.inProgress')",
+                    "inprogress");
+              },
+              onSuccess : function(response) {
+                // Hide other comment editing forms (allow only one comment to be edited at a time)
+                if (this.editing) {
+                  this.cancelEdit(false, this.editing);
                 }
-            );
-          }
-        }.bind(this));
+                // Replace the comment text with a form for editing it
+                var comment = item.up(this.xcommentSelector);
+                comment.insert({before: response.responseText});
+                item._x_editForm = comment.previous();
+                this.addSubmitListener(item._x_editForm);
+
+                // extract the comment number in the number parameter.
+                const commentNbr = item.readAttribute('href').match(/number=(\d+)/)[1];
+
+                $(this.commentPlaceHolderSelector).hide();
+
+                this.reloadEditor({
+                  commentNbr: commentNbr,
+                  callback: function () {
+                    this.addPreview(item._x_editForm);
+                    item._x_editForm.down('a.cancel').observe('click',
+                        this.cancelEdit.bindAsEventListener(this, item));
+                    comment.hide();
+                    item._x_notification.hide();
+                    // Currently editing: this comment
+                    this.editing = item;
+                  }.bind(this)
+                });
+              }.bind(this),
+              onFailure : function (response) {
+                var failureReason = response.statusText;
+                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                  failureReason = 'Server not responding';
+                }
+                item._x_notification.replace(new XWiki.widgets.Notification(
+                    "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
+                    "error"));
+              }.bind(this),
+              on0 : function (response) {
+                response.request.options.onFailure(response);
+              },
+              onComplete: function() {
+                // In the end: re-enable the button
+                item.disabled = false;
+              }
+            }
+          );
+        }
       }.bindAsEventListener(this));
     }.bind(this));
   },
@@ -225,6 +227,14 @@ viewers.Comments = Class.create({
     const name = "XWiki.XWikiComments_" + commentNbr + "_comment";
     this.destroyEditor("[name='" + name + "']", name);
     comment.show();
+    $(this.commentPlaceHolderSelector).show();
+    this.reloadEditor({
+          callback: function () {
+            this.getForm();
+            this.addSubmitListener(this.form);
+            this.addCancelListener();
+            this.addPreview(this.form);
+          }.bind(this)});
     this.cancelPreview(editActivator._x_editForm);
     this.editing = false;
   },
@@ -232,9 +242,16 @@ viewers.Comments = Class.create({
    * Inline reply: Move the form under the replied comment and update the hidden "replyto" field.
    */
   addReplyListener : function() {
-    $$(this.xcommentSelector).each(function(item) {
-      this.addReplyListenerToComment(item);
-    }.bind(this));
+    if (this.form) {
+      $$(this.xcommentSelector).each(function(item) {
+        this.addReplyListenerToComment(item);
+      }.bind(this));
+    } else {
+      // If, for some reason, the form is missing, hide the reply functionality from the user
+      $$(this.xcommentSelector + ' a.commentreply').each(function(item) {
+        item.hide();
+      });
+    }
   },
   addReplyListenerToComment : function(item) {
     // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
@@ -243,43 +260,43 @@ viewers.Comments = Class.create({
     if (!item) {
       return;
     }
-    item.observe('click', function (event) {
+    item.observe('click', function(event) {
       item.blur();
       event.stop();
-      this.toggleFormHidden().then(function () {
-        this.getForm();
-        // If the form was already displayed as a reply, re-enable the Reply button for the old location
-        if (this.form.up('.commentthread')) {
-          this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
-        }
-        // Insert the form on top of that comment's discussion
-        item.up(this.xcommentSelector).next('.commentthread').insert({'top': this.form});
+      this.displayHiddenForm();
+      this.getForm();
+      // If the form was already displayed as a reply, re-enable the Reply button for the old location
+      if (this.form.up('.commentthread')) {
+        this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
+      }
+      // Insert the form on top of that comment's discussion
+      item.up(this.xcommentSelector).next('.commentthread').insert({'top': this.form});
 
-        this.addPreview(this.form);
-        this.reloadEditor({
-          callback: function () {
-            this.getForm();
-            this.addSubmitListener(this.form);
-            this.addCancelListener();
-            this.addPreview(this.form);
-            // Set the replyto field to the replied comment's number
-            this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-            // Clear the contents and focus the textarea
-            this.form["XWiki.XWikiComments_comment"].value = "";
-            this.form["XWiki.XWikiComments_comment"].focus();
-            // Hide the reply button
-            item.hide();
-          }.bind(this)
-        });
-      }.bindAsEventListener(this));
-    }.bind(this));
+      this.reloadEditor({
+        callback: function () {
+          this.getForm();
+          this.addSubmitListener(this.form);
+          this.addCancelListener();
+          this.addPreview(this.form);
+          // Set the replyto field to the replied comment's number
+          this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
+          // Clear the contents and focus the textarea
+          this.form["XWiki.XWikiComments_comment"].value = "";
+          this.form["XWiki.XWikiComments_comment"].focus();
+          // Hide the reply button
+          item.hide();
+        }.bind(this)
+      });
+    }.bindAsEventListener(this));
   },
   /**
    * When pressing Submit, check that the comment is not empty. Submit the form with ajax and update the whole
    * comments zone on success.
    */
   addSubmitListener : function(form) {
-    if (form) {
+    // we check that the form exist and that no event has already been attached
+    if (form && !form._has_event) {
+      form._has_event = true;
       // Add listener for submit
       form.down("input[type='submit']").observe('click', function (event) {
         event.stop();
@@ -344,6 +361,16 @@ viewers.Comments = Class.create({
 
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
+                this.displayHiddenForm();
+                this.reloadEditor({
+                  callback: function () {
+                    this.getForm();
+                    this.addSubmitListener(this.form);
+                    this.addCancelListener();
+                    this.addPreview(this.form);
+                  }.bind(this)
+                });
+
                 document.fire("xwiki:docextra:loaded", {
                   "id": "Comments",
                   "element": this.container

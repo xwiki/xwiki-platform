@@ -247,9 +247,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayCommentButton)
-<button type="button" id="OpenCommentForm" class="btn btn-default">
+<button type="button" id="openCommentForm" class="btn btn-default">
   $services.icon.renderHTML('comment')
-    $services.localization.render('core.viewers.comments.add.comment.label')</button>
+  $services.localization.render('core.viewers.comments.add.comment.label')
+</button>
 #end
 ##
 ##
@@ -421,10 +422,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #if(!$replied)
-  #displayCommentButton()
-  <div id="CommentFormPlaceholder">
-    #displayCommentForm()
-  </div>
+  #if($xwiki.hasAccessLevel('comment'))
+    #displayCommentButton()
+    <div id="commentFormPlaceholder" class="hidden">
+      #displayCommentForm()
+    </div>
+  #end
 #end
   </div> ## comments
   #showPermalinkModal

@@ -64,12 +64,15 @@ public class CommentsTab extends BaseElement
 
     private void toggleComments()
     {
+        String commentFormId = "AddComment";
+        String openFormId = "openCommentForm";
         XWikiWebDriver driver = getDriver();
-        List<WebElement> openCommentForm = driver.findElementsById("OpenCommentForm");
-        if (openCommentForm.size() > 0) {
-            openCommentForm.get(0).click();
+        // if the comments has not already been toggled (ie, the comment button is not displayed).
+        // we click on the button and wait until the form is visible
+        if (!driver.findElementWithoutWaiting(By.id(commentFormId)).isDisplayed()) {
+            driver.findElementWithoutWaiting(By.id(openFormId)).click();
+            driver.waitUntilElementIsVisible(By.id(commentFormId));
         }
-        driver.waitUntilElementIsVisible(By.id("AddComment"));
     }
 
     public void setAnonymousCommentAuthor(String author)

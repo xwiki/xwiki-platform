@@ -319,6 +319,9 @@
     <property>
       <code>.like-button.btn-default.badge {
   color: grey;
+}
+.like-container {
+  width: 10%;
 }</code>
     </property>
     <property>

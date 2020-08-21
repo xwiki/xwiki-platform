@@ -145,6 +145,7 @@
       <code>require.config({
   paths: {
     'actionButtons': $jsontool.serialize($xwiki.getSkinFile('js/xwiki/actionbuttons/actionButtons.js', true)),
+    'autoSave': $jsontool.serialize($xwiki.getSkinFile('js/xwiki/editors/autosave.js', true)),
     // Required in case the user needs to resolve merge conflicts on save.
     'xwiki-diff': $jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.js'))
   }
@@ -319,6 +320,7 @@ define('editInPlace', [
 ], function($, xcontext, xwikiDocumentAPI) {
   var preload = function() {
     loadCSS($jsontool.serialize($xwiki.getSkinFile('js/xwiki/actionbuttons/actionButtons.css', true)));
+    loadCSS($jsontool.serialize($xwiki.getSkinFile('js/xwiki/editors/autosave.css', true)));
     // Required in case the user needs to resolve merge conflicts on save.
     loadCSS($jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.css', true)));
     return initActionButtons();
@@ -732,9 +734,13 @@ define('editInPlace', [
       // We need a place where actionButtons.js can add more hidden inputs.
       actionButtons.append('&lt;div class="hidden extra"/&gt;');
       var deferred = $.Deferred();
-      require(['actionButtons', 'xwiki-diff'], function() {
+      require(['actionButtons', 'xwiki-diff', 'autoSave'], function() {
         overrideEditActions();
         overrideAjaxSaveAndContinue();
+        // Activate the auto-save feature passing our fake edit form. Note that autosave.js also creates an instance of
+        // AutoSave but it doesn't do anything because it doesn't find a real edit form in the page. This is why we have
+        // to create our own instance of AutoSave passing the right (fake) form.
+        new XWiki.editors.AutoSave({form: fakeForm});
         var xwikiDocument = actionButtons.data('xwikiDocument');
         // Enable the action buttons (and their shortcut keys) only if we're editing a document.
         actionButtons.find(':input').prop('disabled', !xwikiDocument);
@@ -770,6 +776,9 @@ define('editInPlace', [
     },
     insert: function(element) {
       this._getActionButtons().find('.hidden.extra').append(element);
+    },
+    down: function(selector) {
+      return this._getActionButtons().find(selector)[0];
     },
     serialize: function() {
       var extra = this._getActionButtons().find(':input').serializeArray().reduce(function(extra, entry) {

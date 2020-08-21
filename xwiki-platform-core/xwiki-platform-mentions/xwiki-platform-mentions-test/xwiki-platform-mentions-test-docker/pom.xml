@@ -62,6 +62,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mentions-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

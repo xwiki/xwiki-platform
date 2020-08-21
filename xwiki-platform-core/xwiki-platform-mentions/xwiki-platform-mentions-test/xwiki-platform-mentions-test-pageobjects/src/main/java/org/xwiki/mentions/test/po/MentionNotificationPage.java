@@ -31,13 +31,23 @@ import static org.openqa.selenium.By.xpath;
  * Mentions notifications page object.
  *
  * @version $Id$
- * @since 12.7RC1
+ * @since 12.8RC1
  */
 public class MentionNotificationPage extends GroupedNotificationElementPage
 {
     private static final String SUMMARY_SELECTOR = "../following-sibling::tr/td/blockquote";
 
     /**
+     * Default constructor.
+     * @param rootElement The root element of the notification blocks.
+     */
+    public MentionNotificationPage(WebElement rootElement)
+    {
+        super(rootElement);
+    }
+
+    /**
+     *
      *
      * @param notificationNumber The notification group number.
      * @param groupIndex The index of the notification in the group.
@@ -64,7 +74,7 @@ public class MentionNotificationPage extends GroupedNotificationElementPage
     private List<WebElement> findSummaryElement(int notificationNumber, int groupIndex)
     {
         WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
+            findNotifications().get(notificationNumber);
         WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
         return element.findElements(xpath(SUMMARY_SELECTOR));
     }

@@ -34,8 +34,8 @@
     <profile>
       <id>docker</id>
       <modules>
-        <module>xwiki-platform-mentions-test-docker</module>
         <module>xwiki-platform-mentions-test-pageobjects</module>
+        <module>xwiki-platform-mentions-test-docker</module>
       </modules>
     </profile>
   </profiles>

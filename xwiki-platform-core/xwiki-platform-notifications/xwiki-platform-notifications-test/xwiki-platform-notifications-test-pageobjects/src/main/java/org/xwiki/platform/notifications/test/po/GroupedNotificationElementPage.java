@@ -19,8 +19,11 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
 
 import static org.openqa.selenium.By.cssSelector;
@@ -29,7 +32,7 @@ import static org.openqa.selenium.By.cssSelector;
  * Represent generic operations on the notification tray groups.
  *
  * @version $Id$
- * @since 1.7RC1
+ * @since 12.8RC1
  */
 public class GroupedNotificationElementPage extends BaseElement
 {
@@ -43,6 +46,18 @@ public class GroupedNotificationElementPage extends BaseElement
     private static final String EMITTER_SELECTOR =
         "tr td span.notification-event-user";
 
+    private final WebElement rootElement;
+
+    /**
+     * Default constructor.
+     * @param rootElement The root element of the notification blocks.
+     */
+    public GroupedNotificationElementPage(WebElement rootElement)
+    {
+
+        this.rootElement = rootElement;
+    }
+
     /**
      * Opens a notification group.
      * @param notificationNumber The notification index.
@@ -50,21 +65,20 @@ public class GroupedNotificationElementPage extends BaseElement
     public void openGroup(int notificationNumber)
     {
         WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
+            findNotifications().get(notificationNumber);
         WebElement group = notifications.findElement(cssSelector(GROUP_SELECTOR));
         group.click();
     }
 
     /**
-     *
+     * Finds the text of a notification.
      * @param notificationNumber The notification group number.
      * @param groupIndex The index of the notification in the group.
      * @return The mention text.
      */
     public String getText(int notificationNumber, int groupIndex)
     {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
+        WebElement notifications = findNotifications().get(notificationNumber);
         WebElement element = notifications.findElements(cssSelector(TEXT_SELECTOR)).get(groupIndex);
         return element.getText();
     }
@@ -77,9 +91,13 @@ public class GroupedNotificationElementPage extends BaseElement
      */
     public String getEmitter(int notificationNumber, int groupIndex)
     {
-        WebElement notifications =
-            getDriver().findElementsByCssSelector(NOTIFICATION_EVENT_SELECTOR).get(notificationNumber);
+        WebElement notifications = findNotifications().get(notificationNumber);
         WebElement emitter = notifications.findElements(cssSelector(EMITTER_SELECTOR)).get(groupIndex);
         return emitter.findElement(By.tagName("a")).getText();
+    }
+
+    protected List<WebElement> findNotifications()
+    {
+        return this.rootElement.findElements(cssSelector(NOTIFICATION_EVENT_SELECTOR));
     }
 }

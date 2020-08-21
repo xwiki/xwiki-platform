@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
 import org.xwiki.mentions.test.po.MentionNotificationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -116,7 +117,8 @@ public class MentionsIT
             String expected = "You have received one mention.";
             assertTrue(notificationContent.contains(expected),
                 String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
-            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage();
+            final WebElement rootElement = tray.getNotificationsButton();
+            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
             mentionNotificationPage.openGroup(0);
             assertEquals("mentioned you on page Mention Test Page", mentionNotificationPage.getText(0, 0));
             assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
@@ -177,7 +179,8 @@ public class MentionsIT
             String expected = "You have received one mention.";
             assertTrue(notificationContent.contains(expected),
                 String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
-            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage();
+            final WebElement rootElement = tray.getNotificationsButton();
+            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
             mentionNotificationPage.openGroup(0);
             assertEquals("mentioned you on a comment on page Mention Comment Test Page",
                 mentionNotificationPage.getText(0, 0));

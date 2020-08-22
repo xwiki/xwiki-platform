@@ -101,6 +101,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       '<!--startmacro:html|-||-|--><!--stopmacro-->' +
       '<p>' +
         '<!--startmacro:id|-|name="foo"-->' +
+          '<span id="foo"></span>' +
         '<!--stopmacro-->' +
       '</p>', {
       callback: function() {
@@ -123,11 +124,12 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         editor.config.fullData = true;
         expect(editor.getData()).toBe(
           '<!--startmacro:html|-||-|-->' +
-          '<div class="macro-placeholder">macro:html</div>' +
+            '<div class="macro-placeholder">macro:html</div>' +
           '<!--stopmacro-->' +
           '<p>' +
             '<!--startmacro:id|-|name="foo"-->' +
-            '<span class="macro-placeholder">macro:id</span>' +
+              '<span id="foo"></span>' +
+              '<span class="macro-placeholder">macro:id</span>' +
             '<!--stopmacro-->' +
           '</p>'
         );

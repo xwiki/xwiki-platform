@@ -134,7 +134,12 @@
             wrapper.add(output[i]);
           }
         } else {
-          // Use a placeholder for the macro output. The user cannot edit the macro otherwise.
+          // Use a placeholder for the macro output. Otherwise the user might not be able to select the macro to edit
+          // its parameters for instance. We do this here and not when the macro widget is initialized because the
+          // browser may add content (e.g. a non-breaking space or a BR tag) to make the (usually block-level) empty
+          // macro wrapper editable before the macro widget is initialized. Note that we don't add the placeholder if
+          // the macro output is not visible (e.g. empty in-line elements) because we cannot check at this point if the
+          // macro output is visible or not. We do this below when the macro widget is initialized.
           var placeholder = new CKEDITOR.htmlParser.element(wrapperName, {'class': 'macro-placeholder'});
           var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
           var text = editor.localization.get('xwiki-macro.placeholder', macroCall.name);
@@ -204,6 +209,12 @@
         init: function() {
           // Initialize the nested editables.
           macroPlugin.initializeNestedEditables(this, editor);
+          // Make sure the user can select the macro widget (e.g. to edit its parameters) by showing a placeholder text
+          // when the macro output is not visible.
+          if (!this.element.isVisible()) {
+            // The placeholder text is going to be set below when the widget data is set.
+            this.element.append(new CKEDITOR.dom.element(this.element.getName()).addClass('macro-placeholder'));
+          }
           // Initialize the widget data.
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
           // We need to focus the macro widget after it has been inserted or updated beause the edited content has been

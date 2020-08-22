@@ -117,8 +117,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private void beforeAllInternal(ExtensionContext extensionContext) throws Exception
     {
-        // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
-        // already started and we should not do anything.
+        // This method is going to be called for the top level test class but also for nested test classes. So if
+        // the currently executing test class has parents and one of them has the @UITest annotation, it means the
+        // test has already been setup (all Docker containers are already started, etc), and thus we should not do
+        // anything.
         if (hasParentTestContainingUITestAnnotation(extensionContext)) {
             return;
         }
@@ -331,14 +333,15 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        // If the tests has parent tests and one of them has the @UITest annotation then it means all containers
-        // have already been started and thus the servlet engine is supported.
+        // This method is the first one called in the test lifecycle. It's called for the top level test class but
+        // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
+        // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
+            // We are in the top level test. Create the TestConfiguration object and save it in the context.
             UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
             TestConfiguration testConfiguration = new TestConfiguration(uiTest);
             // Save the test configuration so that we can access it in afterAll()
             saveTestConfiguration(extensionContext, testConfiguration);
-
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {
                 return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",

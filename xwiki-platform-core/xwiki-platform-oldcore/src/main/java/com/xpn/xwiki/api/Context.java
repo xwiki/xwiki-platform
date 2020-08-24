@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.ScriptXWikiServletRequest;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -58,7 +59,7 @@ public class Context extends Api
      */
     public XWikiRequest getRequest()
     {
-        return getXWikiContext().getRequest();
+        return new ScriptXWikiServletRequest(getXWikiContext().getRequest(), getContextualAuthorizationManager());
     }
 
     /**

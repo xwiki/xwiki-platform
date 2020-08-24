@@ -78,7 +78,6 @@ public class DocumentReferenceConverterTest
     private DocumentReferenceResolver<EntityReference> mockReferenceResolver;
 
     @MockComponent
-    @Named("compact")
     private EntityReferenceSerializer<String> mockSerialier;
 
     @BeforeEach

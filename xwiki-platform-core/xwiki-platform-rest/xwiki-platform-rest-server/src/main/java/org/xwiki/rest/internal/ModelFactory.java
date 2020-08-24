@@ -560,6 +560,7 @@ public class ModelFactory
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getDocumentReference().getName());
         pageSummary.setTitle(doc.getDisplayTitle());
+        pageSummary.setRawTitle(doc.getTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(toRestTranslations(baseUri, doc));

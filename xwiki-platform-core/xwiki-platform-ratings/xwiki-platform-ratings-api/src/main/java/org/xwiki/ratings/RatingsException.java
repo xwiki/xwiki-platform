@@ -19,6 +19,8 @@
  */
 package org.xwiki.ratings;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -44,6 +46,8 @@ public class RatingsException extends XWikiException
     public static final int ERROR_RATINGS_INVALID_RATING_ID = 1120004;
 
     public static final int ERROR_RATINGS_SAVERATING_NULLDOCUMENT = 1120005;
+
+    public static final int ERROR_RATING_SOLR_CORE = 1120006;
 
     /**
      * RatingsException default constructor
@@ -88,5 +92,18 @@ public class RatingsException extends XWikiException
 
         initCause(e.getCause());
         setArgs(e.getArgs());
+    }
+
+    /**
+     * Constructor taking a message and a parent exception.
+     *
+     * @param message the message of the exception.
+     * @param throwable the parent cause.
+     * @since 12.6
+     */
+    @Unstable
+    public RatingsException(String message, Throwable throwable)
+    {
+        super(message, throwable);
     }
 }

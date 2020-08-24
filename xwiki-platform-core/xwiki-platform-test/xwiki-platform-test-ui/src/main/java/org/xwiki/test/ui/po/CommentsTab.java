@@ -90,7 +90,7 @@ public class CommentsTab extends BaseElement
     public int postComment(String content, boolean wait)
     {
         CommentForm addCommentForm = getAddCommentForm();
-        addCommentForm.getContentField().sendKeys(content);
+        addCommentForm.addToContentField(content);
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
@@ -127,7 +127,9 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(
+        // Comments are handled async so it makes sense to wait for the reply button to be ready if another comment
+        // has just been posted for example. That's why we don't use findElementWithoutWaiting here.
+        getDriver().findElement(
             By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
@@ -141,7 +143,7 @@ public class CommentsTab extends BaseElement
     public void replyToCommentByID(int id, String replyContent)
     {
         CommentForm replyCommentForm = replyToCommentByID(id);
-        replyCommentForm.getContentField().sendKeys(replyContent);
+        replyCommentForm.addToContentField(replyContent);
         replyCommentForm.clickSubmit();
     }
 
@@ -156,7 +158,7 @@ public class CommentsTab extends BaseElement
         getDriver()
             .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
             .click();
-        getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
+        getDriver().waitUntilElementIsVisible(By.className("commenteditor-" + id));
         return new CommentForm(By.className("edit-xcomment"));
     }
 
@@ -169,8 +171,7 @@ public class CommentsTab extends BaseElement
     public void editCommentByID(int id, String content)
     {
         CommentForm editCommentForm = editCommentByID(id);
-        editCommentForm.getContentField().clear();
-        editCommentForm.getContentField().sendKeys(content);
+        editCommentForm.clearAndSetContentField(content);
         editCommentForm.clickSubmit();
     }
 

@@ -23,10 +23,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.browser.Browser;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,20 +36,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-public class TestConfigurationTest
+class TestConfigurationTest
 {
     @UITest
-    public class EmptyAnnotation
+    class EmptyAnnotation
     {
     }
 
     @UITest(servletEngine = ServletEngine.TOMCAT, verbose = true, databaseTag = "version")
-    public class SampleAnnotation
+    class SampleAnnotation
     {
     }
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         System.clearProperty("xwiki.test.ui.servletEngine");
         System.clearProperty("xwiki.test.ui.verbose");
@@ -56,18 +57,20 @@ public class TestConfigurationTest
     }
 
     @Test
-    public void getConfigurationWhenDefault()
+    void getConfigurationWhenDefault()
     {
         UITest uiTest = EmptyAnnotation.class.getAnnotation(UITest.class);
 
         TestConfiguration configuration = new TestConfiguration(uiTest);
         assertEquals(ServletEngine.JETTY_STANDALONE, configuration.getServletEngine());
-        assertFalse(configuration.isVerbose());
+        assertEquals(Browser.FIREFOX, configuration.getBrowser());
+        assertEquals(Database.HSQLDB_EMBEDDED, configuration.getDatabase());
+        assertNull(configuration.getServletEngineTag());
         assertNull(configuration.getDatabaseTag());
     }
 
     @Test
-    public void getConfigurationWhenInAnnotationAndNoSystemProperty()
+    void getConfigurationWhenInAnnotationAndNoSystemProperty()
     {
         UITest uiTest = SampleAnnotation.class.getAnnotation(UITest.class);
 
@@ -78,7 +81,7 @@ public class TestConfigurationTest
     }
 
     @Test
-    public void getConfigurationWhenInSystemPropertiesAndNotInAnnotation()
+    void getConfigurationWhenInSystemPropertiesAndNotInAnnotation()
     {
         UITest uiTest = EmptyAnnotation.class.getAnnotation(UITest.class);
         System.setProperty("xwiki.test.ui.servletEngine", "jetty");
@@ -92,7 +95,7 @@ public class TestConfigurationTest
     }
 
     @Test
-    public void getConfigurationWhenInSystemPropertiesAndInAnnotation()
+    void getConfigurationWhenInSystemPropertiesAndInAnnotation()
     {
         UITest uiTest = SampleAnnotation.class.getAnnotation(UITest.class);
         System.setProperty("xwiki.test.ui.servletEngine", "jetty");

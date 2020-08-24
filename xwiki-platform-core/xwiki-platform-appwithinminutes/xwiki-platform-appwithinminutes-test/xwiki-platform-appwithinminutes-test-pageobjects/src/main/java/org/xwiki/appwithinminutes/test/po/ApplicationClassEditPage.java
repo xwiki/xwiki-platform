@@ -95,19 +95,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    return !addedField.getAttribute("class").contains("loading");
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return !addedField.getAttribute("class").contains("loading");
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
 

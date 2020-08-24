@@ -64,9 +64,10 @@ public class RequestInitializer
         String requestWiki = (String) contextStore.get(XWikiContextContextStore.PROP_REQUEST_WIKI);
         if (requestWiki == null) {
             requestWiki = storedWikiId;
-        } else {
-            xcontext.setOriginalWikiId(requestWiki);
         }
+
+        // Set the original wiki to property choose between full or relative URL
+        xcontext.setOriginalWikiId(requestWiki);
 
         // Find the URL to put in the context request
         URL url = (URL) contextStore.get(XWikiContextContextStore.PROP_REQUEST_URL);

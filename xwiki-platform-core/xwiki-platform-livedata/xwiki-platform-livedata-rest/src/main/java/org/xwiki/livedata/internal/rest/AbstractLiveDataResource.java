@@ -54,7 +54,7 @@ import org.xwiki.rest.model.jaxb.Link;
  * Base class for live data REST resources.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 public abstract class AbstractLiveDataResource extends XWikiResource
 {
@@ -65,8 +65,8 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         String namespace)
     {
         LiveDataQuery.Source source = new LiveDataQuery.Source();
-        source.putAll(sourceParams);
         source.setId(sourceId);
+        source.getParameters().putAll(sourceParams);
         return this.liveDataSourceManager.get(source, namespace);
     }
 
@@ -114,18 +114,16 @@ public abstract class AbstractLiveDataResource extends XWikiResource
 
     protected PropertyDescriptor createPropertyDescriptor(LiveDataPropertyDescriptor descriptor)
     {
+        // Prevent null pointer exceptions.
+        descriptor.initialize();
+
         StringMap icon = new StringMap();
         icon.putAll(descriptor.getIcon());
 
-        StringMap displayer = new StringMap();
-        displayer.putAll(descriptor.getDisplayer());
-
-        StringMap filter = new StringMap();
-        filter.putAll(descriptor.getFilter());
-
         return (PropertyDescriptor) new PropertyDescriptor().withId(descriptor.getId()).withName(descriptor.getName())
-            .withDescription(descriptor.getDescription()).withIcon(icon).withSortable(descriptor.isSortable())
-            .withDisplayer(displayer).withFilter(filter).withType(descriptor.getType())
+            .withDescription(descriptor.getDescription()).withIcon(icon).withHidden(descriptor.isHidden())
+            .withDisplayer(descriptor.getDisplayer()).withSortable(descriptor.isSortable())
+            .withFilterable(descriptor.isFilterable()).withFilter(descriptor.getFilter()).withType(descriptor.getType())
             .withStyleName(descriptor.getStyleName());
     }
 
@@ -180,9 +178,11 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         propertyDescriptor.setDescription(descriptor.getDescription());
         propertyDescriptor.getIcon().putAll(descriptor.getIcon());
         propertyDescriptor.setType(descriptor.getType());
+        propertyDescriptor.setHidden(descriptor.isHidden());
         propertyDescriptor.setSortable(descriptor.isSortable());
-        propertyDescriptor.getDisplayer().putAll(descriptor.getDisplayer());
-        propertyDescriptor.getFilter().putAll(descriptor.getFilter());
+        propertyDescriptor.setFilterable(descriptor.isFilterable());
+        propertyDescriptor.setDisplayer(descriptor.getDisplayer());
+        propertyDescriptor.setFilter(descriptor.getFilter());
         propertyDescriptor.setStyleName(descriptor.getStyleName());
         return propertyDescriptor;
     }

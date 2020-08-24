@@ -21,6 +21,8 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
@@ -319,5 +321,39 @@ public class DefaultRating implements Rating
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DefaultRating that = (DefaultRating) o;
+
+        return new EqualsBuilder()
+            .append(documentRef, that.documentRef)
+            .append(document, that.document)
+            .append(object, that.object)
+            .append(context, that.context)
+            .append(ratingsManager, that.ratingsManager)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(documentRef)
+            .append(document)
+            .append(object)
+            .append(context)
+            .append(ratingsManager)
+            .toHashCode();
     }
 }

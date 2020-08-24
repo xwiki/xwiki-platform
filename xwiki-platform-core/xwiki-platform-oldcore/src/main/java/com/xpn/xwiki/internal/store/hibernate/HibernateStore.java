@@ -29,9 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -115,20 +114,10 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
 
-    private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
-
     /**
-     * Recognize the database used based on the JDBC driver class used.
+     * The name of the property for configuring the current timezone.
      */
-    static {
-        DRIVER_MAPPING.put("org.postgresql.Driver", DatabaseProduct.POSTGRESQL);
-        DRIVER_MAPPING.put("oracle.jdbc.driver.OracleDriver", DatabaseProduct.ORACLE);
-        DRIVER_MAPPING.put("org.hsqldb.jdbcDriver", DatabaseProduct.HSQLDB);
-        // MySQL has 2 possible driver classes that can be used. The "com.mysql.jdbc.Driver" one is deprecated but we
-        // must still recognize the DB as MySQL.
-        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
-        DRIVER_MAPPING.put("com.mysql.cj.jdbc.Driver", DatabaseProduct.MYSQL);
-    }
+    private static final String PROPERTY_TIMEZONE = "timezone";
 
     @Inject
     private Logger logger;
@@ -278,6 +267,9 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         if (url.matches(".*\\$\\{.*\\}.*")) {
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
                 this.environment.getPermanentDirectory().getAbsolutePath());
+
+            newURL =
+                StringUtils.replace(newURL, String.format("${%s}", PROPERTY_TIMEZONE), TimeZone.getDefault().getID());
 
             // Set the new URL
             hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
@@ -441,15 +433,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String driverClassName = this.configuration.getProperty("hibernate.connection.driver_class");
-                if (driverClassName == null) {
-                    driverClassName = this.configuration.getProperty("connection.driver_class");
+                String connectionURL = this.configuration.getProperty("hibernate.connection.url");
+                if (connectionURL == null) {
+                    connectionURL = this.configuration.getProperty("connection.url");
                 }
-                product = DRIVER_MAPPING.getOrDefault(driverClassName, DatabaseProduct.UNKNOWN);
+                product = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
 
         return product;
+    }
+
+    private String extractJDBCConnectionURLScheme(String fullConnectionURL)
+    {
+        // Format of a JDBC URL is always: "jdbc:<db scheme>:..."
+        return StringUtils.split(fullConnectionURL, ':')[1];
     }
 
     /**

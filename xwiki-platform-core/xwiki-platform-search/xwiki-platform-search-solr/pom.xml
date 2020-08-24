@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
@@ -81,6 +81,10 @@
           </exclusion>
           <exclusion>
             <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>*</artifactId>
           </exclusion>
           <!-- We use slf4j in XWiki -->

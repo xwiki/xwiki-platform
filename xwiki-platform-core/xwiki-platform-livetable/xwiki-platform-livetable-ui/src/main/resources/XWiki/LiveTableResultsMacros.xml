@@ -447,6 +447,12 @@
   #elseif($colname == '_images')
     #livetable_getImagesList($itemDoc)
     #set($discard = $row.put($colname, $imagesList))
+  ## Output likes if they are available.
+  #elseif($colname == '_likes' &amp;&amp; "$!services.like" != "")
+    #set($likes = $services.like.getLikes($docReference))
+    #if ($likes.isPresent())
+      #set($discard = $row.put('_likes', $likes.get().likeNumber))
+    #end
   #else
     #livetable_getPropertyClassAndType($colname)
     #if(!$propClass.equals($class))
@@ -666,7 +672,10 @@
       #if ($colName.startsWith('doc.'))
         #if ($colName == 'doc.location')
           #set ($safeColName = 'doc.fullName')
-          #addLivetableLocationFilter($whereSql, $whereParams, $filterValue, true)
+          ## Use filterLocation since addLivetableLocationFilter is buggy when called several times (it'll add the
+          ## same HQL binding name every time it's called! See https://jira.xwiki.org/browse/XWIKI-17463).
+          ## Also note that we don't call addLocationFilter since we use a Map for $params.
+          #filterLocation($whereSql, $whereParams, $filterValue, 'locationFilterValue2', true)
         #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
           #livetable_getTableAlias($colname)
           #livetable_filterDateProperty()

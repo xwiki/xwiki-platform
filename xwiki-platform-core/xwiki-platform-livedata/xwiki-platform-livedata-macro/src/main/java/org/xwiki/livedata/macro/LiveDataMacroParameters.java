@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Parameters for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Unstable
 public class LiveDataMacroParameters
@@ -46,9 +46,15 @@ public class LiveDataMacroParameters
 
     private String filters;
 
-    private int limit = 15;
+    private Integer limit;
 
-    private long offset;
+    private Long offset;
+
+    private String layouts;
+
+    private Boolean showPageSizeDropdown;
+
+    private String pageSizes;
 
     /**
      * @return the live data instance id
@@ -190,7 +196,7 @@ public class LiveDataMacroParameters
     /**
      * @return the maximum number of live data entries to show on a page
      */
-    public int getLimit()
+    public Integer getLimit()
     {
         return limit;
     }
@@ -201,7 +207,7 @@ public class LiveDataMacroParameters
      * @param limit the maximum number of live data entries to show on a page
      */
     @PropertyDescription("The maximum number of live data entries to show on a page.")
-    public void setLimit(int limit)
+    public void setLimit(Integer limit)
     {
         this.limit = limit;
     }
@@ -209,7 +215,7 @@ public class LiveDataMacroParameters
     /**
      * @return the index of the first live data entry to show
      */
-    public long getOffset()
+    public Long getOffset()
     {
         return offset;
     }
@@ -220,8 +226,72 @@ public class LiveDataMacroParameters
      * @param offset the index of the first live data entry to show
      */
     @PropertyDescription("The index of the first live data entry to show.")
-    public void setOffset(long offset)
+    public void setOffset(Long offset)
     {
         this.offset = offset;
+    }
+
+    /**
+     * @return a comma-separated list of layout identifiers, indicating the layouts the user can choose from to display
+     *         the live data
+     */
+    public String getLayouts()
+    {
+        return layouts;
+    }
+
+    /**
+     * Sets the layouts that the user can choose from to display the live data. The first layout in the list will be
+     * loaded initially.
+     * 
+     * @param layouts a comma-separated list of layout identifiers
+     */
+    @PropertyDescription("The comma-separated list of layouts the user can choose from to display the live data. "
+        + "The first layout in the list will be loaded initially.")
+    public void setLayouts(String layouts)
+    {
+        this.layouts = layouts;
+    }
+
+    /**
+     * @return whether to show or not the page size drop down that allows the user to change the number of entries
+     *         displayed per page
+     */
+    public Boolean getShowPageSizeDropdown()
+    {
+        return showPageSizeDropdown;
+    }
+
+    /**
+     * Sets whether to show or not the page size drop down that allows the user to change the number of entries
+     * displayed per page.
+     * 
+     * @param showPageSizeDropdown {@code true} to show the page size drop down, {@code false} otherwise; leave
+     *            {@code null} to inherit from the default configuration
+     */
+    @PropertyDescription("Show or hide the page size drop down that allows the user to change "
+        + "the number of entries displayed per page.")
+    public void setShowPageSizeDropdown(Boolean showPageSizeDropdown)
+    {
+        this.showPageSizeDropdown = showPageSizeDropdown;
+    }
+
+    /**
+     * @return the values to display in the page size drop down
+     */
+    public String getPageSizes()
+    {
+        return pageSizes;
+    }
+
+    /**
+     * Sets the values to display in the page size drop down.
+     * 
+     * @param pageSizes a comma-separated list of page sizes to display in the page size drop down
+     */
+    @PropertyDescription("The comma-separated list of page sizes to display in the page size drop down.")
+    public void setPageSizes(String pageSizes)
+    {
+        this.pageSizes = pageSizes;
     }
 }

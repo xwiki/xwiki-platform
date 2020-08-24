@@ -19,14 +19,29 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,14 +56,73 @@ public class DocumentUserManagerTest
     private DocumentUserManager userManager;
 
     @MockComponent
-    private DocumentAccessBridge dab;
+    private Provider<XWikiContext> contextProvider;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void exists()
+    void exists() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        when(this.dab.exists(reference)).thenReturn(true);
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
+        when(document.isNew()).thenReturn(false);
+        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
+            EntityType.SPACE)))).thenReturn(mock(BaseObject.class));
 
         assertTrue(this.userManager.exists(new DocumentUserReference(reference, null)));
+    }
+
+    @Test
+    void existsWhenDocumentIsNotAUser() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.isNew()).thenReturn(false);
+        when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
+        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
+            EntityType.SPACE)))).thenReturn(null);
+
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+    }
+
+    @Test
+    void existsWhenNoDocument() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.isNew()).thenReturn(true);
+        when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
+
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+    }
+
+    @Test
+    void existsWhenError() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        when(xwiki.getDocument(reference, xcontext)).thenThrow(new XWikiException(0, 0, "error"));
+
+        assertFalse(this.userManager.exists(new DocumentUserReference(reference, null)));
+
+        assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. Considering it's not "
+            + "the case. Root error: [XWikiException: Error number 0 in 0: error]", logCapture.getMessage(0));
     }
 }

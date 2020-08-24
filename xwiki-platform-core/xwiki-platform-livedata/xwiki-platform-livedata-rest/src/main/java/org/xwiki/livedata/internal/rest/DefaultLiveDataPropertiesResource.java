@@ -47,10 +47,10 @@ import org.xwiki.rest.model.jaxb.Link;
  * Default implementation of {@link LiveDataPropertiesResource}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
-@Named("org.xwiki.livedata.rest.internal.DefaultLiveDataPropertiesResource")
+@Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertiesResource")
 @Singleton
 public class DefaultLiveDataPropertiesResource extends AbstractLiveDataResource implements LiveDataPropertiesResource
 {
@@ -59,7 +59,7 @@ public class DefaultLiveDataPropertiesResource extends AbstractLiveDataResource 
     {
         Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
         if (source.isPresent()) {
-            return createProperties(source.get().getPropertyTypes().get(), hint, namespace);
+            return createProperties(source.get().getProperties().get(), hint, namespace);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

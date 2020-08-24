@@ -42,7 +42,7 @@ import org.xwiki.livedata.WithParameters;
  * Default {@link LiveDataSourceManager} implementation.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Singleton
@@ -62,14 +62,14 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
     private ComponentManagerManager componentManagerManager;
 
     @Override
-    public Optional<LiveDataSource> get(Source sourceParams, String namespace)
+    public Optional<LiveDataSource> get(Source sourceConfig, String namespace)
     {
         ComponentManager cm = getComponentManager(namespace);
-        if (cm != null && cm.hasComponent(LiveDataSource.class, sourceParams.getId())) {
+        if (cm != null && cm.hasComponent(LiveDataSource.class, sourceConfig.getId())) {
             try {
-                LiveDataSource liveDataSource = cm.getInstance(LiveDataSource.class, sourceParams.getId());
+                LiveDataSource liveDataSource = cm.getInstance(LiveDataSource.class, sourceConfig.getId());
                 if (liveDataSource instanceof WithParameters) {
-                    ((WithParameters) liveDataSource).getParameters().putAll(sourceParams);
+                    ((WithParameters) liveDataSource).getParameters().putAll(sourceConfig.getParameters());
                 }
                 return Optional.of(liveDataSource);
             } catch (ComponentLookupException e) {

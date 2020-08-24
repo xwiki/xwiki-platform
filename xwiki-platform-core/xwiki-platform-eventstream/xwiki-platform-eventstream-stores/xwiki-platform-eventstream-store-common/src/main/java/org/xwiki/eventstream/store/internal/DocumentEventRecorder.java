@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.concurrent.ExecutionException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,7 +34,6 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -75,8 +76,10 @@ public class DocumentEventRecorder
      * @param event the event to record
      * @param source the source that has triggered the event
      * @throws EventStreamException when failing to record the passed event
+     * @throws ExecutionException if this future completed exceptionally
+     * @throws InterruptedException if the current thread was interrupted
      */
-    public void recordEvent(Event event, Object source) throws EventStreamException
+    public void recordEvent(Event event, Object source) throws EventStreamException, InterruptedException, ExecutionException
     {
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
@@ -127,7 +130,6 @@ public class DocumentEventRecorder
     }
 
     private void recordEvent(String streamName, XWikiDocument doc, String type, String title)
-        throws EventStreamException
     {
         final String msgPrefix = "activitystream.event.";
 

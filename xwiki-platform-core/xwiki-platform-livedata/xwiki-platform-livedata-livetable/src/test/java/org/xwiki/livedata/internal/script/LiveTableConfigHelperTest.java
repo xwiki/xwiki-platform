@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for {@link LiveTableConfigHelper}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class LiveTableConfigHelperTest

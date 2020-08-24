@@ -93,6 +93,7 @@ function enhanceEmptyIsToday(field) {
     emptyIsToday.insert({after: new Element('input', {type: 'hidden', value: '0', name: emptyIsToday.name})});
   }
 }
+/** @suppress {uselessCode} */
 function enhanceDateFormat(field) {
   var dateFormatInput = $(field.getPropertyId('dateFormat'));
   if (dateFormatInput.type == 'text') {

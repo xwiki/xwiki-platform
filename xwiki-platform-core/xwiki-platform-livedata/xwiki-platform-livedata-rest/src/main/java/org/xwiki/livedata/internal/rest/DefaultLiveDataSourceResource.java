@@ -36,10 +36,10 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
  * Default implementation of {@link LiveDataSourceResource}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
-@Named("org.xwiki.livedata.rest.internal.DefaultLiveDataSourceResource")
+@Named("org.xwiki.livedata.internal.rest.DefaultLiveDataSourceResource")
 @Singleton
 public class DefaultLiveDataSourceResource extends AbstractLiveDataResource implements LiveDataSourceResource
 {

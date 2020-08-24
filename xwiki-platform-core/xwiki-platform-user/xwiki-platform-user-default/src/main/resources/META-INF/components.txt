@@ -1,7 +1,9 @@
 org.xwiki.user.internal.DefaultUserConfiguration
 org.xwiki.user.internal.DefaultUserManager
 org.xwiki.user.internal.SuperAdminConfigurationSource
+org.xwiki.user.internal.AllSuperAdminConfigurationSource
 org.xwiki.user.internal.GuestConfigurationSource
+org.xwiki.user.internal.AllGuestConfigurationSource
 org.xwiki.user.internal.ConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer
 org.xwiki.user.internal.UserReferenceConverter

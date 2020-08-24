@@ -27,6 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -57,7 +58,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
 public class NotificationsIT
@@ -94,12 +98,16 @@ public class NotificationsIT
 
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 0);
         p.disableAllParameters();
         // Enable own filter
         p.getNotificationFilterPreferences().get(2).setEnabled(true);
 
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
         p.disableAllParameters();
     }
 
@@ -148,6 +156,9 @@ public class NotificationsIT
 
         // Check that the badge is showing «20+»
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
+            PAGES_TOP_CREATION_COUNT);
         testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
@@ -240,10 +251,16 @@ public class NotificationsIT
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));
-        assertTrue(tray.getNotificationDescription(0).startsWith(String.format("commented by %s", FIRST_USER_NAME)));
+        String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
+        String obtainedComment = tray.getNotificationDescription(0);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
-        assertTrue(tray.getNotificationDescription(1).startsWith(String.format("edited by %s", FIRST_USER_NAME)));
+        expectedComment = String.format("edited by %s", FIRST_USER_NAME);
+        obtainedComment = tray.getNotificationDescription(1);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();
@@ -327,6 +344,7 @@ public class NotificationsIT
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
+        DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
@@ -350,12 +368,30 @@ public class NotificationsIT
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             assertFalse(preferences.get(2).isEnabled());
             preferences.get(2).setEnabled(true);
+            testUtils.createPage(page2, "", "Page 2");
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             notificationsTrayPage = new NotificationsTrayPage();
-            assertEquals(0, notificationsTrayPage.getNotificationsCount());
+
+            // Ensure we only have the previous notification.
+            assertEquals(1, notificationsTrayPage.getNotificationsCount());
+            assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
+                notificationsTrayPage.getNotificationDescription(0));
+            assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
             testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
         }
+    }
+
+    @Test
+    @Order(5)
+    public void guestUsersDontSeeNotificationPanel(TestUtils testUtils)
+    {
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        testUtils.gotoPage("Main", "WebHome");
+        assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
+        testUtils.forceGuestUser();
+        assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());
     }
 }

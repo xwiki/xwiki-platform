@@ -67,7 +67,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as extension
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
 public class NotificationsEmailsIT

@@ -22,7 +22,6 @@ package org.xwiki.annotation.rest.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,6 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
     /**
      * Request parameter prefix for a filter in an annotation request.
      */
-
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
 
     /**
@@ -95,10 +93,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
-            String documentName = referenceSerializer.serialize(documentReference);
+            String documentName = this.referenceSerializer.serialize(documentReference);
 
             // check access to this function
-            if (!annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
+            if (!this.annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
@@ -110,7 +108,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             Form form = Request.getCurrent().getResourceRef().getQueryAsForm();
             AnnotationRequest request = new AnnotationRequest();
             AnnotationFieldCollection fields = new AnnotationFieldCollection();
-            List<AnnotationField> annotationFields = new ArrayList<AnnotationField>();
+            List<AnnotationField> annotationFields = new ArrayList<>();
             AnnotationRequest.Request requestedFields = new AnnotationRequest.Request();
             for (String name : form.getNames()) {
                 if (StringUtils.startsWith(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX)) {
@@ -162,39 +160,23 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
-            String documentName = referenceSerializer.serialize(documentReference);
+            String documentName = this.referenceSerializer.serialize(documentReference);
 
             // check access to this function
-            if (!annotationRightService.canAddAnnotation(documentName, getXWikiUser())) {
+            if (!this.annotationRightService.canAddAnnotation(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
             // add the annotation
             Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
-            annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
+            this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
                 request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
+
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
-            return response;
+            return getSuccessResponseWithAnnotatedContent(documentName, request);
         } catch (AnnotationServiceException | XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
-    }
-
-    /**
-     * Builds a simple map from a field collection.
-     *
-     * @param fields the collection of fields to build a map for
-     * @return a map of the fields, as string key and Object value pair
-     */
-    protected Map<String, Object> getMap(AnnotationFieldCollection fields)
-    {
-        Map<String, Object> metadataMap = new HashMap<String, Object>();
-        for (AnnotationField f : fields.getFields()) {
-            metadataMap.put(f.getName(), f.getValue());
-        }
-
-        return metadataMap;
     }
 }

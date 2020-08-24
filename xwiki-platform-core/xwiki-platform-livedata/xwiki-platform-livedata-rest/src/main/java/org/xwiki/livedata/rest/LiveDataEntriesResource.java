@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * Provides the list of entries from an existing {@link LiveDataSource}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Path("/liveData/sources/{sourceId}/entries")
 @Unstable

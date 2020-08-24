@@ -163,7 +163,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension installedExtension = this.installedRepository.getInstalledExtension(extensionId);
 
-        if (installedExtension != null && installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+        if (installedExtension != null && XarExtensionHandler.TYPE.equals(installedExtension.getType())) {
             if (getInstalledExtension(installedExtension.getId()) == null) {
                 try {
                     addCacheXarExtension(installedExtension);
@@ -198,7 +198,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     private void loadExtensions()
     {
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
-            if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equalsIgnoreCase(localExtension.getType())) {
                 try {
                     // Add XAR extension to the cache
                     XarInstalledExtension xarInstalledExtension = addCacheXarExtension(localExtension);
@@ -307,7 +307,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
         if (extension != null) {
-            if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equals(extension.getType())) {
                 extension = this.extensions.get(extension.getId());
             } else {
                 extension = null;
@@ -336,7 +336,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE)
+        return XarExtensionHandler.TYPE.equals(extension.getType())
             ? this.installedRepository.getBackwardDependencies(id, namespace, withOptional) : null;
     }
 
@@ -346,7 +346,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE)
+        return XarExtensionHandler.TYPE.equals(extension.getType())
             ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 }

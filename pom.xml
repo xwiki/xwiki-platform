@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -35,13 +35,13 @@
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
     -->
-    <relativePath />
+    <relativePath/>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>12.5-SNAPSHOT</version>
+  <version>12.7-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -49,19 +49,19 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.5.0</hsqldb.version>
+    <hsqldb.version>2.5.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.46-SNAPSHOT</ckeditor.version>
+    <ckeditor.version>1.49</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.13</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.24.1</tika.version>
-    <pdfbox.version>2.0.19</pdfbox.version>
+    <pdfbox.version>2.0.20</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- Jetty version -->
-    <jetty.version>9.4.27.v20200227</jetty.version>
+    <jetty.version>9.4.29.v20200521</jetty.version>
 
     <!-- Netty version -->
     <netty.version>4.1.48.Final</netty.version>
@@ -72,8 +72,8 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
 
-    <!-- The recommended version of known extensions to use -->
     <xwiki.extension.recommendedVersions.platform>
+    <!-- The recommended version of known extensions to use -->
       ${xwiki.extension.recommendedVersions.commons},
       org.xwiki.rendering:.*/[${rendering.version}],
       org.xwiki.platform:.*/[${platform.version}]
@@ -86,38 +86,37 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.16.Final</hibernate.version>
+    <hibernate.version>5.4.20.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.20</mysql.version>
+    <mysql.version>8.0.21</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>2.6.0</mariadb.version>
+    <mariadb.version>2.6.2</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.12</pgsql.version>
+    <pgsql.version>42.2.14</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
-    <mariadb.version>2.3.0</mariadb.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>6.3.5.2</libreoffice.version>
+    <libreoffice.version>6.3.6.2</libreoffice.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>stable-10.7.x</tag>
+    <tag>stable-12.6.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -239,12 +238,12 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.12.2</version>
+        <version>1.15.0</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome-utils</artifactId>
-        <version>1.12.2</version>
+        <version>1.15.0</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -403,7 +402,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.5.0</version>
+        <version>5.6.0</version>
       </dependency>
 
       <dependency>
@@ -490,7 +489,7 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>3.1</version>
+        <version>3.2</version>
       </dependency>
 
       <!-- JNR -->
@@ -507,7 +506,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.1.15</version>
+        <version>2.1.16</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -517,7 +516,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.57</version>
+        <version>3.0.58</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -622,7 +621,7 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.12.2</version>
+        <version>3.12.4</version>
       </dependency>
 
       <!-- Mails -->
@@ -727,6 +726,13 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-buffer</artifactId>
         <version>${netty.version}</version>
+      </dependency>
+
+      <!-- Jetbrain's annotations are used by several dependencies -->
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>19.0.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

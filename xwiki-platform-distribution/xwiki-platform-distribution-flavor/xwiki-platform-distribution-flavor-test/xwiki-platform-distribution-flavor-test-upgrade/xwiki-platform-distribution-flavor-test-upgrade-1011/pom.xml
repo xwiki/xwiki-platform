@@ -25,20 +25,20 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1011</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
-    <upgradetest.previousflavor.version>10.11.1</upgradetest.previousflavor.version>
+    <upgradetest.previousflavor.version>10.11.11</upgradetest.previousflavor.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <version>10.11.1</version>
+      <version>${upgradetest.previousflavor.version}</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

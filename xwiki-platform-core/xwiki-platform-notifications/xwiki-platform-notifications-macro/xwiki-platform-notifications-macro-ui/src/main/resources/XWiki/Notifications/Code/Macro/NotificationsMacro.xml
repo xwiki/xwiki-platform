@@ -260,7 +260,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
    * @param users (optional) list of users, comma-separated, to include in the notifications (and only them)
    * @param tags (optional) list of tags, comma-separated, to include in the notifications (and only them)
    */
-  return function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
+  var factory = function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
       displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, wikis, spaces, pages, users, tags) {
     var self = this;
     self.macro = $(macro);
@@ -312,13 +312,14 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       };
       if (untilDate) {
         params.untilDate = untilDate;
+        params.untilDateIncluded = false;
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();
       self.doLoad(params, untilDate, promise);
       return promise;
     };
-    
+
     self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
       $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
@@ -337,7 +338,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         self.displayNoNotification();
       });
     };
-    
+
     self.showNotifications = function(data, untilDate, promise) {
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
@@ -372,7 +373,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       // Call the listeners
       promise.resolve(data.notifications);
     };
-    
+
     /**
      * Add the given DOM element into the macro container (could be before the RSS link if there is one).
      */
@@ -450,6 +451,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         .text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
     };
   };
+
+  return factory;
 });
 </code>
     </property>
@@ -556,7 +559,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
    *
    * @param macro DOM element that will be uses as container for the notifications.
    */
-  return function(macro) {
+  var factory = function(macro) {
     var self = this;
     self.macro = $(macro);
     self.displayReadStatus = self.macro.attr('data-displayReadStatus').toLowerCase() == 'true';
@@ -578,7 +581,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         });
       }
     };
-    
+
     self.augmentEntry = function (entry) {
       if (!entry.data('augmented')) {
         // Ensure to not call twice this method.
@@ -650,6 +653,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
     var observer = new MutationObserver(self.processEvents);
     observer.observe(document, { childList: true, subtree : true});
   };
+
+  return factory;
 });
 </code>
     </property>
@@ -1146,7 +1151,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
   #set($discard = $dataParameters.add("data-$key=""$parameters.get($key)"""))
 #end
 #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
-#set($notifs = $services.notification.notifiers.getNotifications($notifParameters))
+#set($notifs = $services.notification.notifiers.getNotifications($notifParameters, true))
 {{html clean="false"}}
 &lt;div class="notifications-macro" data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)" $stringtool.join($dataParameters, " ")&gt;
 #if ('true' == $xcontext.macro.params.displayRSSLink)

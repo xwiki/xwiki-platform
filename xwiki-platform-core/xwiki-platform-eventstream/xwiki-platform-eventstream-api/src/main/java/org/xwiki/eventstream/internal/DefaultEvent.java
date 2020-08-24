@@ -44,7 +44,7 @@ public class DefaultEvent implements Event
 {
     /** The format of the {@link #toString()} result. */
     private static final MessageFormat STRING_FORMAT =
-        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3}");
+        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3} with id {4}");
 
     /** @see #getId() */
     private String id;
@@ -104,6 +104,8 @@ public class DefaultEvent implements Event
     private Set<String> target;
 
     private boolean hidden;
+
+    private boolean prefiltered;
 
     @Override
     public String getId()
@@ -360,7 +362,7 @@ public class DefaultEvent implements Event
     @Override
     public String toString()
     {
-        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument()});
+        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument(), getId()});
     }
 
     @Override
@@ -373,6 +375,18 @@ public class DefaultEvent implements Event
     public void setHidden(boolean isHidden)
     {
         this.hidden = isHidden;
+    }
+
+    @Override
+    public boolean isPrefiltered()
+    {
+        return this.prefiltered;
+    }
+
+    @Override
+    public void setPrefiltered(boolean prefiltered)
+    {
+        this.prefiltered = prefiltered;
     }
 
     /**
@@ -413,6 +427,7 @@ public class DefaultEvent implements Event
             builder.append(getUrl(), otherEvent.getUrl());
             builder.append(getUser(), otherEvent.getUser());
             builder.append(getWiki(), otherEvent.getWiki());
+            builder.append(isPrefiltered(), otherEvent.isPrefiltered());
 
             return builder.build();
         }
@@ -451,6 +466,7 @@ public class DefaultEvent implements Event
         builder.append(getUrl());
         builder.append(getUser());
         builder.append(getWiki());
+        builder.append(isPrefiltered());
 
         return builder.build();
     }

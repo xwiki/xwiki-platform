@@ -124,6 +124,8 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
         if (notificationParameters.endDate != null) {
             cacheKeyBuilder.append(notificationParameters.endDate.getTime())
                 .append(CACHE_KEY_SEPARATOR);
+            cacheKeyBuilder.append(notificationParameters.endDateIncluded)
+                .append(CACHE_KEY_SEPARATOR);
         }
 
         cacheKeyBuilder

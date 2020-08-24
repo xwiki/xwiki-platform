@@ -96,8 +96,6 @@ notifications.filters.preferences.setEnabled.error=Kunne ikke lagre filterinnsti
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Du må aktivere varsler i innstillingene dine hvis du ønsker å overvåke disse stedene
-notifications.toggle.label.off=AV
-notifications.toggle.label.on=PÅ
 
 ## Notifications formats
 notifications.format.alert=Varsel
@@ -213,5 +211,4 @@ notifications.switches.tooltip.pageAndChildren=Overvåk denne siden og dens unde
 notifications.switches.tooltip.space=Overvåk overliggende side og dens undersider
 notifications.switches.tooltip.wiki=Overvåk Wiki
 notifications.switches.changeStatusError=Kunne ikke endre statusen for varslene.</content>
-  
 </xwikidoc>

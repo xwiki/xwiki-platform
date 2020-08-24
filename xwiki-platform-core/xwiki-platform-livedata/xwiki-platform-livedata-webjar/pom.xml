@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -48,35 +48,83 @@
       <artifactId>vue</artifactId>
       <version>2.6.11</version>
     </dependency>
-    <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>http-vue-loader</artifactId>
-        <version>1.4.2</version>
-    </dependency>
   </dependencies>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <!-- Cancel custom MANIFEST file (since it's not generated for "webjar" packaging) -->
-              <manifestFile combine.self="override" />
-            </archive>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- We keep the Vue files and the build configuration files in separate folders in the source tree but
+              we need them in the same folder when building the Vue components. -->
+            <id>copy-vue-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/vue</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/vue</directory>
+                </resource>
+                <resource>
+                  <directory>src/main/config</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the generated Vue components to the WebJar folder. -->
+            <id>copy-vue-components</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/vue/dist</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
-        <groupId>com.github.searls</groupId>
-        <artifactId>jasmine-maven-plugin</artifactId>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.10.0</version>
+        <executions>
+          <execution>
+            <id>install-node-and-npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>v12.18.3</nodeVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>npm-run-build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <workingDirectory>${project.build.directory}/vue</workingDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>

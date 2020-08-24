@@ -105,6 +105,7 @@
           <element name="space" type="string"></element>
           <element name="name" type="string"></element>
           <element name="title" type="string"></element>
+          <element name="rawTitle" type="string"></element>
           <element name="parent" type="string"></element>
           <element name="parentId" type="string"></element>
           <element name="version" type="string"></element>

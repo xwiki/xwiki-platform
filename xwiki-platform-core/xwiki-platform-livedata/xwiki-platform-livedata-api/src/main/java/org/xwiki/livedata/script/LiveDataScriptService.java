@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.script;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,7 +43,7 @@ import org.xwiki.stability.Unstable;
  * Scripting APIs for the Live Data component.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
 @Named(LiveDataScriptService.ROLEHINT)
@@ -79,7 +78,7 @@ public class LiveDataScriptService implements ScriptService
     {
         try {
             return query(this.configHelper.createQuery(queryConfig));
-        } catch (IOException e) {
+        } catch (Exception e) {
             this.logger.warn("Failed to create the live data query from [{}]. Root cause is [{}].", queryConfig,
                 ExceptionUtils.getRootCauseMessage(e));
             return null;
@@ -96,7 +95,7 @@ public class LiveDataScriptService implements ScriptService
     {
         try {
             return query(this.configHelper.createQuery(queryConfigJSON));
-        } catch (IOException e) {
+        } catch (Exception e) {
             this.logger.warn("Failed to create the live data query from JSON [{}]. Root cause is [{}].",
                 queryConfigJSON, ExceptionUtils.getRootCauseMessage(e));
             return null;

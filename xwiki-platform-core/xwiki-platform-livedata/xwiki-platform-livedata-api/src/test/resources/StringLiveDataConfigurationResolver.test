@@ -1,0 +1,273 @@
+##
+## Empty configuration
+##
+{}
+---
+{}
+##
+## Invalid query and meta
+## 
+{
+  "query":23,
+  "meta":[],
+  "foo":"bar"
+}
+---
+{
+  "foo":"bar"
+}
+##
+## Invalid query (properties, source, sort, filters, limit, offset)
+##
+{
+  "query":{
+    "properties":{"foo":"bar"},
+    "source":13,
+    "sort":true,
+    "filters":"test",
+    "limit":{"one":1},
+    "offset":[false],
+    "alice":"bob"
+  }
+}
+---
+{
+  "query":{
+    "alice":"bob"
+  }
+}
+##
+## Sort and source as text, filters as object
+##
+{
+  "query":{
+    "properties":["doc.title","doc.location"],
+    "source":"foo",
+    "sort":"publishDate",
+    "filters":{
+      "doc.author":"mflorea"
+    }
+  }
+}
+---
+{
+  "query":{
+    "properties":["doc.title","doc.location"],
+    "source":{
+      "id":"foo"
+    },
+    "filters":[{
+      "property":"doc.author",
+      "constraints":[{"value":"mflorea"}]
+    }],
+    "sort":[{
+      "property":"publishDate"
+    }]
+  }
+}
+##
+## Sort as object
+##
+{
+  "query":{
+    "sort":{
+      "property":"publishDate"
+    }
+  }
+}
+---
+{
+  "query":{
+    "sort":[{
+      "property":"publishDate"
+    }]
+  }
+}
+##
+## Sort as array of string
+##
+{
+  "query":{
+    "sort":["publishDate",{"property":"doc.name","descending":true}]
+  }
+}
+---
+{
+  "query":{
+    "sort":[
+      {
+        "property":"publishDate"
+      },
+      {
+        "property":"doc.name",
+        "descending":true
+      }
+    ]
+  }
+}
+##
+## Invalid property descriptors and types
+##
+{
+  "meta":{
+    "foo":"bar",
+    "propertyDescriptors":{"two":2},
+    "propertyTypes":"test"
+  }
+}
+---
+{
+  "meta":{
+    "foo":"bar"
+  }
+}
+##
+## Invalid icon, displayer and filter 
+##
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"test",
+        "icon":[34],
+        "displayer":12,
+        "filterable":true
+      }
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"test",
+        "filterable":true
+      }
+    ]
+  }
+}
+##
+## Icon, displayer and filter as string
+##
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "icon":"file",
+        "displayer":"link",
+        "filter":"text"
+      }
+    ],
+    "propertyTypes":[
+      {
+        "filterable":false
+      }
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "icon":{
+          "iconSetName":"Font Awesome",
+          "cssClass":"fa fa-file-o",
+          "iconSetType":"font"
+        },
+        "displayer":{"id":"link"},
+        "filter":{"id":"text"}
+      }
+    ],
+    "propertyTypes":[
+      {
+        "filterable":false
+      }
+    ]
+  }
+}
+##
+## Filter operators as string
+##
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "filter":{
+          "operators":["equals"]
+        }
+      }
+    ],
+    "filters":[
+      {
+        "operators":["contains"]
+      }
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "filter":{
+          "operators":[
+            {"id":"equals"}
+          ]
+        }
+      }
+    ],
+    "filters":[
+      {
+        "operators":[
+          {"id":"contains"}
+        ]
+      }
+    ]
+  }
+}
+##
+## Layouts as string
+##
+{
+  "meta":{
+    "layouts":["table","cards"]
+  }
+}
+---
+{
+  "meta":{
+    "layouts":[
+      {"id":"table"},
+      {"id":"cards"}
+    ]
+  }
+}
+##
+## Layout icon as string
+##
+{
+  "meta":{
+    "layouts":[
+      {"id":"table","icon":"table"},
+      {"id":"cards","icon":"th"}
+    ]
+  }
+}
+---
+{
+  "meta":{
+    "layouts":[
+      {
+        "id":"table",
+        "icon":{
+          "iconSetName":"Silk",
+          "iconSetType":"image",
+          "url":"/path/to/table.png"
+        }
+      },
+      {"id":"cards","icon":{}}
+    ]
+  }
+}

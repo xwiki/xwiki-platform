@@ -24,6 +24,8 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
@@ -37,7 +39,7 @@ import org.xwiki.template.TemplateManager;
  */
 @Component
 @Named(AsyncRendererJobStatus.JOBTYPE)
-public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus>
+public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus> implements GroupedJob
 {
     @Inject
     private AsyncRendererCache cache;
@@ -108,5 +110,11 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
         // Cache the result
         this.cache.put(getStatus());
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return getRequest().getJobGroupPath();
     }
 }

@@ -26,7 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.renderer.html5.HTML5Renderer;
@@ -42,7 +43,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
@@ -50,7 +51,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * Unit tests for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 @ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,
@@ -61,7 +62,7 @@ class LiveDataMacroTest
     private LiveDataMacro liveDataMacro;
 
     @MockComponent
-    private LiveDataConfigHelper configHelper;
+    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver;
 
     private PrintRendererFactory rendererFactory;
 
@@ -70,20 +71,21 @@ class LiveDataMacroTest
     {
         this.rendererFactory = componentManager.getInstance(PrintRendererFactory.class, "html/5.0");
 
-        when(this.configHelper.effectiveConfig(anyString())).thenAnswer(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
+        when(this.defaultConfigResolver.resolve(any(LiveDataConfiguration.class)))
+            .thenAnswer(new Answer<LiveDataConfiguration>()
             {
-                return invocation.getArgument(0);
-            }
-        });
+                @Override
+                public LiveDataConfiguration answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return invocation.getArgument(0);
+                }
+            });
     }
 
     @Test
     void executeWithoutParams() throws Exception
     {
-        String expectedConfig = json("{'query':{'source':{}}}");
+        String expectedConfig = json("{'query':{'source':{}},'meta':{'pagination':{}}}");
         String expected = "<div class=\"liveData\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);
@@ -95,10 +97,9 @@ class LiveDataMacroTest
     {
         StringBuilder expectedConfig = new StringBuilder();
         expectedConfig.append("{");
-        expectedConfig.append("  'id':'test',".trim());
         expectedConfig.append("  'query':{".trim());
         expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
-        expectedConfig.append("    'source':{'wiki':'dev','id':'users','group':'apps'},".trim());
+        expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
         expectedConfig.append("    'filters':[{'property':'firstName','constraints':[{'value':'m'}]}],".trim());
         expectedConfig.append("    'sort':[".trim());
         expectedConfig.append("      {'property':'firstName'},".trim());
@@ -107,7 +108,18 @@ class LiveDataMacroTest
         expectedConfig.append("    'offset':20,".trim());
         expectedConfig.append("    'limit':10,".trim());
         expectedConfig.append("    'hiddenFilters':[{'property':'position','constraints':[{'value':'lead'}]}]".trim());
-        expectedConfig.append("  }".trim());
+        expectedConfig.append("  },".trim());
+        expectedConfig.append("  'meta':{".trim());
+        expectedConfig.append("    'layouts':[".trim());
+        expectedConfig.append("      {'id':'table'},".trim());
+        expectedConfig.append("      {'id':'cards'}".trim());
+        expectedConfig.append("    ],".trim());
+        expectedConfig.append("    'pagination':{".trim());
+        expectedConfig.append("      'pageSizes':[15,25,50],".trim());
+        expectedConfig.append("      'showPageSizeDropdown':true".trim());
+        expectedConfig.append("    }".trim());
+        expectedConfig.append("  },".trim());
+        expectedConfig.append("  'id':'test'".trim());
         expectedConfig.append("}");
 
         String expected = "<div class=\"liveData\" id=\"test\" data-config=\""
@@ -122,7 +134,10 @@ class LiveDataMacroTest
         parameters.setHiddenFilters("position=lead");
         parameters.setFilters("firstName=m");
         parameters.setLimit(10);
-        parameters.setOffset(20);
+        parameters.setOffset(20L);
+        parameters.setLayouts("table, cards");
+        parameters.setShowPageSizeDropdown(true);
+        parameters.setPageSizes("15, 25, 50");
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, null, null);
         assertBlocks(expected, blocks, this.rendererFactory);

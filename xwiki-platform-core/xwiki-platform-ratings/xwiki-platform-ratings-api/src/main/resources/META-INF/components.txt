@@ -10,3 +10,5 @@ org.xwiki.ratings.internal.SeparatePageRatingsManager
 org.xwiki.ratings.internal.SimpleReputationAlgorithm
 org.xwiki.ratings.internal.UpdateReputationListener
 org.xwiki.ratings.script.RatingsScriptService
+org.xwiki.ratings.internal.SolrRatingsManager
+org.xwiki.ratings.internal.RatingCoreSolrInitializer

@@ -32,10 +32,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.UpdateRatingEvent;
 import org.xwiki.ratings.UpdatingRatingEvent;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -179,19 +182,10 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
         try {
-            int skipped = 0;
             XWikiDocument doc = getXWiki().getDocument(documentRef, getXWikiContext());
-            List<BaseObject> bobjects = doc.getObjects(getRatingsClassName());
-            if (bobjects != null) {
-                for (BaseObject bobj : bobjects) {
-                    if (bobj != null) {
-                        if (skipped < id) {
-                            skipped++;
-                        } else {
-                            return getDefaultRating(documentRef, bobj);
-                        }
-                    }
-                }
+            BaseObject baseObject = doc.getXObject(getRatingsClassReference(), id);
+            if (baseObject != null) {
+                return getDefaultRating(documentRef, baseObject);
             }
         } catch (XWikiException e) {
             throw new RatingsException(e);
@@ -231,5 +225,58 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     private DefaultRating getDefaultRating(DocumentReference documentRef, BaseObject bobj)
     {
         return new DefaultRating(documentRef, bobj, getXWikiContext(), this);
+    }
+
+    @Override
+    public List<Rating> getRatings(UserReference userReference, int start, int count, boolean asc)
+        throws RatingsException
+    {
+        List<Rating> ratings = new ArrayList<>();
+
+        DocumentReference userDoc = this.userReferenceSerializer.serialize(userReference);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling separate page manager code for ratings");
+        }
+
+        // This query performs the following:
+        //   - It retrieves both the doc.fullName containing the rating, and the various rating objects numbers
+        //     (and also the date to allow ordering on it since we use distinct)
+        //   - It selects only documents contaning a RatingClass object whose author is the author reference
+        //   - It avoids selecting document translations to avoid duplications in result (and ratings objects shouldn't
+        //     be in translated pages)
+        //   - It filters out results whom status is refused or moderated
+        String statement = "select distinct doc.fullName, obj.number, doc.date "
+            + "from XWikiDocument as doc, BaseObject as obj, StringProperty as authorProp "
+            + "where doc.fullName=obj.name and doc.translation=0 and obj.className=:ratingClassName "
+            + "and obj.id=authorProp.id.id and authorProp.id.name=:authorPropertyName and authorProp.value=:authorValue"
+            + " and obj.name not in ("
+            + "select obj2.name from BaseObject as obj2, StringProperty as statusprop "
+            + "where obj.id=obj2.id and obj2.className=:ratingClassName and obj2.id=statusprop.id.id and "
+            + "statusprop.id.name=:statusPropertyName and "
+            + "(statusprop.value=:statusModerated or statusprop.value=:statusRefused)"
+            + ") order by doc.date " + (asc ? "asc" : "desc");
+
+        try {
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            List<Object[]> queryResult = query.bindValue("ratingClassName", getRatingsClassName())
+                .bindValue("authorPropertyName", RATING_CLASS_FIELDNAME_AUTHOR)
+                .bindValue("authorValue", this.entityReferenceSerializer.serialize(userDoc))
+                .bindValue("statusPropertyName", "status")
+                .bindValue("statusModerated", "moderated")
+                .bindValue("statusRefused", "refused")
+                .setLimit(count)
+                .setOffset(start)
+                .execute();
+
+            for (Object[] result : queryResult) {
+                DocumentReference documentReference = this.documentReferenceResolver.resolve((String) result[0]);
+                int objNumber = (Integer) result[1];
+                ratings.add(getRating(documentReference, objNumber));
+            }
+        } catch (QueryException | XWikiException e) {
+            throw new RatingsException(String.format("Error while retrieving ratings for user [%s].", userDoc), e);
+        }
+
+        return ratings;
     }
 }

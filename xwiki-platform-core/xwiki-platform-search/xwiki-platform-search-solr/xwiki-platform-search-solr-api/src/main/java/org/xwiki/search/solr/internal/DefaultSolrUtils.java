@@ -23,6 +23,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -308,6 +309,20 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public <T> T get(String fieldName, SolrDocument document, T def)
+    {
+        if (document.containsKey(fieldName)) {
+            if (def != null) {
+                return get(fieldName, document, def.getClass());
+            } else {
+                return (T) document.getFieldValue(fieldName);
+            }
+        }
+
+        return def;
+    }
+
+    @Override
     public void setId(Object fieldValue, SolrInputDocument document)
     {
         set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, fieldValue, document);
@@ -330,6 +345,12 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document)
+    {
+        document.setField(fieldName, Collections.singletonMap(modifier, fieldValue));
+    }
+
+    @Override
     public void setString(String fieldName, Object fieldValue, SolrInputDocument document)
     {
         String value;
@@ -343,6 +364,19 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public void setString(String fieldName, Object fieldValue, Type valueType, SolrInputDocument document)
+    {
+        String value;
+        if (valueType == String.class && fieldValue instanceof String) {
+            value = (String) fieldValue;
+        } else {
+            value = this.converter.getConverter(valueType).convert(String.class, fieldValue);
+        }
+
+        document.setField(fieldName, value);
+    }
+
+    @Override
     public String toFilterQueryString(Object fieldValue)
     {
         if (fieldValue == null) {
@@ -350,14 +384,16 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
+        if (fieldValue instanceof Date) {
+            str = ((Date) fieldValue).toInstant().toString();
+        } else if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
             // TODO: this is not the right implementation for date and arrays
-            str = fieldValue.toString();
+            str = ClientUtils.escapeQueryChars(fieldValue.toString());
+        } else {
+            str = ClientUtils.escapeQueryChars(this.converter.convert(String.class, fieldValue));
         }
 
-        str = this.converter.convert(String.class, fieldValue);
-
-        return ClientUtils.escapeQueryChars(str);
+        return str;
     }
 
     @Override

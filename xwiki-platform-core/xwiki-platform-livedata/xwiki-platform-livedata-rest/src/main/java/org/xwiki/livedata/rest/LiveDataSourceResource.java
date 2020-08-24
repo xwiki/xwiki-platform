@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * Exposes a {@link LiveDataSource} through REST.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Path("/liveData/sources/{sourceId}")
 @Unstable

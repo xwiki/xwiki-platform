@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="es">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=Mención de usuario
+rendering.macro.mention.description=Añade una mención de usuario.
+rendering.macro.mention.parameter.reference.name=Referencia
+rendering.macro.mention.parameter.reference.description=La referencia de usuario o grupo mencionada.
+rendering.macro.mention.parameter.style.name=Estilo de visualización
+rendering.macro.mention.parameter.style.description=La elección de estilo de la mención (solo es compatible con las menciones de usuario).
+rendering.macro.mention.parameter.anchor.name=Ancla
+rendering.macro.mention.parameter.anchor.description=El ancla a utilizar para vincular con esa mención (este anclaje debería ser único en el documento tanto como sea posible).
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Nombre completo del usuario
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=Solo nombre del usuario
+org.xwiki.mentions.DisplayStyle.LOGIN=Nombre de usuario
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Color de la menciones
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=El color de las menciones al usuario actual (aclaración: se usa como el valor de un atributo CSS de color de fondo).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Color de las automenciones
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activar las citas
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Establece si se incluye una cita del texto que rodea a una mención en las notificaciones de mención de usuario.</content>
+  
+</xwikidoc>

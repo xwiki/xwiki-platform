@@ -22,10 +22,7 @@ XWiki.widgets = XWiki.widgets || {};
 /**
  * XWiki namespace.
  * TODO: move everything in it.
- *
- * @type object
  */
-
 Object.extend(XWiki, {
 
   constants: {

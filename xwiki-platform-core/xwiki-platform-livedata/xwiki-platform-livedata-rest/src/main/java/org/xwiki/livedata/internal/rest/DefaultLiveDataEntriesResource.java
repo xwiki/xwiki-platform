@@ -48,17 +48,20 @@ import org.xwiki.rest.model.jaxb.Link;
  * Default implementation of {@link LiveDataEntriesResource}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Component
-@Named("org.xwiki.livedata.rest.internal.DefaultLiveDataEntriesResource")
+@Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntriesResource")
 @Singleton
 public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource implements LiveDataEntriesResource
 {
     @Override
     public Entries getEntries(String hint, LiveDataQuery query, String namespace) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, query.getSource(), namespace);
+        // Prevent null pointer exceptions.
+        query.initialize();
+
+        Optional<LiveDataSource> source = getLiveDataSource(hint, query.getSource().getParameters(), namespace);
         if (source.isPresent()) {
             return createEntries(source.get().getEntries().get(query), hint, namespace);
         } else {

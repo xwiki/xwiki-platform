@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-script</artifactId>
   <name>XWiki Platform - Rendering - Macro - Script</name>
@@ -57,12 +57,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-classloader-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-classloader-protocol-jar</artifactId>
-      <version>${commons.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -121,6 +115,33 @@
               <includes>
                 <include>**/ScriptMockSetup*.class</include>
               </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude java.net.URLStreamHandlerFactory since it's not an XWiki interface and thus
+                           doesn't have a @Role annotation. there's no way for the Spoon checker to find
+                           out about this, since only the Component Manager knows what has been registered for it. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["java.net.URLStreamHandlerFactory"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
             </configuration>
           </execution>
         </executions>

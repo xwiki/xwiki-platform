@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Hierarchy;
 import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -364,5 +366,24 @@ public class ModelFactoryTest
 
         assertEquals("", translations.getDefault());
         assertTrue(translations.getTranslations().isEmpty());
+    }
+
+    @Test
+    void toRestPageSummary() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        Document document = mock(Document.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getWiki()).thenReturn(documentReference.getWikiReference().getName());
+        when(document.getTitle()).thenReturn("Some > title");
+        when(document.getDisplayTitle()).thenReturn("Some &gt; title");
+        when(document.getDefaultLocale()).thenReturn(Locale.ITALIAN);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(document.getComments()).thenReturn(new Vector<>());
+
+        PageSummary pageSummary = this.modelFactory.toRestPageSummary(this.baseURI, document, true);
+
+        assertEquals(document.getDisplayTitle(), pageSummary.getTitle());
+        assertEquals(document.getTitle(), pageSummary.getRawTitle());
     }
 }

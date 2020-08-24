@@ -5,10 +5,10 @@
     "filterable":true,
     "displayer":{"id":"boolean"},
     "filter":{
+      "id":"boolean",
       "operators":[
-        {"name":"equals","id":"equals"}
-      ],
-      "id":"boolean"
+        {"id":"equals","name":"equals"}
+      ]
     }
   },
   {
@@ -22,12 +22,12 @@
     "sortable":true,
     "filterable":true,
     "filter":{
+      "id":"suggest",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"suggest"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -35,12 +35,12 @@
     "sortable":true,
     "filterable":true,
     "filter":{
+      "id":"suggest",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"suggest"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -49,11 +49,11 @@
     "filterable":true,
     "displayer":{"id":"date"},
     "filter":{
+      "id":"date",
       "operators":[
-        {"name":"isBetween","id":"isBetween"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"date"
+        {"id":"isBetween","name":"isBetween"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -62,12 +62,12 @@
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
+      "id":"text",
       "operators":[
-        {"name":"contains","id":"contains"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"equals","id":"equals"}
-      ],
-      "id":"text"
+        {"id":"contains","name":"contains"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"equals","name":"equals"}
+      ]
     }
   },
   {
@@ -76,12 +76,12 @@
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
+      "id":"suggest",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"suggest"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -90,10 +90,10 @@
     "filterable":true,
     "displayer":{"id":"number"},
     "filter":{
+      "id":"number",
       "operators":[
-        {"name":"equals","id":"equals"}
-      ],
-      "id":"number"
+        {"id":"equals","name":"equals"}
+      ]
     }
   },
   {
@@ -102,12 +102,12 @@
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
+      "id":"suggest",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"suggest"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -120,12 +120,12 @@
     "sortable":true,
     "filterable":true,
     "filter":{
+      "id":"list",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"list"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   },
   {
@@ -133,12 +133,12 @@
     "sortable":true,
     "filterable":true,
     "filter":{
+      "id":"text",
       "operators":[
-        {"name":"contains","id":"contains"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"equals","id":"equals"}
-      ],
-      "id":"text"
+        {"id":"contains","name":"contains"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"equals","name":"equals"}
+      ]
     }
   },
   {
@@ -147,12 +147,12 @@
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
+      "id":"text",
       "operators":[
-        {"name":"contains","id":"contains"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"equals","id":"equals"}
-      ],
-      "id":"text"
+        {"id":"contains","name":"contains"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"equals","name":"equals"}
+      ]
     }
   },
   {
@@ -161,12 +161,12 @@
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
+      "id":"suggest",
       "operators":[
-        {"name":"equals","id":"equals"},
-        {"name":"startsWith","id":"startsWith"},
-        {"name":"contains","id":"contains"}
-      ],
-      "id":"suggest"
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
     }
   }
 ]

@@ -320,22 +320,21 @@ LiveValidation.prototype = {
    *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   validate: function(){
-  	if(!this.element.disabled){
-		this.beforeValidation();
-		var isValid = this.doValidations();
-		if(isValid){
-			this.beforeValid();
-			this.onValid();
-			this.afterValid();
-			return true;
-		}else {
-			this.beforeInvalid();
-			this.onInvalid();
-			this.afterInvalid();
-			return false;
-		}
-		this.afterValidation();
-	}else{
+  	if (!this.element.disabled){
+		  this.beforeValidation();
+		  var isValid = this.doValidations();
+		  if(isValid){
+			  this.beforeValid();
+			  this.onValid();
+			  this.afterValid();
+		  }else {
+			  this.beforeInvalid();
+			  this.onInvalid();
+			  this.afterInvalid();
+		  }
+		  this.afterValidation();
+		  return isValid;
+	  }else{
       return true;
     }
   },

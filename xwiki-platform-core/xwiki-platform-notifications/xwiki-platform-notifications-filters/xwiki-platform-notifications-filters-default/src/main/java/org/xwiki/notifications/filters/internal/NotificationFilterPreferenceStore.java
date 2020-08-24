@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
@@ -58,7 +57,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 public class NotificationFilterPreferenceStore
 {
     @Inject
-    private LegacyEventStreamStoreConfiguration legacyEventStreamStoreConfiguration;
+    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -74,13 +73,14 @@ public class NotificationFilterPreferenceStore
 
     /**
      * Get the notification preference that corresponds to the given id and user.
+     * 
      * @param user a user
      * @param filterPreferenceId a filter preference id
      * @return the corresponding preference
      * @throws NotificationException if an error occurs
      */
     public NotificationFilterPreference getFilterPreference(DocumentReference user, String filterPreferenceId)
-            throws NotificationException
+        throws NotificationException
     {
         for (NotificationFilterPreference preference : getPreferencesOfUser(user)) {
             if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
@@ -98,7 +98,7 @@ public class NotificationFilterPreferenceStore
      * @throws NotificationException if an error happens
      */
     public List<DefaultNotificationFilterPreference> getPreferencesOfUser(DocumentReference user)
-            throws NotificationException
+        throws NotificationException
     {
         if (user == null) {
             return Collections.emptyList();
@@ -110,10 +110,10 @@ public class NotificationFilterPreferenceStore
 
         try {
             Query query = queryManager.createQuery(
-                    "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner "
-                            + "order by nfp.id", Query.HQL);
+                "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner " + "order by nfp.id",
+                Query.HQL);
             query.bindValue("owner", serializedUser);
-            if (legacyEventStreamStoreConfiguration.useMainStore()) {
+            if (filterPreferenceConfiguration.useMainStore()) {
                 query.setWiki(context.getMainXWiki());
             }
             List<DefaultNotificationFilterPreference> results = query.execute();
@@ -125,13 +125,13 @@ public class NotificationFilterPreferenceStore
             return results;
         } catch (QueryException e) {
             throw new NotificationException(String.format(
-                    "Error while loading the notification filter preferences of the user [%s].", serializedUser),
-                e);
+                "Error while loading the notification filter preferences of the user [%s].", serializedUser), e);
         }
     }
 
     /**
      * Delete a filter preference.
+     * 
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceId name of the filter preference
      * @throws NotificationException if an error happens
@@ -148,7 +148,7 @@ public class NotificationFilterPreferenceStore
         // store event in the main database
         String oriDatabase = context.getWikiId();
 
-        if (legacyEventStreamStoreConfiguration.useMainStore()) {
+        if (filterPreferenceConfiguration.useMainStore()) {
             context.setWikiId(context.getMainXWiki());
         }
 
@@ -172,12 +172,13 @@ public class NotificationFilterPreferenceStore
 
     /**
      * Save a collection of NotificationFilterPreferences.
+     * 
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferences a list of NotificationFilterPreference
      * @throws NotificationException if an error happens
      */
     public void saveFilterPreferences(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
         if (user == null) {
             return;
@@ -193,7 +194,7 @@ public class NotificationFilterPreferenceStore
         XWikiHibernateStore hibernateStore = null;
 
         try {
-            if (legacyEventStreamStoreConfiguration.useMainStore()) {
+            if (filterPreferenceConfiguration.useMainStore()) {
                 // store event in the main database
                 context.setWikiId(context.getMainXWiki());
             }

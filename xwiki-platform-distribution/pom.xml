@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -167,28 +167,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -199,34 +199,34 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -238,13 +238,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>12.5-SNAPSHOT</version>
+        <version>12.7-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -512,6 +512,30 @@
                   <ignoredClassPattern>module-info</ignoredClassPattern>
                   <ignoredClassPattern>META-INF.versions.9.module-info</ignoredClassPattern>
                 </ignoredClassPatterns>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-platform-rendering-isolation</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <bannedDependencies>
+                    <excludes>
+                      <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
+                      <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
+                      <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
+                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                </rules>
               </configuration>
             </execution>
           </executions>

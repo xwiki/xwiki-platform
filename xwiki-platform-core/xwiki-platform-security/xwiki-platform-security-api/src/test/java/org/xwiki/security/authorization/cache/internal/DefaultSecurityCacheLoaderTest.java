@@ -157,6 +157,8 @@ public class DefaultSecurityCacheLoaderTest
 
         // Assert that we've also emitted a log
         assertEquals(1, this.logRule.size());
-        assertEquals("Failed to load the cache in 5 attempts. Giving up.", this.logRule.getMessage(0));
+        assertEquals(
+            "Failed to load the cache in 5 attempts. Giving up. For user [Document wiki:Users.mflorea] and entity [Document wiki:Space.Document].",
+            this.logRule.getMessage(0));
     }
 }

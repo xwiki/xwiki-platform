@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Exception related to live data processing.
  *
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @Unstable
 public class LiveDataException extends Exception

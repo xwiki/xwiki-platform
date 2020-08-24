@@ -32,58 +32,55 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * Describes how the user interacts with a given property.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
-public class LiveDataPropertyDescriptor
+public class LiveDataPropertyDescriptor extends BaseDescriptor
 {
-    private static final String ID = "id";
-
-    private static final String NAME = "name";
-
-    private static final String DEFAULT_OPERATOR = "defaultOperator";
-
-    private static final String OPERATORS = "operators";
-
     /**
      * Holds the filter configuration.
      */
-    public static class FilterDescriptor extends HashMap<String, Object>
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class FilterDescriptor extends BaseDescriptor
     {
-        private static final long serialVersionUID = 1L;
+        private String defaultOperator;
+
+        private List<OperatorDescriptor> operators;
 
         /**
-         * @return the filter id
+         * Default constructor.
          */
-        public String getId()
+        public FilterDescriptor()
         {
-            return (String) get(ID);
         }
 
         /**
-         * Sets the filter id.
+         * Creates a new descriptor for the filter with the specified id.
          * 
-         * @param id the new filter id
-         * @return the previous filter id
+         * @param id the filter id
          */
-        public String setId(String id)
+        public FilterDescriptor(String id)
         {
-            return (String) put(ID, id);
+            setId(id);
         }
 
         /**
          * @return the list of operators supported by this filter
          */
-        @SuppressWarnings("unchecked")
         public List<OperatorDescriptor> getOperators()
         {
-            Object operators = get(OPERATORS);
-            if (!(operators instanceof List)) {
-                operators = new ArrayList<>();
-                put(OPERATORS, operators);
-            }
-            return (List<OperatorDescriptor>) operators;
+            return operators;
+        }
+
+        /**
+         * Set the list of operators supported by this filter.
+         * 
+         * @param operators the new list of supported operators
+         */
+        public void setOperators(List<OperatorDescriptor> operators)
+        {
+            this.operators = operators;
         }
 
         /**
@@ -96,7 +93,10 @@ public class LiveDataPropertyDescriptor
         public OperatorDescriptor addOperator(String id, String name)
         {
             OperatorDescriptor operator = new OperatorDescriptor(id, name);
-            getOperators().add(operator);
+            if (this.operators == null) {
+                this.operators = new ArrayList<>();
+            }
+            this.operators.add(operator);
             return operator;
         }
 
@@ -105,27 +105,37 @@ public class LiveDataPropertyDescriptor
          */
         public String getDefaultOperator()
         {
-            return (String) get(DEFAULT_OPERATOR);
+            return defaultOperator;
         }
 
         /**
          * Sets the default operator to use.
          * 
-         * @param operator the new default operator to use
-         * @return the previous default operator
+         * @param defaultOperator the new default operator to use
          */
-        public String setDefaultOperator(String operator)
+        public void setDefaultOperator(String defaultOperator)
         {
-            return (String) put(DEFAULT_OPERATOR, operator);
+            this.defaultOperator = defaultOperator;
+        }
+
+        /**
+         * Prevent {@code null} values where it's possible.
+         */
+        public void initialize()
+        {
+            if (this.operators == null) {
+                this.operators = new ArrayList<>();
+            }
         }
     }
 
     /**
      * An operator to use when filtering the live data.
      */
-    public static class OperatorDescriptor extends HashMap<String, Object>
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class OperatorDescriptor extends BaseDescriptor
     {
-        private static final long serialVersionUID = 1L;
+        private String name;
 
         /**
          * Default constructor.
@@ -147,75 +157,47 @@ public class LiveDataPropertyDescriptor
         }
 
         /**
-         * @return the operator id
-         */
-        public String getId()
-        {
-            return (String) get(ID);
-        }
-
-        /**
-         * Sets the operator id.
-         * 
-         * @param id the new operator id
-         * @return the previous operator id
-         */
-        public String setId(String id)
-        {
-            return (String) put(ID, id);
-        }
-
-        /**
          * @return the operator pretty name
          */
         public String getName()
         {
-            return (String) get(NAME);
+            return name;
         }
 
         /**
          * Sets the operator pretty name.
          * 
          * @param name the new operator pretty name
-         * @return the previous operator pretty name
          */
-        public String setName(String name)
+        public void setName(String name)
         {
-            return (String) put(NAME, name);
+            this.name = name;
         }
     }
 
     /**
      * Holds the displayer configuration.
      */
-    public static class DisplayerDescriptor extends HashMap<String, Object>
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class DisplayerDescriptor extends BaseDescriptor
     {
-        private static final long serialVersionUID = 1L;
-
         /**
-         * @return the displayer id
+         * Default constructor.
          */
-        public String getId()
+        public DisplayerDescriptor()
         {
-            return (String) get(ID);
         }
 
         /**
-         * Sets the displayer id.
+         * Creates a new descriptor for the displayer with the specified id.
          * 
-         * @param id the new displayer id
-         * @return the previous displayer id
+         * @param id the displayer id
          */
-        public String setId(String id)
+        public DisplayerDescriptor(String id)
         {
-            return (String) put(ID, id);
+            setId(id);
         }
     }
-
-    /**
-     * Identifies the property that this descriptor corresponds to.
-     */
-    private String id;
 
     /**
      * The property pretty name, usually displayed before the property value.
@@ -231,7 +213,7 @@ public class LiveDataPropertyDescriptor
      * Specifies the property icon, usually displayed before the property name. The map contains meta data about the
      * icon, such as the icon set name, icon set type, URL or CSS class name.
      */
-    private final Map<String, Object> icon = new HashMap<>();
+    private Map<String, Object> icon;
 
     /**
      * Indicates the property type, which usually has default settings that the property descriptor can default to.
@@ -256,35 +238,17 @@ public class LiveDataPropertyDescriptor
     /**
      * Displayer configuration, specifies how the property value should be displayed or edited.
      */
-    private final DisplayerDescriptor displayer = new DisplayerDescriptor();
+    private DisplayerDescriptor displayer;
 
     /**
      * Filter configuration, specifies how the user can filter the values of this property.
      */
-    private final FilterDescriptor filter = new FilterDescriptor();
+    private FilterDescriptor filter;
 
     /**
      * Optional CSS class name to add to the HTML element used to display this property.
      */
     private String styleName;
-
-    /**
-     * @return the property id
-     */
-    public String getId()
-    {
-        return id;
-    }
-
-    /**
-     * Sets the property id.
-     * 
-     * @param id the new property id
-     */
-    public void setId(String id)
-    {
-        this.id = id;
-    }
 
     /**
      * @return the property pretty name
@@ -387,6 +351,16 @@ public class LiveDataPropertyDescriptor
     }
 
     /**
+     * Sets the icon meta data.
+     * 
+     * @param icon the new icon meta data
+     */
+    public void setIcon(Map<String, Object> icon)
+    {
+        this.icon = icon;
+    }
+
+    /**
      * @return whether this property should be displayed or not; the returned value can be {@code null} in which case
      *         the value should be inherited from the property type descriptor
      */
@@ -416,6 +390,16 @@ public class LiveDataPropertyDescriptor
     }
 
     /**
+     * Sets the displayer configuration.
+     * 
+     * @param displayer the new displayer configuration
+     */
+    public void setDisplayer(DisplayerDescriptor displayer)
+    {
+        this.displayer = displayer;
+    }
+
+    /**
      * @return whether the user can filter by this property or not; the returned value can be {@code null} in which case
      *         the value should be inherited from the property type descriptor
      */
@@ -442,5 +426,32 @@ public class LiveDataPropertyDescriptor
     public FilterDescriptor getFilter()
     {
         return filter;
+    }
+
+    /**
+     * Sets the filter configuration.
+     * 
+     * @param filter the new filter configuration
+     */
+    public void setFilter(FilterDescriptor filter)
+    {
+        this.filter = filter;
+    }
+
+    /**
+     * Prevent {@code null} values where it's possible.
+     */
+    public void initialize()
+    {
+        if (this.icon == null) {
+            this.icon = new HashMap<>();
+        }
+        if (this.displayer == null) {
+            this.displayer = new DisplayerDescriptor();
+        }
+        if (this.filter == null) {
+            this.filter = new FilterDescriptor();
+        }
+        this.filter.initialize();
     }
 }

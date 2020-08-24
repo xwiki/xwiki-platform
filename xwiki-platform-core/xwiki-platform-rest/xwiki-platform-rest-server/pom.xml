@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -55,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -236,12 +236,13 @@
                   <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
                   <properties>
                     <property>
-                      <!-- Exclude javax.ws.rs.core.Application since we use an Inject on it. This is a very special
-                           case when we don't inject on an interface, and there's no way for the Spoon checker to find
-                           out about this, since only the Component Manager knows what has been registered in it. -->
+                      <!-- Exclude javax.ws.rs.core.Application & org.restlet.ext.jaxrs.ObjectFactory since we use an
+                           Inject on them. These are special cases when we don't inject on an interface with a @Role
+                           and there's no way for the Spoon checker to find out about this, since only the Component
+                           Manager knows what has been registered in it. -->
                       <name>excludedFieldTypes</name>
                       <value><![CDATA[
-                        ["javax.ws.rs.core.Application"]
+                        ["javax.ws.rs.core.Application", "org.restlet.ext.jaxrs.ObjectFactory"]
                       ]]></value>
                     </property>
                   </properties>

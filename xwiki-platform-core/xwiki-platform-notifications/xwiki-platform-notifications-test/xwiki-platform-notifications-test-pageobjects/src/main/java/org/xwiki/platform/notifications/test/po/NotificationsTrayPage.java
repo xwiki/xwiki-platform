@@ -19,12 +19,15 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BootstrapSwitch;
@@ -69,18 +72,46 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
-        pageOnlyWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
-                getDriver()
-        );
-        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
-            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
-            getDriver()
-        );
-        wikiWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
-                getDriver()
-        );
+    }
+
+    /**
+     * Wait until the given number of unread notification is received.
+     * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
+     * the given user has on the given wiki, using user preferences.
+     *
+     * @param userId the serialized user reference for which to get notifications.
+     * @param wiki the wiki on which to get notifications
+     * @param expectedUnread the number of expected unread notifications to wait for
+     * @since 12.6
+     */
+    public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread)
+    {
+        String notificationCountAjaxURL = String.format("/xwiki/rest/notifications/count?media=json&userId=%s"
+            + "&useUserPreferences=true&currentWiki=%s&async=true", userId, wiki);
+
+        final List<Object> responses = new ArrayList<>();
+        try {
+            getUtil().getDriver().waitUntilCondition(driver -> {
+                // Execute AJAX request to wait until the number of unread notification match the expectation.
+                Object response = ((JavascriptExecutor) driver).executeAsyncScript(
+                    "var callback = arguments[arguments.length - 1];"
+                        + "new Ajax.Request('" + notificationCountAjaxURL
+                        + "&_='+new Date().getTime(), {method: 'GET', "
+                        + "   onSuccess: function(response) {"
+                        + "      callback(response.responseJSON.unread);"
+                        + "   },"
+                        + "   onFailure: function(response) { console.error(response); callback(-1); }"
+                        + "});");
+                responses.add(response);
+                return response != null && Integer.valueOf(response.toString()).equals(expectedUnread);
+            });
+        } catch (TimeoutException e)
+        {
+            String latestResponse = (responses.isEmpty()) ? null : responses.get(responses.size() - 1).toString();
+            throw new TimeoutException(String.format(
+                "Timeout while waiting on notification count. Expected: [%s] - Latest result: [%s].",
+                expectedUnread, latestResponse), e);
+        }
     }
 
     /**
@@ -89,6 +120,20 @@ public class NotificationsTrayPage extends ViewPage
     public boolean isMenuOpen()
     {
         return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
+    }
+
+    /**
+     * @return {@code true} only if the notification menu icon (small bell) is displayed.
+     * @since 12.6
+     * @since 12.5.1
+     */
+    public boolean isNotificationMenuVisible()
+    {
+        try {
+            return notificationsButton.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 
     /**
@@ -178,6 +223,18 @@ public class NotificationsTrayPage extends ViewPage
             }
             return false;
         });
+        pageOnlyWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
+            getDriver()
+        );
+        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
+            getDriver()
+        );
+        wikiWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
+            getDriver()
+        );
     }
 
     private List<WebElement> getNotifications()

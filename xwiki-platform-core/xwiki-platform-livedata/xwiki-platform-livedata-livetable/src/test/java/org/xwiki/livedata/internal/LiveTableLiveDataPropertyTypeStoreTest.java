@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for {@link LiveTableLiveDataPropertyTypeStore}.
  * 
  * @version $Id$
- * @since 12.6RC1
+ * @since 12.6
  */
 @ComponentTest
 class LiveTableLiveDataPropertyTypeStoreTest
@@ -69,8 +69,8 @@ class LiveTableLiveDataPropertyTypeStoreTest
     void getOne() throws Exception
     {
         String expectedJSON = "{'id':'Page','sortable':true,'filterable':true,'displayer':{'id':'html'},'filter':{"
-            + "'operators':[{'name':'equals','id':'equals'},{'name':'startsWith','id':'startsWith'},"
-            + "{'name':'contains','id':'contains'}],'id':'suggest'}}";
+            + "'id':'suggest','operators':[{'id':'equals','name':'equals'},{'id':'startsWith','name':'startsWith'},"
+            + "{'id':'contains','name':'contains'}]}}";
         LiveDataPropertyDescriptor pageType = this.typeStore.get("Page").get();
         assertEquals(expectedJSON.replace('\'', '"'), objectMapper.writeValueAsString(pageType));
     }

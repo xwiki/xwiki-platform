@@ -170,10 +170,10 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.velocity.VelocityContextFactory;
-import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -201,6 +201,7 @@ import com.xpn.xwiki.internal.WikiInitializerRequest;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializingEvent;
 import com.xpn.xwiki.internal.event.UserCreatingDocumentEvent;
@@ -501,10 +502,10 @@ public class XWiki implements EventListener
         return this.spaceConfiguration;
     }
 
-    private UserPropertiesResolver getUserPropertiesResolver()
+    private UserPropertiesResolver getAllUserPropertiesResolver()
     {
         if (this.userPropertiesResolver == null) {
-            this.userPropertiesResolver = Utils.getComponent(UserPropertiesResolver.class);
+            this.userPropertiesResolver = Utils.getComponent(UserPropertiesResolver.class, "all");
         }
 
         return this.userPropertiesResolver;
@@ -2624,49 +2625,70 @@ public class XWiki implements EventListener
      */
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        XWikiURLFactory urlf = context.getURLFactory();
+        String skinFile = getSkinFile(filename, null, forceSkinAction, context);
 
-        try {
-            // Try in the specified skin
-            Skin skin = getInternalSkinManager().getCurrentSkin(true);
-            if (skin != null) {
-                Resource<?> resource = skin.getResource(filename);
-                if (resource != null) {
-                    return resource.getURL(forceSkinAction);
-                }
+        if (skinFile == null) {
+            // Use the default base skin even if the URL could be invalid.
+            XWikiURLFactory urlf = context.getURLFactory();
+            URL url;
+            if (forceSkinAction) {
+                url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
             } else {
-                // Try in the current parent skin
-                Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
-                if (parentSkin != null) {
-                    Resource<?> resource = parentSkin.getResource(filename);
+                url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
+            }
+            skinFile = urlf.getURL(url, context);
+        }
+
+        return skinFile;
+    }
+
+    private String getSkinFileInternal(String fileName, String skinId, boolean forceSkinAction, XWikiContext context)
+    {
+        try {
+            if (skinId != null) {
+                // Try only in the specified skin.
+                Skin skin = getInternalSkinManager().getSkin(skinId);
+                if (skin != null) {
+                    Resource<?> resource = skin.getLocalResource(fileName);
                     if (resource != null) {
                         return resource.getURL(forceSkinAction);
                     }
                 }
+            } else {
+                // Try in the current skin.
+                Skin skin = getInternalSkinManager().getCurrentSkin(true);
+                if (skin != null) {
+                    Resource<?> resource = skin.getResource(fileName);
+                    if (resource != null) {
+                        return resource.getURL(forceSkinAction);
+                    }
+                } else {
+                    // Try in the current parent skin.
+                    Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
+                    if (parentSkin != null) {
+                        Resource<?> resource = parentSkin.getResource(fileName);
+                        if (resource != null) {
+                            return resource.getURL(forceSkinAction);
+                        }
+                    }
+                }
             }
 
-            // Look for a resource file
-            String resourceFilePath = "/resources/" + filename;
+            // Look for a resource file.
+            String resourceFilePath = "/resources/" + fileName;
+            XWikiURLFactory urlFactory = context.getURLFactory();
             if (resourceExists(resourceFilePath)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context,
                     getResourceURLCacheParameters(resourceFilePath));
-                return urlf.getURL(url, context);
+                return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [" + filename + "]", e);
+                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", fileName, skinId, e);
             }
         }
 
-        // If all else fails, use the default base skin, even if the URLs could be invalid.
-        URL url;
-
-        if (forceSkinAction) {
-            url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
-        } else {
-            url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
-        }
-        return urlf.getURL(url, context);
+        return null;
     }
 
     private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
@@ -2705,33 +2727,30 @@ public class XWiki implements EventListener
         return getSkinFile(filename, skin, false, context);
     }
 
-    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
+    public String getSkinFile(String fileName, String skinId, boolean forceSkinAction, XWikiContext context)
     {
-        try {
-            Skin skin = getInternalSkinManager().getSkin(skinId);
-
-            Resource<?> resource = skin.getLocalResource(filename);
-
-            if (resource != null) {
-                return resource.getURL(forceSkinAction);
+        if (StringUtils.endsWithAny(fileName, ".js", ".css")) {
+            String extension = StringUtils.substringAfterLast(fileName, '.');
+            String shortFileName = StringUtils.substringBeforeLast(fileName, ".");
+            if (StringUtils.endsWith(shortFileName, ".min")) {
+                shortFileName = StringUtils.substringBeforeLast(shortFileName, ".");
             }
-
-            // Look for a resource file
-            String resourceFilePath = "/resources/" + filename;
-            if (resourceExists(resourceFilePath)) {
-                XWikiURLFactory urlf = context.getURLFactory();
-
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceFilePath));
-                return urlf.getURL(url, context);
+            String fileNameSource = String.format("%s.%s", shortFileName, extension);
+            String fileNameMinified = String.format("%s.min.%s", shortFileName, extension);
+            DebugConfiguration debugConfig = Utils.getComponent(DebugConfiguration.class);
+            String[] fileNames = debugConfig.isMinify() ? new String[] {fileNameMinified, fileNameSource}
+                : new String[] {fileNameSource, fileNameMinified};
+            String skinFile = null;
+            for (String name : fileNames) {
+                skinFile = getSkinFileInternal(name, skinId, forceSkinAction, context);
+                if (skinFile != null) {
+                    break;
+                }
             }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", filename, skinId, e);
-            }
+            return skinFile;
+        } else {
+            return getSkinFileInternal(fileName, skinId, forceSkinAction, context);
         }
-
-        return null;
     }
 
     /**
@@ -2975,11 +2994,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         String result =
-            getUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
-
-        if (StringUtils.isEmpty(result)) {
-            result = getSpacePreference(prefname, context);
-        }
+            getAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
         return result != null ? result : "";
     }

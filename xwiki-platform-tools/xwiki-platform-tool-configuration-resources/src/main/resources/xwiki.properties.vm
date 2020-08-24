@@ -39,25 +39,25 @@
 #-# [Since 2.4M1]
 #-# Indicate if the rendering cache is enabled.
 #-# Default value is false.
-# core.renderingcache.enabled=true
+# core.renderingcache.enabled = true
 
 #-# [Since 2.4M1]
 #-# A list of Java regex patterns matching full documents reference.
-# core.renderingcache.documents=wiki:Space\.Page
-# core.renderingcache.documents=wiki:Space\..*
-# core.renderingcache.documents=Space\.PageOnWhateverWiki
+# core.renderingcache.documents = wiki:Space\.Page
+# core.renderingcache.documents = wiki:Space\..*
+# core.renderingcache.documents = Space\.PageOnWhateverWiki
 
 #-# [Since 2.4M1]
 #-# The time (in seconds) after which data should be removed from the cache when not used.
 #-# Default value is 300 (5 min).
-# core.renderingcache.duration=300
+# core.renderingcache.duration = 300
 
 #-# [Since 2.4M1]
 #-# The size of the rendering cache. Not that it's not the number of cached documents but the number of cached results.
 #-# (For a single document several cache entries are created, because each action, language and request query string
 #-# produces a unique rendering result)
 #-# Default value is 100.
-# core.renderingcache.size=100
+# core.renderingcache.size = 100
 
 #-# [Since 7.2M2]
 #-# Define which hierarchy is used between pages (for example inside the breadcrumb).
@@ -66,7 +66,7 @@
 #-# could be defined as the parent of an other document.
 #-# If "reference" is used, then the children of a document must be placed inside this document. It's less flexible but
 #-# more clear.
-# core.hierarchyMode=reference
+# core.hierarchyMode = reference
 
 #-------------------------------------------------------------------------------------
 # Environment
@@ -89,9 +89,9 @@
 #-# directory is used; This is absolutely not recommended since that directory could be wiped out at any time and you
 #-# should specify a value.
 #if ($xwikiPropertiesEnvironmentPermanentDirectory)
-environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
+environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #else
-# environment.permanentDirectory=/var/lib/xwiki/data/
+# environment.permanentDirectory = /var/lib/xwiki/data/
 #end
 
 #-------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.imageHeightLimit = -1
 
 #-# [Since 2.5M2]
-#-# InterWiki definitions in the format alias=URL
+#-# InterWiki definitions in the format alias = URL
 #-# See http://en.wikipedia.org/wiki/Interwiki_links for a definition of an InterWiki link
 # Some examples:
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
@@ -162,7 +162,7 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 #-# [Since 2.4M1]
 #-# Change the Pygments style used in the code macro (see http://pygments.org/docs/styles/)
 #-# If not set "default" style is used.
-# rendering.macro.code.pygments.style=vs
+# rendering.macro.code.pygments.style = vs
 
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
@@ -245,12 +245,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 1.7M1]
 #-# The standard cache component implementation to use (can be local or distributed depending on the implementation).
 #-# The default standard cache implementation is Infinispan.
-# cache.defaultCache=infinispan
+# cache.defaultCache = infinispan
 
 #-# [Since 1.7M1]
 #-# The local cache implementation to use.
 #-# The default local cache implementation is Infinispan.
-# cache.defaultLocalCache=infinispan/local
+# cache.defaultLocalCache = infinispan/local
 
 #-------------------------------------------------------------------------------------
 # Settings for the OpenOffice server instance consumed by the OfficeImporter component
@@ -260,38 +260,38 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Type of the openoffice server instance used by officeimporter component.
 #-# 0 - Internally managed server instance. (Default)
 #-# 1 - Externally managed (local) server instance.
-# openoffice.serverType=0
+# openoffice.serverType = 0
 
 #-# [Since 12.1RC1]
 #-# Port numbers used for connecting to the openoffice server instance.
 #-# For an internally managed server instance, it will create the process for all ports.
 #-# For an externally managed server instance, only the first server port is taken into account.
-# openoffice.serverPorts=8100,8101
+# openoffice.serverPorts = 8100,8101
 
 #-# [Since 1.9M2]
 #-# If the openoffice server should be started / connected upon XE start.
 #-# Default value is false
-# openoffice.autoStart=false
+# openoffice.autoStart = false
 
 #-# [Since 1.8RC3]
 #-# Path to openoffice installation (serverType:0 only).
 #-# If no path is provided, a default value will be calculated based on the operating environment.
-# openoffice.homePath=/opt/openoffice.org3/
+# openoffice.homePath = /opt/openoffice.org3/
 
 #-# [Since 1.8RC3]
 #-# Path to openoffice execution profile (serverType:0 only).
 #-# If no path is provided, a default value will be calculated based on the operating environment.
-# openoffice.profilePath=/home/user/.openoffice.org/3
+# openoffice.profilePath = /home/user/.openoffice.org/3
 
 #-# [Since 1.8RC3]
 #-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process (serverType:0 only).
 #-# Default value is 50
-# openoffice.maxTasksPerProcess=50
+# openoffice.maxTasksPerProcess = 50
 
 #-# [Since 1.8RC3]
 #-# Timeout for conversion tasks (in milliseconds) (serverType:0 only).
 #-# Default value is 30 seconds
-# openoffice.taskExecutionTimeout=30000
+# openoffice.taskExecutionTimeout = 30000
 
 #-------------------------------------------------------------------------------------
 # Velocity
@@ -347,13 +347,13 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# There's no customizers defined by default. Available customizer ids:
 #-# - timedinterrupt: interrupt script execution if it takes longer than a given time (default to 1 minute)
 #-# - secure: runs Groovy in a security sandbox
-#-# groovy.compilationCustomizers=<list of customizer ids here>
+#-# groovy.compilationCustomizers = <list of customizer ids here>
 
 #-# Timed Interrupt Customizer
 
 #-# [Since 4.1M1]
 #-# Default execution time for a script before a timeout occurs, in seconds.
-#-# groovy.customizer.timedInterrupt.timeout=60
+#-# groovy.customizer.timedInterrupt.timeout = 60
 
 #-------------------------------------------------------------------------------------
 # Events distribution
@@ -368,8 +368,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
 #-#
-#-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded JGroups configuration
-#-# files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
+#-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded
+#-# JGroups configuration files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
 #-# There's a README file in that directory with more information.
 #-# Example: observation.remote.channels = public, cluster
 
@@ -377,7 +377,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The implementation of network adapter to use.
 #-# The default is jgroups.
 #-#
-#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier provided in the configuration is matched with the component role hint.
+#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier
+#-# provided in the configuration is matched with the component role hint.
 #-# Example: observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
@@ -405,12 +406,29 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 4.0M1]
 #-# The folder containing job executing status.
 #-# The default is {environment.permanentDirectory}/jobs/
-# job.statusFolder=/var/lib/xwiki/data/jobs/
+# job.statusFolder = /var/lib/xwiki/data/jobs/
 
 #-# [Since 7.2M2]
 #-# The maximum number of entries to put in the job status cache.
 #-# The default is 50.
-# job.statusCacheSize=50
+# job.statusCacheSize = 50
+
+#-# [Since 12.5RC1]
+#-# The maximum number of entries to put in cache for the GroupedJobInitializer components.
+#-# The default is 100.
+# job.groupedJobInitializerCacheSize = 100
+
+#-# [Since 12.5RC1]
+#-# The thread keep-alive time in milliseconds for the single job executor.
+#-# This value defines how long a thread can be idle before being terminated by the executor.
+#-# The default value is 60000 for 60 000ms.
+# job.singleJobThreadKeepAliveTime = 60000
+
+#-# [Since 12.5RC1]
+#-# The thread keep-alive time in milliseconds for the grouped job executors.
+#-# This value defines how long a thread can be idle before being terminated by an executor.
+#-# The default value is 60000 for 60 000ms.
+# job.groupedJobThreadKeepAliveTime = 60000
 
 #-------------------------------------------------------------------------------------
 # Extension Manager
@@ -431,32 +449,34 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# * password: the password to use to authenticate to the repository
 #-# 
 #-# And here those for "maven" repositories:
-#-# * [Since 10.7RC1] checksumPolicy: what to do when checksum validation fail. Possible values are "fail", "warn" (the default) and "ignore"
+#-# * [Since 10.7RC1] checksumPolicy: what to do when checksum validation fail. Possible values are "fail", "warn"
+#-#   (the default) and "ignore"
 #-#
 #-# Here is an example:
-# extension.repositories=privatemavenid:maven:http://host.com/private/maven/
-# extension.repositories.privatemavenid.auth.user=someuser
-# extension.repositories.privatemavenid.auth.password=thepassword
+# extension.repositories = privatemavenid:maven:http://host.com/private/maven/
+# extension.repositories.privatemavenid.auth.user = someuser
+# extension.repositories.privatemavenid.auth.password = thepassword
 #-#
 #-# Here's an example to add your local Maven Repository
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
 ## Apache Commons Configuration syntax for specifying the user.home system property!
 #set ($userHome = '${sys:user.home}')
-# extension.repositories=maven-local:maven:file://${userHome}/.m2/repository
+# extension.repositories = maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
-# extension.repositories=maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots
+# extension.repositories = maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
 #-# When not set the following is taken (in this order):
-# extension.repositories=maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public
-# extension.repositories=store.xwiki.com:xwiki:https://store.xwiki.com/xwiki/rest/
-# extension.repositories=extensions.xwiki.org:xwiki:https://extensions.xwiki.org/xwiki/rest/
+# extension.repositories = maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public
+# extension.repositories = store.xwiki.com:xwiki:https://store.xwiki.com/xwiki/rest/
+# extension.repositories = extensions.xwiki.org:xwiki:https://extensions.xwiki.org/xwiki/rest/
 #-#
-#-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
+#-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list
+#-# empty:
 # extension.repositories=
 #if ($xwikiExtensionRepositories)
 #foreach ($extensionRepository in $xwikiExtensionRepositories.split(','))
-extension.repositories=$extensionRepository
+extension.repositories = $extensionRepository
 #end
 #end
 
@@ -492,7 +512,8 @@ extension.oldflavors=$oldFlavor.trim()
 
 #-# [Since 9.6]
 #-# Indicate a list of pattern extension ids and the corresponding recommended version.
-#-# This version will be used for dependencies matching the pattern and fallback on the version declared by the extension in case of failure.
+#-# This version will be used for dependencies matching the pattern and fallback on the version declared by the
+#-# extension in case of failure.
 #-#
 #-# Here is an example:
 # extension.recommendedVersions=org.xwiki.commons:.*/[9.6]
@@ -563,11 +584,14 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 
 #-# [Since 10.2RC1] Override the default UI indicated in the "environment extension" (usually means the WAR).
 #-# It usually make more sense to set that at the WAR level (since it's usually synchronized with it).
-#-# If this is set it also means the Distribution Wizard will switch to default UI mode in which you cannot choose the flavor.
+#-# If this is set it also means the Distribution Wizard will switch to default UI mode in which you cannot choose the
+#-# flavor.
 #-#
-#-# The id[/version] of the default UI for the main wiki. If the version is not indicated it will be the version of the environment extension.
+#-# The id[/version] of the default UI for the main wiki. If the version is not indicated it will be the version of the
+#-# environment extension.
 # distribution.defaultUI=org.my.groupid:artifactid-mainwiki/1.5
-#-# The id[/version] default UI for the subwikis.  If the version is not indicated it will be the version of the environment extension.
+#-# The id[/version] default UI for the subwikis.  If the version is not indicated it will be the version of the
+#-# environment extension.
 # distribution.defaultWikiUI=org.my.groupid:artifactid-wiki/1.5
 
 #-------------------------------------------------------------------------------------
@@ -585,8 +609,14 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 
 #-# [Since 12.2]
 #-# The URL of the Solr server (the root server and not the URL of a core).
-#-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
+#-# The default value assumes that the remote Solr server is started in a different process on the same machine,
+#-# using the default port.
 # solr.remote.baseURL=http://localhost:8983/solr
+
+#-# [Since 12.6]
+#-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
+#-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
+# solr.remote.corePrefix=xwiki
 
 #-# [Since 5.1M1]
 #-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
@@ -605,10 +635,20 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # solr.indexer.queue.capacity=100000
 
 #-# [Since 6.1M2]
-#-# Indicating if a synchronization between SOLR index and XWiki database should be run at startup.
-#-# Synchronization can be started from search administration.
+#-# Indicates if a synchronization between SOLR index and XWiki database should be performed at startup.
+#-# Synchronization can be started from the search administration UI.
 #-# The default is true.
 # solr.synchronizeAtStartup=false
+
+#-# [Since 12.5RC1]
+#-# Indicates which wiki synchronization to perform when the "solr.synchronizeAtStartup" property is set to true.
+#-# Two modes are available:
+#-#   - WIKI: indicate that the synchronization is performed when each wiki is accessed for the first time.
+#-#   - FARM: indicate that the synchronization is performed once for the full farm when XWiki is started.
+#-# For large farms and in order to spread the machine's indexing load, the WIKI value is recommended, especially if
+#-# some wikis are not used.
+#-# The default is:
+# solr.synchronizeAtStartupMode=FARM
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -700,15 +740,15 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-------------------------------------------------------------------------------------
 
 #-# [Since 5.2M2]
-#-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist (only
-#-# the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in this list
-#-# would be displayed inline if possible)
+#-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist
+#-# (only the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in
+#-# this list would be displayed inline if possible)
 #-#
 #-# By default we use the following whitelist (coma separated list of values).
 # attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv
 #-#
-#-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of values.
-#-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
+#-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of
+#-# values. We advise you to forbid at least the following mimetypes : text/html, text/javascript
 # attachment.download.blacklist=text/html,text/javascript
 
 #-------------------------------------------------------------------------------------
@@ -843,27 +883,6 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail.sender.sendQueueCapacity = 1000
 
 #-------------------------------------------------------------------------------------
-# WatchList
-#-------------------------------------------------------------------------------------
-
-#-# [Since 10.0]
-#-# [Since 9.11.2]
-#-# Controls if the notifications feature is enabled. Default value is false.
-#-# Thanks to this option, you can disable the application without uninstalling it.
-# watchlist.enabled = false
-
-#-# [Since 7.0RC1]
-#-# Controls if the realtime notifications feature is enabled. Default value is false.
-#-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause performance issues.
-#-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
-# watchlist.realtime.enabled = false
-
-#-# [Since 8.1M2]
-#-# Controls if realtime notifications are triggered by remote events. Default value is false.
-#-# Enable if you don't have watchlist loaded on all instances in cluster.
-# watchlist.realtime.allowRemote = false
-
-#-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------
 
@@ -923,6 +942,16 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is:
 # edit.conflictChecking.enabled = true
 
+#-# [Since 12.5]
+#-# Indicate if the XWiki documents should be edited in-place, without leaving the view mode, whenever possible (e.g. if
+#-# the default edit mode for that document and the preferred editor both support in-place editing). When enabled,
+#-# clicking on the document Edit button makes the document title and content editable in-place, without leaving the
+#-# view mode. When disabled, clicking on the document Edit button loads the default (stand-alone) edit mode for that
+#-# document.
+#-#
+#-# The default is:
+# edit.document.inPlaceEditing.enabled = true
+
 #-------------------------------------------------------------------------------------
 # Notifications
 #-------------------------------------------------------------------------------------
@@ -980,21 +1009,41 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# This properties controls the size of this pool. Any number lower than 1 disable the thread pool system.
 #-# 
 #-# The default is :
-# notifications.rest.poolSize=2
+# notifications.rest.poolSize = 2
 
 #-# [Since 10.11.8]
 #-# [Since 11.3]
 #-# Enable or disable caching of notification search result in the REST or async API.
 #-# 
 #-# The default is :
-# notifications.rest.cache=true
+# notifications.rest.cache = true
 
-#-# [Since 12.1] [Experimental]
-#-# Enabling this option will make user notifications be filtered and stored when the event is generated
-#-# instead of filtered each time they are displayed.
+#-# [Since 12.6]
+#-# When this option is enabled the relation between users and events is evaluated and stored when the events are
+#-# generated instead of each time they are displayed.
 #-#
 #-# The default is :
-# notifications.eventPreFilteringEnabled = false
+# notifications.eventPrefilteringEnabled = true
+
+#-# [Since 12.5RC1]
+#-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
+#-# instance.
+#-# This properties controls the size of this pool.
+#-#
+#-# The default is :
+# notifications.async.poolSize = 2
+
+#-------------------------------------------------------------------------------------
+# Mentions
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.6]
+#-# The detection and notification for the user mentions in created or edited content is done asynchronously 
+#-# by a pool of consumers.
+#-# This properties controls the size of this pool.
+#-#
+#-# The default is :
+# mentions.poolSize = 1
 
 #-------------------------------------------------------------------------------------
 # Event Stream
@@ -1023,11 +1072,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # eventstream.daystokeepevents = 0
 
-#-# [Since 12.4][EXPERIMENTAL]
-#-# The new experimental no-SQL oriented event store is disabled by default. Once enabled the Solr implementation is
+#-# [Since 12.4]
+#-# Indicate if the new no-SQL oriented event store is enabled. Once enabled the Solr implementation is
 #-# used by default but other implementations (like a MongoDB based implementation for example) might come later.
-# eventstream.store.enabled=false
-# eventstream.store=solr
+#-# It's enabled by default since 12.6.
+# eventstream.store.enabled = true
+#-# Indicate which event store implementation to use. The default implementation is based on Solr.
+# eventstream.store = solr
 
 #-------------------------------------------------------------------------------------
 # Logging
@@ -1037,7 +1088,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Indicate of logging about the use of deprecated APIs/feature should be enabled.
 #-# 
 #-# The default is:
-# logging.deprecated.enabled=true
+# logging.deprecated.enabled = true
 
 #-------------------------------------------------------------------------------------
 # User
@@ -1074,10 +1125,10 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation
-#-# using an atomic operation on database (which allows efficient rollback).
-#-# This property aims at being removed in the future once the atomic rename has been validated
-#-# to work 100% fine. Only use it if you are facing an issue with the move/rename features.
+#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
+#-# on database (which is a lot more performant).
+#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
+#-# Only use it if you are facing an issue with the move/rename features.
 #-#
 #-# The default value is:
 # refactoring.rename.useAtomicRename = true

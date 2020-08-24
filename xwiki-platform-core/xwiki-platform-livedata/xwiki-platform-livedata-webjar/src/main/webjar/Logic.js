@@ -20,12 +20,10 @@
 
 
 define([
-  "jquery",
   "Vue",
   "xwiki-livedata",
   //"polyfills"
 ], function (
-  $,
   Vue,
   XWikiLivedata
 ) {

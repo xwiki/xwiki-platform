@@ -31,11 +31,14 @@
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
+  <properties>
+    <upgradetest.previousflavor.version>11.10.8</upgradetest.previousflavor.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <version>11.10.8</version>
+      <version>${upgradetest.previousflavor.version}</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

@@ -44,7 +44,7 @@
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
       <classifier>${upgradetest.previousdata.classifier}</classifier>
-      <version>${upgradetest.previousflavor.version}</version>
+      <version>8.4.6</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

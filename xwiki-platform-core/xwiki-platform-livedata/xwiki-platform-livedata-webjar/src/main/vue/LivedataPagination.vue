@@ -63,13 +63,16 @@
         <span class="fa fa-angle-left"></span>
       </a>
 
-      <span
-        v-for="pageIndex in paginationIndexesAndDots"
-        :key="pageIndex"
+      <template
+        v-for="(pageIndex, i) in paginationIndexesAndDots"
       >
-        <span v-if="pageIndex === '...'">...</span>
+        <span
+          v-if="pageIndex === '...'"
+          :key="'...' + i"
+        >...</span>
         <a
           v-else
+          :key="pageIndex"
           :class="{
             'page-nav': true,
             'current': pageIndex === logic.getPageIndex(),
@@ -79,7 +82,7 @@
         >
           {{ pageIndex + 1 }}
         </a>
-      </span>
+      </template>
 
       <a
         class="page-nav"

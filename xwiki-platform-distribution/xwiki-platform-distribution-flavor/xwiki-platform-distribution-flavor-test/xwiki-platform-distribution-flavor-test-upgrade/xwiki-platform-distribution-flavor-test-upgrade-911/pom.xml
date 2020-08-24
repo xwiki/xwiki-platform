@@ -38,7 +38,7 @@
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <version>${upgradetest.previousflavor.version}</version>
+      <version>9.11.8</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

@@ -28,13 +28,14 @@
     <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-84-filestore</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From 8.4.6 - Filestore</name>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version} - Filestore</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From 8.4.6 with file store</description>
+  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version} with file store</description>
   <properties>
     <upgradetest.previousflavor.name>XWiki Enterprise Flavor - Main Wiki</upgradetest.previousflavor.name>
     <upgradetest.previousflavor.groupId>org.xwiki.enterprise</upgradetest.previousflavor.groupId>
     <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
+    <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.classifier>custom-filestore-6</upgradetest.previousdata.classifier>
   </properties>
@@ -43,7 +44,7 @@
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
       <classifier>${upgradetest.previousdata.classifier}</classifier>
-      <version>8.4.6</version>
+      <version>${upgradetest.previousflavor.version}</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

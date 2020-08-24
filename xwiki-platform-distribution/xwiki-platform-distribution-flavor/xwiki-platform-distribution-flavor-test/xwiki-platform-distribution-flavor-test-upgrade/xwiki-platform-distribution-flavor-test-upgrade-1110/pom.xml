@@ -28,9 +28,9 @@
     <version>12.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1110</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From 11.10.8</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
+  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From 11.10.8</description>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>

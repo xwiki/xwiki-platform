@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rightsmanager.like=Aimer
+  <content>rightsmanager.like=J'aime
 like.unlike.modal.title=Confirmation de suppression du J'aime
 like.unlike.modal.body=Êtes-vous sûr de vouloir enlever votre J''aime de la page {0} ?
 like.unlike.modal.closeButton=Fermer

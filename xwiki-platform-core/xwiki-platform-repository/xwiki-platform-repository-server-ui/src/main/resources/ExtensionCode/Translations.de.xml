@@ -41,12 +41,12 @@ extension.repository.emptyvalue=
 extension.repository.name=Name
 extension.repository.summary=Zusammenfassung
 extension.repository.type=Typ
-### Missing: extension.repository.category=Category
+extension.repository.category=Kategorie
 extension.repository.authors=Autoren
 extension.repository.doc.creationDate=Erzeugungsdatum
 extension.repository.doc.date=Letzte Änderung
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.rating=Bewertung
+extension.repository.installedCount=Installationen
 
 ## Administration UI
 admin.repository=Repository mit Erweiterungen</content>

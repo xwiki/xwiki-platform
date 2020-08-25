@@ -39,6 +39,7 @@ import org.xwiki.like.LikeManager;
 import org.xwiki.like.LikedEntity;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.async.internal.AsyncRendererCache;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -61,8 +62,8 @@ import com.xpn.xwiki.XWikiContext;
 @Unstable
 public class LikeScriptService implements ScriptService
 {
-    private static final EntityReference UIX_REFERENCE =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Like"), "LikeUIX", Locale.ROOT);
+    private static final LocalDocumentReference UIX_REFERENCE =
+        new LocalDocumentReference(new LocalDocumentReference(Arrays.asList("XWiki", "Like"), "LikeUIX"), Locale.ROOT);
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -235,6 +236,8 @@ public class LikeScriptService implements ScriptService
      */
     public void cleanCacheUIX()
     {
-        this.asyncRendererCache.cleanCache(UIX_REFERENCE);
+        DocumentReference localUIXReference = new DocumentReference(UIX_REFERENCE,
+            contextProvider.get().getWikiReference());
+        this.asyncRendererCache.cleanCache(localUIXReference);
     }
 }

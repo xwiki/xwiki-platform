@@ -52,6 +52,7 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 
 import static com.xpn.xwiki.doc.XWikiDocument.COMMENTSCLASS_REFERENCE;
 import static java.util.Collections.emptyList;
@@ -281,11 +282,8 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                 Optional.<Object>ofNullable(baseObject.getField("comment"))
                     .ifPresent(it -> {
                         LargeStringProperty lsp = (LargeStringProperty) it;
-                        boolean isComment =
-                            StringUtils.isEmpty(lsp
-                                                    .getObject()
-                                                    .getField(SELECTION_FIELD)
-                                                    .toFormString());
+                        PropertyInterface field = lsp.getObject().getField(SELECTION_FIELD);
+                        boolean isComment = field == null || StringUtils.isEmpty(field.toFormString());
                         MentionLocation location = isComment ? COMMENT : ANNOTATION;
                         handleField(oldBaseObject, lsp, location, documentReference, authorReference, syntax);
                     });

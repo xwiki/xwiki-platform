@@ -477,4 +477,14 @@ public class NotificationsTrayPage extends ViewPage
         String url = this.rssLink.getAttribute("href");
         return new NotificationsRSS(url, username, password);
     }
+
+    /**
+     *
+     * @return The tray notification button.
+     * @since 12.8RC1
+     */
+    public WebElement getNotificationsButton()
+    {
+        return this.notificationsButton;
+    }
 }

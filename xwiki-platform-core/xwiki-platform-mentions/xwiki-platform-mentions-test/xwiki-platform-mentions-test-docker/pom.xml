@@ -60,7 +60,7 @@
     <!-- page objects -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-mentions-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
  * Page Object for Comments Tab (or pane)
@@ -55,9 +56,23 @@ public class CommentsTab extends BaseElement
 
     public boolean isCommentFormShown()
     {
+        toggleComments();
         WebElement commentForm =
             getDriver().findElement(By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
+    }
+
+    private void toggleComments()
+    {
+        String commentFormId = "AddComment";
+        String openFormId = "openCommentForm";
+        XWikiWebDriver driver = getDriver();
+        // if the comments has not already been toggled (ie, the comment button is not displayed).
+        // we click on the button and wait until the form is visible
+        if (!driver.findElementWithoutWaiting(By.id(commentFormId)).isDisplayed()) {
+            driver.findElementWithoutWaiting(By.id(openFormId)).click();
+            driver.waitUntilElementIsVisible(By.id(commentFormId));
+        }
     }
 
     public void setAnonymousCommentAuthor(String author)
@@ -84,6 +99,7 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm getAddCommentForm()
     {
+        toggleComments();
         return new CommentForm(By.id("AddComment"));
     }
 

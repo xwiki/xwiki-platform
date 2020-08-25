@@ -122,6 +122,8 @@ public class CommentAsAdminTest extends AbstractTest
     public void testPreviewComment()
     {
         definePreferedEditor("Text");
+        final ViewPage vp = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        vp.openCommentsDocExtraPane();
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
         addCommentForm.addToContentField("one **two** three");
         assertEquals("one two three", addCommentForm.clickPreview().getText());

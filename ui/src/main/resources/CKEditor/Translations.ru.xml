@@ -89,23 +89,23 @@ ckeditor.plugin.save.leaveConfirmationMessage=Есть несохраненны�
 ckeditor.plugin.save.failed=Содержимое не может быть сохранено из-за внутренней ошибки CKEditor. Вы должны попытаться скопировать ваши важные изменения и перезагрузить редактор.
 ckeditor.plugin.source.conversionFailed=Не удалось выполнить преобразование.
 
-### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+ckeditor.plugin.toolbar.basicStyles=Базовые стили
 ckeditor.plugin.toolbar.lists=Списки
 ckeditor.plugin.toolbar.bulletedlist=Маркированный список
 ckeditor.plugin.toolbar.numberedlist=Нумерованный список
 ckeditor.plugin.toolbar.insert=Вставить
 ckeditor.plugin.toolbar.horizontalrule=Горизонтальная линия
 ckeditor.plugin.toolbar.specialchar=Cпециальные символы
-### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
-### Missing: ckeditor.plugin.toolbar.successBox=Success Box
-### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
-### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
-### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
-### Missing: ckeditor.plugin.toolbar.include=Include
-### Missing: ckeditor.plugin.toolbar.code=Code Snippet
-### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
+ckeditor.plugin.toolbar.infoBox=Информация
+ckeditor.plugin.toolbar.successBox=Успешное завершение
+ckeditor.plugin.toolbar.warningBox=Предупреждение
+ckeditor.plugin.toolbar.errorBox=Ошибка!
+ckeditor.plugin.toolbar.toc=Оглавление
+ckeditor.plugin.toolbar.include=Вставка
+ckeditor.plugin.toolbar.code=Фрагмент кода
+ckeditor.plugin.toolbar.otherMacros=Другие макросы
 
-### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+ckeditor.inline.failedToInit=Не удалось инициализировать CKEditor.
 
 modal.ok=ОК
 modal.cancel=Отмена

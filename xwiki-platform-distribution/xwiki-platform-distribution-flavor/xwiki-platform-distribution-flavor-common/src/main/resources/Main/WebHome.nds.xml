@@ -1,0 +1,95 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Main.WebHome" locale="nds">
+  <web>Main</web>
+  <name>WebHome</name>
+  <language>nds</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Start</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{box cssClass="floatinginfobox"}}
+{{velocity}}
+{{html clean="false"}}
+## Chrome's XSS Auditor blocks the preview action if:
+## * the submitted content has an iframe with an external URL
+## * the preview action displays the submitted iframe
+## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
+## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
+#set ($iframe = 'iframe')
+&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
+{{/html}}
+{{/velocity}}
+{{/box}}
+
+= Willkommen in Ihrem XWiki =
+
+XWiki ist das beste Tool, um Wissen zu organisieren. Ein //Wiki// besteht aus einer Hierarchie von //Seiten//. Sie können mehrere Wikis erstellen - und jedes davon hat eine eigene Struktur und eigene Seiten.
+
+XWiki kann für ein strukturiertes Wissensmanagement genutzt werden (Prozesse, Produkte, Projekte, Support oder Dokumentation, etc.), für die kollaborative Arbeit oder sogar als vollständiges Firmen-Intranet.
+
+= Die Basics =
+
+Um das Meiste aus Ihrem neuen XWiki herauszuholen:
+
+Benutzen Sie die {{velocity}}$services.icon.render('pencil'){{/velocity}}-Schaltfläche //Bearbeiten// auf dieser Seite und fangen Sie an die Inhalte an Ihren Bedarf anzupassen.
+
+Benutzen Sie die {{velocity}}$services.icon.render('add'){{/velocity}}-Schaltfläche //Erstellen//, um weitere Seiten hinzuzufügen und eine //Hierachie// zu beginnen, die genau so ist, wie Sie sie für Ihre Inhalte benötigen.
+
+Benutzen Sie die {{velocity}}$services.icon.render('home'){{/velocity}} Breadrcumbs-Leiste über dem Seiten-Titel, um einfach zu //navigieren//. In einem großen Wiki sind Sie so nie verloren.
+
+In der [[Sandbox&gt;&gt;Sandbox.WebHome]] haben Sie zugriff auf weiteren Beispielinhalte. Sie können hier einfach experimentieren und die XWiki-Funktionen ausprobieren. 
+
+ {{box}}
+Weitere Informationen für einen leichten Einstieg erhalten Sie im {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+{{/box}}
+
+(%class="row"%)
+(((
+(%class="col-xs-12 col-sm-6"%)
+(((
+= Extend your wiki =
+
+Um die zahlreichen Möglichkeiten von XWiki noch zu erweitern und an Ihre Bedarfe anzupassen, wechseln //Sie// zum {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}. Hier können Sie Extensions installieren und das Wiki noch weiter personalisieren.
+
+Um aus über 900 Extentions auszuwählen, besuchen Sie die [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]]. Hier gibt es für viele Anwendungszwecke die richtige Extension.
+)))
+
+(%class="col-xs-12 col-sm-6"%)
+(((
+= Erstellen Sie eigene Anwendungen =
+
+Holen Sie noch mehr aus Ihrem XWiki, indem Sie die //Datenstruktur// an Ihre Bedarfe anpassen und erstellen //Sie// Ihre eigenen, //ganz persönlichen Anwendungen// mit Hilfe der Anwendung [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
+
+Mit AWM ist es kinderleicht eigene Anwendungen zu erstellen und in wenigen Minuten Daten in gewünschter Form zu bearbeiten oder zu verwalten.
+)))
+)))</content>
+  
+</xwikidoc>

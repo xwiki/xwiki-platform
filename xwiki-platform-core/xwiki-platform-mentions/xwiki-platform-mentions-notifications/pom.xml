@@ -33,8 +33,8 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- This component must be installed at the farm level because 
-    org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses 
-    org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
+         org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
+         org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <description>Handles the notififcations of user mentions.</description>

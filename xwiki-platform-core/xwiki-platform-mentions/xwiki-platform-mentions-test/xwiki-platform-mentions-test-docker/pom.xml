@@ -45,8 +45,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
-   
     <!-- ================================
         Test only dependencies
         ================================ -->
@@ -56,7 +54,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
     <!-- page objects -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -110,5 +107,4 @@
       </build>
     </profile>
   </profiles>
-
 </project>

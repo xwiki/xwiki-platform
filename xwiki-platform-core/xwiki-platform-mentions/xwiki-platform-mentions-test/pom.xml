@@ -29,7 +29,6 @@
   <name>XWiki Platform - Mentions - Test - POM</name>
   <packaging>pom</packaging>
   <description>Tests for the Mentions Application.</description>
-
   <profiles>
     <profile>
       <id>docker</id>

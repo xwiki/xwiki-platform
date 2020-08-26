@@ -72,7 +72,7 @@
             left outer join xwikidoc doc on (
                 doc.XWD_WEB = XWS_REFERENCE and
                 doc.XWD_NAME = 'WebHome' and
-                doc.XWD_LANGUAGE = '')
+                (doc.XWD_LANGUAGE = '' OR doc.XWD_LANGUAGE is NULL))
             left outer join xwikidoc tdoc on (
                 tdoc.XWD_WEB = XWS_REFERENCE and
                 tdoc.XWD_NAME = 'WebHome' and
@@ -134,7 +134,7 @@
         left outer join xwikidoc doc on (
             doc.XWD_WEB = XWS_REFERENCE and
             doc.XWD_NAME = 'WebHome' and
-            doc.XWD_LANGUAGE = '')
+            (doc.XWD_LANGUAGE = '' OR doc.XWD_LANGUAGE is NULL))
         left outer join xwikidoc tdoc on (
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and

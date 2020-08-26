@@ -170,9 +170,9 @@
        $('#modal-like-button').addClass('hidden');
        $('#modal-unlike-button').removeClass('hidden');
        $('#is-liked').val('true');
-       new XWiki.widgets.Notification('$services.localization.render('like.newlike.success')', 'done');
+       new XWiki.widgets.Notification("$services.localization.render('like.newlike.success')", 'done');
      }).fail(function(data) {
-       new XWiki.widgets.Notification('$services.localization.render('like.newlike.error')', 'error');
+       new XWiki.widgets.Notification("$services.localization.render('like.newlike.error')", 'error');
      });
     $('#like-modal').modal('hide');
   };
@@ -190,9 +190,9 @@
       $('#modal-like-button').removeClass('hidden');
       $('#modal-unlike-button').addClass('hidden');
       $('#is-liked').val('false');
-      new XWiki.widgets.Notification('$services.localization.render('like.unlike.success')', 'done');
+      new XWiki.widgets.Notification("$services.localization.render('like.unlike.success')", 'done');
     }).fail(function(data) {
-      new XWiki.widgets.Notification('$services.localization.render('like.unlike.error')', 'error');
+      new XWiki.widgets.Notification("$services.localization.render('like.unlike.error')", 'error');
     });
     $('#like-modal').modal('hide');
   };

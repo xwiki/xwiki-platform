@@ -107,7 +107,13 @@ public class NotificationsTrayPage extends ViewPage
             });
         } catch (TimeoutException e)
         {
-            String latestResponse = (responses.isEmpty()) ? null : responses.get(responses.size() - 1).toString();
+            String latestResponse = null;
+            if (!responses.isEmpty()) {
+                Object response = responses.get(responses.size() - 1);
+                if (response != null) {
+                    latestResponse = response.toString();
+                }
+            }
             throw new TimeoutException(String.format(
                 "Timeout while waiting on notification count. Expected: [%s] - Latest result: [%s].",
                 expectedUnread, latestResponse), e);

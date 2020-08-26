@@ -60,6 +60,8 @@ public class DeleteAction extends XWikiAction
 
     protected static final String EMPTY_RECYCLE_BIN = "emptybin";
 
+    private static final String TO_RECYCLEBIN_PARAM = "toRecyclebin";
+
     private boolean isAsync(XWikiRequest request)
     {
         return "true".equals(request.get(ASYNC_PARAM));
@@ -136,6 +138,14 @@ public class DeleteAction extends XWikiAction
 
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         String emptyBin = request.getParameter(EMPTY_RECYCLE_BIN);
+        // the document skips the recyclebin only if the user has explicitly made the choice to skip it
+        String toRecyclebinParam = request.getParameter(TO_RECYCLEBIN_PARAM);
+        boolean toRecyclebin;
+        if (toRecyclebinParam == null) {
+            toRecyclebin = true;
+        } else {
+            toRecyclebin = Boolean.parseBoolean(toRecyclebinParam);
+        }
 
         if ("true".equals(emptyBin)) {
             return deleteAllFromRecycleBin(context);
@@ -148,7 +158,7 @@ public class DeleteAction extends XWikiAction
             return true;
         } else {
             // Delete to recycle bin.
-            return deleteToRecycleBin(context);
+            return deleteToRecycleBin(context, toRecyclebin);
         }
     }
 
@@ -214,7 +224,7 @@ public class DeleteAction extends XWikiAction
         sendRedirect(response, Utils.getRedirect("view", context));
     }
 
-    private boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
+    private boolean deleteToRecycleBin(XWikiContext context, boolean toRecyclebin) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
@@ -226,12 +236,13 @@ public class DeleteAction extends XWikiAction
             doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference().getLastSpaceReference()
                 : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
 
-        return deleteToRecycleBin(documentReference, context);
+        return deleteToRecycleBin(documentReference, context, toRecyclebin);
     }
 
-    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context) throws XWikiException
+    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context, boolean toRecyclebin)
+        throws XWikiException
     {
-        Job deleteJob = startDeleteJob(entityReference, context);
+        Job deleteJob = startDeleteJob(entityReference, context, toRecyclebin);
 
         // If the user have asked for an asynchronous delete action...
         if (isAsync(context.getRequest())) {
@@ -262,7 +273,8 @@ public class DeleteAction extends XWikiAction
         return StringUtils.join(jobId, "/");
     }
 
-    private Job startDeleteJob(EntityReference entityReference, XWikiContext context) throws XWikiException
+    private Job startDeleteJob(EntityReference entityReference, XWikiContext context, boolean toRecyclebin)
+        throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
@@ -270,6 +282,7 @@ public class DeleteAction extends XWikiAction
             refactoring.getRequestFactory().createDeleteRequest(Arrays.asList(entityReference));
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
+        deleteRequest.setProperty(TO_RECYCLEBIN_PARAM, toRecyclebin);
 
         try {
             JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);

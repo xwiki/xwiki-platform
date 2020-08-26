@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -80,6 +81,12 @@ public class RefactoringScriptService implements ScriptService
     @Inject
     private JobExecutor jobExecutor;
 
+    @Inject
+    private RefactoringConfiguration configuration;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     /**
      * Used to check user rights.
      */
@@ -91,9 +98,6 @@ public class RefactoringScriptService implements ScriptService
 
     @Inject
     private RequestFactory requestFactory;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @return the standard request factory for creating the different refactoring requests.
@@ -531,7 +535,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to perform the given request.
-     * 
+     *
      * @param request the request to perform (specifies the old user reference and the new user reference)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
@@ -541,5 +545,16 @@ public class RefactoringScriptService implements ScriptService
     public Job replaceUser(ReplaceUserRequest request)
     {
         return this.execute(RefactoringJobs.REPLACE_USER, request);
+    }
+
+    /**
+     *
+     * @return {@code true} if the configuration allows to skip the recyclebin and if the current userhas the right
+     * to do so (ie, the current user is advanced).
+     * @since 12.8RC1
+     */
+    @Unstable
+    public boolean canSkipRecycleBin() {
+        return this.configuration.canSkipRecyclebin() && this.documentAccessBridge.isAdvancedUser();
     }
 }

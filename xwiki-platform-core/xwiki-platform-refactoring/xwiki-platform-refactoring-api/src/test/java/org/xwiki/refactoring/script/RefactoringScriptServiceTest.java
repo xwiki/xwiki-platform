@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -88,6 +89,9 @@ public class RefactoringScriptServiceTest
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private RefactoringConfiguration configuration;
 
     private ExecutionContext executionContext = new ExecutionContext();
 
@@ -362,5 +366,31 @@ public class RefactoringScriptServiceTest
 
         verify(request).setReplaceDocumentAuthor(true);
         verify(request).setReplaceDocumentContentAuthor(true);
+    }
+
+    @Test
+    void canSkipRecycleBinAllTrue()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
+        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        assertTrue(actual);
+    }
+
+    @Test
+    void canSkipRecycleBinConfigurationIsFalse()
+    {
+        when(this.configuration.canSkipRecyclebin()).thenReturn(false);
+        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        assertFalse(actual);
+    }
+
+    @Test
+    void canSkipRecycleBinAdvancedIsFalse()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(false);
+        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
+        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        assertFalse(actual);
     }
 }

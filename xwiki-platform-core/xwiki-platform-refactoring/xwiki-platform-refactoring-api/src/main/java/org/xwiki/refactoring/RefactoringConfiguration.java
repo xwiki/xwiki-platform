@@ -17,33 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package org.xwiki.refactoring;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Action for deleting an entire space, optionally saving all the deleted documents to the document trash, if enabled.
+ * Provides configuration for the refactoring module.
  *
  * @version $Id$
- * @since 3.4M1
+ * @since 12.8RC1
  */
-public class DeleteSpaceAction extends DeleteAction
+@Role
+@Unstable
+public interface RefactoringConfiguration
 {
-    @Override
-    protected boolean delete(XWikiContext context) throws XWikiException
-    {
-        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context, true);
-    }
-
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        XWikiRequest request = context.getRequest();
-        String result = "deletespace";
-        if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
-            result = "deletedspace";
-        }
-        return result;
-    }
+    /**
+     *
+     * @return {@code true} if the configuration allows advanced users to skip the recyclebin when deleting documents.
+     */
+    boolean canSkipRecyclebin();
 }

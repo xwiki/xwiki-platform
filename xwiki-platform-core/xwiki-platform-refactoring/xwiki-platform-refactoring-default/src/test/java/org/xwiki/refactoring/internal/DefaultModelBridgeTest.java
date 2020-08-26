@@ -202,8 +202,22 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted.", sourceReference);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (send to trash: [{}]).", sourceReference, true);
+    }
+
+    @Test
+    public void expurge() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        this.modelBridge.expurge(sourceReference);
+
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (send to trash: [{}]).", sourceReference, false);
     }
 
     @Test
@@ -217,8 +231,8 @@ public class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations.", sourceReference);
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (send to trash: [{}]).", sourceReference, true);
     }
 
     @Test

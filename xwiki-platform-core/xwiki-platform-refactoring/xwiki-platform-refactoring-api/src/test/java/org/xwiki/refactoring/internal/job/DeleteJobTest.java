@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -33,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.EntitySelection;
@@ -60,6 +62,10 @@ public class DeleteJobTest extends AbstractEntityJobTest
     @Rule
     public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(DeleteJob.class);
 
+    private RefactoringConfiguration configuration;
+
+    private DocumentAccessBridge documentAccessBridge;
+
     @Override
     protected MockitoComponentMockingRule<Job> getMocker()
     {
@@ -71,9 +77,12 @@ public class DeleteJobTest extends AbstractEntityJobTest
     {
         super.configure();
 
-        Execution execution = mocker.getInstance(Execution.class);
+        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
         when(execution.getContext()).thenReturn(executionContext);
+
+        this.configuration = this.mocker.getInstance(RefactoringConfiguration.class);
+        this.documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
     }
 
     @Test
@@ -96,6 +105,32 @@ public class DeleteJobTest extends AbstractEntityJobTest
             eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(documentReference);
+    }
+
+    @Test
+    public void deleteDocumentSkipRecyclebin() throws Throwable
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
+
+        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+
+        EntityRequest request = createRequest(documentReference);
+        request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        request.setProperty("toRecyclebin", false);
+        run(request);
+
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
+            eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).expurge(documentReference);
     }
 
     @Test

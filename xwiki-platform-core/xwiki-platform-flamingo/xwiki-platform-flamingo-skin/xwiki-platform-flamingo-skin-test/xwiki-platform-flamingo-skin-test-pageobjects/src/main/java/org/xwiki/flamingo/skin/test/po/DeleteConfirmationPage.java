@@ -17,33 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package org.xwiki.flamingo.skin.test.po;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.ConfirmationPage;
 
 /**
- * Action for deleting an entire space, optionally saving all the deleted documents to the document trash, if enabled.
+ * Represent the form the offer the choice between removing a document permanently
+ * or sending it to the recyclebin.
  *
  * @version $Id$
- * @since 3.4M1
+ * @since 12.8RC1
  */
-public class DeleteSpaceAction extends DeleteAction
+public class DeleteConfirmationPage extends ConfirmationPage
 {
-    @Override
-    protected boolean delete(XWikiContext context) throws XWikiException
+    @FindBy(css = "input[name='toRecyclebin'][value='true']")
+    private WebElement optionToReyclebin;
+
+    @FindBy(css = "input[name='toRecyclebin'][value='false']")
+    private WebElement optionSkipReyclebin;
+
+    /**
+     * Click on the option to put the document in the recyclebin.
+     */
+    public void selectOptionToRecycleBin()
     {
-        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context, true);
+        this.optionToReyclebin.click();
     }
 
-    @Override
-    public String render(XWikiContext context) throws XWikiException
+    /**
+     * Click on the option to remove permanently the document.
+     */
+    public void selectOptionSkipRecycleBin()
     {
-        XWikiRequest request = context.getRequest();
-        String result = "deletespace";
-        if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
-            result = "deletedspace";
-        }
-        return result;
+        this.optionSkipReyclebin.click();
     }
 }

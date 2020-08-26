@@ -36,20 +36,6 @@ export default {
 
   name: "XWikiDraggableItem",
 
-  inject: ["logic"],
-
-  computed: {
-    data () { return this.logic.data; },
-
-    dragOptions () {
-      return {
-        animation: 200,
-        handle: ".handle",
-      };
-    },
-
-  },
-
 };
 </script>
 

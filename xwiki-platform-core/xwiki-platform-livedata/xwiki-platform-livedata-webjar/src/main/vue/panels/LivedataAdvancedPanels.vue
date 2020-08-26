@@ -18,17 +18,27 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataAdvancedPanels component contains all the Livedata
+  advanced panels, so that they can be included at once.
+  It provides advance panels for configuration (sort, filter, ...)
+  whatever layout is being used.
+  It is included inside the livedata root component.
+
+  Advanced panels can be opened from the DropdownMenu component.
+-->
 <template>
   <div class="livedata-advanced-panels">
+
+    <!-- Properties Panel -->
+    <LivedataAdvancedPanelProperties/>
 
     <!-- Sort Panel -->
     <LivedataAdvancedPanelSort/>
 
     <!-- Filter Panel -->
     <LivedataAdvancedPanelFilter/>
-
-    <!-- Properties Panel -->
-    <LivedataAdvancedPanelProperties/>
 
   </div>
 </template>

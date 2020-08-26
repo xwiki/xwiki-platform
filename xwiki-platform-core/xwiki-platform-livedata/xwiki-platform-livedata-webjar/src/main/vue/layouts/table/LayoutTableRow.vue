@@ -18,14 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+<!--
+  LayoutCardsCard is a row component for the Table Layout.
+  It format an entry as an html row, with an entry selector on the left
+-->
 <template>
   <tr>
 
     <!-- Entry Select -->
     <td class="entry-selector">
-      <LivedataEntrySelector
-        :entry="entry"
-      />
+      <LivedataEntrySelector :entry="entry"/>
     </td>
 
     <!-- Entry cells -->

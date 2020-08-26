@@ -18,20 +18,39 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LivedataDropdownMenu is a component that propose different actions
+  to the user: chaging layout, opning advance configuration panels, ...
+  It should be included once in every layout component,
+  generaly on the leftmost of its topbar so that it stay a consistent place.
+-->
 <template>
+  <!--
+    The Livedata Dropdown
+    Uses the Bootstrap 3 dropdown syntax.
+  -->
   <div class="livedata-dropdown-menu btn-group">
 
-    <!-- Drowpdown button-->
-    <a class="btn btn-default dropdown-toggle" title="More Actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+    <!-- Drowpdown open / close button-->
+    <a
+      class="btn btn-default dropdown-toggle"
+      title="More Actions"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="true"
+      role="button"
+    >
       <span class="fa fa-ellipsis-v"></span>
     </a>
 
-    <!-- Drowpdown content-->
+    <!-- Drowpdown body -->
     <ul class="dropdown-menu">
 
-      <!-- Change layout-->
+      <!-- Change layout Section -->
       <li class="dropdown-header">Change Layout</li>
 
+      <!-- Layout options -->
       <li
         v-for="layout in data.meta.layouts"
         :key="layout.id"
@@ -42,24 +61,27 @@
         </a>
       </li>
 
-      <!-- Common actions -->
+      <!-- Advanced panels Section -->
       <li class="dropdown-header">Actions</li>
 
+      <!-- Properties Panel -->
+      <li>
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
+          <span class="fa fa-list-ul"></span> Advanced Properties
+        </a>
+      </li>
+
+      <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
           <span class="fa fa-sort"></span> Advanced Sorting
         </a>
       </li>
 
+      <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
           <span class="fa fa-filter"></span> Advanced Filtering
-        </a>
-      </li>
-
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> Advanced Properties
         </a>
       </li>
 

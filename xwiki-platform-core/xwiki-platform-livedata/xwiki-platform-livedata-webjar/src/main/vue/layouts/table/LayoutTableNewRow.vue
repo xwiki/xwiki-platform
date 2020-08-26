@@ -18,13 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
-<template>
-  <tr class="layout-table-new-row">
 
-    <!-- Entry Select -->
+<!--
+  LayoutTableNewRow is a component for the Table layout that can be used
+  to add new entries to the Livedata
+-->
+<template>
+  <!--
+    The component is formatted like a normal row
+    but has contains one cell that span on the entire row
+  -->
+  <tr class="layout-table-new-row">
+    <!--
+      We need to create an empty cell for the entry selector
+      so that it align well with the entries selectors of the rows
+      and the select-all entries in the header
+    -->
     <td class="entry-selector"></td>
 
-    <!-- Entry cells -->
+    <!--
+      The cell to add a new entry
+      Span the whole row width
+    -->
     <td :colspan="colspan">
       <a
         href="#"
@@ -52,6 +67,9 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+    // The colspan value to specify to the create-new-entry cell
+    // It is set to the number of properties that can be displayed
+    // as it is the max number of column that could be displayed at once
     colspan () {
       return this.logic.getPropertyDescriptors().length;
     },

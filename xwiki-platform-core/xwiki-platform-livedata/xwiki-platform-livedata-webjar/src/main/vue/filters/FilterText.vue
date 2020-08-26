@@ -18,16 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
-<template>
 
+<!--
+  FilterText is a custom filter that allow to filter strings
+-->
+<template>
+  <!--
+    Simple input of type text that apply filter on change event
+  -->
   <input
-    class="livedata-filter-text"
+    class="filter-text"
     type="text"
     size="1"
     :value="filterEntry.value"
     @change="applyFilter($event.target.value)"
   />
-
 </template>
 
 
@@ -38,6 +43,7 @@ export default {
 
   name: "filter-text",
 
+  // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
 
 };
@@ -46,7 +52,7 @@ export default {
 
 <style>
 
-.livedata-filter .livedata-filter-text {
+.livedata-filter .filter-text {
   width: 100%;
 }
 

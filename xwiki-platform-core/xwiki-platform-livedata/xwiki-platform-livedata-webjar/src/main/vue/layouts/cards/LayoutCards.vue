@@ -18,10 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LayoutCard.vue is the main file for the Card layout component.
+  It displays data formatted as cards, with a title that can be
+  specified in the `titleProperty` property of its layout descriptor,
+  inside the Livedata configuration.
+-->
 <template>
   <div class="layout-cards">
 
-    <!-- Topbar -->
+    <!--
+      The layout Topbar
+      Add common layout utilities, like the dropdown menu, the refresh button,
+      and the pagination.
+      It is also has the "select all" button
+    -->
     <LivedataTopbar>
       <template #left>
         <LivedataDropdownMenu/>
@@ -37,16 +49,20 @@
     <LivedataEntrySelectorInfoBar/>
 
 
-    <!-- Cards component -->
-    <div class="livedata-cards">
+    <!-- Cards layout root -->
+    <div class="layout-table-root">
 
-    <!-- A card -->
+      <!--
+        The cards (= the entries)
+        Implement property reorder
+      -->
       <LayoutCardsCard
         v-for="entry in entries"
         :key="logic.getEntryId(entry)"
         :entry="entry"
       />
 
+      <!-- Component to create a new entry -->
       <LayoutCardsNewCard/>
 
     </div>
@@ -94,13 +110,21 @@ export default {
 
 <style>
 
+/*
+  The Cards Layout uses css grid to display its cards in a nice grid pattern
+  However, IE11 does not support a lot grid layouts, but does not support either
+  the `@supports` at-rule, so only browser that support at-rule (everyone but IE)
+  and display grid will use the following styles
+*/
 @supports (display: grid) {
 
-  .layout-cards .livedata-cards {
+    /* Make the cards 30rem large, and display as many of them on one row */
+  .layout-cards .layout-table-root {
     display: grid;
     grid-template-columns: repeat(auto-fill, 30rem);
     grid-auto-rows: min-content;
     gap: 1.5rem;
+    grid-gap: 1.5rem; /* safari */
   }
 
 }

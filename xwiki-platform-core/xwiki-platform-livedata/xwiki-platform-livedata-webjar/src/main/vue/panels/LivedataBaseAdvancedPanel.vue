@@ -18,16 +18,43 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LivedataBaseAdvancedPanel is a component that provide for advanced panels
+  an interface that already handles the panel's base behavior:
+  open from dropdown menu, close, and also the panel display style.
+  It is not meant to be used directly, but instead to be used inside a
+  specific advanced panel that pass to it a `title` and `body` slot.
+  In that way, Advanced panels only care about implementing
+  the content of the panel, rather the reimplemting the whole panel logic
+  each time.
+-->
 <template>
+  <!--
+    The Livedata Advanced panel base
+    Uses the Bootstrap 3 panel syntax.
+  -->
   <div
     class="livedata-advanced-panel panel panel-default"
     v-show="panelOpened"
   >
+    <!--
+      Panel Header
+      Contains the panel title on the left
+      and buttons to close panel on the right
+    -->
     <div class="panel-heading">
+      <!--
+        The slot containing the panel header
+        The header should contains an icon and a title
+      -->
       <span class="title">
         <slot name="header"></slot>
       </span>
+
+      <!-- Panel header buttons -->
       <div class="actions">
+        <!-- Collapse panel button -->
         <span
           class="action collapse-button"
           @click="collapsed = !collapsed"
@@ -35,21 +62,28 @@
           <span v-if="!collapsed" class="fa fa-chevron-circle-down"></span>
           <span v-else class="fa fa-chevron-circle-right"></span>
         </span>
+        <!-- Close panel button -->
         <span
           class="action close-button"
           @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
         >
           <span class="fa fa-times"></span>
         </span>
+
       </div>
     </div>
 
+    <!--
+      Panel Body
+    -->
     <div
       class="panel-body"
       v-if="!collapsed"
     >
+      <!-- The slot containing the panel body content -->
       <slot name="body"></slot>
     </div>
+
   </div>
 </template>
 
@@ -62,11 +96,15 @@ export default {
   inject: ["logic"],
 
   props: {
+    // The panel id is used to open the panel in the dropdown menu
+    // and is used as item in the `Logic.openedPanels` array
     panelId: String,
   },
 
   data () {
     return {
+      // whether the panel is collapsed (panel body is hidden) or not
+      // A panel will always be expanded when opened.
       collapsed: false,
     };
   },
@@ -74,12 +112,14 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
+    // returns whether the panel is opened based on the `Logic.openedPanels` array
     panelOpened () {
       return this.logic.uniqueArrayHas(this.logic.openedPanels, this.panelId);
     },
   },
 
   watch: {
+    // whenever panel is opened, ensure it is not collapsed
     panelOpened () {
       if (this.panelOpened) {
         this.collapsed = false;

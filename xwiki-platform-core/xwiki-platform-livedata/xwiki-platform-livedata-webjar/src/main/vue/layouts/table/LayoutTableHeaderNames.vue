@@ -18,34 +18,59 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LayoutTableHeaderNames is a component for the Table layout that displays
+  the property names in the table header of the table
+  It also allow the user to sort by a property by clicking on it (it sets
+  the property as the first level of sort)
+  and also allow the user to reorder properties by dragind and dropping them
+-->
 <template>
-  <tr
+  <!--
+    The table properties are wrapped inside a XWikiDraggable component
+    in order to allow the user to reorder them easily
+  -->
+  <XWikiDraggable
     class="column-header-names"
-      is="XWikiDraggable"
       :value="data.query.properties"
       @change="reorderProperty"
       tag="tr"
   >
-    <!-- Entry Select All-->
+    <!-- Entry Select All -->
     <th class="entry-selector">
       <LivedataEntrySelectorAll/>
     </th>
 
+    <!--
+      Table Properties
+      Here we can't use the XWikiDraggableItem component as it returns
+      a div element, that would be invalid inside the table structure.
+      So we need to implement the XWikiDraggableItem structure from scratch
+    -->
     <th
       class="draggable-item"
       v-for="property in properties"
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
     >
+      <!-- Wrapper for the column header -->
       <div
         class="column-name"
         @click="sort(property)"
       >
+        <!-- Specify the handle to drag properties -->
         <div class="handle">
           <span class="fa fa-ellipsis-v"></span>
         </div>
+        <!-- Property Name -->
         <span>{{ property.name }}</span>
+        <!-- Spacer between the property name and the sort icon -->
         <span class="flex-spacer"></span>
+        <!--
+          Sort icon
+          Only show the icon for the first-level sort property
+        -->
         <span
           v-if="logic.isPropertySortable(property.id)"
           :class="[
@@ -84,6 +109,7 @@ export default {
       return this.logic.getPropertyDescriptors();
     },
 
+    // The first sort entry in the Livedata configuration sort array
     firstSortLevel () {
       return this.data.query.sort[0] || {};
     },
@@ -93,6 +119,11 @@ export default {
 
   methods: {
 
+    /**
+     * Return whether the given property the one of `this.firstSortLevel`
+     * @param {property} Object A property descriptor
+     * @returns {Boolean}
+     */
     isFirstSortLevel (property) {
       return this.firstSortLevel.property === property.id
     },

@@ -18,44 +18,53 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataAdvancedPanelFilterEntry component is used by the
+  LivedataAdvancedPanelFilterc omponent.
+  It displays the filter entry corresponding to the passed props:
+  - propertyId, corresponding to the Filter Group containing the filter
+  - filterIndex indeicating the filter index inside the Filter Group
+-->
 <template>
-
-  <div
-    class="livedata-filter-container"
-    tabindex="0"
-  >
-
-
+  <div class="livedata-filter-container">
+    <!--
+      Operator select
+      Allow to select operator corresponding to the filter id
+    -->
     <select
-      class="select-operator"
-      @change="logic.filter(propertyId, filterIdx, {operator: $event.target.value})"
+      class="operator-select"
+      @change="logic.filter(propertyId, filterIndex, { operator: $event.target.value })"
     >
       <option
         v-for="operator in logic.getFilterDescriptor(propertyId).operators"
         :key="operator.id"
         :value="operator.id"
         v-text="operator.name"
-        :selected="operator.id === filter.operator"
+        :selected="operator.id === filterEntry.operator"
       ></option>
     </select>
 
+    <!--
+      Livedata Filter component
+      Uses the LivedataFilter component to let the user modify the filter value
+    -->
     <LivedataFilter
       :property-id="propertyId"
-      :index="filterIdx"
+      :index="filterIndex"
     />
 
+    <!-- Delete filter entry button -->
     <a
       class="delete-filter"
       href="#"
-      @click.prevent="logic.removeFilter(propertyId, filterIdx)"
+      @click.prevent="logic.removeFilter(propertyId, filterIndex)"
       title="Delete filters"
     >
       <span class="fa fa-trash-o"></span>
     </a>
 
   </div>
-
-
 </template>
 
 
@@ -73,9 +82,15 @@ export default {
   inject: ["logic"],
 
   props: {
-    filter: Object,
-    filterIdx: Number,
+    filterIndex: Number,
     propertyId: String,
+  },
+
+  computed: {
+    // The filter entry corresponding to the props
+    filterEntry () {
+      return this.logic.getQueryFilterGroup(this.propertyId).constrains[this.filterIndex];
+    },
   },
 
 };
@@ -84,31 +99,30 @@ export default {
 
 <style>
 
-  .livedata-filter-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-  }
+.livedata-filter-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
 
-  .livedata-filter-container .delete-filter {
-    display: inline-block;
-    visibility: hidden;
-    margin-left: 5px;
-    padding: 6px 10px;
-    border-radius: 3px;
-    color: currentColor;
-  }
-  .livedata-filter-container:hover .delete-filter {
-    visibility: visible;
-  }
-  .livedata-filter-container .delete-filter:hover {
-    background-color: #ccc4;
-  }
-  .livedata-filter-container .delete-filter:active {
-    background-color: unset;
-  }
-
+.livedata-filter-container .delete-filter {
+  display: inline-block;
+  visibility: hidden;
+  margin-left: 5px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  color: currentColor;
+}
+.livedata-filter-container:hover .delete-filter {
+  visibility: visible;
+}
+.livedata-filter-container .delete-filter:hover {
+  background-color: #ccc4;
+}
+.livedata-filter-container .delete-filter:active {
+  background-color: unset;
+}
 
 </style>

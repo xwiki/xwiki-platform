@@ -18,14 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+<!--
+  LayoutCardsCard is a card component for the Cards Layout.
+  It format an entry as a card, with a title that can be specified
+  in the `titleProperty` property of its layout descriptor,
+  inside the Livedata configuration.
+-->
 <template>
   <div class="card">
+
     <!-- Cartd title-->
     <div class="card-title">
-      <LivedataEntrySelector
-        :entry="entry"
-      />
-
+      <!-- Entry selector -->
+      <LivedataEntrySelector :entry="entry"/>
+      <!-- Title property -->
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
         <LivedataDisplayer
           :property-id="titlePropertyId"
@@ -34,34 +40,44 @@
       </h2>
     </div>
 
-    <!-- Card properties-->
-
+    <!--
+      The cards properties are wrapped inside a XWikiDraggable component
+      in order to allow the user to reorder them easily
+    -->
     <XWikiDraggable
       :value="data.query.properties"
       @change="reorderProperty"
     >
+      <!--
+        Card Properties
+        Uses the XWikiDraggableItem component that goes along the
+        XWikiDraggable one
+      -->
       <XWikiDraggableItem
         class="card-property"
         v-for="property in properties"
         :key="property.id"
         v-show="logic.isPropertyVisible(property.id) && property.id !== titlePropertyId"
       >
+        <!-- Specify the handle to drag properties -->
         <template #handle>
           <span class="fa fa-ellipsis-v"></span>
         </template>
+
+        <!-- Property Name -->
         <strong class="property-name">{{ property.name }}:</strong>
-        <span
-          class="value"
-        >
+        <!-- Property Value -->
+        <span class="value">
           <LivedataDisplayer
             :property-id="property.id"
             :entry="entry"
           />
         </span>
+
       </XWikiDraggableItem>
     </XWikiDraggable>
-  </div>
 
+  </div>
 </template>
 
 
@@ -95,12 +111,12 @@ export default {
       return this.logic.getPropertyDescriptors();
     },
 
+    // The id of the property that is going to be in the card title
     titlePropertyId () {
       return this.logic.getLayoutDescriptor("cards").titleProperty;
     },
 
   },
-
 
   methods: {
     reorderProperty (e) {
@@ -116,8 +132,8 @@ export default {
 
 .layout-cards .card {
   display: inline-block;
-  padding: 1rem 2rem;
   margin: 1rem;
+  padding: 1rem 2rem;
   border: 1px solid lightgray;
   border-radius: 1rem;
 }
@@ -177,6 +193,7 @@ export default {
   align-self: stretch;
 }
 
+/* for not IE11 */
 @supports (display: grid) {
 
   .layout-cards .card {

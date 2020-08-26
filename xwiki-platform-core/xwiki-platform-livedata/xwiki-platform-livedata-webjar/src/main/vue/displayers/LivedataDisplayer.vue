@@ -18,14 +18,46 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataDisplayer component is used to display any data of the Livedata.
+  Each LivedataDisplayer instance is defined by two props:
+  - an entry
+  - the property of the entry to display the value
+
+  It comes with two modes: View mode (default) and Edit mode,
+  that are implemented throught the Viewer and Editor widgets.
+  When the user double-click on the Viewer widget, it changes to the Editor one
+  Then when the user validates the new value for the entry property,
+  it change back to the Viewer mode.
+
+  There are differents type of displayers: Text, Number, Link, Html, ...
+  Those are specified in every propertyDescriptors.
+  Each specific displayer comes with its own implementation
+  of Viewer and Editor widgets.
+
+  The LivedataDisplayer component directly handle for us the choice of
+  which custom Displayer implementation to use, based on the props passed to it,
+  and dynamically import this Displayer component and mount it at runtime.
+  If this custom implementation can't be found, or there was an loading error,
+  then it falls back to the default one
+  (specified by the `defaultDisplayer` property in the Livedata configuration).
+-->
 <template>
+  <!--
+    This is where the specific displayer component gets injected
+  -->
   <component
-    v-if="component"
-    :is="component"
+    class="livedata-displayer"
+    v-if="displayerComponent"
+    :is="displayerComponent"
     :property-id="propertyId"
     :entry="entry"
   ></component>
 
+  <!--
+    This loader component is displayed while the displayer is being loaded
+  -->
   <XWikiLoader
     v-else
   ></XWikiLoader>
@@ -45,6 +77,7 @@ export default {
 
   inject: ["logic"],
 
+  // The two props defining the Displayer
   props: {
     propertyId: String,
     entry: Object,
@@ -52,41 +85,51 @@ export default {
 
   data () {
     return {
-      component: undefined,
+      // The displayer component used to display the value
+      // It is set to `undefined before it is resolved
+      displayerComponent: undefined,
     };
   },
 
   computed: {
     data () { return this.logic.data; },
+    // The displayer id of the Displayer component to load,
+    // corresponding to the property id
     displayerId () {
       return this.logic.getDisplayerDescriptor(this.propertyId).id;
     },
   },
 
   methods: {
+    // Capitalize the given string
     capitalize (string) {
       string ??= "";
       return string[0].toUpperCase() + string.slice(1);
     },
 
+    // Load the displayer component corresponding to the given displayerId
+    // On success, set `this.displayerComponent` to the retreived component,
+    // which automatically insert the component in the html
     loadDisplayer (displayerId) {
       return new Promise ((resolve, reject) => {
 
         displayerId ??= this.displayerId;
 
-        // load success callback
-        const loadDisplayerSuccess = component => {
-          this.component = component;
-          resolve(component);
+        // Load success callback
+        const loadDisplayerSuccess = displayerComponent => {
+          this.displayerComponent = displayerComponent;
+          resolve(displayerComponent);
         };
 
-        // load error callback
+        // Load error callback
         const loadDisplayerFailure = err => {
           reject(err);
         };
 
-        // load displayer based on it's id
+        // Load displayer based on it's id
         import("./Displayer" + this.capitalize(displayerId) + ".vue")
+          // We *have to* destructure the return value as `{ default: component }`,
+          // because it's how Webpack is handling dynamic imports
           .then(({ default: component }) => loadDisplayerSuccess(component))
           .catch(err => void loadDisplayerFailure(err));
       });
@@ -94,9 +137,12 @@ export default {
     },
   },
 
+  // On mounted, try to load the Displayer corresponding to the passed props,
+  // or the default one as fallback
   mounted () {
-    // load displayer
+    // Try to load Displayer
     this.loadDisplayer(this.displayerId).catch(err => {
+      // Try to load default Displayer
       console.warn(err);
       this.loadDisplayer(this.data.meta.defaultDisplayer).catch(err => {
         console.error(err);

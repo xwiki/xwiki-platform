@@ -17,45 +17,68 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+
+/**
+ * The displayerMixin is a vue mixin containing all the needed
+ * props, computed values, methods, etc. for any custom displayer:
+ * `propertyId`, `entry`, `value`, `config`, `applyEdit()`, ...
+ * It should be included in every custom displayer component
+ */
 export default {
 
+  inject: ["logic"],
+
   directives: {
+    // This directive autofocus the element that has it
+    // This can be usefull in order to autofocus the input in the Editor widget
+    // right after the user switched from the Viewer widget
     autofocus: {
-      inserted: function (el) { el.focus(); }
+      inserted (el) { el.focus(); }
     },
   },
-
-  inject: ["logic"],
 
   props: {
     propertyId: String,
     entry: Object,
   },
 
+  // The computed values provide common data needed by displayers
   computed: {
-    value: function () {
+    // The value to be displayed
+    value () {
       return this.entry[this.propertyId];
     },
-    propertyDescriptor: function () {
+    // The property descriptor of `this.propetyId`
+    propertyDescriptor () {
       return this.logic.getPropertyDescriptor(this.propertyId);
     },
-    config: function () {
+    // The configuration (aka displayerDescriptor) of the displayer
+    config () {
       return this.logic.getDisplayerDescriptor(this.propertyId);
     },
-    data: function () {
+    // The whole Livedata data object
+    data () {
       return this.logic.data;
     },
   },
 
   methods: {
-
-    applyEdit: function (newValue) {
+    // This method should be used to apply edit and go back to view mode
+    // It validate the entered value, ensuring that is is valid for the server
+    applyEdit (newValue) {
       // TODO: should call the logic API instead, but this is just for quick prove of concept
       this.entry[this.propertyId] = newValue;
+      // Go back to view mode
+      // (there might be a cleaner way to do this)
       this.$el.__vue__.view();
     },
 
-    cancelEdit: function () {
+    // This method should be used to cancel edit and go back to view mode
+    // This is like applyEdit but it does not save the entered value
+    cancelEdit () {
+      // Go back to view mode
+      // (there might be a cleaner way to do this)
       this.$el.__vue__.view();
     },
 

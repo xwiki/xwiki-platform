@@ -18,7 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LivedataEntrySelector component allow the user to select
+  an entry of the Livedata.
+  One LivedataEntrySelector component is associated with one entry,
+  passed as its prop.
+
+  When toggled, it modifies the `Logic.entrySelection` object.
+-->
 <template>
+  <!--
+    Property selection checkbox
+    Checkbox is surrounded by a div with padding to facilitate the user click
+  -->
   <div
     class="livedata-entry-selector"
     @click.self="$refs.checkbox.click()"
@@ -47,6 +60,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
+    // Whether the selector property is currently selected
     selected () {
       return this.logic.isEntrySelected(this.entry);
     },

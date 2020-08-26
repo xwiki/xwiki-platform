@@ -18,10 +18,24 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataPagination component is used to change the current page
+  displayed by the layout.
+  What it actually does is that it fetches new data corresponding
+  to the chosen page number,
+  which then updates the entries array in `config.data.data.entries`,
+  which has the effect of changing the displayed entries in the layout
+-->
 <template>
   <!-- Pagination -->
   <nav class="livedata-pagination">
 
+    <!--
+      Select the pagination size (number of entries per page)
+      Can be shown / hiden by the `pagination.showPageSizeDropdown` property
+      in the Livedata meta config
+    -->
     <span
       class="pagination-page-size"
       v-if="data.meta.pagination.showPageSizeDropdown"
@@ -30,6 +44,7 @@
       <select
         @change="logic.setPageSize(+$event.target.value)"
       >
+        <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
           v-for="pageSize in data.meta.pagination.pageSizes"
           :key="pageSize"
@@ -39,12 +54,32 @@
       </select>
     </span>
 
-    <span class="pagination-current-entries">
-      {{ logic.getFirstIndexOfPage() + 1}} - {{ logic.getLastIndexOfPage() + 1}}
+    <!--
+      Display the pagination current entry range
+      Can be shown / hiden by the `pagination.showEntryRange` property
+      in the Livedata meta config
+    -->
+    <span
+      class="pagination-current-entries"
+      v-if="data.meta.pagination.showEntryRange"
+    >
+      {{ logic.getFirstIndexOfPage() + 1 }} - {{ logic.getLastIndexOfPage() + 1 }}
       of {{ data.data.count }}
     </span>
 
+    <!--
+      The actual pagination widget
+      It dislays the the available pages numbers, and change to them on click.
+      Not all page numbers are show depending of the `pagination.maxShownPages`
+      property in the Livedata meta config.
+      Arrows can be shown to go to first, last, previous, next page.
+    -->
     <nav class="pagination-indexes">
+      <!--
+        Go to First Page button
+        Can be shown / hiden by the `pagination.showFirstLast` property
+        in the Livedata meta config
+      -->
       <a
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
@@ -54,6 +89,11 @@
         <span class="fa fa-angle-double-left"></span>
       </a>
 
+      <!--
+        Go to Previous Page button
+        Can be shown / hiden by the `pagination.showNextPrevious` property
+        in the Livedata meta config
+      -->
       <a
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
@@ -63,13 +103,27 @@
         <span class="fa fa-angle-left"></span>
       </a>
 
+
+      <!--
+        Page Numbers
+        Shown page numbers are specified by `this.paginationIndexesAndDots`
+        computed property, which take into account the `pagination.maxShownPages`
+        property in the Livedata meta config.
+        It displays "..." when pages numbers are not displayed.
+      -->
       <template
         v-for="(pageIndex, i) in paginationIndexesAndDots"
       >
+        <!--
+          Ellispis (for hidden pages)
+          v-for keys need to be unique, so we use "..." + the index of the
+          ellipsis in the paginationIndexesAndDots array to ensure this
+        -->
         <span
           v-if="pageIndex === '...'"
           :key="'...' + i"
         >...</span>
+        <!-- Page numbers -->
         <a
           v-else
           :key="pageIndex"
@@ -80,10 +134,16 @@
           href="#"
           @click.prevent="logic.setPageIndex(pageIndex)"
         >
+          <!-- pageIndex + 1 because pageIndex are 0-based -->
           {{ pageIndex + 1 }}
         </a>
       </template>
 
+      <!--
+        Go to Next Page button
+        Can be shown / hiden by the `pagination.showNextPrevious` property
+        in the Livedata meta config
+      -->
       <a
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
@@ -93,6 +153,11 @@
         <span class="fa fa-angle-right"></span>
       </a>
 
+      <!--
+        Go to Last Page button
+        Can be shown / hiden by the `pagination.showFirstLast` property
+        in the Livedata meta config
+      -->
       <a
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
@@ -118,23 +183,37 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
-    // get the page indexes to be displayed in the page nav
+    // Return the page indexes (= page number but 0-based) to be displayed
+    // It follows the following algorithm:
+    // - always display the current page index
+    // - then adds the following in order, until matching the shown page count
+    //   - first page index
+    //   - last page index
+    //   - page indexes around current page index, alternating before and after it
     paginationIndexes () {
+      // Total count of pages
       const pageCount = this.logic.getPageCount();
+      // Number of pages to show on widget
       const maxShownPages = this.data.meta.pagination.maxShownPages;
+      // Current page index
       const currentPageIndex = this.logic.getPageIndex();
+      // Page indexes to be displayed
       const pageIndexes = [];
-      const addPage = pageNumber => {
-        if (pageNumber >= 0 && pageNumber < pageCount && !pageIndexes.includes(pageNumber)) {
-          pageIndexes.push(pageNumber);
+      // Function to add a page inside the pageIndexes array
+      // it verifies if the page index is valid and not already pushed
+      const addPage = pageIndex => {
+        if (pageIndex >= 0 && pageIndex < pageCount && !pageIndexes.includes(pageIndex)) {
+          pageIndexes.push(pageIndex);
         }
       };
 
-      // pages to display at the very least
+      // Pages to display at the very least
       if (maxShownPages >= 1) { addPage(currentPageIndex); }
       if (maxShownPages >= 2) { addPage(0); }
       if (maxShownPages >= 3) { addPage(pageCount - 1); }
 
+      // Add pages index around current pages
+      // Until we have the specified count of pages to display
       let i = 1;
       const bound = Math.max(currentPageIndex, pageCount - currentPageIndex);
       while (pageIndexes.length < maxShownPages && Math.abs(i) < bound) {
@@ -146,9 +225,13 @@ export default {
         }
       }
 
+      // Return the sorted array
       return pageIndexes.sort((a, b) => a - b);
     },
 
+    // Add a "..." string item between page indexes that are not
+    // following one each other
+    // So that we know where to display the ellipsis in widget
     paginationIndexesAndDots () {
       const indexesAndDots = [];
       this.paginationIndexes.forEach((index, i, indexes) => {

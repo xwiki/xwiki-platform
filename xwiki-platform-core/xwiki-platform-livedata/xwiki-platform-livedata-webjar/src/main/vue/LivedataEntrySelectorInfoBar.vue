@@ -18,6 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+<!--
+  The LivedataEntrySelectorInfoBar indicate to the user
+  what is being selected in the Livedata.
+  It gives the number of entry selected compared to the number of
+  entries in total.
+
+  The total number of entries is either:
+  - The number of entries per page
+  - The number of entries mathing the current config (global mode on)
+  - TODO: The total number of entries in the Livedata (global mode on without config)
+-->
 <template>
   <div
     class="livedata-entry-selector-info-bar"
@@ -38,6 +49,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
+    // The number of selected entries to be displayed
     selectedCount () {
       return this.logic.getSelectedEntriesCount();
     },

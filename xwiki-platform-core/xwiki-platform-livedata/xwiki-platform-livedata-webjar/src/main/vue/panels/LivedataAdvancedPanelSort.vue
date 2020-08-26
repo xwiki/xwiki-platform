@@ -18,35 +18,57 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataAdvancedPanelSort component is used to provide
+  advance sorting, whatever layout is being used.
+  It allows:
+  - Adding / removing sort levels
+  - Reorderin sorts levels
+  - Changing sort direction
+-->
 <template>
+  <!--
+    Uses the LivedataBaseAdvancedPanel as root element, as it handles for us
+    all the Advanced Panels default behavior
+  -->
   <LivedataBaseAdvancedPanel
     class="livedata-advanced-panel-sort"
     panel-id="sortPanel"
   >
-
+    <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
       <span class="fa fa-sort"></span> Sort
     </template>
 
+    <!-- Define panel content inside the `body` slot -->
     <template #body>
-
+      <!--
+        The sort entries are wrapped inside a XWikiDraggable component
+        in order to allow the user to reorder them easily
+      -->
       <XWikiDraggable
         :value="data.query.sort"
         @change="reorderSorts"
       >
-
-        <!-- A sort entry -->
+        <!--
+          Sort entries
+          Uses the XWikiDraggableItem component that goes along the
+          XWikiDraggable one
+        -->
         <XWikiDraggableItem
           class="sort-entry"
           v-for="(sortEntry, level) in data.query.sort"
           :key="level"
         >
-          <!-- property name -->
+          <!-- Property name -->
           <span>{{ logic.getPropertyDescriptor(sortEntry.property).name }}</span>
-
           <span style="margin: 0 1rem"> - </span>
 
-          <!-- direction select -->
+          <!--
+            Direction select
+            Allow to select either Ascending or Descending
+          -->
           <select
             @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
           >
@@ -60,6 +82,7 @@
             >Descending</option>
           </select>
 
+          <!-- Delete sort entry button -->
           <a
             class="delete-sort"
             href="#"
@@ -69,20 +92,35 @@
             <span class="fa fa-trash-o"></span>
           </a>
         </XWikiDraggableItem>
-
       </XWikiDraggable>
 
-      <!-- Add Sort -->
+
+      <!--
+        Add Sort
+        When a user select an property from this select,
+        it directly adds an sort entry in the sort array of the Livedata config.
+        If all property are sorting, it is hidden.
+      -->
       <select
-        class="select-properties"
+        class="add-sort-select"
         v-show="unsortedProperties.length > 0"
         @change="addSortLevel($event.target.value)"
       >
+        <!--
+          This is the default option that is always selected
+          When the user change the value of the select,
+          it adds the sort corresponging to the option
+          then falls back to this default option
+        -->
         <option
           value="none"
           ref="selectPropertiesNone"
           selected disabled
         >Add Sort level</option>
+        <!--
+          Unsorted properties
+          Only display in the select properties that are not already sorting
+        -->
         <option
           v-for="property in unsortedProperties"
           :key="property.id"
@@ -94,7 +132,6 @@
     </template>
 
   </LivedataBaseAdvancedPanel>
-
 </template>
 
 
@@ -118,21 +155,21 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
-    // property descriptors that does not have sort
+    // Property descriptors that does not have a sort entry in Livedata config
     unsortedProperties () {
-      return this.logic.getSortablePropertyDescriptors().filter(propertyDescriptor => {
-        const sort = this.logic.getQuerySort(propertyDescriptor.id);
-        return !sort;
-      });
+      return this.logic.getSortablePropertyDescriptors()
+        .filter(propertyDescriptor => !this.logic.getQuerySort(propertyDescriptor.id));
     },
   },
 
   methods: {
+    // Change event handler called by the add-sort select
     addSortLevel (value) {
       if (value === "none") { return; }
       this.logic.addSort(value);
       this.$refs.selectPropertiesNone.selected = true;
     },
+    // Event handler called when sort entries are dragged and dropped
     reorderSorts (e) {
       this.logic.reorderSort(e.moved.element.property, e.moved.newIndex)
       .catch(err => void console.warn(err));
@@ -174,7 +211,7 @@ export default {
   background-color: unset;
 }
 
-.livedata-advanced-panel-sort .select-properties {
+.livedata-advanced-panel-sort .add-sort-select {
   margin-top: 1rem;
 }
 

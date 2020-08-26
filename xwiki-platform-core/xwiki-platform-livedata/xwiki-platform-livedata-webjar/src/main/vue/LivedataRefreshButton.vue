@@ -18,10 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataRefreshButton is button that simply refresh data
+  according to current configuration
+-->
 <template>
   <div
     class="livedata-refresh-button"
     @click="logic.updateEntries()"
+    title="Refresh"
   >
     <span class="fa fa-repeat"></span>
   </div>

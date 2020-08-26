@@ -18,28 +18,52 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataAdvancedPanelProperties component is used to provide
+  advance property options edition, whatever layout is being used.
+  It allows:
+  - Toggling property visibility
+  - Changing property order
+-->
 <template>
+  <!--
+    Uses the LivedataBaseAdvancedPanel as root element, as it handles for us
+    all the Advanced Panels default behavior
+  -->
   <LivedataBaseAdvancedPanel
     class="livedata-advanced-panel-properties"
     panel-id="propertiesPanel"
   >
-
+    <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
       <span class="fa fa-list-ul"></span> Properties
     </template>
 
-
+    <!-- Define panel content inside the `body` slot -->
     <template #body>
-
+      <!--
+        The properties are wrapped inside a XWikiDraggable component
+        in order to allow the user to reorder them easily
+      -->
       <XWikiDraggable
         :value="data.query.properties"
         @change="reorderProperty"
       >
+        <!--
+          Properties
+          Uses the XWikiDraggableItem component that goes along the
+          XWikiDraggable one
+        -->
         <XWikiDraggableItem
           class="property"
           v-for="property in logic.getPropertyDescriptors()"
           :key="property.id"
         >
+          <!--
+            Property visibility checkbox
+            Checkbox is surrounded by a div with padding to facilitate the user click
+          -->
           <div
             class="visibility"
             @click.self="$event.currentTarget.querySelector('input').click()"
@@ -50,6 +74,8 @@
               @change="logic.setPropertyVisible(property.id, $event.target.checked)"
             />
           </div>
+
+          <!-- Property name -->
           <span class="property-name">{{ property.name }}</span>
         </XWikiDraggableItem>
       </XWikiDraggable>
@@ -91,6 +117,7 @@ export default {
   },
 
   methods: {
+    // event handler called when properties are dragged and dropped
     reorderProperty (e) {
       this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
     },

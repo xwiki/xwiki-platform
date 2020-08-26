@@ -18,8 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LayoutCardsNewCard is a component for the Card layout that can be used
+  to add new entries to the Livedata
+-->
 <template>
 
+  <!--
+    The component is formatted like a normal card
+    but only contains an action to add a new one
+  -->
   <div class="layout-cards-new-card">
 
     <a
@@ -54,6 +63,7 @@ export default {
 
 .layout-cards-new-card {
   display: inline-block;
+  vertical-align: top;
   margin: 1rem;
   padding: 1rem;
   border: 1px solid lightgray;
@@ -79,6 +89,7 @@ export default {
   text-decoration: underline;
 }
 
+/* for not IE11 */
 @supports (display: grid) {
 
   .layout-cards-new-card {

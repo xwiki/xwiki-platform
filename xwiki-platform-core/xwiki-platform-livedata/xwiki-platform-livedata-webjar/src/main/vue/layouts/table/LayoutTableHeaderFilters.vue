@@ -18,9 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LayoutTableHeaderFilter is a component for the Table layout that can be used
+  to quickly filter a property.
+  The LivedataFilter is bind to the first filter found in the property filter list.
+-->
 <template>
   <tr class="column-filters">
+
+    <!--
+      We need to create an empty cell for the entry selector
+      so that it align well with the entries selectors of the rows
+      and the select-all entries in the header
+    -->
     <th class="entry-selector"></th>
+
+    <!-- The filters cells -->
     <th
       v-for="property in properties"
       :key="property.id"
@@ -32,6 +46,7 @@
         :index="0"
       />
     </th>
+
   </tr>
 </template>
 
@@ -65,6 +80,12 @@ export default {
   padding-right: 0;
   font-weight: normal;
   vertical-align: middle;
+  /*
+    This width is used to make the filters take up globally the same space
+    inside the table header, because by default the table display allocate
+    size according to its cell content (but in a way we don't want because
+    this could stretch a cell more than half of the table width, which is ugly)
+  */
   width: 100vw;
 }
 .layout-table .column-filters th.entry-selector {

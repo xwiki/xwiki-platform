@@ -18,13 +18,22 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The XWikiLivedata is the root component of the Livedata.
+  It only needs the `logic` object as prop, and then is
+  totally autonomous.
+-->
 <template>
   <div class="xwiki-livedata">
 
+      <!-- Import the Livedata advanced configuration panels -->
       <LivedataAdvancedPanels/>
 
+      <!-- Where the layouts are going to be displayed -->
       <LivedataLayout :layout-id="layoutId"/>
 
+      <!-- Persitent configuration module (if supported by the config) -->
       <LivedataPersistentConfiguration v-if="data.id"/>
 
   </div>
@@ -53,9 +62,15 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+    // The id of the layout to be displayed
     layoutId () { return this.logic.currentLayoutId; }
   },
 
+  // The provide function allows to vue to provide the Logic object
+  // to every children component of this one
+  // This is handy to avoid passing the logic as a prop everywhere
+  // For the children components to access it, they only need to use:
+  // `inject: ["logic"]` in their component definition
   provide () {
     return {
       logic: this.logic,

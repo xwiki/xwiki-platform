@@ -18,16 +18,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  FilterList is a custom filter that allow to filter static lists
+-->
 <template>
+  <!--
+    We use the BaseSelect component from where we provide:
+    - the possibles options (as a prop)
+    - the title formt (as a slot)
+    - options format (as a slot)
+    Apply filter on change evebt (when an option is toggled)
+  -->
   <BaseSelect
     class="filter-list"
     :options="options"
     :selected="values"
     :multiple="true"
     :sort="true"
-    @change="changeHandler"
+    @change="applyFilter(JSON.stringify($event))"
   >
 
+    <!--
+      Provide a title for the select
+      List the selected options, or display "Select Values" if none is selected
+    -->
     <template #title=data>
       <div v-if="data.selected.length === 0">
         Select Values
@@ -37,6 +52,10 @@
       </div>
     </template>
 
+    <!--
+      Provide the options template for the select
+      Display a checkbox along the option value
+    -->
     <template #option=option>
       <input
         type="checkbox"
@@ -63,16 +82,22 @@ export default {
     BaseSelect,
   },
 
+  // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
 
   computed: {
+    // The list of all the options available for the static list
     options () {
       return this.config.options;
     },
 
+    // The filter value is String that contains an Array,
+    // but if no Array is found, the string is parsed as a singleton
+    // so that it always return an array
     values () {
       try {
-         const values = JSON.parse(this.filterEntry.value || "[]");
+        // Try to parse the string as an array
+        const values = JSON.parse(this.filterEntry.value || "[]");
         if (values instanceof Array) {
           return values;
         } else {
@@ -85,25 +110,18 @@ export default {
     },
   },
 
-  methods: {
-    changeHandler (selected) {
-      this.logic.filter(this.propertyId, this.index, {value: JSON.stringify(selected)});
-    },
-  },
-
-
 };
 </script>
 
 
 <style>
 
-.filter-list .selected-enum {
+.livedata-filter .filter-list .selected-enum {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.filter-list input[type="checkbox"] {
+.livedata-filter .filter-list input[type="checkbox"] {
   margin-right: 1rem;
 }
 

@@ -17,6 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+
+/**
+ * The filterMixin is a vue mixin containing all the needed
+ * props, computed values, methods, etc. for any custom filter:
+ * `propertyId`, `index`, `filterEntry`, `config`, `applyFilter()`, ...
+ * It should be included in every custom filter component
+ */
 export default {
 
   inject: ["logic"],
@@ -26,26 +34,34 @@ export default {
     index: Number,
   },
 
+  // The computed values provide common data needed by filters
   computed: {
-    filterGroup: function () {
+    // The filter group (the whole filter configuration) of `this.propertyId`
+    filterGroup () {
       return this.logic.getQueryFilterGroup(this.propertyId) || {};
     },
-    filterEntry: function () {
+    // The filter entry (the filter at `this.index`) of `this.propertyId`
+    filterEntry () {
         return (this.filterGroup.constrains || [])[this.index] || {};
     },
-    propertyDescriptor: function () {
+    // The property descriptor of `this.propetyId`
+    propertyDescriptor () {
       return this.logic.getPropertyDescriptor(this.propertyId);
     },
-    config: function () {
+    // The configuration (aka filterDescriptor) of the filter
+    config () {
       return this.logic.getFilterDescriptor(this.propertyId);
     },
-    data: function () {
+    // The whole Livedata data object
+    data () {
       return this.logic.data;
     },
   },
 
   methods: {
-    applyFilter: function (newValue) {
+    // This method should be used to apply filter
+    // As only the newValue has to be specified it is less error prone
+    applyFilter (newValue) {
       this.logic.filter(this.propertyId, this.index, {value: newValue});
     },
   },

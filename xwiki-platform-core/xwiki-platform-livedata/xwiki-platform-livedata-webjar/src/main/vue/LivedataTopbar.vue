@@ -18,6 +18,16 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  The LivedataTopbar component can be use to create consistent topbars
+  for the different layout implementations.
+  It usually contains the dropdown menu, the refresh button, the global search
+  and the pagination.
+
+  It contains two slots: `left` and `right`, that allows to quickly
+  organize its content to stick to the left or to the right
+-->
 <template>
   <div class="livedata-topbar">
 

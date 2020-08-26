@@ -18,10 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  LayoutTable.vue is the main file for the Table layout component.
+  It displays data formatted as a table, with properties as columns
+  and entries as rows.
+  It contains a header row containing LivedataFilter componenents for each column.
+-->
 <template>
   <div class="layout-table">
 
-    <!-- Topbar -->
+    <!--
+      The layout Topbar
+      Add common layout utilities, like the dropdown menu, the refresh button,
+      and the pagination.
+    -->
     <LivedataTopbar>
       <template #left>
         <LivedataDropdownMenu/>
@@ -36,34 +47,33 @@
     <LivedataEntrySelectorInfoBar/>
 
 
-    <!-- Table component -->
-    <table class="livedata-table">
+    <!-- Table layout root -->
+    <table class="layout-table-root">
 
-      <!-- Table Header -->
+      <!--
+        Table Header
+        Implement quick sort, filter, and property reorder
+      -->
       <thead>
-
         <!-- Table property names -->
-        <tr is="LayoutTableHeaderNames"></tr>
+        <LayoutTableHeaderNames/>
 
         <!-- Table filters -->
-        <tr is="LayoutTableHeaderFilters"></tr>
-
+        <LayoutTableHeaderFilters/>
       </thead>
 
 
       <!-- Table Body -->
       <tbody>
-
-        <!-- Table row -->
-        <tr
-          is="LayoutTableRow"
+        <!-- The rows (= the entries) -->
+        <LayoutTableRow
           v-for="entry in entries"
           :key="logic.getEntryId(entry)"
           :entry="entry"
-        ></tr>
+        />
 
-        <tr is="LayoutTableNewRow"></tr>
-
+        <!-- Component to create a new entry -->
+        <LayoutTableNewRow/>
       </tbody>
 
     </table>

@@ -18,14 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  -->
 
+
+<!--
+  DisplayerText is a custom displayer that displays the entry value as text.
+  This is the simpliest displayer, as it does not even implement new widget
+  instead of the BaseDisplayer default ones!
+-->
 <template>
+  <!--
+    Uses the BaseDisplayer as root element, as it handles for us
+    all the displayer default behavior
+  -->
   <BaseDisplayer
+    class="displayer-text"
     :property-id="propertyId"
     :entry="entry"
   >
 
+    <!-- Keep the default Viewer widget -->
     <template #viewer></template>
 
+    <!-- Keep the default Editor widget -->
     <template #editor></template>
 
   </BaseDisplayer>
@@ -45,6 +58,7 @@ export default {
     BaseDisplayer,
   },
 
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
 };

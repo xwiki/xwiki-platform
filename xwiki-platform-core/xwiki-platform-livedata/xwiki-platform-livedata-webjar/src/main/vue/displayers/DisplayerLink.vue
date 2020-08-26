@@ -18,17 +18,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
+
+<!--
+  DisplayerLink is a custom displayer that displays the entry value as link.
+  It uses the `propertyHref` proprety of the displayer descriptor,
+  which refers to the property in the entries holding the displayer href
+-->
 <template>
+  <!--
+    Uses the BaseDisplayer as root element, as it handles for us
+    all the displayer default behavior
+  -->
   <BaseDisplayer
+    class="displayer-link"
     :property-id="propertyId"
     :entry="entry"
   >
 
+    <!-- Provide the Link Viewer widget to the `viewer` slot -->
     <template #viewer>
         <a
           :href="href"
         >
           {{ value }}
+          <!--
+            If there is no value but still a link
+            the user should still be able to click the link
+            so we create an explicit "no value" message in that case
+          -->
           <span
             class="explicit-empty-value"
             v-if="!value"
@@ -36,6 +53,8 @@
         </a>
     </template>
 
+
+    <!-- Keep the default Editor widget -->
     <template #editor></template>
 
   </BaseDisplayer>
@@ -54,9 +73,11 @@ export default {
     BaseDisplayer,
   },
 
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
   computed: {
+    // The link href taken from the propertyHref property of the entry
     href () {
       return this.config.propertyHref && this.entry[this.config.propertyHref] || "#";
     },

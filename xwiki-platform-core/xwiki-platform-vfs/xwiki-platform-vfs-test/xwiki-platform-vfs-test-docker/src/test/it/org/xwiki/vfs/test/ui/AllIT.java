@@ -21,7 +21,6 @@ package org.xwiki.vfs.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
@@ -30,16 +29,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  * @since 11.10
  */
-@UITest(
-    extensionOverrides = {
-        @ExtensionOverride(
-            extensionId = "com.google.code.findbugs:jsr305",
-            overrides = {
-                "features=com.google.code.findbugs:annotations"
-            }
-        )
-    }
-)
+@UITest
 public class AllIT
 {
     @Nested

@@ -29,30 +29,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 12.3RC1
  * @version $Id$
  */
-@UITest(sshPorts = {
-    // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
-    // by GreenMail running on the host.
-    3025
-},
-    properties = {
-        // Mail used for NotificationsEmailsIT and filters preferences for almost all tests
-        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml,notification-filter-preferences.hbm.xml",
-
-        // Scheduler used in NotificationsEmailsIT
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin",
-        // Switch to domain-based URL for NotificationsEmailsIT
-        "xwikiCfgVirtualUsepath=0"
-    },
-    extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib
-        "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as extension
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    }
-)
+@UITest
 public class AllIT
 {
     @Nested

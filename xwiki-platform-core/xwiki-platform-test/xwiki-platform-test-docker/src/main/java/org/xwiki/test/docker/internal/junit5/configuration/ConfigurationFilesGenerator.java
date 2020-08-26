@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.internal.junit5;
+package org.xwiki.test.docker.internal.junit5.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +40,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -143,10 +145,10 @@ public class ConfigurationFilesGenerator
         }
     }
 
-    private VelocityContext createVelocityContext()
+    private VelocityContext createVelocityContext() throws DockerTestException
     {
         Properties properties = this.propertiesMerger.merge(getDefaultConfigurationProperties(),
-            this.testConfiguration.getProperties());
+            this.testConfiguration.getProperties(), true);
         return new VelocityContext((Map) properties);
     }
 

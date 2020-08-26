@@ -105,6 +105,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private boolean isVncStarted;
 
+    private TestConfigurationResolver testConfigurationMerger = new TestConfigurationResolver();
+
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
@@ -337,10 +339,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
         // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
-            // We are in the top level test. Create the TestConfiguration object and save it in the context.
-            UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-            TestConfiguration testConfiguration = new TestConfiguration(uiTest);
-            // Save the test configuration so that we can access it in afterAll()
+            // Create & save the test configuration so that we can access it in afterAll()
+            TestConfiguration testConfiguration = testConfigurationMerger.resolve(extensionContext);
             saveTestConfiguration(extensionContext, testConfiguration);
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {

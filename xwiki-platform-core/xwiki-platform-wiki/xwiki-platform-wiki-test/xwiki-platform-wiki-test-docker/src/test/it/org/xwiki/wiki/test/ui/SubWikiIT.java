@@ -55,7 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.5RC1
  * @version $Id$
  */
-// FIXME: setup copied from AllIT: this should be improved to avoid having copying it.
 @UITest(
     properties = {
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed

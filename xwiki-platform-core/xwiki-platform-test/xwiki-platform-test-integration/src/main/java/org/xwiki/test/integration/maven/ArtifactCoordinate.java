@@ -22,6 +22,8 @@ package org.xwiki.test.integration.maven;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 
@@ -134,5 +136,37 @@ public class ArtifactCoordinate
             version = matcher.group(4);
         }
         return new ArtifactCoordinate(groupId, artifactId, type, version);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(7, 9)
+            .append(getGroupId())
+            .append(getArtifactId())
+            .append(getType())
+            .append(getVersion())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        ArtifactCoordinate rhs = (ArtifactCoordinate) object;
+        return new EqualsBuilder()
+            .append(getGroupId(), rhs.getGroupId())
+            .append(getArtifactId(), rhs.getArtifactId())
+            .append(getType(), rhs.getType())
+            .append(getVersion(), rhs.getVersion())
+            .isEquals();
     }
 }

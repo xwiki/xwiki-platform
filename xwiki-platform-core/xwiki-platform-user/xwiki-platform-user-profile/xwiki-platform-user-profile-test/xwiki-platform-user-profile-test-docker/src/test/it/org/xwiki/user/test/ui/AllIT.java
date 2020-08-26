@@ -29,9 +29,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 11.10
  * @version $Id$
  */
-@UITest(extraJARs = {
-    // The Solr store is not ready yet to be installed as extension
-    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"})
+@UITest
 public class AllIT
 {
     @Nested

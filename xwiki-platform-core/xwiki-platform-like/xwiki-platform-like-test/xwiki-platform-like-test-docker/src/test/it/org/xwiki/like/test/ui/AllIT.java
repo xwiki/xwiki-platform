@@ -1,4 +1,4 @@
-package org.xwiki.like.test.ui;/*
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,23 +17,12 @@ package org.xwiki.like.test.ui;/*
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.like.test.ui;
 
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
-@UITest(
-    properties = {
-        // Required for filters preferences
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
-    },
-    extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as extension
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    }, resolveExtraJARs = true)
+@UITest
 public class AllIT
 {
     @Nested

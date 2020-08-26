@@ -387,19 +387,18 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   #if(!$picturelist.containsKey("${username}--${size}"))
     #getUserAvatarURL($username $avatarURL $size)
-    #set ($userName = $xwiki.getUserName($username, false))
     #if ($avatarURL.specified)
       #set ($picture = "<img src='")
       #set ($picture = $picture.concat($escapetool.xml($avatarURL.url)))
       #set ($picture = $picture.concat("' alt='"))
-      #set ($picture = $picture.concat($userName))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
       #set ($picture = $picture.concat("' title='"))
-      #set ($picture = $picture.concat($userName))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
       #set ($picture = $picture.concat("'/>"))
     #else
       #set ($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
       #set ($picture = $picture.concat($avatarURL.url))
-      #set ($picture = $picture.concat("' alt='$userName' title='$userName'/>"))
+      #set ($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
     #end
     #set ($discard = $!picturelist.put("${username}--${size}", $picture))
   #end

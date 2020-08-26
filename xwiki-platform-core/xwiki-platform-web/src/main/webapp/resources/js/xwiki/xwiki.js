@@ -252,11 +252,9 @@ Object.extend(XWiki, {
                         }
                       });
 
-                      // jQuery's html() is used instead of prototype's update to avoid the undesired
-                      // interpretation of the innerHTML during the dom update.  
-                      require(['jquery'], function ($) {
-                        $("#" + extraID + "pane").html(container.innerHTML);
-                      });
+                      // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
+                      // Note: This also allows script tag defined in the update html to be loaded.
+                      $(extraID + "pane").update(container.descendants()[0]);
 
                       // Notify the others that the DOM has been updated.
                       document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});

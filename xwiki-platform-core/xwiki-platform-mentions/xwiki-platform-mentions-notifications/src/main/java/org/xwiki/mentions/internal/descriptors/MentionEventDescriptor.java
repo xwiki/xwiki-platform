@@ -39,6 +39,7 @@ import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -83,6 +84,35 @@ public class MentionEventDescriptor implements RecordableEventDescriptor, Initia
     public void initialize() throws InitializationException
     {
         WikiReference wikiReference = this.contextProvider.get().getWikiReference();
+        // Save it
+        try {
+            if (!this.isMentionDefaultNotificationPreferenceAlreadySaved(wikiReference)) {
+                this.saveDefaultNotificationPreference(wikiReference);
+            }
+        } catch (NotificationException e) {
+            // We don't throw an InitializationException since it doesn't prevent the component to be used.
+            this.logger.warn("Error while enabling MentionEvent for the wiki {}: {}", wikiReference,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private boolean isMentionDefaultNotificationPreferenceAlreadySaved(WikiReference wikiReference)
+        throws NotificationException
+    {
+        for (NotificationPreference preference : this.notificationPreferenceManager
+            .getAllPreferences(wikiReference)) {
+            if (preference.getProperties() != null
+                && preference.getStartDate() != null
+                && MentionEvent.EVENT_TYPE.equals(preference.getProperties()
+                .get(NotificationPreferenceProperty.EVENT_TYPE))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void saveDefaultNotificationPreference(WikiReference wikiReference) throws NotificationException
+    {
         Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, MentionEvent.EVENT_TYPE);
 
@@ -98,14 +128,7 @@ public class MentionEventDescriptor implements RecordableEventDescriptor, Initia
             .setTarget(wikiReference)
             .build();
 
-        // Save it
-        try {
-            this.notificationPreferenceManager.savePreferences(Collections.singletonList(notificationPreference));
-        } catch (NotificationException e) {
-            // We don't throw an InitializationException since it doesn't prevent the component to be used.
-            this.logger.warn("Error while enabling MentionEvent for the wiki {}: {}", wikiReference,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
+        this.notificationPreferenceManager.savePreferences(Collections.singletonList(notificationPreference));
     }
 
     @Override

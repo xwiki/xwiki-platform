@@ -162,7 +162,15 @@ define('xwiki-document-api', ['jquery'], function($) {
      * @return this document's real locale
      */
     getRealLocale: function() {
-      return this.language || (this.translations &amp;&amp; this.translations['default']) || $('html').attr('lang');
+      var result = "";
+      if (this.language !== "undefined") {
+        result = this.language;
+      } else if (this.translations !== "undefined") {
+        result = this.translations['default'];
+      } else {
+        result = $('html').attr('lang');
+      }
+      return result;
     },
 
     /**

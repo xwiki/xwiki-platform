@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.XWikiGroupSheet" locale="">
+<xwikidoc version="1.4" reference="XWiki.XWikiGroupSheet" locale="">
   <web>XWiki</web>
   <name>XWikiGroupSheet</name>
   <language/>
@@ -118,8 +118,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -167,6 +170,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -210,14 +215,20 @@
       return;
     }
     addMembersButton.prop('disabled', true);
-    $.post(form.attr('action'), parameters).done(function() {
+    $.post(form.attr('action'), parameters).done(function(response) {
       // Clear the list of selected users and groups.
       $('#userInput')[0].selectize.clear(true);
       $('#groupInput')[0].selectize.clear(true);
       // Reload the live table.
       editgrouptable.refresh();
       // Show notification message.
-      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+      if(response.ignored.size() &gt; 0) {
+        var ignoredGroups = response.ignored.join(', ');
+        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addIgnored') (" + ignoredGroups + ")",
+          'warning', {timeout: 5});
+      } else {
+        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+      }
     }).fail(function(response) {
       new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
         response.statusText, 'error', {timeout: 5});
@@ -253,8 +264,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -283,6 +297,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -318,6 +334,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

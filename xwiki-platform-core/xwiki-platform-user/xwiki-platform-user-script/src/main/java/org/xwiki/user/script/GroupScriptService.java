@@ -34,7 +34,7 @@ import org.xwiki.user.group.WikiTarget;
 
 /**
  * Groups related script API.
- * 
+ *
  * @version $Id$
  * @since 10.8RC1
  */
@@ -139,5 +139,30 @@ public class GroupScriptService implements ScriptService
     public Collection<DocumentReference> getMembers(DocumentReference group) throws GroupException
     {
         return getMembers(group, true);
+    }
+
+    /**
+     * Checks if a group can be added to the members of a group.
+     *
+     * @param target The targeted group
+     * @param member The group to be added
+     * @return {@code true} if the candidate member can be added to the members of the target, {@code false} otherwise.
+     * @since 12.8RC1
+     */
+    public boolean canAddAsMember(DocumentReference target, DocumentReference member) throws GroupException
+    {
+        final boolean ret;
+        if (target == null || member == null || member.equals(target)) {
+            ret = false;
+        } else {
+            // check if the candidate member is not already one of the members of the target
+            if (getGroupsFromAllWikis(target).contains(member)) {
+                ret = false;
+            } else {
+                // check if the target is not a member of the member
+                ret = !getMembers(target, true).contains(member);
+            }
+        }
+        return ret;
     }
 }

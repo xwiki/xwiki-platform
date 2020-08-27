@@ -756,30 +756,28 @@ public class XWikiDocumentTest
     {
         XWiki wiki = mock(XWiki.class);
         XWikiContext context = new XWikiContext();
-        
+        context.setWiki(wiki);
         when(wiki.hasVersioning(context)).thenReturn(false);
         XWikiVersioningStoreInterface versionStore = mock(XWikiVersioningStoreInterface.class);
-        when(wiki.getVersioningStore()).thenReturn(versionStore);
-        context.setWiki(wiki);
-        
+
         this.document.resetArchive(context);
+
         verify(versionStore, never()).resetRCSArchive(this.document, true, context);
     }
 
     @Test
-    void resetArchiveDocArchiveNull() throws Exception
+    void resetArchive() throws Exception
     {
         XWiki wiki = mock(XWiki.class);
         XWikiContext context = new XWikiContext();
+        context.setWiki(wiki);
         when(wiki.hasVersioning(context)).thenReturn(true);
         XWikiVersioningStoreInterface versionStore = mock(XWikiVersioningStoreInterface.class);
-        when(wiki.getVersioningStore()).thenReturn(versionStore);
-        context.setWiki(wiki);
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "doc"));
-        context.setDoc(doc);
+        when(this.document.getVersioningStore(context)).thenReturn(versionStore);
 
         this.document.resetArchive(context);
+
+        verify(versionStore).getXWikiDocumentArchive(this.document, context);
         verify(versionStore).resetRCSArchive(this.document, true, context);
-        assertNotNull(doc.getDocumentArchive());
     }
 }

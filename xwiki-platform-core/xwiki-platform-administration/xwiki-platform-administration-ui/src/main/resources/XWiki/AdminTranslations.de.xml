@@ -50,7 +50,7 @@ administration.menu.search.noResults=Keine Ergebnisse.
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
-### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Die E-Mail-Vorlage für die erste Mail die der Benutzer erhält, nachdem das Konto durch Klicken auf den Validierungslink erstellt wurde.
 XWiki.XWikiPreferences_invitation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, die zur Registrierung eingeladen werden.
 
 XWiki.Registration_heading.hint=Dies ist die Zeile oben auf der Seite, die den Personen angezeigt wird, die sich registrieren und die sich gerade registriert haben. Velocity und Wiki-Syntax können verwendet werden.
@@ -62,11 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Wenn die Login-Taste aktiv
 XWiki.Registration_defaultRedirect.hint=Dies ist die URL, zu der der Benutzer nach dem Drücken der Login-Taste umgeleitet wird, wenn der xredirect-Parameter nicht angegeben ist. Es kann ein Velocity-Code verwendet werden.
 XWiki.Registration_requireCaptcha.hint=Setzen Sie dies auf true, damit der Benutzer ein CAPTCHA lösen muss, um sich zu registrieren.
 XWiki.Registration_registrationSuccessMessage.hint=Dies wird dem Benutzer angezeigt, wenn er sich erfolgreich registriert hat. Velocity und Wiki-Syntaxcode können verwendet werden.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.Registration_passwordLength.hint=Die Mindestlänge des Passworts. Ein längeres Passwort ist sicherer. Es wird empfohlen ein Passwort mit mehr als 6 Zeichen zu erstellen.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Wenn diese Option aktiviert ist, zwingen Sie den Benutzer, ein Kennwort mit mindestens einem Kleinbuchstaben zu wählen.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Wenn diese Option aktiviert ist, zwingen Sie den Benutzer, ein Passwort mit mindestens einem Großbuchstaben zu wählen.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Wenn diese Option aktiviert ist, zwingen Sie den Benutzer, ein Passwort mit mindestens einer Zahl zu wählen.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Wenn diese Option aktiviert ist, zwingen Sie den Benutzer, ein Passwort mit mindestens einem Symbolzeichen zu wählen.
 
 # Look &amp; Feel Sections
 admin.themes=Themes
@@ -109,37 +109,37 @@ XWiki.XWikiPreferences_timezone.hint=Legt die Zeitzone für die Daten global fes
 administration.section.import.hint=Beginnen Sie, indem Sie ein neues Paket hochladen oder eines aus der Liste der verfügbaren Pakete auswählen. Der Inhalt des ausgewählten Pakets wird auf der rechten Seite zusammen mit den Importoptionen angezeigt.
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
+administration.section.export.pages=Seiten
+administration.section.export.pages.all=Alle Seiten
 administration.section.export.withHistory.hint=Fügt den Seitenverlauf in den Export ein. Ansonsten wird nur die neueste Version einer Seite exportiert.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-administration.section.export.packageName.hint=Der Dateiname, der beim Erzeugen des Archivs mit dem exportierten Inhalt verwendet wird.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.targetXWikiVersion=XWiki Zielversion
+administration.section.export.targetXWikiVersion.hint=Die Version von XWiki, in der Sie die Seiten importieren möchten. Ihre aktuelle Version ist {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 und neuer
+administration.section.export.targetXWikiVersion.below12=Älter als 12.0
+administration.section.export.packageName.hint=Der Dateiname, der beim Erzeugen des Archivs mit den exportierten Wiki-Seiten verwendet wird.
+administration.section.export.moreOptions=Mehr Optionen
+administration.section.export.lessOptions=Weniger Optionen
 administration.section.export.description.hint=Die Paketbeschreibung, die beim Importieren des Pakets angezeigt wird.
-administration.section.export.author.hint=Der Paketautor.
+administration.section.export.author.hint=Der Paketautor. Wird angezeigt, wenn das Paket importiert wird.
 administration.section.export.licence.hint=Die Inhaltslizenz. Z.B.: LGPL, GPLV2, etc.
-administration.section.export.version.hint=Die Paketversion.
-administration.section.export.backupPack.hint=Geben Sie an, ob das Paket als Backup verwendet werden soll. Diese Option hat keinen Einfluss auf den exportierten Inhalt. Der einzige Effekt ist, dass die Option "Als Backup-Paket importieren" beim Importieren des Pakets vorgewählt ist. Der Unterschied zwischen einem Backup-Paket und einem normalen Paket besteht darin, dass im ersten Fall der letzte Autor der Seite beim Import erhalten bleibt, während im zweiten Fall der Benutzer, der den Import durchführt, zum letzten Autor jeder importierten Seite wird.
+administration.section.export.version.hint=Die Paketversion. Wird in der Paketbeschreibung gespeichert.
+administration.section.export.backupPack.hint=Erhalten Sie den Seitenautor beim Importieren der Seiten. Diese Option hat keine Auswirkung auf den exportierten Inhalt und kann vor dem Import geändert werden.
 
 # Users Section
-### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
-### Missing: administration.section.users.enableUser.done=User account enabled
-### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
-### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
-### Missing: administration.section.users.disableUser.done=User account disabled
-### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
-### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.newAuthor=New Author
-### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
-### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
-### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
+administration.section.users.enableUser.inProgress=Benutzerkonto wird aktiviert...
+administration.section.users.enableUser.done=Benutzerkonto aktiviert
+administration.section.users.enableUser.failed=Fehler beim Aktivieren des Benutzerkontos
+administration.section.users.disableUser.inProgress=Benutzerkonto wird deaktiviert...
+administration.section.users.disableUser.done=Benutzerkonto deaktiviert
+administration.section.users.disableUser.failed=Fehler beim Deaktivieren des Benutzerkontos
+administration.section.users.deleteUser.confirmationMessage=Der Benutzer {0} wird gelöscht und aus allen {1} Gruppen {2} entfernt, denen er angehört. Sind Sie sicher, dass Sie fortfahren möchten?
+administration.section.users.deleteUser.programmingRightsWarning=Der Benutzer, den Sie löschen möchten, hat Programmierrechte und ist der letzte Autor von {0}{1,choice,1#1 page|1&lt;{1} Seiten}{2}. Wenn {1,choice,1#diese Seite |1&lt;diese Seiten} Skripte hat\\haben, die Programmierrechte erfordern, dann funktionieren diese Skripte nicht mehr, bis der Autor ersetzt wurde.
+administration.section.users.deleteUser.scriptRightsWarning=Der Benutzer, den Sie löschen möchten, hat Skriptrechte und ist der letzte Autor von {0}{1,choice,1#1 Seite|1&lt;{1} Seiten}{2}. Die Skripte von {1,choice,1#dieser Seite|1&lt;diesen Seiten} funktionieren möglicherweise nicht mehr, wenn Sie den Benutzer löschen, ohne den Autor zu ersetzen.
+administration.section.users.deleteUser.newAuthor=Neuer Autor
+administration.section.users.deleteUser.newAuthor.hint=Wählen Sie einen Benutzer mit den Rechten {0} oder lassen Sie dieses Feld leer, wenn Sie den Autor nicht ersetzen wollen.
+administration.section.users.deleteUser.newAuthor.error=Der ausgewählte Benutzer hat keine {0} Rechte!
+administration.section.users.deleteUser.newAuthor.programming=Programmieren
+administration.section.users.deleteUser.newAuthor.script=Script
 
 # Other Category
 admin.other=Andere

@@ -1014,6 +1014,14 @@
                 <id>cglib:cglib</id>
                 <features>cglib:cglib-nodep</features>
               </extensionOverride>
+              <extensionOverride>
+                <!-- We bundle the Syntax Highlighting Application in XS and this extension draws the 3rd
+                     party codemirror jar which has changed its groupid. Thus we need to tell EM that it's the same
+                     extension so that we don't get with 2 competing jars for the same feature in the XWiki classloader
+                     -->
+                <id>org.webjars.npm:codemirror</id>
+                <features>org.webjars:codemirror</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

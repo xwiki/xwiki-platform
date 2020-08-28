@@ -272,5 +272,5 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  (XWiki.isInitialized && init()) || $(document).on('xwiki:dom:loading', init);
 });

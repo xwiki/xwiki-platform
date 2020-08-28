@@ -51,7 +51,8 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Mentions Color
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions to the current user (note: used as the value of a background-color css attribute).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Self Mentions Color
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activate the quotes
-XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.</content>
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.
+mentions.tip=When in the WYSIWYG editor, you can mention a user by typing the '@' character followed by the user's name (you can type some letters and you'll get autocompletion).</content>
   <object>
     <name>XWiki.Mentions.MentionsTranslations</name>
     <number>0</number>

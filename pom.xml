@@ -621,7 +621,7 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.12.4</version>
+        <version>3.13.0</version>
       </dependency>
 
       <!-- Used by solr-core and closure-compiler -->

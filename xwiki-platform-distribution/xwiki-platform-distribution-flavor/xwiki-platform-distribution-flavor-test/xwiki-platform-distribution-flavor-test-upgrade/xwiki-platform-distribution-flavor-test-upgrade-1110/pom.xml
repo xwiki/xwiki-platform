@@ -38,6 +38,10 @@
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
+      <!-- Using a fixed version instead of ${upgradetest.previousflavor.version} because of
+           https://issues.apache.org/jira/browse/MRELEASE-799, causing "The artifact (...) requires a different
+           version (...) than what is found (...) for the expression (upgradetest.previousflavor.version) in the
+           project (...)" otherwise, when using the release plugin -->
       <version>11.10.8</version>
       <type>zip</type>
       <scope>test</scope>

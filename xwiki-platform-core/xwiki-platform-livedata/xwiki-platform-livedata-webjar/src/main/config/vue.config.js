@@ -22,6 +22,11 @@ module.exports = {
   // See https://cli.vuejs.org/config/
   publicPath: "/xwiki/resources/uicomponents/livedata/",
   filenameHashing: false,
+  configureWebpack: {
+    externals: {
+      jquery: "jquery",
+    },
+  },
   chainWebpack: config => {
     config.optimization.delete("splitChunks");
   },

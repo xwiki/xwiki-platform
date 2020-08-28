@@ -71,6 +71,7 @@ define([
       isGlobal: false,
     };
     this.openedPanels = [];
+    this.designMode = false;
 
     element.removeAttribute("data-data");
     // create Vuejs instance
@@ -425,6 +426,20 @@ define([
         this.data.data.entries.push(newEntry);
         this.data.data.count++; // TODO: remove when merging with backend
       });
+    },
+
+
+
+
+    /**
+     * Load a layout, or default layout if none specified
+     * @returns {Promise}
+     */
+    toggleDesignMode: function (designModeOn) {
+      if (designModeOn === undefined) {
+        designModeOn = ! this.designMode;
+      }
+      this.designMode = designModeOn;
     },
 
 

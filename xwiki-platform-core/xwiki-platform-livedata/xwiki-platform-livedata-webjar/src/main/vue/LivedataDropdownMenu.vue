@@ -85,6 +85,22 @@
         </a>
       </li>
 
+
+      <!-- Design mode Section -->
+      <li class="dropdown-header">Design</li>
+
+      <li v-show="!logic.designMode">
+        <a href="#" @click.prevent="logic.toggleDesignMode(true)">
+          <span class="fa fa-pencil"></span> Switch to Design Mode
+        </a>
+      </li>
+
+      <li v-show="logic.designMode">
+        <a href="#" @click.prevent="logic.toggleDesignMode(false)">
+          <span class="fa fa-pencil"></span> Leave Design Mode
+        </a>
+      </li>
+
     </ul>
 
   </div>

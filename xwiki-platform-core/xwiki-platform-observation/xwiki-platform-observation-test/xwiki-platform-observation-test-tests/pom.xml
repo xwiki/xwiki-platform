@@ -174,37 +174,6 @@
           </dependency>
         </dependencies>
       </plugin>
-      <!-- Generate XWiki instances -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
-        </configuration>
-        <executions>
-          <execution>
-            <id>xwiki-0</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-            <configuration>
-              <outputPackageDirectory>${xwiki.instance.directory}</outputPackageDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>xwiki-1</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-            <configuration>
-              <outputPackageDirectory>${xwiki.instance.directory}-1</outputPackageDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <!-- Customize instances -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -236,6 +205,49 @@
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>package</id>
+      <activation>
+        <property>
+          <name>!skipITs</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Generate XWiki instances -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+              <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
+            </configuration>
+            <executions>
+              <execution>
+                <id>xwiki-0</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <outputPackageDirectory>${xwiki.instance.directory}</outputPackageDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>xwiki-1</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <outputPackageDirectory>${xwiki.instance.directory}-1</outputPackageDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.

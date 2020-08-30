@@ -80,26 +80,6 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <!-- Make sure that the pages are imported with the superadmin user that we use in our tests so that they have
-             programming rights. We need since since some pages such as XWiki.DeletedDocumentsJSON,
-             XWiki.DeletedDocuments, XWiki.DeletedAttachments currently require PR.
-        -->
-        <configuration>
-          <importUser>superadmin</importUser>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -108,6 +88,38 @@
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>package</id>
+      <activation>
+        <property>
+          <name>!skipITs</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+            <version>${project.version}</version>
+            <!-- Make sure that the pages are imported with the superadmin user that we use in our tests so that they have
+                 programming rights. We need since since some pages such as XWiki.DeletedDocumentsJSON,
+                 XWiki.DeletedDocuments, XWiki.DeletedAttachments currently require PR.
+            -->
+            <configuration>
+              <importUser>superadmin</importUser>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.

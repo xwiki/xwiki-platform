@@ -34,7 +34,6 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <xwiki.database.directory>${project.build.directory}/data/database</xwiki.database.directory>
     <xwiki.instance.directory>${project.build.directory}/xwiki</xwiki.instance.directory>
@@ -115,7 +114,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -150,7 +148,6 @@
           </execution>
         </executions>
       </plugin>
-
       <!-- Start Hsqldb -->
       <plugin>
         <groupId>org.onebusaway.plugins</groupId>
@@ -177,7 +174,6 @@
           </dependency>
         </dependencies>
       </plugin>
-
       <!-- Generate XWiki instances -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>
@@ -232,17 +228,10 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

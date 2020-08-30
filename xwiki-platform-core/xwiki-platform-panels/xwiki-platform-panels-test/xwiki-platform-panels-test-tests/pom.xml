@@ -98,16 +98,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            https://jira.xwiki.org/browse/XWIKI-7683 -->

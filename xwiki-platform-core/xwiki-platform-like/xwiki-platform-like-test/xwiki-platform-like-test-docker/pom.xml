@@ -54,8 +54,6 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
-
-   
     <!-- ================================
         Test only dependencies
         ================================ -->
@@ -65,7 +63,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
     <!-- page objects -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -79,19 +76,14 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

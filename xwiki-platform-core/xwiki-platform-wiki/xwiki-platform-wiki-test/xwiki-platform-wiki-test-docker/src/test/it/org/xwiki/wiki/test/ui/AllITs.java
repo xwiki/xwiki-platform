@@ -17,30 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.panels.test.ui;
+package org.xwiki.wiki.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * All UI Tests for the Panels.
+ * All UI Tests for the multi-wikis manipulations.
  *
  * @version $Id$
- * @since 11.3RC1
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
-    @DisplayName("Panels Administration Tests")
-    class NestedPanelsAdministrationIT extends PanelsAdministrationIT
+    @DisplayName("Wiki Manager REST Panels Tests")
+    class NestedWikiManagerRestIT extends WikiManagerRestIT
     {
     }
 
     @Nested
-    @DisplayName("Navigation Panel Tests")
-    class NestedNavigationPanelIT extends NavigationPanelIT
+    @DisplayName("Wiki Template Tests")
+    class NestedWikiTemplateIT extends WikiTemplateIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Tests using a subwiki")
+    class NestedSubWikiIT extends SubWikiIT
     {
     }
 }

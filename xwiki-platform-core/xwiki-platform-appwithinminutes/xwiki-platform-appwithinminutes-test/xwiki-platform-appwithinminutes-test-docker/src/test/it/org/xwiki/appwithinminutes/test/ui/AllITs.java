@@ -17,24 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.ui;
+package org.xwiki.appwithinminutes.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * All UI tests for the Index feature.
+ * All UI tests for the App Within Minutes.
  *
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.10
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
-    @DisplayName("AllDocs Page UI")
-    class NestedAllDocsIT extends AllDocsIT
+    @DisplayName("Overall AWM LiveTable test")
+    class NestedAppsLiveTableIT extends AppsLiveTableIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Application wizard test")
+    class NestedWizardIT extends WizardIT
     {
     }
 }

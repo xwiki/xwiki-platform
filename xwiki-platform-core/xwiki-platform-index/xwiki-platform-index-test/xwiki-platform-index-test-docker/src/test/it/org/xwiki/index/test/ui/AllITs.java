@@ -17,35 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.test.ui;
+package org.xwiki.index.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * All UI Tests for the multi-wikis manipulations.
+ * All UI tests for the Index feature.
  *
  * @version $Id$
+ * @since 11.4RC1
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
-    @DisplayName("Wiki Manager REST Panels Tests")
-    class NestedWikiManagerRestIT extends WikiManagerRestIT
+    @DisplayName("AllDocs Page UI")
+    class NestedAllDocsIT extends AllDocsIT
     {
     }
 
     @Nested
-    @DisplayName("Wiki Template Tests")
-    class NestedWikiTemplateIT extends WikiTemplateIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Tests using a subwiki")
-    class NestedSubWikiIT extends SubWikiIT
+    @DisplayName("Deleted Attachment Page UI")
+    class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
     {
     }
 }

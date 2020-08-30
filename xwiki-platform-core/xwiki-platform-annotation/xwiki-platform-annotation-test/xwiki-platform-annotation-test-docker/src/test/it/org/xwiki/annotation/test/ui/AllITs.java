@@ -17,24 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.test.ui;
+package org.xwiki.annotation.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * All tests of the mentions application UI.
- *
  * @version $Id$
- * @since 12.5RC1
+ * @since 11.3RC1
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
-    @DisplayName("Mentions UI")
-    class NestedMentionsIT extends MentionsIT
+    @DisplayName("Annotations Tests")
+    class NestedAnnotationsIT extends AnnotationsIT
     {
     }
 }

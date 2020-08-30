@@ -17,24 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.vfs.test.ui;
+package org.xwiki.panels.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * VFS functional tests.
+ * All UI Tests for the Panels.
  *
  * @version $Id$
- * @since 11.10
+ * @since 11.3RC1
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
-    @DisplayName("VFS Tests")
-    class NestedVfsIT extends VfsIT
+    @DisplayName("Panels Administration Tests")
+    class NestedPanelsAdministrationIT extends PanelsAdministrationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Navigation Panel Tests")
+    class NestedNavigationPanelIT extends NavigationPanelIT
     {
     }
 }

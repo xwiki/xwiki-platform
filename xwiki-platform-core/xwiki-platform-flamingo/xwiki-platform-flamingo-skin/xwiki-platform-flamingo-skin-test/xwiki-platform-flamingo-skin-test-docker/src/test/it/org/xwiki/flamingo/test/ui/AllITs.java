@@ -31,7 +31,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 11.2RC1
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
     @DisplayName("Save Edit Comments Tests")

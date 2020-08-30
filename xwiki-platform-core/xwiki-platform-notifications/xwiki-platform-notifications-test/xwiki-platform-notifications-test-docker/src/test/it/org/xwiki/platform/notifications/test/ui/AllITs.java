@@ -30,7 +30,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  */
 @UITest
-public class AllIT
+public class AllITs
 {
     @Nested
     @DisplayName("Overall Notifications Settings UI tests")

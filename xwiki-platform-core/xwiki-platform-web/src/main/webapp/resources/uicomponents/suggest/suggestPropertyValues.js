@@ -96,5 +96,5 @@ require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], functi
   };
 
   $(document).on('xwiki:dom:updated', init);
-  init();
+  $(init);
 });

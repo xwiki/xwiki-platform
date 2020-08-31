@@ -744,5 +744,5 @@ require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker',
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

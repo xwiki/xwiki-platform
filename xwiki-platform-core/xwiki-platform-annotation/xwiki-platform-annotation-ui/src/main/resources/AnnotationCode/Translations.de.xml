@@ -36,23 +36,23 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>annotations.title=Anmerkungen
-annotations.menu.loading=Lade Anmerkungen Einstellungen
+  <content>annotations.title=Anmerken
+annotations.menu.loading=Lade Anmerkungseinstellungen
 annotations.menu.loaderror=Fehlgeschlagen:
-annotations.tab.info.noannotations=Dieses Dokument enthält keine Anmerkungen
+annotations.tab.info.noannotations=Keine Anmerkungen auf dieser Seite
 
 annotations.settings.display=Zeige Anmerkungen
-annotations.settings.error.wrongsyntax=Anmerkungen sind nicht verfügbar in Dokumenten in XWiki/1.0 Syntax.
-annotations.settings.error.notarget=Kein Dokument, für das die Anmerkungseinstellungen abgerufen werden sollen, spezifiziert.
+annotations.settings.error.wrongsyntax=Anmerkungen sind nicht verfügbar in Dokumenten mit XWiki/1.0 Syntax.
+annotations.settings.error.notarget=Kein Dokument angegeben, für das die Anmerkungseinstellungen abgerufen werden sollen.
 
 annotations.annotated.loading=Lade Dokument mit Anmerkungen
 annotations.annotated.loaderror=Fehlgeschlagen:
 annotations.annotated.loaderror.wrongresponse=Falsch formatierte Serverantwort
 annotations.annotated.error.noannotatedelement=Anmerkungen konnten nicht geladen werden, da der Inhalt nicht verfügbar ist.
-annotations.annotated.error.wrongsyntax=Anmerkungen werden in Dokumenten in XWiki/1.0 Syntax nicht unterstützt.
+annotations.annotated.error.wrongsyntax=Anmerkungen werden auf Seiten mit XWiki/1.0 Syntax nicht unterstützt.
 
 annotations.action.edit.text=[Bearbeiten]
-annotations.action.edit.tooltip=Diese Anmerkung bearbeiten
+annotations.action.edit.tooltip=Anmerkung bearbeiten
 annotations.action.edit.submit.text=Aktualisieren
 annotations.action.edit.cancel.text=Abbrechen
 annotations.action.edit.success=Anmerkung wurde erfolgreich aktualisiert.
@@ -60,9 +60,9 @@ annotations.action.edit.loaderror=Fehlgeschlagen:
 annotations.action.edit.error.notfound=Diese Anmerkung existiert nicht mehr. Bitte laden Sie die Seite erneut, um die Ansicht zu aktualisieren.
 
 annotations.action.delete.text=[Löschen]
-annotations.action.delete.tooltip=Diese Anmerkung löschen
+annotations.action.delete.tooltip=Anmerkung löschen
 annotations.action.delete.confirm=Sind Sie sicher, dass Sie diese Anmerkung löschen möchten?
-annotations.action.delete.inProgress=Lösche Anmerkung...
+annotations.action.delete.inProgress=Anmerkung wird gelöscht...
 annotations.action.delete.done=Anmerkung gelöscht
 annotations.action.delete.failed=Löschen von Anmerkung fehlgeschlagen:
 
@@ -70,7 +70,7 @@ annotations.action.create.submit.text=Anmerkung hinzufügen
 annotations.action.create.cancel.text=Abbrechen
 annotations.action.create.selection.invalid=Bitte wählen Sie einen nicht-leeren Text im Dokument aus.
 annotations.action.create.form.loaderror=Fehlgeschlagen:
-annotations.action.create.success=Anmerkung wurde erfolgreich hinzufügt
+annotations.action.create.success=Anmerkung hinzugefügt
 annotations.action.create.loaderror=Fehlgeschlagen:
 annotations.action.create.error.unauthorized=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen.
 annotations.action.create.error.unauthorizedguest=Sie sind nicht berechtigt Anmerkungen in diesem Dokument zu erstellen. Bitte melden Sie sich an.
@@ -105,12 +105,12 @@ admin.annotations=Anmerkungen
 admin.annotations.description=Seite-Anmerkungen konfigurieren
 
 AnnotationCode.AnnotationConfig_activated=Anmerkungen sind aktiviert
-AnnotationCode.AnnotationConfig_activated.hint=Entscheiden Sie, ob Anmerkungen im Wiki aktiv sind.
+AnnotationCode.AnnotationConfig_activated.hint=Entscheiden, ob Anmerkungen im aktuellen Wiki aktiviert sind
 AnnotationCode.AnnotationConfig_exceptionSpaces=Außer für die folgenden Bereiche
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deaktivieren Sie Anmerkungen für die folgende Teilmenge von Positionen:
 AnnotationCode.AnnotationConfig_displayed=Anmerkungen standardmäßig anzeigen
-AnnotationCode.AnnotationConfig_displayed.hint=Entscheiden Sie, ob Anmerkungen standardmäßig angezeigt werden oder nur, wenn "Anmerkungen anzeigen" auf jeder Seite aktiviert ist
+AnnotationCode.AnnotationConfig_displayed.hint=Entscheiden, ob Anmerkungen standardmäßig angezeigt werden oder nur, wenn "Anmerkungen anzeigen" auf jeder Seite aktiviert ist
 AnnotationCode.AnnotationConfig_displayHighlight=Anmerkungen standardmäßig im Text hervorheben
-AnnotationCode.AnnotationConfig_displayHighlight.hint=Entscheiden Sie, ob die Hervorhebung einer Anmerkung immer oder nur dann angezeigt werden soll, wenn Sie mit der Maus über eine Anmerkung oder eine Struktur von Anmerkungen fahren
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Entscheide, ob Anmerkungen immer hervorgehoben werden, oder nur wenn die Maus sich über dem entsprechenden Bereich befindet
 AnnotationCode.AnnotationConfig_annotationClass=XWiki Klasse, welche zum Speichern der Anmerkungen verwendet wird</content>
 </xwikidoc>

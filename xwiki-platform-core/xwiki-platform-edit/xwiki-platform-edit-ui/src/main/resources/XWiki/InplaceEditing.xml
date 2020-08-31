@@ -162,15 +162,17 @@ define('xwiki-document-api', ['jquery'], function($) {
      * @return this document's real locale
      */
     getRealLocale: function() {
-      var result = "";
-      if (this.language !== "undefined") {
-        result = this.language;
-      } else if (this.translations !== "undefined") {
-        result = this.translations['default'];
+      var realLocale = this.language;
+      if (typeof realLocale === 'string' &amp;&amp; realLocale !== '') {
+        // This document is a translation.
+      } else if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
+        // This is the original document.
+        realLocale = this.translations['default'];
       } else {
-        result = $('html').attr('lang');
+        // The document locale is not specified. Use the UI locale.
+        realLocale = $('html').attr('lang');
       }
-      return result;
+      return realLocale;
     },
 
     /**

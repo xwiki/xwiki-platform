@@ -81,7 +81,7 @@
     <dependency>
       <groupId>com.google.javascript</groupId>
       <artifactId>closure-compiler-unshaded</artifactId>
-      <version>v20200719</version>
+      <version>${closure-compiler.version}</version>
       <exclusions>
         <!-- Exclude closure-compiler-externs because externs.zip is packaged in closure-compiler-unshaded -->
         <exclusion>

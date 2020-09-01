@@ -113,7 +113,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
-        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
+        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
@@ -124,13 +124,13 @@ public class DeleteJobTest extends AbstractEntityJobTest
         request.setCheckAuthorRights(false);
         request.setUserReference(userReference);
         request.setAuthorReference(authorReference);
-        request.setProperty("toRecyclebin", false);
+        request.setProperty("toRecycleBin", false);
         run(request);
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
             eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).expurge(documentReference);
+        verify(this.modelBridge).delete(documentReference, false);
     }
 
     @Test

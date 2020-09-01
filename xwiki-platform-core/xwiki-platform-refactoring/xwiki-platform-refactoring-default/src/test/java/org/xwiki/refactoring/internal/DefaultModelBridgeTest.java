@@ -54,6 +54,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
@@ -180,6 +181,18 @@ public class DefaultModelBridgeTest
     }
 
     @Test
+    public void createWithException(MockitoComponentManager mocker) throws Exception
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenThrow(new XWikiException());
+
+        this.modelBridge.create(documentReference);
+
+        assertLog(Level.ERROR, "Failed to create document [{}].", documentReference);
+    }
+
+    @Test
     public void copy() throws Exception
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
@@ -203,21 +216,35 @@ public class DefaultModelBridgeTest
         this.modelBridge.delete(sourceReference);
 
         verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted (send to trash: [{}]).", sourceReference, true);
+        assertLog(Level.INFO, "Document [{}] has been deleted (trashed: [{}]).", sourceReference, true);
     }
 
     @Test
-    public void expurge() throws Exception
+    public void deleteAndSkipTheRecycleBin() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(1);
 
-        this.modelBridge.expurge(sourceReference);
+        this.modelBridge.delete(sourceReference, false);
 
         verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted (send to trash: [{}]).", sourceReference, false);
+        assertLog(Level.INFO, "Document [{}] has been deleted (trashed: [{}]).", sourceReference, false);
+    }
+
+    @Test
+    public void deleteAndThrowException() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenThrow(new XWikiException());
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        boolean actual = this.modelBridge.delete(sourceReference, true);
+
+        assertFalse(actual);
+        assertLog(Level.ERROR, "Failed to delete document [{}]  (trashed: [{}]).", sourceReference, true);
     }
 
     @Test
@@ -232,7 +259,7 @@ public class DefaultModelBridgeTest
         this.modelBridge.delete(sourceReference);
 
         verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
-        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (send to trash: [{}]).", sourceReference, true);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (trashed: [{}]).", sourceReference, true);
     }
 
     @Test

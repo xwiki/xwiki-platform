@@ -19,7 +19,9 @@
  */
 package org.xwiki.refactoring.internal;
 
+
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -37,13 +39,12 @@ import org.xwiki.refactoring.RefactoringConfiguration;
 public class DefaultRefactoringConfiguration implements RefactoringConfiguration
 {
     @Inject
+    @Named("refactoring")
     private ConfigurationSource configurationSource;
 
     @Override
-    public boolean canSkipRecyclebin()
+    public boolean canSkipRecycleBin()
     {
-        // check if the wiki is configured to allow the recyclebin to be skipped, and if the user has the right to do
-        // so (ie, is an advanced user).
-        return this.configurationSource.getProperty("refactoring.recyclebin.skip", Boolean.FALSE);
+        return this.configurationSource.getProperty("canSkipRecycleBin", false);
     }
 }

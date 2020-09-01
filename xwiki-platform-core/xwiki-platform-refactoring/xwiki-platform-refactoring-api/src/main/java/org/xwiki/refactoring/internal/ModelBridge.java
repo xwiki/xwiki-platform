@@ -65,13 +65,15 @@ public interface ModelBridge
     boolean delete(DocumentReference documentReference);
 
     /**
-     * Delete the specified document while explictly skiping the recyclebin, even if it exists and is activated.
-     *
+     * Delete or move to the recycle bin the specified document.
      * @param documentReference the reference of the document to delete
+     * @param toRecycleBin If {@code true}, the document is moved to the recycle bin (if the recycle bin is not
+     *                    activated, the document is removed permanently nevertheless). If {@code false},
+     *                    the document is removed permanently
      * @return {@code true} if the document was deleted successfully, {@code false} if the delete failed
      * @since 12.8RC1
      */
-    boolean expurge(DocumentReference documentReference);
+    boolean delete(DocumentReference documentReference, boolean toRecycleBin);
 
     /**
      * Remove the edit lock from the specified document.

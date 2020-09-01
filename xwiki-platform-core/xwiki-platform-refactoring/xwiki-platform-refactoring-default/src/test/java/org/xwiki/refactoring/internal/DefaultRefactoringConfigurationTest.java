@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.internal;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -42,21 +44,22 @@ class DefaultRefactoringConfigurationTest
     private DefaultRefactoringConfiguration configuration;
 
     @MockComponent
+    @Named("refactoring")
     private ConfigurationSource configurationSource;
 
     @Test
     void canSkipRecyclebinTrue()
     {
-        when(this.configurationSource.getProperty("refactoring.recyclebin.skip", Boolean.FALSE)).thenReturn(true);
-        boolean actual = this.configuration.canSkipRecyclebin();
+        when(this.configurationSource.getProperty("canSkipRecycleBin", false)).thenReturn(true);
+        boolean actual = this.configuration.canSkipRecycleBin();
         assertTrue(actual);
     }
 
     @Test
     void canSkipRecyclebinFalse()
     {
-        when(this.configurationSource.getProperty("refactoring.recyclebin.skip", Boolean.FALSE)).thenReturn(false);
-        boolean actual = this.configuration.canSkipRecyclebin();
+        when(this.configurationSource.getProperty("canSkipRecycleBin", false)).thenReturn(false);
+        boolean actual = this.configuration.canSkipRecycleBin();
         assertFalse(actual);
     }
 }

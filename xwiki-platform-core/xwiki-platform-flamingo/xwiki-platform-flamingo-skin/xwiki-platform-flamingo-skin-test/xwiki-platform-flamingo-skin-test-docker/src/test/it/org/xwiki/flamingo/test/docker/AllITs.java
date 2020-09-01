@@ -82,12 +82,6 @@ public class AllITs
     }
 
     @Nested
-    @DisplayName("Delete Page Recyclebin Tests")
-    class NestedDeletePageRecyclebinIT extends DeletePageRecyclebinIT
-    {
-    }
-
-    @Nested
     @DisplayName("Object editor Tests")
     class NestedObjectEditorIT extends ObjectEditorIT
     {

@@ -93,7 +93,7 @@ public class RefactoringScriptServiceTest
     @MockComponent
     private RefactoringConfiguration configuration;
 
-    private ExecutionContext executionContext = new ExecutionContext();
+    private final ExecutionContext executionContext = new ExecutionContext();
 
     @BeforeEach
     void setup()
@@ -369,28 +369,28 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    void canSkipRecycleBinAllTrue()
+    void canSkipRecycleBinWhenAdvancedUserAndCanSkipRecycleBin()
     {
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
-        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
-        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
         assertTrue(actual);
     }
 
     @Test
-    void canSkipRecycleBinConfigurationIsFalse()
+    void canSkipRecycleBinWhenSimpleUserAndCannotSkipRecycleBin()
     {
-        when(this.configuration.canSkipRecyclebin()).thenReturn(false);
-        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        when(this.configuration.canSkipRecycleBin()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
         assertFalse(actual);
     }
 
     @Test
-    void canSkipRecycleBinAdvancedIsFalse()
+    void canSkipRecycleBinWhenSimpleUser()
     {
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(false);
-        when(this.configuration.canSkipRecyclebin()).thenReturn(true);
-        final boolean actual = this.refactoringScriptService.canSkipRecycleBin();
+        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
         assertFalse(actual);
     }
 }

@@ -21,12 +21,15 @@ package org.xwiki.flamingo.test.docker;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.xwiki.flamingo.skin.test.po.DeleteConfirmationPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -56,6 +59,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class DeletePageIT
 {
+    private static final DocumentReference REFACTORING_CONFIGURATION_REFERENCE =
+        new DocumentReference("xwiki", Arrays.asList("XWiki", "Refactoring"), "RefactoringConfiguration");
+
     private ViewPage viewPage;
 
     private static final String LOGGED_USERNAME = "superadmin";
@@ -373,5 +379,56 @@ public class DeletePageIT
         // check that the old one doesn't exist anymore
         ViewPage viewPage = setup.gotoPage(freeReference);
         assertFalse(viewPage.exists());
+    }
+
+    /**
+     *
+     * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
+     * page to the recycle bin or delete it permanently.
+     * In this test the user choose to send the page to the recycle bin.
+     */
+    @Test
+    @Order(9)
+    public void deleteToRecycleBin(TestUtils setup)
+    {
+        // Set the user type to Advanced
+        Map<String, Object> userProperties = new HashMap<>();
+        userProperties.put("usertype", "Advanced");
+        setup.updateObject("XWiki", "superadmin", "XWiki.XWikiUsers", 0, userProperties);
+
+        // Set the canSkipRecycleBin property to true
+        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "XWiki.Refactoring.RefactoringConfigurationClass", 0,
+            "canSkipRecycleBin", 1);
+
+        setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
+        ConfirmationPage confirmationPage = this.viewPage.delete();
+        new DeleteConfirmationPage().selectOptionToRecycleBin();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+    }
+
+    /**
+     * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
+     * page to the recycle bin or delete it permanently.
+     * In this test the user choose to delete the page permanently.
+     */
+    @Test
+    @Order(10)
+    public void deleteSkipRecycleBin()
+    {
+        ConfirmationPage confirmationPage = this.viewPage.delete();
+        new DeleteConfirmationPage().selectOptionSkipRecycleBin();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
     }
 }

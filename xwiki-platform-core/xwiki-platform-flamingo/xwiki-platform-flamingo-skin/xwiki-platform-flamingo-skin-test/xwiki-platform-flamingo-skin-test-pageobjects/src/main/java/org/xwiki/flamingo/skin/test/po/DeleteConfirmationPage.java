@@ -21,25 +21,25 @@ package org.xwiki.flamingo.skin.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ConfirmationPage;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represent the form the offer the choice between removing a document permanently
- * or sending it to the recyclebin.
+ * or sending it to the recycle bin.
  *
  * @version $Id$
  * @since 12.8RC1
  */
-public class DeleteConfirmationPage extends ConfirmationPage
+public class DeleteConfirmationPage extends ViewPage
 {
-    @FindBy(css = "input[name='toRecyclebin'][value='true']")
+    @FindBy(css = "input[name='toRecycleBin'][value='true']")
     private WebElement optionToReyclebin;
 
-    @FindBy(css = "input[name='toRecyclebin'][value='false']")
+    @FindBy(css = "input[name='toRecycleBin'][value='false']")
     private WebElement optionSkipReyclebin;
 
     /**
-     * Click on the option to put the document in the recyclebin.
+     * Click on the option to put the document in the recycle bin.
      */
     public void selectOptionToRecycleBin()
     {

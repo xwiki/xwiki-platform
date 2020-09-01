@@ -184,7 +184,7 @@
       <name>org.xwiki.platform.wiki.ui.common.contentFooter.authors</name>
     </property>
     <property>
-      <parameters>order=200</parameters>
+      <parameters>order=300</parameters>
     </property>
     <property>
       <scope>wiki</scope>

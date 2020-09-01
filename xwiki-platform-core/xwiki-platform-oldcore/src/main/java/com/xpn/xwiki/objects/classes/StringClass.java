@@ -135,6 +135,6 @@ public class StringClass extends PropertyClass
         } else {
             result = "";
         }
-        buffer.append(XMLUtils.escape(result));
+        buffer.append(XMLUtils.minimalEscape(result));
     }
 }

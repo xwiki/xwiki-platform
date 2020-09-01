@@ -176,7 +176,7 @@
       <name>org.xwiki.platform.tag.ui.contentFooter</name>
     </property>
     <property>
-      <parameters>order=100</parameters>
+      <parameters>order=200</parameters>
     </property>
     <property>
       <scope>wiki</scope>

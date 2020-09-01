@@ -321,7 +321,8 @@
   color: grey;
 }
 .like-container {
-  width: 10%;
+  /* Leave some space between the like button and the next footer item (e.g. the page tags). */
+  margin-right: 2em;
 }</code>
     </property>
     <property>
@@ -521,7 +522,7 @@
       <name>org.xwiki.platform.like.contentFooter</name>
     </property>
     <property>
-      <parameters>order=3000</parameters>
+      <parameters>order=100</parameters>
     </property>
     <property>
       <scope>wiki</scope>

@@ -174,7 +174,7 @@ public class AllDocsIT extends AbstractTest
         // Filter by attachment location.
         liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "th");
         assertEquals(1, liveTable.getRowCount());
-        assertEquals("AllDocsTestOtherPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
+        assertEquals(getTestClassName() + "OtherPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
 
         // Clear the filter.
         liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "");
@@ -188,9 +188,9 @@ public class AllDocsIT extends AbstractTest
 
         // Sort by attachment location.
         liveTable.sortBy("Location");
-        assertEquals("AllDocsTestPage", liveTable.getCell(liveTable.getRow(2), 3).getText());
+        assertEquals(getTestClassName() + "Page", liveTable.getCell(liveTable.getRow(2), 3).getText());
         liveTable.sortBy("Location");
         assertEquals(2, liveTable.getRowCount());
-        assertEquals("AllDocsTestPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
+        assertEquals(getTestClassName() + "Page", liveTable.getCell(liveTable.getRow(1), 3).getText());
     }
 }

@@ -19,16 +19,17 @@
  */
 package com.xpn.xwiki.plugin.scheduler.internal;
 
-import org.xwiki.observation.event.EndFoldEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 
 /**
- * Event triggered when starting to initialize the scheduler jobs at startup.
+ * Event triggered when finished to initialize the scheduler jobs at startup.
  * 
  * @version $Id$
  * @since 12.8RC1
+ * @since 12.7.1
  * @since 12.6.2
  */
-public class SchedulerJobsInitializingEvent implements EndFoldEvent
+public class SchedulerJobsInitializingEvent implements BeginFoldEvent
 {
     @Override
     public boolean matches(Object otherEvent)

@@ -124,7 +124,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
         request.setCheckAuthorRights(false);
         request.setUserReference(userReference);
         request.setAuthorReference(authorReference);
-        request.setProperty("toRecycleBin", false);
+        request.setProperty(DeleteJob.SKIP_RECYCLE_BIN_PROPERTY, true);
         run(request);
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),

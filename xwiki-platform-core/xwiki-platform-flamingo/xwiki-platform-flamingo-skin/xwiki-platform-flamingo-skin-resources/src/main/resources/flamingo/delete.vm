@@ -246,11 +246,11 @@
           </dt>
           <dd>
             <label class="xwiki-form-listclass">
-              <input name="toRecycleBin" type="radio" value="true" checked/>
+              <input name="skipRecycleBin" type="radio" value="false" checked/>
               $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.no'))
             </label>
             <label class="xwiki-form-listclass">
-              <input name="toRecycleBin" type="radio" value="false"/>
+              <input name="skipRecycleBin" type="radio" value="true"/>
               $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.yes'))
             </label>
           </dd>

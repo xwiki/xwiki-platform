@@ -17,25 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.skin.test.po;
+package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represent the form the offer the choice between removing a document permanently
- * or sending it to the recycle bin.
+ * Specialized confirmation page, dedicated to pages deletion.
+ * Allows to interact with the form that offers the choice between removing a document permanently
+ * or sending it to the recycle bin, in addition to the interactions already allowed by {@link ConfirmationPage}.
  *
  * @version $Id$
  * @since 12.8RC1
  */
-public class DeleteConfirmationPage extends ViewPage
+public class DeletePageConfirmationPage extends ConfirmationPage
 {
-    @FindBy(css = "input[name='toRecycleBin'][value='true']")
+    @FindBy(css = "input[name='skipRecycleBin'][value='false']")
     private WebElement optionToReyclebin;
 
-    @FindBy(css = "input[name='toRecycleBin'][value='false']")
+    @FindBy(css = "input[name='skipRecycleBin'][value='true']")
     private WebElement optionSkipReyclebin;
 
     /**

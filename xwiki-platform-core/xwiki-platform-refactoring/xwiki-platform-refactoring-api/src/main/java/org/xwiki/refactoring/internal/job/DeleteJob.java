@@ -48,6 +48,12 @@ import org.xwiki.security.authorization.Right;
 @Named(RefactoringJobs.DELETE)
 public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
 {
+    /**
+     * Key of the optional property that indicates whether the document should be send to the recycle bin
+     * or removed permanently.
+     */
+    public static final String SKIP_RECYCLE_BIN_PROPERTY = "skipRecycleBin";
+
     @Inject
     private BatchOperationExecutor batchOperationExecutor;
 
@@ -120,10 +126,10 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        Boolean toRecycleBinProperty = this.getRequest().getProperty("toRecycleBin");
+        Boolean skipRecycleBin = this.getRequest().getProperty(SKIP_RECYCLE_BIN_PROPERTY);
         boolean toRecycleBin = !this.configuration.canSkipRecycleBin()
                                    || !this.documentAccessBridge.isAdvancedUser()
-                                   || ObjectUtils.defaultIfNull(toRecycleBinProperty, true);
+                                   || !ObjectUtils.defaultIfNull(skipRecycleBin, false);
         EntitySelection entitySelection = this.concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             // TODO: handle entitySelection == null which means something is wrong

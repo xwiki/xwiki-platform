@@ -50,6 +50,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- FIXME: We shouldn't rely on hibernate store since the default in the Solr store now.
+         Needed to have an implementation of EventStatusManager -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-message</artifactId>

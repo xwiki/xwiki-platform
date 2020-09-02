@@ -175,7 +175,7 @@
           </executions>
           <configuration>
             <includes>
-              <include>**/AllTests.java</include>
+              <include>**/org.xwiki.test.ui.AllTests.java</include>
             </includes>
             <systemProperties combine.children="append">
               <property>
@@ -515,6 +515,12 @@
       <properties>
         <browser>*custom ${browserPath}</browser>
       </properties>
+    </profile>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-distribution-flavor-test-docker-ui</module>
+      </modules>
     </profile>
   </profiles>
   <modules>

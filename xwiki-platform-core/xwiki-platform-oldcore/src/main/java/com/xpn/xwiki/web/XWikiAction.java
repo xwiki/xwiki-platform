@@ -35,10 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.struts2.ServletActionContext;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +82,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opensymphony.xwork2.ActionSupport;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -127,7 +125,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  * right to perform the current action.
  * </p>
  */
-public abstract class XWikiAction extends Action
+public abstract class XWikiAction extends ActionSupport
 {
     public static final String ACTION_PROGRESS = "actionprogress";
 
@@ -731,15 +729,18 @@ public abstract class XWikiAction extends Action
         xcontext.setFinished(true);
     }
 
-    protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-        HttpServletResponse resp) throws XWikiException, ServletException
+    protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form) throws XWikiException, ServletException
     {
+        HttpServletRequest servletRequest = ServletActionContext.getRequest();
+        HttpServletResponse servletResponse = ServletActionContext.getResponse();
+
         String action = mapping.getName();
 
-        XWikiRequest request = new XWikiServletRequest(req);
-        XWikiResponse response = new XWikiServletResponse(resp);
+        XWikiRequest request = new XWikiServletRequest(servletRequest);
+        XWikiResponse response = new XWikiServletResponse(servletResponse);
         XWikiContext context =
-            Utils.prepareContext(action, request, response, new XWikiServletContext(this.servlet.getServletContext()));
+            Utils.prepareContext(action, request, response,
+                new XWikiServletContext(ServletActionContext.getServletContext()));
 
         // This code is already called by struts.
         // However struts will also set all the parameters of the form data
@@ -796,7 +797,7 @@ public abstract class XWikiAction extends Action
 
     public String getRealPath(String path)
     {
-        return this.servlet.getServletContext().getRealPath(path);
+        return ServletActionContext.getServletContext().getRealPath(path);
     }
 
     // hook

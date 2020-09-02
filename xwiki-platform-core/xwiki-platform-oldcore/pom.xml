@@ -134,7 +134,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
+      <artifactId>struts2-core</artifactId>
     </dependency>
 
     <!-- Used by parse groovy from page -->

@@ -37,7 +37,7 @@
          org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
-  <description>Handles the notififcations of user mentions.</description>
+  <description>Handles the notifications of user mentions.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -59,6 +59,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

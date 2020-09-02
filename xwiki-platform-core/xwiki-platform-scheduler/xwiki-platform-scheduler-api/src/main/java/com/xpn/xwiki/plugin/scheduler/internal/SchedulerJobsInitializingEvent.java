@@ -22,7 +22,7 @@ package com.xpn.xwiki.plugin.scheduler.internal;
 import org.xwiki.observation.event.BeginFoldEvent;
 
 /**
- * Event triggered when finished to initialize the scheduler jobs at startup.
+ * Event triggered when starting to initialize the scheduler jobs at startup.
  * 
  * @version $Id$
  * @since 12.8RC1

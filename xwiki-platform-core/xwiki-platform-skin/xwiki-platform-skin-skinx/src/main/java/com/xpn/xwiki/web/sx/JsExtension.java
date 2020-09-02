@@ -27,6 +27,7 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.skinx.SkinExtensionConfiguration;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
@@ -90,6 +91,10 @@ public class JsExtension implements Extension
             // See https://dev.xwiki.org/xwiki/bin/view/Community/SupportStrategy/BrowserSupportStrategy
             // As long as we support IE11 we need to output a lower version of ECMAScript.
             options.setLanguageOut(LanguageMode.ECMASCRIPT5_STRICT);
+
+            // Enable the JavaScript strict mode based on the configuration.
+            options.setStrictModeInput(getConfig().shouldRunJavaScriptInStrictMode());
+            options.setEmitUseStrict(options.expectStrictModeInput());
 
             // Add support for using the latest JavaScript APIs by including the necessary polyfills in the output. Note
             // that the polyfills won't be included if the JavaScript minification is disabled (e.g. from the debug
@@ -161,6 +166,11 @@ public class JsExtension implements Extension
         public String getSourceMap()
         {
             return this.sourceMap;
+        }
+
+        private SkinExtensionConfiguration getConfig()
+        {
+            return Utils.getComponent(SkinExtensionConfiguration.class);
         }
     }
 }

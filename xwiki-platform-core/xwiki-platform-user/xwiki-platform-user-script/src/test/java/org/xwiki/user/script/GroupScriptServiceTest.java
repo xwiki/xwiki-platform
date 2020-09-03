@@ -26,11 +26,13 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.group.GroupManager;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -45,12 +47,22 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class GroupScriptServiceTest
 {
-    private static final DocumentReference ADDED_GROUP = new DocumentReference("xwiki", "XWiki", "Added");
+    private static final DocumentReference CANDIDATE_GROUP = new DocumentReference("xwiki", "XWiki", "Added");
 
     private static final DocumentReference TARGET_GROUP = new DocumentReference("xwiki", "XWiki", "Target");
 
     @InjectMockComponents
     private GroupScriptService groupScriptService;
+
+    @Test
+    void canAddAsMember() throws Exception
+    {
+        when(this.groupManager.getMembers(CANDIDATE_GROUP,  true)).thenReturn(emptyList());
+        when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(emptyList());
+
+        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, CANDIDATE_GROUP);
+        assertTrue(actual);
+    }
 
     @MockComponent
     private GroupManager groupManager;
@@ -58,25 +70,25 @@ class GroupScriptServiceTest
     @Test
     void canAddAsMemberTargetNull() throws Exception
     {
-        final boolean actual = this.groupScriptService.canAddAsMember(null, ADDED_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(null, CANDIDATE_GROUP);
         assertFalse(actual);
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
     }
 
     @Test
-    void canAddAsMemberMemberNull() throws Exception
+    void canAddAsMemberCandidateNull() throws Exception
     {
-        final boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, null);
+        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, null);
         assertFalse(actual);
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
     }
 
     @Test
-    void canAddAsMemberTargetIsMember() throws Exception
+    void canAddAsMemberTargetIsCandidate() throws Exception
     {
-        final boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, TARGET_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, TARGET_GROUP);
         assertFalse(actual);
         // if the target is equal to the member no need to do more advanced verifications
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
@@ -84,33 +96,74 @@ class GroupScriptServiceTest
     }
 
     @Test
-    void canAddAsMemberIsAlreadyAMemberOf() throws Exception
+    void canAddAsMemberCandidateIsAlreadyAMemberOfTarget() throws Exception
     {
-        when(this.groupManager.getGroups(TARGET_GROUP, null, true)).thenReturn(singletonList(ADDED_GROUP));
+        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(singletonList(CANDIDATE_GROUP));
 
-        final boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, ADDED_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, CANDIDATE_GROUP);
 
         assertFalse(actual);
-        verify(this.groupManager, never()).getMembers(any(), anyBoolean());
+        verify(this.groupManager, never()).getMembers(eq(CANDIDATE_GROUP), anyBoolean());
     }
 
     @Test
-    void canAddAsMemberTargetIsAlreadyAMember() throws Exception
+    void canAddAsMemberLinearHierarchy() throws Exception
     {
-        when(this.groupManager.getGroups(TARGET_GROUP, null, true)).thenReturn(emptyList());
-        when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(singletonList(ADDED_GROUP));
+        /*
+        - B is a member of A
+        - C is a member of B
+        - C can be added to the members of A
+        - B cannot be added to the members of C
+        - A cannot be added to the members of C
+         */
 
-        final boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, ADDED_GROUP);
-        assertFalse(actual);
+        DocumentReference groupA = new DocumentReference("xwiki", "XWiki", "A");
+        DocumentReference groupB = new DocumentReference("xwiki", "XWiki", "B");
+        DocumentReference groupC = new DocumentReference("xwiki", "XWiki", "C");
+
+        when(this.groupManager.getMembers(groupA, false)).thenReturn(singletonList(groupB));
+        when(this.groupManager.getMembers(groupA, true)).thenReturn(asList(groupB, groupC));
+
+        when(this.groupManager.getMembers(groupB, false)).thenReturn(singletonList(groupC));
+        when(this.groupManager.getMembers(groupB, true)).thenReturn(singletonList(groupC));
+
+        when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
+        when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
+
+        assertTrue(this.groupScriptService.canAddAsMember(groupA, groupC));
+        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupA));
+        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
     }
 
     @Test
-    void canAddAsMember() throws Exception
+    void canAddAsMemberNonLinearHierarchy() throws Exception
     {
-        when(this.groupManager.getGroups(TARGET_GROUP, null, true)).thenReturn(emptyList());
-        when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(emptyList());
+        /*
+        - B is a member of A
+        - C is a member of A
+        - C is a member of B
+        - C cannot be added to the members of A
+        - C cannot be added to the members of B
+        - B cannot be added to the members of C
+        - A cannot be added to the members of C
+         */
 
-        final boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, ADDED_GROUP);
-        assertTrue(actual);
+        DocumentReference groupA = new DocumentReference("xwiki", "XWiki", "A");
+        DocumentReference groupB = new DocumentReference("xwiki", "XWiki", "B");
+        DocumentReference groupC = new DocumentReference("xwiki", "XWiki", "C");
+
+        when(this.groupManager.getMembers(groupA, false)).thenReturn(asList(groupB, groupC));
+        when(this.groupManager.getMembers(groupA, true)).thenReturn(asList(groupB, groupC));
+
+        when(this.groupManager.getMembers(groupB, false)).thenReturn(singletonList(groupC));
+        when(this.groupManager.getMembers(groupB, true)).thenReturn(singletonList(groupC));
+
+        when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
+        when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
+
+        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
+        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
+        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
+        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupA));
     }
 }

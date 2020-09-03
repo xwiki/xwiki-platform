@@ -42,9 +42,14 @@
   #if(!$isAjaxRequest)
     $response.sendRedirect($doc.getURL())
   #else
-    #jsonResponse({
-      'ignored': $ignoredGroups
-    })
+    #set ($hasIgnored = !$ignoredGroups.isEmpty())
+    #set ($jsonObject = { 'hasIgnored': $hasIgnored})
+    #if ($hasIgnored)
+      #set ($ignoredGroupsStr = "$stringtool.join($ignoredGroups, ', ')")
+      #set ($discard = $jsonObject.put('ignoredMessage',
+        "$services.localization.render('xe.admin.groups.addIgnored', [$ignoredGroupsStr])"))
+    #end
+    #jsonResponse($jsonObject)
   #end
 #elseif ($isAjaxRequest)
   $response.sendError(401, 'CSRF token verification failed!')

@@ -142,26 +142,24 @@ public class GroupScriptService implements ScriptService
     }
 
     /**
-     * Checks if a group can be added to the members of a group.
+     * Checks if a group (candidate) can be added to the members of another group (target).
+     * A group can be added to the members of another group if neither group already has the other in its members.
+     * A group cannot be added the its own members.
      *
      * @param target The targeted group
-     * @param member The group to be added
-     * @return {@code true} if the candidate member can be added to the members of the target, {@code false} otherwise.
+     * @param candidate The group to be added
+     * @return {@code true} if the candidate can be added to the members of the target, {@code false} otherwise.
      * @since 12.8RC1
      */
-    public boolean canAddAsMember(DocumentReference target, DocumentReference member) throws GroupException
+    public boolean canAddAsMember(DocumentReference target, DocumentReference candidate) throws GroupException
     {
-        final boolean ret;
-        if (target == null || member == null || member.equals(target)) {
+        boolean ret;
+        if (target == null || candidate == null || candidate.equals(target)) {
+            ret = false;
+        } else if (getMembers(target, false).contains(candidate)) {
             ret = false;
         } else {
-            // check if the candidate member is not already one of the members of the target
-            if (getGroupsFromAllWikis(target).contains(member)) {
-                ret = false;
-            } else {
-                // check if the target is not a member of the member
-                ret = !getMembers(target, true).contains(member);
-            }
+            ret = !getMembers(candidate, true).contains(target);
         }
         return ret;
     }

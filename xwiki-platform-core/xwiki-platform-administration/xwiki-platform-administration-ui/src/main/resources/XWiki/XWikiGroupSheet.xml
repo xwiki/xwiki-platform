@@ -222,10 +222,8 @@
       // Reload the live table.
       editgrouptable.refresh();
       // Show notification message.
-      if(response.ignored.size() &gt; 0) {
-        var ignoredGroups = response.ignored.join(', ');
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addIgnored') (" + ignoredGroups + ")",
-          'warning', {timeout: 5});
+      if(response.hasIgnored) {
+        new XWiki.widgets.Notification(response.ignoredMessage, 'warning', {timeout: 5});
       } else {
         new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
       }

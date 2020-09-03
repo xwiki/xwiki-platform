@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.phase.InitializationException;
@@ -39,6 +40,7 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -77,6 +79,8 @@ public class AsynchronousEventStoreTest
             return entry;
         }
 
+        ReentrantLock lock = new ReentrantLock();
+
         @Override
         public Optional<Event> getEvent(String eventId) throws EventStreamException
         {
@@ -102,93 +106,148 @@ public class AsynchronousEventStoreTest
         @Override
         public void initialize() throws InitializationException
         {
-            initialize(2, true, false);
+            initialize(10, true, false);
         }
 
         @Override
         protected EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
         {
-            getEventEntry(status.getEvent().getId(), true).statuses.put(status.getEntityId(), status);
+            this.lock.lock();
 
-            return status;
+            try {
+                getEventEntry(status.getEvent().getId(), true).statuses.put(status.getEntityId(), status);
+
+                return status;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
         {
-            getEventEntry(event.getEvent().getId(), true).mailstatuses.put(event.getEntityId(), event);
+            this.lock.lock();
 
-            return event;
+            try {
+                getEventEntry(event.getEvent().getId(), true).mailstatuses.put(event.getEntityId(), event);
+
+                return event;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected Event syncSaveEvent(Event event) throws EventStreamException
         {
-            getEventEntry(event.getId(), true).event = (DefaultEvent) event;
+            this.lock.lock();
 
-            return event;
+            try {
+                getEventEntry(event.getId(), true).event = (DefaultEvent) event;
+
+                return event;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected Event syncPrefilterEvent(Event event) throws EventStreamException
         {
-            DefaultEvent storeEvent = getEventEntry(event.getId(), true).event;
 
-            storeEvent.setPrefiltered(true);
+            this.lock.lock();
 
-            return storeEvent;
+            try {
+                DefaultEvent storeEvent = getEventEntry(event.getId(), true).event;
+
+                storeEvent.setPrefiltered(true);
+
+                return storeEvent;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
         {
-            EventEntry entry = getEventEntry(status.getEvent().getId(), false);
+            this.lock.lock();
 
-            if (entry != null) {
-                return Optional.ofNullable(entry.statuses.remove(status.getEntityId()));
+            try {
+                EventEntry entry = getEventEntry(status.getEvent().getId(), false);
+
+                if (entry != null) {
+                    return Optional.ofNullable(entry.statuses.remove(status.getEntityId()));
+                }
+
+                return Optional.empty();
+            } finally {
+                this.lock.unlock();
             }
-
-            return Optional.empty();
         }
 
         @Override
         protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
         {
-            this.events.forEach((eventId, entry) -> {
-                if (entry.event.getDate() != null && !entry.event.getDate().after(date)) {
-                    entry.statuses.remove(entityId);
-                }
-            });
+            this.lock.lock();
 
-            return null;
+            try {
+                this.events.forEach((eventId, entry) -> {
+                    if (entry.event.getDate() != null && !entry.event.getDate().after(date)) {
+                        entry.statuses.remove(entityId);
+                    }
+                });
+
+                return null;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
         {
-            EventEntry entry = getEventEntry(event.getEvent().getId(), false);
+            this.lock.lock();
 
-            if (entry != null) {
-                return Optional.ofNullable(entry.mailstatuses.remove(event.getEntityId()));
+            try {
+                EventEntry entry = getEventEntry(event.getEvent().getId(), false);
+
+                if (entry != null) {
+                    return Optional.ofNullable(entry.mailstatuses.remove(event.getEntityId()));
+                }
+
+                return Optional.empty();
+            } finally {
+                this.lock.unlock();
             }
-
-            return Optional.empty();
         }
 
         @Override
         protected Optional<Event> syncDeleteEvent(String eventId) throws EventStreamException
         {
-            Optional<Event> event = getEvent(eventId);
+            this.lock.lock();
 
-            this.events.remove(eventId);
+            try {
+                Optional<Event> event = getEvent(eventId);
 
-            return event;
+                this.events.remove(eventId);
+
+                return event;
+            } finally {
+                this.lock.unlock();
+            }
         }
 
         @Override
         protected Optional<Event> syncDeleteEvent(Event event) throws EventStreamException
         {
-            return syncDeleteEvent(event.getId());
+            this.lock.lock();
+
+            try {
+                return syncDeleteEvent(event.getId());
+            } finally {
+                this.lock.unlock();
+            }
         }
     }
 
@@ -218,6 +277,39 @@ public class AsynchronousEventStoreTest
     }
 
     // Tests
+
+    @Test
+    void getQueueSize() throws InterruptedException
+    {
+        assertEquals(0, this.store.getQueueSize());
+
+        // Lock, add an event and wait for the lock to be in place in the store thread
+        this.store.lock.lock();
+
+        try {
+            this.store.saveEvent(event(""));
+            Thread.sleep(10);
+            assertEquals(0, this.store.getQueueSize());
+
+            this.store.saveEvent(event("id1"));
+
+            assertEquals(1, this.store.getQueueSize());
+
+            this.store.saveEvent(event("id2"));
+
+            assertEquals(2, this.store.getQueueSize());
+
+            this.store.deleteEvent(event("id3"));
+
+            assertEquals(1, this.store.getQueueSize());
+
+            this.store.deleteEvent("id4");
+
+            assertEquals(0, this.store.getQueueSize());
+        } finally {
+            this.store.lock.unlock();
+        }
+    }
 
     @Test
     void event() throws InterruptedException, ExecutionException, EventStreamException

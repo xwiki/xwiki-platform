@@ -45,6 +45,6 @@ public class DefaultSkinExtensionConfiguration implements SkinExtensionConfigura
     @Override
     public boolean shouldRunJavaScriptInStrictMode()
     {
-        return this.xwikiProperties.getProperty("skinx.js.strictMode.enabled", false);
+        return this.xwikiProperties.getProperty("skinx.jsStrictModeEnabled", false);
     }
 }

@@ -1148,6 +1148,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#   follow the ECMAScript strict rules. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 #-#
 #-# The default value is:
-# skinx.js.strictMode.enabled = false
+# skinx.jsStrictModeEnabled = false
 
 $!xwikiPropertiesAdditionalProperties

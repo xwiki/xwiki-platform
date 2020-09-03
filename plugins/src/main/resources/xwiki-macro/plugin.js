@@ -150,6 +150,12 @@
         startMacroComment.replaceWith(wrapper);
       };
 
+      var isWidgetVisible = function(widget) {
+        // We don't use CKEDITOR.dom.element#isVisible() because we want to check that the widget has both width and
+        // height, otherwise the user cannot select it (to edit it for instance).
+        return widget.element.$.offsetHeight && widget.element.$.offsetWidth;
+      };
+
       // Replace the macro marker comments with a DIV or SPAN in order to be able to initialize the macro widgets.
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'macro', {
         toHtml: wrapMacroOutput
@@ -210,8 +216,10 @@
           // Initialize the nested editables.
           macroPlugin.initializeNestedEditables(this, editor);
           // Make sure the user can select the macro widget (e.g. to edit its parameters) by showing a placeholder text
-          // when the macro output is not visible.
-          if (!this.element.isVisible()) {
+          // when the macro output is not visible. When a macro is inserted the widget is initialized while the macro
+          // element is detached: don't add the placeholder text in that case because it's already there from the macro
+          // widget template.
+          if (!this.element.isDetached() && !isWidgetVisible(this)) {
             // The placeholder text is going to be set below when the widget data is set.
             this.element.append(new CKEDITOR.dom.element(this.element.getName()).addClass('macro-placeholder'));
           }

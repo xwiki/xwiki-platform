@@ -78,12 +78,14 @@ public class EventMigrationStep extends AbstractDistributionStep
 
                     long legacyCount = eventStream.countEvents();
 
-                    // The total might not be fully accurate but counting 1 or 2 more events than the reality should not
-                    // have much impact on the logic of that step which is generally used to migrate events that used to
-                    // be only stored in the legacy store
                     long eventCount = (this.eventStore instanceof AbstractAsynchronousEventStore
                         ? ((AbstractAsynchronousEventStore) this.eventStore).getQueueSize() : 0)
                         + this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
+
+                    // Bulletproofing in case some events have been sent to solr but not yet fully taken into account.
+                    // The main target of this step is use cases where there is a lot more legacy events than new
+                    // events.
+                    eventCount += 10;
 
                     if (legacyCount > eventCount) {
                         // There is more legacy events than new store events

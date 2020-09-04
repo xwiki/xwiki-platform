@@ -148,8 +148,8 @@ administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Bestem om sporing i Google Analytics™ er aktiv eller ikke
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=Sosial
+admin.social.description=Konfigurasjon for sosiale funksjoner.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart

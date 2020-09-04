@@ -29,7 +29,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 
 /**
@@ -77,13 +76,7 @@ public class EventMigrationStep extends AbstractDistributionStep
                     EventStream eventStream = this.componentManager.getInstance(EventStream.class);
 
                     long legacyCount = eventStream.countEvents();
-
-                    // The total might not be fully accurate but counting 1 or 2 more events than the reality should not
-                    // have much impact on the logic of that step which is generally used to migrate events that used to
-                    // be only stored in the legacy store
-                    long eventCount = (this.eventStore instanceof AbstractAsynchronousEventStore
-                        ? ((AbstractAsynchronousEventStore) this.eventStore).getQueueSize() : 0)
-                        + this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
+                    long eventCount = this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
 
                     if (legacyCount > eventCount) {
                         // There is more legacy events than new store events

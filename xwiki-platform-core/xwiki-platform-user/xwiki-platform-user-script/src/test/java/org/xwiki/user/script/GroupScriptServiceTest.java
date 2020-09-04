@@ -20,15 +20,21 @@
 package org.xwiki.user.script;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
+
+import ch.qos.logback.classic.Level;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -37,6 +43,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.test.LogLevel.WARN;
 
 /**
  * Test of {@link GroupScriptService}.
@@ -51,63 +58,75 @@ class GroupScriptServiceTest
 
     private static final DocumentReference TARGET_GROUP = new DocumentReference("xwiki", "XWiki", "Target");
 
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
+
     @InjectMockComponents
     private GroupScriptService groupScriptService;
-
-    @Test
-    void canAddAsMember() throws Exception
-    {
-        when(this.groupManager.getMembers(CANDIDATE_GROUP,  true)).thenReturn(emptyList());
-        when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(emptyList());
-
-        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, TARGET_GROUP);
-        assertTrue(actual);
-    }
 
     @MockComponent
     private GroupManager groupManager;
 
     @Test
-    void canAddAsMemberTargetNull() throws Exception
+    void canAddGroupAsMember() throws Exception
     {
-        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, null);
-        assertFalse(actual);
-        verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
-        verify(this.groupManager, never()).getMembers(any(), anyBoolean());
+        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenReturn(emptyList());
+        when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(emptyList());
+
+        boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
+
+        assertTrue(actual);
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    void canAddAsMemberCandidateNull() throws Exception
+    void canAddGroupAsMemberTargetNull() throws Exception
     {
-        boolean actual = this.groupScriptService.canAddAsMember(null, TARGET_GROUP);
+        boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, null);
+
         assertFalse(actual);
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    void canAddAsMemberTargetIsCandidate() throws Exception
+    void canAddGroupAsMemberCandidateNull() throws Exception
     {
-        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, TARGET_GROUP);
+        boolean actual = this.groupScriptService.canAddGroupAsMember(null, TARGET_GROUP);
+
+        assertFalse(actual);
+        verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
+        verify(this.groupManager, never()).getMembers(any(), anyBoolean());
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void canAddGroupAsMemberTargetIsCandidate() throws Exception
+    {
+        boolean actual = this.groupScriptService.canAddGroupAsMember(TARGET_GROUP, TARGET_GROUP);
+
         assertFalse(actual);
         // if the target is equal to the member no need to do more advanced verifications
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    void canAddAsMemberCandidateIsAlreadyAMemberOfTarget() throws Exception
+    void canAddGroupAsMemberCandidateIsAlreadyAMemberOfTarget() throws Exception
     {
         when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(singletonList(CANDIDATE_GROUP));
 
-        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, TARGET_GROUP);
+        boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 
         assertFalse(actual);
         verify(this.groupManager, never()).getMembers(eq(CANDIDATE_GROUP), anyBoolean());
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    void canAddAsMemberLinearHierarchy() throws Exception
+    void canAddGroupAsMemberLinearHierarchy() throws Exception
     {
         /*
         - B is a member of A
@@ -130,13 +149,14 @@ class GroupScriptServiceTest
         when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
         when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
 
-        assertTrue(this.groupScriptService.canAddAsMember(groupC, groupA));
-        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
-        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
+        assertTrue(this.groupScriptService.canAddGroupAsMember(groupC, groupA));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupA, groupC));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupB, groupC));
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    void canAddAsMemberNonLinearHierarchy() throws Exception
+    void canAddGroupAsMemberNonLinearHierarchy() throws Exception
     {
         /*
         - B is a member of A
@@ -161,9 +181,40 @@ class GroupScriptServiceTest
         when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
         when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
 
-        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupA));
-        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
-        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
-        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupC, groupA));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupC, groupB));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupB, groupC));
+        assertFalse(this.groupScriptService.canAddGroupAsMember(groupA, groupC));
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void canAddGroupAsMemberTargetMembersError() throws Exception
+    {
+        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenThrow(new GroupException(""));
+
+        boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
+
+        assertFalse(actual);
+        verify(this.groupManager, never()).getMembers(CANDIDATE_GROUP, true);
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to access the members of the target group [xwiki:XWiki.Target]",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void canAddGroupAsMemberCandidateMembersError() throws Exception
+    {
+        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(emptyList());
+        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenThrow(new GroupException(""));
+
+        boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
+
+        assertFalse(actual);
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to access the members of the candidate group [xwiki:XWiki.Added]",
+            this.logCapture.getMessage(0));
     }
 }

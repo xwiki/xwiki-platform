@@ -26,13 +26,20 @@
     #if ($name.trim() == '')
       #set ($accept = false)
     #else
-      #set ($accept = $services.user.group.canAddAsMember($name, $doc.getDocumentReference()))
+      #set ($candidateDoc = $xwiki.getDocument($name))
+      #set ($isGroup = $candidateDoc.getObject('XWiki.XWikiGroups'))
+      #if ($isGroup)
+        #set ($accept = $services.user.group.canAddGroupAsMember($candidateDoc.getDocumentReference(),
+          $doc.getDocumentReference()))
+      #else
+        #set ($accept = !$doc.getObject('XWiki.XWikiGroups', 'member', $name))
+      #end
     #end
     #if ($accept)
       #set ($obj = $doc.newObject('XWiki.XWikiGroups'))
       #set ($discard = $obj.set('member', $name))
       #set ($dirty = true)
-    #elseif($name != '')
+    #elseif($name != '' && $isGroup)
       #set ($discard = $ignoredGroups.add($name))
     #end
   #end

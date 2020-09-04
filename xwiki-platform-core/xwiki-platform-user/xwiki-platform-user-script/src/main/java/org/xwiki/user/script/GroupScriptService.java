@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -35,7 +36,7 @@ import org.xwiki.user.group.WikiTarget;
 
 /**
  * Groups related script API.
- * 
+ *
  * @version $Id$
  * @since 10.8RC1
  */
@@ -52,12 +53,15 @@ public class GroupScriptService implements ScriptService
     @Inject
     private GroupManager groupManager;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Search groups the passed user or group is member of.
      * <p>
      * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be
      * returned or the whole hierarchy.
-     * 
+     *
      * @param member the group member (user or group)
      * @param wikiTarget the wikis where to search. The following types are supported:
      *            <ul>
@@ -153,19 +157,30 @@ public class GroupScriptService implements ScriptService
      * @param candidate The group to be added
      * @param target The targeted group
      * @return {@code true} if the candidate can be added to the members of the target, {@code false} otherwise.
-     * @throws GroupException when failing to get members
      * @since 12.8RC1
      */
     @Unstable
-    public boolean canAddAsMember(DocumentReference candidate, DocumentReference target) throws GroupException
+    public boolean canAddGroupAsMember(DocumentReference candidate, DocumentReference target)
     {
         boolean ret;
         if (target == null || candidate == null || candidate.equals(target)) {
             ret = false;
-        } else if (getMembers(target, false).contains(candidate)) {
-            ret = false;
         } else {
-            ret = !getMembers(candidate, true).contains(target);
+            try {
+                if (getMembers(target, false).contains(candidate)) {
+                    ret = false;
+                } else {
+                    try {
+                        ret = !getMembers(candidate, true).contains(target);
+                    } catch (GroupException e) {
+                        this.logger.warn("Failed to access the members of the candidate group [{}]", candidate, e);
+                        ret = false;
+                    }
+                }
+            } catch (GroupException e) {
+                this.logger.warn("Failed to access the members of the target group [{}]", target, e);
+                ret = false;
+            }
         }
         return ret;
     }

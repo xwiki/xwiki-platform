@@ -28,13 +28,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
 
 /**
  * Groups related script API.
- *
+ * 
  * @version $Id$
  * @since 10.8RC1
  */
@@ -142,16 +143,21 @@ public class GroupScriptService implements ScriptService
     }
 
     /**
-     * Checks if a group (candidate) can be added to the members of another group (target).
-     * A group can be added to the members of another group if neither group already has the other in its members.
-     * A group cannot be added the its own members.
+     * Checks if a group (candidate) can be added to the members of another group (target).<br />
+     * A group (candidate) can be added to the members of another group (target) if the target is not, transitively,
+     * already part of the members of candidate.<br />
+     * A group cannot be added to its own members.<br />
+     * A group (candidate) cannot be added to the members of a group (target) if candidate is already one of the direct
+     * members of target.<br />
      *
-     * @param target The targeted group
      * @param candidate The group to be added
+     * @param target The targeted group
      * @return {@code true} if the candidate can be added to the members of the target, {@code false} otherwise.
+     * @throws GroupException when failing to get members
      * @since 12.8RC1
      */
-    public boolean canAddAsMember(DocumentReference target, DocumentReference candidate) throws GroupException
+    @Unstable
+    public boolean canAddAsMember(DocumentReference candidate, DocumentReference target) throws GroupException
     {
         boolean ret;
         if (target == null || candidate == null || candidate.equals(target)) {

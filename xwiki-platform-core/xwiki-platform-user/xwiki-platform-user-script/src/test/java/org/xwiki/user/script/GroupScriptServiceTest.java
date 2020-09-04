@@ -60,7 +60,7 @@ class GroupScriptServiceTest
         when(this.groupManager.getMembers(CANDIDATE_GROUP,  true)).thenReturn(emptyList());
         when(this.groupManager.getMembers(TARGET_GROUP, true)).thenReturn(emptyList());
 
-        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, CANDIDATE_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, TARGET_GROUP);
         assertTrue(actual);
     }
 
@@ -70,7 +70,7 @@ class GroupScriptServiceTest
     @Test
     void canAddAsMemberTargetNull() throws Exception
     {
-        boolean actual = this.groupScriptService.canAddAsMember(null, CANDIDATE_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, null);
         assertFalse(actual);
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
@@ -79,7 +79,7 @@ class GroupScriptServiceTest
     @Test
     void canAddAsMemberCandidateNull() throws Exception
     {
-        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, null);
+        boolean actual = this.groupScriptService.canAddAsMember(null, TARGET_GROUP);
         assertFalse(actual);
         verify(this.groupManager, never()).getGroups(any(), any(), anyBoolean());
         verify(this.groupManager, never()).getMembers(any(), anyBoolean());
@@ -100,7 +100,7 @@ class GroupScriptServiceTest
     {
         when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(singletonList(CANDIDATE_GROUP));
 
-        boolean actual = this.groupScriptService.canAddAsMember(TARGET_GROUP, CANDIDATE_GROUP);
+        boolean actual = this.groupScriptService.canAddAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 
         assertFalse(actual);
         verify(this.groupManager, never()).getMembers(eq(CANDIDATE_GROUP), anyBoolean());
@@ -130,9 +130,9 @@ class GroupScriptServiceTest
         when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
         when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
 
-        assertTrue(this.groupScriptService.canAddAsMember(groupA, groupC));
-        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupA));
-        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
+        assertTrue(this.groupScriptService.canAddAsMember(groupC, groupA));
+        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
+        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
     }
 
     @Test
@@ -161,9 +161,9 @@ class GroupScriptServiceTest
         when(this.groupManager.getMembers(groupC, false)).thenReturn(emptyList());
         when(this.groupManager.getMembers(groupC, true)).thenReturn(emptyList());
 
-        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
-        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
-        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
         assertFalse(this.groupScriptService.canAddAsMember(groupC, groupA));
+        assertFalse(this.groupScriptService.canAddAsMember(groupC, groupB));
+        assertFalse(this.groupScriptService.canAddAsMember(groupB, groupC));
+        assertFalse(this.groupScriptService.canAddAsMember(groupA, groupC));
     }
 }

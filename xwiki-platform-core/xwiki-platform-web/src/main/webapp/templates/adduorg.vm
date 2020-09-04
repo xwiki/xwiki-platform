@@ -26,7 +26,7 @@
     #if ($name.trim() == '')
       #set ($accept = false)
     #else
-      #set ($accept = $services.user.group.canAddAsMember($doc.getDocumentReference(), $name))
+      #set ($accept = $services.user.group.canAddAsMember($name, $doc.getDocumentReference()))
     #end
     #if ($accept)
       #set ($obj = $doc.newObject('XWiki.XWikiGroups'))
@@ -39,7 +39,7 @@
   #if ($dirty)
     #set ($discard = $doc.save())
   #end
-  #if(!$isAjaxRequest)
+  #if (!$isAjaxRequest)
     $response.sendRedirect($doc.getURL())
   #else
     #set ($hasIgnored = !$ignoredGroups.isEmpty())
@@ -47,7 +47,7 @@
     #if ($hasIgnored)
       #set ($ignoredGroupsStr = "$stringtool.join($ignoredGroups, ', ')")
       #set ($discard = $jsonObject.put('ignoredMessage',
-        "$services.localization.render('xe.admin.groups.addIgnored', [$ignoredGroupsStr])"))
+        "$services.localization.render('web.groups.administration.groupsIgnored', [$ignoredGroupsStr])"))
     #end
     #jsonResponse($jsonObject)
   #end

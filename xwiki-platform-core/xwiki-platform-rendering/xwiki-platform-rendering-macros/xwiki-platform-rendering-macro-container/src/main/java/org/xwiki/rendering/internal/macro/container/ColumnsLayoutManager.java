@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -48,9 +47,24 @@ import org.xwiki.xml.XMLAttributeValue;
 public class ColumnsLayoutManager implements LayoutManager
 {
     /**
-     * The name of the parameter to convey style information to the HTML (html style attribute).
+     * The CSS class attribute name (used to style the content in CSS).
      */
-    private static final String CLASS_ATTRIBUTE = "class";
+    private static final String CLASS_ATTRIBUTE_NAME = "class";
+
+    /**
+     * The CSS class attribute value to identify a column.
+     */
+    private static final String COLUMN_CLASS_VALUE = "column";
+
+    /**
+     * The CSS class attribute value to identify the first column.
+     */
+    private static final String FIRST_COLUMN_CLASS_VALUE = "first-column";
+
+    /**
+     * The CSS class attribute value to identify the last column.
+     */
+    private static final String LAST_COLUMN_CLASS_VALUE = "last-column";
 
     /**
      * The javascript file skin extension, to fetch the columns layout css.
@@ -62,47 +76,47 @@ public class ColumnsLayoutManager implements LayoutManager
     @Override
     public void layoutContainer(Block container)
     {
-        List<GroupBlock> innerGroups =
-            container.getBlocks(new ClassBlockMatcher(GroupBlock.class), Block.Axes.CHILD);
-        // FIXME Should we cry and throw an exception if ever we meet something else than a group right under
-        // the container macro, or automatically put it in a group maybe ?
+        // The container macro works by having GroupBlock inside the macro content, each group representing a column.
+        // Any top level block that is not a GroupBlock is ignored.
+        // Find all GroupBlocks and thus all column contents to layout.
+        List<GroupBlock> innerGroups = container.getBlocks(new ClassBlockMatcher(GroupBlock.class), Block.Axes.CHILD);
 
         int count = innerGroups.size();
-
-        if (innerGroups.size() == 0) {
-            // nothing inside, nothing to layout
+        if (count == 0) {
+            // No columns. Thus, nothing to layout...
             return;
         }
 
+        // Add CSS for the columns.
         Map<String, Object> skinxParams = new HashMap<>();
         skinxParams.put("forceSkinAction", true);
+        this.ssfx.use("uicomponents/container/columns.css", skinxParams);
 
-        ssfx.use("uicomponents/container/columns.css", skinxParams);
-
-        // add styles to all columns inside
+        // Add style metadata to all columns
         for (int i = 0; i < count; i++) {
             GroupBlock column = innerGroups.get(i);
-            String classValue = "column";
+            XMLAttributeValue classValue = new XMLAttributeValue(column.getParameter(CLASS_ATTRIBUTE_NAME));
+            classValue.addValue(COLUMN_CLASS_VALUE);
             if (i == 0) {
-                // we're at the first element in the list, put a marker. Don't need it to do standard columns layout,
+                // We're at the first column in the list, put a marker. Don't need it to do standard columns layout,
                 // but maybe somebody needs it for customization...
-                classValue = classValue + " first-column";
+                classValue.addValue(FIRST_COLUMN_CLASS_VALUE);
             }
             if (i == count - 1) {
-                // we're at the last element in the list, put a marker
-                classValue = classValue + " last-column";
+                // We're at the last element in the list, put a marker
+                classValue.addValue(LAST_COLUMN_CLASS_VALUE);
             }
-            String oldClass = column.getParameter(CLASS_ATTRIBUTE);
-            column.setParameter(CLASS_ATTRIBUTE, (StringUtils.isEmpty(oldClass) ? classValue : oldClass + " "
-                + classValue));
+            column.setParameter(CLASS_ATTRIBUTE_NAME, classValue.toString());
         }
 
-        // finally, clear the floats introduced by the columns
-        Map<String, String> clearFloatsParams = new HashMap<String, String>();
-        clearFloatsParams.put(CLASS_ATTRIBUTE, "clearfloats");
-        String oldClass = container.getParameter(CLASS_ATTRIBUTE);
-        String newClass = "container-columns container-columns-" + count;
-        container.setParameter(CLASS_ATTRIBUTE, StringUtils.isEmpty(oldClass) ? newClass : oldClass + " " + newClass);
+        // Add metadata to the container
+        XMLAttributeValue classValue = new XMLAttributeValue(container.getParameter(CLASS_ATTRIBUTE_NAME));
+        classValue.addValues("container-columns", "container-columns-" + count);
+        container.setParameter(CLASS_ATTRIBUTE_NAME, classValue.toString());
+
+        // Finally, clear the floats introduced by the columns
+        Map<String, String> clearFloatsParams = new HashMap<>();
+        clearFloatsParams.put(CLASS_ATTRIBUTE_NAME, "clearfloats");
         container.addChild(new GroupBlock(clearFloatsParams));
     }
 

@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.macro.container.LayoutManager;
 import org.xwiki.skinx.SkinExtension;
+import org.xwiki.xml.XMLAttributeValue;
 
 /**
  * Layout manager implementation to layout the group blocks inside a container as columns.

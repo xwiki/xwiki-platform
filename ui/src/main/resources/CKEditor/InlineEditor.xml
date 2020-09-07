@@ -132,7 +132,10 @@
   };
 
   var css = [
+    // Styles for the editor UI (tool bar, dialogs, etc.).
     new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx'),
+    // Custom styles for the edited content.
+    new XWiki.Document('ContentSheet', 'CKEditor').getURL('ssx'),
     $jsontool.serialize($services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
       'plugins/xwiki-resource/resourcePicker.min.css', {'evaluate': true})),
     $jsontool.serialize($services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',

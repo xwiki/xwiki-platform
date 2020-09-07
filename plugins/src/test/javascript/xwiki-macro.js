@@ -48,7 +48,9 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         nestedEditableTypes: {
           'java.util.List<org.xwiki.rendering.block.Block>': {}
         }
-      }
+      },
+      // Style used by the hidden macro output placeholder.
+      contentsCss: 'div.hidden, span.hidden {display: none}'
     });
   });
 
@@ -87,8 +89,14 @@ describe('XWiki Macro Plugin for CKEditor', function() {
 
         editor.config.fullData = true;
         expect(editor.getData()).toBe('<p>before</p>' +
-          '<!--startmacro:warning|-||-|warning--><div class="box warningmessage">warning</div><!--stopmacro-->' +
-          '<!--startmacro:info|-||-|info--><div class="box infomessage">info</div><!--stopmacro-->' +
+          '<!--startmacro:warning|-||-|warning-->' +
+            '<div class="macro-placeholder hidden">macro:warning</div>' +
+            '<div class="box warningmessage">warning</div>' +
+          '<!--stopmacro-->' +
+          '<!--startmacro:info|-||-|info-->' +
+            '<div class="macro-placeholder hidden">macro:info</div>' +
+            '<div class="box infomessage">info</div>' +
+          '<!--stopmacro-->' +
           '<p>after</p>');
 
         done();
@@ -128,8 +136,8 @@ describe('XWiki Macro Plugin for CKEditor', function() {
           '<!--stopmacro-->' +
           '<p>' +
             '<!--startmacro:id|-|name="foo"-->' +
-              '<span id="foo"></span>' +
               '<span class="macro-placeholder">macro:id</span>' +
+              '<span id="foo"></span>' +
             '<!--stopmacro-->' +
           '</p>'
         );
@@ -330,8 +338,10 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       [
         '<p>',
           '<!--startmacro:outer|-|-->',
+            '<span class="macro-placeholder">macro:outer</span>',
             '<span class="macro" data-macro="startmacro:inner|-|">',
-              '<span class="macro-placeholder">macro:inner</span>',
+              // The inner macro is not initialized as a widget because the outer macro is not editable in-place.
+              '<span class="macro-placeholder hidden">macro:inner</span>',
             '</span>',
           '<!--stopmacro-->',
         '</p>'
@@ -370,15 +380,18 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         '<p>',
           '12',
           '<!--startmacro:outer|-|-->',
-          '3<span></span>4',
-          '<span class="macro" data-macro="startmacro:inner|-|">',
-            '5<strong></strong>6',
-          '</span>',
-          '7<i></i>8',
+            '<span class="macro-placeholder hidden">macro:outer</span>',
+            '3<span></span>4',
+            '<span class="macro" data-macro="startmacro:inner|-|">',
+              '<span class="macro-placeholder hidden">macro:inner</span>',
+              '5<strong></strong>6',
+            '</span>',
+            '7<i></i>8',
           '<!--stopmacro-->',
           '90',
         '</p>',
         '<!--startmacro:test|-|-->',
+        '<div class="macro-placeholder hidden">macro:test</div>',
         '<div>',
           '1<em></em>2',
           '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;" ',

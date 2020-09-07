@@ -181,7 +181,9 @@
   padding: 15px 15px 30px;
 }
 
-/* Fix the link styles. The HTML structure is a bit different in edit mode. */
+/* Fix the link styles. The HTML structure is a bit different in edit mode. Note that these styles have been added to
+  the XWiki skin (for in-place editing) in 12.2 and 11.10.4 but we have to keep them here for older versions of XWiki
+  where the CKEditor can be installed. */
 a[data-linktype="external"] {
   background: url("$xwiki.getSkinFile('icons/xwiki/external-link.png')") no-repeat scroll right center transparent;
   padding-right: 12px;

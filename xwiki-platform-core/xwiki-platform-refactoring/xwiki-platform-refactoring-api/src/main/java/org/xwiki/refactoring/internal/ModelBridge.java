@@ -67,13 +67,13 @@ public interface ModelBridge
     /**
      * Delete or move to the recycle bin the specified document.
      * @param documentReference the reference of the document to delete
-     * @param toRecycleBin If {@code true}, the document is moved to the recycle bin (if the recycle bin is not
-     *                    activated, the document is removed permanently nevertheless). If {@code false},
+     * @param skipRecycleBin If {@code false}, the document is moved to the recycle bin (if the recycle bin is not
+     *                    activated, the document is removed permanently nevertheless). If {@code true},
      *                    the document is removed permanently
-     * @return {@code true} if the document was deleted successfully, {@code false} if the delete failed
+     * @return {@code true} if the document was deleted successfully, {@code false} if the delete operation failed
      * @since 12.8RC1
      */
-    boolean delete(DocumentReference documentReference, boolean toRecycleBin);
+    boolean delete(DocumentReference documentReference, boolean skipRecycleBin);
 
     /**
      * Remove the edit lock from the specified document.

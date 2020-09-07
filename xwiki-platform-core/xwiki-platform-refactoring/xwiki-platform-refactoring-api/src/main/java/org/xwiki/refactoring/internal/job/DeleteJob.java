@@ -126,10 +126,10 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        Boolean skipRecycleBin = this.getRequest().getProperty(SKIP_RECYCLE_BIN_PROPERTY);
-        boolean toRecycleBin = !this.configuration.canSkipRecycleBin()
-                                   || !this.documentAccessBridge.isAdvancedUser()
-                                   || !ObjectUtils.defaultIfNull(skipRecycleBin, false);
+        Boolean skipRecycleBinProperty = this.getRequest().getProperty(SKIP_RECYCLE_BIN_PROPERTY);
+        boolean skipRecycleBin = this.configuration.canSkipRecycleBin()
+                                     && this.documentAccessBridge.isAdvancedUser()
+                                     && ObjectUtils.defaultIfNull(skipRecycleBinProperty, false);
         EntitySelection entitySelection = this.concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             // TODO: handle entitySelection == null which means something is wrong
@@ -138,11 +138,11 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);
-        } else if (toRecycleBin) {
+        } else if (!skipRecycleBin) {
             this.modelBridge.delete(documentReference);
             this.logger.debug("[{}] has been successfully moved to the recycle bin.", documentReference);
         } else {
-            this.modelBridge.delete(documentReference, false);
+            this.modelBridge.delete(documentReference, true);
             this.logger.debug("[{}] has been successfully removed.", documentReference);
         }
     }

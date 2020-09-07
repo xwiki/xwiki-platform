@@ -53,4 +53,14 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     {
         this.optionSkipReyclebin.click();
     }
+
+    /**
+     * Confirm the deletion of the page
+     * @return an object representing the UI displayed when a page is deleted
+     */
+    public DeletingPage confirmDeletePage()
+    {
+        clickYes();
+        return new DeletingPage();
+    }
 }

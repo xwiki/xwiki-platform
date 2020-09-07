@@ -139,14 +139,6 @@ public class DeleteAction extends XWikiAction
 
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         String emptyBin = request.getParameter(EMPTY_RECYCLE_BIN);
-        // The document skips the recycle bin only if the user has explicitly made the choice to skip it
-        String skipRecycleBinParam = request.getParameter(SKIP_RECYCLE_BIN_PARAM);
-        boolean skipRecycleBin;
-        if (skipRecycleBinParam == null) {
-            skipRecycleBin = false;
-        } else {
-            skipRecycleBin = Boolean.parseBoolean(skipRecycleBinParam);
-        }
 
         if ("true".equals(emptyBin)) {
             return deleteAllFromRecycleBin(context);
@@ -159,6 +151,8 @@ public class DeleteAction extends XWikiAction
             return true;
         } else {
             // Delete to recycle bin.
+            // The document skips the recycle bin only if the user has explicitly made the choice to skip it.
+            boolean skipRecycleBin = Boolean.parseBoolean(request.getParameter(SKIP_RECYCLE_BIN_PARAM));
             return deleteToRecycleBin(context, skipRecycleBin);
         }
     }

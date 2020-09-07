@@ -227,7 +227,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(1);
 
-        this.modelBridge.delete(sourceReference, false);
+        this.modelBridge.delete(sourceReference, true);
 
         verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (trashed: [{}]).", sourceReference, false);
@@ -241,7 +241,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenThrow(new XWikiException());
         when(sourceDocument.getTranslation()).thenReturn(1);
 
-        boolean actual = this.modelBridge.delete(sourceReference, true);
+        boolean actual = this.modelBridge.delete(sourceReference, false);
 
         assertFalse(actual);
         assertLog(Level.ERROR, "Failed to delete document [{}]  (trashed: [{}]).", sourceReference, true);

@@ -79,7 +79,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public String getLink(String filename, XWikiContext context)
     {
         boolean forceSkinAction = BooleanUtils.toBoolean((Boolean) getParameter("forceSkinAction", filename, context));
-        StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
+        StringBuilder result = new StringBuilder("<script src='");
         result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
         if (forceSkinAction) {
             String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");

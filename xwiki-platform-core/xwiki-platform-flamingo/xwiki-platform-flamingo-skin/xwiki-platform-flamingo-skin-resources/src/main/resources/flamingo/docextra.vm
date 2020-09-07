@@ -104,7 +104,7 @@
     ##
     ## JavaScript code generation
     ##
-    <script type="text/javascript">
+    <script>
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $docextra[0])

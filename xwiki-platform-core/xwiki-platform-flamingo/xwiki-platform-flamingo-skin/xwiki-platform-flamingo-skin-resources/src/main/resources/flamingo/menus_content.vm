@@ -416,7 +416,7 @@
  * Add keyboard shortcuts
  *#
 #macro(keyboardShortcuts)
-  <script type="text/javascript">
+  <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
       shortcut.add("$services.localization.render('core.shortcuts.view.edit')", function() {

@@ -7318,7 +7318,7 @@ public class XWiki implements EventListener
     public String addTooltipJS(XWikiContext context)
     {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("<script type=\"text/javascript\" src=\"");
+        buffer.append("<script src=\"");
         buffer.append(getSkinFile("ajax/wzToolTip.js", context));
         buffer.append("\"></script>");
         // buffer.append("<div id=\"dhtmltooltip\"></div>");

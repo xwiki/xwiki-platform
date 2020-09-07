@@ -91,7 +91,7 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
             return "";
         }
 
-        StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
+        StringBuilder result = new StringBuilder("<script src='");
         result.append(getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);

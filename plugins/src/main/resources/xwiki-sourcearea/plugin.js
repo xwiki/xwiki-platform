@@ -22,6 +22,8 @@
 
   // The following code is partially taken (and adapted) from CKEditor's default sourcearea plugin.
   CKEDITOR.plugins.add('xwiki-sourcearea', {
+    requires: 'xwiki-selection',
+
     init: function(editor) {
       editor.addMode('source', function(callback) {
         var contentsSpace = editor.ui.space('contents');
@@ -217,77 +219,4 @@ define('centerTextAreaSelectionVertically', ['jquery', 'scrollUtils'], function(
   };
 
   return $;
-});
-
-define('scrollUtils', ['jquery'], function($) {
-  /**
-   * Look for the first ancestor, starting from the given element, that has vertical scroll.
-   */
-  var getVerticalScrollParent = function(element) {
-    var parent = element.parentNode;
-    while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
-      parent = parent.parentNode;
-    }
-    return parent;
-  };
-
-  var hasVerticalScrollBar = function(element) {
-    var overflowY = $(element).css('overflow-y');
-    // Use a delta to detect the vertical scroll bar, in order to overcome a bug in Chrome.
-    // See https://bugs.chromium.org/p/chromium/issues/detail?id=34224 (Incorrect scrollHeight on the <body> element)
-    var delta = 4;
-    return element.scrollHeight > (element.clientHeight + delta) && overflowY !== 'hidden' &&
-      // The HTML and BODY tags can have vertical scroll bars even if overflow is visible.
-      (overflowY !== 'visible' || element === element.ownerDocument.documentElement ||
-        element === element.ownerDocument.body);
-  };
-
-  /**
-   * Compute the top offset of the given element within the specified ancestor.
-   */
-  var getRelativeTopOffset = function(element, ancestor) {
-    // Save the vertical scroll position so that we can restore it afterwards.
-    var originalScrollTop = ancestor.scrollTop;
-    // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
-    // its ancestor, is positive.
-    ancestor.scrollTop = 0;
-    var relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
-    // Restore the previous vertical scroll position.
-    ancestor.scrollTop = originalScrollTop;
-    return relativeTopOffset;
-  };
-
-  var isCenteredVertically = function(verticalScrollParent, padding, position) {
-    return position >= (verticalScrollParent.scrollTop + padding) &&
-      position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
-  };
-
-  /**
-   * Center the given element vertically within its scroll parent, if needed.
-   *
-   * @param element the element to center vertically
-   * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
-   *          area; when specified, the element is centered vertically only if it's not already in the center area
-   *          defined by this padding
-   */
-  var centerVertically = function(element, padding) {
-    var verticalScrollParent = getVerticalScrollParent(element);
-    if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
-      if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
-        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
-      }
-    }
-  };
-
-  return {
-    getVerticalScrollParent: getVerticalScrollParent,
-    hasVerticalScrollBar: hasVerticalScrollBar,
-    getRelativeTopOffset: getRelativeTopOffset,
-    isCenteredVertically: isCenteredVertically,
-    centerVertically: centerVertically
-  };
 });

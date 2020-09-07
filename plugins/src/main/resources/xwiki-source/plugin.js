@@ -28,13 +28,7 @@
   CKEDITOR.plugins.xwikiSource = {};
 
   CKEDITOR.plugins.add('xwiki-source', {
-    requires: 'notification,xwiki-loading,xwiki-localization,xwiki-sourcearea',
-
-    onLoad: function() {
-      require(['textSelection'], function(textSelection) {
-        CKEDITOR.plugins.xwikiSource.textSelection = textSelection;
-      });
-    },
+    requires: 'notification,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-sourcearea',
 
     init: function(editor) {
       // The source command is not registered if the editor is loaded in-line.
@@ -157,7 +151,7 @@
     },
 
     startLoading: function(editor) {
-      this.saveSelection(editor);
+      CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
       editor.setLoading(true);
       // Prevent the source command from being enabled while the conversion takes place.
       var sourceCommand = editor.getCommand('source');
@@ -204,211 +198,7 @@
       sourceCommand.running = false;
       sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       editor.setLoading(false);
-      this.restoreSelection(editor);
-    },
-
-    saveSelection: function(editor) {
-      var editable = editor.editable();
-      if (editable) {
-        editor._.textSelection = CKEDITOR.plugins.xwikiSource.textSelection.from(editable.$);
-      } else {
-        delete editor._.textSelection;
-      }
-    },
-
-    restoreSelection: function(editor) {
-      var editable = editor.editable();
-      var textSelection = editor._.textSelection;
-      if (editable && textSelection) {
-        editor.focus();
-        textSelection.applyTo(editable.$);
-        // Update the tool bar state.
-        editor.selectionChange();
-      }
+      CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
     }
   });
 })();
-
-define('node-module', {
-  load: function(name, req, onLoad, config) {
-    window.module = window.module || {};
-    req([name], function () {
-      onLoad(window.module.exports);
-    });
-  }
-});
-
-define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {
-  var isTextInput = function(element) {
-    return typeof element.setSelectionRange === 'function';
-  };
-
-  var getTextSelection = function(element) {
-    if (isTextInput(element)) {
-      return {
-        text: element.value,
-        startOffset: element.selectionStart,
-        endOffset: element.selectionEnd
-      };
-    } else {
-      var selection = element.ownerDocument.defaultView.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        var range = selection.getRangeAt(0);
-        if (elementContainsRange(element, range)) {
-          return getTextSelectionFromRange(element, range);
-        }
-      }
-      return {
-        text: element.textContent,
-        startOffset: 0,
-        endOffset: 0
-      };
-    }
-  };
-
-  var elementContainsRange = function(element, range) {
-    var rangeContainer = range.commonAncestorContainer;
-    // Element#contains() returns false on IE11 if we pass text nodes. Let's pass the parent element in this case.
-    if (rangeContainer.nodeType !== Node.ELEMENT_NODE) {
-      rangeContainer = rangeContainer.parentNode;
-    }
-    return element.contains(rangeContainer);
-  };
-
-  var getTextSelectionFromRange = function(root, range) {
-    var beforeRange = root.ownerDocument.createRange();
-    beforeRange.setStartBefore(root);
-    beforeRange.setEnd(range.startContainer, range.startOffset);
-    var startOffset = beforeRange.toString().length;
-    return {
-      text: root.textContent,
-      startOffset: startOffset,
-      endOffset: startOffset + range.toString().length
-    };
-  };
-
-  var getRangeFromTextSelection = function(root, textSelection) {
-    var start = findTextOffsetInDOM(root, textSelection.startOffset);
-    var end = textSelection.endOffset === textSelection.startOffset ? start :
-      findTextOffsetInDOM(root, textSelection.endOffset);
-    var range = root.ownerDocument.createRange();
-    range.setStart(start.node, start.offset);
-    range.setEnd(end.node, end.offset);
-    return range;
-  };
-
-  var findTextOffsetInDOM = function(root, offset) {
-    var count = 0, node, iterator = root.ownerDocument.createNodeIterator(root, NodeFilter.SHOW_TEXT,
-      // Accept all text nodes (we need this for IE11 which complains that the last 2 arguments are not optional).
-      function(node) {
-        return NodeFilter.FILTER_ACCEPT;
-      }, false);
-    do {
-      node = iterator.nextNode();
-      count += node ? node.nodeValue.length : 0;
-    } while (node && count < offset);
-    if (node) {
-      return {
-        node: node,
-        offset: offset - (count - node.nodeValue.length)
-      };
-    } else {
-      return {
-        node: root,
-        offset: offset > 0 ? root.childNodes.length : 0
-      };
-    }
-  };
-
-  var changeText = function(textSelection, newText) {
-    var changes = diff(textSelection.text, newText);
-    var startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
-    var endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
-      findTextOffsetInChanges(changes, textSelection.endOffset);
-    return {
-      text: newText,
-      startOffset: startOffset,
-      endOffset: endOffset
-    };
-  };
-
-  var findTextOffsetInChanges = function(changes, oldOffset) {
-    var count = 0, newOffset = oldOffset;
-    for (var i = 0; i < changes.length && count < oldOffset; i++) {
-      var change = changes[i];
-      if (change[0] < 0) {
-        // Delete: shift the offset to the left.
-        if (count + change[1].length > oldOffset) {
-          // Shift the offset to the left with the number of deleted characters before the original offset.
-          newOffset -= oldOffset - count;
-        } else {
-          // Shift the offset to the left with the number of deleted characters.
-          newOffset -= change[1].length;
-        }
-        count += change[1].length;
-      } else if (change[0] > 0) {
-        // Insert: shift the offset to the right with the number of inserted characters.
-        newOffset += change[1].length;
-      } else {
-        // Keep: don't change the offset.
-        count += change[1].length;
-      }
-    }
-    return newOffset;
-  };
-
-  var applySelection = function(element, range) {
-    if (isTextInput(element)) {
-      // Scroll the selection into view.
-      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
-      var fullText = element.value;
-      element.value = fullText.substring(0, range.endOffset);
-      // Scroll to the bottom.
-      element.scrollTop = element.scrollHeight;
-      var canScroll = element.scrollHeight > element.clientHeight;
-      element.value = fullText;
-      if (canScroll) {
-        // Scroll to center the selection.
-        element.scrollTop += element.clientHeight / 2;
-      }
-      // And then apply the selection.
-      element.setSelectionRange(range.startOffset, range.endOffset);
-    } else {
-      // Scroll the selection into view.
-      var scrollTarget = range.startContainer;
-      if (scrollTarget.nodeType !== Node.ELEMENT_NODE) {
-        scrollTarget = scrollTarget.parentNode;
-      }
-      scrollUtils.centerVertically(scrollTarget, 65);
-      // And then apply the selection.
-      var selection = element.ownerDocument.defaultView.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  };
-
-  return {
-    from: function(element) {
-      return $.extend({}, this, getTextSelection(element));
-    },
-    applyTo: function(element) {
-      var range;
-      if (isTextInput(element)) {
-        range = this.withText(element.value);
-      } else {
-        range = this.withText(element.textContent).asRange(element);
-      }
-      applySelection(element, range);
-    },
-    withText: function(text) {
-      if (this.text === text) {
-        return this;
-      } else {
-        return $.extend({}, this, changeText(this, text));
-      }
-    },
-    asRange: function(root) {
-      return getRangeFromTextSelection(root, this);
-    }
-  };
-});

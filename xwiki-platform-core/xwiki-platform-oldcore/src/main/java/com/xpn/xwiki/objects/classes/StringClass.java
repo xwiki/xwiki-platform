@@ -128,13 +128,23 @@ public class StringClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        String result;
-        if (prop != null) {
-            result = prop.toText();
+        String content = getPropertyText((BaseProperty) object.safeget(name));
+        buffer.append(XMLUtils.escapeElementText(content));
+    }
+
+    /**
+     * Get the text of the base property. Returns the empty string if the base property is null.
+     * @param property the base property
+     * @return the text of the base property. The empty string is returned if the base property is null
+     */
+    protected String getPropertyText(BaseProperty property)
+    {
+        String ret;
+        if (property != null) {
+            ret = property.toText();
         } else {
-            result = "";
+            ret = "";
         }
-        buffer.append(XMLUtils.minimalEscape(result));
+        return ret;
     }
 }

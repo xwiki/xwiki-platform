@@ -381,18 +381,13 @@ public class TextAreaClass extends StringClass
                 buffer.append(result);
             }
         } else {
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            String result;
-            if (prop != null) {
-                result = prop.toText();
-            } else {
-                result = "";
-            }
+            String content = getPropertyText((BaseProperty) object.safeget(name));
+
             if (doc != null) {
                 String syntax = getObjectDocumentSyntax(object, context).toIdString();
-                buffer.append(context.getDoc().getRenderedContent(result, syntax, context));
+                buffer.append(context.getDoc().getRenderedContent(content, syntax, context));
             } else {
-                buffer.append(result);
+                buffer.append(content);
             }
         }
     }

@@ -98,4 +98,16 @@ public class AllITs
     class NestedSectionEditIT extends SectionEditIT
     {
     }
+
+    @Nested
+    @DisplayName("Comment as admin tests")
+    class NestedCommentAsAdminIT extends CommentAsAdminIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Comment as guest tests")
+    class NestedCommentAsGuestIT extends CommentAsGuestIT
+    {
+    }
 }

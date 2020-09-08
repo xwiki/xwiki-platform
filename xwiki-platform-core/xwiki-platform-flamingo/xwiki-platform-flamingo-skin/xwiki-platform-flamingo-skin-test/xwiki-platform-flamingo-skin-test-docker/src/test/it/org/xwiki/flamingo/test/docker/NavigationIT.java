@@ -108,7 +108,7 @@ public class NavigationIT
         viewPage.useShortcutKeyForRightsEditing();
         assertTrue(testUtils.isInAdminMode());
         AdministrationPage administrationPage = new AdministrationPage();
-        assertTrue(administrationPage.hasSection("PageRights"));
+        assertTrue(administrationPage.hasSection("PageRights")); // This is failing here
 
         // Test Object edit mode key
         viewPage = testUtils.gotoPage(testReference);

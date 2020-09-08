@@ -25,231 +25,231 @@ import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.LSInput;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link org.xwiki.xml.script.XMLScriptService}.
- * 
+ *
  * @version $Id$
  * @since 2.7RC1
  */
-public class XMLScriptServiceTest extends AbstractComponentTestCase
+@ComponentTest
+public class XMLScriptServiceTest
 {
+    @InjectMockComponents
     private XMLScriptService xml;
 
-    @Override
-    public void setUp() throws Exception
-    {
-        this.xml = getComponentManager().getInstance(ScriptService.class, "xml");
-    }
-
     @Test
-    public void testGetDomDocument()
+    void testGetDomDocument()
     {
         // Nothing much that we can test here...
-        Assert.assertNotNull(this.xml.createDOMDocument());
+        assertNotNull(this.xml.createDOMDocument());
     }
 
     @Test
-    public void testParseString()
+    void testParseString()
     {
         Document result = this.xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>");
-        Assert.assertNotNull("Failed to parse content", result);
-        Assert.assertEquals("Incorrect root node", "a", result.getDocumentElement().getLocalName());
+        assertNotNull(result, "Failed to parse content");
+        assertEquals("a", result.getDocumentElement().getLocalName(), "Incorrect root node");
     }
 
     @Test
-    public void testParseByteArray() throws UnsupportedEncodingException
+    void testParseByteArray() throws UnsupportedEncodingException
     {
         Document result = this.xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>".getBytes("UTF-8"));
-        Assert.assertNotNull("Failed to parse content", result);
-        Assert.assertEquals("Incorrect root node", "a", result.getDocumentElement().getLocalName());
+        assertNotNull(result, "Failed to parse content");
+        assertEquals("a", result.getDocumentElement().getLocalName(), "Incorrect root node");
     }
 
     @Test
-    public void testParseInputStream() throws UnsupportedEncodingException
+    void testParseInputStream() throws UnsupportedEncodingException
     {
         Document result = this.xml.parse(
             new ByteArrayInputStream("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>".getBytes("UTF-8")));
-        Assert.assertNotNull("Failed to parse content", result);
-        Assert.assertEquals("Incorrect root node", "a", result.getDocumentElement().getLocalName());
+        assertNotNull(result, "Failed to parse content");
+        assertEquals("a", result.getDocumentElement().getLocalName(), "Incorrect root node");
     }
 
     @Test
-    public void testParseWithDifferentEncoding() throws UnsupportedEncodingException
+    void testParseWithDifferentEncoding() throws UnsupportedEncodingException
     {
         Document result =
             this.xml.parse("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><a>\u00E9</a>".getBytes("ISO-8859-1"));
-        Assert.assertNotNull("Failed to parse content", result);
-        Assert.assertEquals("Incorrect root node", "a", result.getDocumentElement().getLocalName());
-        Assert.assertEquals("Incorrect content", "\u00E9", result.getDocumentElement().getTextContent());
+        assertNotNull(result, "Failed to parse content");
+        assertEquals("a", result.getDocumentElement().getLocalName(), "Incorrect root node");
+        assertEquals("\u00E9", result.getDocumentElement().getTextContent(), "Incorrect content");
     }
 
     @Test
-    public void testParseWithWrongEncoding() throws UnsupportedEncodingException
+    void testParseWithWrongEncoding() throws UnsupportedEncodingException
     {
         Document result =
             this.xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>\u00E9</a>".getBytes("ISO-8859-1"));
-        Assert.assertNull("Content should be invalid with the specified encoding", result);
+        assertNull(result, "Content should be invalid with the specified encoding");
     }
 
     @Test
-    public void testParseWithoutXMLDeclaration()
+    void testParseWithoutXMLDeclaration()
     {
         Document result = this.xml.parse("<a>\u00E9</a>");
-        Assert.assertNotNull("Failed to parse content", result);
-        Assert.assertEquals("Incorrect root node", "a", result.getDocumentElement().getLocalName());
+        assertNotNull(result, "Failed to parse content");
+        assertEquals("a", result.getDocumentElement().getLocalName(), "Incorrect root node");
     }
 
     @Test
-    public void testParseInvalidDocument()
+    void testParseInvalidDocument()
     {
         Document result = this.xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a></b>");
-        Assert.assertNull("Invalid content shouldn't be parsed", result);
+        assertNull(result, "Invalid content shouldn't be parsed");
     }
 
     @Test
-    public void testParseNull()
+    void testParseNull()
     {
         Document result = this.xml.parse((String) null);
-        Assert.assertNull("Null Document input shouldn't be parsed", result);
+        assertNull(result, "Null Document input shouldn't be parsed");
         result = this.xml.parse((byte[]) null);
-        Assert.assertNull("Null byte[] input shouldn't be parsed", result);
+        assertNull(result, "Null byte[] input shouldn't be parsed");
         result = this.xml.parse((ByteArrayInputStream) null);
-        Assert.assertNull("Null InputStream input shouldn't be parsed", result);
+        assertNull(result, "Null InputStream input shouldn't be parsed");
         result = this.xml.parse((LSInput) null);
-        Assert.assertNull("Null LSInput input shouldn't be parsed", result);
+        assertNull(result, "Null LSInput input shouldn't be parsed");
     }
 
     @Test
-    public void testParseAndSerialize()
+    void testParseAndSerialize()
     {
         String content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>\u00E9</a>";
         String result = this.xml.serialize(this.xml.parse(content));
-        Assert.assertEquals("Not identical content after parse + serialize", content, result);
+        assertEquals(content, result, "Not identical content after parse + serialize");
 
         content = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<a>\u00E9</a>";
         result = this.xml.serialize(this.xml.parse(content));
-        Assert.assertEquals("Not identical content after parse + serialize", content, result);
+        assertEquals(content, result, "Not identical content after parse + serialize");
 
         content = "<a>\u00E9</a>";
         result = this.xml.serialize(this.xml.parse(content), false);
-        Assert.assertEquals("Not identical content after parse + serialize", content, result);
+        assertEquals(content, result, "Not identical content after parse + serialize");
     }
 
     @Test
-    public void testSerialize()
+    void testSerialize()
     {
         Document d = createSimpleDocument();
         String result = this.xml.serialize(d);
-        Assert.assertEquals("Wrong serialization", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>\u00E9</a>", result);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>\u00E9</a>", result, "Wrong serialization");
     }
 
     @Test
-    public void testSerializeDocumentElement()
+    void testSerializeDocumentElement()
     {
         Document d = createSimpleDocument();
         String result = this.xml.serialize(d.getDocumentElement());
-        Assert.assertEquals("Wrong serialization", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>\u00E9</a>", result);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>\u00E9</a>", result, "Wrong serialization");
     }
 
     @Test
-    public void testSerializeNode()
+    void testSerializeNode()
     {
         Document d = createSimpleDocument();
         Element b = d.createElement("b");
         b.setTextContent("c");
         d.getDocumentElement().appendChild(b);
         String result = this.xml.serialize(d.getDocumentElement().getElementsByTagName("b").item(0));
-        Assert.assertEquals("Wrong serialization", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<b>c</b>", result);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<b>c</b>", result, "Wrong serialization");
     }
 
     @Test
-    public void testSerializeNull()
+    void testSerializeNull()
     {
-        Assert.assertEquals("Wrong serialization for null document", "", this.xml.serialize(null));
+        assertEquals("", this.xml.serialize(null), "Wrong serialization for null document");
     }
 
     @Test
-    public void testSerializeWithoutXmlDeclaration()
+    void testSerializeWithoutXmlDeclaration()
     {
         Document d = createSimpleDocument();
         String result = this.xml.serialize(d.getDocumentElement(), false);
-        Assert.assertEquals("Wrong serialization", "<a>\u00E9</a>", result);
+        assertEquals("<a>\u00E9</a>", result, "Wrong serialization");
     }
 
     @Test
-    public void testNewlineSerialization()
+    void testNewlineSerialization()
     {
         Document d = this.xml.parse("<a>a\nb\n</a>");
         String result = this.xml.serialize(d, false);
-        Assert.assertEquals("Wrong newlines", "<a>a\nb\n</a>", result);
+        assertEquals("<a>a\nb\n</a>", result, "Wrong newlines");
 
         d = this.xml.parse("<a>a\r\nb\r\n</a>");
         result = this.xml.serialize(d, false);
-        Assert.assertEquals("Wrong newlines", "<a>a\nb\n</a>", result);
+        assertEquals("<a>a\nb\n</a>", result, "Wrong newlines");
 
         d = this.xml.parse("<a>a\rb\r</a>");
         result = this.xml.serialize(d, false);
-        Assert.assertEquals("Wrong newlines", "<a>a\nb\n</a>", result);
+        assertEquals("<a>a\nb\n</a>", result, "Wrong newlines");
     }
 
     @Test
-    public void testSerializationWithDoctype()
+    void testSerializationWithDoctype()
     {
         Document d = this.xml.parse("<?xml version='1.0' encoding='UTF-8' ?>"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
             + "<html><body>a</body></html>");
         String result = this.xml.serialize(d, true);
-        Assert.assertEquals("Failed Doctype", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-            + "<html><body>a</body></html>", result);
+            + "<html><body>a</body></html>", result, "Failed Doctype");
         result = this.xml.serialize(d, false);
-        Assert.assertEquals("Failed Doctype", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+        assertEquals("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-            + "<html><body>a</body></html>", result);
+            + "<html><body>a</body></html>", result, "Failed Doctype");
     }
 
     @Test
-    public void testDoctypeSerialization()
+    void testDoctypeSerialization()
     {
         Document d = this.xml.parse("<?xml version='1.0' encoding='UTF-8' ?>"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
             + "<html><body>a</body></html>");
         String result = this.xml.serialize(d.getDoctype(), true);
-        Assert.assertEquals("Doctype alone shouldn't be serialized", "", result);
+        assertEquals("", result, "Doctype alone shouldn't be serialized");
     }
 
     @Test
-    public void testSerializeToSmallerCharset()
+    void testSerializeToSmallerCharset()
     {
         Document d = this.xml.parse("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><a>\u0345</a>");
         String result = this.xml.serialize(d);
-        Assert.assertFalse("Non-latin1 character shouldn't be present in the output", result.contains("\u0345"));
+        assertFalse(result.contains("\u0345"), "Non-latin1 character shouldn't be present in the output");
     }
 
     @Test
-    public void testTransformDocument()
+    void testTransformDocument()
     {
         Document d = this.xml.parse("<a b='c'>d</a>");
         Document s = this.xml.parse("<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>" +
             "<xsl:output method='xml' omit-xml-declaration='yes'/>"
             + "<xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>");
         String result = this.xml.transform(d, s);
-        Assert.assertEquals("<a/>", result);
+        assertEquals("<a/>", result);
     }
 
     @Test
-    public void testTransformByteArray() throws UnsupportedEncodingException
+    void testTransformByteArray() throws UnsupportedEncodingException
     {
         byte[] d = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>".getBytes("UTF-8");
         byte[] s = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -257,11 +257,11 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
             "<xsl:output method='xml' omit-xml-declaration='yes'/>"
             + "<xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>").getBytes("UTF-8");
         String result = this.xml.transform(d, s);
-        Assert.assertEquals("<a/>", result);
+        assertEquals("<a/>", result);
     }
 
     @Test
-    public void testTransformString()
+    void testTransformString()
     {
         String d = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>";
         String s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -269,79 +269,79 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
             "<xsl:output method='xml' omit-xml-declaration='yes'/>"
             + "<xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>";
         String result = this.xml.transform(d, s);
-        Assert.assertEquals("<a/>", result);
+        assertEquals("<a/>", result);
     }
 
     @Test
-    public void testTransformWithNullInputs()
+    void testTransformWithNullInputs()
     {
         StreamSource d = new StreamSource(new StringReader("<a b='c'>d</a>"));
         StreamSource s = new StreamSource(new StringReader(
             "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'><xsl:output method='xml'/>"
             + "<xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>"));
         String result = this.xml.transform(null, s);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform(d, null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform((StreamSource) null, (StreamSource) null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
     }
 
     @Test
-    public void testTransformWithNullDocuments()
+    void testTransformWithNullDocuments()
     {
         Document d = this.xml.parse("<a b='c'>d</a>");
         Document s = this.xml.parse("<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>" +
             "<xsl:output method='xml'/><xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>");
         String result = this.xml.transform(null, s);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform(d, null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform((Document) null, (Document) null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
     }
 
     @Test
-    public void testTransformWithNullStrings()
+    void testTransformWithNullStrings()
     {
         String d = "<a b='c'>d</a>";
         String s = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>" +
             "<xsl:output method='xml'/><xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>";
         String result = this.xml.transform(null, s);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform(d, null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform((String) null, (String) null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
     }
 
     @Test
-    public void testTransformWithNullByteArrays() throws UnsupportedEncodingException
+    void testTransformWithNullByteArrays() throws UnsupportedEncodingException
     {
         byte[] d = "<a b='c'>d</a>".getBytes("UTF-8");
         byte[] s = ("<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>" +
             "<xsl:output method='xml'/><xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>")
             .getBytes();
         String result = this.xml.transform(null, s);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform(d, null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
         result = this.xml.transform((byte[]) null, (byte[]) null);
-        Assert.assertNull(null, result);
+        assertNull(null, result);
     }
 
     @Test
-    public void testTransformWithInvalidSheet()
+    void testTransformWithInvalidSheet()
     {
         Document d = this.xml.parse("<a b='c'>d</a>");
         Document s = this.xml.parse("<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>" +
             "<xsl:output method='xml'/><xsl:template match='node()'><xsl:copy/></xsl:template></xsl:stylesheet>");
         String result = this.xml.transform(s, d);
-        Assert.assertEquals(null, result);
+        assertEquals(null, result);
     }
 
     @Test
-    public void testTransformToText()
+    void testTransformToText()
     {
         Document d = this.xml.parse("<a b='c'>d</a>");
         Document s =
@@ -349,7 +349,58 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
             "<xsl:output method='text'/><xsl:template match='node()'><xsl:value-of select='@*'/></xsl:template>"
             + "</xsl:stylesheet>");
         String result = this.xml.transform(d, s);
-        Assert.assertEquals("c", result);
+        assertEquals("c", result);
+    }
+
+    @Test
+    void escape()
+    {
+        assertEquals("&#60;a b=&#39;c&#39;&#62;d&#60;/a&#62;", XMLScriptService.escape("<a b='c'>d</a>"));
+    }
+
+    @Test
+    void escapeNull()
+    {
+        assertNull(XMLScriptService.escape(null));
+    }
+
+    @Test
+    void escapeForAttributeValue()
+    {
+        assertEquals("&#60;a b=&#39;c&#39;&#62;d&#60;/a&#62;",
+            XMLScriptService.escapeForAttributeValue("<a b='c'>d</a>"));
+    }
+
+    @Test
+    void escapeForAttributeValueNull()
+    {
+        assertNull(XMLScriptService.escapeForAttributeValue(null));
+    }
+
+    @Test
+    void escapeForElementContent()
+    {
+        assertEquals("&#60;a b='c'&#62;d&#60;/a&#62;",
+            XMLScriptService.escapeForElementContent("<a b='c'>d</a>"));
+    }
+
+    @Test
+    void escapeForElementContentNull()
+    {
+        assertNull(XMLScriptService.escapeForElementContent(null));
+    }
+
+    @Test
+    void unescape()
+    {
+        assertEquals("<a b='c'>d</a>",
+            XMLScriptService.unescape("&#60;a b='c'&#62;d&#60;/a&#62;"));
+    }
+
+    @Test
+    void unescapeNull()
+    {
+        assertNull(XMLScriptService.unescape(null));
     }
 
     private Document createSimpleDocument()

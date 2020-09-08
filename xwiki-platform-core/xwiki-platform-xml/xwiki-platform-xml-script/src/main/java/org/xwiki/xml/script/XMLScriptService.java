@@ -22,6 +22,7 @@ package org.xwiki.xml.script;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -81,7 +82,10 @@ public class XMLScriptService implements ScriptService
      */
     public static String escape(Object content)
     {
-        return XMLUtils.escape(content);
+        // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
+        // objects from being converted using other conversion methods by the Velocity converters during the method
+        // call.
+        return XMLUtils.escape(Objects.toString(content, null));
     }
 
     /**
@@ -93,7 +97,10 @@ public class XMLScriptService implements ScriptService
      */
     public static String escapeForAttributeValue(Object content)
     {
-        return XMLUtils.escapeAttributeValue(content);
+        // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
+        // objects from being converted using other conversion methods by the Velocity converters during the method
+        // call.
+        return XMLUtils.escapeAttributeValue(Objects.toString(content, null));
     }
 
     /**
@@ -105,7 +112,10 @@ public class XMLScriptService implements ScriptService
      */
     public static String escapeForElementContent(Object content)
     {
-        return XMLUtils.escapeElementContent(content);
+        // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
+        // objects from being converted using other conversion methods by the Velocity converters during the method
+        // call.
+        return XMLUtils.escapeElementContent(Objects.toString(content, null));
     }
 
     /**
@@ -117,7 +127,10 @@ public class XMLScriptService implements ScriptService
      */
     public static String unescape(Object content)
     {
-        return XMLUtils.unescape(content);
+        // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
+        // objects from being converted using other conversion methods by the Velocity converters during the method
+        // call.
+        return XMLUtils.unescape(Objects.toString(content, null));
     }
 
     /**

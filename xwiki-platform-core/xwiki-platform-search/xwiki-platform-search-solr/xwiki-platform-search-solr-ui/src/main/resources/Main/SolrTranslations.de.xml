@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Solr Suche Administration
 solr.admin.submit=Ausführen
-### Missing: solr.admin.error.action={0} failed:
+solr.admin.error.action={0} fehlgeschlagen:
 solr.admin.error.notallowed=Sie sind zur Ausführung dieser Aktion nicht berechtigt.
 solr.admin.error.norights=Sie benötigen Adminstratorenrechte, um diesen Abschnitt zu sehen.
-### Missing: solr.admin.success.action={0} successfully triggered.
+solr.admin.success.action={0} erfolgreich gestartet.
 
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Länge der Warteschlange
@@ -59,12 +59,12 @@ solr.admin.indexing.wiki.select_farm=Alle Wikis
 solr.admin.indexing.query.label=Einschränkende Abfrage
 solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
 
-### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
+solr.admin.info.affectedDocuments=Betroffene Dokumente im Index:
 
 solr.sortBy=Sortierung:
 solr.sortBy.score=Relevanz
 solr.sortBy.title_sort=Titel
-solr.sortBy.date=Datum
+solr.sortBy.date=Letztes Bearbeitungsdatum
 solr.sortBy.author_display_sort=Letzter Autor
 solr.sortBy.filename_sort=Dateiname
 solr.sortBy.attsize_sort=Dateigröße
@@ -73,25 +73,25 @@ solr.sortBy.attauthor_display_sort=Hochgeladen von
 solr.sortOrder.asc=Aufsteigend
 solr.sortOrder.desc=Absteigend
 
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
-### Missing: solr.options.facet=Facets
-### Missing: solr.options.facet.title=Allow extra filtering of the result
+solr.options=Anzeigen:
+solr.options.highlight=Hervorheben
+solr.options.highlight.title=Einen Auszug dessen anzeigen, was mit den Suchergebnissen übereinstimmt
+solr.options.facet=Facetten
+solr.options.facet.title=Erlauben Sie die zusätzliche Filterung der Ergebnisse
 
 solr.result.language=Sprache
-### Missing: solr.result.locatedIn=Located in
+solr.result.locatedIn=Speicherort
 solr.result.author=Geändert von {0} am {1}
 solr.result.mediaType=Dateityp {0}
 solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2})
 solr.result.highlightAll=Alle Vorkommen anzeigen
 
 solr.facets.title=Suche verfeinern
-solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen.
+solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen
 solr.facets.resetAll=Zurücksetzen
 solr.facets.expandAll=Alles aufklappen
 solr.facets.collapseAll=Alles zuklappen
-solr.facets.emptyValue=-/-
+solr.facets.emptyValue=Leerer Wert
 solr.facets.moreValues={0} weitere
 
 solr.filterBy.type.document=Dokument
@@ -103,20 +103,20 @@ solr.filterBy.fileType.image=Bild
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
 solr.filterBy.fileType.text=Text
-### Missing: solr.filterBy.fileType.office=Office
-### Missing: solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.office=Büro
+solr.filterBy.fileType.word=Word
 solr.filterBy.fileType.presentation=Präsentation
 solr.filterBy.fileType.spreadsheet=Tabellenkalkulation
 solr.filterBy.fileType.archive=Archiv
 solr.filterBy.fileType.font=Schrittyp
 solr.filterBy.fileType.other=Anders
-solr.facet.fileType.text.plain=Test
+solr.facet.fileType.text.plain=Reiner Text
 solr.facet.fileType.text.javascript=JavaScript
 solr.facet.fileType.text.java-source=Java Quelltext
 solr.facet.fileType.text.sh=Shellskript
 solr.facet.fileType.image.icon=Piktogramm
-### Missing: solr.facet.fileType.archive.java-archive=JAR
-### Missing: solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Binärdaten
 
 solr.facet.date.today=Heute
@@ -146,19 +146,19 @@ solr.field.locale=Sprache
 solr.field.locale.emptyValue=Ohne Sprachangabe
 solr.field.locale.emptyValue.hint=Einige Dokumente sind mit keiner Sprache assoziiert, weil sie entweder Programmcode enthalten (welcher keiner natürlichen Spache entspricht) oder weil sie eine Benutzerschnittstelle sind (wie diese Seite).
 solr.field.wiki=Wiki
-### Missing: solr.field.spaces=Location
+solr.field.spaces=Speicherort
 solr.field.space_exact=Bereich
-### Missing: solr.field.space_facet=Location
+solr.field.space_facet=Speicherort
 solr.field.name=Dokument
 solr.field.name_exact=Dokument
 solr.field.title=Titel
 solr.field.author=Letzter Autor
-solr.field.author_display=Autor
+solr.field.author_display=Letzter Autor
 solr.field.creator=Ersteller
 solr.field.creator_display=Ersteller
-solr.field.date=Letzte Änderung
+solr.field.date=Letztes Bearbeitungsdatum
 solr.field.creationdate=Erstelldatum
-solr.field.doccontent=Angezeiger Inhalt des Dokuments
+solr.field.doccontent=Angezeigter Inhalt des Dokuments
 solr.field.doccontentraw=Quelltext des Dokuments
 solr.field.class=Objekttyp
 solr.field.class.definedBy=Definiert durch {0} » {1}
@@ -174,8 +174,8 @@ solr.field.attauthor_display=Hochgeladen von
 solr.field.attdate=Hochgeladen am
 solr.field.attsize=Dateigröße
 
-### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
-### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+solr.uix.docdoesnotexist.title=Haben Sie stattdessen eine der folgenden Seiten gesucht?
+solr.uix.attachmentdoesnotexist.title=Haben Sie stattdessen nach einem der folgenden Anhänge gesucht?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

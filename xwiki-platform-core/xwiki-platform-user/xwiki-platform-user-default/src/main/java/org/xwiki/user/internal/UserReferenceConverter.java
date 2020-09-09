@@ -23,18 +23,12 @@ import java.lang.reflect.Type;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
@@ -47,12 +41,8 @@ import com.xpn.xwiki.XWikiContext;
 public class UserReferenceConverter extends AbstractConverter<UserReference>
 {
     @Inject
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
-
-    @Inject
     @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private UserReferenceResolver<String> userReferenceResolver;
 
     @Override
     protected UserReference convertToType(Type targetType, Object value)
@@ -61,7 +51,6 @@ public class UserReferenceConverter extends AbstractConverter<UserReference>
             return null;
         }
 
-        DocumentReference documentReference = this.documentReferenceResolver.resolve(value.toString());
-        return this.userReferenceResolver.resolve(documentReference);
+        return this.userReferenceResolver.resolve(value.toString());
     }
 }

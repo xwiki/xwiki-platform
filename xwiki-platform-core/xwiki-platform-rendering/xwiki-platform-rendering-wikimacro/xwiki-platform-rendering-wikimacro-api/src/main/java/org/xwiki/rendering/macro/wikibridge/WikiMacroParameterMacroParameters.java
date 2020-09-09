@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.wikimacro.macro.wikimacroparameter;
+package org.xwiki.rendering.macro.wikibridge;
 
+import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.stability.Unstable;
 
 /**
- * Parameters for {@link WikiMacroParameterMacro}.
+ * Parameters for wikimacroparameter macro.
  *
  * @version $Id$
  * @since 11.5RC1
@@ -35,13 +36,15 @@ public class WikiMacroParameterMacroParameters
     /**
      * @return the name of the macro.
      */
+    @PropertyMandatory
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
      * Set the name...
+     * 
      * @param name the name to set.
      */
     public void setName(String name)

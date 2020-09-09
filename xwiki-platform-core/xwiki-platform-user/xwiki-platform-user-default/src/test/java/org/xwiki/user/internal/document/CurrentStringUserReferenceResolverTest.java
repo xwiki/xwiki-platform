@@ -17,54 +17,54 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
-
-import java.lang.reflect.Type;
+package org.xwiki.user.internal.document;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link UserReferenceConverter}.
+ * Test of {@link CurrentStringUserReferenceResolver}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 1.8RC1
  */
 @ComponentTest
-class UserReferenceConverterTest
+class CurrentStringUserReferenceResolverTest
 {
     @InjectMockComponents
-    private UserReferenceConverter converter;
+    private CurrentStringUserReferenceResolver resolver;
 
     @MockComponent
     @Named("current")
-    private UserReferenceResolver<String> userReferenceResolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
 
     @Test
-    void convertToType()
+    void resolve()
     {
-        UserReference userReference = () -> false;
-        when(this.userReferenceResolver.resolve("XWiki.U1")).thenReturn(userReference);
-
-        UserReference actual = this.converter.convertToType(mock(Type.class), "XWiki.U1");
-        assertEquals(userReference, actual);
+        when(this.documentReferenceResolver.resolve("wiki:space.page")).thenReturn(new DocumentReference("wiki", "space", "page"));
+        UserReference reference = this.resolver.resolve("wiki:space.page");
+        assertNotNull(reference);
+        assertEquals("wiki:space.page", ((DocumentUserReference) reference).getReference().toString());
     }
 
     @Test
-    void convertToTypeValueNull()
+    void resolveWhenNull()
     {
-        assertNull(this.converter.convertToType(mock(Type.class), null));
-
+        UserReference reference = this.resolver.resolve(null);
+        assertSame(CurrentUserReference.INSTANCE, reference);
     }
 }

@@ -26,7 +26,7 @@ define(['jquery', 'textSelection'], function($, textSelectionAPI) {
 
       assertSelection('abc [[ab|c>>x|yz]] xyz', 'abc <a href="#xyz">ab|c|</a> xyz', 'abc [[ab|c|>>xyz]] xyz');
 
-      assertSelection('abc [|[abc>>xyz]|] xyz', 'abc <a href="#xyz">|abc|</a> xyz', 'abc |[[abc|>>xyz]] xyz');
+      assertSelection('abc [|[abc>>xyz]|] xyz', 'abc |<a href="#xyz">abc|</a> xyz', 'abc |[[abc|>>xyz]] xyz');
 
       assertSelection('{{abc/}} **a|bc**', 'xyz <b>a|bc</b>');
 

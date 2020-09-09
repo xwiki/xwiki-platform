@@ -112,10 +112,32 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
+                    installed locally. -->
+                  <name>wdm.chromeDriverVersion</name>
+                  <value>85.0.4183.87</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
-        <!-- We want a more recent version of Jasmine and we want to use the PhantomJS driver-->
-        <version>2.2</version>
+        <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
+        <version>3.0-alpha-01</version>
         <executions>
           <execution>
             <goals>
@@ -124,9 +146,6 @@
           </execution>
         </executions>
         <configuration>
-          <phantomjs>
-            <version>2.1.1</version>
-          </phantomjs>
           <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
           <!-- jasmine-require-config.txt is filtered so we load it from the test output directory. -->
           <customRunnerConfiguration>

@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="de">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=Benutzererwähnung
+rendering.macro.mention.description=Fügen Sie eine Benutzererwähnung hinzu.
+rendering.macro.mention.parameter.reference.name=Referenz
+rendering.macro.mention.parameter.reference.description=Referenz zur erwähntem Benutzer oder erwähnter Gruppe.
+rendering.macro.mention.parameter.style.name=Anzeige-Stil
+rendering.macro.mention.parameter.style.description=Die Wahl des Stils der Erwähnung. Dies wird nur für Benutzererwähnungen unterstützt.
+rendering.macro.mention.parameter.anchor.name=Anker
+rendering.macro.mention.parameter.anchor.description=Der Anker, der für die Verlinkung zu dieser Erwähnung zu verwenden ist. Dieser Anker sollte, so weit wie möglich, einmalig im Dokument sein.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Vollständiger Name des Benutzers
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=Nur Vorname des Benutzers
+org.xwiki.mentions.DisplayStyle.LOGIN=Benutzername
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Farbe der Erwähnung
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Die Farbe der Erwähnungen des aktuellen Benutzers (Anmerkung: wird über den Wert eines css-Attributs "background-color" angewandt).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farbe der eigenen Erwähnung
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Zitate aktivieren
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Definiert, ob ein Zitat des Textes, der eine Erwähnung umgibt, in den Benachrichtigungen über Erwähnungen des Benutzers enthalten ist.
+mentions.tip=Im WYSIWYG-Editor können Sie ein @ eingeben und dann mit der Eingabe von Buchstaben beginnen, um Vorschläge zur Nennung eines Benutzers zu erhalten.</content>
+  
+</xwikidoc>

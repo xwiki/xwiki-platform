@@ -189,6 +189,16 @@ define([
 
 
     /**
+     * Return whether the specified property type is valid (i.e. there is a type descriptor in meta)
+     * @param {String} propertyType
+     */
+    isValidPropertyType (propertyType) {
+      return this.data.meta.propertyTypes
+        .find(propertyTypeDescriptor => propertyTypeDescriptor.id === propertyType);
+    },
+
+
+    /**
      * Return the id of the given entry
      * @param {Object} entry
      * @returns {String}
@@ -293,6 +303,21 @@ define([
 
 
     /**
+     * Return the type descriptor corresponding to a property type
+     * @param {String} propertyType
+     * @returns {Object}
+     */
+    getTypeDescriptor (propertyType) {
+      const typeDescriptor = this.data.meta.propertyTypes
+        .find(typeDescriptor => typeDescriptor.id === propertyType);
+      if (!typeDescriptor) {
+        console.error("Type descriptor of `" + propertyType + "` does not exists");
+      }
+      return typeDescriptor;
+    },
+
+
+    /**
      * Return the property type descriptor corresponding to a property id
      * @param {String} propertyId
      * @returns {Object}
@@ -302,6 +327,122 @@ define([
       if (!propertyDescriptor) { return; }
       return this.data.meta.propertyTypes
         .find(typeDescriptor => typeDescriptor.id === propertyDescriptor.type);
+    },
+
+
+    /**
+     * Get the displayer descriptor associated to a property id
+     * @param {String} propertyId
+     * @returns {Object}
+     */
+    getPropertyDisplayerDescriptor (propertyId) {
+      if (!this.isValidPropertyId(propertyId)) { return; }
+      // property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
+      const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
+      // property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
+      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
+      // merge property and/or type displayer descriptors
+      let mergedDisplayerDescriptor;
+      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
+        mergedDisplayerDescriptor = Object.assign({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+      } else {
+        mergedDisplayerDescriptor = Object.assign({}, propertyDescriptorDisplayer);
+      }
+      // resolve displayer
+      return this._resolveDisplayerDescriptor(mergedDisplayerDescriptor);
+    },
+
+
+    /**
+     * Get the displayer descriptor associated to a property type
+     * @param {String} propertyType
+     * @returns {Object}
+     */
+    getTypeDisplayerDescriptor (propertyType) {
+      if (!this.isValidPropertyType(propertyType)) { return; }
+      // property type descriptor config
+      const typeDescriptor = this.getTypeDescriptor(propertyType) || {};
+      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
+      // resolve displayer
+      return this._resolveDisplayerDescriptor(typeDescriptorDisplayer);
+    },
+
+
+    /**
+     * Inherit or default given displayer descriptor
+     * @param {Object} displayerDescriptor A displayer descriptor, from the property descriptor or type descriptor
+     * @returns {Object}
+     */
+    _resolveDisplayerDescriptor (displayerDescriptor) {
+      const displayerId = displayerDescriptor.id;
+      const displayer = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
+      // merge displayers
+      if (displayerDescriptor.id) {
+        return Object.assign({}, displayer, displayerDescriptor);
+      } else {
+        // default displayer
+        return { id: this.data.meta.defaultDisplayer };
+      }
+    },
+
+
+    /**
+     * Get the filter descriptor associated to a property id
+     * @param {String} propertyId
+     * @returns {Object}
+     */
+    getPropertyFilterDescriptor (propertyId) {
+      if (!this.isValidPropertyId(propertyId)) { return; }
+      // property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
+      const propertyDescriptorFilter = propertyDescriptor.filter || {};
+      // property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
+      const typeDescriptorFilter = typeDescriptor.filter || {};
+      // merge property and/or type filter descriptors
+      let mergedFilterDescriptor;
+      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
+        mergedFilterDescriptor = Object.assign({}, typeDescriptorFilter, propertyDescriptorFilter);
+      } else {
+        mergedFilterDescriptor = Object.assign({}, propertyDescriptorFilter);
+      }
+      // resolve filter
+      return this._resolveFilterDescriptor(mergedFilterDescriptor);
+    },
+
+
+    /**
+     * Get the filter descriptor associated to a property type
+     * @param {String} propertyType
+     * @returns {Object}
+     */
+    getTypeFilterDescriptor (propertyType) {
+      if (!this.isValidPropertyType(propertyType)) { return; }
+      // property type descriptor config
+      const typeDescriptor = this.getTypeDescriptor(propertyType) || {};
+      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
+      // resolve filter
+      return this._resolveFilterDescriptor(typeDescriptorDisplayer);
+    },
+
+
+    /**
+     * Inherit or default given filter descriptor
+     * @param {Object} filterDescriptor A filter descriptor, from the property descriptor or type descriptor
+     * @returns {Object}
+     */
+    _resolveFilterDescriptor (filterDescriptor) {
+      const filterId = filterDescriptor.id;
+      const filter = this.data.meta.filters.find(filter => filter.id === filterId);
+      // merge filters
+      if (filterDescriptor.id) {
+        return Object.assign({}, filter, filterDescriptor);
+      } else {
+        // default filter
+        return { id: this.data.meta.defaultFilter };
+      }
     },
 
 
@@ -316,77 +457,11 @@ define([
     },
 
 
-    /**
-     * Get the displayer descriptor associated to a property id
-     * @param {String} propertyId
-     * @returns {Object}
-     */
-    getDisplayerDescriptor (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
-      // merge property and/or type displayer descriptors
-      let highLevelDisplayer;
-      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
-        highLevelDisplayer = Object.assign({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
-      } else {
-        highLevelDisplayer = Object.assign({}, propertyDescriptorDisplayer);
-      }
-      // displayer config
-      const displayerId = highLevelDisplayer.id;
-      const displayer = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
-      // merge displayers
-      if (highLevelDisplayer.id) {
-        return Object.assign({}, displayer, highLevelDisplayer);
-      } else {
-        // default displayer
-        return { id: this.data.meta.defaultDisplayer };
-      }
-    },
-
-
-    /**
-     * Get the filter descriptor associated to a property id
-     * @param {String} propertyId
-     * @returns {Object}
-     */
-    getFilterDescriptor (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorFilter = propertyDescriptor.filter || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorFilter = typeDescriptor.filter || {};
-      // merge property and/or type filter descriptors
-      let highLevelFilter;
-      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
-        highLevelFilter = Object.assign({}, typeDescriptorFilter, propertyDescriptorFilter);
-      } else {
-        highLevelFilter = Object.assign({}, propertyDescriptorFilter);
-      }
-      // filter filter config
-      const filterId = highLevelFilter.id;
-      const filter = this.data.meta.filters.find(filter => filter.id === filterId);
-      // merge filters
-      if (highLevelFilter.id) {
-        return Object.assign({}, filter, highLevelFilter);
-      } else {
-        // default filter
-        return { id: this.data.meta.defaultFilter };
-      }
-    },
-
-
 
 
     /**
      * ---------------------------------------------------------------
-     * LAYOUT
+     * ENTRIES
      */
 
 
@@ -432,16 +507,54 @@ define([
 
 
     /**
+     * ---------------------------------------------------------------
+     * DESIGN MODE
+     */
+
+
+    /**
      * Load a layout, or default layout if none specified
      * @returns {Promise}
      */
-    toggleDesignMode: function (designModeOn) {
+    toggleDesignMode (designModeOn) {
       if (designModeOn === undefined) {
-        designModeOn = ! this.designMode;
+        designModeOn = !this.designMode;
       }
       this.designMode = designModeOn;
     },
 
+
+    setPropertyType (propertyId, type) {
+      console.log("LOGIC set property type", propertyId, type);
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      propertyDescriptor.type = type;
+    },
+
+
+    setPropertyDisplayer (propertyId, displayerId) {
+      console.log("LOGIC set property displayer", propertyId, displayerId);
+      if (displayerId) {
+        Vue.set(this.getPropertyDescriptor(propertyId), "displayer", {
+          id: displayerId,
+        });
+      }
+      else {
+        Vue.delete(this.getPropertyDescriptor(propertyId), "displayer");
+      }
+    },
+
+
+    setPropertyFilter (propertyId, filterId) {
+      console.log("LOGIC set property filter", propertyId, filterId);
+      if (filterId) {
+        Vue.set(this.getPropertyDescriptor(propertyId), "filter", {
+          id: filterId,
+        });
+      }
+      else {
+        Vue.delete(this.getPropertyDescriptor(propertyId), "filter");
+      }
+    },
 
 
 
@@ -947,7 +1060,7 @@ define([
      */
     getFilterDefaultOperator (propertyId) {
       // get valid operator descriptor
-      const filterDescriptor = this.getFilterDescriptor(propertyId);
+      const filterDescriptor = this.getPropertyFilterDescriptor(propertyId);
       if (!filterDescriptor) { return; }
       const filterOperators = filterDescriptor.operators;
       if (!(filterOperators instanceof Array)) { return; }

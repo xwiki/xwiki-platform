@@ -34,7 +34,7 @@ define({
       url: "...",
     },
 
-    hiddenFilters: {},
+    hiddenFilters: [],
 
     filters: [
       {
@@ -162,6 +162,7 @@ define({
     filters: [
       {
         id: "text",
+        name: "Text",
         defaultOperator: "contains",
         operators: [
           { id: "contains", name: "Contains", },
@@ -171,6 +172,7 @@ define({
       },
       {
         id: "list",
+        name: "List",
         defaultOperator: "is",
         operators: [
           { id: "is", name: "Is", },
@@ -179,6 +181,7 @@ define({
       },
       {
         id: "number",
+        name: "Number",
         defaultOperator: "equals",
         operators: [
           { id: "equals", name: "=", },
@@ -194,12 +197,19 @@ define({
     displayers: [
       {
         id: "text",
+        name: "Text",
+      },
+      {
+        id: "number",
+        name: "Number",
       },
       {
         id: "link",
+        name: "Link",
       },
       {
         id: "html",
+        name: "Html",
       },
     ],
 

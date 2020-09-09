@@ -21,7 +21,7 @@
 
 <!--
   The LivedataAdvancedPanelFilterEntry component is used by the
-  LivedataAdvancedPanelFilterc omponent.
+  LivedataAdvancedPanelFilter component.
   It displays the filter entry corresponding to the passed props:
   - propertyId, corresponding to the Filter Group containing the filter
   - filterIndex indeicating the filter index inside the Filter Group
@@ -37,7 +37,7 @@
       @change="logic.filter(propertyId, filterIndex, { operator: $event.target.value })"
     >
       <option
-        v-for="operator in logic.getFilterDescriptor(propertyId).operators"
+        v-for="operator in logic.getPropertyFilterDescriptor(propertyId).operators"
         :key="operator.id"
         :value="operator.id"
         v-text="operator.name"

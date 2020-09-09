@@ -94,7 +94,7 @@
             class="filter-entries"
             :value="logic.getQueryFilterGroup(filterGroup.property).constrains"
             @change="reorderFilter($event, filterGroup)"
-            :group="'filter-panel' + logic.getFilterDescriptor(filterGroup.property).id"
+            :group="'filter-panel' + logic.getPropertyFilterDescriptor(filterGroup.property).id"
           >
             <!--
               Draggable wrapper for the filter entry

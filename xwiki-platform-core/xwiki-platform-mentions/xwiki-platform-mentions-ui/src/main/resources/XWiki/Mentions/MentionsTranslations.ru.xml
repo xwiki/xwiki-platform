@@ -52,5 +52,5 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Цвет упоми
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Цвета самоупоминания
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Включить цитирование
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Определяет, включена ли цитата текста, окружающего упоминание, в уведомления об упоминании пользователя.
-### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.</content>
+mentions.tip=При редактировании в WYSIWYG введите @, а затем начните вводить буквы, чтобы получить предложения по упоминанию пользователя.</content>
 </xwikidoc>

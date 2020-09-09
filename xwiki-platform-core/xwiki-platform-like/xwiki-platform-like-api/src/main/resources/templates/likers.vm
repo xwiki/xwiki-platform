@@ -17,24 +17,19 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#set ($optLikeRecord = $services.like.getLikes($doc))
-#if ($optLikeRecord.isPresent())
-    #set ($likeRecord = $optLikeRecord.get())
+#set ($likers = $services.like.getLikers($doc, 0, 50))
 <div id="document-title"><h1>$services.localization.render('like.likers.title', [$doc.title])</h1></div>
 <div id="likers-content">
-    #if ($likeRecord.likers.isEmpty())
+    #if ($likers.isEmpty())
         $services.localization.render('like.likers.empty')
     #else
       <p>
-          $services.localization.render('like.likers.number', [$likeRecord.likers.size()])
+          $services.localization.render('like.likers.number', [$likers.size()])
       </p>
       <ul>
-          #foreach($liker in $likeRecord.likers)
+          #foreach($liker in $likers)
             <li>#displayUserLink($liker)</li>
           #end
       </ul>
     #end
 </div>
-#else
-No data.
-#end

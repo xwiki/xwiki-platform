@@ -20,33 +20,49 @@
 package org.xwiki.ratings;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provides Ratings configuration.
+ * Configuration of {@link RatingsManager}.
  *
  * @version $Id$
- * @since 8.2.1
+ * @since 12.9RC1
  */
+@Unstable
 @Role
 public interface RatingsConfiguration
-{   
+{
     /**
-     * @param documentReference the documentReference for which to return the configuration document
-     * @return the configuration document
+     * @return {@code false} if a rating set to 0 shoud lead to the deletion of a previously made vote.
+     *         {@code true} means that all ratings noted to 0 are stored. Note that this option will impact the
+     *         average rating.
      */
-    XWikiDocument getConfigurationDocument(DocumentReference documentReference);
-    
+    boolean storeZero();
+
     /**
-     * Retrieves configuration parameter from the current space's WebPreferences and fallback to XWiki.RatingsConfig if
-     * it does not exist.
-     * 
-     * @param documentReference the document being rated or for which the existing ratings are fetched
-     * @param parameterName the parameter for which to retrieve the value
-     * @param defaultValue the default value for the parameter
-     * @return the value of the given parameter name from the current configuration context
+     * @return the upper bound of the scale. The lower bound is always 0.
      */
-    String getConfigurationParameter(DocumentReference documentReference, String parameterName, String defaultValue);
+    int getScale();
+
+    /**
+     * @return {@code true} to create - if possible, depending on the storage implementation - a dedicated store.
+     *         {@code false} means that all ratings from any applications will be stored on the same storage.
+     */
+    boolean hasDedicatedCore();
+
+    /**
+     * @return {@code true} to store the average rating. {@code false} means that the average rating is never stored
+     * nor computed.
+     */
+    boolean storeAverage();
+
+    /**
+     * @return the storage hint to be used for Ratings data (e.g. solr).
+     */
+    String getStorageHint();
+
+    /**
+     * @return the storage hint to be used for Average Ratings data (e.g. solr or xobject)
+     */
+    String getAverageRatingStorageHint();
 }

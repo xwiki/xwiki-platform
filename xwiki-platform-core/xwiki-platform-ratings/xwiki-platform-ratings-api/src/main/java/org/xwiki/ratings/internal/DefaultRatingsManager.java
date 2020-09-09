@@ -19,264 +19,414 @@
  */
 package org.xwiki.ratings.internal;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.slf4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
-import org.xwiki.ratings.UpdateRatingEvent;
-import org.xwiki.ratings.UpdatingRatingEvent;
+import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.events.CreatedRatingEvent;
+import org.xwiki.ratings.events.DeletedRatingEvent;
+import org.xwiki.ratings.events.UpdatedRatingEvent;
+import org.xwiki.ratings.internal.averagerating.AverageRatingManager;
+import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
- * The default ratings manager.
- * 
+ * Default implementation of {@link RatingsManager} which stores Rating and AverageRating in Solr.
+ *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.9RC1
  */
 @Component
-@Singleton
-public class DefaultRatingsManager extends AbstractRatingsManager
+@Named("solr")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class DefaultRatingsManager implements RatingsManager
 {
     @Inject
-    @Named("user/current")
-    protected DocumentReferenceResolver<String> userReferenceResolver;
+    private SolrUtils solrUtils;
 
     @Inject
-    @Named("compactwiki")
-    protected EntityReferenceSerializer<String> entityReferenceSerializer;
+    private Solr solr;
 
     @Inject
-    private Logger logger;
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
-    @Override
-    public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
-    {
-        Rating rating = getRating(documentRef, author);
-        int oldVote;
-        if (rating == null) {
-            oldVote = 0;
-            try {
-                rating = new DefaultRating(documentRef, author, vote, getXWikiContext(), this);
-            } catch (XWikiException e) {
-                throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS, e.getCode(),
-                    "Failed to create new rating object", e);
-            }
-        } else {
-            oldVote = rating.getVote();
-            rating.setVote(vote);
-            rating.setDate(new Date());
-        }
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-        // Indicate that we start modifying the rating
-        this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
+    @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
 
-        boolean updateFailed = true;
-        try {
-            // update rating
-            rating.save();
+    @Inject
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
-            // update average rating count
-            updateAverageRatings(documentRef, rating, oldVote);
+    @Inject
+    private ObservationManager observationManager;
 
-            updateFailed = false;
-        } finally {
-            if (updateFailed) {
-                // Indicate that the we start modifying the rating
-                this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
-            } else {
-                // Indicate that we finished updating the rating
-                this.observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
-            }
-        }
+    @Inject
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
-        return rating;
-    }
+    private AverageRatingManager averageRatingManager;
 
-    @Override
-    public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
-        throws RatingsException
-    {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Calling default manager code for ratings");
-        }
-        try {
-            int skipped = 0;
-            int nb = 0;
-            XWikiDocument doc = getXWiki().getDocument(documentRef, getXWikiContext());
-            List<BaseObject> bobjects = doc.getObjects(getRatingsClassName());
-            if (bobjects != null) {
-                List<Rating> ratings = new ArrayList<Rating>();
-                for (BaseObject bobj : bobjects) {
-                    if (bobj != null) {
-                        if (skipped < start) {
-                            skipped++;
-                        } else {
-                            ratings.add(getDefaultRating(documentRef, bobj));
-                            nb++;
-                        }
-                        if ((count != 0) && (nb == count)) {
-                            break;
-                        }
-                    }
-                }
-                return ratings;
-            }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    private RatingsConfiguration ratingsConfiguration;
 
-    @Override
-    public Rating getRating(String ratingId) throws RatingsException
-    {
-        try {
-            int i1 = ratingId.indexOf(":");
-            if (i1 == -1) {
-                throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
-                    RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, cannot parse rating id");
-            }
-
-            String docName = ratingId.substring(0, i1);
-            String sObjectNb = ratingId.substring(i1 + 1);
-            int objectNb = Integer.parseInt(sObjectNb);
-            XWikiDocument doc = getXWiki().getDocument(docName, getXWikiContext());
-            DocumentReference docRef = doc.getDocumentReference();
-
-            if (doc.isNew()) {
-                throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
-                    RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, document does not exist");
-            }
-
-            BaseObject object = doc.getObject(getRatingsClassName(), objectNb);
-
-            if (object == null) {
-                throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
-                    RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, could not find rating");
-            }
-
-            return new DefaultRating(docRef, object, getXWikiContext(), this);
-        } catch (XWikiException e) {
-            throw new RatingsException(e);
-        }
-    }
-
-    @Override
-    public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
-    {
-        try {
-            XWikiDocument doc = getXWiki().getDocument(documentRef, getXWikiContext());
-            BaseObject baseObject = doc.getXObject(getRatingsClassReference(), id);
-            if (baseObject != null) {
-                return getDefaultRating(documentRef, baseObject);
-            }
-        } catch (XWikiException e) {
-            throw new RatingsException(e);
-        }
-        return null;
-    }
-
-    @Override
-    public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
-    {
-        try {
-            if (author == null) {
-                return null;
-            }
-            List<Rating> ratings = getRatings(documentRef, 0, 0, false);
-            if (ratings == null) {
-                return null;
-            }
-            for (Rating rating : ratings) {
-                if (rating != null && author.equals(rating.getAuthor())) {
-                    return rating;
-                }
-            }
-        } catch (XWikiException e) {
-            return null;
-        }
-        return null;
-    }
+    private String identifier;
 
     /**
-     * Gets a DefaultRating.
+     * Retrieve the solr client for storing rankings based on the configuration.
+     * If the configuration specifies to use a dedicated core (see {@link RatingsConfiguration#hasDedicatedCore()}),
+     * then it will use a client based on the current manager identifier, else it will use the default solr core.
      *
-     * @param documentRef the document to which the rating is linked
-     * @param bobj the rating object containing the rating information
-     * @return an instance of DefaultRating containing the passed rating information
+     * @return the right solr client for storing rankings.
+     * @throws SolrException in case of problem to retrieve the solr client.
      */
-    private DefaultRating getDefaultRating(DocumentReference documentRef, BaseObject bobj)
+    private SolrClient getRatingSolrClient() throws SolrException
     {
-        return new DefaultRating(documentRef, bobj, getXWikiContext(), this);
+        if (this.getRatingConfiguration().hasDedicatedCore()) {
+            return this.solr.getClient(this.getIdentifier());
+        } else {
+            return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE);
+        }
+    }
+
+    private AverageRatingManager getAverageRatingManager() throws RatingsException
+    {
+        if (this.averageRatingManager == null) {
+            String averageRatingManagerHint = this.getRatingConfiguration().getAverageRatingStorageHint();
+            try {
+                this.averageRatingManager = this.contextComponentManager
+                    .getInstance(AverageRatingManager.class, averageRatingManagerHint);
+                this.averageRatingManager.setRatingsManager(this);
+            } catch (ComponentLookupException e) {
+                throw new RatingsException(String.format("Cannot instantiate AverageRatingManager with hint [%s]",
+                    averageRatingManagerHint), e);
+            }
+        }
+        return this.averageRatingManager;
     }
 
     @Override
-    public List<Rating> getRatings(UserReference userReference, int start, int count, boolean asc)
+    public String getIdentifier()
+    {
+        return this.identifier;
+    }
+
+    @Override
+    public void setIdentifer(String identifier)
+    {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public int getScale()
+    {
+        return this.getRatingConfiguration().getScale();
+    }
+
+    @Override
+    public void setRatingConfiguration(RatingsConfiguration configuration)
+    {
+        this.ratingsConfiguration = configuration;
+    }
+
+    @Override
+    public RatingsConfiguration getRatingConfiguration()
+    {
+        return this.ratingsConfiguration;
+    }
+
+    private SolrQuery.ORDER getOrder(boolean asc)
+    {
+        return (asc) ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc;
+    }
+
+    private Rating getRankingFromSolrDocument(SolrDocument document)
+    {
+        String rankingId = this.solrUtils.getId(document);
+        String managerId = this.solrUtils.get(RatingQueryField.MANAGER_ID.getFieldName(), document);
+        String serializedEntityReference = this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            document);
+        String serializedUserReference = this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), document);
+        int vote = this.solrUtils.get(RatingQueryField.VOTE.getFieldName(), document);
+        Date createdAt = this.solrUtils.get(RatingQueryField.CREATED_DATE.getFieldName(), document);
+        Date updatedAt = this.solrUtils.get(RatingQueryField.UPDATED_DATE.getFieldName(), document);
+        int scale = this.solrUtils.get(RatingQueryField.SCALE.getFieldName(), document);
+        String entityTypeValue = this.solrUtils.get(RatingQueryField.ENTITY_TYPE.getFieldName(), document);
+
+        EntityType entityType = EntityType.valueOf(entityTypeValue);
+        UserReference userReference = this.userReferenceResolver.resolve(serializedUserReference);
+        EntityReference entityReference = this.entityReferenceResolver.resolve(serializedEntityReference, entityType);
+
+        return new DefaultRating(rankingId)
+            .setReference(entityReference)
+            .setAuthor(userReference)
+            .setVote(vote)
+            .setScale(scale)
+            .setCreatedAt(createdAt)
+            .setUpdatedAt(updatedAt)
+            .setManagerId(managerId);
+    }
+
+    private List<Rating> getRankingsFromQueryResult(SolrDocumentList documents)
+    {
+        if (documents != null) {
+            return documents.stream().map(this::getRankingFromSolrDocument).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private String mapToQuery(Map<RatingQueryField, Object> originalParameters)
+    {
+        Map<RatingQueryField, Object> queryParameters = new LinkedHashMap<>(originalParameters);
+        queryParameters.put(RatingQueryField.MANAGER_ID, this.getIdentifier());
+
+        StringBuilder result = new StringBuilder();
+        Iterator<Map.Entry<RatingQueryField, Object>> iterator = queryParameters.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<RatingQueryField, Object> queryParameter = iterator.next();
+            result.append("filter(");
+            result.append(queryParameter.getKey().getFieldName());
+            result.append(":");
+
+            Object value = queryParameter.getValue();
+            if (value instanceof String || value instanceof Date) {
+                result.append(solrUtils.toFilterQueryString(value));
+            } else if (value instanceof UserReference) {
+                result.append(
+                    solrUtils.toFilterQueryString(this.userReferenceSerializer.serialize((UserReference) value)));
+            } else if (value instanceof EntityReference) {
+                result.append(
+                    solrUtils.toFilterQueryString(this.entityReferenceSerializer.serialize((EntityReference) value)));
+            } else if (value != null) {
+                result.append(value);
+            }
+            result.append(")");
+            if (iterator.hasNext()) {
+                result.append(" AND ");
+            }
+        }
+
+        return result.toString();
+    }
+
+    private SolrInputDocument getInputDocumentFromRating(Rating rating)
+    {
+        SolrInputDocument result = new SolrInputDocument();
+        solrUtils.setId(rating.getId(), result);
+        solrUtils.set(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            this.entityReferenceSerializer.serialize(rating.getReference()), result);
+        solrUtils.set(RatingQueryField.ENTITY_TYPE.getFieldName(),
+            rating.getReference().getType().toString(), result);
+        solrUtils.set(RatingQueryField.CREATED_DATE.getFieldName(), rating.getCreatedAt(), result);
+        solrUtils.set(RatingQueryField.UPDATED_DATE.getFieldName(), rating.getUpdatedAt(), result);
+        solrUtils.set(RatingQueryField.USER_REFERENCE.getFieldName(),
+            this.userReferenceSerializer.serialize(rating.getAuthor()), result);
+        solrUtils.set(RatingQueryField.SCALE.getFieldName(), rating.getScale(), result);
+        solrUtils.set(RatingQueryField.MANAGER_ID.getFieldName(), rating.getManagerId(), result);
+        solrUtils.set(RatingQueryField.VOTE.getFieldName(), rating.getVote(), result);
+        return result;
+    }
+
+    private Optional<Rating> retrieveExistingRanking(EntityReference rankedEntity, UserReference voter)
         throws RatingsException
     {
-        List<Rating> ratings = new ArrayList<>();
+        String serializedEntity = this.entityReferenceSerializer.serialize(rankedEntity);
+        String serializedUserReference = this.userReferenceSerializer.serialize(voter);
+        Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
+        queryMap.put(RatingQueryField.ENTITY_REFERENCE, serializedEntity);
+        queryMap.put(RatingQueryField.ENTITY_TYPE, rankedEntity.getType());
+        queryMap.put(RatingQueryField.USER_REFERENCE, serializedUserReference);
 
-        DocumentReference userDoc = this.userReferenceSerializer.serialize(userReference);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Calling separate page manager code for ratings");
+        List<Rating> ratings = this.getRatings(queryMap, 0, 1, RatingQueryField.CREATED_DATE, true);
+        if (ratings.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(ratings.get(0));
+        }
+    }
+
+    @Override
+    public Rating saveRating(EntityReference reference, UserReference user, int vote)
+        throws RatingsException
+    {
+        // If the vote is outside the scope of the scale, we throw an exception immediately.
+        if (vote < 0 || vote > this.getScale()) {
+            throw new RatingsException(String.format("The vote [%s] is out of scale [%s] for [%s] ranking manager.",
+                vote, this.getScale(), this.getIdentifier()));
         }
 
-        // This query performs the following:
-        //   - It retrieves both the doc.fullName containing the rating, and the various rating objects numbers
-        //     (and also the date to allow ordering on it since we use distinct)
-        //   - It selects only documents contaning a RatingClass object whose author is the author reference
-        //   - It avoids selecting document translations to avoid duplications in result (and ratings objects shouldn't
-        //     be in translated pages)
-        //   - It filters out results whom status is refused or moderated
-        String statement = "select distinct doc.fullName, obj.number, doc.date "
-            + "from XWikiDocument as doc, BaseObject as obj, StringProperty as authorProp "
-            + "where doc.fullName=obj.name and doc.translation=0 and obj.className=:ratingClassName "
-            + "and obj.id=authorProp.id.id and authorProp.id.name=:authorPropertyName and authorProp.value=:authorValue"
-            + " and obj.name not in ("
-            + "select obj2.name from BaseObject as obj2, StringProperty as statusprop "
-            + "where obj.id=obj2.id and obj2.className=:ratingClassName and obj2.id=statusprop.id.id and "
-            + "statusprop.id.name=:statusPropertyName and "
-            + "(statusprop.value=:statusModerated or statusprop.value=:statusRefused)"
-            + ") order by doc.date " + (asc ? "asc" : "desc");
+        // Check if a vote for the same entity by the same user and on the same manager already exists.
+        Optional<Rating> existingRanking = this.retrieveExistingRanking(reference, user);
+
+        boolean storeAverage = this.getRatingConfiguration().storeAverage();
+        Event event = null;
+        Rating result = null;
+        Rating oldRating = null;
+
+        // It's the first vote for the tuple entity, user, manager.
+        if (!existingRanking.isPresent()) {
+
+            // We only store the vote if it's not 0 or if the configuration allows to store 0
+            if (vote != 0 || this.getRatingConfiguration().storeZero()) {
+                result = new DefaultRating(UUID.randomUUID().toString())
+                    .setManagerId(this.getIdentifier())
+                    .setReference(reference)
+                    .setCreatedAt(new Date())
+                    .setUpdatedAt(new Date())
+                    .setVote(vote)
+                    .setScale(this.getScale())
+                    .setAuthor(user);
+
+                // it's a vote creation
+                event = new CreatedRatingEvent(result);
+            }
+
+        // There was already a vote with the same information
+        } else {
+            oldRating = existingRanking.get();
+
+            // If the vote is not 0 or if we store zero, we just modify the existing vote
+            if (vote != 0) {
+                result = new DefaultRating(oldRating)
+                    .setUpdatedAt(new Date())
+                    .setVote(vote);
+
+                // It's an update of a vote
+                event = new UpdatedRatingEvent(result, oldRating.getVote());
+            // Else we remove it.
+            } else if (this.ratingsConfiguration.storeZero()) {
+                this.removeRating(oldRating.getId());
+            }
+        }
+
+        // If there's a vote to store (all cases except if the vote is 0 and we don't store it)
+        if (result != null) {
+            SolrInputDocument solrInputDocument = this.getInputDocumentFromRating(result);
+            try {
+                // Store the new document in Solr
+                this.getRatingSolrClient().add(solrInputDocument);
+                this.getRatingSolrClient().commit();
+
+                // Send the appropriate notification
+                this.observationManager.notify(event, this.getIdentifier(), result);
+
+                // If we store the average, we also compute the new informations for it.
+                if (storeAverage) {
+                    if (oldRating == null) {
+                        this.getAverageRatingManager().addVote(reference, vote);
+                    } else {
+                        this.getAverageRatingManager().updateVote(reference, oldRating.getVote(), vote);
+                    }
+                }
+            } catch (SolrServerException | IOException | SolrException e) {
+                throw new RatingsException(
+                    String.format("Error when storing rank information for entity [%s] with user [%s].",
+                        reference, user), e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Rating> getRatings(Map<RatingQueryField, Object> queryParameters, int offset, int limit,
+        RatingQueryField orderBy, boolean asc) throws RatingsException
+    {
+        SolrQuery solrQuery = new SolrQuery()
+            .addFilterQuery(this.mapToQuery(queryParameters))
+            .setStart(offset)
+            .setRows(limit)
+            .setSort(orderBy.getFieldName(), this.getOrder(asc));
 
         try {
-            Query query = this.queryManager.createQuery(statement, Query.HQL);
-            List<Object[]> queryResult = query.bindValue("ratingClassName", getRatingsClassName())
-                .bindValue("authorPropertyName", RATING_CLASS_FIELDNAME_AUTHOR)
-                .bindValue("authorValue", this.entityReferenceSerializer.serialize(userDoc))
-                .bindValue("statusPropertyName", "status")
-                .bindValue("statusModerated", "moderated")
-                .bindValue("statusRefused", "refused")
-                .setLimit(count)
-                .setOffset(start)
-                .execute();
-
-            for (Object[] result : queryResult) {
-                DocumentReference documentReference = this.documentReferenceResolver.resolve((String) result[0]);
-                int objNumber = (Integer) result[1];
-                ratings.add(getRating(documentReference, objNumber));
-            }
-        } catch (QueryException | XWikiException e) {
-            throw new RatingsException(String.format("Error while retrieving ratings for user [%s].", userDoc), e);
+            QueryResponse query = this.getRatingSolrClient().query(solrQuery);
+            return this.getRankingsFromQueryResult(query.getResults());
+        } catch (SolrServerException | IOException | SolrException e) {
+            throw new RatingsException("Error while trying to get rankings", e);
         }
+    }
 
-        return ratings;
+    @Override
+    public long countRatings(Map<RatingQueryField, Object> queryParameters) throws RatingsException
+    {
+        SolrQuery solrQuery = new SolrQuery()
+            .addFilterQuery(this.mapToQuery(queryParameters))
+            .setStart(0)
+            .setRows(0);
+
+        try {
+            QueryResponse query = this.getRatingSolrClient().query(solrQuery);
+            return query.getResults().getNumFound();
+        } catch (SolrServerException | IOException | SolrException e) {
+            throw new RatingsException("Error while trying to get count of rankings", e);
+        }
+    }
+
+    @Override
+    public boolean removeRating(String ratingIdentifier) throws RatingsException
+    {
+        Map<RatingQueryField, Object> queryMap = Collections
+            .singletonMap(RatingQueryField.IDENTIFIER, ratingIdentifier);
+
+        List<Rating> ratings = this.getRatings(queryMap, 0, 1, RatingQueryField.CREATED_DATE, true);
+        if (!ratings.isEmpty()) {
+            try {
+                this.getRatingSolrClient().deleteById(ratingIdentifier);
+                this.getRatingSolrClient().commit();
+                Rating rating = ratings.get(0);
+                this.observationManager.notify(new DeletedRatingEvent(rating), this.getIdentifier(), rating);
+                if (this.getRatingConfiguration().storeAverage()) {
+                    this.getAverageRatingManager().removeVote(rating.getReference(), rating.getVote());
+                }
+                return true;
+            } catch (SolrServerException | IOException | SolrException e) {
+                throw new RatingsException("Error while removing ranking.", e);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
+    {
+        return this.getAverageRatingManager().getAverageRating(entityReference);
     }
 }

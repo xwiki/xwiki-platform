@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.xwiki.like.LikeConfiguration;
 import org.xwiki.like.LikeException;
 import org.xwiki.like.LikeManager;
-import org.xwiki.like.LikedEntity;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -55,7 +54,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -154,12 +152,11 @@ public class LikeScriptServiceTest
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Foo");
         when(this.authorizationManager.hasAccess(this.likeRight, this.docUserReference, entityReference))
             .thenReturn(true);
-        LikedEntity likedEntity = mock(LikedEntity.class);
-        when(this.likeManager.saveLike(userReference, entityReference)).thenReturn(likedEntity);
-        Optional<LikedEntity> optionalLikedEntity = this.likeScriptService.like(entityReference);
+        when(this.likeManager.saveLike(userReference, entityReference)).thenReturn(42L);
+        Optional<Long> optionalLikedEntity = this.likeScriptService.like(entityReference);
 
         assertTrue(optionalLikedEntity.isPresent());
-        assertSame(likedEntity, optionalLikedEntity.get());
+        assertSame(42L, optionalLikedEntity.get());
     }
 
     @Test
@@ -198,12 +195,11 @@ public class LikeScriptServiceTest
         when(this.authorizationManager.hasAccess(this.likeRight, this.docUserReference, entityReference))
             .thenReturn(true);
 
-        LikedEntity likedEntity = mock(LikedEntity.class);
-        when(this.likeManager.getEntityLikes(entityReference)).thenReturn(likedEntity);
-        Optional<LikedEntity> optionalLikedEntity = this.likeScriptService.unlike(entityReference);
+        when(this.likeManager.getEntityLikes(entityReference)).thenReturn(41L);
+        Optional<Long> optionalLikedEntity = this.likeScriptService.unlike(entityReference);
 
         assertTrue(optionalLikedEntity.isPresent());
-        assertSame(likedEntity, optionalLikedEntity.get());
+        assertSame(41L, optionalLikedEntity.get());
         verify(this.likeManager).removeLike(userReference, entityReference);
     }
 
@@ -240,12 +236,11 @@ public class LikeScriptServiceTest
     {
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Foo");
 
-        LikedEntity likedEntity = mock(LikedEntity.class);
-        when(this.likeManager.getEntityLikes(entityReference)).thenReturn(likedEntity);
-        Optional<LikedEntity> optionalLikedEntity = this.likeScriptService.getLikes(entityReference);
+        when(this.likeManager.getEntityLikes(entityReference)).thenReturn(40L);
+        Optional<Long> optionalLikedEntity = this.likeScriptService.getLikes(entityReference);
 
         assertTrue(optionalLikedEntity.isPresent());
-        assertSame(likedEntity, optionalLikedEntity.get());
+        assertSame(40L, optionalLikedEntity.get());
     }
 
     @Test

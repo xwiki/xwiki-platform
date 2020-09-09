@@ -31,8 +31,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.like.LikeEvent;
-import org.xwiki.like.LikedEntity;
 import org.xwiki.like.events.LikeRecordableEvent;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -76,15 +76,15 @@ public class LikeEventListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (data != null) {
-            LikedEntity likedEntity = (LikedEntity) data;
+            EntityReference likedEntity = (EntityReference) data;
 
             try {
                 DocumentModelBridge documentInstance =
-                    this.documentAccessBridge.getDocumentInstance(likedEntity.getEntityReference());
+                    this.documentAccessBridge.getDocumentInstance(likedEntity);
                 this.observationManager.notify(new LikeRecordableEvent(),
                     LikeEventDescriptor.EVENT_SOURCE, documentInstance);
             } catch (Exception e) {
-                this.logger.error("Error while sending event about like on [{}]", likedEntity.getEntityReference(), e);
+                this.logger.error("Error while sending event about like on [{}]", likedEntity, e);
             }
         }
     }

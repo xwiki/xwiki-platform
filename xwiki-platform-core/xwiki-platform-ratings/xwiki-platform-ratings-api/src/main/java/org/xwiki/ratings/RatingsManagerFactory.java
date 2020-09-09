@@ -19,37 +19,33 @@
  */
 package org.xwiki.ratings;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Generic exception for Rating API.
+ * Allow to create dedicated instances of {@link RatingsManager} for any rating usage.
  *
  * @version $Id$
  * @since 12.9RC1
  */
+@Role
 @Unstable
-public class RatingsException extends Exception
+public interface RatingsManagerFactory
 {
-    private static final long serialVersionUID = -2229233170941158972L;
+    /**
+     * The hint of the Ratings Manager to use for the default Ratings Application.
+     */
+    String DEFAULT_APP_HINT = "ratings";
 
     /**
-     * Default constructor with message.
+     * Create or retrieve an instance of {@link RatingsManager} for the given hint.
+     * If the instance needs to be created, the {@link RatingsConfiguration} based on this hint will be used to create
+     * it. If there is no instance of {@link RatingsConfiguration} matching the given hint, the default implementation
+     * will be used.
      *
-     * @param message Cause of the exception.
+     * @param hint an hint of an instance to create or retrieve.
+     * @return a {@link RatingsManager} identified with the given hint.
+     * @throws RatingsException in case of problem when creating or retrieving the component.
      */
-    public RatingsException(String message)
-    {
-        super(message);
-    }
-
-    /**
-     * Default constructor with message and parent exception.
-     *
-     * @param message Cause of the exception.
-     * @param throwable Parent of the exception.
-     */
-    public RatingsException(String message, Throwable throwable)
-    {
-        super(message, throwable);
-    }
+    RatingsManager getInstance(String hint) throws RatingsException;
 }

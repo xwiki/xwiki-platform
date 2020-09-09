@@ -17,27 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.like;
+package org.xwiki.ratings.events;
 
-import org.xwiki.observation.event.Event;
+import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsManager;
 import org.xwiki.stability.Unstable;
 
 /**
- * An event sent when a Like action is performed.
- *
- * The following information are sent along with the event:
- *   - source: a {@link org.xwiki.user.UserReference} of the user who performs the like
- *   - data: the {@link org.xwiki.model.reference.EntityReference} being target of the like.
+ * Event sent whenever a new {@link Rating} is recorded.
+ * The event is sent with the following informations:
+ *   - source: the identifier of the {@link RatingsManager}
+ *   - data: the {@link Rating} created.
  *
  * @version $Id$
- * @since 12.7RC1
+ * @since 12.9RC1
  */
 @Unstable
-public class LikeEvent implements Event
+public class CreatedRatingEvent extends AbstractRatingEvent
 {
+    /**
+     * Default constructor.
+     * @param rating the rating that has been created.
+     */
+    public CreatedRatingEvent(Rating rating)
+    {
+        super(rating);
+    }
+
     @Override
     public boolean matches(Object otherEvent)
     {
-        return otherEvent instanceof LikeEvent;
+        return otherEvent instanceof CreatedRatingEvent;
     }
 }

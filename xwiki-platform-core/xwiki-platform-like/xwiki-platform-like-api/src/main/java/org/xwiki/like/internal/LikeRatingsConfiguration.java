@@ -17,36 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ratings.internal;
+package org.xwiki.like.internal;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ratings.RatingsConfiguration;
 
 /**
- * Default configuration for Ratings.
- * By default the configuration considers a scale of 5, doesn't use a dedicated core, stores the zero values and the
- * average. And it uses the solr manager.
- * FIXME: Change this to be based on a RatingConfiguration document.
+ * Default {@link RatingsConfiguration} for Likes.
  *
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.8RC1
  */
 @Component
 @Singleton
-public class DefaultRatingsConfiguration implements RatingsConfiguration
+@Named(LikeRatingsConfiguration.RANKING_MANAGER_HINT)
+public class LikeRatingsConfiguration implements RatingsConfiguration
 {
+    /**
+     * Default hint for Ranking Manager.
+     */
+    public static final String RANKING_MANAGER_HINT = "like";
+
     @Override
     public boolean storeZero()
     {
-        return true;
+        return false;
     }
 
     @Override
     public int getScale()
     {
-        return 5;
+        return 1;
     }
 
     @Override
@@ -58,7 +62,7 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
     @Override
     public boolean storeAverage()
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -70,6 +74,6 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
     @Override
     public String getAverageRatingStorageHint()
     {
-        return "xobject";
+        return null;
     }
 }

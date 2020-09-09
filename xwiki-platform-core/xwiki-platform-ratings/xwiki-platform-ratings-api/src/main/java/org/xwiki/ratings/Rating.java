@@ -21,133 +21,57 @@ package org.xwiki.ratings;
 
 import java.util.Date;
 
-import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.objects.BaseObject;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
- * Represent a rating : a note given by a user to a container. A container can be: A Wiki Document A section of a wiki
- * document A sentence in a wiki document A comment A sentence in a comment etc...
+ * Generic interface of what should be available in a Rating.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.9RC1
  */
+@Unstable
 public interface Rating
 {
     /**
-     * Gets the document reference to which the rating is associated to.
-     * 
-     * @return the document reference for which this rating applies.
+     * @return the identifier of this rating data.
      */
-    DocumentReference getDocumentReference();
+    String getId();
 
     /**
-     * Retrieves the current rating as a BaseObject This method is used for compatibility.
-     *
-     * @return BaseObject rating object
-     * @throws RatingsException when an error occurs while fetching this average rating.
-     * @deprecated Since 12.7RC1 this method shouldn't be used anymore: Ratings are not necessarily stored as xobjects.
+     * @return the identifier of the manager who handles this data.
      */
-    @Deprecated
-    BaseObject getAsObject() throws RatingsException;
+    String getManagerId();
 
     /**
-     * Retrieves the rating unique ID allowing to distinguish it from other ratings of the same container.
-     *
-     * @return String rating ID
+     * @return the reference of the element being graded.
      */
-    String getRatingId();
+    EntityReference getReference();
 
     /**
-     * Retrieves the rating unique ID allowing to find the rating.
-     *
-     * @return String rating ID
+     * @return the reference of the user who performs the rating.
      */
-    String getGlobalRatingId();
+    UserReference getAuthor();
 
     /**
-     * Retrieves the current rating author.
-     *
-     * @return String author of the rating
+     * @return the date of the creation of this rating data.
      */
-    DocumentReference getAuthor();
+    Date getCreatedAt();
 
     /**
-     * Retrieves the date of the rating.
-     *
-     * @return Date date of the rating
+     * @return the date of the last update of this rating data. It could be same as {@link #getCreatedAt()} if no
+     *          update has been performed.
      */
-    Date getDate();
+    Date getUpdatedAt();
 
     /**
-     * Retrieves the rating value.
-     *
-     * @return integer value of rating
+     * @return the actual rating.
      */
     int getVote();
 
     /**
-     * Retrieves additional properties.
-     *
-     * @param propertyName the name of the property for which to retrieve the value
-     * @return Object property value
+     * @return the upper bound of the scale used to rate.
      */
-    Object get(String propertyName);
-
-    /**
-     * Retrieves additional properties.
-     *
-     * @param propertyName the name of the property for which to retrieve the value
-     * @param mode the mode in which to display the value
-     * @return Object property value
-     */
-    String display(String propertyName, String mode);
-
-    /**
-     * Set the author to which the rating belongs to.
-     *
-     * @param author to which the rating belongs to
-     */
-    void setAuthor(DocumentReference author);
-
-    /**
-     * Set the date when the rating occurred.
-     *
-     * @param date when the rating occurred
-     */
-    void setDate(Date date);
-
-    /**
-     * Set the vote that the user gave.
-     *
-     * @param vote the number of selected stars ranging from 1 to 5
-     */
-    void setVote(int vote);
-
-    /**
-     * Store the rating information.
-     *
-     * @throws RatingsException when an error occurs while saving this average rating.
-     * @deprecated Since 12.7RC1: only {@link RatingsManager} should be responsible to save the ratings.
-     */
-    @Deprecated
-    void save() throws RatingsException;
-
-    /**
-     * Remove the rating.
-     * 
-     * @return the status of the action
-     * @throws RatingsException when an error occurs while removing this average rating
-     * @deprecated Since 12.7RC1: only {@link RatingsManager} should be responsible to remove the ratings.
-     */
-    @Deprecated
-    boolean remove() throws RatingsException;
-
-    /**
-     * The string representation of the vote.
-     *
-     * @return the string representation of the vote
-     */
-    @Override
-    String toString();
+    int getScale();
 }

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.like.LikeEvent;
-import org.xwiki.like.LikedEntity;
 import org.xwiki.like.events.LikeRecordableEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -32,7 +31,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -63,12 +61,10 @@ public class LikeEventListenerTest
         this.likeEventListener.onEvent(null, null, null);
         verify(this.observationManager, never()).notify(any(), any());
 
-        LikedEntity likedEntity = mock(LikedEntity.class);
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Page");
-        when(likedEntity.getEntityReference()).thenReturn(entityReference);
         DocumentModelBridge documentModelBridge = mock(DocumentModelBridge.class);
         when(this.documentAccessBridge.getDocumentInstance(entityReference)).thenReturn(documentModelBridge);
-        this.likeEventListener.onEvent(new LikeEvent(), null, likedEntity);
+        this.likeEventListener.onEvent(new LikeEvent(), null, entityReference);
         verify(this.observationManager).notify(eq(new LikeRecordableEvent()), eq(LikeEventDescriptor.EVENT_SOURCE),
             eq(documentModelBridge));
     }

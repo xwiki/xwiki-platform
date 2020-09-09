@@ -221,7 +221,7 @@ export default {
     encodedConfig () {
       // If the encodedConfig exist save it
       if (this.encodedConfig) {
-        this.saveConfig(this.saveKey, this.encodeConfig);
+        this.saveConfig(this.saveKey, this.encodedConfig);
       // If the encodedConfig is falsy, delete saved config
       } else {
         this.deleteConfig(this.saveKey);
@@ -341,7 +341,7 @@ export default {
     if (!this.hasConfig(this.saveKey)) { return; }
     const config = this.decodeConfig(this.getConfig(this.saveKey));
     if (!config) {
-      this.deleteConfig();
+      this.deleteConfig(this.saveKey);
       new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");
       return;
     }

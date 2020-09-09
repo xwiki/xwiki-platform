@@ -21,47 +21,59 @@ package org.xwiki.user.internal;
 
 import java.lang.reflect.Type;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
-import com.xpn.xwiki.XWikiContext;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
+ * Test of {@link UserReferenceConverter}.
  *
  * @version $Id$
- * @since 12.2
+ * @since 12.8RC1
  */
-@Component
-@Singleton
-public class UserReferenceConverter extends AbstractConverter<UserReference>
+@ComponentTest
+class UserReferenceConverterTest
 {
-    @Inject
+    @InjectMockComponents
+    private UserReferenceConverter converter;
+
+    @MockComponent
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
-    @Inject
+    @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    @Override
-    protected UserReference convertToType(Type targetType, Object value)
+    @Test
+    void convertToType()
     {
-        if (value == null) {
-            return null;
-        }
+        UserReference userReference = () -> false;
 
-        DocumentReference documentReference = this.documentReferenceResolver.resolve(value.toString());
-        return this.userReferenceResolver.resolve(documentReference);
+        DocumentReference documentReference = new DocumentReference("s1", "XWiki", "U1");
+        when(this.documentReferenceResolver.resolve("XWiki.U1")).thenReturn(documentReference);
+        when(this.userReferenceResolver.resolve(documentReference)).thenReturn(userReference);
+
+        UserReference actual = this.converter.convertToType(mock(Type.class), "XWiki.U1");
+        assertEquals(userReference, actual);
+    }
+
+    @Test
+    void convertToTypeValueNull()
+    {
+        assertNull(this.converter.convertToType(mock(Type.class), null));
+
     }
 }

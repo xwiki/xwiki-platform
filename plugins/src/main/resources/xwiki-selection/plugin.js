@@ -19,11 +19,14 @@
  */
 (function() {
   'use strict';
+  var $ = jQuery;
 
   CKEDITOR.plugins.xwikiSelection = {
     saveSelection: function(editor) {
       var editable = editor.editable();
       if (editable) {
+        // Convert the fake editor selection to a real (native) selection if needed.
+        ensureRealSelection(editor);
         editor._.textSelection = CKEDITOR.plugins.xwikiSelection.textSelection.from(editable.$);
       } else {
         delete editor._.textSelection;
@@ -36,8 +39,15 @@
       if (editable && textSelection) {
         editor.focus();
         textSelection.applyTo(editable.$);
-        // Update the tool bar state.
-        editor.selectionChange();
+        // Check if there is a widget to select.
+        var widget = editor.widgets && getWidgetToSelect(editor);
+        if (widget) {
+          // Select the widget.
+          widget.scrollIntoViewAndFocus();
+        } else {
+          // Just notify the editor that the selection has changed so that it can update the tool bar for instance.
+          editor.selectionChange();
+        }
       }
     }
   };
@@ -49,6 +59,105 @@
       });
     }
   });
+
+  /**
+   * The native selection doesn't always match what the user perceives as selected in the editor UI. For instance, when
+   * the user selects a widget (e.g. a macro or an image, which are implemented as widgets) the editor creates a fake
+   * selection and places the native selection inside a hidden element. This way the widget text doesn't appear as
+   * selected and the editor can style the selected widget in any way. The role of this function is to ensure that the
+   * native selection mathes the fake selection.
+   */
+  var ensureRealSelection = function(editor) {
+    var selection = editor.getSelection();
+    if (selection && selection.isFake) {
+      var nativeSelection = selection.document.$.defaultView.getSelection();
+      nativeSelection.removeAllRanges();
+      selection.getRanges().map(toNativeRange).forEach($.proxy(nativeSelection, 'addRange'));
+    }
+  };
+
+  var toNativeRange = function(range) {
+    var nativeRange = range.startContainer.$.ownerDocument.createRange();
+    nativeRange.setStart(range.startContainer.$, range.startOffset);
+    nativeRange.setEnd(range.endContainer.$, range.endOffset);
+    return nativeRange;
+  };
+
+  var getWidgetToSelect = function(editor) {
+    var selection = editor.getSelection();
+    if (selection && !selection.isFake) {
+      var nativeSelection = selection.getNative();
+      for (var i = 0; i < nativeSelection.rangeCount; i++) {
+        var widget = getWidgetInRange(nativeSelection.getRangeAt(i), editor);
+        if (widget) {
+          return widget;
+        }
+      }
+    }
+  };
+
+  var getWidgetInRange = function(range, editor) {
+    var widgetWrapper;
+    var startEditable = $(range.startContainer).closest('[contenteditable]');
+    var endEditable = $(range.endContainer).closest('[contenteditable]');
+    if (startEditable.attr('contenteditable') === 'false' && (startEditable[0] === endEditable[0] ||
+        rangeEndsJustAfter(range, startEditable[0]))) {
+      // The range starts inside a widget and ends either inside the same widget or just after it.
+      widgetWrapper = startEditable[0];
+    } else if (endEditable.attr('contenteditable') === 'false' && rangeStartsJustBefore(range, endEditable[0])) {
+      // The range ends inside a widget and starts just before it.
+      widgetWrapper = endEditable[0];
+    }
+    return widgetWrapper && editor.widgets.getByElement(new CKEDITOR.dom.element(widgetWrapper), true);
+  };
+
+  var rangeEndsJustAfter = function(range, node) {
+    var delta = node.ownerDocument.createRange();
+    delta.setStartAfter(node);
+    delta.setEnd(range.endContainer, range.endOffset);
+    return isEmptyRange(delta);
+  };
+
+  var rangeStartsJustBefore = function(range, node) {
+    var delta = node.ownerDocument.createRange();
+    delta.setStart(range.startContainer, range.startOffset);
+    delta.setEndBefore(node);
+    return isEmptyRange(delta);
+  };
+
+  var isEmptyRange = function(range) {
+    while (!range.collapsed) {
+      if (typeof range.endContainer.nodeValue === 'string') {
+        if (range.endOffset === 0) {
+          // The range ends at the start of a text node. Move the end before that text node.
+          range.setEndBefore(range.endContainer);
+        } else {
+          break;
+        }
+      } else if (range.endOffset === 0) {
+        // The range ends at the start of an element (inside). Move the end before that element.
+        range.setEndBefore(range.endContainer);
+      } else {
+        break;
+      }
+    }
+    while (!range.collapsed) {
+      if (typeof range.startContainer.nodeValue === 'string') {
+        if (range.startOffset === range.startContainer.nodeValue.length) {
+          // The range starts at the end of a text node. Move the start after that text node.
+          range.setStartAfter(range.startContainer);
+        } else {
+          break;
+        }
+      } else if (range.startOffset === range.startContainer.childNodes.length) {
+        // The range starts at the end of an element (inside). Move the start after that element.
+        range.setStartAfter(range.startContainer);
+      } else {
+        break;
+      }
+    }
+    return range.collapsed;
+  };
 })();
 
 define('node-module', {

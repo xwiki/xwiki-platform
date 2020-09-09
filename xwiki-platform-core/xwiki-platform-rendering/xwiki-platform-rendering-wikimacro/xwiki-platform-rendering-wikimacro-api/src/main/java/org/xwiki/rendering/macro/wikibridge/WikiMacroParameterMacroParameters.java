@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,39 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.rendering.macro.wikibridge;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-rendering</artifactId>
-    <version>12.8-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Rendering - Wiki Macro Bridge</name>
-  <description>XWiki Platform - Rendering - Wiki Macro Bridge</description>
-  <modules>
-    <module>xwiki-platform-rendering-wikimacro-api</module>
-    <module>xwiki-platform-rendering-wikimacro-store</module>
-  </modules>
-</project>
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Parameters for wikimacroparameter macro.
+ *
+ * @version $Id$
+ * @since 11.5RC1
+ */
+@Unstable
+public class WikiMacroParameterMacroParameters
+{
+    private String name;
+
+    /**
+     * @return the name of the macro.
+     */
+    @PropertyMandatory
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Set the name...
+     * 
+     * @param name the name to set.
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}

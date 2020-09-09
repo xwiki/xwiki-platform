@@ -209,7 +209,7 @@
   $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/toolTip.js')##
   {{html}}
-  &lt;script type="text/javascript"&gt;
+  &lt;script&gt;
   //&lt;![CDATA[
   window.ajaxurl = "$ajaxurl";
   window.allPanelsPlace = new Object();

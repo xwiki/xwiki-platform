@@ -188,7 +188,7 @@ public class EditIT
 
     @Test
     @Order(5)
-    public void testBoldButton(TestUtils setup, TestReference reference)
+    public void editWikiFormattingToolbarButtons(TestUtils setup, TestReference reference)
     {
         testToolBarButton(setup, reference, "Bold", "**%s**", "Text in Bold");
         testToolBarButton(setup, reference, "Italics", "//%s//", "Text in Italics");

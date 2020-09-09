@@ -37,7 +37,7 @@
          org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
-  <description>Handles the notififcations of user mentions.</description>
+  <description>Handles the notifications of user mentions.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -54,7 +54,7 @@
       <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- FIXME: We shouldn't rely on hibernate store since the default in the Solr store now -->
+    <!-- FIXME: We shouldn't rely on hibernate store since the default is the Solr store now -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>

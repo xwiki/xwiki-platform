@@ -60,7 +60,7 @@
     &lt;input id="pagepicker-${pagePickerCounter}-input" type="hidden" name="${prefix}${name}" value="$!pageListValue" /&gt;
     &lt;ul id="pagepicker-${pagePickerCounter}-items" class="pagepicker-list"&gt;
     &lt;/ul&gt;
-    &lt;script type="text/javascript"&gt;
+    &lt;script&gt;
     // &lt;![CDATA[
     function suggest${pagePickerCounter}(field) {
       if (!field.suggest${pagePickerCounter}) {

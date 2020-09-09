@@ -17,35 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.wikimacro.macro.wikimacroparameter;
+package org.xwiki.skinx.internal;
 
-import org.xwiki.stability.Unstable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.skinx.SkinExtensionConfiguration;
 
 /**
- * Parameters for {@link WikiMacroParameterMacro}.
- *
+ * Default implementation of {@link SkinExtensionConfiguration}.
+ * 
  * @version $Id$
- * @since 11.5RC1
+ * @since 12.7.1
+ * @since 12.8RC1
  */
-@Unstable
-public class WikiMacroParameterMacroParameters
+@Component
+@Singleton
+public class DefaultSkinExtensionConfiguration implements SkinExtensionConfiguration
 {
-    private String name;
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiProperties;
 
-    /**
-     * @return the name of the macro.
-     */
-    public String getName()
+    @Override
+    public boolean shouldRunJavaScriptInStrictMode()
     {
-        return name;
-    }
-
-    /**
-     * Set the name...
-     * @param name the name to set.
-     */
-    public void setName(String name)
-    {
-        this.name = name;
+        return this.xwikiProperties.getProperty("skinx.jsStrictModeEnabled", false);
     }
 }

@@ -147,6 +147,10 @@ admin.other.description=Verschiedene Konfigurationen für Erweiterungen.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in Google Analytics™ aktiv ist oder nicht
 
+# Social category
+### Missing: admin.social=Social
+### Missing: admin.social.description=Configuration for social features.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 

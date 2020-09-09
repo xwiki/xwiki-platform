@@ -232,7 +232,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>link</categoryIcon>
     </property>
     <property>
       <codeToExecute/>
@@ -244,10 +244,10 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>Mentions</displayInSection>
@@ -265,7 +265,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>200</sectionOrder>
     </property>
   </object>
   <object>

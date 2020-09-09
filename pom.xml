@@ -496,7 +496,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.9.15</version>
+        <version>0.9.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -511,7 +511,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.59</version>
+        <version>3.0.61</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

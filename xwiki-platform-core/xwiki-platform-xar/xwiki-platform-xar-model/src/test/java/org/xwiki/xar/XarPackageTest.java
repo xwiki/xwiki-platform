@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @version $Id$
  */
-public class XarPackageTest
+class XarPackageTest
 {
     private static final LocalDocumentReference SPACE_PAGE = new LocalDocumentReference("Space", "Page", Locale.ROOT);
 
@@ -70,10 +70,8 @@ public class XarPackageTest
         assertEquals(expected.getEntryType(), actual.getEntryType());
     }
 
-    // Tests
-
     @Test
-    public void readDescriptor() throws Exception
+    void readDescriptor() throws Exception
     {
         XarPackage xarPackage = new XarPackage();
 
@@ -104,7 +102,7 @@ public class XarPackageTest
     }
 
     @Test
-    public void readDescriptorWithEmptyId() throws Exception
+    void readDescriptorWithEmptyId() throws Exception
     {
         XarPackage xarPackage = new XarPackage();
 

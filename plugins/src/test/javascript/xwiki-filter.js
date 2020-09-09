@@ -17,15 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-filter': 'xwiki-filter/plugin'
-  },
-  shim: {
-    'xwiki-filter': ['ckeditor']
-  }
-});
-
 define(['jquery', 'testUtils', 'xwiki-filter'], function($, testUtils) {
 
   describe('XWiki Filter Plugin for CKEditor', function() {

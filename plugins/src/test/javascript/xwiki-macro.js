@@ -17,21 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-loading': 'xwiki-loading/plugin',
-    'xwiki-localization': 'xwiki-localization/plugin',
-    'xwiki-macro': 'xwiki-macro/plugin',
-    'xwiki-marker': 'xwiki-marker/plugin',
-  },
-  shim: {
-    'xwiki-loading': ['ckeditor'],
-    'xwiki-localization': ['ckeditor'],
-    'xwiki-macro': ['ckeditor', 'xwiki-marker', 'xwiki-loading', 'xwiki-localization'],
-    'xwiki-marker': ['ckeditor']
-  }
-});
-
 define(['jquery', 'ckeditor', 'testUtils', 'xwiki-macro'], function($, CKEDITOR, testUtils) {
 
 describe('XWiki Macro Plugin for CKEditor', function() {

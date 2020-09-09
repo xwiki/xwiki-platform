@@ -17,17 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    textSelection: 'xwiki-selection/plugin',
-    scrollUtils: 'xwiki-selection/plugin'
-  },
-  shim: {
-    textSelection: ['ckeditor'],
-    scrollUtils: ['ckeditor']
-  }
-});
-
 define(['jquery', 'textSelection'], function($, textSelectionAPI) {
   describe('XWiki Source Plugin for CKEditor', function() {
     it('Convert text selection between WYSIWYG and Source modes', function() {

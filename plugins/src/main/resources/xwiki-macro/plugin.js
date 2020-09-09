@@ -129,25 +129,37 @@
           'data-macro': startMacroComment.value
         });
 
+        // Add the macro output.
+        var hasPlaceholder = false;
+        output.forEach(function(node) {
+          node.remove();
+          wrapper.add(node);
+          hasPlaceholder = hasPlaceholder || isMacroPlaceholder(node);
+        });
+
         // Add a placeholder to be used when the macro output is empty or not visible. Otherwise the user might not be
         // able to select the macro to edit its parameters for instance. We do this here and not when the macro widget
         // is initialized because the browser may add content (e.g. a non-breaking space or a BR tag) to make the
         // (usually block-level) empty macro wrapper editable before the macro widget is initialized. Note that we can't
         // check if the macro output is not visible at this point so we can't show the placeholder. We do this below
         // when the macro widget is initialized.
-        var placeholder = new CKEDITOR.htmlParser.element(wrapperName, {'class': 'macro-placeholder hidden'});
-        var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
-        var text = editor.localization.get('xwiki-macro.placeholder', macroCall.name);
-        placeholder.add(new CKEDITOR.htmlParser.text(text));
-        wrapper.add(placeholder);
-
-        // Add the macro output.
-        for (var i = 0; i < output.length; i++) {
-          output[i].remove();
-          wrapper.add(output[i]);
+        if (!hasPlaceholder) {
+          var placeholder = new CKEDITOR.htmlParser.element(wrapperName, {'class': 'macro-placeholder hidden'});
+          var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
+          var text = editor.localization.get('xwiki-macro.placeholder', macroCall.name);
+          placeholder.add(new CKEDITOR.htmlParser.text(text));
+          wrapper.add(placeholder, 0);
         }
 
         startMacroComment.replaceWith(wrapper);
+      };
+
+      /**
+       * @param node an instance of CKEDITOR.htmlParser.node
+       * @return true if the given node is a macro placeholder, false othewise
+       */
+      var isMacroPlaceholder = function(node) {
+        return (node.name === 'div' || node.name === 'span') && node.hasClass('macro-placeholder');
       };
 
       var isWidgetVisible = function(widget) {

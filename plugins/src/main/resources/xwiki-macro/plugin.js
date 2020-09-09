@@ -52,8 +52,6 @@
     return nestedEditableType;
   };
 
-  var selectedMacroMarker = '__cke_selected_macro';
-
   var withLowerCaseKeys = function(object) {
     var key, keys = Object.keys(object);
     var n = keys.length;
@@ -66,7 +64,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization',
+    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization,xwiki-selection',
 
     init: function(editor) {
       var macroPlugin = this;
@@ -247,13 +245,6 @@
           }
           // Initialize the widget data.
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
-          // We need to focus the macro widget after it has been inserted or updated beause the edited content has been
-          // refreshed so the selection was lost.
-          if (data.parameters[selectedMacroMarker]) {
-            setTimeout($.proxy(this, 'scrollIntoViewAndFocus'), 0);
-          }
-          // Remove this meta data from the macro call so that it doesn't get saved.
-          delete data.parameters[selectedMacroMarker];
           // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
           data.inline = this.inline;
           // Update the macro widget data.
@@ -345,6 +336,7 @@
         async: true,
         exec: function(editor) {
           var command = this;
+          CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
           editor.setLoading(true);
           var config = editor.config['xwiki-source'] || {};
           $.post(config.htmlConverter, {
@@ -364,6 +356,7 @@
         },
         done: function(success) {
           editor.setLoading(false);
+          CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }
@@ -422,9 +415,6 @@
     },
 
     insertOrUpdateMacroWidget: function(editor, data, widget) {
-      // We're going to refresh the edited content after inserting / updating the macro widget so we mark the macro in
-      // order to be able to select it afterwards.
-      data.parameters[selectedMacroMarker] = true;
       // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
       // * if the macro is inserted then we need to wait for the macro markers to be replaced by the actual macro output
       // * if the macro is updated then we need to wait for the macro output to be updated to match the new macro data

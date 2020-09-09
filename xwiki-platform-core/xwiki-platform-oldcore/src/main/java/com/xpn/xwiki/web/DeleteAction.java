@@ -35,6 +35,7 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -234,6 +235,32 @@ public class DeleteAction extends XWikiAction
         return deleteToRecycleBin(documentReference, context, skipRecycleBin);
     }
 
+    /**
+     *
+     * @param entityReference The entity to delete
+     * @param context the current content
+     * @return {@code true} if the user is redirected, {@code false} otherwise
+     * @throws XWikiException If anything goes wrong during the document deletion
+     * @deprecated since 12.8RC1, use {@link #deleteToRecycleBin(EntityReference, XWikiContext, boolean)} instead
+     */
+    @Deprecated
+    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context)
+        throws XWikiException
+    {
+        return this.deleteToRecycleBin(entityReference, context, false);
+    }
+
+    /**
+     *
+     * @param entityReference The entity to delete
+     * @param context the current content
+     * @param skipRecycleBin If {@code false} the entity is send to the recycle bin. If {@code false}, the
+     *                       entity is deleted permanently
+     * @return {@code true} if the user is redirected, {@code false} otherwise
+     * @throws XWikiException If anything goes wrong during the document deletion
+     * @since 12.8RC1
+     */
+    @Unstable
     protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context, boolean skipRecycleBin)
         throws XWikiException
     {

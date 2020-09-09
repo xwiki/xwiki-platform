@@ -381,7 +381,13 @@ public class TextAreaClass extends StringClass
                 buffer.append(result);
             }
         } else {
-            String content = getPropertyText((BaseProperty) object.safeget(name));
+            BaseProperty property = (BaseProperty) object.safeget(name);
+            String content;
+            if (property != null) {
+                content = property.toText();
+            } else {
+                content = "";
+            }
 
             if (doc != null) {
                 String syntax = getObjectDocumentSyntax(object, context).toIdString();

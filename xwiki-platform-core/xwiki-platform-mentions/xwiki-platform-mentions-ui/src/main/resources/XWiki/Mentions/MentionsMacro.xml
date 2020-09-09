@@ -207,22 +207,14 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
             '&lt;/li&gt;',
         outputTemplate: function (param) {
           var editor = ckeditor.instances[name];
-          var currentWikiReference = xm.documentReference.extractReference(XWiki.EntityType.WIKI);
-          
-          // Compute an absolute reference containing the wiki reference even if the user is local.
-          var documentReference = XWiki.Model.resolve(param.id, XWiki.EntityType.DOCUMENT);
-          if (!documentReference.extractReference(XWiki.EntityType.WIKI)) {
-            documentReference = documentReference.appendParent(currentWikiReference);
-          }
-          var serializedReference = XWiki.Model.serialize(documentReference);
           editor.once('afterInsertHtml', function () {
             editor.execCommand('xwiki-macro-insert', {
               name: 'mention',
               inline: true,
               parameters: {
-                reference: serializedReference,
+                reference: param.id,
                 style: 'FULL_NAME',
-                anchor: getAnchor(serializedReference)
+                anchor: getAnchor(param.id)
               }
             });
           });
@@ -250,8 +242,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       return oldInline.call(this, element, updateConf(config, element.id));
     };
   });
-});
-</code>
+});</code>
     </property>
     <property>
       <name/>

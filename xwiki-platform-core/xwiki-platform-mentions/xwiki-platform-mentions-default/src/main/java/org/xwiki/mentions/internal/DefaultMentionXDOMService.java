@@ -40,6 +40,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -85,12 +86,13 @@ public class DefaultMentionXDOMService implements MentionXDOMService
     }
 
     @Override
-    public Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions)
+    public Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions,
+        WikiReference wikiReference)
     {
         Map<DocumentReference, List<String>> ret = new HashMap<>();
         for (MacroBlock block : mentions) {
             String macroReference = block.getParameter(REFERENCE_PARAM_NAME);
-            DocumentReference reference = this.documentReferenceResolver.resolve(macroReference);
+            DocumentReference reference = this.documentReferenceResolver.resolve(macroReference, wikiReference);
             String anchor = block.getParameter(ANCHORID_PARAM_NAME);
             ret.merge(reference, new ArrayList<>(Collections.singletonList(anchor)), (l1, l2) -> {
                 l1.addAll(l2);

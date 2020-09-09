@@ -42,6 +42,7 @@ import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -196,7 +197,7 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         List<MacroBlock> blocks = this.xdomService.listMentionMacros(xdom);
 
         Map<DocumentReference, List<String>> counts =
-            this.xdomService.countByIdentifier(blocks);
+            this.xdomService.countByIdentifier(blocks, documentReference.getWikiReference());
 
         for (Map.Entry<DocumentReference, List<String>> entry : counts.entrySet()) {
             boolean emptyAnchorProcessed = false;
@@ -217,8 +218,9 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
         List<MacroBlock> oldMentions = this.xdomService.listMentionMacros(oldXDOM);
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXDOM);
 
-        Map<DocumentReference, List<String>> oldCounts = this.xdomService.countByIdentifier(oldMentions);
-        Map<DocumentReference, List<String>> newCounts = this.xdomService.countByIdentifier(newMentions);
+        WikiReference wikiReference = documentReference.getWikiReference();
+        Map<DocumentReference, List<String>> oldCounts = this.xdomService.countByIdentifier(oldMentions, wikiReference);
+        Map<DocumentReference, List<String>> newCounts = this.xdomService.countByIdentifier(newMentions, wikiReference);
 
         for (Map.Entry<DocumentReference, List<String>> entry : newCounts.entrySet()) {
             DocumentReference key = entry.getKey();
@@ -256,8 +258,7 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
 
         // the matching element has not be found in the previous version of the document
         // notification are send unconditionally to all mentioned users.
-        this.xdomService
-            .countByIdentifier(newMentions)
+        this.xdomService.countByIdentifier(newMentions, documentReference.getWikiReference())
             .forEach((key, value) -> value.forEach(
                 anchorId -> sendNotif(
                     new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,

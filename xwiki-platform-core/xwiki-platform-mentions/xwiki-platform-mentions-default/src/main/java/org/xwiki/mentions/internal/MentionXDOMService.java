@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -48,11 +49,13 @@ public interface MentionXDOMService
     /**
      * Count the number of mentions per reference.
      *
-     * @param mentions the list of mentions.
+     * @param mentions the list of mentions
+     * @param wikiReference the reference to the wiki in which the mentions occured
      * @return the map of anchors of mentions per reference. If the anchor is not specified, then the list must contain
-     *          an empty value (null or empty string).
+     *          an empty value (null or empty string)
      */
-    Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions);
+    Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions,
+        WikiReference wikiReference);
 
     /**
      *

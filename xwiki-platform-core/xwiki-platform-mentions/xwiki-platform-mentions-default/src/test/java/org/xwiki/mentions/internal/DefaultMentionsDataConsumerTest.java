@@ -123,7 +123,7 @@ class DefaultMentionsDataConsumerTest
         Map<DocumentReference, List<String>> value = new HashMap<>();
         value.put(user1, asList("anchor1", "anchor2"));
         value.put(authorReference, asList("", null));
-        when(this.xdomService.countByIdentifier(mentions)).thenReturn(value);
+        when(this.xdomService.countByIdentifier(mentions, documentReference.getWikiReference())).thenReturn(value);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.U2")).thenReturn(authorReference);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
         XWikiDocument mock = mock(XWikiDocument.class);
@@ -187,7 +187,7 @@ class DefaultMentionsDataConsumerTest
         Map<DocumentReference, List<String>> value = new HashMap<>();
         value.put(user1, asList("anchor1", "anchor2"));
         value.put(authorReference, asList("", null));
-        when(this.xdomService.countByIdentifier(mentions)).thenReturn(value);
+        when(this.xdomService.countByIdentifier(mentions, documentReference.getWikiReference())).thenReturn(value);
         when(this.xdomService.parse("some content with mentions", XWIKI_2_1)).thenReturn(Optional.of(xdom));
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.U2")).thenReturn(authorReference);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
@@ -415,10 +415,9 @@ class DefaultMentionsDataConsumerTest
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Creator")).thenReturn(authorReference);
         when(this.documentRevisionProvider.getRevision(any(DocumentReference.class), any(String.class)))
             .thenReturn(null);
-        this.dataConsumer.consume(buildDefaultUpdateMentionData()
-        );
+        this.dataConsumer.consume(buildDefaultUpdateMentionData());
 
-        verify(this.xdomService, never()).countByIdentifier(any());
+        verify(this.xdomService, never()).countByIdentifier(any(), any());
         verify(this.xdomService, never()).listMentionMacros(any());
         verify(this.xdomService, never()).parse(any(), any());
         verify(this.notificationService, never()).sendNotification(any());
@@ -430,7 +429,8 @@ class DefaultMentionsDataConsumerTest
         DocumentReference documentReference1 = new DocumentReference("xwiki", "XWiki", "U1");
         Map<DocumentReference, List<String>> mentionsCount = new HashMap<>();
         mentionsCount.put(documentReference1, Collections.singletonList("anchor1"));
-        when(this.xdomService.countByIdentifier(newCommentNewMentions)).thenReturn(mentionsCount);
+        when(this.xdomService.countByIdentifier(newCommentNewMentions, documentReference.getWikiReference()))
+            .thenReturn(mentionsCount);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Creator")).thenReturn(authorReference);
         when(this.documentReferenceResolver.resolve("xwiki:XWiki.Doc")).thenReturn(documentReference);
         return documentReference1;

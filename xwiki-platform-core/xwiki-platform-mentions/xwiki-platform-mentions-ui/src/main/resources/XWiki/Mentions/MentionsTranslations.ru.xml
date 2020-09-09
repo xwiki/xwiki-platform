@@ -51,5 +51,6 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Цвет упомина�
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Цвет упоминаний для текущего пользователя (Примечание: используется в качестве значения атрибута css background-color).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Цвета самоупоминания
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Включить цитирование
-XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Определяет, включена ли цитата текста, окружающего упоминание, в уведомления об упоминании пользователя.</content>
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Определяет, включена ли цитата текста, окружающего упоминание, в уведомления об упоминании пользователя.
+### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.</content>
 </xwikidoc>

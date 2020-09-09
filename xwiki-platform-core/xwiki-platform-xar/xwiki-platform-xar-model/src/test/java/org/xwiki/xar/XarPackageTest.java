@@ -27,9 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.model.XarModel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for {@link XarPackage}.
+ *
+ * @version $Id$
+ */
 public class XarPackageTest
 {
     private static final LocalDocumentReference SPACE_PAGE = new LocalDocumentReference("Space", "Page", Locale.ROOT);

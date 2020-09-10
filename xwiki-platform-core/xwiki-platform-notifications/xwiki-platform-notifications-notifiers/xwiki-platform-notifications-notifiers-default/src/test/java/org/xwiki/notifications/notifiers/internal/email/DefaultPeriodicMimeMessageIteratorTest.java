@@ -52,9 +52,9 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.api.Attachment;
 
 import static org.jgroups.util.Util.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -70,7 +70,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultPeriodicMimeMessageIteratorTest
+class DefaultPeriodicMimeMessageIteratorTest
 {
     private static final DocumentReference TEMPLATE_REFERENCE = new DocumentReference("xwiki", "XWiki", "Template");
 
@@ -106,7 +106,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
     private UserAvatarAttachmentExtractor userAvatarAttachmentExtractor;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
         when(this.mailSenderConfiguration.getFromAddress()).thenReturn("xwiki@xwiki.org");

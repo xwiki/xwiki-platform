@@ -380,8 +380,7 @@ public class XMLScriptServiceTest
     @Test
     void escapeForElementContent()
     {
-        assertEquals("&#60;a b='c'&#62;d&#60;/a&#62;",
-            XMLScriptService.escapeForElementContent("<a b='c'>d</a>"));
+        assertEquals("&#60;a b='c'>d&#60;/a>", XMLScriptService.escapeForElementContent("<a b='c'>d</a>"));
     }
 
     @Test

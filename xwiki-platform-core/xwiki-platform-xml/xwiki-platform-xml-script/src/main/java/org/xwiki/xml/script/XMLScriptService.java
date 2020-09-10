@@ -31,6 +31,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -115,7 +116,7 @@ public class XMLScriptService implements ScriptService
         // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
         // objects from being converted using other conversion methods by the Velocity converters during the method
         // call.
-        return XMLUtils.escapeElementContent(Objects.toString(content, null));
+        return XMLUtils.escapeElementText(Objects.toString(content, null));
     }
 
     /**
@@ -130,7 +131,7 @@ public class XMLScriptService implements ScriptService
         // The method has an Object parameter, converted using Objects#toString(Object, String) to prevent non-string
         // objects from being converted using other conversion methods by the Velocity converters during the method
         // call.
-        return XMLUtils.unescape(Objects.toString(content, null));
+        return StringEscapeUtils.unescapeXml(Objects.toString(content, null));
     }
 
     /**

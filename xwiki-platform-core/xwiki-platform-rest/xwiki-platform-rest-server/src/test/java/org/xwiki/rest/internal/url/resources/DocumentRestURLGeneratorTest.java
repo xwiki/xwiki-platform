@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,13 +46,13 @@ import static org.mockito.Mockito.when;
  * @since 10.4RC1
  */
 @ComponentTest
-public class DocumentRestURLGeneratorTest
+class DocumentRestURLGeneratorTest
 {
     @InjectMockComponents
     private DocumentRestURLGenerator generator;
 
     @BeforeEach
-    public void setup(ComponentManager componentManager) throws Exception
+    void setup(ComponentManager componentManager) throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         XWikiContext xwikiContext = xwikiContextProvider.get();
@@ -66,7 +66,7 @@ public class DocumentRestURLGeneratorTest
     }
 
     @Test
-    public void getURLWithoutLocale() throws Exception
+    void getURLWithoutLocale() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page",
@@ -74,7 +74,7 @@ public class DocumentRestURLGeneratorTest
     }
 
     @Test
-    public void getURLWithLocale() throws Exception
+    void getURLWithLocale() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page", Locale.FRENCH);
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page/translations/fr",
@@ -82,7 +82,7 @@ public class DocumentRestURLGeneratorTest
     }
 
     @Test
-    public void getURLWithSlash() throws Exception
+    void getURLWithSlash() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "pa/ge");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/pa%2Fge",

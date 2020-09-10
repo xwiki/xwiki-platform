@@ -60,7 +60,7 @@ import org.xwiki.resource.entity.EntityResourceAction;
 @Singleton
 public class DefaultEntityResourceActionLister implements EntityResourceActionLister, Initializable
 {
-    private static final String STRUTS_CONFIG_RESOURCE = "/WEB-INF/struts-config.xml";
+    private static final String STRUTS_CONFIG_RESOURCE = "/WEB-INF/struts.xml";
 
     private List<String> strutsActionNames;
 

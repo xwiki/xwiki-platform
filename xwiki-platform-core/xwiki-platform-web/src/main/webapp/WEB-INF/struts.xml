@@ -89,61 +89,61 @@
     <!-- XWiki Struts Application with Velocity -->
     <action class="com.xpn.xwiki.web.ViewAction"
             name="view">
-        <forward name="view" path="/templates/view.vm"/>
-        <forward name="notexist" path="/templates/notexist.vm"/>
-        <forward name="plain" path="/templates/plain.vm"/>
+        <result name="view" type="velocity">/templates/view.vm</result>
+        <result name="notexist" type="velocity">/templates/notexist.vm</result>
+        <result name="plain" type="velocity">/templates/plain.vm</result>
     </action>
     <action class="com.xpn.xwiki.web.ViewAttachRevAction"
             name="viewattachrev">
-        <forward name="viewattachrev" path="/templates/viewattachrev.vm"/>
+        <result name="viewattachrev" type="velocity">/templates/viewattachrev.vm</result>
     </action>
 
     <action class ="com.xpn.xwiki.web.ViewrevAction"
             name="viewrev">
-        <forward name="notexist" path="/templates/notexist.vm"></forward>
-        <forward name="view" path="/templates/view.vm"></forward>
+        <result name="notexist" type="velocity">/templates/notexist.vm</result>
+        <result name="view" type="velocity">/templates/view.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.PDFAction"
             name="pdf">
     </action>
     <action class="com.xpn.xwiki.web.TexAction"
-                name="tex">
+            name="tex">
     </action>
     <action class="com.xpn.xwiki.web.EditAction"
             name="edit">
-        <forward name="edit" path="/templates/edit.vm"/>
+        <result name="edit" type="velocity">/templates/edit.vm</result>
     </action>
     <action class="com.xpn.xwiki.web.CreateAction"
             name="create">
-        <forward name="create" path="/templates/create.vm" />
+        <result name="create" type="velocity">/templates/create.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.InlineAction"
             name="inline">
-        <forward name="inline" path="/templates/inline.vm"/>
-        <forward name="pageexist" path="/templates/inline.vm"/>
+        <result name="inline" type="velocity">/templates/inline.vm</result>
+        <result name="pageexist" type="velocity">/templates/inline.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.PreviewAction"
             name="preview">
-        <forward name="preview" path="/templates/preview.vm"/>
+        <result name="preview" type="velocity">/templates/preview.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.SaveAction"
             name="save">
-        <forward name="save" path="/templates/save.vm"/>
-      </action>
+        <result name="save" type="velocity">/templates/save.vm</result>
+    </action>
 
     <action class="com.xpn.xwiki.web.SaveAndContinueAction"
-            name="saveandcontinue">
-        <forward name="save" path="/templates/save.vm"/>
-      </action>
+            name="saveandcontinue" oldname="save">
+        <result name="save" type="velocity">/templates/save.vm</result>
+    </action>
 
     <action class="com.xpn.xwiki.web.RollbackAction"
             name="rollback">
-        <forward name="edit" path="/templates/rollback.vm"/>
-        <forward name="rollback" path="/templates/rollback.vm"/>
+        <result name="edit" type="velocity">/templates/rollback.vm</result>
+        <result name="rollback" type="velocity">/templates/rollback.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.DeleteVersionsAction"
@@ -152,13 +152,13 @@
 
     <action class="com.xpn.xwiki.web.CancelAction"
             name="cancel">
-        <forward name="cancel" path="/templates/cancel.vm"/>
+        <result name="cancel" type="velocity">/templates/cancel.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.DeleteAction"
             name="delete">
-        <forward name="delete" path="/templates/delete.vm"/>
-        <forward name="deleted" path="/templates/deleted.vm"/>
+        <result name="delete" type="velocity">/templates/delete.vm</result>
+        <result name="deleted" type="velocity">/templates/deleted.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.DeleteSpaceAction"
@@ -171,23 +171,23 @@
 
     <action class="com.xpn.xwiki.web.ResetVersionsAction"
             name="reset">
-        <forward name="delete" path="/templates/reset.vm"/>
-        <forward name="deleted" path="/templates/reset.vm"/>
+        <result name="delete" type="velocity">/templates/reset.vm</result>
+        <result name="deleted" type="velocity">/templates/reset.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.RegisterAction"
             name="register">
-        <forward name="register" path="/templates/register.vm"/>
+        <result name="register" type="velocity">/templates/register.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.PropUpdateAction"
             name="propupdate">
-        <forward name="propupdate" path="/templates/edit.vm"/>
+        <result name="propupdate" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.PropAddAction"
             name="propadd">
-        <forward name="propadd" path="/templates/edit.vm"/>
+        <result name="propadd" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.PropDisableAction"
@@ -200,21 +200,21 @@
 
     <action class="com.xpn.xwiki.web.PropDeleteAction"
             name="propdelete">
-        <forward name="propdelete" path="/templates/edit.vm"/>
+        <result name="propdelete" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.ObjectAddAction"
             name="objectadd">
-        <forward name="objectadd" path="/templates/edit.vm"/>
+        <result name="objectadd" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.CommentAddAction"
             name="commentadd">
-        <forward name="commentadd" path="/templates/edit.vm"/>
+        <result name="commentadd" type="velocity">/templates/edit.vm</result>
     </action>
     <action class="com.xpn.xwiki.web.CommentSaveAction"
             name="commentsave">
-        <forward name="commentsave" path="/templates/edit.vm"/>
+        <result name="commentsave" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.ObjectsSynchronizeAction"
@@ -222,17 +222,17 @@
     </action>
     <action class="com.xpn.xwiki.web.ObjectRemoveAction"
             name="objectremove">
-        <forward name="objectremove" path="/templates/edit.vm"/>
+        <result name="objectremove" type="velocity">/templates/edit.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.AttachAction"
             name="attach">
-        <forward name="attach" path="/templates/attachments.vm"/>
+        <result name="attach" type="velocity">/templates/attachments.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.UploadAction"
             name="upload">
-        <forward name="upload" path="/templates/attachments.vm"/>
+        <result name="upload" type="velocity">/templates/attachments.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.DownloadAction"
@@ -282,7 +282,7 @@
 
     <action class="com.xpn.xwiki.web.LogoutAction"
             name="logout">
-        <forward name="logout" path="/templates/logout.vm"/>
+        <result name="logout" type="velocity">/templates/logout.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.plugin.charts.actions.ChartingAction"
@@ -299,27 +299,27 @@
 
     <action class="com.xpn.xwiki.web.AdminAction"
             name="admin">
-        <forward name="admin" path="/templates/admin.vm"/>
+        <result name="admin" type="velocity">/templates/admin.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.ExportAction"
             name="export">
-        <forward name="export" path="/templates/export.vm"/>
+        <result name="export" type="velocity" type="velocity">/templates/export.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.ImportAction"
             name="import">
-        <forward name="import" path="/templates/import.vm"/>
+        <result name="import" type="velocity">/templates/import.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.GetAction"
             name="get">
-        <forward name="get" path="/templates/get.vm"/>
+        <result name="get" type="velocity">/templates/get.vm</result>
     </action>
 
     <action class="org.xwiki.extension.distribution.internal.DistributionAction"
             name="distribution">
-        <forward name="distribution" path="/templates/distribution.vm"/>
+        <result name="distribution" type="velocity">/templates/distribution.vm</result>
     </action>
 
     <action class="com.xpn.xwiki.web.UnknownAction"

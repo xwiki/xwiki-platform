@@ -71,8 +71,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -590,9 +590,9 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testGetXObjectWithObjectReference()
     {
-        Assert.assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
+        assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
 
-        Assert.assertSame(this.baseObject,
+        assertSame(this.baseObject,
             this.document.getXObject(new ObjectReference(
                 this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()),
                 this.document.getDocumentReference())));
@@ -601,11 +601,11 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testGetXObjectWithNumber()
     {
-        Assert.assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber()));
-        Assert.assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber()));
-        Assert.assertSame(this.baseObject,
+        assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber()));
+        assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber()));
+        assertSame(this.baseObject,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject.getNumber()));
-        Assert.assertSame(this.baseObject2,
+        assertSame(this.baseObject2,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject2.getNumber()));
     }
 

@@ -52,7 +52,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -66,7 +66,11 @@ import static org.mockito.Mockito.when;
  * @since 9.7RC1
  * @version $Id$
  */
-@ComponentList(TargetableNotificationPreferenceBuilder.class)
+// @formatter:off
+@ComponentList({
+    TargetableNotificationPreferenceBuilder.class
+})
+// @formatter:on
 public class NotificationPreferenceScriptServiceTest
 {
     @Rule

@@ -58,7 +58,7 @@ class DefaultStringEntityReferenceSerializerTest implements TestConstants
     private DefaultStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.provider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.provider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);

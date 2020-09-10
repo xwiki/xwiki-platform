@@ -19,16 +19,17 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver}.
@@ -36,31 +37,34 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentTest
+// @formatter:off
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class ExplicitReferenceDocumentReferenceResolverTest
+// @formatter:on
+class ExplicitReferenceDocumentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private DefaultStringEntityReferenceResolver resolver;
 
-    private DocumentReferenceResolver<EntityReference> resolver;
+    private DocumentReferenceResolver<EntityReference> documentResolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.resolver = new ExplicitReferenceDocumentReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
+        this.documentResolver = new ExplicitReferenceDocumentReferenceResolver();
+        ReflectionUtils.setFieldValue(this.documentResolver, "entityReferenceResolver", this.resolver);
     }
 
     @Test
-    public void resolveWithExplicitDocumentReference()
+    void resolveWithExplicitDocumentReference()
     {
-        DocumentReference reference = this.resolver.resolve(null, new DocumentReference("wiki", "space", "page"));
+        DocumentReference reference =
+            this.documentResolver.resolve(null, new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals("space", reference.getLastSpaceReference().getName());
-        Assert.assertEquals("wiki", reference.getWikiReference().getName());
+        assertEquals("page", reference.getName());
+        assertEquals("space", reference.getLastSpaceReference().getName());
+        assertEquals("wiki", reference.getWikiReference().getName());
     }
 }

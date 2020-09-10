@@ -19,35 +19,11 @@
  */
 package org.xwiki.mentions.internal.descriptors;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.mentions.events.MentionEvent;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.preferences.TargetableNotificationPreference;
-import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
-import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.xwiki.mentions.events.MentionEvent.EVENT_TYPE;
 
@@ -61,76 +37,8 @@ import static org.xwiki.mentions.events.MentionEvent.EVENT_TYPE;
 @Component
 @Singleton
 @Named(EVENT_TYPE)
-public class MentionEventDescriptor implements RecordableEventDescriptor, Initializable
+public class MentionEventDescriptor implements RecordableEventDescriptor
 {
-    @Inject
-    private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
-
-    @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
-    private Logger logger;
-
-    /**
-     * {@inheritDoc}
-     *
-     * This initialization save a new notification filter in preferences to enable automatically mentions notification.
-     */
-    @Override
-    public void initialize() throws InitializationException
-    {
-        WikiReference wikiReference = this.contextProvider.get().getWikiReference();
-        // Save it
-        try {
-            if (!this.isMentionDefaultNotificationPreferenceAlreadySaved(wikiReference)) {
-                this.saveDefaultNotificationPreference(wikiReference);
-            }
-        } catch (NotificationException e) {
-            // We don't throw an InitializationException since it doesn't prevent the component to be used.
-            this.logger.warn("Error while enabling MentionEvent for the wiki {}: {}", wikiReference,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-    }
-
-    private boolean isMentionDefaultNotificationPreferenceAlreadySaved(WikiReference wikiReference)
-        throws NotificationException
-    {
-        for (NotificationPreference preference : this.notificationPreferenceManager
-            .getAllPreferences(wikiReference)) {
-            if (preference.getProperties() != null
-                && preference.getStartDate() != null
-                && MentionEvent.EVENT_TYPE.equals(preference.getProperties()
-                .get(NotificationPreferenceProperty.EVENT_TYPE))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void saveDefaultNotificationPreference(WikiReference wikiReference) throws NotificationException
-    {
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
-        properties.put(NotificationPreferenceProperty.EVENT_TYPE, MentionEvent.EVENT_TYPE);
-
-        // Create the preference
-        TargetableNotificationPreference notificationPreference = this.targetableNotificationPreferenceBuilder
-            .prepare()
-            .setCategory(NotificationPreferenceCategory.DEFAULT)
-            .setEnabled(true)
-            .setFormat(NotificationFormat.ALERT)
-            .setProperties(properties)
-            .setProviderHint(WikiNotificationPreferenceProvider.NAME)
-            .setStartDate(new Date())
-            .setTarget(wikiReference)
-            .build();
-
-        this.notificationPreferenceManager.savePreferences(Collections.singletonList(notificationPreference));
-    }
-
     @Override
     public String getEventType()
     {

@@ -41,7 +41,7 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
-    protected UserReference resolve(String userName, DocumentReferenceResolver<String> resolver, Object[] parameters)
+    protected UserReference resolve(String userName, DocumentReferenceResolver<String> resolver, Object... parameters)
     {
         UserReference reference = resolveName(userName);
         if (reference == null) {
@@ -51,7 +51,8 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
-            reference = new DocumentUserReference(resolver.resolve(userName, baseEntityReference), this.entityReferenceProvider);
+            reference = new DocumentUserReference(resolver.resolve(userName, baseEntityReference),
+                this.entityReferenceProvider);
         }
         return reference;
     }

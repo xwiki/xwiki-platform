@@ -57,7 +57,6 @@ class CurrentDocumentStringUserReferenceResolverTest
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-
     @Test
     void resolveWithoutParameter()
     {

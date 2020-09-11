@@ -39,16 +39,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefautConfiguredStringUserReferenceResolver}.
+ * Unit tests for {@link DefaultConfiguredStringUserReferenceResolver}.
  *
  * @version $Id$
  * @since 12.8RC1
  */
 @ComponentTest
-public class DefautConfiguredStringUserReferenceResolverTest
+public class DefaultConfiguredStringUserReferenceResolverTest
 {
     @InjectMockComponents
-    private DefautConfiguredStringUserReferenceResolver resolver;
+    private DefaultConfiguredStringUserReferenceResolver resolver;
 
     @MockComponent
     @Named("context")

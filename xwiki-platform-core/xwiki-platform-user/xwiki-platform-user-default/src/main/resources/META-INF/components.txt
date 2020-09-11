@@ -4,7 +4,7 @@ org.xwiki.user.internal.SuperAdminConfigurationSource
 org.xwiki.user.internal.AllSuperAdminConfigurationSource
 org.xwiki.user.internal.GuestConfigurationSource
 org.xwiki.user.internal.AllGuestConfigurationSource
-org.xwiki.user.internal.DefautConfiguredStringUserReferenceResolver
+org.xwiki.user.internal.DefaultConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.CurrentConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer
 org.xwiki.user.internal.UserReferenceConverter

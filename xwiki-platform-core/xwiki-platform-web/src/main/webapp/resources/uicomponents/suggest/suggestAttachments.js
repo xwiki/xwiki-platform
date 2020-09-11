@@ -294,15 +294,47 @@ define('xwiki-file-picker', ['jquery'], function($) {
   };
 });
 
+define('xwiki-l10n', ['jquery'], function($) {
+  var withParams = function(translation) {
+    return function() {
+      var result = translation;
+      $.each(arguments, function(index, value) {
+        result = result.replace('{' + index + '}', value);
+      });
+      return result;
+    };
+  };
+
+  return function(entries) {
+    $.each(entries, function(key, value) {
+      if (typeof value === 'string' && value.match(/{\d+}/)) {
+        entries[key] = withParams(value);
+      }
+    });
+    return entries;
+  };
+});
+
 define('xwiki-suggestAttachments', [
   'jquery',
   'xwiki-attachments-store',
   'xwiki-attachments-icon',
   'xwiki-attachments-filter',
   'xwiki-file-picker',
+  'xwiki-l10n',
   'xwiki-selectize'
-], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker) {
+], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker, L10n) {
   'use strict';
+
+  var l10n = L10n({
+    upload: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.upload')),
+    uploading: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploading',
+      ['{0}'])),
+    uploadDone: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadDone',
+      ['{0}'])),
+    uploadFailed: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadFailed',
+      ['{0}']))
+  });
 
   var getSelectizeOptions = function(select) {
     return {
@@ -460,7 +492,7 @@ define('xwiki-suggestAttachments', [
    */
   var addFileUploadSupport = function(selectize) {
     // Activate the styles needed to show the upload progress.
-    (selectize.$wrapper).addClass('async-create');
+    (selectize.get$('wrapper')).addClass('async-create');
 
     // Show the Create option even when the input is empty in order to allow the user to upload files.
     var oldCanCreate = selectize.canCreate;
@@ -475,8 +507,7 @@ define('xwiki-suggestAttachments', [
         return oldCreate.apply(this, arguments);
       } else {
         // Allow the user to upload a file.
-        var text = $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.upload'));
-        return $('<div class="create upload option"/>').text(text);
+        return $('<div class="create upload option"/>').text(l10n.upload);
       }
     };
 
@@ -549,11 +580,7 @@ define('xwiki-suggestAttachments', [
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
     var attachmentName = '<em>' + $('<em/>').text(attachment.label).html() + '</em>';
-    var notification = new XWiki.widgets.Notification(
-      ($jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploading',
-        ['{0}']))).replace('{0}', attachmentName),
-      'inprogress'
-    );
+    var notification = new XWiki.widgets.Notification(l10n.uploading(attachmentName), 'inprogress');
     attachment.data.upload = {
       status: 'pending',
       progress: {
@@ -573,19 +600,11 @@ define('xwiki-suggestAttachments', [
     }).done(function(attachment) {
       attachment.data.upload = {status: 'done'};
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(
-        ($jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadDone',
-          ['{0}']))).replace('{0}', attachmentName),
-        'done'
-      ));
+      notification.replace(new XWiki.widgets.Notification(l10n.uploadDone(attachmentName), 'done'));
     }).fail(function() {
       attachment.data.upload.status = 'failed';
       selectize.updateOption(attachment.value, attachment);
-      notification.replace(new XWiki.widgets.Notification(
-        ($jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadFailed',
-          ['{0}']))).replace('{0}', attachmentName),
-        'error'
-      ));
+      notification.replace(new XWiki.widgets.Notification(l10n.uploadFailed(attachmentName), 'error'));
     });
   };
 
@@ -596,7 +615,7 @@ define('xwiki-suggestAttachments', [
 
   var acceptDroppedFiles = function(selectize) {
     // Prevent any unwanted behaviors for the drag & drop events across browsers.
-    (selectize.$wrapper).on('drag dragstart dragend dragover dragenter dragleave drop', function(event) {
+    (selectize.get$('wrapper')).on('drag dragstart dragend dragover dragenter dragleave drop', function(event) {
       event.preventDefault();
       event.stopPropagation();
     // Indicate visually that the user can drop the files.

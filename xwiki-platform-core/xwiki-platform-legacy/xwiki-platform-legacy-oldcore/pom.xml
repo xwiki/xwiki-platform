@@ -212,6 +212,13 @@
               </processorProperties>
             </configuration>
           </execution>
+          <execution>
+            <id>spoon-test</id>
+            <configuration>
+              <!-- TODO: Remove once https://github.com/INRIA/spoon/issues/3583 is fixed -->
+              <skip>true</skip>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>

@@ -24,17 +24,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Converts a {@link String} representing a user id into a {@link UserReference}.
+ * Converts a {@link String} representing a user id into a {@link UserReference}, relatively to the current wiki or
+ * sub-wiki.
  * <p>
- * The conversion takes into account the current wiki.
  * Thus, "XWiki.U1" will be resolved to "xwiki:XWiki.U1" on the main wiki, and to "s1:XWiki.U1" in the context of the
  * sub-wiki s1.
  *
@@ -43,26 +39,16 @@ import org.xwiki.user.UserReferenceResolver;
  */
 @Singleton
 @Component
-@Named("current")
-public class CurrentStringUserReferenceResolver implements UserReferenceResolver<String>
+@Named("current/document")
+public class CurrentDocumentStringUserReferenceResolver extends AbstractDocumentStringUserReferenceResolver
 {
     @Inject
-    private EntityReferenceProvider entityReferenceProvider;
-
-    @Inject
     @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> resolver;
 
     @Override
-    public UserReference resolve(String rawReference, Object... parameters)
+    public UserReference resolve(String userName, Object... parameters)
     {
-        UserReference ret;
-        if (rawReference == null) {
-            ret = CurrentUserReference.INSTANCE;
-        } else {
-            DocumentReference documentReference = this.documentReferenceResolver.resolve(rawReference);
-            ret = new DocumentUserReference(documentReference, this.entityReferenceProvider);
-        }
-        return ret;
+        return resolve(userName, this.resolver, parameters);
     }
 }

@@ -53,7 +53,18 @@
         if (contentsSpace) {
           contentsSpace.removeStyle('visibility');
         }
-        if (this.editable()) {
+        var editable = this.editable();
+        if (editable) {
+          if (editable.hasFocus) {
+            // Firefox can have problems if we turn contenteditable=true on an element that was previously focused. The
+            // workaround is to blur the element before making it editable and then focus it back.
+            // Bug 1587966: Cursor does not appear if element is focused before being made contenteditable
+            // CKEDITOR-369: The caret is not visible anymore after inserting a macro, when using the in-place editor
+            editable.$.blur();
+            setTimeout(function() {
+              editable.focus();
+            }, 0);
+          }
           // End the read-only mode.
           this.setReadOnly(false);
         }

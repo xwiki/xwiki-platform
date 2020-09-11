@@ -23,50 +23,45 @@ import java.lang.reflect.Type;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.user.UserConfiguration;
-import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Finds the User Reference Resolver based on the configured User store hint.
+ * Common code to find the User Reference Resolver based on the configured User store hint.
  *
  * @version $Id$
- * @since 12.2
+ * @since 12.8RC1
  */
-@Component
-@Singleton
-public class ConfiguredStringUserReferenceResolver implements UserReferenceResolver<String>
+public abstract class AbstractConfiguredStringUserReferenceResolver implements UserReferenceResolver<String>
 {
+    @Inject
+    protected UserConfiguration userConfiguration;
+
     @Inject
     @Named("context")
     private ComponentManager componentManager;
 
-    @Inject
-    private UserConfiguration userConfiguration;
-
-    @Override
-    public UserReference resolve(String userName, Object... parameters)
-    {
-        return resolveUserReferenceResolver().resolve(userName, parameters);
-    }
-
-    private UserReferenceResolver<String> resolveUserReferenceResolver()
+    /**
+     * Finds a {@code UserReferenceResolver<String>} according to the provided role hint.
+     * @param roleHint the role hint
+     * @return the resolved {@code UserReferenceResolver<String>} component
+     */
+    protected UserReferenceResolver<String> resolveUserReferenceResolver(String roleHint)
     {
         Type type = new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
         try {
-            return this.componentManager.getInstance(type, this.userConfiguration.getStoreHint());
+            return this.componentManager.getInstance(type, roleHint);
         } catch (ComponentLookupException e) {
             // If the configured user store hint is invalid (i.e. there's no resolver for it, then the XWiki instance
             // cannot work and thus we need to fail hard and fast. Hence the runtime exception.
-            throw new RuntimeException(String.format(
-                "Failed to find user reference resolver for role [%s] and hint [%s]", type,
-                this.userConfiguration.getStoreHint()), e);
+            throw new RuntimeException(
+                String.format("Failed to find user reference resolver for role [%s] and hint [%s]", type,
+                    this.userConfiguration.getStoreHint()),
+                e);
         }
     }
 }

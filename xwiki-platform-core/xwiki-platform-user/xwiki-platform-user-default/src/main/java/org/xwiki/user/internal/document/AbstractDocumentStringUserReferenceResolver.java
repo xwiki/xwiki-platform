@@ -20,10 +20,7 @@
 package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -32,26 +29,19 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReference;
 
 /**
- * Converts a {@link String} representing a user id into a {@link UserReference}.
+ * Common code for all the converters from a {@link String} representing a user id into a {@link UserReference}.
  *
  * @version $Id$
- * @since 12.2
+ * @since 12.8RC1
  */
-@Component
-@Named("document")
-@Singleton
-public class DocumentStringUserReferenceResolver extends AbstractUserReferenceResolver<String>
+public abstract class AbstractDocumentStringUserReferenceResolver extends AbstractUserReferenceResolver<String>
 {
     private static final EntityReference USER_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
-    @Inject
-    private DocumentReferenceResolver<String> resolver;
-
-    @Override
-    public UserReference resolve(String userName, Object... parameters)
+    protected UserReference resolve(String userName, DocumentReferenceResolver<String> resolver, Object[] parameters)
     {
         UserReference reference = resolveName(userName);
         if (reference == null) {
@@ -61,8 +51,7 @@ public class DocumentStringUserReferenceResolver extends AbstractUserReferenceRe
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
-            reference = new DocumentUserReference(this.resolver.resolve(userName, baseEntityReference),
-                this.entityReferenceProvider);
+            reference = new DocumentUserReference(resolver.resolve(userName, baseEntityReference), this.entityReferenceProvider);
         }
         return reference;
     }

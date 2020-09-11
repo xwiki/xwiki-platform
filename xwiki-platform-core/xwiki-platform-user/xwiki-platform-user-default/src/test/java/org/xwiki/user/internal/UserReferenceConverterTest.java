@@ -19,8 +19,6 @@
  */
 package org.xwiki.user.internal;
 
-import java.lang.reflect.Type;
-
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,6 @@ import org.xwiki.user.UserReferenceResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,15 +52,15 @@ class UserReferenceConverterTest
     void convertToType()
     {
         UserReference userReference = () -> false;
-        when(this.userReferenceResolver.resolve("XWiki.U1")).thenReturn(userReference);
+        when(this.userReferenceResolver.resolve("space.userPage")).thenReturn(userReference);
 
-        UserReference actual = this.converter.convertToType(mock(Type.class), "XWiki.U1");
-        assertEquals(userReference, actual);
+        UserReference result = this.converter.convertToType(null, "space.userPage");
+        assertEquals(userReference, result);
     }
 
     @Test
     void convertToTypeValueNull()
     {
-        assertNull(this.converter.convertToType(mock(Type.class), null));
+        assertNull(this.converter.convertToType(null, null));
     }
 }

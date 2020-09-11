@@ -41,7 +41,8 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
-    protected UserReference resolve(String userName, DocumentReferenceResolver<String> resolver, Object... parameters)
+    @Override
+    public UserReference resolve(String userName, Object... parameters)
     {
         UserReference reference = resolveName(userName);
         if (reference == null) {
@@ -51,9 +52,15 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
-            reference = new DocumentUserReference(resolver.resolve(userName, baseEntityReference),
+            reference = new DocumentUserReference(getDocumentReferenceResolver().resolve(userName, baseEntityReference),
                 this.entityReferenceProvider);
         }
         return reference;
     }
+
+    /**
+     * @return the document reference resolver to use to resolve a username string into a
+     *         {@link org.xwiki.model.reference.DocumentReference}
+     */
+    protected abstract DocumentReferenceResolver<String> getDocumentReferenceResolver();
 }

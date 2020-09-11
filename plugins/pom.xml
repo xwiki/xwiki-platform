@@ -128,6 +128,11 @@
                   <name>wdm.chromeDriverVersion</name>
                   <value>85.0.4183.87</value>
                 </property>
+                <property>
+                  <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
+                  <name>webdriver.chrome.whitelistedIps</name>
+                  <value></value>
+                </property>
               </properties>
             </configuration>
           </execution>

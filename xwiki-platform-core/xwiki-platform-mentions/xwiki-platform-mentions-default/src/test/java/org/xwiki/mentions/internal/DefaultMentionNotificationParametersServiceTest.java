@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @since 12.5RC1
  */
 @ComponentTest
-public class DefaultMentionNotificationParametersServiceTest
+class DefaultMentionNotificationParametersServiceTest
 {
     @InjectMockComponents
     private DefaultMentionNotificationService notificationService;

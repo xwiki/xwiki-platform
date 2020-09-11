@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import ch.qos.logback.classic.Level;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.test.LogLevel.DEBUG;
@@ -46,7 +46,7 @@ import static org.xwiki.test.LogLevel.DEBUG;
  * @since 12.5RC1
  */
 @ComponentTest
-public class MentionsCreatedEventListenerTest
+class MentionsCreatedEventListenerTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);

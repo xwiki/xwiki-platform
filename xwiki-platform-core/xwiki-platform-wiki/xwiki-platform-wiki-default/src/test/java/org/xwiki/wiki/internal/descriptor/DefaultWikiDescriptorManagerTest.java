@@ -42,10 +42,10 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
  * @since 6.0M1
  */
 @OldcoreTest
-public class DefaultWikiDescriptorManagerTest
+class DefaultWikiDescriptorManagerTest
 {
     @InjectMockComponents
     private DefaultWikiDescriptorManager descriptorManager;
@@ -80,14 +80,14 @@ public class DefaultWikiDescriptorManagerTest
     private MockitoOldcore oldcore;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         // Cache is supposed to return null and not empty list by default
         when(this.cache.getWikiIds()).thenReturn(null);
     }
 
     @Test
-    public void getByIdWhenNotInCacheButExists() throws Exception
+    void getByIdWhenNotInCacheButExists() throws Exception
     {
         // Not in cache
         when(this.cache.getFromId("wikiid")).thenReturn(null);
@@ -113,7 +113,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getByIdWhenInCache() throws Exception
+    void getByIdWhenInCache() throws Exception
     {
         // Wiki id is in cache...
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
@@ -123,7 +123,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getByIdWhenNotInCacheAndItDoesntExist() throws Exception
+    void getByIdWhenNotInCacheAndItDoesntExist() throws Exception
     {
         // Get the XWikiDocument for the Document Reference but mark it as new (meaning that it doesn't exist)
         XWikiDocument document = mock(XWikiDocument.class);
@@ -136,7 +136,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getByAliasWhenNotInCacheButExists() throws Exception
+    void getByAliasWhenNotInCacheButExists() throws Exception
     {
         // Not in cache
         when(this.cache.getFromId("wikiid")).thenReturn(null);
@@ -162,7 +162,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getByAliasWhenInCache() throws Exception
+    void getByAliasWhenInCache() throws Exception
     {
         // Wiki alias is in cache...
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
@@ -172,7 +172,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getByAliasWhenNotInCacheAndItDoesntExist() throws Exception
+    void getByAliasWhenNotInCacheAndItDoesntExist() throws Exception
     {
         assertNull(this.descriptorManager.getByAlias("wikialias"));
 
@@ -180,7 +180,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getAll() throws Exception
+    void getAll() throws Exception
     {
         // Get the XWikiDocuments for the Document References
         XWikiDocument document1 = mock(XWikiDocument.class);
@@ -229,7 +229,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void exists() throws Exception
+    void exists() throws Exception
     {
         when(this.cache.getWikiIds()).thenReturn(Arrays.asList("wikiid1"));
 
@@ -241,13 +241,13 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getMainWikiId() throws Exception
+    void getMainWikiId()
     {
         assertEquals("xwiki", this.descriptorManager.getMainWikiId());
     }
 
     @Test
-    public void isMainWiki() throws Exception
+    void isMainWiki()
     {
         assertTrue(this.descriptorManager.isMainWiki(null));
         assertTrue(this.descriptorManager.isMainWiki(""));
@@ -256,7 +256,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getMainWikiDescriptor() throws Exception
+    void getMainWikiDescriptor() throws Exception
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("xwiki", "xwiki");
         when(this.cache.getFromId("xwiki")).thenReturn(descriptor);
@@ -265,7 +265,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void testCacheProtection() throws WikiManagerException
+    void cacheProtection() throws WikiManagerException
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("xwiki", "xwiki");
         descriptor.setPrettyName("pretty name");
@@ -297,7 +297,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getCurrentWikiId()
+    void getCurrentWikiId()
     {
         this.oldcore.getXWikiContext().setWikiId("wiki");
 
@@ -305,7 +305,7 @@ public class DefaultWikiDescriptorManagerTest
     }
 
     @Test
-    public void getCurrentWikiDescriptor() throws WikiManagerException
+    void getCurrentWikiDescriptor() throws WikiManagerException
     {
         this.oldcore.getXWikiContext().setWikiId("wiki");
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wiki", "wikialias");

@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 12.5RC1
  */
 @ComponentTest
-public class DefaultMentionNotificationServiceTest
+class DefaultMentionNotificationServiceTest
 {
     @InjectMockComponents
     private DefaultMentionNotificationService notificationService;

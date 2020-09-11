@@ -24,9 +24,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,25 +44,25 @@ class DirectMessageDescriptorTest
     private DirectMessageDescriptor descriptor;
 
     @Test
-    void getEventType() throws Exception
+    void getEventType()
     {
         assertEquals("directMessage", this.descriptor.getEventType());
     }
 
     @Test
-    void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
         assertEquals("comment", this.descriptor.getApplicationIcon());
     }
 
     @Test
-    void getApplicationId() throws Exception
+    void getApplicationId()
     {
         assertEquals("org.xwiki.platform:xwiki-platform-messagestream-api", this.descriptor.getApplicationId());
     }
 
     @Test
-    void isEnabled() throws Exception
+    void isEnabled()
     {
         when(this.messageStreamConfiguration.isActive("wiki1")).thenReturn(true);
         when(this.messageStreamConfiguration.isActive("wiki2")).thenReturn(false);

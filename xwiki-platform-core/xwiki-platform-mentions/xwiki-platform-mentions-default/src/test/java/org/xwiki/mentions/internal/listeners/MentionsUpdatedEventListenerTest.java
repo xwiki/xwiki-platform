@@ -19,7 +19,6 @@
  */
 package org.xwiki.mentions.internal.listeners;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
@@ -35,6 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import ch.qos.logback.classic.Level;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.test.LogLevel.DEBUG;
@@ -46,7 +46,7 @@ import static org.xwiki.test.LogLevel.DEBUG;
  * @since 12.6
  */
 @ComponentTest
-public class MentionsUpdatedEventListenerTest
+class MentionsUpdatedEventListenerTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
@@ -74,9 +74,9 @@ public class MentionsUpdatedEventListenerTest
 
         this.listener.onEvent(event, this.document, null);
 
-        Assert.assertEquals(1, this.logCapture.size());
-        Assert.assertEquals(Level.DEBUG, this.logCapture.getLogEvent(0).getLevel());
-        Assert.assertEquals(
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.DEBUG, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals(
             "Event [org.xwiki.bridge.event.DocumentUpdatedEvent] received from [document] with data [null].",
             this.logCapture.getMessage(0));
 

@@ -71,7 +71,7 @@ import static org.xwiki.test.LogLevel.WARN;
  * @since 12.5RC1
  */
 @ComponentTest
-public class DefaultMentionXDOMServiceTest
+class DefaultMentionXDOMServiceTest
 {
     @InjectMockComponents
     private DefaultMentionXDOMService xdomService;

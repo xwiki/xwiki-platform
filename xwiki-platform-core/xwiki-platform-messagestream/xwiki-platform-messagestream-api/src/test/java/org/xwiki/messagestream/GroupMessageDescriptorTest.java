@@ -24,7 +24,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Validate {@link GroupMessageDescriptor}.
@@ -41,19 +41,19 @@ class GroupMessageDescriptorTest
     private GroupMessageDescriptor descriptor;
 
     @Test
-    void getEventType() throws Exception
+    void getEventType()
     {
         assertEquals("groupMessage", this.descriptor.getEventType());
     }
 
     @Test
-    void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
         assertEquals("comment", this.descriptor.getApplicationIcon());
     }
 
     @Test
-    void getApplicationId() throws Exception
+    void getApplicationId()
     {
         assertEquals("org.xwiki.platform:xwiki-platform-messagestream-api", this.descriptor.getApplicationId());
     }

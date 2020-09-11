@@ -22,12 +22,13 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -36,29 +37,30 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  *  @since 2.0M1
  */
-public class XWikiRenderingConfigurationTest
+@ComponentTest
+class XWikiRenderingConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiRenderingConfiguration> mocker =
-        new MockitoComponentMockingRule<>(XWikiRenderingConfiguration.class);
+    @InjectMockComponents
+    private XWikiRenderingConfiguration configuration;
+
+    @MockComponent
+    private ConfigurationSource source;
 
     @Test
-    public void getLinkLabelFormat() throws Exception
+    void getLinkLabelFormat()
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
-        when(source.getProperty("rendering.linkLabelFormat", "%np")).thenReturn("%np");
+        when(this.source.getProperty("rendering.linkLabelFormat", "%np")).thenReturn("%np");
 
-        assertEquals("%np", this.mocker.getComponentUnderTest().getLinkLabelFormat());
+        assertEquals("%np", this.configuration.getLinkLabelFormat());
     }
 
     @Test
-    public void getTransformationNames() throws Exception
+    void getTransformationNames()
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
-        when(source.getProperty("rendering.transformations", Arrays.asList("macro", "icon"))).thenReturn(
+        when(this.source.getProperty("rendering.transformations", Arrays.asList("macro", "icon"))).thenReturn(
             Arrays.asList("mytransformation"));
 
-        List<String> txs = this.mocker.getComponentUnderTest().getTransformationNames();
+        List<String> txs = this.configuration.getTransformationNames();
         assertEquals(1, txs.size());
         assertEquals("mytransformation", txs.get(0));
     }

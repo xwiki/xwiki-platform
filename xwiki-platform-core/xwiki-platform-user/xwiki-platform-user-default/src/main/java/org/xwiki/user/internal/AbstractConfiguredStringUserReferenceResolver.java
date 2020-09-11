@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.user.UserConfiguration;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
@@ -50,7 +51,12 @@ public abstract class AbstractConfiguredStringUserReferenceResolver implements U
      * @param roleHint the role hint
      * @return the resolved {@code UserReferenceResolver<String>} component
      */
-    protected UserReferenceResolver<String> resolveUserReferenceResolver(String roleHint)
+    protected UserReference resolve(String roleHint, String userName, Object... parameters)
+    {
+        return resolveUserReferenceResolver(roleHint).resolve(userName, parameters);
+    }
+
+    private UserReferenceResolver<String> resolveUserReferenceResolver(String roleHint)
     {
         Type type = new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
         try {
@@ -58,10 +64,9 @@ public abstract class AbstractConfiguredStringUserReferenceResolver implements U
         } catch (ComponentLookupException e) {
             // If the configured user store hint is invalid (i.e. there's no resolver for it, then the XWiki instance
             // cannot work and thus we need to fail hard and fast. Hence the runtime exception.
-            throw new RuntimeException(
-                String.format("Failed to find user reference resolver for role [%s] and hint [%s]", type,
-                    this.userConfiguration.getStoreHint()),
-                e);
+            throw new RuntimeException(String.format(
+                "Failed to find user reference resolver for role [%s] and hint [%s]", type,
+                this.userConfiguration.getStoreHint()), e);
         }
     }
 }

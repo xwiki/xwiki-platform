@@ -65,6 +65,5 @@ class UserReferenceConverterTest
     void convertToTypeValueNull()
     {
         assertNull(this.converter.convertToType(mock(Type.class), null));
-
     }
 }

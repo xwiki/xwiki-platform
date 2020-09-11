@@ -32,11 +32,11 @@ import org.xwiki.user.UserReference;
  */
 @Component
 @Singleton
-public class DefautConfiguredStringUserReferenceResolver extends AbstractConfiguredStringUserReferenceResolver
+public class DefaultConfiguredStringUserReferenceResolver extends AbstractConfiguredStringUserReferenceResolver
 {
     @Override
     public UserReference resolve(String userName, Object... parameters)
     {
-        return resolveUserReferenceResolver(this.userConfiguration.getStoreHint()).resolve(userName, parameters);
+        return resolve(this.userConfiguration.getStoreHint(), userName, parameters);
     }
 }

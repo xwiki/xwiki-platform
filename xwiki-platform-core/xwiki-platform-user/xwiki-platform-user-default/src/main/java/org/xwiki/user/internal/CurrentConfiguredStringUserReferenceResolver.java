@@ -41,7 +41,6 @@ public class CurrentConfiguredStringUserReferenceResolver extends AbstractConfig
     {
         // By convention, each store must provide a Current User Reference Resolver suffixed by the kind of store.
         // For instance, the current store of the document store is "current/document".
-        return resolveUserReferenceResolver(String.format("current/%s", this.userConfiguration.getStoreHint()))
-                   .resolve(userName, parameters);
+        return resolve(String.format("current/%s", this.userConfiguration.getStoreHint()), userName, parameters);
     }
 }

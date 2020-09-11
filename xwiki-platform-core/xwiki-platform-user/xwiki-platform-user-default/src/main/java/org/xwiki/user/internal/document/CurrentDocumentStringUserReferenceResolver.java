@@ -31,8 +31,8 @@ import org.xwiki.user.UserReference;
  * Converts a {@link String} representing a user id into a {@link UserReference}, relatively to the current wiki or
  * sub-wiki.
  * <p>
- * Thus, "XWiki.U1" will be resolved to "xwiki:XWiki.U1" on the main wiki, and to "s1:XWiki.U1" in the context of the
- * sub-wiki s1.
+ * For example {@code XWiki.U1} will be resolved as {@code xwiki:XWiki.U1} on the main wiki, and as {@code s1:XWiki.U1}
+ * in the context of the sub-wiki {@code s1}.
  *
  * @version $Id$
  * @since 12.8RC1
@@ -47,8 +47,8 @@ public class CurrentDocumentStringUserReferenceResolver extends AbstractDocument
     private DocumentReferenceResolver<String> resolver;
 
     @Override
-    public UserReference resolve(String userName, Object... parameters)
+    protected DocumentReferenceResolver<String> getDocumentReferenceResolver()
     {
-        return resolve(userName, this.resolver, parameters);
+        return this.resolver;
     }
 }

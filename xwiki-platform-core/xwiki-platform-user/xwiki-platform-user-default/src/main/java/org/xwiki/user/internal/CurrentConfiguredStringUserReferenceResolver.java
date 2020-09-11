@@ -19,11 +19,12 @@
  */
 package org.xwiki.user.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.user.UserReference;
+import org.xwiki.user.UserConfiguration;
 
 /**
  * Finds the Current User Reference Resolver based on the configured User store hint.
@@ -36,11 +37,12 @@ import org.xwiki.user.UserReference;
 @Singleton
 public class CurrentConfiguredStringUserReferenceResolver extends AbstractConfiguredStringUserReferenceResolver
 {
+    @Inject
+    private UserConfiguration userConfiguration;
+
     @Override
-    public UserReference resolve(String userName, Object... parameters)
+    protected String getUserReferenceResolverHint()
     {
-        // By convention, each store must provide a Current User Reference Resolver suffixed by the kind of store.
-        // For instance, the current store of the document store is "current/document".
-        return resolve(String.format("current/%s", this.userConfiguration.getStoreHint()), userName, parameters);
+        return String.format("current/%s", this.userConfiguration.getStoreHint());
     }
 }

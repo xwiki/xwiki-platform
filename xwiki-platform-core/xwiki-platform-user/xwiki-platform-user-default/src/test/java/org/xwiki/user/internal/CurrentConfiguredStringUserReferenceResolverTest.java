@@ -80,7 +80,8 @@ class CurrentConfiguredStringUserReferenceResolverTest
         Throwable exception = assertThrows(RuntimeException.class,
             () -> this.resolver.resolve("userreference"));
         assertEquals("Failed to find user reference resolver for role "
-                         + "[org.xwiki.user.UserReferenceResolver<java.lang.String>] and hint [storehint]", exception.getMessage());
+            + "[org.xwiki.user.UserReferenceResolver<java.lang.String>] and hint [current/storehint]",
+            exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 }

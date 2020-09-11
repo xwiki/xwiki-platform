@@ -31,7 +31,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
+ * Converts a String to a {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
  *
  * @version $Id$
  * @since 12.2

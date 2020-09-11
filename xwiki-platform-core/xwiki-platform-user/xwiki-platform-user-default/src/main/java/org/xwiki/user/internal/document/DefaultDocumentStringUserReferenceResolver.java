@@ -30,7 +30,7 @@ import org.xwiki.user.UserReference;
 /**
  * Converts a {@link String} representing a user id into a {@link UserReference}, relatively to the main wiki.
  * <p>
- * Thus, "XWiki.U1" is always resolved to "xwiki:XWiki.U1".
+ * For example, {@code XWiki.U1} is always resolved as {@code xwiki:XWiki.U1}.
  *
  * @version $Id$
  * @since 12.2
@@ -44,8 +44,8 @@ public class DefaultDocumentStringUserReferenceResolver extends AbstractDocument
     private DocumentReferenceResolver<String> resolver;
 
     @Override
-    public UserReference resolve(String userName, Object... parameters)
+    protected DocumentReferenceResolver<String> getDocumentReferenceResolver()
     {
-        return resolve(userName, this.resolver, parameters);
+        return this.resolver;
     }
 }

@@ -205,5 +205,5 @@ require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

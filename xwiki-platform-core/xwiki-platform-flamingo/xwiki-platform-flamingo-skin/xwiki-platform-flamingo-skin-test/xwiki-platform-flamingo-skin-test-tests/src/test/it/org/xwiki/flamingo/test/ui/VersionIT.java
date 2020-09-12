@@ -19,7 +19,6 @@
  */
 package org.xwiki.flamingo.test.ui;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -34,7 +33,7 @@ import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify versioning features of documents and attachments.
@@ -84,11 +83,11 @@ public class VersionIT extends AbstractTest
         // back is going to load a new page and make the focus active on the comments tab.
         vp.waitForDocExtraPaneActive("comments");
 
-        Assert.assertEquals("First version of Content", vp.getContent());
+        assertEquals("First version of Content", vp.getContent());
 
         historyTab = vp.openHistoryDocExtraPane();
-        Assert.assertEquals("Rollback to version 1.1", historyTab.getCurrentVersionComment());
-        Assert.assertEquals("superadmin", historyTab.getCurrentAuthor());
+        assertEquals("Rollback to version 1.1", historyTab.getCurrentVersionComment());
+        assertEquals("superadmin", historyTab.getCurrentAuthor());
     }
 
     /**
@@ -113,12 +112,12 @@ public class VersionIT extends AbstractTest
 
         // Verify and delete the latest version.
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
-        Assert.assertEquals("2.1", historyTab.getCurrentVersion());
+        assertEquals("2.1", historyTab.getCurrentVersion());
         historyTab = historyTab.deleteVersion("2.1");
 
         // Verify that the current version is now the previous one.
-        Assert.assertEquals("1.1", historyTab.getCurrentVersion());
-        Assert.assertEquals("superadmin", historyTab.getCurrentAuthor());
+        assertEquals("1.1", historyTab.getCurrentVersion());
+        assertEquals("superadmin", historyTab.getCurrentAuthor());
     }
 
     @Test
@@ -161,7 +160,7 @@ public class VersionIT extends AbstractTest
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
-        Assert.assertEquals("attachment2", getDriver().findElement(By.tagName("html")).getText());
+        assertEquals("attachment2", getDriver().findElement(By.tagName("html")).getText());
 
         // Revert to 2.1 (first update of the attachment)
         vp = getUtil().gotoPage(REFERENCE).openHistoryDocExtraPane().rollbackToVersion("2.1");
@@ -170,7 +169,7 @@ public class VersionIT extends AbstractTest
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
-        Assert.assertEquals("attachment1", getDriver().findElement(By.tagName("html")).getText());
+        assertEquals("attachment1", getDriver().findElement(By.tagName("html")).getText());
 
         // Back to empty page again
         vp = getUtil().gotoPage(REFERENCE).openHistoryDocExtraPane().rollbackToVersion("1.1");
@@ -185,6 +184,6 @@ public class VersionIT extends AbstractTest
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment(attachmentReference.getName()));
         attachmentsPane.getAttachmentLink(attachmentReference.getName()).click();
-        Assert.assertEquals("attachment1", getDriver().findElement(By.tagName("html")).getText());
+        assertEquals("attachment1", getDriver().findElement(By.tagName("html")).getText());
     }
 }

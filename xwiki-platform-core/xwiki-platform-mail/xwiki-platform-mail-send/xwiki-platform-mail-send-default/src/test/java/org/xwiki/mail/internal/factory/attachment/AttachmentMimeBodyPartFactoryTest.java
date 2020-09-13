@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 6.1M2
  */
 @ComponentTest
-public class AttachmentMimeBodyPartFactoryTest
+class AttachmentMimeBodyPartFactoryTest
 {
     private static final String TEMPORARY_DIRECTORY =
         "target/" + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
@@ -68,13 +68,13 @@ public class AttachmentMimeBodyPartFactoryTest
     private ComponentManager componentManager;
 
     @AfterComponent
-    public void afterComponent()
+    void afterComponent()
     {
         when(this.environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
     }
 
     @Test
-    public void createAttachmentBodyPart() throws Exception
+    void createAttachmentBodyPart() throws Exception
     {
         Attachment attachment = mock(Attachment.class);
         when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
@@ -94,7 +94,7 @@ public class AttachmentMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createAttachmentBodyPartWithHeader() throws Exception
+    void createAttachmentBodyPartWithHeader() throws Exception
     {
         Environment environment = this.componentManager.getInstance(Environment.class);
         when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
@@ -122,18 +122,17 @@ public class AttachmentMimeBodyPartFactoryTest
     }
 
     @Test
-    public void createAttachmentBodyPartWhenWriteError() throws Exception
+    void createAttachmentBodyPartWhenWriteError() throws Exception
     {
         Environment environment = this.componentManager.getInstance(Environment.class);
         when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         Attachment attachment = mock(Attachment.class);
         when(attachment.getFilename()).thenReturn("image.png");
-        when(attachment.getContent()).thenThrow(new RuntimeException("error"));
+        when(attachment.getContentInputStream()).thenThrow(new RuntimeException("error"));
 
-        Throwable exception = assertThrows(MessagingException.class, () -> {
-            this.attachmentMimeBodyPartFactory.create(attachment, Collections.emptyMap());
-        });
+        Throwable exception = assertThrows(MessagingException.class,
+            () -> this.attachmentMimeBodyPartFactory.create(attachment, Collections.emptyMap()));
         assertEquals("Failed to save attachment [image.png] to the file system", exception.getMessage());
     }
 }

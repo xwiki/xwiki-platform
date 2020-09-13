@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
-import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -67,9 +67,13 @@ class AttachmentMimeBodyPartFactoryTest
     @InjectComponentManager
     private ComponentManager componentManager;
 
-    @AfterComponent
-    void afterComponent()
+    @BeforeComponent
+    void beforeComponent()
     {
+        // The mail attachment temporary directory is set when the Initializable phase of AttachmentMimeBodyPartFactory
+        // is called. Thus we need to set up the the temporary directory we wish to use before the components are
+        // instantiated, and especially before the AttachmentMimeBodyPartFactory component has its components
+        // instantiated.
         when(this.environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
     }
 
@@ -96,16 +100,13 @@ class AttachmentMimeBodyPartFactoryTest
     @Test
     void createAttachmentBodyPartWithHeader() throws Exception
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         Attachment attachment = mock(Attachment.class);
         when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 
         Map<String, Object> parameters = Collections.singletonMap("headers",
-            (Object) Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
+            Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
 
         MimeBodyPart part = this.attachmentMimeBodyPartFactory.create(attachment, parameters);
 
@@ -122,11 +123,8 @@ class AttachmentMimeBodyPartFactoryTest
     }
 
     @Test
-    void createAttachmentBodyPartWhenWriteError() throws Exception
+    void createAttachmentBodyPartWhenWriteError()
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         Attachment attachment = mock(Attachment.class);
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getContentInputStream()).thenThrow(new RuntimeException("error"));

@@ -40,6 +40,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -50,12 +51,14 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@OldcoreTest
+// @formatter:off
 @ComponentList({
     DefaultDiffManager.class
 })
+// @formatter:on
 @ReferenceComponentList
-@OldcoreTest
-public class BaseClassTest
+class BaseClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -64,7 +67,7 @@ public class BaseClassTest
     private MergeManager mergeManager;
 
     @Test
-    public void setDocumentReference()
+    void setDocumentReference()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -75,7 +78,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameSetWiki()
+    void setNameSetWiki()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -88,7 +91,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void setNameAloneWithChangingContext()
+    void setNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -131,7 +134,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenNullContentType()
+    void addTextAreaFieldWhenNullContentType()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -146,7 +149,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void addTextAreaFieldWhenExistingNumberField()
+    void addTextAreaFieldWhenExistingNumberField()
     {
         BaseClass baseClass = new BaseClass();
 
@@ -156,7 +159,7 @@ public class BaseClassTest
     }
 
     @Test
-    public void merge()
+    void merge()
     {
         BaseClass previousClass = new BaseClass();
         previousClass.setPrettyName("previous");
@@ -207,5 +210,18 @@ public class BaseClassTest
         assertEquals("current", currentClass.getPrettyName());
         assertEquals("my new validation script", currentClass.getValidationScript());
         assertEquals("An edit sheet", currentClass.getDefaultEditSheet());
+    }
+
+    @Test
+    void addStaticListField()
+    {
+        BaseClass baseClass = new BaseClass();
+
+        StaticListClass slc = baseClass.addStaticListField("field");
+        slc.setPrettyName("Custom Field");
+
+        assertNotNull(slc);
+        assertNotNull(baseClass.get("field"));
+        assertEquals("Custom Field", ((StaticListClass) baseClass.get("field")).getPrettyName());
     }
 }

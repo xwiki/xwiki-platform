@@ -4,9 +4,9 @@
   #set ($maxColumnsNumber = 50)
 #end
 #set($columnsTotalWidth = 100)
-## using velocity variables here because we don't have Less, normally we'd use bootstrap variables & less
+#* using velocity variables here because we don't have Less, normally we'd use bootstrap variables & less *#
 #set($gridGutterWidth = "30")
-## 15px padding right to all the columns except last one. 15px = @grid-gutter-width / 2
+#* 15px padding right to all the columns except last one. 15px = @grid-gutter-width / 2 *#
 #set($columnPadding = "${mathtool.div($gridGutterWidth, 2)}px")
 
 /* Render generic css first */
@@ -81,7 +81,7 @@
 @media (min-width: 768px) {
   /* Generate column-specific css classes */
   #foreach($columns in [1..$maxColumnsNumber])
-    /* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't break the sum and because 4 decimals should be enough for everyone. */
+    #* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't break the sum and because 4 decimals should be enough for everyone. *#
     #set($rawComputedColumnWidth = $mathtool.div(100, $columns))
     #set($computedColumnWidth = $mathtool.roundTo(4, $rawComputedColumnWidth))
     .container-columns-$columns .column{

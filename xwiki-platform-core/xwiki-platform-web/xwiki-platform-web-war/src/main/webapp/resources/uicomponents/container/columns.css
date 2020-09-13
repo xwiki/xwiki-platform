@@ -4,8 +4,10 @@
   #set ($maxColumnsNumber = 50)
 #end
 #set($columnsTotalWidth = 100)
-/* 1.5% padding right to all the columns except last one. */
-#set($columnPadding = 0.75)
+## using velocity variables here because we don't have Less, normally we'd use bootstrap variables & less
+#set($gridGutterWidth = "30")
+## 15px padding right to all the columns except last one. 15px = @grid-gutter-width / 2
+#set($columnPadding = "${mathtool.div($gridGutterWidth, 2)}px")
 
 /* Render generic css first */
 
@@ -16,8 +18,27 @@
   text-align: justify;
 }
 
+/* Bootstrap row, copy of .make-row() mixin */
+.container-columns {
+  margin-left: -$columnPadding;
+  margin-right: -$columnPadding;
+}
+.container-columns:after, .container-columns:before {
+  display: table;
+  content: " ";
+}
+.container-columns:after {
+  clear: both;
+}
+
+/* Bootstrap column, copy of .make-xs-column(12) mixin, the default display, mobile first */
 .container-columns .column {
   float: left;
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  padding-left: $columnPadding;
+  padding-right: $columnPadding;
 }
 
 /* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will collapse
@@ -53,4 +74,18 @@
     padding-right: 0;
     padding-left: 0;
   }
+/*
+ * Responsiveness, upon the same limit than Twitter Bootstrap (768px)
+ * On desktop, set the width of the columns as Bootstrap does it (by dividing 100% by the number of columns)
+ */
+@media (min-width: 768px) {
+  /* Generate column-specific css classes */
+  #foreach($columns in [1..$maxColumnsNumber])
+    /* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't break the sum and because 4 decimals should be enough for everyone. */
+    #set($rawComputedColumnWidth = $mathtool.div(100, $columns))
+    #set($computedColumnWidth = $mathtool.roundTo(4, $rawComputedColumnWidth))
+    .container-columns-$columns .column{
+      width: $computedColumnWidth%;
+    }
+  #end
 }

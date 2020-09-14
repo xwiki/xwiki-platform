@@ -126,7 +126,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         }
 
         // But it might been still unwatched because of an other filter!
-        if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
+        if (!thereIsAMatch || entity.isWatchedWithAllEventTypes(user) != shouldBeWatched) {
             notificationFilterPreferenceManager.saveFilterPreferences(user,
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
         }
@@ -136,7 +136,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             boolean desiredState) throws NotificationException
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
-        return !xwikiEventTypesEnabler.isNotificationDisabled(user) && entity.isWatched(user) == desiredState;
+        return !xwikiEventTypesEnabler.isNotificationDisabled(user)
+            && entity.isWatchedWithAllEventTypes(user) == desiredState;
     }
 
     private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,

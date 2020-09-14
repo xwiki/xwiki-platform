@@ -54,28 +54,50 @@ public class ScopeNotificationFilterLocationStateComputer
     /**
      * @param filterPreferences the collection of all preferences to take into account
      * @param location a location
-     * @return if the location is watched by the user, for the given event type and format
+     * @return {@code true} if the location is watched by the user, for any kind of event types or format.
      */
     public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null).isWatched();
+        return isLocationWatched(filterPreferences, location, null, null, false).isWatched();
     }
 
     /**
      * @param filterPreferences the collection of all preferences to take into account
      * @param location a location
-     * @param eventType an event type (could be null)
-     * @param format the notification format (could be null)
+     * @return {@code true} if the location is watched by the user, for any of format but for all events only.
+     */
+    public boolean isLocationWatchedWithAllEventTypes(Collection<NotificationFilterPreference> filterPreferences,
+        EntityReference location)
+    {
+        return isLocationWatched(filterPreferences, location, null, null, true).isWatched();
+    }
+
+    /**
+     * This method has a specific handling of the {@code eventType} parameter based on {@code onlyGivenType} boolean
+     * value. If this value is {@code false}, then {@code eventType} is only used for filters matching specific types:
+     * filters matching all types are always considered. Moreover in that case if {@code eventType} is {@code null} all
+     * filters are considered. Now if {@code onlyGivenType} is {@code false} and {@code eventType} is not null, only the
+     * filters using the specified type are considered, filters matching all types won't be considered. On the contrary,
+     * if {@code onlyGivenType} is {@code false} and {@code eventType} is null, then only the filters matching all types
+     * are considered.
+     *
+     * @param filterPreferences the collection of all preferences to take into account
+     * @param eventType the type of event to take into account: {@code null} is accepted but have different meaning
+     *                  depending on {@code onlyGivenType}.
+     * @param format the notification format (can be {@code null} in which cases all formats are accepted)
+     * @param onlyGivenType if {@code true} only the given {@code evenType} is taken into account. If {@code false}, the
+     *                      given type and filters matching all types are taken into account.
+     * @param location the location to check
      * @return if the location is watched by the user, for the given event type and format
      */
     public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-        EntityReference location, String eventType, NotificationFormat format)
+        EntityReference location, String eventType, NotificationFormat format, boolean onlyGivenType)
     {
         // TODO: write a unit test with a complex set of preferences
 
         ScopeNotificationFilterPreferencesHierarchy preferences
-                = preferencesGetter.getScopeFilterPreferences(filterPreferences, eventType, format);
+                = preferencesGetter.getScopeFilterPreferences(filterPreferences, eventType, format, onlyGivenType);
 
         if (preferences.isEmpty()) {
             // If there is no filter preference, then the location is watched (no filter = we get everything)

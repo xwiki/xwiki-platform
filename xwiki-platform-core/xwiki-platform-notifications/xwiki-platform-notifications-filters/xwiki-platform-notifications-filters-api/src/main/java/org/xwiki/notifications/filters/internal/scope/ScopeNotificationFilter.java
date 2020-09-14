@@ -82,7 +82,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
         // scope preference.
         WatchedLocationState state
-                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format);
+                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false);
         if (!state.isWatched()
                 || (state.getStartingDate() != null && state.getStartingDate().after(event.getDate()))) {
             return FilterPolicy.FILTER;

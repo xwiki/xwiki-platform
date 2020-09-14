@@ -895,17 +895,11 @@ define('editInPlace', [
       // Keep the focus while the edit content is being prepared.
       viewContent.focus();
     }
-    var data = {
-      contentType: 'org.xwiki.rendering.syntax.SyntaxContent',
-      editMode: 'wysiwyg',
+    var data = $.extend({}, $('div[data-inplace-editing-config]').data('inplaceEditingConfig'), {
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
-      deferred: $.Deferred(),
-      // We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
-      // could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so
-      // the content editor cannot enable the source mode by default).
-      enableSourceMode: true
-    };
+      deferred: $.Deferred()
+    });
     var editContentPromise = data.deferred.promise();
     editContentPromise.done(function() {
       editContent.show();
@@ -1323,9 +1317,15 @@ input#document-title-input:focus,
   ## We support in-place editing only for the WYSIWYG edit mode ATM.
   #getDefaultDocumentEditor($defaultEditMode)
   #if ($defaultEditMode == 'wysiwyg')
+    ## We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
+    ## could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so the
+    ## content editor cannot enable the source mode by default).
     #set ($inplaceEditingConfig = {
+      'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
-      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id
+      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id,
+      'enableSourceMode': true,
+      'enableOfficeImport': $services.officemanager.isConnected()
     })
     &lt;div class="hidden" data-inplace-editing-config="$escapetool.xml($jsontool.serialize($inplaceEditingConfig))"&gt;&lt;/div&gt;
     ## We didn't move this to the file system because it uses LESS and we didn't want to include it in the skin.

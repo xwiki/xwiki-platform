@@ -74,6 +74,7 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testPostCommentAsAdmin()
     {
+        this.commentsTab.openCommentForm();
         assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         assertEquals(COMMENT_CONTENT,
@@ -85,7 +86,7 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testReplyToCommentAsAdmin()
     {
-        assertTrue(this.commentsTab.isCommentFormShown());
+        this.commentsTab.openCommentForm();
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.replyToCommentByID(this.commentsTab.getCommentID(COMMENT_CONTENT), COMMENT_REPLY);
         assertEquals(COMMENT_REPLY,
@@ -96,6 +97,7 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testDeleteCommentAsAdmin()
     {
+        this.commentsTab.openCommentForm();
         assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.deleteCommentByID(this.commentsTab.getCommentID(COMMENT_CONTENT));
@@ -105,6 +107,7 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testEditCommentAsAdmin()
     {
+        this.commentsTab.openCommentForm();
         assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.editCommentByID(0, COMMENT_REPLACED_CONTENT);

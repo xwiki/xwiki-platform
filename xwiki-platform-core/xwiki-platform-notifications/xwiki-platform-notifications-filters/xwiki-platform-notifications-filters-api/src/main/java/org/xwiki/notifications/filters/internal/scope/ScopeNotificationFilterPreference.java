@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -31,6 +33,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.text.StringUtils;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
@@ -213,5 +216,47 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public void setEnabled(boolean enabled)
     {
         this.filterPreference.setEnabled(enabled);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScopeNotificationFilterPreference that = (ScopeNotificationFilterPreference) o;
+
+        return new EqualsBuilder()
+            .append(hasParent, that.hasParent)
+            .append(filterPreference, that.filterPreference)
+            .append(scopeReference, that.scopeReference)
+            .append(children, that.children)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(filterPreference)
+            .append(scopeReference)
+            .append(hasParent)
+            .append(children)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this).append("hasParent", hasParent)
+            .append("filterPreference", filterPreference)
+            .append("scopeReference", scopeReference)
+            .append("children", children)
+            .toString();
     }
 }

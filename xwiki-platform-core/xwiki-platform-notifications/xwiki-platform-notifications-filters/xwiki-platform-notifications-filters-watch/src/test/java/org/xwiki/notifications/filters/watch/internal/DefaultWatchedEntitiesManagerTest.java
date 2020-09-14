@@ -19,9 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
@@ -29,11 +27,13 @@ import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -42,22 +42,17 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.9RC1
  */
+@ComponentTest
 public class DefaultWatchedEntitiesManagerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultWatchedEntitiesManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultWatchedEntitiesManager.class);
-
+    @InjectMockComponents
+    private DefaultWatchedEntitiesManager watchedEntitiesManager;
+    
+    @MockComponent
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        notificationFilterPreferenceManager = mocker.getInstance(NotificationFilterPreferenceManager.class);
-    }
-
+    
     @Test
-    public void testWithSeveralFilterPreferences() throws Exception
+    void testWithSeveralFilterPreferences() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -83,12 +78,13 @@ public class DefaultWatchedEntitiesManagerTest
         pref4.setEnabled(false);
         pref4.setId("pref4");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
+        when(notificationFilterPreferenceManager.getFilterPreferences(user))
+            .thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
 
         // Test
-        mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
 
         // Checks
         verify(watchedEntityReference, never()).matchExactly(pref2);
@@ -98,7 +94,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void watchWhenExclusiveFilter() throws Exception
+    void watchWhenExclusiveFilter() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -114,10 +110,10 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
 
         // Test
-        mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
@@ -125,7 +121,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void watchWhen2OppositeFilters() throws Exception
+    void watchWhen2OppositeFilters() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -147,10 +143,10 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(false, true);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
 
         // Test
-        mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref2");
@@ -158,7 +154,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void watchWhenNoFilterMatch() throws Exception
+    void watchWhenNoFilterMatch() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -170,7 +166,7 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(false);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false);
 
         DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createInclusiveFilterPreference()).thenReturn(createdPref);
@@ -186,14 +182,14 @@ public class DefaultWatchedEntitiesManagerTest
         }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
 
         // Test
-        mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
     }
 
     @Test
-    public void unwatchWhenInclusiveFilter() throws Exception
+    void unwatchWhenInclusiveFilter() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -209,10 +205,10 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
 
         // Test
-        mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
@@ -220,7 +216,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void unwatchWhenExclusiveFilter() throws Exception
+    void unwatchWhenExclusiveFilter() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -236,10 +232,10 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
 
         // Test
-        mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref1", true);
@@ -247,7 +243,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void unwatchWhen2OppositeFilters() throws Exception
+    void unwatchWhen2OppositeFilters() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -270,10 +266,10 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(true, false);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
 
         // Test
-        mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
@@ -281,7 +277,7 @@ public class DefaultWatchedEntitiesManagerTest
     }
 
     @Test
-    public void unwatchWhenNoFilterMatch() throws Exception
+    void unwatchWhenNoFilterMatch() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
@@ -293,7 +289,7 @@ public class DefaultWatchedEntitiesManagerTest
 
         when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatched(user)).thenReturn(true);
+        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true);
 
         DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createExclusiveFilterPreference()).thenReturn(createdPref);
@@ -307,11 +303,9 @@ public class DefaultWatchedEntitiesManagerTest
         }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
 
         // Test
-        mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
 
         // Checks
         verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
     }
-
-
 }

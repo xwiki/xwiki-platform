@@ -35,6 +35,7 @@
     <xwiki.pitest.mutationThreshold>48</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Filters API</xwiki.extension.name>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>

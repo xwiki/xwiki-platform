@@ -151,18 +151,21 @@
     if (data &amp;&amp; data.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; data.editMode === 'wysiwyg') {
       var container = $(event.target);
       ckeditorPromise.done(function(ckeditor) {
-        createEditor(ckeditor, container, data.document, data.deferred, !data.enableSourceMode);
+        createEditor(ckeditor, container, data);
       });
     }
   });
 
-  var createEditor = function(ckeditor, container, xwikiDocument, deferred, disableSourceMode) {
-    container.prop('contenteditable', true).attr('data-sourceDocumentSyntax', xwikiDocument.syntax);
+  var createEditor = function(ckeditor, container, config) {
+    container.prop('contenteditable', true).attr({
+      'data-sourceDocumentSyntax': config.document.syntax,
+      'data-officeImporterSupported': config.enableOfficeImport
+    });
     container.each(function() {
       try {
         var editor = ckeditor.inline(this);
         // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
-        if (disableSourceMode) {
+        if (!config.enableSourceMode) {
           editor.once('configLoaded', function(event) {
             if (typeof editor.config.removePlugins === 'string') {
               editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
@@ -170,10 +173,10 @@
           });
         }
         editor.on('instanceReady', function() {
-          deferred.resolve(xwikiDocument);
+          config.deferred.resolve(config.document);
         });
         $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
-          xwikiDocument[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
+          config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
         });
         $(document).one('xwiki:actions:view', function(event, data) {
           $(document).off('xwiki:actions:beforeSave.contentEditor');
@@ -195,7 +198,7 @@
         console.log(e);
         new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
           'ckeditor.inline.failedToInit')), 'error');
-        deferred.reject();
+        config.deferred.reject();
       }
     });
   };

@@ -269,7 +269,8 @@ define('xwiki-ckeditor', [
         styles: '*',
         classes: '*'
       }
-    }
+    },
+    'plain/1.0': ';'
   };
   allowedContentBySyntax['xwiki/2.0'] = allowedContentBySyntax['xwiki/2.1'];
   // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown

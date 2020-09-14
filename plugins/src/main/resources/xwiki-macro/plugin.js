@@ -314,6 +314,7 @@
       // Command to insert a macro directly without going through the Macro Wizard.
       editor.addCommand('xwiki-macro-insert', {
         async: true,
+        requiredContent: editor.widgets.registered['xwiki-macro'].requiredContent,
         exec: function(editor, macroCall) {
           macroCall = $.extend({parameters: {}}, macroCall);
           if (!macroCall.name) {

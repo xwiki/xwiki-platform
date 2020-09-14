@@ -31,9 +31,10 @@
   <name>XWiki Platform - Notifications - Filters - API</name>
   <description>Handle the filters that can be applied on notifications</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Filters API</xwiki.extension.name>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>

@@ -27,6 +27,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
+import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -50,6 +51,9 @@ public class DefaultWatchedEntitiesManagerTest
     
     @MockComponent
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    @MockComponent
+    private XWikiEventTypesEnabler xwikiEventTypesEnabler;
     
     @Test
     void testWithSeveralFilterPreferences() throws Exception
@@ -91,6 +95,7 @@ public class DefaultWatchedEntitiesManagerTest
         verify(watchedEntityReference, never()).matchExactly(pref3);
         verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref4", true);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -118,6 +123,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -151,6 +157,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref2");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -186,6 +193,7 @@ public class DefaultWatchedEntitiesManagerTest
 
         // Checks
         verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        verify(this.xwikiEventTypesEnabler).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -213,6 +221,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler, never()).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -240,6 +249,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref1", true);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler, never()).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -274,6 +284,7 @@ public class DefaultWatchedEntitiesManagerTest
         // Checks
         verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
+        verify(this.xwikiEventTypesEnabler, never()).ensureXWikiNotificationsAreEnabled(user);
     }
 
     @Test
@@ -307,5 +318,6 @@ public class DefaultWatchedEntitiesManagerTest
 
         // Checks
         verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        verify(this.xwikiEventTypesEnabler, never()).ensureXWikiNotificationsAreEnabled(user);
     }
 }

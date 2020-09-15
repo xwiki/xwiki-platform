@@ -25,16 +25,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
 
 /**
  * Groups related script API.
- * 
+ *
  * @version $Id$
  * @since 10.8RC1
  */
@@ -51,12 +53,15 @@ public class GroupScriptService implements ScriptService
     @Inject
     private GroupManager groupManager;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Search groups the passed user or group is member of.
      * <p>
      * {code wikis} controls where to search for the groups and {@code recurse} only the direct group should be
      * returned or the whole hierarchy.
-     * 
+     *
      * @param member the group member (user or group)
      * @param wikiTarget the wikis where to search. The following types are supported:
      *            <ul>
@@ -139,5 +144,44 @@ public class GroupScriptService implements ScriptService
     public Collection<DocumentReference> getMembers(DocumentReference group) throws GroupException
     {
         return getMembers(group, true);
+    }
+
+    /**
+     * Checks if a group (candidate) can be added to the members of another group (target).<br />
+     * A group (candidate) can be added to the members of another group (target) if the target is not, transitively,
+     * already part of the members of candidate.<br />
+     * A group cannot be added to its own members.<br />
+     * A group (candidate) cannot be added to the members of a group (target) if candidate is already one of the direct
+     * members of target.<br />
+     *
+     * @param candidate The group to be added
+     * @param target The targeted group
+     * @return {@code true} if the candidate can be added to the members of the target, {@code false} otherwise.
+     * @since 12.8RC1
+     */
+    @Unstable
+    public boolean canAddGroupAsMember(DocumentReference candidate, DocumentReference target)
+    {
+        boolean ret;
+        if (target == null || candidate == null || candidate.equals(target)) {
+            ret = false;
+        } else {
+            try {
+                if (getMembers(target, false).contains(candidate)) {
+                    ret = false;
+                } else {
+                    try {
+                        ret = !getMembers(candidate, true).contains(target);
+                    } catch (GroupException e) {
+                        this.logger.warn("Failed to access the members of the candidate group [{}]", candidate, e);
+                        ret = false;
+                    }
+                }
+            } catch (GroupException e) {
+                this.logger.warn("Failed to access the members of the target group [{}]", target, e);
+                ret = false;
+            }
+        }
+        return ret;
     }
 }

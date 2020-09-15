@@ -377,7 +377,7 @@ XWiki.widgets.LiveTable = Class.create({
                 event.stop();
                 new Ajax.Request(this.href, {
                   onSuccess: function() {
-                    eval(action.callback);
+                    new Function('row', 'i', 'table', action.callback)(row, i, table);
                   }
                 });
               }.bindAsEventListener(link));

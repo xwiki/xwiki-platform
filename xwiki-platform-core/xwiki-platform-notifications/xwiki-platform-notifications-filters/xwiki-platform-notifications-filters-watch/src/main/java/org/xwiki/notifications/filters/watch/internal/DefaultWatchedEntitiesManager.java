@@ -96,14 +96,18 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             return;
         }
 
-        // If the notifications for the XWiki app (create, update, delete, addComment) are not enabled but autowatch is
-        // on, then we need to enable the notifications in the user preferences.
-        // We do that because it has no sense for a user to use the "AutoWatch" feature when the notifications are not
-        // enabled.
-        // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
-        // user has made a contribution will generate notifications. That's probably what users expect from a
-        // notification area.
-        xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
+        if (shouldBeWatched) {
+            // If the notifications for the XWiki app (create, update, delete, addComment) are not enabled but autowatch
+            // is on, then we need to enable the notifications in the user preferences.
+            // We do that because it has no sense for a user to use the "AutoWatch" feature when the notifications are
+            // not enabled.
+            // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
+            // user has made a contribution will generate notifications. That's probably what users expect from a
+            // notification area.
+            // Now we only enable those events in case of a watch: it doesn't make sense to enable them in case of
+            // unwatch.
+            xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
+        }
 
         Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
 

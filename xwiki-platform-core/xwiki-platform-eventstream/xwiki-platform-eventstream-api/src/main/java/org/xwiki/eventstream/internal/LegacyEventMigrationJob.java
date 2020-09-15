@@ -159,7 +159,7 @@ public class LegacyEventMigrationJob
         }
 
         if (getRequest().isVerbose()) {
-            this.logger.info("{} events were saved in the new store because they did not already existed",
+            this.logger.info("{} events were saved in the new store because they did not already exist",
                 eventsToSave.size());
         }
     }

@@ -20,6 +20,7 @@
 
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +36,10 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class GroupEditPage extends InlinePage
 {
+    private static final String MEMBER_ACTION_XPATH_FORMAT =
+        "//table[@id = 'groupusers']//td[contains(@class, 'member') and normalize-space(.) = '%s']"
+            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
+
     LiveTableElement membersLiveTable = new LiveTableElement("groupusers");
 
     @FindBy(id = "addMembers")
@@ -56,19 +61,37 @@ public class GroupEditPage extends InlinePage
      */
     public GroupEditPage addMemberToGroup(String member, boolean isUser)
     {
-        SuggestInputElement picker;
+        return addMembersToGroup(isUser ? this.userInput : this.groupInput, member);
+    }
 
-        if (isUser) {
-            picker = new SuggestInputElement(userInput);
-        } else {
-            picker = new SuggestInputElement(groupInput);
+    public GroupEditPage addUsers(String... users)
+    {
+        return addMembersToGroup(this.userInput, users);
+    }
+
+    public GroupEditPage addGroups(String... groups)
+    {
+        return addMembersToGroup(this.groupInput, groups);
+    }
+
+    private GroupEditPage addMembersToGroup(WebElement input, String... members)
+    {
+        SuggestInputElement picker = new SuggestInputElement(input);
+        for (String member : members) {
+            picker.sendKeys(member).waitForSuggestions().selectByIndex(0);
         }
-
-        picker.sendKeys(member).waitForSuggestions().selectByIndex(0).hideSuggestions();
+        picker.hideSuggestions();
         clickAddMemberButton();
-
         waitForNotificationSuccessMessage("Members successfully added");
+        return this;
+    }
 
+    public GroupEditPage removeMembers(String... members)
+    {
+        for (String member : members) {
+            getDriver().findElementWithoutWaiting(By.xpath(String.format(MEMBER_ACTION_XPATH_FORMAT, member, "delete")))
+                .click();
+        }
         return this;
     }
 

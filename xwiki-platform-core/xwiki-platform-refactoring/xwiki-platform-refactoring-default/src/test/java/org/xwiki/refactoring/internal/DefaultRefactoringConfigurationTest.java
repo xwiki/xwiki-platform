@@ -48,9 +48,17 @@ class DefaultRefactoringConfigurationTest
     private ConfigurationSource configurationSource;
 
     @Test
+    void canSkipRecyclebinDefault()
+    {
+        when(this.configurationSource.getProperty("canSkipRecycleBin", "0")).thenReturn(null);
+        boolean actual = this.configuration.canSkipRecycleBin();
+        assertFalse(actual);
+    }
+
+    @Test
     void canSkipRecyclebinTrue()
     {
-        when(this.configurationSource.getProperty("canSkipRecycleBin", false)).thenReturn(true);
+        when(this.configurationSource.getProperty("canSkipRecycleBin", "0")).thenReturn("1");
         boolean actual = this.configuration.canSkipRecycleBin();
         assertTrue(actual);
     }
@@ -58,7 +66,7 @@ class DefaultRefactoringConfigurationTest
     @Test
     void canSkipRecyclebinFalse()
     {
-        when(this.configurationSource.getProperty("canSkipRecycleBin", false)).thenReturn(false);
+        when(this.configurationSource.getProperty("canSkipRecycleBin", "0")).thenReturn("0");
         boolean actual = this.configuration.canSkipRecycleBin();
         assertFalse(actual);
     }

@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Refactoring.RefactoringTranslations" locale="">
-  <web>XWiki.Refactoring</web>
+<xwikidoc version="1.4" reference="Refactoring.Code.RefactoringTranslations" locale="">
+  <web>Refactoring.Code</web>
   <name>RefactoringTranslations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Refactoring.WebHome</parent>
+  <parent>Refactoring.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,11 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>XWiki.Refactoring.RefactoringConfigurationClass_canSkipRecycleBin=Can skip the recycle bin
-XWiki.Refactoring.RefactoringConfigurationClass_canSkipRecycleBin.hint=When set to Yes, allows advanced users to choose whether they want to send pages to the recycle bin or delete them permanently when deleting a page. When set to No, pages are always sent to the recycle bin if it is available, otherwise they are always permanently deleted.
-  </content>
+  <content>refactoring.configuration.delete.heading=Delete Properties
+admin.delete=Delete
+Refactoring.Code.RefactoringConfigurationClass_canSkipRecycleBin=Can skip the recycle bin
+Refactoring.Code.RefactoringConfigurationClass_canSkipRecycleBin.hint=When set to Yes, allows advanced users to choose whether they want to send pages to the recycle bin or delete them permanently when deleting a page. When set to No, pages are always sent to the recycle bin if it is available, otherwise they are always permanently deleted. The default value is No.</content>
   <object>
-    <name>XWiki.Refactoring.RefactoringTranslations</name>
+    <name>Refactoring.Code.RefactoringTranslations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>dbc1a9ef-e400-41cb-b6c1-ab228f351fb7</guid>

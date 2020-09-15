@@ -20,8 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Refactoring.WebHome" locale="">
-  <web>XWiki.Refactoring</web>
+<xwikidoc version="1.4" reference="Refactoring.WebHome" locale="">
+  <web>Refactoring</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>

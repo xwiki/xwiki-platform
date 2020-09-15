@@ -20,6 +20,8 @@
 package org.xwiki.refactoring.internal;
 
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -45,6 +47,7 @@ public class DefaultRefactoringConfiguration implements RefactoringConfiguration
     @Override
     public boolean canSkipRecycleBin()
     {
-        return this.configurationSource.getProperty("canSkipRecycleBin", false);
+        String canSkipRecycleBin = this.configurationSource.getProperty("canSkipRecycleBin", "0");
+        return Objects.equals("1", canSkipRecycleBin);
     }
 }

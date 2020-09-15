@@ -151,7 +151,6 @@ public class DeleteAction extends XWikiAction
             sendRedirect(response, Utils.getRedirect("view", context));
             return true;
         } else {
-            // Delete to recycle bin.
             // The document skips the recycle bin only if the user has explicitly made the choice to skip it.
             boolean skipRecycleBin = Boolean.parseBoolean(request.getParameter(SKIP_RECYCLE_BIN_PARAM));
             return deleteToRecycleBin(context, skipRecycleBin);
@@ -237,10 +236,10 @@ public class DeleteAction extends XWikiAction
 
     /**
      *
-     * @param entityReference The entity to delete
+     * @param entityReference the entity to delete
      * @param context the current content
      * @return {@code true} if the user is redirected, {@code false} otherwise
-     * @throws XWikiException If anything goes wrong during the document deletion
+     * @throws XWikiException if anything goes wrong during the document deletion
      * @deprecated since 12.8RC1, use {@link #deleteToRecycleBin(EntityReference, XWikiContext, boolean)} instead
      */
     @Deprecated
@@ -252,12 +251,12 @@ public class DeleteAction extends XWikiAction
 
     /**
      *
-     * @param entityReference The entity to delete
+     * @param entityReference the entity to delete
      * @param context the current content
-     * @param skipRecycleBin If {@code false} the entity is send to the recycle bin. If {@code false}, the
+     * @param skipRecycleBin if {@code false} the entity is send to the recycle bin, if {@code false}, the
      *                       entity is deleted permanently
      * @return {@code true} if the user is redirected, {@code false} otherwise
-     * @throws XWikiException If anything goes wrong during the document deletion
+     * @throws XWikiException if anything goes wrong during the document deletion
      * @since 12.8RC1
      */
     @Unstable

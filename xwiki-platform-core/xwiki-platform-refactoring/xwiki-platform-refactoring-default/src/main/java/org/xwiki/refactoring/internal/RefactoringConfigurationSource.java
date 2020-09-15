@@ -41,7 +41,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Named("refactoring")
 public class RefactoringConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    private static final List<String> SPACE_NAMES = Arrays.asList("XWiki", "Refactoring");
+    private static final List<String> SPACE_NAMES = Arrays.asList("Refactoring", "Code");
 
     private static final LocalDocumentReference DOCUMENT_REFERENCE =
         new LocalDocumentReference(SPACE_NAMES, "RefactoringConfiguration");

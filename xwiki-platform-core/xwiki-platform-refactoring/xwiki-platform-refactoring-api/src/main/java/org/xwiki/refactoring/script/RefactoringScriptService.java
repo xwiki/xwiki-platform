@@ -84,9 +84,6 @@ public class RefactoringScriptService implements ScriptService
     @Inject
     private RefactoringConfiguration configuration;
 
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
     /**
      * Used to check user rights.
      */
@@ -98,6 +95,9 @@ public class RefactoringScriptService implements ScriptService
 
     @Inject
     private RequestFactory requestFactory;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @return the standard request factory for creating the different refactoring requests.

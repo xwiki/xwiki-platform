@@ -20,25 +20,59 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Refactoring.RefactoringConfiguration" locale="">
-  <web>XWiki.Refactoring</web>
+<xwikidoc version="1.4" reference="Refactoring.Code.RefactoringConfiguration" locale="">
+  <web>Refactoring.Code</web>
   <name>RefactoringConfiguration</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Refactoring.WebHome</parent>
+  <parent>Refactoring.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>RefactoringConfiguration</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>XWiki.Refactoring.RefactoringConfiguration</name>
+    <name>Refactoring.Code.RefactoringConfiguration</name>
+    <number>0</number>
+    <className>Refactoring.Code.RefactoringConfigurationClass</className>
+    <guid>ece38be5-7cd0-45aa-ad3d-911430fd8deb</guid>
+    <class>
+      <name>Refactoring.Code.RefactoringConfigurationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <canSkipRecycleBin>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <hint/>
+        <name>canSkipRecycleBin</name>
+        <number>1</number>
+        <prettyName/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </canSkipRecycleBin>
+    </class>
+    <property>
+      <canSkipRecycleBin/>
+    </property>
+  </object>
+  <object>
+    <name>Refactoring.Code.RefactoringConfiguration</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>12faaa9d-5049-44e2-aeaa-f707f9581b64</guid>
@@ -238,7 +272,7 @@
       <codeToExecute/>
     </property>
     <property>
-      <configurationClass>XWiki.Refactoring.RefactoringConfigurationClass</configurationClass>
+      <configurationClass>Refactoring.Code.RefactoringConfigurationClass</configurationClass>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
@@ -247,13 +281,13 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory>other</displayInCategory>
+      <displayInCategory>content</displayInCategory>
     </property>
     <property>
-      <displayInSection>Refactoring</displayInSection>
+      <displayInSection>Delete</displayInSection>
     </property>
     <property>
-      <heading>Refactoring Preferences</heading>
+      <heading>$services.localization.render('refactoring.configuration.delete.heading')</heading>
     </property>
     <property>
       <iconAttachment/>
@@ -266,40 +300,6 @@
     </property>
     <property>
       <sectionOrder/>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Refactoring.RefactoringConfiguration</name>
-    <number>0</number>
-    <className>XWiki.Refactoring.RefactoringConfigurationClass</className>
-    <guid>ece38be5-7cd0-45aa-ad3d-911430fd8deb</guid>
-    <class>
-      <name>XWiki.Refactoring.RefactoringConfigurationClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <canSkipRecycleBin>
-        <customDisplay/>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <hint/>
-        <name>canSkipRecycleBin</name>
-        <number>1</number>
-        <prettyName>canSkipRecycleBin</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </canSkipRecycleBin>
-    </class>
-    <property>
-      <canSkipRecycleBin>0</canSkipRecycleBin>
     </property>
   </object>
 </xwikidoc>

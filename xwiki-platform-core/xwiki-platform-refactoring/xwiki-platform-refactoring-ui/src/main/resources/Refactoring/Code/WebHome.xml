@@ -20,46 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Refactoring.RefactoringConfigurationClass" locale="">
-  <web>XWiki.Refactoring</web>
-  <name>RefactoringConfigurationClass</name>
+<xwikidoc version="1.4" reference="Refactoring.Code.WebHome" locale="">
+  <web>Refactoring.Code</web>
+  <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Refactoring.WebHome</parent>
+  <parent>Refactoring.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Code</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
-  <class>
-    <name>XWiki.Refactoring.RefactoringConfigurationClass</name>
-    <customClass/>
-    <customMapping/>
-    <defaultViewSheet/>
-    <defaultEditSheet/>
-    <defaultWeb/>
-    <nameField/>
-    <validationScript/>
-    <canSkipRecycleBin>
-      <customDisplay/>
-      <defaultValue>0</defaultValue>
-      <disabled>0</disabled>
-      <displayFormType>select</displayFormType>
-      <displayType/>
-      <hint/>
-      <name>canSkipRecycleBin</name>
-      <number>1</number>
-      <prettyName>canSkipRecycleBin</prettyName>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </canSkipRecycleBin>
-  </class>
 </xwikidoc>

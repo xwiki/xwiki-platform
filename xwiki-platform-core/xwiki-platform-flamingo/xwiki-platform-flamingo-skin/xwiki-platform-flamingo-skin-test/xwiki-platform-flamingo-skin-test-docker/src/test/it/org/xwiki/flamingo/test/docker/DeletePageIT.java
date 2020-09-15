@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DeletePageIT
 {
     private static final DocumentReference REFACTORING_CONFIGURATION_REFERENCE =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Refactoring"), "RefactoringConfiguration");
+        new DocumentReference("xwiki", Arrays.asList("Refactoring", "Code"), "RefactoringConfiguration");
 
     private ViewPage viewPage;
 
@@ -382,10 +382,9 @@ public class DeletePageIT
     }
 
     /**
-     *
      * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
      * page to the recycle bin or delete it permanently.
-     * In this test the user choose to send the page to the recycle bin.
+     * In this test the user chooses to send the page to the recycle bin.
      */
     @Test
     @Order(9)
@@ -397,8 +396,8 @@ public class DeletePageIT
         setup.updateObject("XWiki", "superadmin", "XWiki.XWikiUsers", 0, userProperties);
 
         // Set the canSkipRecycleBin property to true
-        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "XWiki.Refactoring.RefactoringConfigurationClass", 0,
-            "canSkipRecycleBin", 1);
+        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "Refactoring.Code.RefactoringConfigurationClass", 0,
+            "canSkipRecycleBin", "1");
 
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
         DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
@@ -415,7 +414,7 @@ public class DeletePageIT
     /**
      * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
      * page to the recycle bin or delete it permanently.
-     * In this test the user choose to delete the page permanently.
+     * In this test the user chooses to delete the page permanently.
      */
     @Test
     @Order(10)

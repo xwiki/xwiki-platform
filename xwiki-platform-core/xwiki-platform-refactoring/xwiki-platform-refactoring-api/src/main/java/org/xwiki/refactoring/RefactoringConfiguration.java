@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Provides configuration for the refactoring module.
+ * Provides the configurations for the refactoring module.
  *
  * @version $Id$
  * @since 12.8RC1
@@ -34,7 +34,8 @@ public interface RefactoringConfiguration
 {
     /**
      *
-     * @return {@code true} if the configuration allows advanced users to skip the recycle bin when deleting documents.
+     * @return {@code true} if the configuration allows advanced users to skip the recycle bin and delete documents
+     * permanently
      */
     boolean canSkipRecycleBin();
 }

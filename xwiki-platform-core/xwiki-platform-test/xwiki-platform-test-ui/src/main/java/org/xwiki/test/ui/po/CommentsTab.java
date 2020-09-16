@@ -56,13 +56,16 @@ public class CommentsTab extends BaseElement
 
     public boolean isCommentFormShown()
     {
-        toggleComments();
         WebElement commentForm =
             getDriver().findElement(By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
     }
 
-    private void toggleComments()
+    /**
+     * Opens the comment form by clicking on the comment button.
+     * If the comment button has already been clicked, does nothing.
+     */
+    public void openCommentForm()
     {
         String commentFormId = "AddComment";
         String openFormId = "openCommentForm";
@@ -99,7 +102,7 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm getAddCommentForm()
     {
-        toggleComments();
+        openCommentForm();
         return new CommentForm(By.id("AddComment"));
     }
 

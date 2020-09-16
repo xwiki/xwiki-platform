@@ -51,7 +51,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
   };
 
   CKEDITOR.plugins.add('xwiki-office', {
-    requires: 'uploadwidget,notification,xwiki-localization',
+    requires: 'uploadwidget,notification,xwiki-localization,xwiki-macro',
 
     init : function(editor) {
       var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;
@@ -118,7 +118,14 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
             filterStyles: upload.file.filterStyles,
             useOfficeViewer: upload.file.useOfficeViewer,
             outputSyntax: 'plain'
-          }).done(function(html) {
+          }).done(function(html, textStatus, jqXHR) {
+            // Load the required skin extensions reusing the function defined by the Macro Wizard. This is needed for
+            // instance when importing a presentation using the Office Viewer macro which requires the gallery widget so
+            // we need to load the gallery CSS and JavaScript resources (skin extensions).
+            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
+            require(['macroWizard'], function() {
+              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+            });
             widget.replaceWith(html);
             notification.update({
               message: editor.localization.get('xwiki-office.importer.done'),

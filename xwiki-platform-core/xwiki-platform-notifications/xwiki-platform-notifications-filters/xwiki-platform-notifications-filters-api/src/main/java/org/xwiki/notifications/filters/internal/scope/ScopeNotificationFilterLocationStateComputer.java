@@ -59,7 +59,7 @@ public class ScopeNotificationFilterLocationStateComputer
     public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null, false).isWatched();
+        return isLocationWatched(filterPreferences, location, null, null, false, true).isWatched();
     }
 
     /**
@@ -70,7 +70,7 @@ public class ScopeNotificationFilterLocationStateComputer
     public boolean isLocationWatchedWithAllEventTypes(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null, true).isWatched();
+        return isLocationWatched(filterPreferences, location, null, null, true, true).isWatched();
     }
 
     /**
@@ -89,10 +89,13 @@ public class ScopeNotificationFilterLocationStateComputer
      * @param onlyGivenType if {@code true} only the given {@code evenType} is taken into account. If {@code false}, the
      *                      given type and filters matching all types are taken into account.
      * @param location the location to check
+     * @param checkInclusiveFilters if {@code true} both inclusive and exclusive filters are considered.
+     *                              if {@code false} only exclusive filters are considered.
      * @return if the location is watched by the user, for the given event type and format
      */
     public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-        EntityReference location, String eventType, NotificationFormat format, boolean onlyGivenType)
+        EntityReference location, String eventType, NotificationFormat format, boolean onlyGivenType,
+        boolean checkInclusiveFilters)
     {
         // TODO: write a unit test with a complex set of preferences
 
@@ -110,7 +113,7 @@ public class ScopeNotificationFilterLocationStateComputer
         }
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
-        if (!it.hasNext()) {
+        if (!checkInclusiveFilters || !it.hasNext()) {
             // No inclusive filters ==  we get everything, so the location is watched
             return new WatchedLocationState(true);
         }

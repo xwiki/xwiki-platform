@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.EntityType;
@@ -50,13 +50,16 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,6 +67,7 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
+@ComponentTest
 @ComponentList({
     LocationOperatorNodeGenerator.class,
     ScopeNotificationFilterExpressionGenerator.class,
@@ -72,28 +76,22 @@ import static org.mockito.Mockito.when;
 })
 public class ScopeNotificationFilterTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<ScopeNotificationFilter> mocker =
-            new MockitoComponentMockingRule<>(ScopeNotificationFilter.class);
+    @InjectMockComponents
+    private ScopeNotificationFilter scopeNotificationFilter;
 
+    @MockComponent
     private NotificationFilterManager notificationFilterManager;
+    
+    @MockComponent
+    @Named("local")
     private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
     private EntityReferenceSerializer<String> globalSerializer;
+
+    @MockComponent
     private EntityReferenceResolver<String> resolver;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        notificationFilterManager = mock(NotificationFilterManager.class);
-        mocker.registerComponent(NotificationFilterManager.class, notificationFilterManager);
-        serializer = mock(EntityReferenceSerializer.class);
-        mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, "local", serializer);
-        globalSerializer = mock(EntityReferenceSerializer.class);
-        mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, globalSerializer);
-        resolver = mock(EntityReferenceResolver.class);
-        mocker.registerComponent(EntityReferenceResolver.TYPE_STRING, resolver);
-    }
-
+    
     private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,
             EntityReference resultReference, NotificationFilterType filterType, String eventName)
     {
@@ -128,33 +126,33 @@ public class ScopeNotificationFilterTest
     }
 
     @Test
-    public void matchPreferenceWithCorrectPreference() throws Exception
+    void matchPreferenceWithCorrectPreference() throws Exception
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
         when(preference.getProperties()).thenReturn(
                 Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, ""));
 
-        assertTrue(mocker.getComponentUnderTest().matchesPreference(preference));
+        assertTrue(this.scopeNotificationFilter.matchesPreference(preference));
     }
 
     @Test
-    public void matchPreferenceWithIncorrectPreference() throws Exception
+    void matchPreferenceWithIncorrectPreference() throws Exception
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
 
-        assertFalse(mocker.getComponentUnderTest().matchesPreference(preference));
+        assertFalse(this.scopeNotificationFilter.matchesPreference(preference));
     }
 
     @Test
-    public void getName() throws Exception
+    void getName() throws Exception
     {
-        assertEquals(ScopeNotificationFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+        assertEquals(ScopeNotificationFilter.FILTER_NAME, this.scopeNotificationFilter.getName());
     }
 
     @Test
-    public void complexCase1() throws Exception
+    void complexCase1() throws Exception
     {
         // Preferences:
         //
@@ -197,7 +195,7 @@ public class ScopeNotificationFilterTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Test 1
-        ExpressionNode result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference);
+        ExpressionNode result = this.scopeNotificationFilter.filterExpression(user, filterPreferences, preference);
         assertNotNull(result);
         assertEquals("(((NOT (WIKI = \"wikiA\") OR ((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\")" +
                 " AND DATE >= \""+ new Date(0).toString() + "\")) "+
@@ -213,39 +211,39 @@ public class ScopeNotificationFilterTest
         when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
         when(event1.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.DocumentE (kept by γ)
         Event event2 = mock(Event.class);
         when(event2.getDocument()).thenReturn(new DocumentReference("DocumentE", spaceReferenceB));
         when(event2.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.SpaceC.DocumentF (filtered by δ)
         Event event3 = mock(Event.class);
         when(event3.getDocument()).thenReturn(new DocumentReference("DocumentF", spaceReferenceC));
         when(event3.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.SpaceC.SpaceD.DocumentG (kept by ε)
         Event event4 = mock(Event.class);
         when(event4.getDocument()).thenReturn(new DocumentReference("DocumentG", spaceReferenceD));
         when(event4.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiB:SpaceH.DocumentI - kept because nothing match and there is no top level inclusive filter
         Event event5 = mock(Event.class);
         when(event5.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceH", "DocumentI"));
         when(event5.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event5, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event5, user, filterPreferences, NotificationFormat.ALERT));
     }
 
     @Test
-    public void testWithTopLevelInclusiveFilters() throws Exception
+    void withTopLevelInclusiveFilters() throws Exception
     {
         // Preferences:
         //
@@ -278,7 +276,7 @@ public class ScopeNotificationFilterTest
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
         // Test 1
-        String result = mocker.getComponentUnderTest().filterExpression(user, filterPreferences, preference).toString();
+        String result = this.scopeNotificationFilter.filterExpression(user, filterPreferences, preference).toString();
         assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
                 + "AND DATE >= \""+ new Date(0).toString() + "\")", result);
 
@@ -287,32 +285,32 @@ public class ScopeNotificationFilterTest
         when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
         when(event1.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.DocumentJ (kept by γ)
         Event event2 = mock(Event.class);
         when(event2.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceB", "DocumentJ"));
         when(event2.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiB:SpaceK.DocumentL (filtered by γ & ζ)
         Event event3 = mock(Event.class);
         when(event3.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceK", "DocumentL"));
         when(event3.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceM.DocumentN (kept by ζ)
         Event event4 = mock(Event.class);
         when(event4.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
         when(event4.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
+                this.scopeNotificationFilter.filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
     }
 
     @Test
-    public void testFilterExpressionWithSubQuery() throws Exception
+    void filterExpressionWithSubQuery() throws Exception
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
@@ -349,11 +347,11 @@ public class ScopeNotificationFilterTest
                         "AND nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> '' " +
                         "AND (nfp.allEventTypes = '' OR nfp.allEventTypes IS NULL) " +
                         "AND nfp.alertEnabled = true AND nfp.enabled = true AND nfp.startingDate <= event.date))",
-                mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.INCLUSIVE,
+                this.scopeNotificationFilter.filterExpression(user, filterPreferences, NotificationFilterType.INCLUSIVE,
                 NotificationFormat.ALERT, notificationFilterPreferences).toString());
 
         // Test 2
-        assertNull(mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
+        assertNull(this.scopeNotificationFilter.filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.ALERT, notificationFilterPreferences));
 
         // Test 3
@@ -365,7 +363,70 @@ public class ScopeNotificationFilterTest
                         "AND nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> '' " +
                         "AND (nfp.allEventTypes = '' OR nfp.allEventTypes IS NULL) " +
                         "AND nfp.emailEnabled = true AND nfp.enabled = true))",
-                mocker.getComponentUnderTest().filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
+                this.scopeNotificationFilter.filterExpression(user, filterPreferences, NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.EMAIL, notificationFilterPreferences).toString());
+    }
+
+    @Test
+    void targetableEvent()
+    {
+        // Preferences:
+        //
+        // α: "mentions" event type enabled for format ALERT
+        //
+        // γ: Inclusive filter on "wikiA:SpaceB"
+        // ζ: Exclusive filter on "wikiA:SpaceM.DocumentN"
+
+        // Mock α
+        NotificationPreference preference = mock(NotificationPreference.class);
+        when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
+        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
+        when(preference.getProperties()).thenReturn(properties);
+
+        // Mock γ
+        WikiReference wikiReference = new WikiReference("wikiA");
+        SpaceReference spaceReferenceB = new SpaceReference("SpaceB", new WikiReference(wikiReference));
+        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB",
+            spaceReferenceB, NotificationFilterType.INCLUSIVE, null);
+
+        // Mock ζ
+        DocumentReference documentReference = new DocumentReference("wikiA", "SpaceM", "DocumentN");
+        NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
+            documentReference, NotificationFilterType.EXCLUSIVE, null);
+        when(prefζ.getProviderHint()).thenReturn("userProfile");
+
+        Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ, prefζ);
+
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+
+        // Test 1
+        String result = this.scopeNotificationFilter.filterExpression(user, filterPreferences, preference).toString();
+        assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
+            + "AND DATE >= \""+ new Date(0).toString() + "\")", result);
+
+        // Test with wikiA:SpaceE -> should not be filtered since inclusive filter is ignored
+        Event event1 = mock(Event.class);
+        when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
+        when(event1.getDate()).thenReturn(new Date(100));
+        when(event1.getTarget()).thenReturn(Collections.singleton("user1"));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+            this.scopeNotificationFilter.filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
+
+        // Test with wikiA:SpaceB.DocumentJ -> should not be filtered since inclusive filter is ignored
+        Event event2 = mock(Event.class);
+        when(event2.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceB", "DocumentJ"));
+        when(event2.getDate()).thenReturn(new Date(100));
+        when(event2.getTarget()).thenReturn(Collections.singleton("user1"));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+            this.scopeNotificationFilter.filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
+
+        // Test with wikiA:SpaceM.DocumentN (excluded by ζ)
+        Event event3 = mock(Event.class);
+        when(event3.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
+        when(event3.getDate()).thenReturn(new Date(100));
+        when(event3.getTarget()).thenReturn(Collections.singleton("user1"));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+            this.scopeNotificationFilter.filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
     }
 }

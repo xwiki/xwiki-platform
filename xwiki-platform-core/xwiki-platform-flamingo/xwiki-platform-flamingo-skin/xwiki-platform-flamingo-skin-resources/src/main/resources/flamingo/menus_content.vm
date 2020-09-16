@@ -384,23 +384,20 @@
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
 
         #set ($viewersContent = "#template('shortcuts.vm')")
-        ## Only show the Viewers section if it contains something to display.
-        #if ($stringtool.isNotBlank("$!viewersContent"))
-          ## Only display a separator if at least one menu entry has been displayed before
-          #if ($needsSeparator)
-            #submenuseparator()
-          #end
-          #submenuheader('core.menu.actions.viewers')
-          ##
-          ## VIEW SOURCE
-          ##
-          #if ("$!request.rev" != '')
-            #set ($revisionParameter = "&rev=$request.rev")
-          #end
-          #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-          $viewersContent
-          #set ($needsSeparator = true)
+        ## Only display a separator if at least one menu entry has been displayed before
+        #if ($needsSeparator)
+          #submenuseparator()
         #end
+        #submenuheader('core.menu.actions.viewers')
+        ##
+        ## VIEW SOURCE
+        ##
+        #if ("$!request.rev" != '')
+          #set ($revisionParameter = "&rev=$request.rev")
+        #end
+        #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+        $viewersContent
+        #set ($needsSeparator = true)
       #end
     #end
   #end

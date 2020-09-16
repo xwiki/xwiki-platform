@@ -124,26 +124,26 @@ class DefaultMentionXDOMServiceTest
     }
 
     @Test
-    void countByIdentifierEmpty()
+    void groupAnchorsByUserReferenceEmpty()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(emptyList(), new WikiReference("xwiki"));
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(emptyList(), new WikiReference("xwiki"));
         assertTrue(actual.isEmpty());
     }
 
     @Test
-    void countByIdentifierOne()
+    void groupAnchorsByUserReferenceOne()
     {
         Map<DocumentReference, List<String>> actual =
-            this.xdomService.countByIdentifier(singletonList(initMentionMacro("A", "A1")), new WikiReference("xwiki"));
+            this.xdomService.groupAnchorsByUserReference(singletonList(initMentionMacro("A", "A1")), new WikiReference("xwiki"));
         Map<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceA, Collections.singletonList("A1"));
         assertEquals(expected, actual);
     }
 
     @Test
-    void countByIdentifierTwo()
+    void groupAnchorsByUserReferenceTwo()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("A", "A2")
         ), new WikiReference("xwiki"));
@@ -153,9 +153,9 @@ class DefaultMentionXDOMServiceTest
     }
 
     @Test
-    void countByIdentifierThree()
+    void groupAnchorsByUserReferenceThree()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("B", "B1"),
             initMentionMacro("A", "A2")
@@ -167,9 +167,9 @@ class DefaultMentionXDOMServiceTest
     }
 
     @Test
-    void countByIdentifierWithEmptyValues()
+    void groupAnchorsByUserReferenceWithEmptyValues()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", null),
             initMentionMacro("A", "A1"),
             initMentionMacro("A", ""),

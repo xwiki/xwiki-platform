@@ -289,8 +289,8 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 1.8RC3]
 #-# Timeout for conversion tasks (in milliseconds) (serverType:0 only).
-#-# Default value is 30 seconds
-# openoffice.taskExecutionTimeout=30000
+#-# Default value is 60 seconds
+# openoffice.taskExecutionTimeout=60000
 
 #-------------------------------------------------------------------------------------
 # Velocity

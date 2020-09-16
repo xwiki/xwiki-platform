@@ -243,7 +243,7 @@ viewers.Comments = Class.create({
    * Inline reply: Move the form under the replied comment and update the hidden "replyto" field.
    */
   addReplyListener : function() {
-    if ($("commentscontent")) {
+    if (this.form) {
       $$(this.xcommentSelector).each(function(item) {
         this.addReplyListenerToComment(item);
       }.bind(this));

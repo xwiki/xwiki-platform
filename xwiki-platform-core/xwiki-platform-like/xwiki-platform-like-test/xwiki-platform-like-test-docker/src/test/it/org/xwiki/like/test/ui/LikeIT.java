@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
-import org.xwiki.like.test.po.LikeModal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -121,11 +120,7 @@ public class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(2, likeButton.getLikeNumber());
-        LikeModal likeModal = likeButton.clickToUnlike();
-        assertTrue(likeModal.isDisplayed());
-        assertTrue(likeModal.isUnlikeButtonDisplayed());
-        likeModal.clickUnlikeButton();
-        assertFalse(likeModal.isDisplayed());
+        likeButton.clickToUnlike();
         assertEquals(1, likeButton.getLikeNumber());
 
         // Check that the value remains after reload

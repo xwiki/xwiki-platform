@@ -66,6 +66,7 @@ viewers.Comments = Class.create({
   startup : function () {
     this.formDisplayed = false;
     this.loadIDs();
+    this.getForm();
     this.addReplyListener();
     this.addEditListener();
     // replaces the comment button with the form on the first click.
@@ -242,7 +243,7 @@ viewers.Comments = Class.create({
    * Inline reply: Move the form under the replied comment and update the hidden "replyto" field.
    */
   addReplyListener : function() {
-    if (this.form) {
+    if ($("commentscontent")) {
       $$(this.xcommentSelector).each(function(item) {
         this.addReplyListenerToComment(item);
       }.bind(this));

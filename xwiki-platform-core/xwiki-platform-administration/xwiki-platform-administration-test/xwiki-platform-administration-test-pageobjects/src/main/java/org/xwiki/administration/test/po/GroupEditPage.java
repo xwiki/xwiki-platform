@@ -91,6 +91,7 @@ public class GroupEditPage extends InlinePage
         for (String member : members) {
             getDriver().findElementWithoutWaiting(By.xpath(String.format(MEMBER_ACTION_XPATH_FORMAT, member, "delete")))
                 .click();
+            waitForNotificationSuccessMessage("Done");
         }
         return this;
     }

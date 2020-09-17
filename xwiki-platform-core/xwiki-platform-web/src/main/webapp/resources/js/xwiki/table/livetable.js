@@ -375,12 +375,28 @@ XWiki.widgets.LiveTable = Class.create({
             if (action.async) {
               link.observe('click', function(event) {
                 event.stop();
-                new Ajax.Request(this.href, {
+                var notification = new XWiki.widgets.Notification(
+                  $jsontool.serialize($services.localization.render('platform.livetable.asyncActionInProgress')),
+                  'inprogress'
+                );
+                new Ajax.Request(link.href, {
                   onSuccess: function() {
-                    new Function('row', 'i', 'table', action.callback)(row, i, table);
+                    if (typeof action.callback === 'string') {
+                      new Function('row', 'i', 'table', action.callback)(row, i, table);
+                    }
+                    notification.replace(new XWiki.widgets.Notification(
+                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionDone')),
+                      'done'
+                    ));
+                  },
+                  onFailure: function() {
+                    notification.replace(new XWiki.widgets.Notification(
+                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionFailed')),
+                      'error'
+                    ));
                   }
                 });
-              }.bindAsEventListener(link));
+              });
             }
             td.insert(link);
           }

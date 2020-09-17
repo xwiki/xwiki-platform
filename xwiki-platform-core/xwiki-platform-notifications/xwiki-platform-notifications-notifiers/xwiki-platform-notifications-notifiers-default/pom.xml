@@ -35,6 +35,7 @@
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back to 13% once https://jira.xwiki.org/browse/XWIKI-17074 is fixed -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>

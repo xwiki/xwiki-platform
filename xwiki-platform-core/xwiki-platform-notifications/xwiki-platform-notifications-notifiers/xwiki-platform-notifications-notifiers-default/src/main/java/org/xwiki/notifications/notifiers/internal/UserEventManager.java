@@ -21,6 +21,7 @@ package org.xwiki.notifications.notifiers.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,10 +29,18 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -56,7 +65,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component(roles = UserEventManager.class)
 @Singleton
-public class UserEventManager
+public class UserEventManager implements Initializable
 {
     @Inject
     private AuthorizationManager authorizationManager;
@@ -76,6 +85,28 @@ public class UserEventManager
     @Inject
     private Logger logger;
 
+    @Inject
+    private CacheManager cacheManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    private Cache<Date> userCreationDateCache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        try {
+            this.userCreationDateCache = this.cacheManager.createNewCache(
+                new LRUCacheConfiguration("xwiki.notification.usersCreationDate.cache", 100));
+        } catch (CacheException e) {
+            throw new InitializationException("Error while initializing the cache for users creation date.", e);
+        }
+    }
+
     /**
      * @param event the event
      * @param user the reference of the user
@@ -84,9 +115,10 @@ public class UserEventManager
      */
     public boolean isListening(Event event, DocumentReference user, NotificationFormat format)
     {
-        if (hasAccess(user, event) && (hasCorrespondingNotificationPreference(user, event, format)
-            || isTriggeredByAFollowedUser(user, event, format))) {
-            try {
+        try {
+            if (hasAccess(user, event) && isEventAfterUserCreationDate(event, user)
+                && (hasCorrespondingNotificationPreference(user, event, format)
+                || isTriggeredByAFollowedUser(user, event, format))) {
                 // Apply the filters that the user has defined in its notification preferences
                 // If one of the events present in the composite event does not match a user filter, remove the event
                 List<NotificationFilter> filters =
@@ -94,9 +126,9 @@ public class UserEventManager
                 filters.sort(null);
 
                 return !isEventFiltered(filters, event, user, format);
-            } catch (NotificationException e) {
-                this.logger.error("Failed to get event filters for user [{}]", user, e);
             }
+        } catch (NotificationException e) {
+            this.logger.error("Failed to get event filters for user [{}]", user, e);
         }
 
         return false;
@@ -123,6 +155,43 @@ public class UserEventManager
         return true;
     }
 
+    /**
+     * Check if the event has been sent after the creation date of the user.
+     *
+     * @param event the event to check
+     * @param user the targeted user
+     * @return {@code true} if event's date or user's creation date is null, or if the event date is after the user's
+     *          creation date.
+     * @throws NotificationException in case of problem to retrieve user's creation date.
+     */
+    private boolean isEventAfterUserCreationDate(Event event, DocumentReference user) throws NotificationException
+    {
+        Date userCreationDate = getUserCreationDate(user);
+        return event.getDate() == null || userCreationDate == null || event.getDate().after(userCreationDate);
+    }
+
+    /**
+     * Retrieve user's creation date from the document creation date and put it in cache for later retrieval.
+     *
+     * @param user the user for whom to retrieve creation date.
+     * @return the actual creation date of the user.
+     * @throws NotificationException in case of problem to access the document.
+     */
+    private Date getUserCreationDate(DocumentReference user) throws NotificationException
+    {
+        String serializedUser = this.entityReferenceSerializer.serialize(user);
+        Date result = this.userCreationDateCache.get(serializedUser);
+        if (result == null) {
+            try {
+                result = this.documentAccessBridge.getDocumentInstance(user).getCreationDate();
+                this.userCreationDateCache.set(serializedUser, result);
+            } catch (Exception e) {
+                throw new NotificationException(String.format("Cannot find creation date for user [%s].", user), e);
+            }
+        }
+        return result;
+    }
+
     private boolean hasCorrespondingNotificationPreference(DocumentReference user, Event event,
         NotificationFormat format)
     {
@@ -133,7 +202,13 @@ public class UserEventManager
                     && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
                     && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
                         .equals(event.getType())) {
-                    return notificationPreference.isNotificationEnabled();
+
+                    // Ensures that the preference is enabled, and that the preference start date is before the event
+                    // date. Note that we return true also if event date is null or notification preference is null
+                    // for possible backward compatibility with old events.
+                    return notificationPreference.isNotificationEnabled()
+                        && (notificationPreference.getStartDate() == null || event.getDate() == null
+                        || notificationPreference.getStartDate().before(event.getDate()));
                 }
             }
         } catch (NotificationException e) {
@@ -148,10 +223,25 @@ public class UserEventManager
     {
         try {
             return notificationFilterPreferenceManager.getFilterPreferences(user).stream()
-                .anyMatch(fp -> isUserFilterPreference(fp, format) && matchUser(fp, event));
+                .anyMatch(fp -> isFilterCreatedBeforeEvent(event, fp) && isUserFilterPreference(fp, format)
+                    && matchUser(fp, event));
         } catch (NotificationException e) {
             return false;
         }
+    }
+
+    /**
+     * Check that the filter preference started before the event has been sent.
+     *
+     * @param event the event to check
+     * @param filterPreference the preference to check
+     * @return {@code true} if the event date or the preference start date is null for backward compatibility, or if the
+     *          preference start date is before the event date.
+     */
+    private boolean isFilterCreatedBeforeEvent(Event event, NotificationFilterPreference filterPreference)
+    {
+        return event.getDate() == null || filterPreference.getStartingDate() == null
+            || filterPreference.getStartingDate().before(event.getDate());
     }
 
     private boolean isUserFilterPreference(NotificationFilterPreference filterPreference, NotificationFormat format)
@@ -206,5 +296,4 @@ public class UserEventManager
 
         return false;
     }
-
 }

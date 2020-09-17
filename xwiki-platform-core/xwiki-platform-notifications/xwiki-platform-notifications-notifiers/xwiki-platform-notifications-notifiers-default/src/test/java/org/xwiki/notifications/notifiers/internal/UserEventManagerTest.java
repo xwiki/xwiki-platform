@@ -277,6 +277,10 @@ public class UserEventManagerTest
         when(event.getUser()).thenReturn(new DocumentReference("xwiki", "Someone", "Else"));
         assertFalse(this.userEventManager.isListening(event, userReference, format));
 
+        // same if the event user is null.
+        when(event.getUser()).thenReturn(null);
+        assertFalse(this.userEventManager.isListening(event, userReference, format));
+
         // on the contrary if the filter is not for the followed user, we don't listen the event either.
         when(event.getUser()).thenReturn(followedUser);
         when(filter2.getUser()).thenReturn("myUser");

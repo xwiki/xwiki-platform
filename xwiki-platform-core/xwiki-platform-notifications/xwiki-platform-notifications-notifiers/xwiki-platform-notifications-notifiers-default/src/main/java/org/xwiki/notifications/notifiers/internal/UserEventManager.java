@@ -242,7 +242,8 @@ public class UserEventManager
 
     private boolean matchUser(NotificationFilterPreference filterPreference, Event event)
     {
-        return event.getUser().equals(this.referenceResolver.resolve(filterPreference.getUser()));
+        return event.getUser() != null
+            && event.getUser().equals(this.referenceResolver.resolve(filterPreference.getUser()));
     }
 
     private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)

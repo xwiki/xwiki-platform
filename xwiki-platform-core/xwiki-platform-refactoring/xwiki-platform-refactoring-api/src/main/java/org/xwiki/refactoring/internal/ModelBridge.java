@@ -58,7 +58,7 @@ public interface ModelBridge
 
     /**
      * Delete the specified document.
-     * If the recycle bin is activated, the document is send to the recycle bin.
+     * If the recycle bin is activated, the document is sent to the recycle bin.
      * Otherwise the document is removed permanently.
      * 
      * @param documentReference the reference of the document to delete
@@ -68,7 +68,7 @@ public interface ModelBridge
 
     /**
      * Delete or move to the recycle bin the specified document.
-     * @param documentReference the reference of the document to delete
+     * @param documentReference the reference of the document to delete or move to the recycle bin
      * @param skipRecycleBin if {@code false}, the document is moved to the recycle bin (if the recycle bin is not
      *                    activated, the document is removed permanently nevertheless), if {@code true},
      *                    the document is removed permanently

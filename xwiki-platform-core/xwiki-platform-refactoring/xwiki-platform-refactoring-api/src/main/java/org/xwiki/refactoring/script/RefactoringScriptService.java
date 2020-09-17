@@ -548,14 +548,13 @@ public class RefactoringScriptService implements ScriptService
     }
 
     /**
-     *
      * @return {@code true} if the current user can be given the option to choose between sending a document to the
      * recycle bin or deleting it permanently. {@code false} otherwise.
      * @since 12.8RC1
      */
     @Unstable
-    public boolean isAllowedToSkipTheRecycleBin()
+    public boolean isRecycleBinSkippingAllowed()
     {
-        return this.configuration.canSkipRecycleBin() && this.documentAccessBridge.isAdvancedUser();
+        return this.configuration.isRecycleBinSkippingActivated() && this.documentAccessBridge.isAdvancedUser();
     }
 }

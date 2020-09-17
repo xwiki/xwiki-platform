@@ -46,20 +46,20 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <canSkipRecycleBin>
+    <isRecycleBinSkippingActivated>
       <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType>yesno</displayType>
       <hint/>
-      <name>canSkipRecycleBin</name>
+      <name>isRecycleBinSkippingActivated</name>
       <number>1</number>
       <prettyName/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </canSkipRecycleBin>
+    </isRecycleBinSkippingActivated>
   </class>
 </xwikidoc>

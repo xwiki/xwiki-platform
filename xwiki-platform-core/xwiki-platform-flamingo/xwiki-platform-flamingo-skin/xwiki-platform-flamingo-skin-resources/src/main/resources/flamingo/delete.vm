@@ -238,20 +238,20 @@
 #######################################################
 #macro(displayConfirmMessage)
   #if($xwiki.hasRecycleBin())
-    #if($services.refactoring.isAllowedToSkipTheRecycleBin())
-      <div class="xform">
+    #if($services.refactoring.isRecycleBinSkippingAllowed())
+      <div class="xform" id="skipRecycleBinForm">
         <dl>
           <dt>
-            $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip'))
+            $escapetool.xml($services.localization.render('core.recycleBin.shouldSkipRecycleBin'))
           </dt>
           <dd>
             <label class="xwiki-form-listclass">
-              <input name="skipRecycleBin" type="radio" value="false" checked/>
-              $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.no'))
+              <input name="shouldSkipRecycleBin" type="radio" value="false" checked/>
+              $escapetool.xml($services.localization.render('core.recycleBin.shouldSkipRecycleBin.no'))
             </label>
             <label class="xwiki-form-listclass">
-              <input name="skipRecycleBin" type="radio" value="true"/>
-              $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.yes'))
+              <input name="shouldSkipRecycleBin" type="radio" value="true"/>
+              $escapetool.xml($services.localization.render('core.recycleBin.shouldSkipRecycleBin.yes'))
             </label>
           </dd>
         </dl>

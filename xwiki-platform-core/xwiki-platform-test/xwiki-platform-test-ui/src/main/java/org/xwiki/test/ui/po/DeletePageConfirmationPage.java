@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -55,7 +56,15 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     }
 
     /**
-     * Confirm the deletion of the page
+     * @return {@code true} if the form proposing to skip the recycle bin is displayed, {@code false} otherwise
+     */
+    public boolean hasSkipRecycleBinForm()
+    {
+        return this.getDriver().findElementsWithoutWaiting(By.id("skipRecycleBinForm")).size() == 1;
+    }
+
+    /**
+     * Confirm the deletion of the page.
      * @return an object representing the UI displayed when a page is deleted
      */
     public DeletingPage confirmDeletePage()

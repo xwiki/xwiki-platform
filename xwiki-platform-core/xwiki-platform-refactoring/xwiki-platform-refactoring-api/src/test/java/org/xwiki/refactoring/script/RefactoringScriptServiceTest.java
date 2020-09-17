@@ -67,7 +67,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class RefactoringScriptServiceTest
+class RefactoringScriptServiceTest
 {
     @InjectMockComponents
     private RefactoringScriptService refactoringScriptService;
@@ -369,28 +369,37 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    void canSkipRecycleBinWhenAdvancedUserAndCanSkipRecycleBin()
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingIsActivated()
     {
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
-        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
-        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
         assertTrue(actual);
     }
 
     @Test
-    void canSkipRecycleBinWhenSimpleUserAndCannotSkipRecycleBin()
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingDeactivated()
     {
-        when(this.configuration.canSkipRecycleBin()).thenReturn(false);
-        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
         assertFalse(actual);
     }
 
     @Test
-    void canSkipRecycleBinWhenSimpleUser()
+    void isRecycleBinSkippingAllowedWhenSimpleUserAndRecycleBinSkippingDeactivated()
+    {
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenSimpleUser()
     {
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(false);
-        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
-        boolean actual = this.refactoringScriptService.isAllowedToSkipTheRecycleBin();
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
         assertFalse(actual);
     }
 }

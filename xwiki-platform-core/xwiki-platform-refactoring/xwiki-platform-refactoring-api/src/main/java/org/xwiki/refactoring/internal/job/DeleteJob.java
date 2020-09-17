@@ -52,7 +52,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
      * Key of the optional property that indicates whether the document should be send to the recycle bin
      * or removed permanently.
      */
-    public static final String SKIP_RECYCLE_BIN_PROPERTY = "skipRecycleBin";
+    public static final String SHOULD_SKIP_RECYCLE_BIN_PROPERTY = "shouldSkipRecycleBin";
 
     @Inject
     private BatchOperationExecutor batchOperationExecutor;
@@ -126,10 +126,10 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        Boolean skipRecycleBinProperty = this.getRequest().getProperty(SKIP_RECYCLE_BIN_PROPERTY);
-        boolean skipRecycleBin = this.configuration.canSkipRecycleBin()
+        Boolean shouldSkipRecycleBinProperty = this.getRequest().getProperty(SHOULD_SKIP_RECYCLE_BIN_PROPERTY);
+        boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()
                                      && this.documentAccessBridge.isAdvancedUser()
-                                     && ObjectUtils.defaultIfNull(skipRecycleBinProperty, false);
+                                     && ObjectUtils.defaultIfNull(shouldSkipRecycleBinProperty, false);
         EntitySelection entitySelection = this.concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             // TODO: handle entitySelection == null which means something is wrong
@@ -143,7 +143,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
             this.logger.debug("[{}] has been successfully moved to the recycle bin.", documentReference);
         } else {
             this.modelBridge.delete(documentReference, true);
-            this.logger.debug("[{}] has been successfully removed.", documentReference);
+            this.logger.debug("[{}] has been successfully deleted.", documentReference);
         }
     }
 }

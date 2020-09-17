@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link EntitySelection}.
- * 
+ *
  * @version $Id$
  */
 class EntitySelectionTest
@@ -77,13 +77,15 @@ class EntitySelectionTest
     }
 
     @Test
-    void compareToEntityReferenceNull() {
+    void compareToEntityReferenceNull()
+    {
         EntitySelection o = new EntitySelection(null);
         assertEquals(-1, o.compareTo(new EntitySelection(null)));
     }
 
     @Test
-    void compareToEntitySelectionReferenceNull() {
+    void compareToEntitySelectionReferenceNull()
+    {
         EntitySelection o = new EntitySelection(new EntityReference("A", EntityType.PAGE));
         assertEquals(1, o.compareTo(new EntitySelection(null)));
     }

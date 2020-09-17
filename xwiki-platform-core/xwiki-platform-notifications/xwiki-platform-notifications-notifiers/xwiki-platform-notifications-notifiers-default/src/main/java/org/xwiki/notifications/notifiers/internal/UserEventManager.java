@@ -22,7 +22,9 @@ package org.xwiki.notifications.notifiers.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,14 +32,9 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.Event;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -65,7 +62,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component(roles = UserEventManager.class)
 @Singleton
-public class UserEventManager implements Initializable
+public class UserEventManager
 {
     @Inject
     private AuthorizationManager authorizationManager;
@@ -86,26 +83,18 @@ public class UserEventManager implements Initializable
     private Logger logger;
 
     @Inject
-    private CacheManager cacheManager;
-
-    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    private Cache<Date> userCreationDateCache;
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        try {
-            this.userCreationDateCache = this.cacheManager.createNewCache(
-                new LRUCacheConfiguration("xwiki.notification.usersCreationDate.cache", 100));
-        } catch (CacheException e) {
-            throw new InitializationException("Error while initializing the cache for users creation date.", e);
-        }
-    }
+    // We use a map here and not a cache since it's expected to contain all users
+    // (we iterate over all users in the UserEventDispatcher)
+    // Note that the memory footprint will be acceptable thanks to the dedup of references here.
+    private Map<DocumentReference, Date> userCreationDateCache = new HashMap<>();
 
     /**
      * @param event the event
@@ -179,15 +168,16 @@ public class UserEventManager implements Initializable
      */
     private Date getUserCreationDate(DocumentReference user) throws NotificationException
     {
-        String serializedUser = this.entityReferenceSerializer.serialize(user);
-        Date result = this.userCreationDateCache.get(serializedUser);
-        if (result == null) {
+        Date result;
+        if (!this.userCreationDateCache.containsKey(user)) {
             try {
                 result = this.documentAccessBridge.getDocumentInstance(user).getCreationDate();
-                this.userCreationDateCache.set(serializedUser, result);
+                this.userCreationDateCache.put(this.entityReferenceFactory.getReference(user), result);
             } catch (Exception e) {
                 throw new NotificationException(String.format("Cannot find creation date for user [%s].", user), e);
             }
+        } else {
+            result = this.userCreationDateCache.get(user);
         }
         return result;
     }

@@ -66,6 +66,7 @@ viewers.Comments = Class.create({
   startup : function () {
     this.formDisplayed = false;
     this.loadIDs();
+    this.getForm();
     this.addReplyListener();
     this.addEditListener();
     // replaces the comment button with the form on the first click.

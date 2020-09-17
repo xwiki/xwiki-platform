@@ -78,9 +78,11 @@
   'type': {'filterable': false, 'sortable': false},
   'scope': {'filterable': false, 'sortable': false},
   '_actions': {
-    'actions': ['delete'],
-    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
-    'ajaxActions': {'delete': true},
+    'actions': [{
+      'id': 'delete',
+      'async': true,
+      'callback': 'table.deleteRow(i);'
+    }],
     'filterable': false
    }
 })

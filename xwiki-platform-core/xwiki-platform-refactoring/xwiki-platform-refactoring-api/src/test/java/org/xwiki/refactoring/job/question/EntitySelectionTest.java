@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class EntitySelectionTest
+class EntitySelectionTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         EntityReference entityReference = new EntityReference("test", EntityType.PAGE);
         EntitySelection selected = new EntitySelection(entityReference);
@@ -52,7 +52,7 @@ public class EntitySelectionTest
     }
 
     @Test
-    public void compareTo()
+    void compareTo()
     {
         EntityReference aEntityReference = new EntityReference("A", EntityType.PAGE);
         EntitySelection aEntitySelection = new EntitySelection(aEntityReference);
@@ -74,5 +74,17 @@ public class EntitySelectionTest
         EntityReference bEntityReference = new EntityReference("B", EntityType.PAGE);
         EntitySelection bEntitySelection = new EntitySelection(bEntityReference);
         assertEquals(-1, aEntitySelection.compareTo(bEntitySelection));
+    }
+
+    @Test
+    void compareToEntityReferenceNull() {
+        EntitySelection o = new EntitySelection(null);
+        assertEquals(-1, o.compareTo(new EntitySelection(null)));
+    }
+
+    @Test
+    void compareToEntitySelectionReferenceNull() {
+        EntitySelection o = new EntitySelection(new EntityReference("A", EntityType.PAGE));
+        assertEquals(1, o.compareTo(new EntitySelection(null)));
     }
 }

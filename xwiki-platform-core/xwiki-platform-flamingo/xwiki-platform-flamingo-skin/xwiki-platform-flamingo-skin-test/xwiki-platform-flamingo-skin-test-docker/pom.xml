@@ -90,6 +90,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed for the recycle bin skipping configuration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Needed for ObectEditorIT to test user displayer. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,34 +18,16 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package com.xpn.xwiki.web;
+-->
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
-/**
- * Action for deleting an entire space, optionally saving all the deleted documents to the document trash, if enabled.
- *
- * @version $Id$
- * @since 3.4M1
- */
-public class DeleteSpaceAction extends DeleteAction
-{
-    @Override
-    protected boolean delete(XWikiContext context) throws XWikiException
-    {
-        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context, false);
-    }
-
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        XWikiRequest request = context.getRequest();
-        String result = "deletespace";
-        if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
-            result = "deletedspace";
-        }
-        return result;
-    }
-}
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-refactoring</artifactId>
+    <version>12.8-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-refactoring-ui</artifactId>
+  <name>XWiki Platform - Refactoring - UI</name>
+  <packaging>xar</packaging>
+</project>

@@ -238,16 +238,36 @@
 #######################################################
 #macro(displayConfirmMessage)
   #if($xwiki.hasRecycleBin())
-    #if($hasInlinks)
-      <p><strong>$services.localization.render('core.recyclebin.confirmWithInlinks')</strong></p>
+    #if($services.refactoring.isAllowedToSkipTheRecycleBin())
+      <div class="xform">
+        <dl>
+          <dt>
+            $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip'))
+          </dt>
+          <dd>
+            <label class="xwiki-form-listclass">
+              <input name="skipRecycleBin" type="radio" value="false" checked/>
+              $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.no'))
+            </label>
+            <label class="xwiki-form-listclass">
+              <input name="skipRecycleBin" type="radio" value="true"/>
+              $escapetool.xml($services.localization.render('core.recyclebin.wantToSkip.yes'))
+            </label>
+          </dd>
+        </dl>
+      </div>
     #else
-      <p>$services.localization.render('core.recyclebin.confirm')</p>
+      #if($hasInlinks)
+        <p><strong>$escapetool.xml($services.localization.render('core.recyclebin.confirmWithInlinks'))</strong></p>
+      #else
+        <p>$escapetool.xml($services.localization.render('core.recyclebin.confirm'))</p>
+      #end
     #end
   #else
     #if($hasInlinks)
-      <p><strong>$services.localization.render('core.delete.confirmWithInlinks')</strong></p>
+      <p><strong>$escapetool.xml($services.localization.render('core.delete.confirmWithInlinks'))</strong></p>
     #else
-      <p>$services.localization.render('core.delete.confirm')</p>
+      <p>$escapetool.xml($services.localization.render('core.delete.confirm'))</p>
     #end
   #end
   <div class="hidden">
@@ -258,13 +278,13 @@
       <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
     #end
   </div>
-  <button class="btn btn-danger confirm">$services.localization.render('delete')</button>
+  <button class="btn btn-danger confirm">$escapetool.xml($services.localization.render('delete'))</button>
   #if("$!{request.xredirect}" != '')
     #set($cancelUrl = "$request.xredirect")
   #else
     #set($cancelUrl = $doc.getURL())
   #end
-  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('cancel')</a>
+  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$escapetool.xml($services.localization.render('cancel'))</a>
 #end
 #######################################################
 ##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE

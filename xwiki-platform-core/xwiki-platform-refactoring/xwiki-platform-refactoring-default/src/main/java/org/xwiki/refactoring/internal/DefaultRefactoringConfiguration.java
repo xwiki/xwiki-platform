@@ -17,33 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package org.xwiki.refactoring.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+
+import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.refactoring.RefactoringConfiguration;
 
 /**
- * Action for deleting an entire space, optionally saving all the deleted documents to the document trash, if enabled.
+ * Default implementation of {@link RefactoringConfiguration}.
  *
  * @version $Id$
- * @since 3.4M1
+ * @since 12.8RC1
  */
-public class DeleteSpaceAction extends DeleteAction
+@Component
+@Singleton
+public class DefaultRefactoringConfiguration implements RefactoringConfiguration
 {
-    @Override
-    protected boolean delete(XWikiContext context) throws XWikiException
-    {
-        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context, false);
-    }
+    @Inject
+    @Named("refactoring")
+    private ConfigurationSource configurationSource;
 
     @Override
-    public String render(XWikiContext context) throws XWikiException
+    public boolean canSkipRecycleBin()
     {
-        XWikiRequest request = context.getRequest();
-        String result = "deletespace";
-        if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
-            result = "deletedspace";
-        }
-        return result;
+        String canSkipRecycleBin = this.configurationSource.getProperty("canSkipRecycleBin", "0");
+        return Objects.equals("1", canSkipRecycleBin);
     }
 }

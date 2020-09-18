@@ -108,7 +108,6 @@ public class MentionsIT
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
             waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            reload(setup);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
@@ -170,7 +169,6 @@ public class MentionsIT
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
             waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            reload(setup);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
@@ -191,11 +189,6 @@ public class MentionsIT
             assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
             tray.clearAllNotifications();
         });
-    }
-
-    private void reload(TestUtils setup)
-    {
-        setup.getDriver().navigate().refresh();
     }
 
     /**

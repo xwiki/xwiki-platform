@@ -118,6 +118,8 @@ public class NotificationsTrayPage extends ViewPage
                 "Timeout while waiting on notification count. Expected: [%s] - Latest result: [%s].",
                 expectedUnread, latestResponse), e);
         }
+        // Ensure to refresh the page after calling this wait, so the notification tray is updated.
+        getUtil().getDriver().navigate().refresh();
     }
 
     /**

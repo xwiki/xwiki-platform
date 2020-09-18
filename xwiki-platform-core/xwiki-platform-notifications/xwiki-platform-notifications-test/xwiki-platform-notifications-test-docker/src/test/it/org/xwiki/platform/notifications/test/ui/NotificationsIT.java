@@ -101,17 +101,21 @@ public class NotificationsIT
         NotificationsUserProfilePage p;
 
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
         // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 0);
+        // The page should have been refreshed but we want to be sure to not have stale elements.
+        p = new NotificationsUserProfilePage();
         p.disableAllParameters();
         // Enable own filter
         p.getNotificationFilterPreferences().get(2).setEnabled(true);
 
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         // Make sure to wait until notifications are empty (in case of leftovers bing cleaned from a previous test)
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
+        // The page should have been refreshed but we want to be sure to not have stale elements.
+        p = new NotificationsUserProfilePage();
         p.disableAllParameters();
     }
 
@@ -163,7 +167,6 @@ public class NotificationsIT
         testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
             PAGES_TOP_CREATION_COUNT);
-        testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
@@ -252,6 +255,7 @@ public class NotificationsIT
         // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));

@@ -945,6 +945,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if (result == null) {
             result = new StaticListClass();
             result.setName(fieldName);
+            // Set default values which can be overridden by the caller
+            result.setSize(1);
+            result.setMultiSelect(false);
+            result.setRelationalStorage(false);
+            result.setFreeText(ListClass.FREE_TEXT_FORBIDDEN);
+            result.setLargeStorage(false);
+            result.setObject(this);
             put(fieldName, result);
         }
         return result;

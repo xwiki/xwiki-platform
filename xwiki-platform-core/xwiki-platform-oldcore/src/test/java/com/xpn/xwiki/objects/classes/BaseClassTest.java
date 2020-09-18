@@ -221,6 +221,7 @@ class BaseClassTest
         slc.setPrettyName("Custom Field");
 
         assertNotNull(slc);
+        assertNotNull(slc.getObject());
         assertNotNull(baseClass.get("field"));
         assertEquals("Custom Field", ((StaticListClass) baseClass.get("field")).getPrettyName());
     }

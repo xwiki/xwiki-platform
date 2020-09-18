@@ -325,16 +325,13 @@ viewers.Comments = Class.create({
                   "$services.localization.render('core.viewers.comments.add.inProgress')",
                   "inprogress");
           form.disable();
-          this.restartNeeded = false;
+          this.requestSucceeded = false;
           new Ajax.Request(url, {
             method : 'post',
             parameters : formData,
             onSuccess : function () {
-              this.restartNeeded = true;
+              this.requestSucceeded = true;
               this.editing = false;
-              form._x_notification.replace(
-                  new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.done')",
-                      "done"));
             }.bind(this),
             onFailure : function (response) {
               var failureReason = response.statusText;
@@ -362,7 +359,7 @@ viewers.Comments = Class.create({
               }
               this.destroyEditor("[name='" + name + "']", name);
 
-              if (this.restartNeeded) {
+              if (this.requestSucceeded) {
                 this.container.update(response.responseText);
 
                 // If a content is found in submittedcomment that means the submission was not valid.
@@ -396,6 +393,12 @@ viewers.Comments = Class.create({
 
                 // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
                 this.container.fire('xwiki:captcha:reloaded');
+
+                // We send success notification only when everything is done: our integration tests relies on it
+                // for waiting a comment added.
+                form._x_notification.replace(
+                  new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.done')",
+                    "done"));
               }
             }.bind(this)
           });

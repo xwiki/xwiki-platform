@@ -397,7 +397,7 @@ class DeletePageIT
 
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
         DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
-        assertFalse(confirmationPage.hasSkipRecycleBinForm());
+        assertFalse(confirmationPage.isRecycleBinOptionsDisplayed());
 
         // Set the isRecycleBinSkippingActivated property to true, allowing advanced user to choose whether they want document to be
         // sent to the recycle bin or permanently removed.
@@ -407,7 +407,7 @@ class DeletePageIT
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
         confirmationPage = this.viewPage.deletePage();
 
-        assertTrue(confirmationPage.hasSkipRecycleBinForm());
+        assertTrue(confirmationPage.isRecycleBinOptionsDisplayed());
         confirmationPage.selectOptionToRecycleBin();
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();

@@ -19,46 +19,43 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.job.Job;
-import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.internal.job.DeleteJob;
-import org.xwiki.refactoring.job.EntityRequest;
-import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
-import org.xwiki.refactoring.job.RefactoringJobs;
-import org.xwiki.refactoring.script.RefactoringScriptService;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.DeletedDocument;
-import com.xpn.xwiki.doc.XWikiDeletedDocument;
-import com.xpn.xwiki.doc.XWikiDocument;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * Action for delete document to recycle bin and for delete documents from recycle bin.
+ * Add a backward compatibility layer to the {@link DeleteAction} class.
  *
+ * @version $Id$
+ * @since 12.8RC1
  */
-public class DeleteAction extends XWikiAction
+public privileged aspect DeleteActionCompatibilityAspect
 {
+    // This method, while previously {@code protected} is now {@code public} due of some technical limitations of
+    // AspectJ.
+    // See https://doanduyhai.wordpress.com/2011/12/12/advanced-aspectj-part-ii-inter-type-declaration/
+    // "If their is one thing to remember from access modifier, it’s that their semantic applies with respect to the
+    // declaring aspect, and not to the target."
+    // This method must still be used as if it is {@code protected} and only be overloaded by sub-classes of
+    // DeleteAction.
     /**
+     * Create a job to delete an entity.
+     * If the recycle bin is active, the entity is moved to the recycle bin.
+     * Otherwise, the entity is removed permanently.
+     *
      * @param entityReference the entity to delete
-     * @param context the current context
+     * @param context the current context, used to access the user's request
      * @return {@code true} if the user is redirected, {@code false} otherwise
      * @throws XWikiException if anything goes wrong during the document deletion
      * @deprecated since 12.8RC1, use {@link #deleteDocument(EntityReference, XWikiContext, boolean)} instead
+     * @since 12.8RC1
      */
     @Deprecated
-    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context)
+    @Unstable
+    public boolean DeleteAction.deleteToRecycleBin(EntityReference entityReference, XWikiContext context)
         throws XWikiException
     {
         return this.deleteDocument(entityReference, context, false);

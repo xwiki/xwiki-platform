@@ -183,7 +183,6 @@ class DefaultModelBridgeTest
     @Test
     void createWithException() throws Exception
     {
-        XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenThrow(new XWikiException());
 

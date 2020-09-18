@@ -50,7 +50,7 @@ class DefaultRefactoringConfigurationTest
     @Test
     void isRecycleBinSkippingActivatedDefault()
     {
-        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", false)).thenReturn(null);
+        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", false)).thenReturn(false);
         boolean actual = this.configuration.isRecycleBinSkippingActivated();
         assertFalse(actual);
     }

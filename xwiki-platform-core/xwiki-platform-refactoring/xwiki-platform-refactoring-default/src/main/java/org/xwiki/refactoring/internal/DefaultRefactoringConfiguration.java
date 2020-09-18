@@ -45,8 +45,6 @@ public class DefaultRefactoringConfiguration implements RefactoringConfiguration
     @Override
     public boolean isRecycleBinSkippingActivated()
     {
-        Boolean isRecycleBinSkippingActivated =
-            this.configurationSource.getProperty("isRecycleBinSkippingActivated", false);
-        return isRecycleBinSkippingActivated != null && isRecycleBinSkippingActivated;
+        return this.configurationSource.getProperty("isRecycleBinSkippingActivated", false);
     }
 }

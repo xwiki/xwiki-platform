@@ -161,7 +161,7 @@ public class NotificationsEmailsIT
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
 
         // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
-        mail.waitForIncomingEmail(30000L, 1);
+        assertTrue(mail.waitForIncomingEmail(30000L, 1), "Timeout reached for getting notification email.");
 
         assertEquals(1, mail.getReceivedMessages().length);
         MimeMessage message = mail.getReceivedMessages()[0];

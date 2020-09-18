@@ -102,7 +102,9 @@ viewers.Comments = Class.create({
   displayHiddenForm: function () {
     if (!this.formDisplayed) {
       var placeHolder = $(this.commentPlaceHolderSelector);
-      placeHolder.removeClassName('hidden');
+      if (placeHolder) {
+        placeHolder.removeClassName('hidden');
+      }
       var button = $('openCommentForm');
       if (button) {
         button.remove();
@@ -362,8 +364,23 @@ viewers.Comments = Class.create({
 
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
+
+                // If a content is found in submittedcomment that means the submission was not valid.
+                // For instance, the captcha was not accepted.
+                var submittedCommentContainer =  $("submittedcomment");
+                var submittedComment = '';
+                if(submittedCommentContainer) {
+                  submittedComment = submittedCommentContainer.value;
+                  // Removed since it is not useful anymore.
+                  submittedCommentContainer.remove();
+                  // Forces displayHiddenForm to display the comment form with the content of the comment
+                  // before submission.
+                  this.formDisplayed = false;
+                }
+
                 this.displayHiddenForm();
                 this.reloadEditor({
+                  content: submittedComment,
                   callback: function () {
                     this.getForm();
                     this.addSubmitListener(this.form);
@@ -567,6 +584,8 @@ viewers.Comments = Class.create({
       wfClass = wfClass + '-' + commentNbr;
     }
 
+    var content = options.content || {};
+
     this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
@@ -576,6 +595,7 @@ viewers.Comments = Class.create({
           vm: 'commentfield.vm',
           number: commentNbr,
           name: name,
+          content: content
         }), function (data, status, jqXHR) {
           function loadRequiredSkinExtensions(requiredSkinExtensions)
           {

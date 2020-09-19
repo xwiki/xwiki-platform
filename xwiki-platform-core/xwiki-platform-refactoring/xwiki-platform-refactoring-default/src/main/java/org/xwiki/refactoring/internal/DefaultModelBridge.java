@@ -191,14 +191,19 @@ public class DefaultModelBridge implements ModelBridge
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
                 xcontext.getWiki().deleteDocument(document, !skipRecycleBin, xcontext);
-                this.logger.info("Document [{}] has been deleted (trashed: [{}]).", reference, !skipRecycleBin);
+                this.logger
+                    .info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference, !skipRecycleBin);
             } else {
                 xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, xcontext);
-                this.logger.info("Document [{}] has been deleted with all its translations (trashed: [{}]).", reference, !skipRecycleBin);
+                this.logger
+                    .info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+                        reference,
+                        !skipRecycleBin);
             }
             return true;
         } catch (Exception e) {
-            this.logger.error("Failed to delete document [{}]  (trashed: [{}]).", reference, !skipRecycleBin, e);
+            this.logger
+                .error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin, e);
             return false;
         }
     }

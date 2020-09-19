@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 3.0M3
  */
 @UITest
-public class DeletePageIT
+class DeletePageIT
 {
     private static final DocumentReference REFACTORING_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", Arrays.asList("Refactoring", "Code"), "RefactoringConfiguration");
@@ -81,7 +81,7 @@ public class DeletePageIT
     private static final String DELETE_SUCCESSFUL = "Done.";
 
     @BeforeEach
-    public void setUp(TestUtils setup)
+    void setUp(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
@@ -91,7 +91,7 @@ public class DeletePageIT
 
     @Test
     @Order(1)
-    public void deleteOkWhenConfirming()
+    void deleteOkWhenConfirming()
     {
         ConfirmationPage confirmationPage = this.viewPage.deletePage();
         // This tests for regression of XWIKI-1388
@@ -114,7 +114,7 @@ public class DeletePageIT
      */
     @Test
     @Order(2)
-    public void deletePageCanSkipConfirmationAndDoARedirect(TestUtils setup)
+    void deletePageCanSkipConfirmationAndDoARedirect(TestUtils setup)
     {
         String pageURL = setup.getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE, DELETE_ACTION, "confirm=1&xredirect=" + pageURL);
@@ -130,7 +130,7 @@ public class DeletePageIT
      */
     @Test
     @Order(3)
-    public void deletePageCanDoRedirect(TestUtils setup)
+    void deletePageCanDoRedirect(TestUtils setup)
     {
         // Set the current page to be any page (doesn't matter if it exists or not)
         String pageURL = setup.getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
@@ -149,7 +149,7 @@ public class DeletePageIT
      */
     @Test
     @Order(4)
-    public void deletePageGoesToOriginalPageWhenCancelled(TestUtils setup, XWikiWebDriver driver)
+    void deletePageGoesToOriginalPageWhenCancelled(TestUtils setup, XWikiWebDriver driver)
     {
         this.viewPage.deletePage().clickNo();
         assertEquals(setup.getURL(SPACE_VALUE, PAGE_VALUE), driver.getCurrentUrl());
@@ -157,7 +157,7 @@ public class DeletePageIT
 
     @Test
     @Order(5)
-    public void deletePageIsImpossibleWhenNoDeleteRights()
+    void deletePageIsImpossibleWhenNoDeleteRights()
     {
         // Logs out to be guest and not have the right to delete
         this.viewPage.logout();
@@ -173,7 +173,7 @@ public class DeletePageIT
      */
     @Test
     @Order(6)
-    public void deleteTerminalAndNonTerminalPages(TestUtils setup, TestReference reference)
+    void deleteTerminalAndNonTerminalPages(TestUtils setup, TestReference reference)
     {
         DocumentReference nonTerminalPageRef = reference;
         DocumentReference terminalPageRef = new DocumentReference(nonTerminalPageRef.getParent().getName(),
@@ -217,7 +217,7 @@ public class DeletePageIT
      */
     @Test
     @Order(7)
-    public void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
+    void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
     {
         // Initialize the parent
         DocumentReference parentReference = reference;
@@ -279,7 +279,7 @@ public class DeletePageIT
      */
     @Test
     @Order(8)
-    public void deletePageWithUsedClass(TestUtils setup, TestInfo info)
+    void deletePageWithUsedClass(TestUtils setup, TestInfo info)
     {
         // Create 4 pages under the same parent
         // 2 of them are free pages (WebHome and FreePage)
@@ -388,19 +388,26 @@ public class DeletePageIT
      */
     @Test
     @Order(9)
-    public void deleteToRecycleBin(TestUtils setup)
+    void deleteToRecycleBin(TestUtils setup)
     {
         // Set the user type to Advanced
         Map<String, Object> userProperties = new HashMap<>();
         userProperties.put("usertype", "Advanced");
         setup.updateObject("XWiki", "superadmin", "XWiki.XWikiUsers", 0, userProperties);
 
-        // Set the canSkipRecycleBin property to true
-        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "Refactoring.Code.RefactoringConfigurationClass", 0,
-            "canSkipRecycleBin", "1");
-
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
         DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
+        assertFalse(confirmationPage.isRecycleBinOptionsDisplayed());
+
+        // Set the isRecycleBinSkippingActivated property to true, allowing advanced user to choose whether they want document to be
+        // sent to the recycle bin or permanently removed.
+        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "Refactoring.Code.RefactoringConfigurationClass", 0,
+            "isRecycleBinSkippingActivated", "1");
+
+        setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
+        confirmationPage = this.viewPage.deletePage();
+
+        assertTrue(confirmationPage.isRecycleBinOptionsDisplayed());
         confirmationPage.selectOptionToRecycleBin();
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
@@ -418,7 +425,7 @@ public class DeletePageIT
      */
     @Test
     @Order(10)
-    public void deleteSkipRecycleBin()
+    void deleteSkipRecycleBin()
     {
         DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
         confirmationPage.selectOptionSkipRecycleBin();

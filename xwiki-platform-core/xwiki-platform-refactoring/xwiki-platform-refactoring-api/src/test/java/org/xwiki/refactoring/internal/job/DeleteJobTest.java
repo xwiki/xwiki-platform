@@ -69,7 +69,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DeleteJobTest
+class DeleteJobTest
 {
     @RegisterExtension
     public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -139,7 +139,7 @@ public class DeleteJobTest
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
-        when(this.configuration.canSkipRecycleBin()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
         when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
@@ -150,7 +150,7 @@ public class DeleteJobTest
         request.setCheckAuthorRights(false);
         request.setUserReference(userReference);
         request.setAuthorReference(authorReference);
-        request.setProperty(DeleteJob.SKIP_RECYCLE_BIN_PROPERTY, true);
+        request.setProperty(DeleteJob.SHOULD_SKIP_RECYCLE_BIN_PROPERTY, true);
 
         run(request);
 

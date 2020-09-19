@@ -31,7 +31,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Configuration source for the Refactoring module.
+ * Provides configuration from the {@code Refactoring.Code.RefactoringConfigurationClass} document in the current wiki.
+ * If the {@code Refactoring.Code.RefactoringConfigurationClass} xobject exists in the
+ * {@code Refactoring.Code.RefactoringConfiguration} document then always use configuration values from it and if it
+ * doesn't then use the passed default value.
  *
  * @version $Id$
  * @since 12.8RC1

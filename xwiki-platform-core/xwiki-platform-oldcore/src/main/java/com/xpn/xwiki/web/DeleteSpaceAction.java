@@ -33,7 +33,7 @@ public class DeleteSpaceAction extends DeleteAction
     @Override
     protected boolean delete(XWikiContext context) throws XWikiException
     {
-        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context, false);
+        return deleteDocument(context.getDoc().getDocumentReference().getLastSpaceReference(), context, false);
     }
 
     @Override

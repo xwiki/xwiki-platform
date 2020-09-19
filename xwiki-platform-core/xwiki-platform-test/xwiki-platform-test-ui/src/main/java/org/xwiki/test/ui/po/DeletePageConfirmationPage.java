@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -32,18 +33,18 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DeletePageConfirmationPage extends ConfirmationPage
 {
-    @FindBy(css = "input[name='skipRecycleBin'][value='false']")
-    private WebElement optionToReyclebin;
+    @FindBy(css = "input[name='shouldSkipRecycleBin'][value='false']")
+    private WebElement optionToRecycleBin;
 
-    @FindBy(css = "input[name='skipRecycleBin'][value='true']")
-    private WebElement optionSkipReyclebin;
+    @FindBy(css = "input[name='shouldSkipRecycleBin'][value='true']")
+    private WebElement optionSkipRecycleBin;
 
     /**
      * Click on the option to put the document in the recycle bin.
      */
     public void selectOptionToRecycleBin()
     {
-        this.optionToReyclebin.click();
+        this.optionToRecycleBin.click();
     }
 
     /**
@@ -51,11 +52,23 @@ public class DeletePageConfirmationPage extends ConfirmationPage
      */
     public void selectOptionSkipRecycleBin()
     {
-        this.optionSkipReyclebin.click();
+        this.optionSkipRecycleBin.click();
     }
 
     /**
-     * Confirm the deletion of the page
+     * @return {@code true} if the form proposing to skip the recycle bin is displayed, {@code false} otherwise
+     */
+    public boolean isRecycleBinOptionsDisplayed()
+    {
+        try {
+            return this.optionSkipRecycleBin.isDisplayed() && this.optionSkipRecycleBin.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Confirm the deletion of the page.
      * @return an object representing the UI displayed when a page is deleted
      */
     public DeletingPage confirmDeletePage()

@@ -33,9 +33,8 @@ import org.xwiki.stability.Unstable;
 public interface RefactoringConfiguration
 {
     /**
-     *
      * @return {@code true} if the configuration allows advanced users to skip the recycle bin and delete documents
      * permanently
      */
-    boolean canSkipRecycleBin();
+    boolean isRecycleBinSkippingActivated();
 }

@@ -69,7 +69,6 @@ public class LegacyEventMigrationJob
     @Inject
     private EventStream eventStream;
 
-    @Inject
     private EventStore eventStore;
 
     @Inject
@@ -115,7 +114,11 @@ public class LegacyEventMigrationJob
         }
 
         long legacyEventCount = this.eventStream.countEvents();
-        int stepCount = (int) (legacyEventCount / BATCH_SIZE) + (int) (legacyEventCount % BATCH_SIZE);
+        int stepCount = (int) (legacyEventCount / BATCH_SIZE);
+
+        if (legacyEventCount % BATCH_SIZE != 0) {
+            stepCount++;
+        }
 
         this.progressManager.pushLevelProgress(stepCount, this);
 

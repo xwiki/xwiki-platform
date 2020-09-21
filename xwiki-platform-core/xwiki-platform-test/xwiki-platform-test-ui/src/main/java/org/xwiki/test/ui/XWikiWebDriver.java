@@ -230,31 +230,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
         try {
-            // Handle both Selenium 2 and Selenium 3
-            try {
-                Method method = WebDriverWait.class.getMethod("until", Function.class);
-                // We're in Selenium3, it requires a java Function passed to the wait
-                try {
-                    method.invoke(wait, new Function<WebDriver, T>()
-                    {
-                        @Override public T apply(WebDriver webDriver)
-                        {
-                            return condition.apply(webDriver);
-                        }
-                    });
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Error converting to selenium3", e);
-                } catch (InvocationTargetException e) {
-                    if (e.getCause() instanceof RuntimeException) {
-                        throw (RuntimeException) e.getCause();
-                    } else {
-                        throw new RuntimeException("Failed to invoke 'until' method for Selenium3", e);
-                    }
-                }
-            } catch (NoSuchMethodException e) {
-                // We're in Selenium 2!
-                wait.until(condition);
-            }
+            wait.until(condition::apply);
         } finally {
             // Reset timeout
             setDriverImplicitWait();

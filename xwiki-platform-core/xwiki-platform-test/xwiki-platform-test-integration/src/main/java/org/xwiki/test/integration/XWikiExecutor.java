@@ -130,7 +130,7 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = 120;
+    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
 
     private int debugPort ;
 

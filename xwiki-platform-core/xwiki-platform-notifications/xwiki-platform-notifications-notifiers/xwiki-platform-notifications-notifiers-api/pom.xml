@@ -32,9 +32,6 @@
   <description>Handle how notifications are transmitted to a user</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Fix the threading aspect and ensure that the threads are stopped corretly before moving to the next
-        test -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

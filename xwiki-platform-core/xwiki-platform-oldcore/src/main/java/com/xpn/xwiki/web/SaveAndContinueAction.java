@@ -63,6 +63,18 @@ public class SaveAndContinueAction extends XWikiAction
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
+    protected String getName()
+    {
+        return "save";
+    }
+
     /**
      * Perform the internal action implied by the save and continue request. If the request is an ajax request,
      * writeAjaxErrorResponse will be called. The return value will be that of the wrapped action.

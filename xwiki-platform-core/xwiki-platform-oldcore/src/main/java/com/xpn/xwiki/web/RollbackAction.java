@@ -28,6 +28,12 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 public class RollbackAction extends XWikiAction
 {
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return RollbackForm.class;
+    }
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         // CSRF prevention

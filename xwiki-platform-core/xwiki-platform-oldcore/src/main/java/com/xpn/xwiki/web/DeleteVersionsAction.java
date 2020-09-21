@@ -36,6 +36,12 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 public class DeleteVersionsAction extends XWikiAction
 {
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return DeleteVersionsForm.class;
+    }
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();

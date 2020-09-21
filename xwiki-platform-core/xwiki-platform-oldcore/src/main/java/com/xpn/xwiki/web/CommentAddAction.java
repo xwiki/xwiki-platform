@@ -53,6 +53,12 @@ public class CommentAddAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
 
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return ObjectAddForm.class;
+    }
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         // CSRF prevention

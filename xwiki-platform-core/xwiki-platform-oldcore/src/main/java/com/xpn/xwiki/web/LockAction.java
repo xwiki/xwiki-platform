@@ -29,6 +29,12 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class LockAction extends XWikiAction
 {
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();

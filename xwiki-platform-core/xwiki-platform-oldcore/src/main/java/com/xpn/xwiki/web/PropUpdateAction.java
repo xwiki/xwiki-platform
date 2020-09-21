@@ -34,6 +34,12 @@ import com.xpn.xwiki.util.Util;
 
 public class PropUpdateAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
     public boolean propUpdate(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();

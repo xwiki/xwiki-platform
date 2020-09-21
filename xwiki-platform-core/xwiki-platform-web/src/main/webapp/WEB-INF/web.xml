@@ -246,7 +246,7 @@
     </init-param>
     <init-param>
       <param-name>config</param-name>
-      <param-value>/WEB-INF/struts-config.xml</param-value>
+      <param-value>struts-default.xml,struts-plugin.xml,WEB-INF/struts.xml</param-value>
     </init-param>
     <init-param>
       <param-name>debug</param-name>

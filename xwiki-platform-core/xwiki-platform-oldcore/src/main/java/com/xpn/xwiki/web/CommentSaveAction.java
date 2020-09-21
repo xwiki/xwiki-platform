@@ -67,6 +67,12 @@ public class CommentSaveAction extends CommentAddAction
      */
     private final Pattern pattern = Pattern.compile("XWiki.XWikiComments_(\\d+)_comment");
 
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
     private int getCommentIdFromRequest(XWikiRequest request) throws XWikiException
     {
         // Get the comment object

@@ -31,6 +31,12 @@ import com.xpn.xwiki.XWikiException;
 public class UnknownAction extends XWikiAction
 {
     @Override
+    protected String getName()
+    {
+        return "unknown";
+    }
+
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         String defaultAction = context.getWiki().Param("xwiki.unknownActionResponse", "exception");

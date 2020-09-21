@@ -1000,7 +1000,7 @@ body &gt; .selectize-dropdown {
 }
 
 /**
- * Full-screen styles.
+ * Full-screen styles (for the standalone / classic editor).
  */
 
 .fullScreenEditLinkContainer {
@@ -1013,7 +1013,7 @@ body &gt; .selectize-dropdown {
   padding: .5em;
 }
 
-/* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save 
+/* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save
   styles. */
 .cke_maximized #autosaveControl input.autosave-frequency {
   width: 3em;
@@ -1375,9 +1375,7 @@ ul.cke_autocomplete_panel {
   margin-top: -1px;
   margin-left: -1px;
 
-  &amp;:focus {
-    .form-control-focus();
-  }
+  .form-control-focus();
 }
 
 .cke_contents.fake {
@@ -1391,6 +1389,68 @@ ul.cke_autocomplete_panel {
   /* Make sure the Source area has the same width as the WYSIWYG area. */
   margin-left: -@grid-gutter-width / 2 - 1px;
   margin-right: -@grid-gutter-width / 2 - 1px;
+}
+
+/**
+ * Full-screen styles for the in-line editor
+ */
+body[data-maximized="true"] {
+  overflow: hidden;
+
+  .cke_maximize_backdrop,
+  .cke_toolBar_active,
+  .cke_editable_active,
+  .cke_actionBar_active {
+    position: fixed !important;
+    right: 0 !important;
+    left: 0 !important;
+  }
+
+  /*
+   * The tool bar
+   */
+  .cke_toolBar_active {
+    /* We have to use !important in order to overwrite the in-line styles. */
+    display: block !important;
+    top: 0 !important;
+  }
+
+  /*
+   * The editing area
+   */
+  .cke_maximize_backdrop,
+  .cke_editable_active {
+    background-color: @xwiki-page-content-bg;
+  }
+  .cke_editable_active {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    z-index: 9995;
+
+    &amp;:focus {
+      /* Remove the focus border. */
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+  .cke_maximize_backdrop {
+    top: 0;
+    bottom: 0;
+    z-index: 99;
+  }
+
+  /*
+   * The action buttons
+   */
+  .cke_actionBar_active {
+    background-color: @xwiki-background-secondary-color;
+    border: 1px solid @xwiki-border-color;
+    bottom: 0;
+    /* Reduce a bit the padding. */
+    padding: .5em;
+    z-index: 9995;
+  }
 }</code>
     </property>
     <property>

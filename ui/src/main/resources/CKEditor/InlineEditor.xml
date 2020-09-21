@@ -163,7 +163,11 @@
     });
     container.each(function() {
       try {
-        var editor = ckeditor.inline(this);
+        var editor = ckeditor.inline(this, {
+          // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
+          // we implemented the maximize feature for the in-line editor.
+          resize_enabled: false
+        });
         // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
         if (!config.enableSourceMode) {
           editor.once('configLoaded', function(event) {

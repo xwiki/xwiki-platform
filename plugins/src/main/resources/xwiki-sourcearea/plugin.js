@@ -19,6 +19,7 @@
  */
 (function() {
   'use strict';
+  var $ = jQuery;
 
   // The following code is partially taken (and adapted) from CKEditor's default sourcearea plugin.
   CKEDITOR.plugins.add('xwiki-sourcearea', {
@@ -44,7 +45,11 @@
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
           // Make the text area auto-resize to fit the content. Initialize with the height of the content edited in-line
           // in order to prevent UI flickering.
-          initAutoHeight(textArea.$, contentsSpace.getSize('height', true));
+          var maximizeCommand = editor.getCommand('maximize') || {};
+          initAutoHeight(textArea.$, contentsSpace.getSize('height', true), function() {
+            // Don't auto resize when the editor is maximized (in full-screen mode).
+            return maximizeCommand.state !== CKEDITOR.TRISTATE_ON;
+          });
         } else {
           textArea.addClass('cke_reset');
         }
@@ -87,15 +92,26 @@
       }
 
       if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        editor.on('maximize', function(event) {
+          // Update the height of the source text area after leaving the full screen mode and center the selection.
+          if (event.data !== CKEDITOR.TRISTATE_ON && editor.mode === 'source') {
+            centerSourceAreaSelectionVertically(editor);
+          }
+        });
+
         require(['centerTextAreaSelectionVertically'], function($) {
           editor.on('modeReady', function() {
             if (editor.mode === 'source') {
               // Update the text area height after the HTML to Wiki Syntax conversion is done.
               // Then try to center the text selection vertically, if needed.
-              $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
+              centerSourceAreaSelectionVertically(editor);
             }
           });
         });
+
+        var centerSourceAreaSelectionVertically = function(editor) {
+          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
+        };
       }
     }
   });
@@ -133,9 +149,9 @@
 
   // Credits: https://stackoverflow.com/a/25621277
   // The text area needs to be the only child of its parent in order for this to work.
-  var initAutoHeight = function(textArea, initialHeight) {
+  var initAutoHeight = function(textArea, initialHeight, isEnabled) {
     var autoHeight = function(textArea) {
-      var $textArea = jQuery(textArea);
+      var $textArea = $(textArea);
       // Set the text area height on its parent (wrapper) in order to reserve the vertical space that the text area
       // currently takes so that the page layout doesn't change while we compute the updated text area height. If we
       // don't do this then the page vertical scroll position changes after we update the text area height and this
@@ -150,10 +166,14 @@
       $textArea.parent().css('min-height', '');
       return $textArea;
     };
-    var $textArea = initialHeight ? jQuery(textArea).height(initialHeight) : autoHeight(textArea);
+    var $textArea = isEnabled() ? (
+      initialHeight ? $(textArea).height(initialHeight) : autoHeight(textArea)
+    ) : $(textArea);
     // Make sure we don't register the input listener twice.
     $textArea.off('input.autoHeight').on('input.autoHeight', function() {
-      autoHeight(this);
+      if (isEnabled()) {
+        autoHeight(this);
+      }
     });
   };
 })();

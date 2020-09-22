@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.simplejavamail.converter.EmailConverter;
 import org.simplejavamail.email.Email;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -91,6 +92,7 @@ public class NotificationsEmailsIT
 
     private static final String NOTIFICATIONS_EMAIL_TEST = "NotificationsEmailTest";
     private static final String EMAIL_FORMAT = "email";
+    private static final String ALERT_FORMAT = "alert";
     private static final String CREATE = "create";
 
     public static final String USER_EMAIL = "test@xwiki.org";
@@ -150,6 +152,9 @@ public class NotificationsEmailsIT
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
 
+        // We also enable on alert format to be able to wait on those notifications.
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
@@ -160,6 +165,11 @@ public class NotificationsEmailsIT
 
         testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page1", "Content 1", "Title 1");
         testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page2", "Content 2", "Title 2");
+
+        // Wait for the notifications to be handled.
+        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        testUtils.gotoPage(page1);
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
 
         // Trigger the notification email job
         testUtils.loginAsSuperAdmin();

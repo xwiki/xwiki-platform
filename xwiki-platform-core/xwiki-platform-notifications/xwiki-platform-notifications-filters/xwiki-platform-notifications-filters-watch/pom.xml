@@ -25,12 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-filters</artifactId>
-    <version>12.8-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-filters-watch</artifactId>
   <name>XWiki Platform - Notifications - Filters - Watch</name>
   <properties>
     <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     </properties>
   <dependencies>
     <dependency>

@@ -229,7 +229,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
           <div class="commenteditor">
-              <!-- loaded by javascript (see comments.js) -->
+            <!-- loaded by javascript (see comments.js) -->
+            <!-- stores the submitted comment in case of error during the submission (eg, invalid captcha). -->
+            #if ($captchaAnswerWrong)
+              <input type="hidden" id="submittedcomment" value="$!comment" />
+            #end
           </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)

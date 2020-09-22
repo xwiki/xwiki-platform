@@ -24,15 +24,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReference;
 
 /**
- * Converts a {@link String} representing a user id into a {@link UserReference}.
+ * Converts a {@link String} representing a user id into a {@link UserReference}, relatively to the main wiki.
+ * <p>
+ * For example, {@code XWiki.U1} is always resolved as {@code xwiki:XWiki.U1}.
  *
  * @version $Id$
  * @since 12.2
@@ -40,30 +38,14 @@ import org.xwiki.user.UserReference;
 @Component
 @Named("document")
 @Singleton
-public class DocumentStringUserReferenceResolver extends AbstractUserReferenceResolver<String>
+public class DefaultDocumentStringUserReferenceResolver extends AbstractDocumentStringUserReferenceResolver
 {
-    private static final EntityReference USER_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
-
-    @Inject
-    private EntityReferenceProvider entityReferenceProvider;
-
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
     @Override
-    public UserReference resolve(String userName, Object... parameters)
+    protected DocumentReferenceResolver<String> getDocumentReferenceResolver()
     {
-        UserReference reference = resolveName(userName);
-        if (reference == null) {
-            EntityReference baseEntityReference;
-            if (parameters.length == 1 && parameters[0] instanceof WikiReference) {
-                baseEntityReference = new EntityReference(USER_SPACE_REFERENCE, (WikiReference) parameters[0]);
-            } else {
-                baseEntityReference = USER_SPACE_REFERENCE;
-            }
-            reference = new DocumentUserReference(this.resolver.resolve(userName, baseEntityReference),
-                this.entityReferenceProvider);
-        }
-        return reference;
+        return this.resolver;
     }
 }

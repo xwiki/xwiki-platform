@@ -79,12 +79,28 @@ public class NotificationsTrayPage extends ViewPage
      * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
      * the given user has on the given wiki, using user preferences.
      *
-     * @param userId the serialized user reference for which to get notifications.
+     * @param userId the serialized user reference for which to get notifications
      * @param wiki the wiki on which to get notifications
      * @param expectedUnread the number of expected unread notifications to wait for
      * @since 12.6
      */
     public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread)
+    {
+        waitOnNotificationCount(userId, wiki, expectedUnread, getUtil().getDriver().getTimeout());
+    }
+
+    /**
+     * Wait until the given number of unread notification is received.
+     * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
+     * the given user has on the given wiki, using user preferences.
+     *
+     * @param userId the serialized user reference for which to get notifications
+     * @param wiki the wiki on which to get notifications
+     * @param expectedUnread the number of expected unread notifications to wait for
+     * @param timeout the time delay in seconds before stopping the notifications count
+     * @since 12.8RC1
+     */
+    public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread, int timeout)
     {
         String notificationCountAjaxURL = String.format("/xwiki/rest/notifications/count?media=json&userId=%s"
             + "&useUserPreferences=true&currentWiki=%s&async=true", userId, wiki);
@@ -104,9 +120,8 @@ public class NotificationsTrayPage extends ViewPage
                         + "});");
                 responses.add(response);
                 return response != null && Integer.valueOf(response.toString()).equals(expectedUnread);
-            });
-        } catch (TimeoutException e)
-        {
+            }, timeout);
+        } catch (TimeoutException e) {
             String latestResponse = null;
             if (!responses.isEmpty()) {
                 Object response = responses.get(responses.size() - 1);
@@ -118,6 +133,8 @@ public class NotificationsTrayPage extends ViewPage
                 "Timeout while waiting on notification count. Expected: [%s] - Latest result: [%s].",
                 expectedUnread, latestResponse), e);
         }
+        // Ensure to refresh the page after calling this wait, so the notification tray is updated.
+        getUtil().getDriver().navigate().refresh();
     }
 
     /**
@@ -472,13 +489,11 @@ public class NotificationsTrayPage extends ViewPage
      * @param username name of the current user
      * @param password password of the current user
      * @return the rss feed
-     * @throws Exception if an error happens
-     *
      * @since 11.5RC1
      * @since 11.4
      * @since 11.3.1
      */
-    public NotificationsRSS getNotificationRSS(String username, String password) throws Exception
+    public NotificationsRSS getNotificationRSS(String username, String password)
     {
         String url = this.rssLink.getAttribute("href");
         return new NotificationsRSS(url, username, password);

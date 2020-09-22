@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class RefactoringScriptServiceTest
+class RefactoringScriptServiceTest
 {
     @InjectMockComponents
     private RefactoringScriptService refactoringScriptService;
@@ -89,7 +90,10 @@ public class RefactoringScriptServiceTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    private ExecutionContext executionContext = new ExecutionContext();
+    @MockComponent
+    private RefactoringConfiguration configuration;
+
+    private final ExecutionContext executionContext = new ExecutionContext();
 
     @BeforeEach
     void setup()
@@ -362,5 +366,40 @@ public class RefactoringScriptServiceTest
 
         verify(request).setReplaceDocumentAuthor(true);
         verify(request).setReplaceDocumentContentAuthor(true);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingIsActivated()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertTrue(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenAdvancedUserAndRecycleBinSkippingDeactivated()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenSimpleUserAndRecycleBinSkippingDeactivated()
+    {
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(false);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
+    }
+
+    @Test
+    void isRecycleBinSkippingAllowedWhenSimpleUser()
+    {
+        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(false);
+        when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
+        boolean actual = this.refactoringScriptService.isRecycleBinSkippingAllowed();
+        assertFalse(actual);
     }
 }

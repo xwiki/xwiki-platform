@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -56,13 +57,16 @@ public class CommentsTab extends BaseElement
 
     public boolean isCommentFormShown()
     {
-        toggleComments();
         WebElement commentForm =
             getDriver().findElement(By.xpath("//form[@id='AddComment']/fieldset[@id='commentform']"));
         return commentForm.isDisplayed();
     }
 
-    private void toggleComments()
+    /**
+     * Opens the comment form by clicking on the comment button.
+     * If the comment button has already been clicked, does nothing.
+     */
+    public void openCommentForm()
     {
         String commentFormId = "AddComment";
         String openFormId = "openCommentForm";
@@ -85,13 +89,12 @@ public class CommentsTab extends BaseElement
     {
         this.commentsList = getDriver().findElementsWithoutWaiting(By.className("xwikicomment"));
 
-        for (int i = 0; i < this.commentsList.size(); i++) {
-            if (this.commentsList.get(i).findElement(By.className("commentcontent")).getText().equals(content)) {
-                return Integer
-                    .parseInt(this.commentsList.get(i).getAttribute("id").substring("xwikicomment_".length()));
+        for (WebElement comment : this.commentsList) {
+            if (comment.findElement(By.className("commentcontent")).getText().equals(content)) {
+                return Integer.parseInt(comment.getAttribute("id").substring("xwikicomment_".length()));
             }
         }
-        return -1;
+        throw new NotFoundException(String.format("Comment with content [%s] cannot be found.", content));
     }
 
     /**
@@ -99,7 +102,7 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm getAddCommentForm()
     {
-        toggleComments();
+        openCommentForm();
         return new CommentForm(By.id("AddComment"));
     }
 

@@ -33,10 +33,10 @@ import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for the wiki templates feature of the Wiki application.
@@ -44,14 +44,14 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  */
 @UITest
-public class WikiTemplateIT
+class WikiTemplateIT
 {
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
 
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
     @BeforeAll
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
@@ -173,7 +173,7 @@ public class WikiTemplateIT
     }
 
     @Test
-    public void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         // Create the template
         createTemplateWiki();

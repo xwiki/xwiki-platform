@@ -39,15 +39,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link ConfiguredStringUserReferenceResolver}.
+ * Test of {@link CurrentConfiguredStringUserReferenceResolver}.
  *
  * @version $Id$
+ * @since 12.8RC1
  */
 @ComponentTest
-public class ConfiguredStringUserReferenceResolverTest
+class CurrentConfiguredStringUserReferenceResolverTest
 {
     @InjectMockComponents
-    private ConfiguredStringUserReferenceResolver resolver;
+    private CurrentConfiguredStringUserReferenceResolver resolver;
 
     @MockComponent
     @Named("context")
@@ -62,7 +63,7 @@ public class ConfiguredStringUserReferenceResolverTest
         when(this.userConfiguration.getStoreHint()).thenReturn("storehint");
         UserReferenceResolver customUserReferenceResolver = mock(UserReferenceResolver.class);
         when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class,
-            String.class), "storehint")).thenReturn(customUserReferenceResolver);
+            String.class), "current/storehint")).thenReturn(customUserReferenceResolver);
 
         this.resolver.resolve("userreference");
 
@@ -74,12 +75,13 @@ public class ConfiguredStringUserReferenceResolverTest
     {
         when(this.userConfiguration.getStoreHint()).thenReturn("storehint");
         when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class,
-            String.class), "storehint")).thenThrow(new ComponentLookupException("error"));
+            String.class), "current/storehint")).thenThrow(new ComponentLookupException("error"));
 
         Throwable exception = assertThrows(RuntimeException.class,
             () -> this.resolver.resolve("userreference"));
         assertEquals("Failed to find user reference resolver for role "
-            + "[org.xwiki.user.UserReferenceResolver<java.lang.String>] and hint [storehint]", exception.getMessage());
+            + "[org.xwiki.user.UserReferenceResolver<java.lang.String>] and hint [current/storehint]",
+            exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 }

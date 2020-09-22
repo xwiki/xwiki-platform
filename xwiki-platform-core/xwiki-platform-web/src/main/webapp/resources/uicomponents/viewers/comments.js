@@ -66,6 +66,7 @@ viewers.Comments = Class.create({
   startup : function () {
     this.formDisplayed = false;
     this.loadIDs();
+    this.getForm();
     this.addReplyListener();
     this.addEditListener();
     // replaces the comment button with the form on the first click.
@@ -101,7 +102,9 @@ viewers.Comments = Class.create({
   displayHiddenForm: function () {
     if (!this.formDisplayed) {
       var placeHolder = $(this.commentPlaceHolderSelector);
-      placeHolder.removeClassName('hidden');
+      if (placeHolder) {
+        placeHolder.removeClassName('hidden');
+      }
       var button = $('openCommentForm');
       if (button) {
         button.remove();
@@ -322,16 +325,13 @@ viewers.Comments = Class.create({
                   "$services.localization.render('core.viewers.comments.add.inProgress')",
                   "inprogress");
           form.disable();
-          this.restartNeeded = false;
+          this.requestSucceeded = false;
           new Ajax.Request(url, {
             method : 'post',
             parameters : formData,
             onSuccess : function () {
-              this.restartNeeded = true;
+              this.requestSucceeded = true;
               this.editing = false;
-              form._x_notification.replace(
-                  new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.done')",
-                      "done"));
             }.bind(this),
             onFailure : function (response) {
               var failureReason = response.statusText;
@@ -359,10 +359,25 @@ viewers.Comments = Class.create({
               }
               this.destroyEditor("[name='" + name + "']", name);
 
-              if (this.restartNeeded) {
+              if (this.requestSucceeded) {
                 this.container.update(response.responseText);
+
+                // If a content is found in submittedcomment that means the submission was not valid.
+                // For instance, the captcha was not accepted.
+                var submittedCommentContainer =  $("submittedcomment");
+                var submittedComment = '';
+                if(submittedCommentContainer) {
+                  submittedComment = submittedCommentContainer.value;
+                  // Removed since it is not useful anymore.
+                  submittedCommentContainer.remove();
+                  // Forces displayHiddenForm to display the comment form with the content of the comment
+                  // before submission.
+                  this.formDisplayed = false;
+                }
+
                 this.displayHiddenForm();
                 this.reloadEditor({
+                  content: submittedComment,
                   callback: function () {
                     this.getForm();
                     this.addSubmitListener(this.form);
@@ -378,6 +393,12 @@ viewers.Comments = Class.create({
 
                 // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
                 this.container.fire('xwiki:captcha:reloaded');
+
+                // We send success notification only when everything is done: our integration tests relies on it
+                // for waiting a comment added.
+                form._x_notification.replace(
+                  new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.add.done')",
+                    "done"));
               }
             }.bind(this)
           });
@@ -566,6 +587,8 @@ viewers.Comments = Class.create({
       wfClass = wfClass + '-' + commentNbr;
     }
 
+    var content = options.content || {};
+
     this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
@@ -575,6 +598,7 @@ viewers.Comments = Class.create({
           vm: 'commentfield.vm',
           number: commentNbr,
           name: name,
+          content: content
         }), function (data, status, jqXHR) {
           function loadRequiredSkinExtensions(requiredSkinExtensions)
           {

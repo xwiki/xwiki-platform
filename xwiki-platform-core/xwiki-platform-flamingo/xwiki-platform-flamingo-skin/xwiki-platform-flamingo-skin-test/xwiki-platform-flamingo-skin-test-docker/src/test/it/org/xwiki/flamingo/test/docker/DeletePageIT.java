@@ -21,7 +21,9 @@ package org.xwiki.flamingo.test.docker;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -36,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -54,8 +57,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 3.0M3
  */
 @UITest
-public class DeletePageIT
+class DeletePageIT
 {
+    private static final DocumentReference REFACTORING_CONFIGURATION_REFERENCE =
+        new DocumentReference("xwiki", Arrays.asList("Refactoring", "Code"), "RefactoringConfiguration");
+
     private ViewPage viewPage;
 
     private static final String LOGGED_USERNAME = "superadmin";
@@ -75,7 +81,7 @@ public class DeletePageIT
     private static final String DELETE_SUCCESSFUL = "Done.";
 
     @BeforeEach
-    public void setUp(TestUtils setup)
+    void setUp(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
@@ -85,9 +91,9 @@ public class DeletePageIT
 
     @Test
     @Order(1)
-    public void deleteOkWhenConfirming()
+    void deleteOkWhenConfirming()
     {
-        ConfirmationPage confirmationPage = this.viewPage.delete();
+        ConfirmationPage confirmationPage = this.viewPage.deletePage();
         // This tests for regression of XWIKI-1388
         assertNotNull(confirmationPage.getCurrentUser(),
             "The interface should not show the user as logged out while deleting page");
@@ -108,7 +114,7 @@ public class DeletePageIT
      */
     @Test
     @Order(2)
-    public void deletePageCanSkipConfirmationAndDoARedirect(TestUtils setup)
+    void deletePageCanSkipConfirmationAndDoARedirect(TestUtils setup)
     {
         String pageURL = setup.getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
         setup.gotoPage(SPACE_VALUE, PAGE_VALUE, DELETE_ACTION, "confirm=1&xredirect=" + pageURL);
@@ -124,7 +130,7 @@ public class DeletePageIT
      */
     @Test
     @Order(3)
-    public void deletePageCanDoRedirect(TestUtils setup)
+    void deletePageCanDoRedirect(TestUtils setup)
     {
         // Set the current page to be any page (doesn't matter if it exists or not)
         String pageURL = setup.getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
@@ -143,15 +149,15 @@ public class DeletePageIT
      */
     @Test
     @Order(4)
-    public void deletePageGoesToOriginalPageWhenCancelled(TestUtils setup, XWikiWebDriver driver)
+    void deletePageGoesToOriginalPageWhenCancelled(TestUtils setup, XWikiWebDriver driver)
     {
-        this.viewPage.delete().clickNo();
+        this.viewPage.deletePage().clickNo();
         assertEquals(setup.getURL(SPACE_VALUE, PAGE_VALUE), driver.getCurrentUrl());
     }
 
     @Test
     @Order(5)
-    public void deletePageIsImpossibleWhenNoDeleteRights()
+    void deletePageIsImpossibleWhenNoDeleteRights()
     {
         // Logs out to be guest and not have the right to delete
         this.viewPage.logout();
@@ -167,7 +173,7 @@ public class DeletePageIT
      */
     @Test
     @Order(6)
-    public void deleteTerminalAndNonTerminalPages(TestUtils setup, TestReference reference)
+    void deleteTerminalAndNonTerminalPages(TestUtils setup, TestReference reference)
     {
         DocumentReference nonTerminalPageRef = reference;
         DocumentReference terminalPageRef = new DocumentReference(nonTerminalPageRef.getParent().getName(),
@@ -180,7 +186,7 @@ public class DeletePageIT
         // Create the non terminal page.
         ViewPage nonTerminalPage = setup.createPage(nonTerminalPageRef, "Content", "Title");
         // Delete it
-        nonTerminalPage.delete().clickYes();
+        nonTerminalPage.deletePage().clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
 
@@ -191,7 +197,7 @@ public class DeletePageIT
         // Create the terminal page.
         ViewPage terminalPage = setup.createPage(terminalPageRef, "Content", "Title");
         // Delete it
-        terminalPage.delete().clickYes();
+        terminalPage.deletePage().clickYes();
         deletingPage.waitUntilFinished();
 
         // Look at the recycle bin
@@ -211,14 +217,14 @@ public class DeletePageIT
      */
     @Test
     @Order(7)
-    public void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
+    void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
     {
         // Initialize the parent
         DocumentReference parentReference = reference;
         ViewPage parentPage = setup.createPage(parentReference, "Content", "Parent");
 
         // Test 1: Try to delete it to make sure we don't have the "affect children" option yet
-        ConfirmationPage confirmationPage = parentPage.delete();
+        ConfirmationPage confirmationPage = parentPage.deletePage();
         assertFalse(confirmationPage.hasAffectChildrenOption());
 
         // Initialize the children pages
@@ -233,7 +239,7 @@ public class DeletePageIT
 
         // Test 2: when you don't select "affect children", the children are not deleted
         parentPage = setup.gotoPage(parentReference);
-        confirmationPage = parentPage.delete();
+        confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
@@ -250,7 +256,7 @@ public class DeletePageIT
 
         // Test 3: when you select "affect children", the children are deleted too
         parentPage = setup.createPage(parentReference, "Content", "Parent");
-        confirmationPage = parentPage.delete();
+        confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(true);
         deletingPage = confirmationPage.confirmDeletePage();
@@ -273,7 +279,7 @@ public class DeletePageIT
      */
     @Test
     @Order(8)
-    public void deletePageWithUsedClass(TestUtils setup, TestInfo info)
+    void deletePageWithUsedClass(TestUtils setup, TestInfo info)
     {
         // Create 4 pages under the same parent
         // 2 of them are free pages (WebHome and FreePage)
@@ -305,7 +311,7 @@ public class DeletePageIT
 
         // Try to delete the parent page
         ViewPage parentPage = setup.gotoPage(parentReference);
-        ConfirmationPage confirmationPage = parentPage.delete();
+        ConfirmationPage confirmationPage = parentPage.deletePage();
         confirmationPage.setAffectChildren(true);
         confirmationPage.confirmDeletePage();
 
@@ -373,5 +379,62 @@ public class DeletePageIT
         // check that the old one doesn't exist anymore
         ViewPage viewPage = setup.gotoPage(freeReference);
         assertFalse(viewPage.exists());
+    }
+
+    /**
+     * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
+     * page to the recycle bin or delete it permanently.
+     * In this test the user chooses to send the page to the recycle bin.
+     */
+    @Test
+    @Order(9)
+    void deleteToRecycleBin(TestUtils setup)
+    {
+        // Set the user type to Advanced
+        Map<String, Object> userProperties = new HashMap<>();
+        userProperties.put("usertype", "Advanced");
+        setup.updateObject("XWiki", "superadmin", "XWiki.XWikiUsers", 0, userProperties);
+
+        setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
+        DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
+        assertFalse(confirmationPage.isRecycleBinOptionsDisplayed());
+
+        // Set the isRecycleBinSkippingActivated property to true, allowing advanced user to choose whether they want document to be
+        // sent to the recycle bin or permanently removed.
+        setup.updateObject(REFACTORING_CONFIGURATION_REFERENCE, "Refactoring.Code.RefactoringConfigurationClass", 0,
+            "isRecycleBinSkippingActivated", "1");
+
+        setup.gotoPage(SPACE_VALUE, PAGE_VALUE);
+        confirmationPage = this.viewPage.deletePage();
+
+        assertTrue(confirmationPage.isRecycleBinOptionsDisplayed());
+        confirmationPage.selectOptionToRecycleBin();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+    }
+
+    /**
+     * This test checks the behaviour of the page deletion form when the user is allowed to choose between sending the
+     * page to the recycle bin or delete it permanently.
+     * In this test the user chooses to delete the page permanently.
+     */
+    @Test
+    @Order(10)
+    void deleteSkipRecycleBin()
+    {
+        DeletePageConfirmationPage confirmationPage = this.viewPage.deletePage();
+        confirmationPage.selectOptionSkipRecycleBin();
+        confirmationPage.clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilFinished();
+        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
     }
 }

@@ -102,6 +102,8 @@ public class XWikiExecutor
     private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
         Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
 
+    private static final int DEBUG_PORT = 5005;
+
     private int port;
 
     private int stopPort;
@@ -128,7 +130,9 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = 120;
+    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
+
+    private int debugPort ;
 
     public XWikiExecutor(int index)
     {
@@ -141,6 +145,7 @@ public class XWikiExecutor
         String rmiPortString = System.getProperty("rmiPort" + index);
         this.rmiPort =
             rmiPortString != null ? Integer.valueOf(rmiPortString) : (Integer.valueOf(DEFAULT_RMIPORT) + index);
+        this.debugPort = DEBUG_PORT + index;
 
         // Resolve the execution directory, which should point to a location where an XWiki distribution is located
         // and can be started (directory where the start_xwiki.sh|bat files are located).
@@ -180,6 +185,11 @@ public class XWikiExecutor
     public int getRMIPort()
     {
         return this.rmiPort;
+    }
+
+    public int getDebugPort()
+    {
+        return this.debugPort;
     }
 
     public String getExecutionDirectory()
@@ -304,7 +314,7 @@ public class XWikiExecutor
     {
         File dir = new File(getExecutionDirectory());
         if (dir.exists()) {
-            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort());
+            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort(), getDebugPort());
             LOGGER.debug("Executing command: [{}]", startCommand);
             this.startedProcessHandler = executeCommand(startCommand);
         } else {
@@ -505,7 +515,7 @@ public class XWikiExecutor
         return URL + ":" + getPort() + DEFAULT_CONTEXT + "/bin/get/Main/";
     }
 
-    private String getDefaultStartCommand(int port, int stopPort, int rmiPort)
+    private String getDefaultStartCommand(int port, int stopPort, int rmiPort, int debugPort)
     {
         String startCommand = START_COMMAND;
         if (startCommand == null) {
@@ -513,8 +523,9 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                String suspend = DEBUG ? "--suspend" : "";
-                startCommand = String.format("bash %s.sh -p %s -sp %s %s", scriptNamePrefix, port, stopPort, suspend);
+                String debugParams = DEBUG ? String.format("-dp %d --suspend", debugPort) : "";
+                startCommand =
+                    String.format("bash %s.sh -p %s -sp %s %s", scriptNamePrefix, port, stopPort, debugParams);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

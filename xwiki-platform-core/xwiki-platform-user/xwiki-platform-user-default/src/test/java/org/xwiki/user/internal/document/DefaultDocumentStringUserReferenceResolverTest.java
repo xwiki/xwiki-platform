@@ -40,15 +40,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DocumentStringUserReferenceResolver}.
+ * Unit tests for {@link DefaultDocumentStringUserReferenceResolver}.
  *
  * @version $Id$
+ * @since 12.8RC1
  */
 @ComponentTest
-public class DocumentStringUserReferenceResolverTest
+public class DefaultDocumentStringUserReferenceResolverTest
 {
     @InjectMockComponents
-    private DocumentStringUserReferenceResolver resolver;
+    private DefaultDocumentStringUserReferenceResolver resolver;
 
     @MockComponent
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;

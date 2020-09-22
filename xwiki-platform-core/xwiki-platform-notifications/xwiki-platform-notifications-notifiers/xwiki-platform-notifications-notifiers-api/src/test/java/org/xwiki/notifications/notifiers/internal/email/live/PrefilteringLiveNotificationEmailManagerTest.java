@@ -24,6 +24,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
@@ -63,6 +64,9 @@ public class PrefilteringLiveNotificationEmailManagerTest
     private IntervalUsersManager intervals;
 
     @MockComponent
+    private Execution execution;
+
+    @MockComponent
     @Named("context")
     private ComponentManager componentManager;
 
@@ -70,7 +74,10 @@ public class PrefilteringLiveNotificationEmailManagerTest
     void beforeComponent() throws ComponentLookupException
     {
         ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
+        Execution execution = mock(Execution.class);
+
         when(this.componentManager.getInstance(ExecutionContextManager.class)).thenReturn(executionContextManager);
+        when(this.componentManager.getInstance(Execution.class)).thenReturn(execution);
     }
 
     @Test

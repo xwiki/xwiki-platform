@@ -274,7 +274,9 @@
     &lt;div class="panel xform"&gt;
       &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
-        placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))" /&gt;
+        placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))"
+        ## Disable the search input initially until the JavaScript code that handles the search is ready.
+        disabled="disabled" /&gt;
     &lt;/div&gt;
     #foreach ($item in $menu)
       #verticalNavigationItem($item $options)
@@ -689,6 +691,8 @@
   $(document).on('click', '.admin-menu a.panel-heading', function(event) {
     event.preventDefault();
   });
+  // Mark the administration menu as ready for user interaction.
+  $('.admin-menu').attr('data-ready', true);
 });
 
 /**
@@ -746,7 +750,9 @@ require(['jquery'], function($) {
     var text = $(this).val().toLowerCase();
     // Schedule a new filter operation.
     timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
-  });
+
+  // Finally, enable the search input.
+  }).prop('disabled', false);
 });</code>
     </property>
     <property>

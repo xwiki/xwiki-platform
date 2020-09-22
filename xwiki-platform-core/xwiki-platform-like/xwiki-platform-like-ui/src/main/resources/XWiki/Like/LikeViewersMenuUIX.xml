@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Like.LikeOtherMenuUIX" locale="">
+<xwikidoc version="1.4" reference="XWiki.Like.LikeViewersMenuUIX" locale="">
   <web>XWiki.Like</web>
-  <name>LikeOtherMenuUIX</name>
+  <name>LikeViewersMenuUIX</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -31,14 +31,14 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>LikeOtherMenuUIX</title>
+  <title>LikeViewersMenuUIX</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>XWiki.Like.LikeOtherMenuUIX</name>
+    <name>XWiki.Like.LikeViewersMenuUIX</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>dc089545-5795-45e7-92f0-7cc28d1c74f5</guid>
@@ -164,17 +164,17 @@
     </property>
     <property>
       <content>{{velocity}}
-{{html clean="false"}}
- #template('menus_macros.vm')
- #submenuitem($doc.getURL('view','viewer=likers'), $services.localization.render('like.unlike.modal.viewLikersButton'), 'likers', '', 'heart')
-{{/html}}
-{{/velocity}}</content>
+        {{html clean="false"}}
+        #template('menus_macros.vm')
+        #submenuitem($doc.getURL('view','viewer=likers'), $services.localization.render('like.unlike.modal.viewLikersButton'), 'likers', '', 'heart')
+        {{/html}}
+        {{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.moreoptions</extensionPointId>
+      <extensionPointId>org.xwiki.platform.template.menu.viewers</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.like.moreoptions</name>
+      <name>org.xwiki.like.menu.viewer</name>
     </property>
     <property>
       <parameters>order=120000</parameters>

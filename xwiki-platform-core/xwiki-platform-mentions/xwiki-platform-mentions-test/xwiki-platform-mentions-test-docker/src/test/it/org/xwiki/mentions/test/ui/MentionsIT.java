@@ -58,11 +58,16 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
     }, resolveExtraJARs = true)
 public class MentionsIT
 {
-    public static final String U1_USERNAME = "U1";
+    private static final String U1_USERNAME = "U1";
 
-    public static final String USERS_PWD = "password";
+    private static final String USERS_PWD = "password";
 
-    public static final String U2_USERNAME = "U2";
+    private static final String U2_USERNAME = "U2";
+
+    /**
+     * Increased timeout for waiting to receive mention notifications.
+     */
+    private static final int NOTIFICATIONS_COUNT_TIMEOUT = 15;
 
     /**
      * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
@@ -107,8 +112,7 @@ public class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            reload(setup);
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1, NOTIFICATIONS_COUNT_TIMEOUT);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
@@ -161,16 +165,15 @@ public class MentionsIT
             properties.put("date", "17/08/2020 14:55:18");
             properties
                 .put("comment",
-                    "AAAAA\n\n" +
-                        "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" /}} XYZ\n\n" +
-                        "BBBBB");
+                    "AAAAA\n\n"
+                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" /}} XYZ\n\n"
+                        + "BBBBB");
             setup.addObject(reference, "XWiki.XWikiComments", properties);
         });
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            reload(setup);
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1, NOTIFICATIONS_COUNT_TIMEOUT);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
@@ -191,11 +194,6 @@ public class MentionsIT
             assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
             tray.clearAllNotifications();
         });
-    }
-
-    private void reload(TestUtils setup)
-    {
-        setup.getDriver().navigate().refresh();
     }
 
     /**

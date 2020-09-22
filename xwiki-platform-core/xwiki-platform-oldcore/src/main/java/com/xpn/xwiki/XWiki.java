@@ -1423,7 +1423,7 @@ public class XWiki implements EventListener
                 }
             }
         } catch (XWikiException e) {
-            LOGGER.error("Failed to initialize mandatory document", e);
+            LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }
 

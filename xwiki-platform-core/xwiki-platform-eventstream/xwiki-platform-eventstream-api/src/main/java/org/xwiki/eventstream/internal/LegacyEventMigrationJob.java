@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
@@ -41,6 +42,8 @@ import org.xwiki.job.Request;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Copy legacy events to the new event store.
@@ -66,11 +69,13 @@ public class LegacyEventMigrationJob
     @Inject
     private EventStream eventStream;
 
-    @Inject
     private EventStore eventStore;
 
     @Inject
     private QueryManager queryManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     protected LegacyEventMigrationRequest castRequest(Request request)
@@ -109,7 +114,11 @@ public class LegacyEventMigrationJob
         }
 
         long legacyEventCount = this.eventStream.countEvents();
-        int stepCount = (int) (legacyEventCount / BATCH_SIZE) + (int) (legacyEventCount % BATCH_SIZE);
+        int stepCount = (int) (legacyEventCount / BATCH_SIZE);
+
+        if (legacyEventCount % BATCH_SIZE != 0) {
+            stepCount++;
+        }
 
         this.progressManager.pushLevelProgress(stepCount, this);
 
@@ -159,7 +168,7 @@ public class LegacyEventMigrationJob
         }
 
         if (getRequest().isVerbose()) {
-            this.logger.info("{} events were saved in the new store because they did not already existed",
+            this.logger.info("{} events were saved in the new store because they did not already exist",
                 eventsToSave.size());
         }
     }
@@ -193,8 +202,17 @@ public class LegacyEventMigrationJob
         List<Event> eventsToSave = new ArrayList<>(events.size());
         for (Event event : events) {
             // TODO: optimize this a bit but there seems to be a problem with the IN clause, see previous commented code
-            if (!this.eventStore.getEvent(event.getId()).isPresent()) {
-                eventsToSave.add(event);
+            try {
+                if (!this.eventStore.getEvent(event.getId()).isPresent()
+                    // Ensure that the event concerns a wiki that still exist.
+                    && (event.getWiki() == null || this.wikiDescriptorManager.exists(event.getWiki().getName())))
+                {
+                    eventsToSave.add(event);
+                }
+            } catch (WikiManagerException e) {
+                logger.warn("Error while checking if the wiki [{}] exists. The event (id: [{}]) referencing this wiki "
+                    + "won't be migrated. Root cause: [{}].", event.getWiki().getName(), event.getId(),
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

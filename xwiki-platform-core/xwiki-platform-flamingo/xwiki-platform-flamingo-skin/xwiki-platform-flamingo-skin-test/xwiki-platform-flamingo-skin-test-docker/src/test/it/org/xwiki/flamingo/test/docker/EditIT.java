@@ -54,11 +54,11 @@ import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the wiki edit UI.
@@ -927,17 +927,17 @@ public class EditIT
             DocumentInformationPanel documentInformationPanel = new DocumentInformationPanel();
             assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
             assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
-            try {
-                documentInformationPanel.selectSyntax("xhtml/1.0");
-                fail("A confirm alert should be triggered");
-            } catch (UnhandledAlertException e) {
-                Alert alert = setup.getDriver().switchTo().alert();
-                assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
-                    + "objects to the selected syntax?"));
-                // in wiki edit mode, we shouldn't loose any content.
-                assertFalse(alert.getText().contains("you will loose modifications"));
-                alert.accept();
-            }
+
+            DocumentInformationPanel finalDocumentInformationPanel1 = documentInformationPanel;
+            assertThrows(UnhandledAlertException.class,
+                () -> finalDocumentInformationPanel1.selectSyntax("xhtml/1.0"));
+            Alert alert = setup.getDriver().switchTo().alert();
+            assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
+                + "objects to the selected syntax?"));
+            // In wiki edit mode, we shouldn't loose any content.
+            assertFalse(alert.getText().contains("you will loose modifications"));
+            alert.accept();
+
             final WikiEditPage reloadedWikiEdit = new WikiEditPage();
 
             String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
@@ -958,13 +958,11 @@ public class EditIT
             documentInformationPanel = new DocumentInformationPanel();
             assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
             assertEquals("xhtml/1.0", documentInformationPanel.getSelectedSyntax());
-            try {
-                documentInformationPanel.selectSyntax("xwiki/2.1");
-                fail("A confirm alert should be triggered");
-            } catch (UnhandledAlertException e) {
-                Alert alert = setup.getDriver().switchTo().alert();
-                alert.dismiss();
-            }
+            DocumentInformationPanel finalDocumentInformationPanel2 = documentInformationPanel;
+            assertThrows(UnhandledAlertException.class,
+                () -> finalDocumentInformationPanel2.selectSyntax("xwiki/2.1"));
+            alert = setup.getDriver().switchTo().alert();
+            alert.dismiss();
 
             wikiEditPage.clickSaveAndContinue();
 
@@ -985,16 +983,14 @@ public class EditIT
             assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
             assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
 
-            try {
-                documentInformationPanel.selectSyntax("xhtml/1.0");
-                fail("A confirm alert should be triggered.");
-            } catch (UnhandledAlertException e) {
-                Alert alert = setup.getDriver().switchTo().alert();
-                assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
-                    + "objects to the selected syntax?"));
-                assertTrue(alert.getText().contains("you will loose modifications"));
-                alert.accept();
-            }
+            DocumentInformationPanel finalDocumentInformationPanel3 = documentInformationPanel;
+            assertThrows(UnhandledAlertException.class,
+                () -> finalDocumentInformationPanel3.selectSyntax("xhtml/1.0"));
+            alert = setup.getDriver().switchTo().alert();
+            assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
+                + "objects to the selected syntax?"));
+            assertTrue(alert.getText().contains("you will loose modifications"));
+            alert.accept();
 
             setup.getDriver().waitUntilPageIsReloaded();
             wikiEditPage = new WikiEditPage();

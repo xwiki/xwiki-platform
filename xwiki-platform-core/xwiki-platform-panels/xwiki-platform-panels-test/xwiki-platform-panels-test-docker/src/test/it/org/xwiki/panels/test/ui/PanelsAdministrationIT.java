@@ -22,9 +22,7 @@ package org.xwiki.panels.test.ui;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.AdministrationMenu;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.PageLayoutTabContent;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelsAdministrationPage;
@@ -203,8 +201,8 @@ public class PanelsAdministrationIT
         wikiEditPage.setContent("aaa");
         wikiEditPage.clickSaveAndView();
 
-        setup.gotoPage(new DocumentReference("WebPreferences", testReference.getLastSpaceReference()), "admin");
-        new AdministrationMenu().expandCategoryWithName("Look & Feel")
+        AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference())
+            .getAdministrationMenu().expandCategoryWithName("Look & Feel")
             .getSectionByName("Look & Feel", "Panels")
             .click();
         panelsAdminPage = new PanelsAdministrationPage();

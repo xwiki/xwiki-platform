@@ -167,4 +167,13 @@ public class AdministrationPage extends ViewPage
     {
         return this.menu.hasNotSectionWithId(sectionId);
     }
+
+    /**
+     * @return the administration menu
+     * @since 12.8RC1
+     */
+    public AdministrationMenu getAdministrationMenu()
+    {
+        return this.menu;
+    }
 }

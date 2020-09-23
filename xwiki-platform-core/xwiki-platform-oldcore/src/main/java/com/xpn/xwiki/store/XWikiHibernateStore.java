@@ -279,8 +279,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 DatabaseProduct databaseProduct = getDatabaseProductName();
                 if (DatabaseProduct.ORACLE == databaseProduct) {
-                    statement.execute("create user " + escapedSchema + " identified by " + escapedSchema);
-                    statement.execute("grant resource to " + escapedSchema);
+                    // Notes:
+                    // - We use default tablespaces (which mean the USERS and TEMP tablespaces) to make it simple.
+                    //   We also don't know which tablespace was used to create the main wiki and creating a new one
+                    //   here would make things more complex (we would need to check if it exists already for example).
+                    // - We must specify a quota on the USERS tablespace so that the user can create objects (like
+                    //   tables). Note that tables are created deferred by default so you'd think the user can create
+                    //   them without quotas set but that's because tables are created deferred by default and thus
+                    //   they'll fail when the first data is written in them.
+                    //   See https://dba.stackexchange.com/a/254950
+                    // - Depending on how it's configured, the default users tablespace size might be too small. Thus
+                    //   it's up to a DBA to make sure it's large enough.
+                    statement.execute(
+                        String.format("CREATE USER %s IDENTIFIED BY %s QUOTA UNLIMITED ON USERS", escapedSchema,
+                            escapedSchema));
+                    statement.execute(String.format("GRANT RESOURCE TO %s", escapedSchema));
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
                     || DatabaseProduct.H2 == databaseProduct) {
                     statement.execute("CREATE SCHEMA " + escapedSchema);

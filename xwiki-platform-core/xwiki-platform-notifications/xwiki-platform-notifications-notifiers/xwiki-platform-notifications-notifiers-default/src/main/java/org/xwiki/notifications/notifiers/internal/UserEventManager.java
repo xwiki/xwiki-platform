@@ -156,7 +156,10 @@ public class UserEventManager
     private boolean isEventAfterUserCreationDate(Event event, DocumentReference user) throws NotificationException
     {
         Date userCreationDate = getUserCreationDate(user);
-        return event.getDate() == null || userCreationDate == null || event.getDate().after(userCreationDate);
+        return event.getDate() == null || userCreationDate == null
+            // after and before API are "strictly after" and "strictly before",
+            // here we use the negative way to ensure we also accept "equals" date.
+            || !event.getDate().before(userCreationDate);
     }
 
     /**
@@ -198,7 +201,9 @@ public class UserEventManager
                     // for possible backward compatibility with old events.
                     return notificationPreference.isNotificationEnabled()
                         && (notificationPreference.getStartDate() == null || event.getDate() == null
-                        || notificationPreference.getStartDate().before(event.getDate()));
+                        // after and before API are "strictly after" and "strictly before",
+                        // here we use the negative way to ensure we also accept "equals" date.
+                        || !event.getDate().before(notificationPreference.getStartDate()));
                 }
             }
         } catch (NotificationException e) {
@@ -231,7 +236,9 @@ public class UserEventManager
     private boolean isFilterCreatedBeforeEvent(Event event, NotificationFilterPreference filterPreference)
     {
         return event.getDate() == null || filterPreference.getStartingDate() == null
-            || filterPreference.getStartingDate().before(event.getDate());
+            // after and before API are "strictly after" and "strictly before",
+            // here we use the negative way to ensure we also accept "equals" date.
+            || !event.getDate().before(filterPreference.getStartingDate());
     }
 
     private boolean isUserFilterPreference(NotificationFilterPreference filterPreference, NotificationFormat format)

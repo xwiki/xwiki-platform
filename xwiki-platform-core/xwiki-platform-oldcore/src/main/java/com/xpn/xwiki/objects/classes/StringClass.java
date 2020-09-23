@@ -129,12 +129,8 @@ public class StringClass extends PropertyClass
         XWikiContext context)
     {
         BaseProperty property = (BaseProperty) object.safeget(name);
-        String content;
         if (property != null) {
-            content = property.toText();
-        } else {
-            content = "";
+            buffer.append(XMLUtils.escapeElementText(property.toText()));
         }
-        buffer.append(XMLUtils.escapeElementText(content));
     }
 }

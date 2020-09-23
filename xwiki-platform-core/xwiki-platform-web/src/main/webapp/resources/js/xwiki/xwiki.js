@@ -252,9 +252,14 @@ Object.extend(XWiki, {
                         }
                       });
 
-                      // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
-                      // Note: This also allows script tags defined in the updated html to be loaded.
-                      $(extraID + "pane").update(container.descendants()[0]);
+                      // Replaces the element's content with the temporary container's content, while also evaluating
+                      // any inline scripts.
+                      // The replacement is done by inserting the child elements of the temporary container into the
+                      // element's content.
+                      var pane = $(extraID + "pane");
+                      container.childElements().forEach(function(e) {
+                        pane.insert(e);
+                      });
 
                       // Notify the others that the DOM has been updated.
                       document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});

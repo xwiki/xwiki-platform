@@ -153,6 +153,11 @@ public class UserEventManagerTest
         when(pref2.isNotificationEnabled()).thenReturn(true);
         assertFalse(this.userEventManager.isListening(event, userReference, format));
 
+        // if the preference is enabled but at the same date as the event is sent, it's listened
+        when(pref2.getStartDate()).thenReturn(new Date(42));
+        when(pref2.isNotificationEnabled()).thenReturn(true);
+        assertTrue(this.userEventManager.isListening(event, userReference, format));
+
         // if the start date is null we don't have enough information so we consider it's listened
         when(pref2.getStartDate()).thenReturn(null);
         assertTrue(this.userEventManager.isListening(event, userReference, format));
@@ -319,6 +324,10 @@ public class UserEventManagerTest
 
         // however if the filter date is null we consider it has been enabled before the event
         when(filter2.getStartingDate()).thenReturn(null);
+        assertTrue(this.userEventManager.isListening(event, userReference, format));
+
+        // if the filter date is the same date, then we keep the event too.
+        when(filter2.getStartingDate()).thenReturn(new Date(42));
         assertTrue(this.userEventManager.isListening(event, userReference, format));
 
         // on the same way if the filter date is set, but the event date is null we consider the event

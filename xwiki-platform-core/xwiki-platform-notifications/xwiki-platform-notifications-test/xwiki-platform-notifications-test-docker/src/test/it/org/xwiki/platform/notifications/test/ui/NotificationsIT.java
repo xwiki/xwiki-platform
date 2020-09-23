@@ -145,10 +145,6 @@ public class NotificationsIT
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
-        // changed.
-        Thread.sleep(1000);
-
         // We create a lot of pages in order to test the notification badge
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
@@ -199,10 +195,6 @@ public class NotificationsIT
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
-
-        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
-        // changed.
-        Thread.sleep(1000);
 
         // Delete the "Deletion test page" and test the notification
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);

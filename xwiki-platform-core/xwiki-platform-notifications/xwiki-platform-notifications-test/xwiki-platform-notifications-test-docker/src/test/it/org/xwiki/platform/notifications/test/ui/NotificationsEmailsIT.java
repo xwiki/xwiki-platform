@@ -27,7 +27,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simplejavamail.converter.EmailConverter;
 import org.simplejavamail.email.Email;
@@ -36,7 +35,6 @@ import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
@@ -152,10 +150,6 @@ public class NotificationsEmailsIT
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
-
-        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
-        // changed.
-        Thread.sleep(1000);
 
         testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page1", "Content 1", "Title 1");
         testUtils.createPage(NOTIFICATIONS_EMAIL_TEST, "Page2", "Content 2", "Title 2");

@@ -270,6 +270,7 @@ public class ScopeNotificationFilterTest
         NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
                 documentReference, NotificationFilterType.INCLUSIVE, null);
         when(prefζ.getProviderHint()).thenReturn("userProfile");
+        when(prefζ.getStartingDate()).thenReturn(new Date(99));
 
         Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ, prefζ);
 
@@ -307,6 +308,20 @@ public class ScopeNotificationFilterTest
         when(event4.getDate()).thenReturn(new Date(100));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 this.scopeNotificationFilter.filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
+
+        // Test with wikiA:SpaceM.DocumentN sent before ζ has been created
+        Event event5 = mock(Event.class);
+        when(event5.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
+        when(event5.getDate()).thenReturn(new Date(98));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+            this.scopeNotificationFilter.filterEvent(event5, user, filterPreferences, NotificationFormat.ALERT));
+
+        // Test with wikiA:SpaceM.DocumentN sent at the date ζ has been created
+        Event event6 = mock(Event.class);
+        when(event6.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
+        when(event6.getDate()).thenReturn(new Date(99));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+            this.scopeNotificationFilter.filterEvent(event6, user, filterPreferences, NotificationFormat.ALERT));
     }
 
     @Test

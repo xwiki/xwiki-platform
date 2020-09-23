@@ -88,8 +88,10 @@ public class ScopeNotificationFilter implements NotificationFilter
         WatchedLocationState state
                 = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
             checkInclusiveFilters);
-        if (!state.isWatched()
-                || (state.getStartingDate() != null && state.getStartingDate().after(event.getDate()))) {
+        if (!state.isWatched() || (state.getStartingDate() != null
+            // We only filter if the inclusive filter is strictly after the event date.
+            // Event that occurs at the same date that the inclusive filters are kept.
+            && state.getStartingDate().after(event.getDate()))) {
             return FilterPolicy.FILTER;
         }
 

@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE struts-config PUBLIC
+<!DOCTYPE struts PUBLIC
         "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
         "http://jakarta.apache.org/struts/dtds/struts-2.5.dtd">
 
 <struts>
-    <package name="xwiki">
+    <package name="xwiki" extends="struts-default">
 
         <!-- ========== Interceptors ============================== -->
 
@@ -188,8 +188,6 @@
         <action class="com.xpn.xwiki.web.LogoutAction" name="logout">
             <result name="logout" type="velocity">/templates/logout.vm</result>
         </action>
-
-        <action class="com.xpn.xwiki.plugin.charts.actions.ChartingAction" name="charting" />
 
         <action class="com.xpn.xwiki.web.LockAction" name="lock" />
 

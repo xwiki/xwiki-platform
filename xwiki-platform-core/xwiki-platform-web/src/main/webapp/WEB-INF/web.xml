@@ -245,10 +245,6 @@
       <param-value>com.xpn.xwiki.XWiki</param-value>
     </init-param>
     <init-param>
-      <param-name>config</param-name>
-      <param-value>struts-default.xml,struts-plugin.xml,WEB-INF/struts.xml</param-value>
-    </init-param>
-    <init-param>
       <param-name>debug</param-name>
       <param-value>2</param-value>
     </init-param>

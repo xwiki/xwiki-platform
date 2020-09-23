@@ -105,7 +105,6 @@ platform.flamingo.themes.category.breadcrumb=Breadcrumb
 platform.flamingo.themes.category.advanced=Advanced
 platform.flamingo.themes.defaultvalue=Default
 platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
-platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
 
@@ -121,6 +120,11 @@ platform.flamingo.themes.global=Global
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
 
 #@deprecatedend</content>
 </xwikidoc>

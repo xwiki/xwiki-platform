@@ -28,6 +28,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.EditPage;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeToBe;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+
 public class EditThemePage extends EditPage
 {
     @FindBy(id = "autosync")
@@ -39,9 +42,12 @@ public class EditThemePage extends EditPage
     @FindBy(id = "preview-curtain")
     private WebElement previewCurtain;
 
+    @FindBy(id = "panel-theme-variables")
+    private WebElement themeVariables;
+
     public EditThemePage()
     {
-        waitUntilPageJSIsLoaded();
+        waitUntilReady();
     }
 
     public void selectVariableCategory(String category)
@@ -99,7 +105,9 @@ public class EditThemePage extends EditPage
 
     public void clickOnRefreshPreview()
     {
-        refreshButton.click();
+        // The refresh button is disabled initially, until the preview is ready, and whenever a refresh is in progress.
+        getDriver().waitUntilCondition(elementToBeClickable(this.refreshButton));
+        this.refreshButton.click();
     }
 
     public void refreshPreview()
@@ -123,6 +131,7 @@ public class EditThemePage extends EditPage
         return new PreviewBox();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ViewThemePage clickSaveAndView()
     {
@@ -130,4 +139,15 @@ public class EditThemePage extends EditPage
         return new ViewThemePage();
     }
 
+    /**
+     * Wait until the theme editor is ready for user interaction.
+     * 
+     * @return this theme editor
+     * @since 12.8
+     */
+    protected EditThemePage waitUntilReady()
+    {
+        getDriver().waitUntilCondition(attributeToBe(this.themeVariables, "data-ready", "true"));
+        return this;
+    }
 }

@@ -92,17 +92,6 @@ public class FlamingoThemeIT
 
         // Create a new theme
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
-        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
-        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
-        // fix properly. In the meantime, I'm trying to force a reload of the page in case it didn't work the first
-        // time: it should prevent most of the flickers.
-        try {
-            editThemePage.waitUntilPreviewIsLoaded();
-        } catch (TimeoutException e) {
-            // try to force a refresh, without using navigate().refresh() which is not working properly...
-            setup.getDriver().get(setup.getDriver().getCurrentUrl());
-            editThemePage = new EditThemePage();
-        }
 
         // First, disable auto refresh because it slows down the test
         // (and can even make it fails if the computer is slow)

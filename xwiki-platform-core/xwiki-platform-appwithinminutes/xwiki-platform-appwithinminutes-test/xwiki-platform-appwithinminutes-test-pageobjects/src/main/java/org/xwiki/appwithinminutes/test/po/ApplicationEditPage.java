@@ -19,6 +19,8 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
@@ -50,6 +52,23 @@ public class ApplicationEditPage extends InlinePage
      */
     @FindBy(name = "xaction_saveandcontinue")
     private WebElement saveAndContinueButton;
+
+    /**
+     * Default constructor which waits on buttons to be enhanced.
+     */
+    public ApplicationEditPage()
+    {
+        super();
+        // Ensure that the javascript to enhance save button has been properly executed.
+        this.getDriver().waitUntilCondition(driver -> {
+            try {
+                driver.findElement(By.id("wizard-next"));
+                return true;
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        });
+    }
 
     @Override
     public WebElement getSaveAndViewButton()

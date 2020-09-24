@@ -742,7 +742,11 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# [Since 5.2M2]
 #-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist
 #-# (only the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in
-#-# this list would be displayed inline if possible)
+#-# this list would be displayed inline if possible).
+#-# Note that only one configuration is used between the whitelist and the blacklist, and the whitelist always have
+#-# the priority over the blacklist. Also note that these configurations exist for security reason so they are only
+#-# impacting attachments added by users who do not have programming rights.
+#-# If you want to force downloading some attachments types please check the configuration below.
 #-#
 #-# By default we use the following whitelist (coma separated list of values).
 # attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv
@@ -750,6 +754,15 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of
 #-# values. We advise you to forbid at least the following mimetypes : text/html, text/javascript
 # attachment.download.blacklist=text/html,text/javascript
+
+#-# [Since 12.10RC1]
+#-# Define the kind of attachment that you always want to be downloaded and never displayed inline.
+#-# By default this list is empty, but you can specify a list of mime-types (coma separated list of values) which
+#-# should be always downloaded no matter who attached them or what is the whitelist/blacklist configuration.
+#-#
+#-# The distinction with the blacklist configuration above is that the blacklist won't affect file attached by a user
+#-# with programming rights, while this configuration affect any attachment.
+# attachment.download.forceDownload=
 
 #-------------------------------------------------------------------------------------
 # Active Installs

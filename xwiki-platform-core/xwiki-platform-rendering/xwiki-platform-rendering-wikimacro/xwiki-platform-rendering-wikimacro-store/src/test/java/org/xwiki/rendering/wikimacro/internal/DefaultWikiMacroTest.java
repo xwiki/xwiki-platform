@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
@@ -50,6 +51,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -57,6 +59,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -76,7 +79,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @AllComponents
-class DefaultWikiMacroTest
+public class DefaultWikiMacroTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -98,6 +101,13 @@ class DefaultWikiMacroTest
     private WikiMacroManager wikiMacroManager;
 
     private XWikiDocument user;
+
+    @AfterComponent
+    public void afterComponent()
+    {
+        // Unregister the xwiki.cfg to get a mock
+        this.componentManager.unregisterComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+    }
 
     @BeforeEach
     public void beforeEach() throws Exception
@@ -140,6 +150,8 @@ class DefaultWikiMacroTest
         XWikiDocument sDocument = new XWikiDocument(new DocumentReference("swiki", "sspace", "sdoc"));
         sDocument.setContentAuthorReference(new DocumentReference("swiki", "sspace", "suser"));
         this.oldcore.getXWikiContext().put("sdoc", sDocument);
+
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.render.velocity.macrolist", "");
     }
 
     private void registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception

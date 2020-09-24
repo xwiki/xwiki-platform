@@ -25,19 +25,11 @@
         "http://jakarta.apache.org/struts/dtds/struts-2.5.dtd">
 
 <struts>
+    <!-- Register a custom logic to map a the URL to an action -->
+    <bean type="org.apache.struts2.dispatcher.mapper.ActionMapper" name="xwikimapper" class="com.xpn.xwiki.web.XWikiActionMapper" />
+    <constant name="struts.mapper.class" value="xwikimapper" />
+
     <package name="xwiki" extends="struts-default">
-
-        <!-- ========== Interceptors ============================== -->
-
-        <interceptors>
-            <interceptor name="shorturl" class="com.xpn.xwiki.web.ShortURLInterceptor"/>
-            <interceptor-stack name="shorturlStack">
-                <interceptor-ref name="shorturl"/>
-                <interceptor-ref name="defaultStack"/>
-            </interceptor-stack>
-        </interceptors>
-
-        <default-interceptor-ref name="shorturlStack"/>
 
         <!-- ========== Global Result Definitions ============================== -->
 

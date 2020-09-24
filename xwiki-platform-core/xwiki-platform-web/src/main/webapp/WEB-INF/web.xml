@@ -233,9 +233,9 @@
     <servlet-class>org.xwiki.resource.servlet.ResourceReferenceHandlerServlet</servlet-class>
   </servlet>
 
-  <filter>
-    <filter-name>action</filter-name>
-    <filter-class>org.apache.struts2.dispatcher.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  <servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts2.dispatcher.servlet.StrutsServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>ApplicationResources</param-value>
@@ -256,7 +256,8 @@
       <param-name>validate</param-name>
       <param-value>true</param-value>
     </init-param>
-  </filter>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
 
   <servlet>
     <servlet-name>redirectHomeServlet</servlet-name>
@@ -286,25 +287,25 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <filter-mapping>
-    <filter-name>action</filter-name>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
-  </filter-mapping>
+  </servlet-mapping>
 
-  <filter-mapping>
-    <filter-name>action</filter-name>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
     <url-pattern>/wiki/*</url-pattern>
-  </filter-mapping>
+  </servlet-mapping>
 
-  <filter-mapping>
-    <filter-name>action</filter-name>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
     <url-pattern>/testbin/*</url-pattern>
-  </filter-mapping>
+  </servlet-mapping>
 
-  <filter-mapping>
-    <filter-name>action</filter-name>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
     <url-pattern>/xwiki/*</url-pattern>
-  </filter-mapping>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>redirectHomeServlet</servlet-name>

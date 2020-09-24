@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.dispatcher.mapper.ActionMapper;
+import org.apache.struts2.dispatcher.mapper.ActionMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
@@ -34,8 +36,7 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
+import com.opensymphony.xwork2.config.ConfigurationManager;
 
 /**
  * Make sure to lead to to the right action depending on the XWiki configuration (for example leading to view action by
@@ -45,34 +46,51 @@ import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
  * @since 12.9RC1
  */
 @Unstable
-public class ShortURLInterceptor extends AbstractInterceptor
+public class XWikiActionMapper implements ActionMapper
 {
-    private transient ResourceTypeResolver<ExtendedURL> typeResolver =
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiActionMapper.class);
+
+    private ResourceTypeResolver<ExtendedURL> typeResolver =
         Utils.getComponent(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
 
-    private transient ResourceReferenceResolver<ExtendedURL> resolver =
+    private ResourceReferenceResolver<ExtendedURL> resolver =
         Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
 
     @Override
-    public String intercept(ActionInvocation invocation) throws Exception
+    public ActionMapping getMappingFromActionName(String actionName)
     {
-        HttpServletRequest httpServletRequest = ServletActionContext.getRequest();
+        ActionMapping mapping = new ActionMapping();
+        mapping.setName(actionName);
+        return mapping;
+    }
 
-        String url = httpServletRequest.getRequestURL().toString();
+    @Override
+    public ActionMapping getMapping(HttpServletRequest request, ConfigurationManager configManager)
+    {
+        String url = request.getRequestURL().toString();
+
+        ActionMapping mapping = new ActionMapping();
 
         try {
-            ExtendedURL extendedURL = new ExtendedURL(new URL(url), httpServletRequest.getContextPath());
+            ExtendedURL extendedURL = new ExtendedURL(new URL(url), request.getContextPath());
 
             ResourceType type = this.typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
 
             EntityResourceReference entityResourceReference = (EntityResourceReference) this.resolver
                 .resolve(extendedURL, type, Collections.<String, Object>emptyMap());
 
-            invocation.getInvocationContext().setName(entityResourceReference.getAction().getActionName());
+            mapping.setName(entityResourceReference.getAction().getActionName());
         } catch (Exception e) {
-            throw new IOException(String.format("Failed to extract the Entity Action from URL [%s]", url), e);
+            LOGGER.error("Failed to extract the Entity Action from URL [{}]", url, e);
         }
 
-        return invocation.invoke();
+        return mapping;
+    }
+
+    @Override
+    public String getUriFromActionMapping(ActionMapping mapping)
+    {
+        // This is never really used in the context of XWiki so implementing it does no worth it
+        return "";
     }
 }

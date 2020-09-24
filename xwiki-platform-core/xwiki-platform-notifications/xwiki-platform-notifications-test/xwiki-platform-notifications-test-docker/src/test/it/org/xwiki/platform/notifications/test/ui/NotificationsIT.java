@@ -157,8 +157,10 @@ public class NotificationsIT
         // Check that the badge is showing «20+»
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         testUtils.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        // We use an explicit timeout of 15sec here because we're waiting on 20 notifications and the process
+        // can be really slow on our CI sometimes.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
-            PAGES_TOP_CREATION_COUNT);
+            PAGES_TOP_CREATION_COUNT, 15);
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 

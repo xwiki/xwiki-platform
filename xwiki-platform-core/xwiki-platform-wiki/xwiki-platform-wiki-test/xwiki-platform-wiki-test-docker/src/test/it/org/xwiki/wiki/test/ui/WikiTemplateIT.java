@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -43,17 +42,47 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-@UITest
+@UITest(
+    properties = {
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
+        // Notifications, as otherwise even streams won't have a store.
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    }
+)
 class WikiTemplateIT
 {
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
 
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
-    @BeforeAll
-    void setup(TestUtils setup)
+    @Test
+    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+
+        // Create the template
+        createTemplateWiki();
+
+        // Create the wiki from the template
+        createWikiFromTemplate();
+        // Do it twice to check if we can create a wiki with the name of a deleted one
+        createWikiFromTemplate();
+
+        // Delete the template wiki
+        deleteTemplateWiki();
+
+        logCaptureConfiguration.registerExcludes(
+            "CSRFToken: Secret token verification failed");
     }
 
     private void createTemplateWiki() throws Exception
@@ -170,23 +199,5 @@ class WikiTemplateIT
         // Finalization
         WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
         return wikiHomePage;
-    }
-
-    @Test
-    void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
-    {
-        // Create the template
-        createTemplateWiki();
-
-        // Create the wiki from the template
-        createWikiFromTemplate();
-        // Do it twice to check if we can create a wiki with the name of a deleted one
-        createWikiFromTemplate();
-
-        // Delete the template wiki
-        deleteTemplateWiki();
-
-        logCaptureConfiguration.registerExcludes(
-            "CSRFToken: Secret token verification failed");
     }
 }

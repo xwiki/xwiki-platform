@@ -85,7 +85,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
             overrides = {
                 // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
                 // to install on a subwiki by default (which is something we test)
-                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it.
+                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
+                // handle it.
                 "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
             }
         )

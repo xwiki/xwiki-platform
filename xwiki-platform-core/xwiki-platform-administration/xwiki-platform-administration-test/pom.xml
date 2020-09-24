@@ -39,7 +39,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-administration-test-pageobjects</module>
-    <module>xwiki-platform-administration-test-tests</module>
   </modules>
   <profiles>
     <profile>

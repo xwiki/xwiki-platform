@@ -51,8 +51,8 @@ public class AllITs
     }
 
     @Nested
-    @DisplayName("UsersGroupsRightsManagement")
-    class NestedUsersGroupsRightsManagementsIT extends UsersGroupsRightsManagementIT
+    @DisplayName("Users and Groups Rights Management")
+    class NestedUsersGroupsRightsManagementIT extends UsersGroupsRightsManagementIT
     {
     }
 
@@ -65,6 +65,12 @@ public class AllITs
     @Nested
     @DisplayName("XAR Import")
     class NestedXARImportIT extends XARImportIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Page Templates")
+    class NestedPageTemplatesIT extends PageTemplatesIT
     {
     }
 }

@@ -18,6 +18,12 @@
     ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
     <span class="meta-versionSummary metamodifs">
       <input type="hidden" name="xeditaction" value="$!xcontext.action" />
+      ## Current version of the document for the conflict check
+      <input type="hidden" id="previousVersion" name="previousVersion" value="$doc.version" />
+      ## If the document is new or not when the user started the edition, for the conflict check too.
+      <input type="hidden" id="isNew" name="isNew" value="$doc.isNew()" />
+      ## We store the date of the beginning of the edition for the conflict check mechanism.
+      <input type="hidden" id="editingVersionDate" name="editingVersionDate" value="$datetool.date.getTime()" />
       #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
         #set ($commentFieldAdded = 1)
         #if ($xwiki.isEditCommentFieldHidden())

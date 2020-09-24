@@ -124,6 +124,7 @@
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+
     ## Pass the section number when the form is submitted in order to affect only the specified section.
     ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
     #if("$!{request.section}" != '')

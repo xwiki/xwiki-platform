@@ -119,7 +119,7 @@ public class StaticListClassTest
         staticListClass.setValues(VALUES_WITH_HTML_SPECIAL_CHARS.get(0) + '|' + VALUES_WITH_HTML_SPECIAL_CHARS.get(1)
             + '=' + StringUtils.reverse(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)) + '|'
             + VALUES_WITH_HTML_SPECIAL_CHARS.get(2));
-        assertEquals("a<b>c * 3'2\"1 * x{y&z", staticListClass.displayView(propertyName, "", object, null));
+        assertEquals("a&#60;b>c * 3'2\"1 * x{y&#38;z", staticListClass.displayView(propertyName, "", object, null));
     }
 
     /**

@@ -57,8 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(
     properties = {
-        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed
-        "xwikiCfgSuperadminPassword=pass",
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
@@ -73,9 +71,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
+        // These extensions are needed when creating the subwiki or it'll fail with some NPE.
         // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
         // by one
-        // Needed by the subwikis
         "org.xwiki.platform:xwiki-platform-wiki-script",
         "org.xwiki.platform:xwiki-platform-wiki-user-default",
         "org.xwiki.platform:xwiki-platform-wiki-user-script"
@@ -110,7 +108,6 @@ public class SubWikiIT
         String wikiName = createWikiPage.getComputedName();
         assertEquals(SUBWIKI_NAME, wikiName);
         createWikiPage.setIsTemplate(false);
-        assertTrue(createWikiPage.isNextStepEnabled());
 
         // Code taken from WikiTemplateIT.
         WikiCreationPage wikiCreationPage = createWikiPage.goUserStep().create();

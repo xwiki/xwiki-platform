@@ -20,6 +20,7 @@
 package org.xwiki.wiki.test.ui;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
@@ -36,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 /**
  * UI tests for the wiki templates feature of the Wiki application.
@@ -62,7 +62,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
         // Notifications, as otherwise even streams won't have a store.
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // Required by components located in a core extensions
+        "org.xwiki.platform:xwiki-platform-wiki-template-default",
+        // These extensions are needed when creating the subwiki or it'll fail with some NPE.
+        // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
+        // by one
+        "org.xwiki.platform:xwiki-platform-wiki-script",
+        "org.xwiki.platform:xwiki-platform-wiki-user-default",
+        "org.xwiki.platform:xwiki-platform-wiki-user-script"
+    },
+    extensionOverrides = {
+        @ExtensionOverride(
+            extensionId = "org.xwiki.platform:xwiki-platform-web",
+            overrides = {
+                // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
+                // to install on a subwiki by default (which is something we test)
+                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
+                // handle it.
+                "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
+            }
+        )
     }
 )
 class WikiTemplateIT
@@ -103,7 +123,6 @@ class WikiTemplateIT
         assertEquals(TEMPLATE_WIKI_ID, wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
-        assertTrue(createWikiPage.isNextStepEnabled());
 
         // Second step
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();

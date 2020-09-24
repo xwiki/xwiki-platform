@@ -99,20 +99,18 @@ public class CreateWikiPage extends ExtendedViewPage
         return list;
     }
 
-    public boolean isNextStepEnabled()
-    {
-        return nextStepButton.isEnabled();
-    }
-
     public CreateWikiPageStepUser goUserStep()
     {
-        nextStepButton.click();
+        goNextStep();
         return new CreateWikiPageStepUser().waitUntilPageIsLoaded();
     }
 
     public void goNextStep()
     {
-        nextStepButton.click();
+        // Wait for the button to ne enabled since by default it's disabled and becomes enabled only after some
+        // fields have been set on the first step UI (using JS), and thus there could be some small delay before it
+        // becomes enabled.
+        getDriver().waitUntilElementIsEnabled(this.nextStepButton);
+        this.nextStepButton.click();
     }
-
 }

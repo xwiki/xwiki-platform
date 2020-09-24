@@ -47,6 +47,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
+        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
+        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
+        // even if the class was found the DW would start which is not something we want.
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
@@ -57,10 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
         // Notifications, as otherwise even streams won't have a store.
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
-        // Needed to be in WEB-INF/lib since it's used by Struts which is a core feature (and thus in the webapp CL).
-        // Otherwise it gets provisioned as an extension and is not available from the webapp CL.
-        "org.xwiki.platform:xwiki-platform-extension-distribution"
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
 class WikiTemplateIT

@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.InlinePage;
 
 /**
@@ -54,20 +55,34 @@ public class ApplicationEditPage extends InlinePage
     private WebElement saveAndContinueButton;
 
     /**
-     * Default constructor which waits on buttons to be enhanced.
+     * Default constructor which doesn't wait.
+     *
+     * @deprecated since 12.8
      */
+    @Deprecated
     public ApplicationEditPage()
     {
+        // By default we don't wait for backward compatibility reason.
+        this(false, false);
+    }
+
+    /**
+     * Constructor that allows to wait or not on next step button.
+     *
+     * @param wait if {@code true} we wait for an element to be visible.
+     * @param waitOnXAction if {@code true} the wait is done on a button named {@code xaction_save}, else it's done on
+     *                      the id {@code wizard-next}.
+     * @since 12.8
+     * @since 12.6.3
+     */
+    public ApplicationEditPage(boolean wait, boolean waitOnXAction)
+    {
         super();
-        // Ensure that the javascript to enhance save button has been properly executed.
-        this.getDriver().waitUntilCondition(driver -> {
-            try {
-                driver.findElement(By.id("wizard-next"));
-                return true;
-            } catch (NoSuchElementException e) {
-                return false;
-            }
-        });
+
+        if (wait) {
+            By findBy = (waitOnXAction) ? By.name("xaction_save") : By.id("wizard-next");
+            getDriver().waitUntilElementIsVisible(findBy);
+        }
     }
 
     @Override

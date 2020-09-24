@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 /**
  * UI tests for the wiki templates feature of the Wiki application.
  *
@@ -56,7 +57,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
         // Notifications, as otherwise even streams won't have a store.
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // Needed to be in WEB-INF/lib since it's used by Struts which is a core feature (and thus in the webapp CL).
+        // Otherwise it gets provisioned as an extension and is not available from the webapp CL.
+        "org.xwiki.platform:xwiki-platform-extension-distribution"
     }
 )
 class WikiTemplateIT

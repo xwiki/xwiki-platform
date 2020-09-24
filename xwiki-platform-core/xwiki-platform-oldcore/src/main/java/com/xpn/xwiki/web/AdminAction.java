@@ -46,7 +46,7 @@ public class AdminAction extends XWikiAction
     }
 
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return EditForm.class;
     }

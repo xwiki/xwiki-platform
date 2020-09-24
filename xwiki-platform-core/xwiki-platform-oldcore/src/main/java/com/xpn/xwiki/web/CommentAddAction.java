@@ -53,7 +53,7 @@ public class CommentAddAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
 
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return ObjectAddForm.class;
     }

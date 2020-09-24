@@ -36,7 +36,7 @@ public class InlineAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
 
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return EditForm.class;
     }

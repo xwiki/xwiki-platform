@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class ObjectRemoveAction extends XWikiAction
 {
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return ObjectAddForm.class;
     }

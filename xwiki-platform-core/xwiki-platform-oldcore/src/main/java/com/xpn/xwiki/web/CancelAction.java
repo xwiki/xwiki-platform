@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class CancelAction extends XWikiAction
 {
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return EditForm.class;
     }

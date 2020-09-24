@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * @version $Id$
  */
@@ -43,7 +45,9 @@ public abstract class XWikiForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
+     * @since 12.9RC1
      */
+    @Unstable
     public void reset(HttpServletRequest request)
     {
         setRequest(request);
@@ -55,7 +59,9 @@ public abstract class XWikiForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
+     * @since 12.9RC1
      */
+    @Unstable
     public void reset(XWikiRequest request)
     {
         this.request = request;

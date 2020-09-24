@@ -37,7 +37,7 @@ import com.xpn.xwiki.util.Util;
 public class PropAddAction extends XWikiAction
 {
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return PropAddForm.class;
     }

@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 public class RollbackAction extends XWikiAction
 {
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return RollbackForm.class;
     }

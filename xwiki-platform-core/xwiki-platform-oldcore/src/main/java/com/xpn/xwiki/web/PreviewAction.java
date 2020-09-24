@@ -51,7 +51,7 @@ public class PreviewAction extends EditAction
     }
 
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return EditForm.class;
     }

@@ -165,7 +165,7 @@ public abstract class XWikiAction extends ActionSupport
      * @since 12.9RC1
      */
     @Unstable
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return null;
     }
@@ -729,8 +729,8 @@ public abstract class XWikiAction extends ActionSupport
         throws XWikiException, ServletException, InstantiationException, IllegalAccessException
     {
         XWikiForm form;
-        if (getFomClass() != null) {
-            form = getFomClass().newInstance();
+        if (getFormClass() != null) {
+            form = getFormClass().newInstance();
         } else {
             form = null;
         }

@@ -55,7 +55,7 @@ public class ObjectAddAction extends XWikiAction
         Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return ObjectAddForm.class;
     }

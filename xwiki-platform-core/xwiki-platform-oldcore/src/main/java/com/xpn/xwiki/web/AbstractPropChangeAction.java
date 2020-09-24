@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public abstract class AbstractPropChangeAction extends XWikiAction
 {
     @Override
-    protected Class<? extends XWikiForm> getFomClass()
+    protected Class<? extends XWikiForm> getFormClass()
     {
         return PropChangeForm.class;
     }

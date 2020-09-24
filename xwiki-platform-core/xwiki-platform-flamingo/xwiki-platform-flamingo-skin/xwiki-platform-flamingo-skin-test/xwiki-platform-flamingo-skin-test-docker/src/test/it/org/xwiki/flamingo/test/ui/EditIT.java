@@ -800,7 +800,7 @@ public class EditIT
         wikiEditPage.setContent("First edit");
         wikiEditPage.clickSaveAndContinue();
 
-        // Simple way, just by going to the view page and going back to edit
+        // Simple way, just by going to the view page after a save and going back to edit
         setup.gotoPage(testReference);
         setup.getDriver().navigate().back();
         wikiEditPage = new WikiEditPage();
@@ -808,36 +808,24 @@ public class EditIT
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Second edit", viewPage.getContent());
 
-        // Complex way: continue to another editor, make other changes, and then get back to the editor.
+        // Complex way: Save&Continue first, then forget an edit and move on.
+        // Come back to check the unsaved changes are still there and can be saved.
         wikiEditPage = viewPage.editWiki();
         wikiEditPage.setContent("third edit");
         wikiEditPage.clickSaveAndContinue();
+        // We set the content without saving.
+        wikiEditPage.setContent("fourth edit");
 
         viewPage = setup.gotoPage(testReference);
         viewPage.waitUntilPageJSIsLoaded();
 
-        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
-        wysiwygEditPage.setContent("fourth edit");
-        wysiwygEditPage.clickSaveAndContinue();
-
-        // WYSIWYG editor -> view page
-        setup.getDriver().navigate().back();
         // view page -> wiki editor
         setup.getDriver().navigate().back();
 
-        setup.getDriver().waitUntilCondition(driver -> {
-            try {
-                return driver.findElement(By.id("content")) != null
-                && driver.findElement(By.id("content")).getText().equals("fourth edit");
-            } catch (NoSuchElementException | StaleElementReferenceException e) {
-                return false;
-            }
-        });
-
         wikiEditPage = new WikiEditPage();
-        wikiEditPage.setContent("fifth edit");
+        assertEquals("fourth edit", wikiEditPage.getExactContent());
         viewPage = wikiEditPage.clickSaveAndView();
-        assertEquals("fifth edit", viewPage.getContent());
+        assertEquals("fourth edit", viewPage.getContent());
     }
 
     @Test

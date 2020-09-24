@@ -817,8 +817,7 @@ define('editInPlace', [
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
         formData.previousVersion = xwikiDocument.version;
-        // It would have been easier to send the timestamp but that's what the Save action expects.
-        formData.editingVersionDate = new Date(xwikiDocument.modified).toISOString();
+        formData.editingVersionDate = new Date(xwikiDocument.modified).getTime();
       }
       return $.extend(formData, extra);
     }

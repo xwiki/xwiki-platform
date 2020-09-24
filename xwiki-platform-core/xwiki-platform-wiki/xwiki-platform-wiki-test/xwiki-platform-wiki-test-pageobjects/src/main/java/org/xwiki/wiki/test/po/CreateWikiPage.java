@@ -91,7 +91,7 @@ public class CreateWikiPage extends ExtendedViewPage
 
     public List<String> getTemplateList()
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         List<WebElement> elements = templateField.findElements(By.tagName("option"));
         for (WebElement element : elements) {
             list.add(element.getAttribute("value"));

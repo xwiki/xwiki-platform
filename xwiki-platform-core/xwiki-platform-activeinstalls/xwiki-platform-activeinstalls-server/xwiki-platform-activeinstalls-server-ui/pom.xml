@@ -29,6 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-activeinstalls-server-ui</artifactId>
   <name>XWiki Platform - Active Installs - Server - UI</name>
+  <description>Displays an Active Installs Dashboard and provide various visualizations</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->

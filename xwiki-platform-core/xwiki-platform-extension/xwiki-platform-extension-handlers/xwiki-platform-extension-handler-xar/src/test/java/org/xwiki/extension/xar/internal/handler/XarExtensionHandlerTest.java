@@ -31,6 +31,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.extension.ExtensionId;
@@ -244,11 +246,22 @@ public class XarExtensionHandlerTest
 
         MandatoryDocumentInitializer mandatoryInitializer =
             this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatory");
-        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
+        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<XWikiDocument>getArgument(0).setTitle("mandatory title");
+
+                return true;
+            }
+        });
         XWikiDocument mandatoryDocument = new XWikiDocument(new DocumentReference("wiki", "space", "mandatory"));
         mandatoryDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         mandatoryDocument.setSyntax(Syntax.PLAIN_1_0);
         mandatoryDocument.setContent("modified content");
+        mandatoryDocument.setTitle("mandatory title");
+        mandatoryDocument.setDefaultLocale(Locale.ENGLISH);
         this.oldcore.getSpyXWiki().saveDocument(mandatoryDocument, "", true, getXWikiContext());
 
         MandatoryDocumentInitializer mandatoryconfigurationInitializer = this.componentManager
@@ -395,6 +408,7 @@ public class XarExtensionHandlerTest
             .getDocument(new DocumentReference("wiki", "space", "mandatory"), getXWikiContext());
 
         Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
+        Assert.assertEquals("mandatory title", mandatorypage.getTitle());
 
         // space.mandatoryconfiguration
 

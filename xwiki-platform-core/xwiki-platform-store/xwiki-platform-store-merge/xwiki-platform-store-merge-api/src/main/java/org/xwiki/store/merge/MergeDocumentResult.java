@@ -70,8 +70,12 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
 
         /**
          * Merge of the locale.
+         * 
+         * @since 11.10.11
+         * @since 12.6.3
+         * @since 12.9RC1
          */
-        LOCALE,
+        DEFAULT_LOCALE,
 
         /**
          * Merge of the parent reference.

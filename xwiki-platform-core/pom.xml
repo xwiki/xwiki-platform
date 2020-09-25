@@ -142,6 +142,11 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.field.removed",
+                    "old": "field org.xwiki.store.merge.MergeDocumentResult.DocumentPart.LOCALE",
+                    "justification": "Young API and still not really used externally"
+                  },
                   // Add more ignores below...
                 ]
               }

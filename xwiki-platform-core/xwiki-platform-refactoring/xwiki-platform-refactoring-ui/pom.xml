@@ -29,5 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-refactoring-ui</artifactId>
   <name>XWiki Platform - Refactoring - UI</name>
+  <description>Administration UI for the refactoring operations</description>
   <packaging>xar</packaging>
 </project>

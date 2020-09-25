@@ -73,7 +73,7 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
          * 
          * @since 11.10.11
          * @since 12.6.3
-         * @since 12.9RC1
+         * @since 12.8
          */
         DEFAULT_LOCALE,
 

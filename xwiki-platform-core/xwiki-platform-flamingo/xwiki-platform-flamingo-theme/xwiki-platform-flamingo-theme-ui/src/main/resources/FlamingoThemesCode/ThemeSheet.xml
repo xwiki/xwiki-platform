@@ -586,10 +586,7 @@
   };
 
   $(document).ready(function() {
-    $('#refresh').click(function() {
-      // We refresh it in a thread to avoid blocking the browser.
-      setTimeout(refreshPreview, 0);
-    });
+    $('#refresh').click(refreshPreview);
 
     // Update the preview when the user modifies the LESS variables.
     $('#bt-variables').on('change', 'input, select', onLESSVariableChange);
@@ -601,10 +598,7 @@
     // a mutation observer) to make it trigger the "change" event.
     trackValueChange(logoFieldInput[0]);
 
-    createPreview().done(function() {
-      // Mark the theme editor as ready for user interaction.
-      $('#panel-theme-variables').attr('data-ready', true);
-    });
+    createPreview();
   });
 });</code>
     </property>

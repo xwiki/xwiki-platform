@@ -330,6 +330,13 @@
         <version>${keypress.version}</version>
         <scope>runtime</scope>
       </dependency>
+      <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>url-search-params-polyfill</artifactId>
+        <version>8.1.0</version>
+        <scope>runtime</scope>
+      </dependency>
 
       <!-- All Batik artifacts should be in sync -->
       <dependency>

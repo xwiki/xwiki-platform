@@ -52,6 +52,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>url-search-params-polyfill</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-script</artifactId>

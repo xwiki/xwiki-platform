@@ -126,13 +126,7 @@
               </item>
             </revapi.ignore>
             -->
-            <revapi.ignore>
-              <item>
-                <code>java.field.removed</code>
-                <old>field org.xwiki.store.merge.MergeDocumentResult.DocumentPart.LOCALE</old>
-                <justification>Young API and still not really used externally</justification>
-              </item>
-            </revapi.ignore>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

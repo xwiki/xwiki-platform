@@ -168,6 +168,9 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
                         }
 
                         dispatch(event);
+                    } catch (Exception e) {
+                        this.logger.error("Unexpected exception has been raison while dispatching event [{}]", event,
+                            e);
                     } finally {
                         // Get rid of current context
                         this.ecm.popContext();

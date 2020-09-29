@@ -157,14 +157,14 @@ public class LegacyEventMigrationJob
         List<Event> eventsToSave = getEventsToSave(events);
 
         // Save events
+        CompletableFuture<Event> future = null;
         for (Iterator<Event> it = eventsToSave.iterator(); it.hasNext();) {
-            Event event = it.next();
+            future = this.eventStore.saveEvent(it.next());
+        }
 
-            CompletableFuture<Event> future = this.eventStore.saveEvent(event);
-            if (!it.hasNext()) {
-                // Wait until the last event of the batch is saved
-                future.get();
-            }
+        // Wait until the last event of the batch is saved
+        if (future != null) {
+            future.get();
         }
 
         if (getRequest().isVerbose()) {

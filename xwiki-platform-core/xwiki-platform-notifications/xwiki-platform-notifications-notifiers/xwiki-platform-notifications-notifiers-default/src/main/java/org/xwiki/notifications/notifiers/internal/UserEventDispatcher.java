@@ -111,7 +111,9 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        this.queue = new LinkedBlockingQueue<>();
+        // Avoid letting the queue grow out of proportion (if it's full the other threads, generally the event store
+        // thread, will have to wait)
+        this.queue = new LinkedBlockingQueue<>(1000);
 
         // Start a background thread to filter and dispatch users events
         // Not making it a daemon thread because we don't want to loose events

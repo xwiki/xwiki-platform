@@ -1,0 +1,9 @@
+Package: xwiki-solr-like
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: 
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]

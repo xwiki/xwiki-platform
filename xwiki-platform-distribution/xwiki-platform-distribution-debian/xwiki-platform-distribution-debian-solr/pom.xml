@@ -35,5 +35,6 @@
     <module>xwiki-platform-distribution-debian-solr-events</module>
     <module>xwiki-platform-distribution-debian-solr-search</module>
     <module>xwiki-platform-distribution-debian-solr-all</module>
+    <module>xwiki-platform-distribution-debian-solr-like</module>
   </modules>
 </project>

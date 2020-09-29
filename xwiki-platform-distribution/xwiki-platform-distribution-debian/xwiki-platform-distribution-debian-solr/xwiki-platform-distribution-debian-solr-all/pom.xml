@@ -58,5 +58,12 @@
       <type>deb</type>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-debian-solr-like</artifactId>
+      <version>${project.version}</version>
+      <type>deb</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

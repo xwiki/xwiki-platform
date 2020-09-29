@@ -6,8 +6,8 @@ set -e
 if [ ! -d /var/lib/xwiki/ ]; then
   mkdir /var/lib/xwiki/
 fi
-if [ ! -d /var/lib/xwiki/solr-data/ ]; then
-  mkdir /var/lib/xwiki/solr-data/
+if [ ! -d /var/lib/xwiki/solr/ ]; then
+  mkdir /var/lib/xwiki/solr/
 fi
 
 # Make the default solr user ("solr") owner of the data folder

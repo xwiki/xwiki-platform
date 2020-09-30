@@ -1,4 +1,5 @@
 org.xwiki.notifications.notifiers.internal.DefaultModelBridge
+org.xwiki.notifications.notifiers.internal.PrefilterMissingEventsJob
 org.xwiki.notifications.notifiers.internal.UserEventDispatcher
 org.xwiki.notifications.notifiers.internal.UserEventDispatcherListener
 org.xwiki.notifications.notifiers.internal.UserEventManager

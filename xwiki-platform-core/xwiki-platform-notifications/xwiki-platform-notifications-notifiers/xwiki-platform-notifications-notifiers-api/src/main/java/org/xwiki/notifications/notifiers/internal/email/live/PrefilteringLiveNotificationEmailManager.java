@@ -83,7 +83,7 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
     {
         // Start the pre queue thread
         Thread optimizeThreadthread = new Thread(new ExecutionContextRunnable(this::prepare, this.componentManager));
-        optimizeThreadthread.setName("Pre filtering Live mail notification obtimizer");
+        optimizeThreadthread.setName("Pre filtering Live mail notification optimizer");
         optimizeThreadthread.setPriority(Thread.NORM_PRIORITY - 1);
         optimizeThreadthread.setDaemon(true);
         optimizeThreadthread.start();

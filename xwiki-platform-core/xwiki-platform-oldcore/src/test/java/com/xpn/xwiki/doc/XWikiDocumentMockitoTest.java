@@ -1311,19 +1311,29 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testCopyDocument() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument();
+        DocumentReference oldReference =
+            new DocumentReference(CLASS_REFERENCE.getWikiReference().getName(), "space1", "document1");
+        DocumentReference newReference =
+            new DocumentReference(CLASS_REFERENCE.getWikiReference().getName(), "space2", "document2");
+
+        XWikiDocument doc = new XWikiDocument(oldReference);
         doc.setTitle("Some title");
         BaseObject o = new BaseObject();
         o.setXClassReference(CLASS_REFERENCE);
         doc.addXObject(o);
+        doc.setLocale(Locale.ENGLISH);
 
-        XWikiDocument newDoc = doc.copyDocument("newdoc", this.oldcore.getXWikiContext());
+        XWikiDocument newDoc = doc.copyDocument(newReference, this.oldcore.getXWikiContext());
         BaseObject newO = newDoc.getXObject(CLASS_REFERENCE);
-
+        
         assertNotSame(o, newDoc.getXObject(CLASS_REFERENCE));
         assertFalse(newO.getGuid().equals(o.getGuid()));
         // Verify that the title is copied
         assertEquals("Some title", newDoc.getTitle());
+        assertEquals(Locale.ENGLISH, newDoc.getLocale());
+        assertEquals(newReference, newDoc.getDocumentReference());
+        assertEquals(new DocumentReference(newReference, Locale.ENGLISH),
+            newDoc.getDocumentReferenceWithLocale());
     }
 
     /**

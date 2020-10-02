@@ -77,13 +77,13 @@ public class DefaultRatingsManagerFactory implements RatingsManagerFactory
     }
 
     @Override
-    public RatingsManager getInstance(String hint) throws RatingsException
+    public RatingsManager getRatingsManager(String managerName) throws RatingsException
     {
         try {
             RatingsManager result;
-            if (!this.contextComponentManager.hasComponent(RatingsManager.class, hint)) {
+            if (!this.contextComponentManager.hasComponent(RatingsManager.class, managerName)) {
                 // step 2: retrieve the configuration
-                RatingsConfiguration ratingsConfiguration = this.getRatingConfiguration(hint);
+                RatingsConfiguration ratingsConfiguration = this.getRatingConfiguration(managerName);
 
                 // step 3: use the configuration information to retrieve the RatingManager and its descriptor.
                 ComponentDescriptor<RatingsManager> componentDescriptor = this.contextComponentManager
@@ -93,19 +93,19 @@ public class DefaultRatingsManagerFactory implements RatingsManagerFactory
 
                 // step 4: set the information of the RatingManager
                 result.setRatingConfiguration(ratingsConfiguration);
-                result.setIdentifer(hint);
+                result.setIdentifer(managerName);
 
                 // step 5: copy the descriptor and modifies the hint and the instantiation strategy
                 DefaultComponentDescriptor<RatingsManager> componentDescriptorCopy =
                     new DefaultComponentDescriptor<>(componentDescriptor);
-                componentDescriptorCopy.setRoleHint(hint);
+                componentDescriptorCopy.setRoleHint(managerName);
                 componentDescriptorCopy.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
 
                 // step 6: register it in the current component manager for next request.
                 this.currentComponentManager.registerComponent(componentDescriptorCopy, result);
             } else {
                 // step 1, return directly the component if it can be found.
-                result = this.contextComponentManager.getInstance(RatingsManager.class, hint);
+                result = this.contextComponentManager.getInstance(RatingsManager.class, managerName);
             }
             return result;
         } catch (ComponentLookupException | ComponentRepositoryException e) {

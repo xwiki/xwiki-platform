@@ -152,4 +152,16 @@ public interface AverageRatingManager
      * @throws RatingsException in case of problem during the operation.
      */
     AverageRating updateVote(EntityReference entityReference, int oldVote, int newVote) throws RatingsException;
+
+    /**
+     * Force resetting the data of average rating to the given value and saving them.
+     * This should be used in case of re-computation of the average rating.
+     *
+     * @param entityReference the reference of rated element.
+     * @param averageVote the new value of the average vote.
+     * @param totalVote the new value of the total numbers of vote.
+     * @return the modified AverageRating.
+     */
+    AverageRating resetAverageRating(EntityReference entityReference, float averageVote, int totalVote)
+        throws RatingsException;
 }

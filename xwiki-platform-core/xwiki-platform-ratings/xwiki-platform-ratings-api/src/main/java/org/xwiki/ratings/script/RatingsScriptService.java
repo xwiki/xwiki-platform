@@ -72,7 +72,7 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
     public void initialize() throws InitializationException
     {
         try {
-            setRatingsManager(this.ratingsManagerFactory.getInstance(RatingsManagerFactory.DEFAULT_APP_HINT));
+            setRatingsManager(this.ratingsManagerFactory.getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT));
         } catch (RatingsException e) {
             throw new InitializationException("Error when trying to retrieve the instance of RatingsManager", e);
         }
@@ -99,7 +99,7 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
             scriptRatingsManager = (DefaultScriptRatingsManager) executionContext.getProperty(executionContextCacheKey);
         } else {
             try {
-                RatingsManager ratingsManager = this.ratingsManagerFactory.getInstance(managerHint);
+                RatingsManager ratingsManager = this.ratingsManagerFactory.getRatingsManager(managerHint);
                 scriptRatingsManager = this.componentManager
                     .getInstance(DefaultScriptRatingsManager.class, managerHint);
                 scriptRatingsManager.setRatingsManager(ratingsManager);

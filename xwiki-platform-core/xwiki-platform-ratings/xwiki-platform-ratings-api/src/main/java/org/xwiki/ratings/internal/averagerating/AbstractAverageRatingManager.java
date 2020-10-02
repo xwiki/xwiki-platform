@@ -120,4 +120,17 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         averageRating.updateRating(oldVote, newVote);
         return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
     }
+
+    @Override
+    public AverageRating resetAverageRating(EntityReference entityReference, float averageVote, int totalVote)
+        throws RatingsException
+    {
+        AverageRating averageRating = getAverageRating(entityReference);
+        int oldTotalVote = averageRating.getNbVotes();
+        float oldAverageVote = averageRating.getAverageVote();
+        DefaultAverageRating defaultAverageRating = new DefaultAverageRating(averageRating);
+        defaultAverageRating.setAverageVote(averageVote);
+        defaultAverageRating.setTotalVote(totalVote);
+        return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+    }
 }

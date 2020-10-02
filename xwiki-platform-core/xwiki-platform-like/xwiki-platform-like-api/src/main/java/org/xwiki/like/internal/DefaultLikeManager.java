@@ -117,7 +117,7 @@ public class DefaultLikeManager implements LikeManager, Initializable
         }
 
         try {
-            this.ratingsManager = this.ratingsManagerFactory.getInstance(LikeRatingsConfiguration.RANKING_MANAGER_HINT);
+            this.ratingsManager = this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT);
         } catch (RatingsException e) {
             throw new InitializationException("Error while trying to get the RankingManager.", e);
         }

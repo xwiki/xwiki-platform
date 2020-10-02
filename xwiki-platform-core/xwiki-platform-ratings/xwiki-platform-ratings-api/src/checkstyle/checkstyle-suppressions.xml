@@ -25,7 +25,10 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress checks="FanOutComplexity" files="DefaultRatingsManager.java"/>
-  <suppress checks="CyclomaticComplexity" files="DefaultRatingsManager.java"/>
-  <suppress checks="ExecutableStatementCount" files="DefaultRatingsManager.java"/>
+  <suppress checks="FanOutComplexity" files="SolrRatingsManager.java"/>
+  <suppress checks="CyclomaticComplexity" files="SolrRatingsManager.java"/>
+  <suppress checks="ExecutableStatementCount" files="R120901000XWIKI17761DataMigration.java"/>
+  <suppress checks="CyclomaticComplexity" files="R120901000XWIKI17761DataMigration.java"/>
+  <suppress checks="NPathComplexity" files="R120901000XWIKI17761DataMigration.java"/>
+  <suppress checks="JavaNCSS" files="R120901000XWIKI17761DataMigration.java"/>
 </suppressions>

@@ -772,7 +772,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         try {
             RatingsManager ratingsManager = this.ratingsManagerFactory
-                .getInstance(RatingsManagerFactory.DEFAULT_APP_HINT);
+                .getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT);
             AverageRating averageRating = ratingsManager.getAverageRating(extensionDocumentReference);
             extensionRating.setTotalVotes(averageRating.getNbVotes());
             extensionRating.setAverageVote(averageRating.getAverageVote());

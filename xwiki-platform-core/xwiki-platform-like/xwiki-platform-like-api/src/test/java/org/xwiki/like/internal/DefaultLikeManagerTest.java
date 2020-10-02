@@ -136,7 +136,7 @@ public class DefaultLikeManagerTest
             }
         });
         this.ratingsManager = mock(RatingsManager.class);
-        when(this.ratingsManagerFactory.getInstance(LikeRatingsConfiguration.RANKING_MANAGER_HINT))
+        when(this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT))
             .thenReturn(this.ratingsManager);
     }
 

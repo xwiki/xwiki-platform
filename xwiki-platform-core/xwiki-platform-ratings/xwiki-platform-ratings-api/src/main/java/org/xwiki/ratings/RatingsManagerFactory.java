@@ -38,14 +38,14 @@ public interface RatingsManagerFactory
     String DEFAULT_APP_HINT = "ratings";
 
     /**
-     * Create or retrieve an instance of {@link RatingsManager} for the given hint.
-     * If the instance needs to be created, the {@link RatingsConfiguration} based on this hint will be used to create
-     * it. If there is no instance of {@link RatingsConfiguration} matching the given hint, the default implementation
-     * will be used.
+     * Create or retrieve an instance of {@link RatingsManager} for the given managerName.
+     * If the instance needs to be created, the {@link RatingsConfiguration} based on this managerName will be used to
+     * create it. If there is no instance of {@link RatingsConfiguration} matching the given managerName, the default
+     * implementation will be used.
      *
-     * @param hint an hint of an instance to create or retrieve.
-     * @return a {@link RatingsManager} identified with the given hint.
+     * @param managerName an managerName of an instance to create or retrieve.
+     * @return a {@link RatingsManager} identified with the given managerName.
      * @throws RatingsException in case of problem when creating or retrieving the component.
      */
-    RatingsManager getInstance(String hint) throws RatingsException;
+    RatingsManager getRatingsManager(String managerName) throws RatingsException;
 }

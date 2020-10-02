@@ -534,6 +534,29 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     }
 
     /**
+     * Delete a field in the Solr schema.
+     *
+     * @param fieldName the name of the field to delete.
+     * @param dynamic true if the field to delete is dynamic.
+     * @throws SolrException when failing to delete the field.
+     * @since 12.9RC1
+     */
+    @Unstable
+    protected void deleteField(String fieldName, boolean dynamic) throws SolrException
+    {
+        try {
+            if (dynamic) {
+                new SchemaRequest.DeleteDynamicField(fieldName).process(this.client);
+            } else {
+                new SchemaRequest.DeleteField(fieldName).process(this.client);
+            }
+        } catch (Exception e) {
+            throw new SolrException(
+                String.format("Failed to remove the field [%s] (dynamic: [%s])", fieldName, dynamic), e);
+        }
+    }
+
+    /**
      * Add or replace a field in the Solr schema.
      * <p>
      * String (UTF-8 encoded string or Unicode). Strings are intended for small fields and are not tokenized or analyzed

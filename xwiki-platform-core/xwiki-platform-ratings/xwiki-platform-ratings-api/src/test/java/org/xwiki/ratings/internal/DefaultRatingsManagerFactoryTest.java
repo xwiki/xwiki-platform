@@ -73,7 +73,7 @@ public class DefaultRatingsManagerFactoryTest
         when(this.contextComponentManager.hasComponent(RatingsManager.class, hint)).thenReturn(true);
         when(this.contextComponentManager.getInstance(RatingsManager.class, hint)).thenReturn(ratingsManager);
 
-        assertSame(ratingsManager, this.factory.getInstance(hint));
+        assertSame(ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager, never()).registerComponent(any(), any());
     }
 
@@ -89,15 +89,15 @@ public class DefaultRatingsManagerFactoryTest
         when(this.contextComponentManager.getInstance(RatingsManager.class, "someStorage"))
             .thenReturn(this.ratingsManager);
         ComponentDescriptor componentDescriptor = mock(ComponentDescriptor.class);
-        when(componentDescriptor.getImplementation()).thenReturn(DefaultRatingsManager.class);
+        when(componentDescriptor.getImplementation()).thenReturn(SolrRatingsManager.class);
         when(this.contextComponentManager.getComponentDescriptor(RatingsManager.class, "someStorage"))
             .thenReturn(componentDescriptor);
         DefaultComponentDescriptor<RatingsManager> expectedComponentDescriptor = new DefaultComponentDescriptor<>();
-        expectedComponentDescriptor.setImplementation(DefaultRatingsManager.class);
+        expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
 
-        assertSame(this.ratingsManager, this.factory.getInstance(hint));
+        assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);
     }
 
@@ -113,15 +113,15 @@ public class DefaultRatingsManagerFactoryTest
         when(this.contextComponentManager.getInstance(RatingsManager.class, "someStorage"))
             .thenReturn(this.ratingsManager);
         ComponentDescriptor componentDescriptor = mock(ComponentDescriptor.class);
-        when(componentDescriptor.getImplementation()).thenReturn(DefaultRatingsManager.class);
+        when(componentDescriptor.getImplementation()).thenReturn(SolrRatingsManager.class);
         when(this.contextComponentManager.getComponentDescriptor(RatingsManager.class, "someStorage"))
             .thenReturn(componentDescriptor);
         DefaultComponentDescriptor<RatingsManager> expectedComponentDescriptor = new DefaultComponentDescriptor<>();
-        expectedComponentDescriptor.setImplementation(DefaultRatingsManager.class);
+        expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
 
-        assertSame(this.ratingsManager, this.factory.getInstance(hint));
+        assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);
     }
 }

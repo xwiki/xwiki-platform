@@ -169,4 +169,24 @@ public interface RatingsManager
      * @throws RatingsException in case of problem during the query.
      */
     AverageRating getAverageRating(EntityReference entityReference) throws RatingsException;
+
+    /**
+     * This method performs a direct save of the rating specified in parameter.
+     * Note that this method does not take into account the {@link RatingsConfiguration#storeZero()} option and does not
+     * compute back the average. Finally no event is triggered when using this method.
+     * For those to be taken into account, please check {@link #saveRating(EntityReference, UserReference, int)}.
+     *
+     * @param rating a rating object to be saved.
+     */
+    void saveRating(Rating rating) throws RatingsException;
+
+    /**
+     * Compute back the average rating for all the ratings existing for the given reference.
+     * Note that this method might be resource consuming in case of large amount of data.
+     *
+     * @param entityReference the reference for which to compute back the ratings.
+     * @throws RatingsException in case of errors.
+     * @return the new average rating computed.
+     */
+    AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException;
 }

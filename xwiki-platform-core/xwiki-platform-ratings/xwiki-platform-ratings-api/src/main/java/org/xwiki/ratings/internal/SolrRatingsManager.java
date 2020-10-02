@@ -76,8 +76,13 @@ import org.xwiki.user.UserReferenceSerializer;
 @Component
 @Named("solr")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DefaultRatingsManager implements RatingsManager
+public class SolrRatingsManager implements RatingsManager
 {
+    private static final int AVERAGE_COMPUTATION_BATCH_SIZE = 100;
+
+    private static final String AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE =
+        "This rating manager is not configured to store average rating.";
+
     @Inject
     private SolrUtils solrUtils;
 
@@ -427,6 +432,48 @@ public class DefaultRatingsManager implements RatingsManager
     @Override
     public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
     {
-        return this.getAverageRatingManager().getAverageRating(entityReference);
+        if (this.getRatingConfiguration().storeAverage()) {
+            return this.getAverageRatingManager().getAverageRating(entityReference);
+        } else {
+            throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);
+        }
+    }
+
+    @Override
+    public void saveRating(Rating rating) throws RatingsException
+    {
+        SolrInputDocument solrInputDocument = this.getInputDocumentFromRating(rating);
+        try {
+            this.getRatingSolrClient().add(solrInputDocument);
+            this.getRatingSolrClient().commit();
+        } catch (SolrServerException | IOException | SolrException e) {
+            throw new RatingsException(String.format("Error when saving the given rating: [%s]", rating), e);
+        }
+    }
+
+    @Override
+    public AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
+    {
+        if (this.getRatingConfiguration().storeAverage()) {
+            Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
+            queryMap.put(RatingQueryField.ENTITY_REFERENCE, this.entityReferenceSerializer.serialize(entityReference));
+            queryMap.put(RatingQueryField.ENTITY_TYPE, entityReference.getType());
+
+            Long sumOfVotes = 0L;
+            int numberOfVotes = 0;
+            List<Rating> ratings;
+            do {
+                int offsetIndex = 0;
+                ratings = this.getRatings(queryMap, offsetIndex, AVERAGE_COMPUTATION_BATCH_SIZE,
+                    RatingQueryField.CREATED_DATE, true);
+                sumOfVotes += ratings.stream().map(Rating::getVote).map(Long::valueOf).reduce(0L, Long::sum);
+                numberOfVotes += ratings.size();
+            } while (!ratings.isEmpty());
+
+            float newAverage = sumOfVotes / numberOfVotes;
+            return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
+        } else {
+            throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);
+        }
     }
 }

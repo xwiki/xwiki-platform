@@ -50,7 +50,6 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager.RatingQueryField;
 import org.xwiki.ratings.events.CreatedRatingEvent;
 import org.xwiki.ratings.events.DeletedRatingEvent;
-import org.xwiki.ratings.events.UpdatedAverageRatingEvent;
 import org.xwiki.ratings.events.UpdatedRatingEvent;
 import org.xwiki.ratings.internal.averagerating.AverageRatingManager;
 import org.xwiki.ratings.internal.averagerating.DefaultAverageRating;
@@ -80,16 +79,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link DefaultRatingsManager}.
+ * Tests for {@link SolrRatingsManager}.
  *
  * @version $Id$
  * @since 12.8RC1
  */
 @ComponentTest
-public class DefaultRatingsManagerTest
+public class SolrRatingsManagerTest
 {
     @InjectMockComponents
-    private DefaultRatingsManager manager;
+    private SolrRatingsManager manager;
 
     @MockComponent
     private SolrUtils solrUtils;
@@ -321,6 +320,7 @@ public class DefaultRatingsManagerTest
             .setScale(12)
             .setReference(reference);
         when(this.averageRatingManager.getAverageRating(reference)).thenReturn(expectedAverageRating);
+        when(this.configuration.storeAverage()).thenReturn(true);
 
         AverageRating averageRating = this.manager.getAverageRating(reference);
         assertEquals(expectedAverageRating, averageRating);

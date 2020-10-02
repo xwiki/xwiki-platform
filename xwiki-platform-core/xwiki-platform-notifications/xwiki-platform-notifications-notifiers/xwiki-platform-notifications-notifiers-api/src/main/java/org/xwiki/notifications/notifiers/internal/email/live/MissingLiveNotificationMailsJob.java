@@ -51,7 +51,7 @@ public class MissingLiveNotificationMailsJob
     /**
      * The id of the job.
      */
-    public static final String JOBTYPE = "notificatiion.livemails.resume";
+    public static final String JOBTYPE = "notification.livemails.resume";
 
     @Inject
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;

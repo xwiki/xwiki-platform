@@ -19,35 +19,31 @@
  */
 package org.xwiki.refactoring.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Provides configuration from the {@code Refactoring.Code.RefactoringConfigurationClass} document in the current wiki.
- * If the {@code Refactoring.Code.RefactoringConfigurationClass} xobject exists in the
- * {@code Refactoring.Code.RefactoringConfiguration} document then always use configuration values from it and if it
- * doesn't then use the passed default value.
+ * Provides configuration from the {@code Refactoring.Code.RefactoringConfiguration} document.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
-@Component
-@Singleton
-@Named("refactoring")
-public class RefactoringConfigurationSource extends AbstractRefactoringConfigurationSource
+public abstract class AbstractRefactoringConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    @Override
-    protected DocumentReference getDocumentReference()
-    {
-        return new DocumentReference(DOCUMENT_REFERENCE, this.getCurrentWikiReference());
-    }
+    protected static final List<String> SPACE_NAMES = Arrays.asList("Refactoring", "Code");
+
+    protected static final LocalDocumentReference DOCUMENT_REFERENCE =
+        new LocalDocumentReference(SPACE_NAMES, "RefactoringConfiguration");
+
+    private static final LocalDocumentReference CLASS_REFERENCE =
+        new LocalDocumentReference(SPACE_NAMES, "RefactoringConfigurationClass");
 
     @Override
-    protected String getCacheId()
+    protected LocalDocumentReference getClassReference()
     {
-        return "configuration.document.refactoring";
+        return CLASS_REFERENCE;
     }
 }

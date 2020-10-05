@@ -676,4 +676,29 @@ class DefaultLinkRefactoringTest
             assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
         }
     }
+
+    @Test
+    void renameLinksBlockRendererNotFound() throws XWikiException
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "XWiki", "new");
+
+        XWiki xWiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(xWiki);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xWiki.getDocument(newReference, this.xcontext)).thenReturn(document);
+
+        ComponentManager componentManager = mock(ComponentManager.class);
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+        when(document.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(componentManager.hasComponent(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
+            .thenReturn(false);
+
+        DocumentReference oldReference = new DocumentReference("xwiki", "XWiki", "old");
+        this.refactoring.updateRelativeLinks(oldReference, newReference);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("We can't rename the links from [null] because there is no renderer available for its "
+                         + "syntax [Markdown 1.1].", this.logCapture.getMessage(0));
+    }
 }

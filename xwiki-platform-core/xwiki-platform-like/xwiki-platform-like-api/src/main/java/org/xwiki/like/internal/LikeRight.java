@@ -73,7 +73,7 @@ public final class LikeRight implements RightDescription
     @Override
     public Set<Right> getImpliedRights()
     {
-        return Collections.EMPTY_SET;
+        return null;
     }
 
     @Override

@@ -27,8 +27,5 @@
 <suppressions>
   <suppress checks="FanOutComplexity" files="SolrRatingsManager.java"/>
   <suppress checks="CyclomaticComplexity" files="SolrRatingsManager.java"/>
-  <suppress checks="ExecutableStatementCount" files="R120901000XWIKI17761DataMigration.java"/>
-  <suppress checks="CyclomaticComplexity" files="R120901000XWIKI17761DataMigration.java"/>
-  <suppress checks="NPathComplexity" files="R120901000XWIKI17761DataMigration.java"/>
-  <suppress checks="JavaNCSS" files="R120901000XWIKI17761DataMigration.java"/>
+  <suppress checks="FanOutComplexity" files="R120901000XWIKI17761DataMigration.java"/>
 </suppressions>

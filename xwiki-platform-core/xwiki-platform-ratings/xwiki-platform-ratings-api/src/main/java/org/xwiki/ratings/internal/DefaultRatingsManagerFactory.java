@@ -42,7 +42,7 @@ import org.xwiki.ratings.RatingsManagerFactory;
  *      if there is one. If there is not, it performs the following steps.
  *   2. it retrieves the {@link RatingsConfiguration} based on the given hint, and fallback on the default one if it
  *      cannot find it.
- *   3. it retrieves an instance of a {@link RatingsManager} based on the {@link RatingsConfiguration#getStorageHint()}
+ *   3. it retrieves an instance of a {@link RatingsManager} based on the {@link RatingsConfiguration#getRatingsStorageHint()}
  *   4. it set in the newly instance of {@link RatingsManager} some information such as its identifiers
  *      and configuration
  *   5. it creates a new {@link ComponentDescriptor} by copying the descriptor of the retrieved
@@ -87,9 +87,9 @@ public class DefaultRatingsManagerFactory implements RatingsManagerFactory
 
                 // step 3: use the configuration information to retrieve the RatingManager and its descriptor.
                 ComponentDescriptor<RatingsManager> componentDescriptor = this.contextComponentManager
-                    .getComponentDescriptor(RatingsManager.class, ratingsConfiguration.getStorageHint());
+                    .getComponentDescriptor(RatingsManager.class, ratingsConfiguration.getRatingsStorageHint());
                 result = this.contextComponentManager.getInstance(RatingsManager.class,
-                    ratingsConfiguration.getStorageHint());
+                    ratingsConfiguration.getRatingsStorageHint());
 
                 // step 4: set the information of the RatingManager
                 result.setRatingConfiguration(ratingsConfiguration);

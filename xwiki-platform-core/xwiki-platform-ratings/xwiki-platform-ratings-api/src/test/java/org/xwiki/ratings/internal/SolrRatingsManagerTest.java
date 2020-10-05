@@ -82,7 +82,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link SolrRatingsManager}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
 @ComponentTest
 public class SolrRatingsManagerTest
@@ -282,7 +282,7 @@ public class SolrRatingsManagerTest
                 .setVote(8)
                 .setReference(reference1)
                 .setAuthor(userReference)
-                .setScale(10),
+                .setScaleUpperBound(10),
 
             new DefaultRating("result2")
                 .setManagerId("otherId")
@@ -291,7 +291,7 @@ public class SolrRatingsManagerTest
                 .setVote(1)
                 .setReference(reference2)
                 .setAuthor(userReference)
-                .setScale(10),
+                .setScaleUpperBound(10),
 
             new DefaultRating("result3")
                 .setManagerId("otherId")
@@ -300,7 +300,7 @@ public class SolrRatingsManagerTest
                 .setVote(3)
                 .setReference(reference3)
                 .setAuthor(userReference)
-                .setScale(10)
+                .setScaleUpperBound(10)
         );
         assertEquals(expectedRatings,
             this.manager.getRatings(queryParameters, offset, limit, RatingQueryField.USER_REFERENCE, asc));
@@ -317,10 +317,10 @@ public class SolrRatingsManagerTest
             .setTotalVote(242)
             .setUpdatedAt(new Date(42))
             .setManagerId(managerId)
-            .setScale(12)
+            .setScaleUpperBound(12)
             .setReference(reference);
         when(this.averageRatingManager.getAverageRating(reference)).thenReturn(expectedAverageRating);
-        when(this.configuration.storeAverage()).thenReturn(true);
+        when(this.configuration.isAverageStored()).thenReturn(true);
 
         AverageRating averageRating = this.manager.getAverageRating(reference);
         assertEquals(expectedAverageRating, averageRating);
@@ -390,24 +390,24 @@ public class SolrRatingsManagerTest
             .setCreatedAt(new Date(1))
             .setUpdatedAt(new Date(1111))
             .setAuthor(userReference)
-            .setScale(10)
+            .setScaleUpperBound(10)
             .setVote(8);
 
         // Average rating handling
-        when(this.configuration.storeAverage()).thenReturn(true);
+        when(this.configuration.isAverageStored()).thenReturn(true);
 
         assertTrue(this.manager.removeRating(ratingingId));
         verify(this.solrClient).deleteById(ratingingId);
         verify(this.solrClient).commit();
         verify(this.observationManager).notify(any(DeletedRatingEvent.class), eq(managerId), eq(rating));
-        verify(this.configuration).storeAverage();
+        verify(this.configuration).isAverageStored();
         verify(this.averageRatingManager).removeVote(reference1, 8);
     }
 
     @Test
     void saveRatingOutScale()
     {
-        when(this.configuration.getScale()).thenReturn(5);
+        when(this.configuration.getScaleUpperBound()).thenReturn(5);
         this.manager.setIdentifer("saveRating1");
         RatingsException exception = assertThrows(RatingsException.class, () -> {
             this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), -1);
@@ -426,7 +426,7 @@ public class SolrRatingsManagerTest
         String managerId = "saveRating2";
         this.manager.setIdentifer(managerId);
         int scale = 10;
-        when(this.configuration.getScale()).thenReturn(scale);
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
         EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
         when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
         when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
@@ -450,13 +450,13 @@ public class SolrRatingsManagerTest
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
 
         // Check if we don't store 0
-        when(this.configuration.storeZero()).thenReturn(false);
+        when(this.configuration.isZeroStored()).thenReturn(false);
         assertNull(this.manager.saveRating(reference, userReference, 0));
 
         // Check if we store 0
-        when(this.configuration.storeZero()).thenReturn(true);
+        when(this.configuration.isZeroStored()).thenReturn(true);
         // Handle Average rating
-        when(this.configuration.storeAverage()).thenReturn(true);
+        when(this.configuration.isAverageStored()).thenReturn(true);
 
         DefaultRating expectedRating = new DefaultRating("")
             .setManagerId(managerId)
@@ -464,7 +464,7 @@ public class SolrRatingsManagerTest
             .setCreatedAt(new Date())
             .setUpdatedAt(new Date())
             .setVote(0)
-            .setScale(scale)
+            .setScaleUpperBound(scale)
             .setAuthor(userReference);
 
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
@@ -511,7 +511,7 @@ public class SolrRatingsManagerTest
         int scale = 8;
         int newVote = 2;
         int oldVote = 3;
-        when(this.configuration.getScale()).thenReturn(scale);
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
         EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
         when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
         when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
@@ -548,10 +548,10 @@ public class SolrRatingsManagerTest
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
 
-        when(this.configuration.storeZero()).thenReturn(false);
+        when(this.configuration.isZeroStored()).thenReturn(false);
 
         // Handle Average rating
-        when(this.configuration.storeAverage()).thenReturn(true);
+        when(this.configuration.isAverageStored()).thenReturn(true);
 
         DefaultRating expectedRating = new DefaultRating("myRating")
             .setManagerId(managerId)
@@ -559,7 +559,7 @@ public class SolrRatingsManagerTest
             .setCreatedAt(new Date(422))
             .setUpdatedAt(new Date())
             .setVote(newVote)
-            .setScale(scale)
+            .setScaleUpperBound(scale)
             .setAuthor(userReference);
 
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
@@ -601,7 +601,7 @@ public class SolrRatingsManagerTest
         int scale = 8;
         int newVote = 0;
         int oldVote = 3;
-        when(this.configuration.getScale()).thenReturn(scale);
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
         EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
         when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
         when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
@@ -640,7 +640,7 @@ public class SolrRatingsManagerTest
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
 
         // Handle Average rating
-        when(this.configuration.storeAverage()).thenReturn(true);
+        when(this.configuration.isAverageStored()).thenReturn(true);
 
         DefaultRating oldRating = new DefaultRating("myRating")
             .setManagerId(managerId)
@@ -648,7 +648,7 @@ public class SolrRatingsManagerTest
             .setCreatedAt(new Date(422))
             .setUpdatedAt(new Date(422))
             .setVote(oldVote)
-            .setScale(scale)
+            .setScaleUpperBound(scale)
             .setAuthor(userReference);
 
         filterQuery = "filter(id:myRating) AND filter(managerId:saveRating4)";
@@ -679,7 +679,7 @@ public class SolrRatingsManagerTest
         });
         when(response.getResults()).thenReturn(this.documentList);
 
-        when(this.configuration.storeZero()).thenReturn(true);
+        when(this.configuration.isZeroStored()).thenReturn(true);
         assertNull(this.manager.saveRating(reference, userReference, newVote));
         verify(this.solrClient, never()).add(any(SolrInputDocument.class));
         verify(this.solrClient).deleteById("myRating");

@@ -83,7 +83,7 @@ public abstract class AbstractScriptRatingsManager
      * @param reference the reference for which to save a rating.
      * @param vote the rating to save.
      * @return an optional containing the {@link Rating} value, or empty in case of problem or if the rating is 0 and
-     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#storeZero()}).
+     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#isZeroStored()}).
      */
     public Optional<Rating> setRating(EntityReference reference, int vote)
     {
@@ -97,19 +97,22 @@ public abstract class AbstractScriptRatingsManager
      * @param userReference the reference of the user who performs the rating.
      * @param vote the rating to save.
      * @return an optional containing the {@link Rating} value, or empty in case of problem or if the rating is 0 and
-     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#storeZero()}).
+     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#isZeroStored()}).
      */
     public Optional<Rating> setRating(EntityReference reference, UserReference userReference, int vote)
     {
-        try {
-            Rating rating = this.ratingsManager.saveRating(reference, userReference, vote);
-            if (rating != null) {
-                return Optional.of(rating);
+        Optional<Rating> result = Optional.empty();
+        if (!this.isExcludedFromRatings(reference)) {
+            try {
+                Rating rating = this.ratingsManager.saveRating(reference, userReference, vote);
+                if (rating != null) {
+                    result = Optional.of(rating);
+                }
+            } catch (RatingsException e) {
+                logger.error("Error while trying to rate reference [{}].", reference, ExceptionUtils.getRootCause(e));
             }
-        } catch (RatingsException e) {
-            logger.error("Error while trying to rate reference [{}].", reference, ExceptionUtils.getRootCause(e));
         }
-        return Optional.empty();
+        return result;
     }
 
     /**
@@ -214,6 +217,36 @@ public abstract class AbstractScriptRatingsManager
                 ExceptionUtils.getRootCause(e));
             result = Collections.emptyList();
         }
+        return result;
+    }
+
+    /**
+     * @return the current configuration.
+     */
+    public RatingsConfiguration getConfiguration()
+    {
+        return this.ratingsManager.getRatingConfiguration();
+    }
+
+    /**
+     * Define if the given reference is excluded from ratings.
+     *
+     * @param entityReference the reference to check.
+     * @return {@code true} only if the given reference is excluded from ratings.
+     */
+    public boolean isExcludedFromRatings(EntityReference entityReference)
+    {
+        boolean result = false;
+
+        for (EntityReference excludedReference : this.ratingsManager.getRatingConfiguration()
+            .getExcludedReferencesFromRatings()) {
+            if (entityReference.equals(excludedReference) || entityReference.hasParent(excludedReference))
+            {
+                result = true;
+                break;
+            }
+        }
+
         return result;
     }
 }

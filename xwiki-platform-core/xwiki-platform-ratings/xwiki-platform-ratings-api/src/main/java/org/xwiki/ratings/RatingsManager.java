@@ -103,11 +103,11 @@ public interface RatingsManager
      * If an existing rank has already been saved by the same user on the same reference, then this method updates the
      * existing value.
      * This method should check that the given grade matches the scale of the manager.
-     * It should also take into account the {@link RatingsConfiguration#storeZero()} configuration to handle case when
+     * It should also take into account the {@link RatingsConfiguration#isZeroStored()} configuration to handle case when
      * the grade is equal to 0. The method returns null if the grade is equal to 0 and the configuration doesn't allow
      * to store it, but it might perform storage side effect (such as removing a previous {@link Rating} information).
      * This method also handles the computation of {@link AverageRating} if the
-     * {@link RatingsConfiguration#storeAverage()} configuration is set to true.
+     * {@link RatingsConfiguration#isAverageStored()} configuration is set to true.
      * Note that this method should also handle sending the appropriate
      * {@link CreatedRatingEvent} and {@link UpdatedRatingEvent}.
      *
@@ -153,7 +153,7 @@ public interface RatingsManager
     /**
      * Remove a rating based on its identifier.
      * This method also performs an update of the {@link AverageRating} if the
-     * {@link RatingsConfiguration#storeAverage()} is enabled.
+     * {@link RatingsConfiguration#isAverageStored()} is enabled.
      *
      * @param ratingIdentifier the ranking identifier to remove.
      * @return {@code true} if a rating is deleted, {@code false} if no rating with the given identifier can be found.
@@ -172,7 +172,7 @@ public interface RatingsManager
 
     /**
      * This method performs a direct save of the rating specified in parameter.
-     * Note that this method does not take into account the {@link RatingsConfiguration#storeZero()} option and does not
+     * Note that this method does not take into account the {@link RatingsConfiguration#isZeroStored()} option and does not
      * compute back the average. Finally no event is triggered when using this method.
      * For those to be taken into account, please check {@link #saveRating(EntityReference, UserReference, int)}.
      *

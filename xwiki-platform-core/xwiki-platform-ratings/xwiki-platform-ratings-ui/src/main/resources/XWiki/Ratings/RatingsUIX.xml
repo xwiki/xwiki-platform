@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Ratings" locale="">
-  <web>XWiki</web>
-  <name>Ratings</name>
+<xwikidoc version="1.4" reference="XWiki.Ratings.RatingsUIX" locale="">
+  <web>XWiki.Ratings</web>
+  <name>RatingsUIX</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Main.WebHome</parent>
+  <parent>XWiki.Ratings.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,43 +36,47 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="XWiki.RatingsMacros"/}}
+  <content>{{include reference="XWiki.Ratings.RatingsMacros"/}}
 
 {{velocity}}
-#if("$!{request.xpage}" == "plain")
-  #if("$!{request.vote}" != "")
-    #set($requestDocRef = $services.model.resolveDocument($request.doc))
-    #set($userDocRef = $xcontext.getUserReference())
-    #set($vote = $numbertool.toNumber($request.vote).intValue())
-    #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
-      #set($ok = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
-      #if($ok) 
-        #if("$!{request.method}" != "")
-          #set($ar = $services.ratings.getAverageRating($requestDocRef, $request.method))
-        #else
-          #set($ar = $services.ratings.getAverageRating($requestDocRef))
-        #end
-        #set($avgvote = $ar.averageVote)
-        #set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef))
-        #set($nbVotes = $ar.nbVotes)
-       $response.setContentType('application/json')
-       {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }
-      #else 
-        {{translation key="rating.saveexception"/}}
+#if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; "$!{request.vote}" != "" &amp;&amp; "$!{request.doc}" != "" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+  #set ($requestDocRef = $services.model.resolveDocument($request.doc))
+  #set ($userDocRef = $xcontext.getUserReference())
+  #set ($vote = $numbertool.toNumber($request.vote).intValue())
+  #set ($config = $services.ratings.configuration)
+  #if ($vote &gt; 0 &amp;&amp; $vote &lt;= $config.scaleUpperBound)
+    #set ($optRating = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
+    #if ($optRating.isPresent())
+      #set ($uservote = $optRating.get())
+      #set ($optAverageRating = $services.ratings.getAverageRating($requestDocRef))
+      #if ($optAverageRating.isPresent())
+        #set ($averageRating = $optAverageRating.get())
+        #set ($averageVote = $averageRating.averageVote)
+        #set ($nbVotes = $averageRating.nbVotes)
+        #set ($data = {
+          "avgvote": "${averageVote}",
+          "uservote": "${uservote.vote}",
+          "totalvotes": "${nbVotes}"
+        })
+        #jsonResponse($data)
+      #else
+        #jsonResponse({"uservote": "${uservote.vote}"})
       #end
-    #elseif($vote == 0)
-      {{translation key="rating.votenotvalid"/}}
     #else
-      {{translation key="rating.voteoutofbounds"/}}
+      {{translation key="rating.saveexception"/}}
     #end
+  #elseif ($vote == 0)
+    {{translation key="rating.votenotvalid"/}}
+  #else
+    {{translation key="rating.voteoutofbounds"/}}
   #end
 #end
 {{/velocity}}</content>
   <object>
-    <name>XWiki.Ratings</name>
+    <name>XWiki.Ratings.RatingsUIX</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>70a8d5ac-906d-4701-b7fd-8837d804740b</guid>
+    <guid>3b70748c-fbc3-4bb9-8fc2-e4fbb97fad65</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -84,8 +88,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -133,6 +140,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -150,95 +159,86 @@
       <cache>default</cache>
     </property>
     <property>
-      <code>function setVote(ulel, url, i) 
-{
- return function() 
- {
-   url = url + "&amp;vote=" + i; 
-   new Ajax.Request(url, 
-   {
-    method: 'get',
-    onSuccess: function(transport)
-    {
-      var values = transport.responseText.evalJSON();
-      
-      var avgvote = values.avgvote;
-      var uservote = values.uservote;
-      var totalvotes = values.totalvotes;
+      <code>require(['jquery', 'xwiki-meta'], function($, xm) {
+  'use strict';
+  const messages = ["$services.localization.render("rating.one-star")","$services.localization.render("rating.two-stars")","$services.localization.render("rating.three-stars")","$services.localization.render("rating.four-stars")","$services.localization.render("rating.five-stars")"];
+  const postURL = new XWiki.Document('RatingsUIX', 'XWiki.Ratings').getURL('get');
 
-      if( (avgvote = parseFloat(avgvote)) ) {
-        var w = avgvote * 20;
-        ulel.down("li.current-rating").style.width = w + "%";
+  var setVote = function (wrapper, reference, vote) {
+    var notification = new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('rating.setvote.inprogress')),
+          'inprogress'
+        );
+    $.post(postURL, {
+      "outputSyntax": "plain",
+      "vote": vote,
+      "doc": reference,
+      "form_token": xm.form_token
+    }).done(function (data) {
+      var averageVote = data.avgvote;
+      var userVote = data.uservote;
+      var totalVotes = data.totalvotes;
+      if ((averageVote = parseFloat(averageVote))) {
+        var width = averageVote * 20 + "%";
+        wrapper.find('li.current-rating').first().width(width)
+        notification.replace(new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('rating.setvote.success')),
+          'done'
+        ));
+      } else {
+        notification.replace(new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('rating.setvote.error')),
+          'error'
+        ));
       }
-      else {
-       alert(transport.responseText); //TODO proper error handling
+    }).fail(function (data) {
+      notification.replace(new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('rating.setvote.error')) + " " + data,
+          'error'
+        ));
+    });
+  };
+  
+  var initLink = function (index, element, msgDiv, reference, wrapper) {
+    var link = $(element);
+    msgDiv.previousMessage = "";
+    link.on('click', function() { setVote(wrapper, reference, index + 1); });
+    link.on('mouseout', function () {
+      if (msgDiv.previousMessage != "") {
+        msgDiv.text(msgDiv.previousMessage);
       }
-
-      var id = ulel.up('.rating-container').id;
-      var msgdiv = $(id).down(".rating-message");
-      if (msgdiv.prevmsg!="") {
-       msgdiv.innerHTML =  msgdiv.prevmsg;
-       msgdiv.prevmsg = "";
+    });
+    link.on('mouseover', function () {
+      if (msgDiv.previousMessage == "") {
+        msgDiv.previousMessage = msgDiv.text();
       }
-      msgdiv.down("span").innerHTML = totalvotes;
-     
-      if( (uservote = parseInt(uservote)) ) {
-        var w = uservote * 20;
-        $(id + "-user").down('.star-rating').down("li.current-rating").style.width = w + "%";
+      msgDiv.text(messages[index]);
+    });
+  };
+  
+  var initRating = function () {
+    var ratingWrapper = $(this);
+    // Augment only the ratings which are not locked
+    if (!ratingWrapper.hasClass('locked') &amp;&amp; !ratingWrapper.hasClass('initialized')) {
+      var reference = ratingWrapper.data('reference');
+      var msgDiv = ratingWrapper.find('.rating-message').first();
+      if (reference) {
+        ratingWrapper.find('.star-rating').first().find('a').each(function (index, element) {
+          initLink(index, element, msgDiv, reference, ratingWrapper);
+        });
       }
-      else {
-       alert(transport.responseText); //TODO proper error handling
-      }     
+      ratingWrapper.addClass('initialized');
     }
-   });
- }
-}
+  };
 
-function showMsg(msgdiv, i) 
-{
- return function() 
- {
-   if (msgdiv.prevmsg=="")
-    msgdiv.prevmsg = msgdiv.innerHTML;
-   var msgs = ["$services.localization.render("rating.one-star")", "$services.localization.render("rating.two-stars")", "$services.localization.render("rating.three-stars")", "$services.localization.render("rating.four-stars")", "$services.localization.render("rating.five-stars")"];
-   msgdiv.update(msgs[i]);
- }
-}
-
-function hideMsg(msgdiv) 
-{
- return function() 
- {
-   if (msgdiv.prevmsg != "")
-    msgdiv.update(msgdiv.prevmsg);
- }
-}
-
-document.observe("dom:loaded", function() 
-{ 
-  $$('.star-rating').each(function(el) 
+  var init = function ()
   {
-     if(! el.hasClassName('locked')) 
-     {
-       var id = el.up('.rating-wrapper').id;
-       var PREFIX = 'rating-';
-       if (id &amp;&amp; id.indexOf(PREFIX) == 0)
-       {
-         id = id.substring(PREFIX.length);
-         var queryString = Object.toQueryString({ xpage: 'plain', outputSyntax: 'plain', doc: id });
-         var url = new XWiki.Document('Ratings', 'XWiki').getURL('view', queryString);
-         var msgdiv = el.up('.rating-container').down('.rating-message');
+    console.log($(".rating-wrapper"));
+    $(".rating-wrapper").each(initRating);
+  };
 
-         el.select('a').each(function(astar, i)
-         {
-            Event.observe(astar, 'click', setVote(el, url, i + 1));
-            msgdiv.prevmsg = "";
-            Event.observe(astar, 'mouseover', showMsg(msgdiv, i));
-            Event.observe(astar, 'mouseout', hideMsg(msgdiv));
-         });
-       }
-     }
-  }); 
+  $(document).ready(init);
+  $(document).on('xwiki:dom:updated', init);
 });</code>
     </property>
     <property>
@@ -252,7 +252,7 @@ document.observe("dom:loaded", function()
     </property>
   </object>
   <object>
-    <name>XWiki.Ratings</name>
+    <name>XWiki.Ratings.RatingsUIX</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>619a1d7d-5944-4a4a-97b0-e006452b0f44</guid>
@@ -267,8 +267,11 @@ document.observe("dom:loaded", function()
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -297,6 +300,8 @@ document.observe("dom:loaded", function()
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -332,6 +337,8 @@ document.observe("dom:loaded", function()
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -346,7 +353,7 @@ document.observe("dom:loaded", function()
       </use>
     </class>
     <property>
-      <cache>default</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>/* ratings */
@@ -373,14 +380,14 @@ position: relative;
       <name>Ratings CSS</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>always</use>
     </property>
   </object>
   <object>
-    <name>XWiki.Ratings</name>
+    <name>XWiki.Ratings.RatingsUIX</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
@@ -393,21 +400,61 @@ position: relative;
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <content>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
       <extensionPointId>
         <disabled>0</disabled>
         <name>extensionPointId</name>
-        <number>1</number>
+        <number>5</number>
         <prettyName>Extension Point ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -416,7 +463,7 @@ position: relative;
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>6</number>
         <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -427,7 +474,7 @@ position: relative;
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>parameters</name>
-        <number>4</number>
+        <number>7</number>
         <prettyName>Extension Parameters</prettyName>
         <rows>10</rows>
         <size>40</size>
@@ -438,9 +485,11 @@ position: relative;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
-        <number>5</number>
+        <number>8</number>
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -452,24 +501,26 @@ position: relative;
       </scope>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <content>{{velocity}}
-#set($canView = $services.security.authorization.hasAccess('view', 'XWiki.RatingsMacros'))
+#set($canView = $services.security.authorization.hasAccess('view', 'XWiki.Ratings.RatingsMacros'))
 #if($canView)
-  {{include reference='XWiki.RatingsMacros'/}}
+  {{include reference='XWiki.Ratings.RatingsMacros'/}}
 #end
 {{/velocity}}
 
 {{velocity}}
 #if($canView)
-  #set($configurationDoc = $services.ratings.getConfigurationDocument($doc.documentReference))
-  #set($configurationObj = $configurationDoc.getObject('XWiki.RatingsConfigClass'))
-  ##
-  #set($displayRatings = $configurationObj.getProperty('displayRatings').value == 1)
-  #set($excludedPages  = $stringtool.split($configurationObj.getProperty('excludedPages').value, ','))
-  #set($excludedPages  = $stringtool.stripAll($excludedPages))
-  ##
-  #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.documentReference.name))
-    #displayFullRating($doc.getDocumentReference() '')
+  #if($services.ratings.configuration.isEnabled() &amp;&amp; !$services.ratings.isExcludedFromRatings($doc.getDocumentReference()))
+    #displayFullRating($doc.getDocumentReference())
   #end
 #end
 {{/velocity}}</content>
@@ -478,7 +529,7 @@ position: relative;
       <extensionPointId>org.xwiki.platform.template.title.before</extensionPointId>
     </property>
     <property>
-      <name>xwiki:XWiki.Ratings</name>
+      <name>xwiki:XWiki.Ratings.RatingsUIX</name>
     </property>
     <property>
       <parameters>label=Ratings

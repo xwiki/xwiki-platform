@@ -19,19 +19,28 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.Collections;
+
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Tests for {@link DefaultRatingsConfiguration}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
 @ComponentTest
 public class DefaultRatingsConfigurationTest
@@ -39,13 +48,22 @@ public class DefaultRatingsConfigurationTest
     @InjectMockComponents
     private DefaultRatingsConfiguration configuration;
 
+    @MockComponent
+    @Named("ratings")
+    private ConfigurationSource configurationSource;
+
     @Test
     void defaultValues()
     {
-        assertEquals("solr", configuration.getStorageHint());
-        assertTrue(configuration.storeZero());
+        when(this.configurationSource.getProperty(any(String.class), any(Object.class)))
+            .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(1));
+        assertEquals("solr", configuration.getRatingsStorageHint());
+        assertEquals("xobject", configuration.getAverageRatingStorageHint());
+        assertTrue(configuration.isZeroStored());
         assertFalse(configuration.hasDedicatedCore());
-        assertEquals(5, configuration.getScale());
-        assertTrue(configuration.storeAverage());
+        assertEquals(5, configuration.getScaleUpperBound());
+        assertTrue(configuration.isAverageStored());
+        assertTrue(configuration.isEnabled());
+        assertEquals(Collections.emptySet(), configuration.getExcludedReferencesFromRatings());
     }
 }

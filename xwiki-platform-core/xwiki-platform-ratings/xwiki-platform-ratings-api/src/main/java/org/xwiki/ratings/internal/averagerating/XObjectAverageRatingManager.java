@@ -134,7 +134,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
             .setAverageVote(averageVote)
             .setTotalVote(totalVote)
             .setUpdatedAt(updatedDate)
-            .setScale(scale);
+            .setScaleUpperBound(scale);
     }
 
     @Override

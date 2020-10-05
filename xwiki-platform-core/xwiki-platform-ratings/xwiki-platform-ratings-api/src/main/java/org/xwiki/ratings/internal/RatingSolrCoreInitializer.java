@@ -19,28 +19,19 @@
  */
 package org.xwiki.ratings.internal;
 
-import java.io.IOException;
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.ratings.internal.migration.SolrDocumentMigration120900000;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
-import org.xwiki.search.solr.SolrUtils;
 
 /**
  * Solr core initializer for the rating informations.
@@ -61,29 +52,16 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
     private static final long CURRENT_VERSION = 120900000;
 
     /**
-     * Number of documents to consider at once for migration.
-     */
-    private static final int BATCH_MIGRATION_SIZE = 100;
-
-    /**
-     * Used to migrate all data from like solr core.
-     */
-    private static final String LIKE_SOLR_CORE = "like";
-
-    /**
-     * Old fields name needed for migrations.
-     */
-    private static final String OLD_PARENT_FIELD = "parent";
-    private static final String OLD_DATE_FIELD = "date";
-
-    /**
      * Needed for migrating likes.
      */
     @Inject
     private Solr solr;
 
     @Inject
-    private SolrUtils solrUtils;
+    private SolrDocumentMigration120900000 solrDocumentMigration120900000;
+
+    @Inject
+    private Logger logger;
 
     @Override
     protected void createSchema() throws SolrException
@@ -120,6 +98,8 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
      */
     private void migrateFrom120700000() throws SolrException
     {
+        this.logger.info("Starting migration of ratings solr core schema.");
+
         // Step 1: Add missing fields (only vote and authors remains identical)
         this.addStringField(RatingsManager.RatingQueryField.MANAGER_ID.getFieldName(), false, false);
         this.addStringField(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), false, false);
@@ -128,90 +108,24 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
         this.addPDateField(RatingsManager.RatingQueryField.CREATED_DATE.getFieldName(), false, false);
         this.addPDateField(RatingsManager.RatingQueryField.UPDATED_DATE.getFieldName(), false, false);
 
+        this.logger.info("Ratings Solr Core schema migrated. Starting migration of already existing ratings.");
         // Step 2: Loop on old ratings and migrate them
-        this.migrateAllDocumentsFrom1207000000(this.client, 5, RatingsManagerFactory.DEFAULT_APP_HINT);
 
-        // Step 3: Loop on old Likes and migrate them
-        // (note that we copy them in the actual ratings core in order to migrate them)
-        SolrClient likeClient = this.solr.getClient(LIKE_SOLR_CORE);
-        // likeClient could be null here if for some reason the core was never initialized or if it has been removed.
-        // TODO: Check in case it's a remote Solr core and it has not been created, it could be not null but still not
-        // exist.
-        if (likeClient != null) {
-            this.migrateAllDocumentsFrom1207000000(likeClient, 1, LIKE_SOLR_CORE);
-        }
+        // We explicitely don't retrieve scale from config here since the previous ratings
+        // were done with a scale of 5.
+        int scaleUpperBound = 5;
+        this.solrDocumentMigration120900000
+            .migrateAllDocumentsFrom1207000000(this.client, scaleUpperBound, RatingsManagerFactory.DEFAULT_APP_HINT);
 
-        // Step 4: Remove old fields (only on the old ratings core, we don't need to perform that change
-        this.deleteField(OLD_DATE_FIELD, false);
-        this.deleteField(OLD_PARENT_FIELD, false);
+        // Step 3: Remove old fields (only on the old ratings core, we don't need to perform that change
+        this.deleteField("date", false);
+        this.deleteField("parent", false);
         this.deleteField("ratingId", false);
         this.commit();
+        this.logger.info("Ratings Solr Core migration finished.");
     }
 
-    private void migrateAllDocumentsFrom1207000000(SolrClient solrClient, int scale, String managerId)
-        throws SolrException
-    {
-        SolrDocumentList documentList;
-        int startIndex = 0;
-        do {
-            SolrQuery solrQuery = new SolrQuery("*")
-                .setStart(startIndex)
-                .setRows(BATCH_MIGRATION_SIZE)
-                .setSort(OLD_DATE_FIELD, SolrQuery.ORDER.asc);
-            try {
-                QueryResponse queryResponse = solrClient.query(solrQuery);
-                documentList = queryResponse.getResults();
-                for (SolrDocument solrDocument : documentList) {
-                    this.migrateDocumentFrom120700000(solrDocument, scale, managerId);
-                }
-                startIndex += BATCH_MIGRATION_SIZE;
-            } catch (SolrServerException | IOException e) {
-                throw new SolrException("Error when executing query to perform 120700000 documents migration", e);
-            }
-        } while (!documentList.isEmpty());
 
-        // We commit when all documents are migrated.
-        try {
-            this.client.commit();
-        } catch (SolrServerException | IOException e) {
-            throw new SolrException("Error when committing after performing 120700000 documents migration.", e);
-        }
-    }
-
-    private void migrateDocumentFrom120700000(SolrDocument solrDocument, int scale, String managerId)
-        throws SolrException
-    {
-        String id = this.solrUtils.getId(solrDocument);
-        Date date = this.solrUtils.get(OLD_DATE_FIELD, solrDocument);
-        String documentReference = this.solrUtils.get(OLD_PARENT_FIELD, solrDocument);
-        String entityType = EntityType.DOCUMENT.getLowerCase();
-        int vote = this.solrUtils.get(RatingsManager.RatingQueryField.VOTE.getFieldName(), solrDocument);
-        String author = this.solrUtils.get(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument);
-
-        SolrInputDocument solrInputDocument = new SolrInputDocument();
-        this.solrUtils.setId(id, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.MANAGER_ID.getFieldName(), managerId, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), documentReference,
-            solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.ENTITY_TYPE.getFieldName(), entityType, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.SCALE.getFieldName(), scale, solrInputDocument);
-
-        this.solrUtils.set(RatingsManager.RatingQueryField.VOTE.getFieldName(), vote, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), author, solrInputDocument);
-
-        // Here the data is not completely accurate since the old "date" is more an updated date, but without more
-        // information it's better to rely on it than having a null data.
-        this.solrUtils.set(RatingsManager.RatingQueryField.CREATED_DATE.getFieldName(), date, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.UPDATED_DATE.getFieldName(), date, solrInputDocument);
-
-        // We use this.client here since we want to copy all documents in the current core, even if they come from
-        // like core.
-        try {
-            this.client.add(solrInputDocument);
-        } catch (SolrServerException | IOException e) {
-            throw new SolrException("Error when adding new document for performing 120700000 document migration", e);
-        }
-    }
 
 
     @Override

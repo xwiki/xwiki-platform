@@ -53,6 +53,12 @@ import static org.mockito.Mockito.when;
 
 import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 
+/**
+ * Tests for {@link SolrAverageRatingManager}.
+ *
+ * @version $Id$
+ * @since 12.9RC1
+ */
 @ComponentTest
 public class SolrAverageRatingManagerTest
 {
@@ -159,7 +165,7 @@ public class SolrAverageRatingManagerTest
             .setTotalVote(242)
             .setUpdatedAt(new Date(42))
             .setManagerId(managerId)
-            .setScale(12)
+            .setScaleUpperBound(12)
             .setReference(reference);
         assertEquals(expectedRating, averageRating);
     }
@@ -192,7 +198,7 @@ public class SolrAverageRatingManagerTest
             .setTotalVote(0)
             .setUpdatedAt(averageRating.getUpdatedAt())
             .setManagerId(managerId)
-            .setScale(7)
+            .setScaleUpperBound(7)
             .setReference(reference);
         assertEquals(expectedRating, averageRating);
     }
@@ -237,7 +243,7 @@ public class SolrAverageRatingManagerTest
             .setTotalVote(2)
             .setManagerId(managerId)
             .setReference(reference)
-            .setScale(scale);
+            .setScaleUpperBound(scale);
         SolrInputDocument expectedAverageInputDocument = new SolrInputDocument();
         expectedAverageInputDocument.setField("id", "average1");
         expectedAverageInputDocument.setField(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
@@ -262,7 +268,7 @@ public class SolrAverageRatingManagerTest
             .setReference(reference)
             .setAverageVote(5.5f)
             .setManagerId(managerId)
-            .setScale(scale)
+            .setScaleUpperBound(scale)
             .setTotalVote(2)
             .setUpdatedAt(new Date(42)));
 

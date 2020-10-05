@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>XWiki</web>
+<xwikidoc version="1.4" reference="XWiki.Ratings.RatingsMacros" locale="">
+  <web>XWiki.Ratings</web>
   <name>RatingsMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Ratings</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -43,28 +43,28 @@
 ###    Display full ratings UI ( rating ui, number of votes, user's vote)
 ###
 ###
-#macro(displayFullRating $requestDocRef $method)
+#macro(displayFullRating $requestDocRef)
 {{html clean="false"}}
-#set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#set($userDocRef = $xcontext.getUserReference())
-#if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
-#else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
-#set($avgvote = $ar.averageVote)
-#set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef).vote)
-#set($votes = $!ar.nbVotes)
-&lt;div class="rating-wrapper" id="rating-${requestDocRef}"&gt;
-#if($xcontext.user!="XWiki.XWikiGuest")
-&lt;div class="avg-rating"&gt;
-#ratingstars($id "" "" $avgvote $votes false)
-&lt;/div&gt;
-#else
- #set($rdoc = $xwiki.getDocument($requestDocRef))
- #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$rdoc.getURL()"))
-&lt;div class="avg-rating"&gt;
-#ratingstars($id "" $services.localization.render("rating.rate") $avgvote  $votes true)
-&lt;/div&gt;
-#end
-&lt;/div&gt;
+  #set ($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+  #set ($userDocRef = $xcontext.getUserReference())
+  #set ($optAverageRating = $services.ratings.getAverageRating($requestDocRef))
+  #if ($optAverageRating.isPresent())
+    #set ($averageRating = $optAverageRating.get())
+    #set ($avgvote = $averageRating.averageVote)
+    #set ($votes = $averageRating.nbVotes)
+    #set ($isLocked = $xcontext.user == "XWiki.XWikiGuest")
+    #set ($message = "")
+    #set ($isLockedClass = "locked")
+    #if (!$isLocked)
+      #set ($message = $services.localization.render("rating.rate"))
+      #set ($isLockedClass = "")
+    #end
+    &lt;div class="rating-wrapper $isLockedClass" data-reference="${requestDocRef}"&gt;
+      &lt;div class="avg-rating"&gt;
+        #ratingstars($id "" $message $avgvote $votes $isLocked)
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
 {{/html}}
 #end
 
@@ -72,13 +72,15 @@
 ###    Display small ratings UI ( rating ui - display only )
 ###
 ###
-#macro(displaySmallRating $requestDocRef $method)
+#macro(displaySmallRating $requestDocRef)
 {{html clean="false"}}
-#set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
-#else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
-#set($avgvote = $ar.averageVote)
-#ratingstars($id "small" "" $avgvote "" true)
+#set ($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+#set ($optAverageRating = $services.ratings.getAverageRating($requestDocRef))
+#if ($optAverageRating.isPresent())
+  #set ($averageRating = $optAverageRating.get())
+  #set($avgvote = $averageRating.averageVote)
+  #ratingstars($id "small" "" $avgvote "" true)
+#end
 {{/html}}
 #end
 {{/velocity}}</content>

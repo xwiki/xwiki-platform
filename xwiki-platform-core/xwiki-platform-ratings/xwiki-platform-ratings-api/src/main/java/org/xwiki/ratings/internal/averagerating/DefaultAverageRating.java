@@ -67,7 +67,7 @@ public class DefaultAverageRating implements AverageRating
         this.reference = averageRating.getReference();
         this.averageVote = averageRating.getAverageVote();
         this.totalVote = averageRating.getNbVotes();
-        this.scale = averageRating.getScale();
+        this.scale = averageRating.getScaleUpperBound();
         this.updatedAt = averageRating.getUpdatedAt();
     }
 
@@ -144,7 +144,7 @@ public class DefaultAverageRating implements AverageRating
      * @param scale the scale used for rating elements.
      * @return the current instance.
      */
-    public DefaultAverageRating setScale(int scale)
+    public DefaultAverageRating setScaleUpperBound(int scale)
     {
         this.scale = scale;
         return this;
@@ -191,7 +191,7 @@ public class DefaultAverageRating implements AverageRating
     }
 
     @Override
-    public int getScale()
+    public int getScaleUpperBound()
     {
         return this.scale;
     }

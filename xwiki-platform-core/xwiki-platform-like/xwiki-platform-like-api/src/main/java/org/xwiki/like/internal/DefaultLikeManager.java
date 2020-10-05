@@ -34,6 +34,8 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.like.LikeConfiguration;
@@ -63,7 +65,7 @@ import org.xwiki.user.UserReferenceSerializer;
  */
 @Component
 @Singleton
-public class DefaultLikeManager implements LikeManager, Initializable
+public class DefaultLikeManager implements LikeManager, Initializable, Disposable
 {
     private static final int DEFAULT_LIKE_VOTE = 1;
 
@@ -117,10 +119,17 @@ public class DefaultLikeManager implements LikeManager, Initializable
         }
 
         try {
-            this.ratingsManager = this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT);
+            this.ratingsManager = this.ratingsManagerFactory
+                .getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT);
         } catch (RatingsException e) {
             throw new InitializationException("Error while trying to get the RankingManager.", e);
         }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        //this.authorizationManager.
     }
 
     private String getExistCacheKey(UserReference source, EntityReference target)

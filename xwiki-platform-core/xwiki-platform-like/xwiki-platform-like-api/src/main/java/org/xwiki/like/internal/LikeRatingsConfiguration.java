@@ -19,10 +19,14 @@
  */
 package org.xwiki.like.internal;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.RatingsConfiguration;
 
 /**
@@ -42,13 +46,13 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
     public static final String RANKING_MANAGER_HINT = "like";
 
     @Override
-    public boolean storeZero()
+    public boolean isZeroStored()
     {
         return false;
     }
 
     @Override
-    public int getScale()
+    public int getScaleUpperBound()
     {
         return 1;
     }
@@ -60,13 +64,13 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
     }
 
     @Override
-    public boolean storeAverage()
+    public boolean isAverageStored()
     {
         return false;
     }
 
     @Override
-    public String getStorageHint()
+    public String getRatingsStorageHint()
     {
         return "solr";
     }
@@ -75,5 +79,17 @@ public class LikeRatingsConfiguration implements RatingsConfiguration
     public String getAverageRatingStorageHint()
     {
         return null;
+    }
+
+    @Override
+    public Set<EntityReference> getExcludedReferencesFromRatings()
+    {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return true;
     }
 }

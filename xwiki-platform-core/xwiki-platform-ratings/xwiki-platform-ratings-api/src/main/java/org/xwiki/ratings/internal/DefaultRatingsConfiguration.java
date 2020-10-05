@@ -19,9 +19,16 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.RatingsConfiguration;
 
 /**
@@ -37,39 +44,55 @@ import org.xwiki.ratings.RatingsConfiguration;
 @Singleton
 public class DefaultRatingsConfiguration implements RatingsConfiguration
 {
+    @Inject
+    @Named("ratings")
+    private ConfigurationSource configurationSource;
+
     @Override
-    public boolean storeZero()
+    public boolean isZeroStored()
     {
-        return true;
+        return this.configurationSource.getProperty("zeroStored", true);
     }
 
     @Override
-    public int getScale()
+    public int getScaleUpperBound()
     {
-        return 5;
+        return this.configurationSource.getProperty("scaleUpperBound", 5);
     }
 
     @Override
     public boolean hasDedicatedCore()
     {
-        return false;
+        return this.configurationSource.getProperty("dedicatedCore", false);
     }
 
     @Override
-    public boolean storeAverage()
+    public boolean isAverageStored()
     {
-        return true;
+        return this.configurationSource.getProperty("averageStored", true);
     }
 
     @Override
-    public String getStorageHint()
+    public String getRatingsStorageHint()
     {
-        return "solr";
+        return this.configurationSource.getProperty("ratingsStorageHint", "solr");
     }
 
     @Override
     public String getAverageRatingStorageHint()
     {
-        return "xobject";
+        return this.configurationSource.getProperty("averageRatingStorageHint", "xobject");
+    }
+
+    @Override
+    public Set<EntityReference> getExcludedReferencesFromRatings()
+    {
+        return this.configurationSource.getProperty("excludedReferences", new HashSet<>());
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return this.configurationSource.getProperty("enabled", true);
     }
 }

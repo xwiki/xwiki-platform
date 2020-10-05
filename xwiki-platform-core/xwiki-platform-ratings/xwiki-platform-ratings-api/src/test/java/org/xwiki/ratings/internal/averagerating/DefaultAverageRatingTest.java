@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests for {@link AverageRating}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
 public class DefaultAverageRatingTest
 {
@@ -90,7 +90,7 @@ public class DefaultAverageRatingTest
             }
 
             @Override
-            public int getScale()
+            public int getScaleUpperBound()
             {
                 return 3;
             }
@@ -128,7 +128,7 @@ public class DefaultAverageRatingTest
         assertEquals(EntityType.ATTACHMENT, defaultAverageRank.getReference().getType());
         assertEquals(0.23f, defaultAverageRank.getAverageVote(), 0);
         assertEquals(1343, defaultAverageRank.getNbVotes());
-        assertEquals(3, defaultAverageRank.getScale());
+        assertEquals(3, defaultAverageRank.getScaleUpperBound());
         assertEquals(new Date(24), defaultAverageRank.getUpdatedAt());
         assertEquals(defaultAverageRank, new DefaultAverageRating(defaultAverageRank));
     }

@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link DefaultRatingsManagerFactory}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
 @ComponentTest
 public class DefaultRatingsManagerFactoryTest
@@ -85,7 +85,7 @@ public class DefaultRatingsManagerFactoryTest
         when(this.contextComponentManager.hasComponent(RatingsConfiguration.class, hint)).thenReturn(true);
         when(this.contextComponentManager.getInstance(RatingsConfiguration.class, hint))
             .thenReturn(this.ratingsConfiguration);
-        when(this.ratingsConfiguration.getStorageHint()).thenReturn("someStorage");
+        when(this.ratingsConfiguration.getRatingsStorageHint()).thenReturn("someStorage");
         when(this.contextComponentManager.getInstance(RatingsManager.class, "someStorage"))
             .thenReturn(this.ratingsManager);
         ComponentDescriptor componentDescriptor = mock(ComponentDescriptor.class);
@@ -109,7 +109,7 @@ public class DefaultRatingsManagerFactoryTest
         when(this.contextComponentManager.hasComponent(RatingsConfiguration.class, hint)).thenReturn(false);
         when(this.contextComponentManager.getInstance(RatingsConfiguration.class))
             .thenReturn(this.ratingsConfiguration);
-        when(this.ratingsConfiguration.getStorageHint()).thenReturn("someStorage");
+        when(this.ratingsConfiguration.getRatingsStorageHint()).thenReturn("someStorage");
         when(this.contextComponentManager.getInstance(RatingsManager.class, "someStorage"))
             .thenReturn(this.ratingsManager);
         ComponentDescriptor componentDescriptor = mock(ComponentDescriptor.class);

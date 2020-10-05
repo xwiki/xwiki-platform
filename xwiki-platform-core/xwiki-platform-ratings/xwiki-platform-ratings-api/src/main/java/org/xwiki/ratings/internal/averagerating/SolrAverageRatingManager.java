@@ -81,7 +81,7 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
         solrUtils.set(AverageRatingQueryField.UPDATED_AT.getFieldName(), averageRating.getUpdatedAt(), result);
         solrUtils.set(AverageRatingQueryField.TOTAL_VOTE.getFieldName(),
             averageRating.getNbVotes(), result);
-        solrUtils.set(AverageRatingQueryField.SCALE.getFieldName(), averageRating.getScale(), result);
+        solrUtils.set(AverageRatingQueryField.SCALE.getFieldName(), averageRating.getScaleUpperBound(), result);
         solrUtils.set(AverageRatingQueryField.MANAGER_ID.getFieldName(), averageRating.getManagerId(), result);
         solrUtils.set(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), averageRating.getAverageVote(), result);
         solrUtils.set(AverageRatingQueryField.ENTITY_TYPE.getFieldName(),
@@ -115,7 +115,7 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
                     .setReference(entityReference)
                     .setTotalVote(solrUtils.get(AverageRatingQueryField.TOTAL_VOTE.getFieldName(),
                         solrDocument))
-                    .setScale(solrUtils.get(AverageRatingQueryField.SCALE.getFieldName(), solrDocument))
+                    .setScaleUpperBound(solrUtils.get(AverageRatingQueryField.SCALE.getFieldName(), solrDocument))
                     .setUpdatedAt(solrUtils.get(AverageRatingQueryField.UPDATED_AT.getFieldName(), solrDocument));
             } else {
                 return this.createAverageRating(entityReference, UUID.randomUUID().toString());

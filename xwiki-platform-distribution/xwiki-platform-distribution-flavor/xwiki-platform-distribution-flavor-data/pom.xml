@@ -155,6 +155,12 @@
               <artifactId>javax.servlet-api</artifactId>
               <version>3.0.1</version>
             </dependency>
+            <!-- Ratings API has a migrator to migrate old Ratings xobjects to the new store -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-ratings-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
           </dependencies>
           <executions>
             <execution>

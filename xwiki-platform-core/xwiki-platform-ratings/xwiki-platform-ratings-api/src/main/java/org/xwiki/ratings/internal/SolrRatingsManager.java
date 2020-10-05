@@ -162,7 +162,7 @@ public class SolrRatingsManager implements RatingsManager
     @Override
     public int getScale()
     {
-        return this.getRatingConfiguration().getScale();
+        return this.getRatingConfiguration().getScaleUpperBound();
     }
 
     @Override
@@ -203,7 +203,7 @@ public class SolrRatingsManager implements RatingsManager
             .setReference(entityReference)
             .setAuthor(userReference)
             .setVote(vote)
-            .setScale(scale)
+            .setScaleUpperBound(scale)
             .setCreatedAt(createdAt)
             .setUpdatedAt(updatedAt)
             .setManagerId(managerId);
@@ -264,7 +264,7 @@ public class SolrRatingsManager implements RatingsManager
         solrUtils.set(RatingQueryField.UPDATED_DATE.getFieldName(), rating.getUpdatedAt(), result);
         solrUtils.set(RatingQueryField.USER_REFERENCE.getFieldName(),
             this.userReferenceSerializer.serialize(rating.getAuthor()), result);
-        solrUtils.set(RatingQueryField.SCALE.getFieldName(), rating.getScale(), result);
+        solrUtils.set(RatingQueryField.SCALE.getFieldName(), rating.getScaleUpperBound(), result);
         solrUtils.set(RatingQueryField.MANAGER_ID.getFieldName(), rating.getManagerId(), result);
         solrUtils.set(RatingQueryField.VOTE.getFieldName(), rating.getVote(), result);
         return result;
@@ -301,7 +301,7 @@ public class SolrRatingsManager implements RatingsManager
         // Check if a vote for the same entity by the same user and on the same manager already exists.
         Optional<Rating> existingRanking = this.retrieveExistingRanking(reference, user);
 
-        boolean storeAverage = this.getRatingConfiguration().storeAverage();
+        boolean storeAverage = this.getRatingConfiguration().isAverageStored();
         Event event = null;
         Rating result = null;
         Rating oldRating = null;
@@ -310,14 +310,14 @@ public class SolrRatingsManager implements RatingsManager
         if (!existingRanking.isPresent()) {
 
             // We only store the vote if it's not 0 or if the configuration allows to store 0
-            if (vote != 0 || this.getRatingConfiguration().storeZero()) {
+            if (vote != 0 || this.getRatingConfiguration().isZeroStored()) {
                 result = new DefaultRating(UUID.randomUUID().toString())
                     .setManagerId(this.getIdentifier())
                     .setReference(reference)
                     .setCreatedAt(new Date())
                     .setUpdatedAt(new Date())
                     .setVote(vote)
-                    .setScale(this.getScale())
+                    .setScaleUpperBound(this.getScale())
                     .setAuthor(user);
 
                 // it's a vote creation
@@ -337,7 +337,7 @@ public class SolrRatingsManager implements RatingsManager
                 // It's an update of a vote
                 event = new UpdatedRatingEvent(result, oldRating.getVote());
             // Else we remove it.
-            } else if (this.ratingsConfiguration.storeZero()) {
+            } else if (this.ratingsConfiguration.isZeroStored()) {
                 this.removeRating(oldRating.getId());
             }
         }
@@ -417,7 +417,7 @@ public class SolrRatingsManager implements RatingsManager
                 this.getRatingSolrClient().commit();
                 Rating rating = ratings.get(0);
                 this.observationManager.notify(new DeletedRatingEvent(rating), this.getIdentifier(), rating);
-                if (this.getRatingConfiguration().storeAverage()) {
+                if (this.getRatingConfiguration().isAverageStored()) {
                     this.getAverageRatingManager().removeVote(rating.getReference(), rating.getVote());
                 }
                 return true;
@@ -432,7 +432,7 @@ public class SolrRatingsManager implements RatingsManager
     @Override
     public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
     {
-        if (this.getRatingConfiguration().storeAverage()) {
+        if (this.getRatingConfiguration().isAverageStored()) {
             return this.getAverageRatingManager().getAverageRating(entityReference);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);
@@ -454,7 +454,7 @@ public class SolrRatingsManager implements RatingsManager
     @Override
     public AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
     {
-        if (this.getRatingConfiguration().storeAverage()) {
+        if (this.getRatingConfiguration().isAverageStored()) {
             Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
             queryMap.put(RatingQueryField.ENTITY_REFERENCE, this.entityReferenceSerializer.serialize(entityReference));
             queryMap.put(RatingQueryField.ENTITY_TYPE, entityReference.getType());
@@ -462,12 +462,13 @@ public class SolrRatingsManager implements RatingsManager
             Long sumOfVotes = 0L;
             int numberOfVotes = 0;
             List<Rating> ratings;
+            int offsetIndex = 0;
             do {
-                int offsetIndex = 0;
                 ratings = this.getRatings(queryMap, offsetIndex, AVERAGE_COMPUTATION_BATCH_SIZE,
                     RatingQueryField.CREATED_DATE, true);
                 sumOfVotes += ratings.stream().map(Rating::getVote).map(Long::valueOf).reduce(0L, Long::sum);
                 numberOfVotes += ratings.size();
+                offsetIndex += AVERAGE_COMPUTATION_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
             float newAverage = sumOfVotes / numberOfVotes;

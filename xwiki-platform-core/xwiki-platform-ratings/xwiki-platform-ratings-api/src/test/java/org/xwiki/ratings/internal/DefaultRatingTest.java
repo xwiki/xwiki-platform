@@ -38,7 +38,7 @@ import static org.mockito.Mockito.mock;
  * Tests for {@link DefaultRating}.
  *
  * @version $Id$
- * @since 12.8RC1
+ * @since 12.9RC1
  */
 public class DefaultRatingTest
 {
@@ -103,7 +103,7 @@ public class DefaultRatingTest
             }
 
             @Override
-            public int getScale()
+            public int getScaleUpperBound()
             {
                 return 43;
             }
@@ -119,7 +119,7 @@ public class DefaultRatingTest
         assertEquals(new Date(12), defaultRanking.getCreatedAt());
         assertEquals(new Date(243), defaultRanking.getUpdatedAt());
         assertEquals(42, defaultRanking.getVote());
-        assertEquals(43, defaultRanking.getScale());
+        assertEquals(43, defaultRanking.getScaleUpperBound());
 
         assertEquals(defaultRanking, new DefaultRating(defaultRanking));
     }

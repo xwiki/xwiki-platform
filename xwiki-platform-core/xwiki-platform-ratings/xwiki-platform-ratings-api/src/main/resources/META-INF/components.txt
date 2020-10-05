@@ -9,4 +9,6 @@ org.xwiki.ratings.internal.averagerating.AverageRatingSolrCoreInitializer
 org.xwiki.ratings.internal.averagerating.SolrAverageRatingManager
 org.xwiki.ratings.internal.averagerating.XObjectAverageRatingManager
 org.xwiki.ratings.internal.averagerating.AverageRatingProtectionListener
-org.xwiki.ratings.internal.R120901000XWIKI17761DataMigration
+org.xwiki.ratings.internal.migration.R120901000XWIKI17761DataMigration
+org.xwiki.ratings.internal.migration.SolrDocumentMigration120900000
+org.xwiki.ratings.internal.RatingsConfigurationSource

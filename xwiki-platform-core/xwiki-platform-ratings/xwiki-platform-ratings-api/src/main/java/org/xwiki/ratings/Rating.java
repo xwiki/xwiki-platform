@@ -73,5 +73,5 @@ public interface Rating
     /**
      * @return the upper bound of the scale used to rate.
      */
-    int getScale();
+    int getScaleUpperBound();
 }

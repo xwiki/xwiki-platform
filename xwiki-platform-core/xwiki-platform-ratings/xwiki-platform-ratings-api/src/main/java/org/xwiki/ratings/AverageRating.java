@@ -61,7 +61,7 @@ public interface AverageRating
     /**
      * @return the upper bound scale of the ratings.
      */
-    int getScale();
+    int getScaleUpperBound();
 
     /**
      * @return the date of the last modification of this average.

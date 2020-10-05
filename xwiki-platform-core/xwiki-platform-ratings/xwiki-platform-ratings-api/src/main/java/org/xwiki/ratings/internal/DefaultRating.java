@@ -72,7 +72,7 @@ public class DefaultRating implements Rating
         this.vote = rating.getVote();
         this.updatedAt = rating.getUpdatedAt();
         this.createdAt = rating.getCreatedAt();
-        this.scale = rating.getScale();
+        this.scale = rating.getScaleUpperBound();
         this.user = rating.getAuthor();
     }
 
@@ -192,14 +192,14 @@ public class DefaultRating implements Rating
      * @param scale the scale of the ranks.
      * @return the current instance.
      */
-    public DefaultRating setScale(int scale)
+    public DefaultRating setScaleUpperBound(int scale)
     {
         this.scale = scale;
         return this;
     }
 
     @Override
-    public int getScale()
+    public int getScaleUpperBound()
     {
         return this.scale;
     }

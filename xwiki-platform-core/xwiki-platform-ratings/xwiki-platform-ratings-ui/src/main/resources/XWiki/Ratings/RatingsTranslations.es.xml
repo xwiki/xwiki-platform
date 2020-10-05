@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>XWiki</web>
+<xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="es">
+  <web>XWiki.Ratings</web>
   <name>RatingsTranslations</name>
   <language>es</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Ratings</parent>
+  <parent>XWiki.Ratings.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -48,5 +48,4 @@ rating.rate=¡Vota!
 rating.yourvote=Tu voto
 rating.logintorate=Iniciar sesión para valorar
 rating.novotes=Todavía no hay valoraciones</content>
-  
 </xwikidoc>

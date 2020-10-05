@@ -19,7 +19,10 @@
  */
 package org.xwiki.ratings;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -37,12 +40,12 @@ public interface RatingsConfiguration
      *         {@code true} means that all ratings noted to 0 are stored. Note that this option will impact the
      *         average rating.
      */
-    boolean storeZero();
+    boolean isZeroStored();
 
     /**
      * @return the upper bound of the scale. The lower bound is always 0.
      */
-    int getScale();
+    int getScaleUpperBound();
 
     /**
      * @return {@code true} to create - if possible, depending on the storage implementation - a dedicated store.
@@ -54,15 +57,30 @@ public interface RatingsConfiguration
      * @return {@code true} to store the average rating. {@code false} means that the average rating is never stored
      * nor computed.
      */
-    boolean storeAverage();
+    boolean isAverageStored();
 
     /**
      * @return the storage hint to be used for Ratings data (e.g. solr).
      */
-    String getStorageHint();
+    String getRatingsStorageHint();
 
     /**
      * @return the storage hint to be used for Average Ratings data (e.g. solr or xobject)
      */
     String getAverageRatingStorageHint();
+
+    /**
+     * Allow to define a set of references that cannot be rated.
+     * This list is mainly used in the UI and in the script service. Note that the provided references are actually
+     * also excluding their children, so excluding a wiki reference will excludes all elements from this wiki to be
+     * rated.
+     *
+     * @return the set of references to be excluded from ratings.
+     */
+    Set<EntityReference> getExcludedReferencesFromRatings();
+
+    /**
+     * @return {@code true} if the ratings is enabled. This configuration is only used to control the UI.
+     */
+    boolean isEnabled();
 }

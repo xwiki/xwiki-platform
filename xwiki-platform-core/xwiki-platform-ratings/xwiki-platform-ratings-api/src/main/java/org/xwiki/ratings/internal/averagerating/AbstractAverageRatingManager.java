@@ -63,7 +63,7 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
     {
         return new DefaultAverageRating(id)
             .setManagerId(this.getIdentifier())
-            .setScale(this.getScale())
+            .setScaleUpperBound(this.getScale())
             .setReference(entityReference)
             .setAverageVote(0)
             .setTotalVote(0);

@@ -19,9 +19,15 @@
  */
 package org.xwiki.security.authorization;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link Right}.
@@ -31,10 +37,70 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class RightTest
 {
     @Test
-    public void toRight()
+    void toRight()
     {
         assertSame(Right.VIEW, Right.toRight("view"));
         assertSame(Right.VIEW, Right.toRight("VIEW"));
         assertSame(Right.ILLEGAL, Right.toRight("notexist"));
+    }
+
+    class CustomRight implements RightDescription
+    {
+        private String name;
+
+        CustomRight(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return this.name;
+        }
+
+        @Override
+        public RuleState getDefaultState()
+        {
+            return RuleState.ALLOW;
+        }
+
+        @Override
+        public RuleState getTieResolutionPolicy()
+        {
+            return RuleState.DENY;
+        }
+
+        @Override
+        public boolean getInheritanceOverridePolicy()
+        {
+            return false;
+        }
+
+        @Override
+        public Set<Right> getImpliedRights()
+        {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<EntityType> getTargetedEntityType()
+        {
+            return Collections.singleton(EntityType.SPACE);
+        }
+
+        @Override
+        public boolean isReadOnly()
+        {
+            return true;
+        }
+    }
+
+    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
+    @Test
+    void like()
+    {
+        Right myRight = new Right(new CustomRight("foo"));
+        assertTrue(myRight.like(new CustomRight("foo")));
     }
 }

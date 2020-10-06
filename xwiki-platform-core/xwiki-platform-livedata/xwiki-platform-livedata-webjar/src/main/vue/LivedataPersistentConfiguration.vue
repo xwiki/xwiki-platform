@@ -342,10 +342,11 @@ export default {
     const config = this.decodeConfig(this.getConfig(this.saveKey));
     if (!config) {
       this.deleteConfig(this.saveKey);
-      new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");
+      new XWiki.widgets.Notification("Bad LiveData config given, fall back to default", "warning");
       return;
     }
     this.loadConfig(config);
+    this.logic.temporaryConfigSave("initial");
   },
 
 

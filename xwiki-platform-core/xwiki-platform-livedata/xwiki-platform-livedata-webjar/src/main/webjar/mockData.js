@@ -24,8 +24,11 @@
 
 define({
 
+  // The unique id of the Livedata
   id: "LD0",
 
+
+  // The configuration send to the server to fetch entries
   query: {
     properties: ["doc_title", "age", "country", "tags", "other"],
 
@@ -54,7 +57,7 @@ define({
   },
 
 
-
+  // The "meta" configuration of the Livedata
   meta: {
 
     defaultLayout: "table",
@@ -233,6 +236,7 @@ define({
 
 
 
+  // The entries fetches from the server
   data: {
 
     count: 545,

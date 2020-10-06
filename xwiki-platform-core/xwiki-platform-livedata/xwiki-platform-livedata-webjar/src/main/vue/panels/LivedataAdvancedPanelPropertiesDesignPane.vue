@@ -125,12 +125,10 @@ export default {
     },
 
     filterId () {
-      console.log("(filerId:", this.logic.getPropertyFilterDescriptor(this.property.id).id, ")");
       return this.logic.getPropertyFilterDescriptor(this.property.id).id;
     },
 
     isFilterDefaulted () {
-      console.log("(isFilterDefaulted: ", this.property.filter === undefined, ")");
       return this.property.filter === undefined;
     },
 
@@ -146,17 +144,9 @@ export default {
     },
 
     isFilterSelected (filterId) {
-      console.groupCollapsed("# isFilterSelected : " + filterId);
-      console.log("filterId", filterId);
       if (this.isFilterDefaulted) {
-        console.log("default option")
-        console.log(": ", this.isFilterDefaulted);
-        console.groupEnd();
         return filterId === undefined;
       } else {
-        console.log("normal option")
-        console.log(": ", filterId === this.filterId);
-        console.groupEnd();
         return filterId === this.filterId;
       }
     }

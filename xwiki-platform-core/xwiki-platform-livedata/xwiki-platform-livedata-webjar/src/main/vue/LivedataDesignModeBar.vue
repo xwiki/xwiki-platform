@@ -50,62 +50,15 @@
     <div class="buttons">
       <button
         class="btn btn-secondary"
-        @click="logic.toggleDesignMode(false)"
+        @click="confirmLeave"
       >Leave
       </button>
       <button
         class="btn btn-primary"
-        type="button"
-        data-toggle="modal"
-        :data-target="'#' + designModeApplyModalId"
+        @click="confirmSave"
       >Apply changes
       </button>
     </div>
-
-    <!-- Apply changes confirmation modal -->
-    <div
-      class="modal fade"
-      :id="designModeApplyModalId"
-      tabindex="-1"
-      role="dialog"
-    >
-      <div
-        class="modal-dialog"
-        role="document"
-      >
-        <div class="modal-content">
-          <div class="modal-header">
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title">Modal title</h4>
-          </div>
-          <div class="modal-body">
-            <p>Applying chages will blah blah blah ...</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-default"
-              aria-label="Close"
-              data-dismiss="modal"
-            >Close</button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              aria-label="Apply"
-              data-dismiss="modal"
-            >Aplly changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
   </div>
 </template>
@@ -113,6 +66,7 @@
 
 <script>
 import $ from "jquery";
+import { confirm } from "./utilities/XWikiDialogConfirm";
 
 export default {
 
@@ -122,13 +76,52 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
-
-    // return a dedicated id for this Livedata only
-    // in case there are several Livedata on the page
-    designModeApplyModalId () {
-      return "design-mode-modal-confirm-apply-" + this.data.id;
-    },
   },
+
+
+  methods: {
+
+    async confirmSave () {
+      // Show confirmation message
+      const success = await confirm({
+        title: "Apply changes?",
+        text: "The current Livedata configuration will be pushed to every Livedata instances, continue?",
+        confirmText: "Apply changes",
+      });
+      // Continue only on success
+      if (!success) { return; }
+      // TODO: brodcast new config to everyone
+      this.logic.temporaryConfigSave("initial");
+      this.logic.temporaryConfigSave("edit");
+      // Show snackbar to inform user
+      new XWiki.widgets.Notification("Changes were applied globally", "done");
+    },
+
+    async confirmLeave () {
+      // if there is only one user in the realtime session and changes are not saved
+      if (/* (TODO) USER IS THE ONLY ONE IN THE REALTIME SESSION */ true
+        && !this.logic.temporaryConfigEquals("edit")) {
+        const response = await confirm({
+          title: "Leave Design mode?",
+          text: "Some changes made in design mode were not saved, and will be lost. Do you really want to leave design mode?",
+          confirmText: "Leave anyway",
+        });
+        if (!response) { return; }
+      // else if changes were not saved, tell user it will be reverted
+      } else if (!this.logic.temporaryConfigEquals("initial")) {
+        const response = await confirm({
+          title: "Leave Design mode?",
+          text: "The Livedata configuration will be reverted to the last saved state",
+          confirmText: "Leave",
+        });
+        if (!response) { return; }
+      }
+      // Continue only on success
+      this.logic.toggleDesignMode(false);
+    },
+
+  },
+
 
   mounted () {
     $(".design-mode-info-span").popover({

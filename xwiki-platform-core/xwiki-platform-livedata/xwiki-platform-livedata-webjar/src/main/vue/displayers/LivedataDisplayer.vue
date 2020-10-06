@@ -107,7 +107,6 @@ export default {
     displayerId: {
       immediate: true,
       handler () {
-        console.log("WATCH displayer");
         // Try to load Displayer
         this.loadDisplayer(this.displayerId).catch(err => {
           // Try to load default Displayer

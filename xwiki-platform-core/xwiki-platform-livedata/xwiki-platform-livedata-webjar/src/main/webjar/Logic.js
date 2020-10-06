@@ -61,20 +61,36 @@ define([
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   const Logic = function (element) {
+    // The element where the Livedata vue component is mounted
     this.element = element;
+    // The Livedata configuration object
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    element.removeAttribute("data-data");
+    // The different saves used to store Livedata states
+    // Some states examples are:
+    // - The initial state (config the user gets from the server)
+    // - The pre-design state (modified config before the user switch to design mode)
+    this.dataSaves = {};
+    this.temporaryConfigSave("initial");
+    // The current layout id of the Livedata
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
+    // A helper object, used for knowing wich entries are being selected
+    // using the selected array property.
+    // If the `isGlobal` property is set to true,
+    // all properties are considered selected, and we track deselected entries
+    // using the `deselected` array property
     this.entrySelection = {
       selected: [],
       deselected: [],
       isGlobal: false,
     };
+    // A helper object to track opened configuration panels
     this.openedPanels = [];
+    // Whether the Livedata is in design mode or not
     this.designMode = false;
 
-    element.removeAttribute("data-data");
-    // create Vuejs instance
+    // Create Livedata instance
     new Vue({
       el: this.element,
       components: {
@@ -210,6 +226,26 @@ define([
         return;
       }
       return entry[idProperty];
+    },
+
+
+    /**
+     * Compare two objects deeply, using SameValue comparison
+     * @param {Any} a A first object to compare
+     * @param {Any} b A second object to compare
+     */
+    isDeepEqual (a, b) {
+      // Check direct equality (using sameValue comparison)
+      if (Object.is(a, b)) { return true; }
+      // If properties are not equal and not object, return false
+      if (typeof a !== "object" || typeof b !== "object") { return false; }
+      // Check class equality
+      if (a.constructor !== b.constructor) { return false; }
+      // check if objects  contain the same entries
+      const aKeys = Object.keys(a);
+      const bKeys = Object.keys(b);
+      if (aKeys.length !== bKeys.length) { return false; }
+      return aKeys.every(key => this.isDeepEqual(a[key], b[key]));
     },
 
 
@@ -513,26 +549,116 @@ define([
 
 
     /**
-     * Load a layout, or default layout if none specified
+     * Toggle design mode
+     * When toggling ON: save temporary config to "edit" save
+     * When toggling OFF: load temporary config from "edit" save
+     *
+     * In order to keep design state when leaving design mode
+     * the design config has to be saved in "initial" and "edit" saves
+     * (This is done automatically in the LivedataDesignModeBar component)
+     * @param {Boolean} designModeOn true to toggle design mode ON, false for OFF
+     * If undefined, toggle current state
      * @returns {Promise}
      */
     toggleDesignMode (designModeOn) {
       if (designModeOn === undefined) {
         designModeOn = !this.designMode;
       }
-      this.designMode = designModeOn;
+      if (designModeOn) {
+        this.designMode = true;
+        this.temporaryConfigSave("edit");
+      } else {
+        this.designMode = false;
+        this.temporaryConfigLoad("edit");
+      }
+    },
+
+
+    /**
+     * Return temporary config at given key if config is a string
+     * or return directly the given config if it is valid
+     * @param {String|Object} config The key of an already save config, or a config object
+     * @returns
+     */
+    _temporaryConfigParse (config) {
+      if (typeof config === "string") {
+        // Type String: return config saved at given key
+        const configObject = this.dataSaves[config];
+        if (!configObject) {
+          console.error("Error: temporary config at key `" + config + "` can't be found");
+        }
+        return configObject;
+      } else if (typeof config === "object") {
+        // Type Object: return config as it is
+        return config;
+      }
+      // Other type: return undefined and show error
+      console.error("Error: given config is invalid");
+    },
+
+
+    /**
+     * Format a config object to only keep query and meta properties
+     * JSON.parse(JSON.stringify()) is used to ensure that
+     * the saved config is not reactive to further changes
+     * @param {Object} configObject The object to format
+     */
+    _temporaryConfigFormat (configObject) {
+      return {
+        query: JSON.parse(JSON.stringify(configObject.query)),
+        meta: JSON.parse(JSON.stringify(configObject.meta)),
+      };
+    },
+
+    /**
+     * Save current or given Livedata configuration to a temporary state
+     * This state could be reloaded later using the temporaryConfigLoad method
+     * @param {String} configName The key used to store the config
+     * @param {Object} config The config to save. Uses current if undefined
+     */
+    temporaryConfigSave (configName, config) {
+      if (config === undefined) {
+        config = config || this.data;
+      }
+      const configToSave = this._temporaryConfigFormat(config);
+      this.dataSaves[configName] = configToSave;
+    },
+
+
+    /**
+     * Replace current config with the given one
+     * @param {String|Object} config The key of an already save config, or a config object
+     */
+    temporaryConfigLoad (config) {
+      const configToLoad = this._temporaryConfigParse(config);
+      if (!configToLoad) { return; }
+      this.data.query = configToLoad.query;
+      this.data.meta = configToLoad.meta;
+    },
+
+
+    /**
+     * Return whether the given config is equal (deeply) to the current config
+     * @param {String|Object} config The key of an already save config, or a config object
+     * @returns {Boolean}
+     */
+    temporaryConfigEquals (config) {
+      const configToCompare = this._temporaryConfigParse(config);
+      if (!configToCompare) { return; }
+      return this.isDeepEqual(
+        this._temporaryConfigFormat(configToCompare),
+        this._temporaryConfigFormat(this.data)
+      );
     },
 
 
     setPropertyType (propertyId, type) {
-      console.log("LOGIC set property type", propertyId, type);
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       propertyDescriptor.type = type;
     },
 
 
     setPropertyDisplayer (propertyId, displayerId) {
-      console.log("LOGIC set property displayer", propertyId, displayerId);
       if (displayerId) {
         Vue.set(this.getPropertyDescriptor(propertyId), "displayer", {
           id: displayerId,
@@ -545,7 +671,6 @@ define([
 
 
     setPropertyFilter (propertyId, filterId) {
-      console.log("LOGIC set property filter", propertyId, filterId);
       if (filterId) {
         Vue.set(this.getPropertyDescriptor(propertyId), "filter", {
           id: filterId,

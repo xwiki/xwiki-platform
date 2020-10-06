@@ -102,7 +102,6 @@ export default {
     filterId: {
       immediate: true,
       handler () {
-        console.log("WATCH filter");
         // Try to load Filter
         this.loadFilter(this.filterId).catch(err => {
           // Try to load default Filter

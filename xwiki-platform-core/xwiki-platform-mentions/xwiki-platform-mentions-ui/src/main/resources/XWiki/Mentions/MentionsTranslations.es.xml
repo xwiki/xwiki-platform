@@ -52,6 +52,6 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=El color de las men
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Color de las automenciones
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activar las citas
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Establece si se incluye una cita del texto que rodea a una mención en las notificaciones de mención de usuario.
-### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.</content>
+mentions.tip=Al editar en modo WYSIWYG, teclea @ y a continuación comienza a teclear letras para obtener sugerencias para mencionar un usuario.</content>
   
 </xwikidoc>

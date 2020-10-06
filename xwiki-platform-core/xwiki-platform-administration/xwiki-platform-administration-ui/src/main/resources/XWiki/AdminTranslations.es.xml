@@ -148,8 +148,8 @@ administration.section.analytics.status=Estado
 administration.section.analytics.status.hint=Determinar si el seguimiento en Google Analytics™ está activo o no
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=Social
+admin.social.description=Configuración de funciones sociales.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart

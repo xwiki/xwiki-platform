@@ -12,7 +12,7 @@ fi
 
 # Make the default solr user ("solr") owner of the data folder
 if id "solr" >/dev/null 2>&1; then
-  chown -R solr:solr /var/lib/xwiki/solr/events/
+  chown -R solr:solr /var/lib/xwiki/solr/like/
 else
-  echo "No user with name 'solr' could be found. Please make the user which runs Solr the owner of the folder /var/lib/xwiki/solr/events"
+  echo "No user with name 'solr' could be found. Please make the user which runs Solr the owner of the folder /var/lib/xwiki/solr/like"
 fi

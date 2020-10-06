@@ -531,10 +531,6 @@ public abstract class XWikiAction extends ActionSupport
                     // Put back the action, because of https://jira.xwiki.org/browse/XWIKI-15182
                     // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
                     context.setAction(originalAction);
-                } catch (Throwable e) {
-                    // Some real failure, log it since it's a problem but still allow the old Action system a chance
-                    // to do something...
-                    LOGGER.error("Failed to handle Action for Resource [{}]", entityResourceReference, e);
                 }
 
                 getProgress().startStep(this, "Execute action render");
@@ -616,7 +612,10 @@ public abstract class XWikiAction extends ActionSupport
                         Utils.parseTemplate(context.getWiki().Param("xwiki.invalid_url_exception", "error"), context);
                         return null;
                     }
-                    vcontext.put("exp", e);
+                    // Note: We don't use the vcontext variable computed above since apparently the velocity context
+                    // can have changed in between. Thus we get it again to be sure we're setting the binding in the
+                    // right one.
+                    velocityManager.getVelocityContext().put("exp", e);
                     if (LOGGER.isWarnEnabled()) {
                         // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
                         // the logs with unnecessary stack traces. It just means the client side has cancelled the

@@ -74,6 +74,14 @@
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed to display debug logs to debug strange issues on CI. Can be removed once the
+         WikiTemplateIT#createWikiFromTemplate() flicker is fixed -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

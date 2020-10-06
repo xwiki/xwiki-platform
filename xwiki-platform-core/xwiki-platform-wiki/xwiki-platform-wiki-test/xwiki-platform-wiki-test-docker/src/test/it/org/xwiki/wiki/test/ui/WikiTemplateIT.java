@@ -19,8 +19,8 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
@@ -43,17 +43,72 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-@UITest
+@UITest(
+    properties = {
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
+        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
+        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
+        // even if the class was found the DW would start which is not something we want.
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
+        // Notifications, as otherwise even streams won't have a store.
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // Required by components located in a core extensions
+        "org.xwiki.platform:xwiki-platform-wiki-template-default",
+        // These extensions are needed when creating the subwiki or it'll fail with some NPE.
+        // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
+        // by one
+        "org.xwiki.platform:xwiki-platform-wiki-script",
+        "org.xwiki.platform:xwiki-platform-wiki-user-default",
+        "org.xwiki.platform:xwiki-platform-wiki-user-script"
+    },
+    extensionOverrides = {
+        @ExtensionOverride(
+            extensionId = "org.xwiki.platform:xwiki-platform-web",
+            overrides = {
+                // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
+                // to install on a subwiki by default (which is something we test)
+                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
+                // handle it.
+                "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
+            }
+        )
+    }
+)
 class WikiTemplateIT
 {
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
 
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
-    @BeforeAll
-    void setup(TestUtils setup)
+    @Test
+    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
+
+        // Create the template
+        createTemplateWiki();
+
+        // Create the wiki from the template
+        createWikiFromTemplate();
+        // Do it twice to check if we can create a wiki with the name of a deleted one
+        createWikiFromTemplate();
+
+        // Delete the template wiki
+        deleteTemplateWiki();
+
+        logCaptureConfiguration.registerExcludes(
+            "CSRFToken: Secret token verification failed");
     }
 
     private void createTemplateWiki() throws Exception
@@ -68,7 +123,6 @@ class WikiTemplateIT
         assertEquals(TEMPLATE_WIKI_ID, wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
-        assertTrue(createWikiPage.isNextStepEnabled());
 
         // Second step
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
@@ -170,23 +224,5 @@ class WikiTemplateIT
         // Finalization
         WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
         return wikiHomePage;
-    }
-
-    @Test
-    void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
-    {
-        // Create the template
-        createTemplateWiki();
-
-        // Create the wiki from the template
-        createWikiFromTemplate();
-        // Do it twice to check if we can create a wiki with the name of a deleted one
-        createWikiFromTemplate();
-
-        // Delete the template wiki
-        deleteTemplateWiki();
-
-        logCaptureConfiguration.registerExcludes(
-            "CSRFToken: Secret token verification failed");
     }
 }

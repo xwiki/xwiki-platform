@@ -57,14 +57,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(
     properties = {
-        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed
-        "xwikiCfgSuperadminPassword=pass",
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
-        // Disable the DW
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false",
-        // Enable Hibernate statistics to debug SQL execution times
-        "xwikiDbAdditionalProperties=<property name=\"hibernate.generate_statistics\">true</property>"
+        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
+        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
+        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
+        // even if the class was found the DW would start which is not something we want.
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
@@ -72,9 +71,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
+        // These extensions are needed when creating the subwiki or it'll fail with some NPE.
         // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
         // by one
-        // Needed by the subwikis
         "org.xwiki.platform:xwiki-platform-wiki-script",
         "org.xwiki.platform:xwiki-platform-wiki-user-default",
         "org.xwiki.platform:xwiki-platform-wiki-user-script"
@@ -85,7 +84,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
             overrides = {
                 // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
                 // to install on a subwiki by default (which is something we test)
-                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it.
+                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
+                // handle it.
                 "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
             }
         )
@@ -108,7 +108,6 @@ public class SubWikiIT
         String wikiName = createWikiPage.getComputedName();
         assertEquals(SUBWIKI_NAME, wikiName);
         createWikiPage.setIsTemplate(false);
-        assertTrue(createWikiPage.isNextStepEnabled());
 
         // Code taken from WikiTemplateIT.
         WikiCreationPage wikiCreationPage = createWikiPage.goUserStep().create();

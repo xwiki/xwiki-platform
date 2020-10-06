@@ -334,10 +334,13 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         LOGGER.info("Checking that XWiki is up and running...");
 
-        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), this.startTimeout);
+        // If we're in debug mode then don't use a timeout (or rather use a very long one - we use 1 day) since we'll
+        // start XWiki in debug mode and wait to connect to it (suspend = true).
+        long timeout = DEBUG ? 60*60*24 : this.startTimeout;
+        WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), timeout);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
-                this.startTimeout, response.responseCode, new String(response.responseBody));
+                timeout, response.responseCode, new String(response.responseBody));
             LOGGER.info(message);
             stop();
             throw new RuntimeException(message);

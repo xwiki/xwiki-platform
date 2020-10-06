@@ -22,6 +22,7 @@ package org.xwiki.test.docker.internal.junit5.configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -68,6 +69,8 @@ public class ConfigurationFilesGenerator
     private static final String SKIN = "flamingo";
 
     private static final String LOGBACK_FILE = "logback.xml";
+
+    private static final String LOGBACK_OVERRIDE_FILE = "logback-override.xml";
 
     private TestConfiguration testConfiguration;
 
@@ -124,7 +127,6 @@ public class ConfigurationFilesGenerator
             throw new Exception("Failed to extract configuration files", e);
         }
 
-
         // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
         // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
         // problems.
@@ -141,7 +143,13 @@ public class ConfigurationFilesGenerator
             LOGGER.info("... Generating logging configuration: {}", outputFile);
         }
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            IOUtils.copy(getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE), fos);
+            // Allows modules to override the default logback config by providing a LOGBACK_OVERRIDE_FILE file in
+            // src/it/test/resources.
+            InputStream is = getClass().getClassLoader().getResourceAsStream(LOGBACK_OVERRIDE_FILE);
+            if (is == null) {
+                is = getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE);
+            }
+            IOUtils.copy(is, fos);
         }
     }
 

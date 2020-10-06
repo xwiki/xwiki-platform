@@ -73,7 +73,6 @@ public class WikiCreationPage extends ExtendedViewPage
 
     public void waitForFinalizeButton(int timeout)
     {
-
         // The finalize button is not visible until the provisioning is done, so we wait for it
         getDriver().waitUntilElementIsVisible(By.id("finalize"), timeout);
     }

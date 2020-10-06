@@ -53,6 +53,8 @@
     ##
     <ul class="drawer-menu">
       #set ($drawerExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.drawer', {'sortByParameter' : 'order'}))
+      ## Logs to debug problems when displaying UIXes.
+      #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIXes: [{}]', $drawerExtensions))
       ##
       ## Local Category
       ##
@@ -117,7 +119,13 @@
   #end
   #foreach($uix in $extensions)
     #set ($uixCategory = "$!uix.parameters.category")
-    #if (($uixCategory == $category || $category == 'local' && $uixCategory == '') && $services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+    #set ($hasAccessForDrawerUIX = $services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+    ## Logs to debug problems when displaying UIXes.
+    #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIX [{}] - Reference: [{}]', $uix, $!uix.documentReference))
+    #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIX [{}] - Author: [{}]', $uix, $!uix.authorReference))
+    #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIX [{}] - Category: [{}] - UIX Category: [{}]', $uix, $category, $uixCategory))
+    #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIX [{}] - Permission: [{}]', $uix, $hasAccessForDrawerUIX))
+    #if (($uixCategory == $category || $category == 'local' && $uixCategory == '') && $hasAccessForDrawerUIX)
       #if ("$!uix.getParameters().separator" == 'true' && $canHaveMenuSeparator)
         #drawerSeparator()
         #set ($canHaveMenuSeparator = false)

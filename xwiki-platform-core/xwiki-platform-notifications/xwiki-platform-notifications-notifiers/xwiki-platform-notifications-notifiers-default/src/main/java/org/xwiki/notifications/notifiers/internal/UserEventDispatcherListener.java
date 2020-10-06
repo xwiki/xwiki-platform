@@ -20,7 +20,9 @@
 package org.xwiki.notifications.notifiers.internal;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,13 +31,14 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventSearchResult;
-import org.xwiki.eventstream.EventStore;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
-import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.job.DefaultRequest;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -50,7 +53,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 @Component
 @Singleton
 @Named(UserEventDispatcherListener.NAME)
-public class UserEventDispatcherListener extends AbstractEventListener
+public class UserEventDispatcherListener extends AbstractEventListener implements Disposable
 {
     /**
      * The name of the listener.
@@ -70,10 +73,12 @@ public class UserEventDispatcherListener extends AbstractEventListener
     private RemoteObservationManagerContext remoteState;
 
     @Inject
-    private EventStore store;
+    private JobExecutor jobs;
 
     @Inject
     private Logger logger;
+
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Configure the listener.
@@ -81,6 +86,13 @@ public class UserEventDispatcherListener extends AbstractEventListener
     public UserEventDispatcherListener()
     {
         super(NAME, new EventStreamAddedEvent(), new ApplicationReadyEvent());
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // Stop the scheduling
+        this.scheduler.shutdownNow();
     }
 
     @Override
@@ -94,24 +106,9 @@ public class UserEventDispatcherListener extends AbstractEventListener
                     prefilterEvent((org.xwiki.eventstream.Event) source);
                 }
             } else if (event instanceof ApplicationReadyEvent) {
-                // Load all the events for which pre filtering was not finished and restart the process for them
-                // Don't block the event thread
-                CompletableFuture.runAsync(this::prefilterMissingEvents);
+                // Schedule a job to regularely check if any event prefiltering was missed
+                this.scheduler.scheduleWithFixedDelay(this::startPrefilterMissingEventsJob, 0, 1, TimeUnit.HOURS);
             }
-        }
-    }
-
-    private void prefilterMissingEvents()
-    {
-        SimpleEventQuery query = new SimpleEventQuery();
-        query.eq(org.xwiki.eventstream.Event.FIELD_PREFILTERED, false);
-
-        try {
-            EventSearchResult result = this.store.search(query);
-
-            result.stream().forEach(this::prefilterEvent);
-        } catch (EventStreamException e) {
-            this.logger.error("Failed to search events for which pre filtering was missed", e);
         }
     }
 
@@ -139,6 +136,19 @@ public class UserEventDispatcherListener extends AbstractEventListener
             Thread.currentThread().interrupt();
 
             this.logger.warn("Failed to add the event [{}] in the user event dispatcher", eventStreamEvent.getId(), e);
+        }
+    }
+
+    private void startPrefilterMissingEventsJob()
+    {
+        try {
+            // Wait until the job is finished so that we don't start several at the same time
+            this.jobs.execute(PrefilterMissingEventsJob.JOBTYPE, new DefaultRequest()).join();
+        } catch (InterruptedException e) {
+            this.logger.warn("Prefiltering thread was interrupted");
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            this.logger.error("Failed to search events for which pre filtering was missed", e);
         }
     }
 }

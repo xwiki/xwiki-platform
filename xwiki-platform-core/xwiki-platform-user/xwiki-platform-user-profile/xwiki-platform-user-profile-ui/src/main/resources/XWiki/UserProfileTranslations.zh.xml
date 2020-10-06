@@ -37,29 +37,29 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=wiki包含默认情况下不显示的文档。这些隐藏的文档表示技术内容，例如应用程序类，配置页，宏，样式，脚本等。
-### Missing: XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
-### Missing: XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
-### Missing: XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
-### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
-### Missing: userprofile.default=Default
-### Missing: user.profile.groups.title=Groups
-### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
-### Missing: user.profile.groups.table.group=Group
-### Missing: platform.core.profile.category.groups=Groups
-### Missing: user.profile.notifications=Notifications
-### Missing: user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
-### Missing: user.profile.network.unfollow.question.yes=Yes, unfollow
-### Missing: user.profile.network.unfollow.question.no=No, cancel
-### Missing: user.profile.network.following=Following
-### Missing: user.profile.network.notfollowing=Not following
-### Missing: user.profile.network.follow=Start following
-### Missing: user.profile.network.unfollow=Stop following
-### Missing: user.profile.network.done=Done
-### Missing: user.profile.network.saving=Saving...
-### Missing: user.profile.network.error=Error saving the notification setting
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+XWiki.XWikiUsers_accessibility.hint=额外的可访问性将启用各种视觉增强功能，例如：更大的字体，带下划线的链接等。
+XWiki.XWikiUsers_timezone.hint=使用特定的时区，以便日期反映您的当前位置。
+XWiki.XWikiUsers_editor.hint=选择默认的编辑器，以覆盖全局设置的默认编辑器。如果未定义，则根据要编辑的内容选择默认编辑器。
+XWiki.XWikiUsers_usertype.hint=选择哪种类型的用户将成为默认用户。高级用户将有权使用多种编辑功能，终端页面创建等。
+XWiki.XWikiUsers_extensionConflictSetup.hint=指明是否要扩展管理器要求您确认冲突解决的默认规则（例如，告诉扩展管理器询问您如果wiki中要升级的文档已经被删除该怎么做）。
+userprofile.default=默认
+user.profile.groups.title=组
+user.profile.groups.description=这里列出了您的用户所属的所有组。
+user.profile.groups.table.group=组
+platform.core.profile.category.groups=组
+user.profile.notifications=通知
+user.profile.network.unfollow.question=您确定要取消关注此用户吗？
+user.profile.network.unfollow.question.yes=是的，取消关注
+user.profile.network.unfollow.question.no=不，取消
+user.profile.network.following=关注
+user.profile.network.notfollowing=未关注
+user.profile.network.follow=开始关注
+user.profile.network.unfollow=停止关注
+user.profile.network.done=完成
+user.profile.network.saving=保存...
+user.profile.network.error=保存通知设置时出错
+user.profile.status.done=完成
+user.profile.status.saving=保存...
+user.profile.status.error=保存用户状态时出错</content>
   
 </xwikidoc>

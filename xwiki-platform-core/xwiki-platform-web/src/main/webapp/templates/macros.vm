@@ -1503,10 +1503,8 @@ $Msz MB##
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      ## Note: Also display a cell when hidden in order to have the correct number of TDs in the table and so that it
-      ## passes validation.
-      <td class="xwiki-livetable-display-header-filter">
       #if ($columnProperties.type != 'hidden')
+        <td class="xwiki-livetable-display-header-filter">
           #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
             #set ($columnXPropertyName = $column)
@@ -1522,8 +1520,8 @@ $Msz MB##
             #set ($xproperty = $xclass.get($columnXPropertyName))
             #livetable_filter($column $columnProperties $xproperty)
           #end
+        </td>
       #end
-      </td>
     #end
   </tr>
 #end

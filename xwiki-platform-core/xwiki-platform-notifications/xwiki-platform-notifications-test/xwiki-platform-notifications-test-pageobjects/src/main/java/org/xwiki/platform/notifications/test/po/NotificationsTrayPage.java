@@ -79,12 +79,29 @@ public class NotificationsTrayPage extends ViewPage
      * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
      * the given user has on the given wiki, using user preferences.
      *
-     * @param userId the serialized user reference for which to get notifications.
+     * @param userId the serialized user reference for which to get notifications
      * @param wiki the wiki on which to get notifications
      * @param expectedUnread the number of expected unread notifications to wait for
      * @since 12.6
      */
     public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread)
+    {
+        waitOnNotificationCount(userId, wiki, expectedUnread, getUtil().getDriver().getTimeout());
+    }
+
+    /**
+     * Wait until the given number of unread notification is received.
+     * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
+     * the given user has on the given wiki, using user preferences.
+     *
+     * @param userId the serialized user reference for which to get notifications
+     * @param wiki the wiki on which to get notifications
+     * @param expectedUnread the number of expected unread notifications to wait for
+     * @param timeout the time delay in seconds before stopping the notifications count
+     * @since 12.8RC1
+     * @since 12.6.3
+     */
+    public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread, int timeout)
     {
         String notificationCountAjaxURL = String.format("/xwiki/rest/notifications/count?media=json&userId=%s"
             + "&useUserPreferences=true&currentWiki=%s&async=true", userId, wiki);
@@ -104,9 +121,8 @@ public class NotificationsTrayPage extends ViewPage
                         + "});");
                 responses.add(response);
                 return response != null && Integer.valueOf(response.toString()).equals(expectedUnread);
-            });
-        } catch (TimeoutException e)
-        {
+            }, timeout);
+        } catch (TimeoutException e) {
             String latestResponse = null;
             if (!responses.isEmpty()) {
                 Object response = responses.get(responses.size() - 1);
@@ -116,7 +132,7 @@ public class NotificationsTrayPage extends ViewPage
             }
             throw new TimeoutException(String.format(
                 "Timeout while waiting [%s] sec on notification count. Expected: [%s] - Latest result: [%s].",
-                getUtil().getDriver().getTimeout(), expectedUnread, latestResponse), e);
+                timeout, expectedUnread, latestResponse), e);
         }
         // Ensure to refresh the page after calling this wait, so the notification tray is updated.
         getUtil().getDriver().navigate().refresh();

@@ -162,9 +162,10 @@
       <code>require(['jquery', 'xwiki-meta'], function($, xm) {
   'use strict';
   const messages = ["$services.localization.render("rating.one-star")","$services.localization.render("rating.two-stars")","$services.localization.render("rating.three-stars")","$services.localization.render("rating.four-stars")","$services.localization.render("rating.five-stars")"];
+  const voteNumberMessage = "$services.localization.render('rating.votes')";
   const postURL = new XWiki.Document('RatingsUIX', 'XWiki.Ratings').getURL('get');
 
-  var setVote = function (wrapper, reference, vote) {
+  var setVote = function (wrapper, reference, vote, msgDiv) {
     var notification = new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('rating.setvote.inprogress')),
           'inprogress'
@@ -180,7 +181,10 @@
       var totalVotes = data.totalvotes;
       if ((averageVote = parseFloat(averageVote))) {
         var width = averageVote * 20 + "%";
-        wrapper.find('li.current-rating').first().width(width)
+        wrapper.find('li.current-rating').first().width(width);
+        msgDiv.text(totalVotes + " " + voteNumberMessage);
+        // reset it to not obtain back and old message when using mouseout/mouseover
+        msgDiv.previousMessage = "";
         notification.replace(new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('rating.setvote.success')),
           'done'
@@ -202,7 +206,7 @@
   var initLink = function (index, element, msgDiv, reference, wrapper) {
     var link = $(element);
     msgDiv.previousMessage = "";
-    link.on('click', function() { setVote(wrapper, reference, index + 1); });
+    link.on('click', function() { setVote(wrapper, reference, index + 1, msgDiv); });
     link.on('mouseout', function () {
       if (msgDiv.previousMessage != "") {
         msgDiv.text(msgDiv.previousMessage);

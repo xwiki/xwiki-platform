@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="">
   <web>XWiki.Ratings</web>
   <name>RatingsTranslations</name>
   <language/>
@@ -45,6 +45,10 @@ rating.voteoutofbounds=The vote is out of the scale limit.
 rating.setvote.inprogress=Your vote is being saved...
 rating.setvote.success=Your vote has been saved!
 rating.setvote.error=Error when saving your vote.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
+XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Enable
+XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Disable
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
 
 #@deprecatedstart
 

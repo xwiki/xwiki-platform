@@ -19,6 +19,7 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +29,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.ratings.RatingsConfiguration;
 
 /**
@@ -47,6 +50,9 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
     @Inject
     @Named("ratings")
     private ConfigurationSource configurationSource;
+
+    @Inject
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
     @Override
     public boolean isZeroStored()
@@ -87,7 +93,19 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
     @Override
     public Set<EntityReference> getExcludedReferencesFromRatings()
     {
-        return this.configurationSource.getProperty("excludedReferences", new HashSet<>());
+        Set<String> serializedExcludedReferences =
+            this.configurationSource.getProperty("excludedReferences", new HashSet<>());
+        Set<EntityReference> result;
+        if (serializedExcludedReferences.isEmpty()) {
+            result = Collections.emptySet();
+        } else {
+            result = new HashSet<>();
+            for (String serializedExcludedReference : serializedExcludedReferences) {
+                // FIXME: for now we are only considering page references, but it should be improved later.
+                result.add(this.entityReferenceResolver.resolve(serializedExcludedReference, EntityType.PAGE));
+            }
+        }
+        return result;
     }
 
     @Override

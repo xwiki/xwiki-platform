@@ -51,7 +51,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>averageRatingsManagerHint</name>
-      <number>4</number>
+      <number>5</number>
       <picker>1</picker>
       <prettyName>averageRatingsManagerHint</prettyName>
       <size>30</size>
@@ -60,6 +60,51 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </averageRatingsManagerHint>
+    <averageStored>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>averageStored</name>
+      <number>8</number>
+      <prettyName>averageStored</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </averageStored>
+    <dedicatedCore>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>dedicatedCore</name>
+      <number>7</number>
+      <prettyName>dedicatedCore</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </dedicatedCore>
+    <enabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>enabled</name>
+      <number>1</number>
+      <prettyName>enabled</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </enabled>
     <excludedReferences>
       <cache>0</cache>
       <classname/>
@@ -73,7 +118,7 @@
       <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>excludedReferences</name>
-      <number>2</number>
+      <number>3</number>
       <picker>1</picker>
       <prettyName>excludedReferences</prettyName>
       <relationalStorage>0</relationalStorage>
@@ -93,7 +138,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>ratingsManagerHint</name>
-      <number>3</number>
+      <number>4</number>
       <picker>1</picker>
       <prettyName>ratingsManagerHint</prettyName>
       <size>30</size>
@@ -107,7 +152,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>scaleUpperBound</name>
-      <number>1</number>
+      <number>2</number>
       <numberType>integer</numberType>
       <prettyName>scaleUpperBound</prettyName>
       <size>5</size>
@@ -116,5 +161,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </scaleUpperBound>
+    <zeroStored>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>zeroStored</name>
+      <number>6</number>
+      <prettyName>zeroStored</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </zeroStored>
   </class>
 </xwikidoc>

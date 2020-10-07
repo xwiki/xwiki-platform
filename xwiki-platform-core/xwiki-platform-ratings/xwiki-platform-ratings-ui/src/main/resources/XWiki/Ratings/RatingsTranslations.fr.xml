@@ -39,12 +39,12 @@
   <content>admin.ratings=Votes
 
 rating.rate=Votez !
-### Missing: rating.saveexception=Error when saving the rating.
-### Missing: rating.votenotvalid=You cannot vote with 0 value.
-### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
-### Missing: rating.setvote.inprogress=Your vote is being saved...
-### Missing: rating.setvote.success=Your vote has been saved!
-### Missing: rating.setvote.error=Error when saving your vote.
+rating.saveexception=Erreur à l'enregistrement du vote.
+rating.votenotvalid=Vous ne pouvez pas voter avec la valeur 0.
+rating.voteoutofbounds=Le vote est hors limite.
+rating.setvote.inprogress=Votre vote est en cours d'enregistrement ...
+rating.setvote.success=Votre vote a été enregistré.
+rating.setvote.error=Erreur à l'enregistrement de votre vote.
 
 #@deprecatedstart
 

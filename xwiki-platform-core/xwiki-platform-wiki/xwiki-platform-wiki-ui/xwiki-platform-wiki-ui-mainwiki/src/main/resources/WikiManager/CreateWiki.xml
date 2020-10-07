@@ -1133,6 +1133,7 @@ XWiki.WikiCreationStatusBar = Class.create({
         $('successMessage').removeClassName('hidden');
         if (response.hasErrorLog) {
           $('errorlogMessage').removeClassName('hidden');
+          $('cleanUp').removeClassName('hidden');
         }
         $('finalize').removeClassName('hidden');
       }

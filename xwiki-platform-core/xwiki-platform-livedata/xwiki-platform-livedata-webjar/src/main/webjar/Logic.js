@@ -20,20 +20,19 @@
 
 
 define([
-  "jquery",
   "Vue",
-  "livedata-root",
-  "polyfills"
+  "xwiki-livedata",
+  //"polyfills"
 ], function (
-  $,
-  Vue
+  Vue,
+  XWikiLivedata
 ) {
 
   /**
    * Map the element to its data object
    * So that each instance of the livedata on the page handle there own data
    */
-  var instancesMap = new WeakMap();
+  const instancesMap = new WeakMap();
 
 
 
@@ -43,14 +42,12 @@ define([
    * If the data does not exists yet, create it from the element
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
    */
-  var init = function (element) {
+  const init = function (element) {
 
     if (!instancesMap.has(element)) {
       // create a new logic object associated to the element
-      var logic = new Logic(element);
+      const logic = new Logic(element);
       instancesMap.set(element, logic);
-
-      logic.changeLayout();
     }
 
     return instancesMap.get(element);
@@ -63,20 +60,26 @@ define([
    * Can be used in the layouts to display the data, and call its API
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
-  var Logic = function (element) {
+  const Logic = function (element) {
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
-    this.currentLayout = "";
+    this.currentLayoutId = "";
+    this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
       selected: [],
-      unselected: [],
+      deselected: [],
       isGlobal: false,
     };
+    this.openedPanels = [];
+
     element.removeAttribute("data-data");
     // create Vuejs instance
     new Vue({
       el: this.element,
-      template: "<livedata-root :logic='logic'></livedata-root>",
+      components: {
+        "XWikiLivedata": XWikiLivedata,
+      },
+      template: "<XWikiLivedata :logic='logic'></XWikiLivedata>",
       data: {
         logic: this,
       },
@@ -104,17 +107,17 @@ define([
      * @param {Object} eventData The data associated with the event.
      *  The livedata object reference is automatically added
      */
-    triggerEvent: function (eventName, eventData) {
+    triggerEvent (eventName, eventData) {
       // configure event
-      var defaultData = {
+      const defaultData = {
         livedata: this,
       };
       eventName = "xwiki:livedata:" + eventName;
       eventData = {
         bubbles: true,
-        detail: $.extend(defaultData, eventData),
+        detail: Object.assign(defaultData, eventData),
       };
-      var event = new CustomEvent(eventName, eventData);
+      const event = new CustomEvent(eventName, eventData);
       // dispatch event
       this.element.dispatchEvent(event);
     },
@@ -124,7 +127,7 @@ define([
      * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
      * @param {Function} callback Function to call we the event is triggered
      */
-    onEvent: function (eventName, callback) {
+    onEvent (eventName, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
         callback(e.detail);
@@ -140,14 +143,12 @@ define([
      *  if Function, the function must return true. e.detail is passed as argument
      * @param {Function} callback Function to call we the event is triggered
      */
-    onEventWhere: function (eventName, condition, callback) {
+    onEventWhere (eventName, condition, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
         // Object check
         if (typeof condition === "object") {
-          var every = Object.keys(condition).every(function (key) {
-            return condition[key] === e.detail[key];
-          });
+          const every = Object.keys(condition).every(key => condition[key] === e.detail[key]);
           if (!every) { return; }
         }
         // Function check
@@ -169,13 +170,11 @@ define([
 
 
     /**
-     * Return the list of all property ids (from propertyDescriptors)
+     * Return the list of layout ids
      * @returns {Array}
      */
-    getPropertyIds: function () {
-      return this.data.meta.propertyDescriptors.map(function (propertyDescriptor) {
-        return propertyDescriptor.id;
-      });
+    getLayoutIds () {
+      return this.data.meta.layouts.map(layoutDescriptor => layoutDescriptor.id);
     },
 
 
@@ -183,10 +182,81 @@ define([
      * Return whether the specified property id is valid (i.e. the property has a descriptor)
      * @param {String} propertyId
      */
-    isValidPropertyId: function (propertyId) {
-      return this.getPropertyIds().indexOf(propertyId) !== -1;
+    isValidPropertyId (propertyId) {
+      return this.data.query.properties.includes(propertyId);
     },
 
+
+    /**
+     * Return the id of the given entry
+     * @param {Object} entry
+     * @returns {String}
+     */
+    getEntryId (entry) {
+      const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+      if (entry[idProperty] === undefined) {
+        console.warn("Entry has no id (at property [" + idProperty + "]", entry);
+        return;
+      }
+      return entry[idProperty];
+    },
+
+
+    /*
+      As Sets are not reactive in Vue 2.x, if we want to create
+      a reactive collection of unique objects, we have to use arrays.
+      So here are some handy functions to do what Sets do, but with arrays
+    */
+
+    /**
+     * Return whether the array has the given item
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayHas (uniqueArray, item) {
+      return uniqueArray.includes(item);
+    },
+
+
+    /**
+     * Add the given item if not present in the array, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayAdd (uniqueArray, item) {
+      if (this.uniqueArrayHas(uniqueArray, item)) { return; }
+      uniqueArray.push(item);
+    },
+
+
+    /**
+     * Remove the given item from the array if present, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     */
+    uniqueArrayRemove (uniqueArray, item) {
+      const index = uniqueArray.indexOf(item);
+      if (index === -1) { return; }
+      uniqueArray.splice(index, 1);
+    },
+
+
+    /**
+     * Toggle the given item from the array, ensuring its uniqueness
+     * @param {Array} uniqueArray An array of unique items
+     * @param {Any} item
+     * @param {Boolean} force Optional: true force add / false force remove
+     */
+    uniqueArrayToggle (uniqueArray, item, force) {
+      if (force === undefined) {
+        force = !this.uniqueArrayHas(uniqueArray, item);
+      }
+      if (force) {
+        this.uniqueArrayAdd(uniqueArray, item);
+      } else {
+        this.uniqueArrayRemove(uniqueArray, item);
+      }
+    },
 
 
 
@@ -198,14 +268,26 @@ define([
 
 
     /**
+     * Returns the property descriptors of displayable properties
+     * @returns {Array}
+     */
+    getPropertyDescriptors () {
+      return this.data.query.properties.map(propertyId => this.getPropertyDescriptor(propertyId));
+    },
+
+
+    /**
      * Return the property descriptor corresponding to a property id
      * @param {String} propertyId
      * @returns {Object}
      */
-    getPropertyDescriptor: function (propertyId) {
-      return this.data.meta.propertyDescriptors.find(function (propertyDescriptor) {
-        return propertyDescriptor.id === propertyId;
-      });
+    getPropertyDescriptor (propertyId) {
+      const propertyDescriptor = this.data.meta.propertyDescriptors
+        .find(propertyDescriptor => propertyDescriptor.id === propertyId);
+      if (!propertyDescriptor) {
+        console.error("Property descriptor of property `" + propertyId + "` does not exists");
+      }
+      return propertyDescriptor;
     },
 
 
@@ -214,24 +296,22 @@ define([
      * @param {String} propertyId
      * @returns {Object}
      */
-    getPropertyTypeDescriptor: function (propertyId) {
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+    getPropertyTypeDescriptor (propertyId) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       if (!propertyDescriptor) { return; }
-      return this.data.meta.propertyTypes.find(function (typeDescriptor) {
-        return typeDescriptor.id === propertyDescriptor.type;
-      });
+      return this.data.meta.propertyTypes
+        .find(typeDescriptor => typeDescriptor.id === propertyDescriptor.type);
     },
 
 
     /**
-     * Return the property type descriptor corresponding to a property id
+     * Return the layout descriptor corresponding to a layout id
      * @param {String} propertyId
      * @returns {Object}
      */
-    getLayoutDescriptor: function (layoutId) {
-      return this.data.meta.layoutDescriptors.find(function (layoutDescriptor) {
-        return layoutDescriptor.id === layoutId;
-      });
+    getLayoutDescriptor (layoutId) {
+      return this.data.meta.layouts
+        .find(layoutDescriptor => layoutDescriptor.id === layoutId);
     },
 
 
@@ -240,29 +320,27 @@ define([
      * @param {String} propertyId
      * @returns {Object}
      */
-    getDisplayerDescriptor: function (propertyId) {
+    getDisplayerDescriptor (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
+      const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      var typeDescriptorDisplayer = typeDescriptor.displayer || {};
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
+      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
       // merge property and/or type displayer descriptors
-      var highLevelDisplayer;
+      let highLevelDisplayer;
       if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
-        highLevelDisplayer = $.extend({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+        highLevelDisplayer = Object.assign({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
       } else {
-        highLevelDisplayer = $.extend({}, propertyDescriptorDisplayer);
+        highLevelDisplayer = Object.assign({}, propertyDescriptorDisplayer);
       }
       // displayer config
-      var displayerId = highLevelDisplayer.id;
-      var displayer = this.data.meta.displayers.find(function (displayer) {
-        return displayer.id === displayerId;
-      });
+      const displayerId = highLevelDisplayer.id;
+      const displayer = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
       // merge displayers
       if (highLevelDisplayer.id) {
-        return $.extend({}, displayer, highLevelDisplayer);
+        return Object.assign({}, displayer, highLevelDisplayer);
       } else {
         // default displayer
         return { id: this.data.meta.defaultDisplayer };
@@ -275,33 +353,78 @@ define([
      * @param {String} propertyId
      * @returns {Object}
      */
-    getFilterDescriptor: function (propertyId) {
+    getFilterDescriptor (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      var propertyDescriptorFilter = propertyDescriptor.filter || {};
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
+      const propertyDescriptorFilter = propertyDescriptor.filter || {};
       // property type descriptor config
-      var typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      var typeDescriptorFilter = typeDescriptor.filter || {};
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
+      const typeDescriptorFilter = typeDescriptor.filter || {};
       // merge property and/or type filter descriptors
-      var highLevelFilter;
+      let highLevelFilter;
       if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
-        highLevelFilter = $.extend({}, typeDescriptorFilter, propertyDescriptorFilter);
+        highLevelFilter = Object.assign({}, typeDescriptorFilter, propertyDescriptorFilter);
       } else {
-        highLevelFilter = $.extend({}, propertyDescriptorFilter);
+        highLevelFilter = Object.assign({}, propertyDescriptorFilter);
       }
       // filter filter config
-      var filterId = highLevelFilter.id;
-      var filter = this.data.meta.filters.find(function (filter) {
-        return filter.id === filterId;
-      });
+      const filterId = highLevelFilter.id;
+      const filter = this.data.meta.filters.find(filter => filter.id === filterId);
       // merge filters
       if (highLevelFilter.id) {
-        return $.extend({}, filter, highLevelFilter);
+        return Object.assign({}, filter, highLevelFilter);
       } else {
         // default filter
         return { id: this.data.meta.defaultFilter };
       }
+    },
+
+
+
+
+    /**
+     * ---------------------------------------------------------------
+     * LAYOUT
+     */
+
+
+    fetchEntries () {
+      return new Promise(function (resolve, reject) {
+        const err = new Error("Error while fetching entries");
+        // TODO: FETCH ENTRIES FROM HERE
+        reject(err);
+      });
+    },
+
+
+    updateEntries () {
+      return this.fetchEntries()
+        .then(entries => this.data.data.entries = entries)
+        .catch(err => console.error(err));
+    },
+
+
+    addEntry () {
+      const mockNewUrl = () => this.getEntryId(this.data.data.entries.slice(-1)[0]) + "0";
+      // TODO: CALL FUNCTION TO CREATE NEW DATA HERE
+      Promise.resolve({ /* MOCK DATA */
+        "doc_url": mockNewUrl(),
+        "doc_name": undefined,
+        "doc_date": "2020/03/27 13:23",
+        "doc_title": undefined,
+        "doc_author": "Author 1",
+        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creator": "Creator 1",
+        "age": undefined,
+        "tags": undefined,
+        "country": undefined,
+        "other": undefined,
+      })
+      .then(newEntry => {
+        this.data.data.entries.push(newEntry);
+        this.data.data.count++; // TODO: remove when merging with backend
+      });
     },
 
 
@@ -318,54 +441,19 @@ define([
      * @param {String} layoutId The id of the layout to load with requireJS
      * @returns {Promise}
      */
-    changeLayout: function (layoutId) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-
-        layoutId = layoutId || self.data.meta.defaultLayout;
-        // layout already loaded
-        if (layoutId === self.currentLayout) {
-          return void resolve(layoutId);
-        }
-        // bad layout
-        if (self.data.meta.layouts.indexOf(layoutId) === -1) { return void reject(); }
-        var layoutDescriptor = self.getLayoutDescriptor(layoutId);
-        if (!layoutDescriptor) { return void reject(); }
-
-        // requirejs success callback
-        var loadLayoutSuccess = function () {
-          var previousLayoutId = self.currentLayout;
-          self.currentLayout = layoutId;
-          // dispatch events
-          self.triggerEvent("layoutChange", {
-            layoutId: layoutId,
-            previousLayoutId: previousLayoutId,
-          });
-          resolve(layoutId);
-        };
-
-        // requirejs error callback
-        var loadLayoutFailure = function (err) {
-          console.warn(err);
-          // try to load default layout instead
-          if (layoutId !== self.data.meta.defaultLayout) {
-            self.changeLayout(self.data.meta.defaultLayout).then(function (layout) {
-              resolve(layout);
-            }, function () {
-              reject();
-            });
-          } else {
-            console.error(err);
-            reject();
-          }
-        };
-
-        // load layout based on it's filename
-        require(["livedata-layout-" + layoutId],
-          loadLayoutSuccess,
-          loadLayoutFailure
-        );
-
+    changeLayout (layoutId) {
+      // bad layout
+      if (!this.getLayoutDescriptor(layoutId)) {
+        console.error("Layout of id `" + layoutId + "` does not have a descriptor");
+        return;
+      }
+      // set layout
+      const previousLayoutId = this.currentLayoutId;
+      this.currentLayoutId = layoutId;
+      // dispatch events
+      this.triggerEvent("layoutChange", {
+        layoutId: layoutId,
+        previousLayoutId: previousLayoutId,
       });
     },
 
@@ -382,7 +470,7 @@ define([
      * Get total number of pages
      * @returns {Number}
      */
-    getPageCount: function () {
+    getPageCount () {
       return Math.ceil(this.data.data.count / this.data.query.limit);
     },
 
@@ -392,7 +480,7 @@ define([
      * @param {Number} entryIndex The index of the entry. Uses current entry if undefined.
      * @returns {Number}
      */
-    getPageIndex: function (entryIndex) {
+    getPageIndex (entryIndex) {
       if (entryIndex === undefined) {
         entryIndex = this.data.query.offset;
       }
@@ -405,17 +493,16 @@ define([
      * @param {Number} pageIndex
      * @returns {Promise}
      */
-    setPageIndex: function (pageIndex) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-        if (pageIndex < 0 || pageIndex >= self.getPageCount()) { return void reject(); }
-        var previousPageIndex = self.getPageIndex();
-        self.data.query.offset = self.getFirstIndexOfPage(pageIndex);
-        self.triggerEvent("pageChange", {
+    setPageIndex (pageIndex) {
+      return new Promise ((resolve, reject) => {
+        if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return void reject(); }
+        const previousPageIndex = this.getPageIndex();
+        this.data.query.offset = this.getFirstIndexOfPage(pageIndex);
+        this.triggerEvent("pageChange", {
           pageIndex: pageIndex,
           previousPageIndex: previousPageIndex,
         });
-        // CALL FUNCTION TO FETCH NEW DATA HERE
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
         resolve();
       });
     },
@@ -426,7 +513,7 @@ define([
      * @param {Number} pageIndex The page index. Uses current page if undefined.
      * @returns {Number}
      */
-    getFirstIndexOfPage: function (pageIndex) {
+    getFirstIndexOfPage (pageIndex) {
       if (pageIndex === undefined) {
         pageIndex = this.getPageIndex();
       }
@@ -443,7 +530,7 @@ define([
      * @param {Number} pageIndex The page index. Uses current page if undefined.
      * @returns {Number}
      */
-    getLastIndexOfPage: function (pageIndex) {
+    getLastIndexOfPage (pageIndex) {
       if (pageIndex === undefined) {
         pageIndex = this.getPageIndex();
       }
@@ -460,20 +547,69 @@ define([
      * @param {Number} pageSize
      * @returns {Promise}
      */
-    setPageSize: function (pageSize) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
+    setPageSize (pageSize) {
+      return new Promise ((resolve, reject) => {
         if (pageSize < 0) { return void reject(); }
-        var previousPageSize = self.data.query.limit;
+        const previousPageSize = this.data.query.limit;
         if (pageSize === previousPageSize) { return void resolve(); }
-        self.data.query.limit = pageSize;
-        self.triggerEvent("pageSizeChange", {
+        this.data.query.limit = pageSize;
+        this.triggerEvent("pageSizeChange", {
           pageSize: pageSize,
           previousPageSize: previousPageSize,
         });
-        // CALL FUNCTION TO FETCH NEW DATA HERE
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
         resolve();
       });
+    },
+
+
+
+
+    /**
+     * ---------------------------------------------------------------
+     * DISPLAY
+     */
+
+
+    /**
+     * Returns whether a certain property is visible
+     * @param {String} propertyId
+     * @returns {Boolean}
+     */
+    isPropertyVisible (propertyId) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      return propertyDescriptor.visible;
+    },
+
+
+    /**
+     * Set whether the given property should be visible
+     * @param {String} propertyId
+     * @param {Boolean} visible
+     */
+    setPropertyVisible (propertyId, visible) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      propertyDescriptor.visible = visible;
+    },
+
+
+    /**
+     * Move a property to a certain index in the property order list
+     * @param {String|Number} from The id or index of the property to move
+     * @param {Number} toIndex
+     */
+    reorderProperty (from, toIndex) {
+      let fromIndex;
+      if (typeof from === "number") {
+        fromIndex = from;
+      } else if (typeof from === "string") {
+        if (!this.isValidPropertyId(from)) { return; }
+        fromIndex = this.data.query.properties.indexOf(from);
+      } else {
+        return;
+      }
+      if (fromIndex <= -1 || toIndex <= -1) { return; }
+      this.data.query.properties.splice(toIndex, 0, this.data.query.properties.splice(fromIndex, 1)[0]);
     },
 
 
@@ -490,11 +626,12 @@ define([
      * @param {Object} entry
      * @returns {Boolean}
      */
-    isEntrySelected: function (entry) {
+    isEntrySelected (entry) {
+      const entryId = this.getEntryId(entry);
       if (this.entrySelection.isGlobal) {
-        return this.entrySelection.unselected.indexOf(entry) === -1;
+        return !this.uniqueArrayHas(this.entrySelection.deselected, entryId);
       } else {
-        return this.entrySelection.selected.indexOf(entry) !== -1;
+        return this.uniqueArrayHas(this.entrySelection.selected, entryId);
       }
     },
 
@@ -503,40 +640,40 @@ define([
      * Select the specified entries
      * @param {Object|Array} entries
      */
-    selectEntries: function (entries) {
-      var self = this;
-      var entryArray = (entries instanceof Array) ? entries : [entries];
-      entryArray.forEach(function (entry) {
-        if (self.entrySelection.isGlobal) {
-          var index = self.entrySelection.unselected.indexOf(entry);
-          if (index === -1) { return; }
-          self.entrySelection.unselected.splice(index, 1);
+    selectEntries (entries) {
+      const entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(entry => {
+        const entryId = this.getEntryId(entry);
+        if (this.entrySelection.isGlobal) {
+          this.uniqueArrayRemove(this.entrySelection.deselected, entryId);
         }
         else {
-          if (self.entrySelection.selected.indexOf(entry) !== -1) { return; }
-          self.entrySelection.selected.push(entry);
+          this.uniqueArrayAdd(this.entrySelection.selected, entryId);
         }
+        this.triggerEvent("select", {
+          entry: entry,
+        });
       });
     },
 
 
     /**
-     * Unselect the specified entries
+     * Deselect the specified entries
      * @param {Object|Array} entries
      */
-    unselectEntries: function (entries) {
-      var self = this;
-      var entryArray = (entries instanceof Array) ? entries : [entries];
-      entryArray.forEach(function (entry) {
-        if (self.entrySelection.isGlobal) {
-          if (self.entrySelection.unselected.indexOf(entry) !== -1) { return; }
-          self.entrySelection.unselected.push(entry);
+    deselectEntries (entries) {
+      const entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(entry => {
+        const entryId = this.getEntryId(entry);
+        if (this.entrySelection.isGlobal) {
+          this.uniqueArrayAdd(this.entrySelection.deselected, entryId);
         }
         else {
-          var index = self.entrySelection.selected.indexOf(entry);
-          if (index === -1) { return; }
-          self.entrySelection.selected.splice(index, 1);
+          this.uniqueArrayRemove(this.entrySelection.selected, entryId);
         }
+        this.triggerEvent("deselect", {
+          entry: entry,
+        });
       });
     },
 
@@ -546,30 +683,45 @@ define([
      * @param {Object|Array} entries
      * @param {Boolean} select Whether to select or not the entries. Undefined toggle current state
      */
-    toggleSelectEntries: function (entries, select) {
-      var self = this;
-      var entryArray = (entries instanceof Array) ? entries : [entries];
-      entryArray.forEach(function (entry) {
+    toggleSelectEntries (entries, select) {
+      const entryArray = (entries instanceof Array) ? entries : [entries];
+      entryArray.forEach(entry => {
         if (select === undefined) {
-          select = !self.isEntrySelected(entry);
+          select = !this.isEntrySelected(entry);
         }
         if (select) {
-          self.selectEntries(entry);
+          this.selectEntries(entry);
         } else {
-          self.unselectEntries(entry);
+          this.deselectEntries(entry);
         }
       });
     },
 
 
     /**
-     * Set the entry selection globally accross pages
-     * @param {Boolean} bool
+     * Get number of selected entries
+     * @returns {Number}
      */
-    setEntrySelectGlobal: function (bool) {
-      this.entrySelection.isGlobal = bool;
+    getSelectedEntriesCount () {
+      if (this.entrySelection.isGlobal) {
+        return this.data.data.count - this.entrySelection.deselected.length;
+      } else {
+        return this.entrySelection.selected.length;
+      }
+    },
+
+
+    /**
+     * Set the entry selection globally accross pages
+     * @param {Boolean} global
+     */
+    setEntrySelectGlobal (global) {
+      this.entrySelection.isGlobal = global;
       this.entrySelection.selected.splice(0);
-      this.entrySelection.unselected.splice(0);
+      this.entrySelection.deselected.splice(0);
+      this.triggerEvent("selectGlobal", {
+        state: global,
+      });
     },
 
 
@@ -586,11 +738,12 @@ define([
      * @param {String} propertyId
      * @returns {Boolean}
      */
-    isPropertySortable: function (propertyId) {
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.sortable ||
-        (propertyDescriptor.sortable === undefined && propertyTypeDescriptor.sortable);
+    isPropertySortable (propertyId) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return propertyDescriptor.sortable !== undefined ?
+      propertyDescriptor.sortable :
+      propertyTypeDescriptor.sortable;
     },
 
 
@@ -598,11 +751,9 @@ define([
      * Returns the property descriptors of sortable properties
      * @returns {Array}
      */
-    getSortablePropertyDescriptors: function () {
-      var self = this;
-      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
-        return self.isPropertySortable(propertyDescriptor.id);
-      });
+    getSortablePropertyDescriptors () {
+      return this.data.meta.propertyDescriptors
+        .filter(propertyDescriptor => this.isPropertySortable(propertyDescriptor.id));
     },
 
 
@@ -610,32 +761,28 @@ define([
      * Get the sort query associated to a property id
      * @param {String} propertyId
      */
-    getQuerySort: function (propertyId) {
+    getQuerySort (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
-      return this.data.query.sort.find(function (sort) {
-        return sort.property === propertyId;
-      });
+      return this.data.query.sort.find(sort => sort.property === propertyId);
     },
 
 
     /**
      * Update sort configuration based on parameters, then fetch new data
      * @param {String} property The property to sort according to
-     * @param {String} level The sort level of the property (0 is the highest).
-     *   Undefined means current. Negative value removes property sort.
+     * @param {String} level The sort level for the property (0 is the highest).
+     *   Undefined means keep current. Negative value removes property sort.
      * @param {String} descending Specify whether the sort should be descending or not.
      *   Undefined means toggle current direction
      * @returns {Promise}
      */
-    sort: function (property, level, descending) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-        if (!self.isValidPropertyId(property)) { return void reject(); }
-        if (!self.isPropertySortable(property)) { return void reject(); }
+    sort (property, level, descending) {
+      const err = new Error("Property `" + property + "` is not sortable");
+      return new Promise ((resolve, reject) => {
+        if (!this.isValidPropertyId(property)) { return void reject(err); }
+        if (!this.isPropertySortable(property)) { return void reject(err); }
         // find property current sort level
-        var currentLevel = self.data.query.sort.findIndex(function (sortObject) {
-          return sortObject.property === property;
-        });
+        const currentLevel = this.data.query.sort.findIndex(sortObject => sortObject.property === property);
         // default level
         if (level === undefined) {
           level = (currentLevel !== -1) ? currentLevel : 0;
@@ -644,28 +791,28 @@ define([
         }
         // default descending
         if (descending === undefined) {
-          descending = (currentLevel !== -1) ? !self.data.query.sort[currentLevel].descending : false;
+          descending = (currentLevel !== -1) ? !this.data.query.sort[currentLevel].descending : false;
         }
         // create sort object
-        var sortObject = {
+        const sortObject = {
           property: property,
           descending: descending,
         };
         // apply sort
         if (level !== -1) {
-          self.data.query.sort.splice(level, 1, sortObject);
+          this.data.query.sort.splice(level, 1, sortObject);
         }
         if (currentLevel !== -1 && currentLevel !== level) {
-          self.data.query.sort.splice(currentLevel, 1);
+          this.data.query.sort.splice(currentLevel, 1);
         }
         // dispatch events
-        self.triggerEvent("sort", {
+        this.triggerEvent("sort", {
           property: property,
           level: level,
           descending: descending,
         });
 
-        // CALL FUNCTION TO FETCH NEW DATA HERE
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
         resolve();
       });
     },
@@ -679,15 +826,10 @@ define([
      *   Undefined means toggle current direction
      * @returns {Promise}
      */
-    addSort: function (property, descending) {
-      var currentLevel = -1;
-      this.data.query.sort.some(function (sortObject, i) {
-        if (sortObject.property === property) {
-          currentLevel = i;
-          return;
-        }
-      });
-      if (currentLevel !== -1) { return Promise.reject(); }
+    addSort (property, descending) {
+      const err = new Error("Property `" + property + "` is already sorting");
+      const propertyQuerySort = this.data.query.sort.find(sortObject => sortObject.property === property);
+      if (propertyQuerySort) { return Promise.reject(err); }
       return this.sort(property, this.data.query.sort.length, descending);
     },
 
@@ -697,8 +839,34 @@ define([
      * @param {String} property The property to remove to the sort
      * @returns {Promise}
      */
-    removeSort: function (property) {
+    removeSort (property) {
       return this.sort(property, -1);
+    },
+
+
+    /**
+     * Move a sort entry to a certain index in the query sort list
+     * @param {String} property The property to reorder the sort
+     * @param {Number} toIndex
+     */
+    reorderSort (propertyId, toIndex) {
+      const err = new Error("Property `" + propertyId + "` is not sortable");
+      return new Promise ((resolve, reject) => {
+        if (!this.isValidPropertyId(propertyId)) { return void reject(err); }
+        const fromIndex = this.data.query.sort.findIndex(querySort => querySort.property === propertyId);
+        if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
+        this.data.query.sort.splice(toIndex, 0, this.data.query.sort.splice(fromIndex, 1)[0]);
+
+        // dispatch events
+        this.triggerEvent("sort", {
+          type: "move",
+          property: propertyId,
+          level: toIndex,
+        });
+
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
+        resolve();
+      });
     },
 
 
@@ -715,11 +883,12 @@ define([
      * @param {String} propertyId
      * @returns {Boolean}
      */
-    isPropertyFilterable: function (propertyId) {
-      var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-      var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.filterable ||
-        (propertyDescriptor.filterable === undefined && propertyTypeDescriptor.filterable);
+    isPropertyFilterable (propertyId) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return propertyDescriptor.filterable !== undefined ?
+        propertyDescriptor.filterable :
+        propertyTypeDescriptor.filterable;
     },
 
 
@@ -727,11 +896,9 @@ define([
      * Returns the property descriptors of filterable properties
      * @returns {Array}
      */
-    getFilterablePropertyDescriptors: function () {
-      var self = this;
-      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
-        return self.isPropertyFilterable(propertyDescriptor.id);
-      });
+    getFilterablePropertyDescriptors () {
+      return this.data.meta.propertyDescriptors
+        .filter(propertyDescriptor => this.isPropertyFilterable(propertyDescriptor.id));
     },
 
 
@@ -740,11 +907,9 @@ define([
      * @param {String} propertyId
      * @returns {Object}
      */
-    getQueryFilterGroup: function (propertyId) {
+    getQueryFilterGroup (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
-      return this.data.query.filters.find(function (filter) {
-        return filter.property === propertyId;
-      });
+      return this.data.query.filters.find(filter => filter.property === propertyId);
     },
 
 
@@ -753,9 +918,9 @@ define([
      * @param {String} propertyId
      * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
      */
-    getQueryFilters: function (propertyId) {
+    getQueryFilters (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
-      var queryFilterGroup = this.getQueryFilterGroup(propertyId);
+      const queryFilterGroup = this.getQueryFilterGroup(propertyId);
       return queryFilterGroup && queryFilterGroup.constrains || [];
     },
 
@@ -765,18 +930,16 @@ define([
      * @param {String} propertyId
      * @returns {String}
      */
-    getFilterDefaultOperator: function (propertyId) {
+    getFilterDefaultOperator (propertyId) {
       // get valid operator descriptor
-      var filterDescriptor = this.getFilterDescriptor(propertyId);
+      const filterDescriptor = this.getFilterDescriptor(propertyId);
       if (!filterDescriptor) { return; }
-      var filterOperators = filterDescriptor.operators;
+      const filterOperators = filterDescriptor.operators;
       if (!(filterOperators instanceof Array)) { return; }
       if (filterOperators.length === 0) { return; }
       // get default operator
-      var defaultOperator = filterDescriptor.defaultOperator;
-      var isDefaultOperatorValid = !!filterOperators.find(function (operator) {
-        return operator.id === defaultOperator;
-      });
+      const defaultOperator = filterDescriptor.defaultOperator;
+      const isDefaultOperatorValid = !!filterOperators.find(operator => operator.id === defaultOperator);
       if (defaultOperator && isDefaultOperatorValid) {
         return defaultOperator;
       } else {
@@ -796,31 +959,31 @@ define([
      * @returns {Object} {oldEntry, newEntry}
      *  with oldEntry / newEntry being {property, index, operator, value}
      */
-    _computeFilterEntries: function (property, index, filterEntry) {
-      var self = this;
+    _computeFilterEntries (property, index, filterEntry) {
       if (!this.isValidPropertyId(property)) { return; }
       if (!this.isPropertyFilterable(property)) { return; }
       // default indexes
       index = index || 0;
-      if (index < 0) { return; }
+      if (index < 0) { index = -1; }
       if (filterEntry.index < 0) { filterEntry.index = -1; }
       // old entry
-      var oldEntry = {
+      let oldEntry = {
         property: property,
         index: index,
       };
-      var queryFilters = this.getQueryFilters(property);
-      var currentEntry = queryFilters[index] || {};
-      oldEntry = $.extend({}, currentEntry, oldEntry);
+      const queryFilters = this.getQueryFilters(property);
+      const currentEntry = queryFilters[index] || {};
+      oldEntry = Object.assign({}, currentEntry, oldEntry);
       // new entry
-      var newEntry = filterEntry || {};
-      var defaultEntry = {
+      let newEntry = filterEntry || {};
+      const self = this;
+      const defaultEntry = {
         property: property,
         value: "",
         get operator () { return self.getFilterDefaultOperator(this.property); },
         index: 0,
       };
-      newEntry = $.extend({}, defaultEntry, oldEntry, newEntry);
+      newEntry = Object.assign({}, defaultEntry, oldEntry, newEntry);
       return {
         oldEntry: oldEntry,
         newEntry: newEntry,
@@ -834,9 +997,9 @@ define([
      * @param {Oject} newEntry
      * @returns {String} "add" | "remove" | "move" | "modify"
      */
-    _getFilteringType: function (oldEntry, newEntry) {
-      var queryFilter = this.getQueryFilterGroup(oldEntry.property);
-      if (queryFilter && oldEntry.index >= queryFilter.constrains.length) {
+    _getFilteringType (oldEntry, newEntry) {
+      const queryFilter = this.getQueryFilterGroup(oldEntry.property);
+      if (queryFilter && oldEntry.index === -1) {
         return "add";
       }
       if (newEntry.index === -1) {
@@ -863,44 +1026,46 @@ define([
      * @param {String} filterEntry.value Value for the new filter entry
      * @returns {Promise}
      */
-    filter: function (property, index, filterEntry) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-        var filterEntries = self._computeFilterEntries(property, index, filterEntry);
-        if (!filterEntries) { return void reject(); }
-        var oldEntry = filterEntries.oldEntry;
-        var newEntry = filterEntries.newEntry;
-        var filteringType = self._getFilteringType(oldEntry, newEntry);
+    filter (property, index, filterEntry) {
+      const err = new Error("Property `" + property + "` is not filterable");
+      return new Promise ((resolve, reject) => {
+        const filterEntries = this._computeFilterEntries(property, index, filterEntry);
+        if (!filterEntries) { return void reject(err); }
+        const oldEntry = filterEntries.oldEntry;
+        const newEntry = filterEntries.newEntry;
+        const filteringType = this._getFilteringType(oldEntry, newEntry);
         // remove filter at current property and index
-        self.getQueryFilters(oldEntry.property).splice(index, 1);
+        if (oldEntry.index !== -1) {
+          this.getQueryFilters(oldEntry.property).splice(index, 1);
+        }
         // add filter at new property and index
         if (newEntry.index !== -1) {
           // create filterGroup if not exists
-          if (!self.getQueryFilterGroup(newEntry.property)) {
-            self.data.query.filters.push({
+          if (!this.getQueryFilterGroup(newEntry.property)) {
+            this.data.query.filters.push({
               property: newEntry.property,
               matchAll: true,
               constrains: [],
             });
           }
           // add entry
-          self.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+          this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
             operator: newEntry.operator,
             value: newEntry.value,
           });
         }
         // remove filter group if empty
-        if (self.getQueryFilters(oldEntry.property).length === 0) {
-          self.removeAllFilters(oldEntry.property);
+        if (this.getQueryFilters(oldEntry.property).length === 0) {
+          this.removeAllFilters(oldEntry.property);
         }
         // dispatch events
-        self.triggerEvent("filter", {
+        this.triggerEvent("filter", {
           type: filteringType,
           oldEntry: oldEntry,
           newEntry: newEntry,
         });
 
-        // CALL FUNCTION TO FETCH NEW DATA HERE
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
         resolve();
       });
     },
@@ -911,14 +1076,18 @@ define([
      * @param {String} property Which property to add the filter to
      * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
      * @param {String} value Default value for the new filter entry
+     * @param {Number} index Index of new filter entry. Undefined means last
      * @returns {Promise}
      */
-    addFilter: function (property, operator, value) {
-      var index = ((this.getQueryFilterGroup(property) || []).constrains || []).length;
-      return this.filter(property, index, {
+    addFilter (property, operator, value, index) {
+      if (index === undefined) {
+        index = ((this.getQueryFilterGroup(property) || {}).constrains || []).length;
+      }
+      return this.filter(property, -1, {
         property: property,
         operator: operator,
-        value: value
+        value: value,
+        index: index,
       });
     },
 
@@ -929,7 +1098,7 @@ define([
      * @param {String} index The index of the filter to remove. Undefined means last.
      * @returns {Promise}
      */
-    removeFilter: function (property, index) {
+    removeFilter (property, index) {
       return this.filter(property, index, {index: -1});
     },
 
@@ -939,22 +1108,20 @@ define([
      * @param {String} property Property to remove the filters to
      * @returns {Promise}
      */
-    removeAllFilters: function (property) {
-      var self = this;
-      return new Promise (function (resolve, reject) {
-        if (!self.isValidPropertyId(property)) { return; }
-        var filterIndex = self.data.query.filters.findIndex(function (filterGroup, i) {
-          return filterGroup.property === property;
-        });
+    removeAllFilters (property) {
+      return new Promise ((resolve, reject) => {
+        if (!this.isValidPropertyId(property)) { return; }
+        const filterIndex = this.data.query.filters
+          .findIndex(filterGroup => filterGroup.property === property);
         if (filterIndex === -1) { return void reject(); }
-        var removedFilterGroups = self.data.query.filters.splice(filterIndex, 1);
+        const removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
         // dispatch events
-        self.triggerEvent("filter", {
+        this.triggerEvent("filter", {
           type: "removeAll",
           property: property,
           removedFilters: removedFilterGroups[0].constrains,
         });
-        // CALL FUNCTION TO FETCH NEW DATA HERE
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
         resolve();
       });
     },

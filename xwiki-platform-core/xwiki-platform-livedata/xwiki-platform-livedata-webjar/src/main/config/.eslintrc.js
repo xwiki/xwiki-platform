@@ -31,10 +31,11 @@ module.exports = {
     parser: 'babel-eslint'
   },
   rules: {
-    'no-console': 'warn',
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
     'no-debugger': 'warn'
   },
   globals: {
-    define: 'readonly'
+    define: 'readonly',
+    XWiki: 'writable'
   }
 };

@@ -1,4 +1,4 @@
-/*
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,16 +16,44 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+ -->
 
-module.exports = {
-  // See https://cli.vuejs.org/config/
-  publicPath: "/xwiki/resources/uicomponents/livedata/",
-  filenameHashing: false,
-  chainWebpack: config => {
-    config.optimization.delete("splitChunks");
-  },
-  css: {
-    extract: false,
-  },
+
+<!--
+  FilterText is a custom filter that allow to filter strings
+-->
+<template>
+  <!--
+    Simple input of type text that apply filter on change event
+  -->
+  <input
+    class="filter-text"
+    type="text"
+    size="1"
+    :value="filterEntry.value"
+    @change="applyFilter($event.target.value)"
+  />
+</template>
+
+
+<script>
+import filterMixin from "./filterMixin.js";
+
+export default {
+
+  name: "filter-text",
+
+  // Add the filterMixin to get access to all the filters methods and computed properties inside this component
+  mixins: [filterMixin],
+
 };
+</script>
+
+
+<style>
+
+.livedata-filter .filter-text {
+  width: 100%;
+}
+
+</style>

@@ -8,7 +8,7 @@
  * the License, or (at your option) any later version.
  *
  * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty oftopbar
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
@@ -24,8 +24,10 @@
 
 define({
 
+  id: "LD0",
+
   query: {
-    properties: ["doc_title", "age", "country", "job", "other"],
+    properties: ["doc_title", "age", "country", "tags", "other"],
 
     source: {
       id: "...",
@@ -55,10 +57,9 @@ define({
 
   meta: {
 
-    layouts: ["table", "cards"],
     defaultLayout: "table",
 
-    layoutDescriptors: [
+    layouts: [
       {
         id: "table",
         name: "Table",
@@ -77,6 +78,7 @@ define({
         id: "doc_title",
         name: "Name",
         type: "string",
+        visible: true,
         displayer: {
           id: 'link',
           propertyHref: "doc_url",
@@ -86,24 +88,28 @@ define({
         id: "age",
         name: "Age",
         type: "number",
-        displayer: {
-          id: 'number',
-        },
+        visible: true,
       },
       {
-        id: "job",
-        name: "Job",
-        type: "string",
+        id: "tags",
+        name: "Tags",
+        type: "list",
+        visible: true,
+        filter: {
+          options: ["Tag 1", "Tag 2", "Tag 3"],
+        },
       },
       {
         id: "country",
         name: "Country",
         type: "string",
+        visible: true,
       },
       {
         id: "other",
         name: "Autre truc",
         type: "string",
+        visible: true,
         displayer: {
           id: "html",
         },
@@ -129,12 +135,24 @@ define({
         id: 'number',
         name: 'Number',
         displayer: {
-          id: 'text',
+          id: 'number',
         },
         sortable: true,
         filterable: true,
         filter: {
           id: 'number'
+        },
+      },
+      {
+        id: 'list',
+        name: 'List',
+        displayer: {
+          id: 'list',
+        },
+        sortable: true,
+        filterable: true,
+        filter: {
+          id: 'list'
         },
       },
     ],
@@ -149,6 +167,14 @@ define({
           { id: "contains", name: "Contains", },
           { id: "equals", name: "Equals", },
           { id: "nequals", name: "Not Equals", },
+        ],
+      },
+      {
+        id: "list",
+        defaultOperator: "is",
+        operators: [
+          { id: "is", name: "Is", },
+          { id: "nis", name: "Is Not", },
         ],
       },
       {
@@ -181,9 +207,16 @@ define({
     pagination: {
       maxShownPages: 10,
       pageSizes: [10, 25, 50, 100, 250],
+      showEntryRange: true,
       showNextPrevious: true,
       showFirstLast: false,
       showPageSizeDropdown: false,
+    },
+
+
+    entryDescriptor: {
+      idProperty: "doc_url",
+      propertySaveHref: "save_url",
     },
 
   },
@@ -204,7 +237,7 @@ define({
         "doc_creationDate": "2020/03/27 13:21",
         "doc_creator": "Creator 1",
         "age": 48,
-        "job": "Job 1",
+        "tags": ["Tag 1"],
         "country": "France",
         "other": "<em>lorem ipsum<em>",
       },
@@ -217,7 +250,7 @@ define({
         "doc_creationDate": "2020/04/22 14:06",
         "doc_creator": "Creator 2",
         "age": 24,
-        "job": "Job 2",
+        "tags": ["Tag 2"],
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
       },
@@ -230,7 +263,7 @@ define({
         "doc_creationDate": "2020/03/27 14:34",
         "doc_creator": "Creator 3",
         "age": 12,
-        "job": "Job 3",
+        "tags": ["Tag 3"],
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
       },

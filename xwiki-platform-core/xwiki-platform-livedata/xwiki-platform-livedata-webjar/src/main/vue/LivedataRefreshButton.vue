@@ -1,4 +1,4 @@
-/*
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,16 +16,50 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+ -->
 
-module.exports = {
-  // See https://cli.vuejs.org/config/
-  publicPath: "/xwiki/resources/uicomponents/livedata/",
-  filenameHashing: false,
-  chainWebpack: config => {
-    config.optimization.delete("splitChunks");
+
+<!--
+  The LivedataRefreshButton is button that simply refresh data
+  according to current configuration
+-->
+<template>
+  <div
+    class="livedata-refresh-button"
+    @click="logic.updateEntries()"
+    title="Refresh"
+  >
+    <span class="fa fa-repeat"></span>
+  </div>
+</template>
+
+
+<script>
+export default {
+
+  name: "LivedataRefreshButton",
+
+  inject: ["logic"],
+
+  computed: {
+    data () { return this.logic.data; },
   },
-  css: {
-    extract: false,
-  },
+
 };
+</script>
+
+
+<style>
+
+.livedata-refresh-button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.livedata-refresh-button:hover,
+.livedata-refresh-button:active {
+  background-color: #ccc4;
+}
+
+</style>

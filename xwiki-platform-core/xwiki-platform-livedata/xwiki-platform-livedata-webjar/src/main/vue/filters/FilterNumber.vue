@@ -1,4 +1,4 @@
-/*
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,16 +16,45 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+ -->
 
-module.exports = {
-  // See https://cli.vuejs.org/config/
-  publicPath: "/xwiki/resources/uicomponents/livedata/",
-  filenameHashing: false,
-  chainWebpack: config => {
-    config.optimization.delete("splitChunks");
-  },
-  css: {
-    extract: false,
-  },
+<!--
+  FilterNumber is a custom filter that allow to filter numbers
+-->
+<template>
+  <!--
+    Simple input that apply filter on change event
+    Should be type="number", but current style.css apply custom input style
+    for type="text" or type="password", but not type="number"
+  -->
+  <input
+    class="filter-number"
+    type="text"
+    size="1"
+    :value="filterEntry.value"
+    @change="applyFilter($event.target.value)"
+  />
+</template>
+
+
+<script>
+import filterMixin from "./filterMixin.js";
+
+export default {
+
+  name: "filter-number",
+
+  // Add the filterMixin to get access to all the filters methods and computed properties inside this component
+  mixins: [filterMixin],
+
 };
+</script>
+
+
+<style>
+
+.livedata-filter .filter-number {
+  width: 100%;
+}
+
+</style>

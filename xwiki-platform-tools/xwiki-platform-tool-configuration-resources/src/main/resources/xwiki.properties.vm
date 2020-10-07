@@ -882,6 +882,10 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
 
+#-# [Since 12.9RC1]
+#-# Decides if XWiki should resend automatically mails that are in the prepare + error states at restart.
+# mail.sender.database.resendAutomaticallyAtStartup = true
+
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------

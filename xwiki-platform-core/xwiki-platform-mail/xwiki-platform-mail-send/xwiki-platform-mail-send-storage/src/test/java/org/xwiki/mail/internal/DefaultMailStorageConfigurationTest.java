@@ -27,7 +27,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,5 +64,23 @@ class DefaultMailStorageConfigurationTest
         when(mailConfigSource.getProperty("discardSuccessStatuses")).thenReturn(0);
 
         assertEquals(false, this.configuration.discardSuccessStatuses());
+    }
+
+    @Test
+    void resendAutomaticallyAtStartupWhenNotDefined()
+    {
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(true);
+
+        assertEquals(true, this.configuration.resendAutomaticallyAtStartup());
+    }
+
+    @Test
+    void resendAutomaticallyAtStartupWhenFalse()
+    {
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(false);
+
+        assertEquals(false, this.configuration.resendAutomaticallyAtStartup());
     }
 }

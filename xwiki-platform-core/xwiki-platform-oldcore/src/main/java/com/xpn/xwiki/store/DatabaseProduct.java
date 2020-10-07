@@ -85,6 +85,13 @@ public final class DatabaseProduct
     public static final DatabaseProduct H2 = new DatabaseProduct("H2");
 
     /**
+     * The Product name and the JDBC scheme to recognize a MariaDB DB.
+     * <p>
+     * Keeping it private until we think it's different enough from MySQL behavior to justify it's own branches.
+     */
+    private static final DatabaseProduct MARIADB = new DatabaseProduct("MariaDB");
+
+    /**
      * @see #getProductName()
      */
     private String productName;
@@ -143,7 +150,7 @@ public final class DatabaseProduct
         } else if (productNameAsString.startsWith(DB2.getProductName())) {
             // See documentation above on why we check starts with for DB2
             product = DB2;
-        } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
+        } else if (isMySQL(productNameAsString)) {
             product = MYSQL;
         } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
             product = POSTGRESQL;
@@ -154,6 +161,12 @@ public final class DatabaseProduct
         }
 
         return product;
+    }
+
+    private static boolean isMySQL(String productNameAsString)
+    {
+        return productNameAsString.equalsIgnoreCase(MYSQL.getProductName())
+            || productNameAsString.equalsIgnoreCase(MARIADB.getProductName());
     }
 
     @Override

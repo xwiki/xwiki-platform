@@ -37,6 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=Ocjene
+
+rating.rate=Ocijenite\!
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+
+#@deprecatedstart
+
+## until 12.9RC1
 admin.ratings.activateratings=U ovom wikiju uključite ocjene
 admin.ratings.activateratingsinfo=Aktivacijom ocjena u ovom wikiju bit će prikazana prosječna ocjena (koja se sastoji od zvjezdica) u gornjem desnom uglu svakog dokumenta ovog wikija (izuzev onih u *XWiki* prostoru). Autenticirani korisnici moći će ocjenjivati dokumente klikanjem po zvjezdicama. Alternativno se može koristiti panel za ocjene, npr. za uključivanje ocjenjivanja samo u željenim prostorima. Za upotrebu panela za ocjene molim posjetite upravljačku sekciju Čarobnjak panela.
 admin.ratings.resetratings=Ponovo postavljanje svih ocjena u ovom wikiju učinit će da svi dokumenti krenu iznova bez glasova. Imajte na umu da je ova akcija ireverzibilna, izuzev vraćanja verzije dokument po dokument. Ponovno postavljanje svih ocjena može potrajati ukoliko wiki već ima značajnu količinu ocijenjenih dokumenata.
@@ -44,8 +56,11 @@ admin.ratings.uninstallratings=Deinstalacija aplikacije Ocjene obrisat će dokum
 admin.ratings.ratingsactivated=Ocjene su uključene
 admin.ratings.ratingsdeactivated=Ocjene su isključene
 admin.ratings.illegalrequest=Nevaljani zahtjev
-rating.rate=Ocijenite\!
+
 rating.yourvote=Vaš glas
 rating.logintorate=Prijavite se za ocjenjivanje
-rating.novotes=Još nema glasova</content>
+rating.novotes=Još nema glasova
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

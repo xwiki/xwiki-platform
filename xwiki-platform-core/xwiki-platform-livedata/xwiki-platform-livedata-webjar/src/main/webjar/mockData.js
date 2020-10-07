@@ -8,7 +8,7 @@
  * the License, or (at your option) any later version.
  *
  * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty oftopbar
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
@@ -24,8 +24,11 @@
 
 define({
 
+  // The unique id of the Livedata
   id: "LD0",
 
+
+  // The configuration send to the server to fetch entries
   query: {
     properties: ["doc_title", "age", "country", "tags", "other"],
 
@@ -34,7 +37,7 @@ define({
       url: "...",
     },
 
-    hiddenFilters: {},
+    hiddenFilters: [],
 
     filters: [
       {
@@ -54,7 +57,7 @@ define({
   },
 
 
-
+  // The "meta" configuration of the Livedata
   meta: {
 
     defaultLayout: "table",
@@ -162,6 +165,7 @@ define({
     filters: [
       {
         id: "text",
+        name: "Text",
         defaultOperator: "contains",
         operators: [
           { id: "contains", name: "Contains", },
@@ -171,6 +175,7 @@ define({
       },
       {
         id: "list",
+        name: "List",
         defaultOperator: "is",
         operators: [
           { id: "is", name: "Is", },
@@ -179,6 +184,7 @@ define({
       },
       {
         id: "number",
+        name: "Number",
         defaultOperator: "equals",
         operators: [
           { id: "equals", name: "=", },
@@ -194,12 +200,19 @@ define({
     displayers: [
       {
         id: "text",
+        name: "Text",
+      },
+      {
+        id: "number",
+        name: "Number",
       },
       {
         id: "link",
+        name: "Link",
       },
       {
         id: "html",
+        name: "Html",
       },
     ],
 
@@ -223,6 +236,7 @@ define({
 
 
 
+  // The entries fetches from the server
   data: {
 
     count: 545,

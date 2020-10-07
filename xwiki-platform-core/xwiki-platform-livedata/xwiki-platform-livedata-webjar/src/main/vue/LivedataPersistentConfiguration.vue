@@ -341,11 +341,12 @@ export default {
     if (!this.hasConfig(this.saveKey)) { return; }
     const config = this.decodeConfig(this.getConfig(this.saveKey));
     if (!config) {
-      this.deleteConfig(config);
-      new XWiki.widgets.Notification("Bad LiveData config given, fall back to default");
+      this.deleteConfig(this.saveKey);
+      new XWiki.widgets.Notification("Bad LiveData config given, fall back to default", "warning");
       return;
     }
     this.loadConfig(config);
+    this.logic.temporaryConfigSave("initial");
   },
 
 

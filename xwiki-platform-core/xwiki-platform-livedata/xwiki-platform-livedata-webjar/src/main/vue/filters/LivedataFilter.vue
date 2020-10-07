@@ -91,7 +91,26 @@ export default {
     // The filter id of the Filter component to load
     // corresponding to the property id
     filterId () {
-      return this.logic.getFilterDescriptor(this.propertyId).id;
+      return this.logic.getPropertyFilterDescriptor(this.propertyId).id;
+    },
+  },
+
+  watch: {
+    // On mounted, or when filter id is changed,
+    // try to load the Filter corresponding to the displayer id,
+    // or the default one as fallback
+    filterId: {
+      immediate: true,
+      handler () {
+        // Try to load Filter
+        this.loadFilter(this.filterId).catch(err => {
+          // Try to load default Filter
+          console.warn(err);
+          this.loadFilter(this.data.meta.defaultFilter).catch(err => {
+            console.error(err);
+          });
+        });
+      },
     },
   },
 
@@ -129,19 +148,6 @@ export default {
           .catch(err => void loadFilterFailure(err));
       });
     },
-  },
-
-  // On mounted, try to load the Filter corresponding to the passed props,
-  // or the default one as fallback
-  mounted () {
-    // Try to load Filter
-    this.loadFilter().catch(err => {
-      // Try to load default Filter
-      console.warn(err);
-      this.loadFilter(this.data.meta.defaultFilter).catch(err => {
-        console.error(err);
-      });
-    });
   },
 
 };

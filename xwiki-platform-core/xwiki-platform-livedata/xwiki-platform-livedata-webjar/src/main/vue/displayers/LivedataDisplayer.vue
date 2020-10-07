@@ -96,7 +96,26 @@ export default {
     // The displayer id of the Displayer component to load,
     // corresponding to the property id
     displayerId () {
-      return this.logic.getDisplayerDescriptor(this.propertyId).id;
+      return this.logic.getPropertyDisplayerDescriptor(this.propertyId).id;
+    },
+  },
+
+  watch: {
+    // On mounted, or when displayer id is changed,
+    // try to load the Displayer corresponding to the displayer id,
+    // or the default one as fallback
+    displayerId: {
+      immediate: true,
+      handler () {
+        // Try to load Displayer
+        this.loadDisplayer(this.displayerId).catch(err => {
+          // Try to load default Displayer
+          console.warn(err);
+          this.loadDisplayer(this.data.meta.defaultDisplayer).catch(err => {
+            console.error(err);
+          });
+        });
+      },
     },
   },
 
@@ -135,19 +154,6 @@ export default {
       });
 
     },
-  },
-
-  // On mounted, try to load the Displayer corresponding to the passed props,
-  // or the default one as fallback
-  mounted () {
-    // Try to load Displayer
-    this.loadDisplayer(this.displayerId).catch(err => {
-      // Try to load default Displayer
-      console.warn(err);
-      this.loadDisplayer(this.data.meta.defaultDisplayer).catch(err => {
-        console.error(err);
-      });
-    });
   },
 
 };

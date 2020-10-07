@@ -27,6 +27,9 @@
 <template>
   <div class="xwiki-livedata">
 
+      <!-- The design mode info bar -->
+      <LivedataDesignModeBar/>
+
       <!-- Import the Livedata advanced configuration panels -->
       <LivedataAdvancedPanels/>
 
@@ -41,6 +44,7 @@
 
 
 <script>
+import LivedataDesignModeBar from "./LivedataDesignModeBar.vue";
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
@@ -51,6 +55,7 @@ export default {
   name: "XWikiLivedata",
 
   components: {
+    LivedataDesignModeBar,
     LivedataAdvancedPanels,
     LivedataLayout,
     LivedataPersistentConfiguration,

@@ -50,7 +50,7 @@ export default {
     },
     // The configuration (aka filterDescriptor) of the filter
     config () {
-      return this.logic.getFilterDescriptor(this.propertyId);
+      return this.logic.getPropertyFilterDescriptor(this.propertyId);
     },
     // The whole Livedata data object
     data () {

@@ -55,7 +55,7 @@ export default {
     },
     // The configuration (aka displayerDescriptor) of the displayer
     config () {
-      return this.logic.getDisplayerDescriptor(this.propertyId);
+      return this.logic.getPropertyDisplayerDescriptor(this.propertyId);
     },
     // The whole Livedata data object
     data () {

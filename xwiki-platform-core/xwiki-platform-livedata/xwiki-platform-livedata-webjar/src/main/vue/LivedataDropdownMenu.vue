@@ -85,6 +85,16 @@
         </a>
       </li>
 
+
+      <!-- Design mode Section -->
+      <li class="dropdown-header">Design</li>
+
+      <li v-show="!logic.designMode">
+        <a href="#" @click.prevent="switchToDesignMode">
+          <span class="fa fa-pencil"></span> Switch to Design Mode
+        </a>
+      </li>
+
     </ul>
 
   </div>
@@ -93,6 +103,7 @@
 
 <script>
 import XWikiIcon from "./utilities/XWikiIcon.vue";
+import { askYesNo } from "./utilities/XWikiDialogYesNo";
 
 export default {
 
@@ -106,6 +117,26 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+  },
+
+  methods: {
+    async switchToDesignMode () {
+      if (/* (TODO) USER IS THE ONLY ONE IN THE REALTIME SESSION */ true
+        && !this.logic.temporaryConfigEquals("initial")) {
+        const response = await askYesNo({
+          title: "Keep changes for design mode?",
+          text: "Your Livedata configuration have been modified, do you want to keep it for design mode?",
+          yesText: "Keep current",
+          noText: "Revert to default",
+        });
+        if (!response) { return; }
+        if (response === "no") {
+          this.logic.temporaryConfigLoad("initial");
+        }
+      }
+      this.logic.toggleDesignMode(true);
+    },
+
   },
 
 };

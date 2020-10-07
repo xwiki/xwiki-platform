@@ -27,7 +27,7 @@ define({
   id: "LD0",
 
   query: {
-    properties: ["doc_title", "age", "country", "tags", "other"],
+    properties: ["doc_title", "age", "country", "tags", "other", "_actions"],
 
     source: {
       id: "...",
@@ -116,6 +116,12 @@ define({
         sortable: false,
         filterable: false,
       },
+      {
+        id: "_actions",
+        name: "Actions",
+        type: "_actions",
+        visible: true,
+      },
     ],
 
     propertyTypes: [
@@ -154,6 +160,15 @@ define({
         filter: {
           id: 'list'
         },
+      },
+      {
+        id: '_actions',
+        name: 'Actions',
+        displayer: {
+          id: 'actions',
+        },
+        sortable: false,
+        filterable: false,
       },
     ],
 
@@ -200,6 +215,9 @@ define({
       },
       {
         id: "html",
+      },
+      {
+        id: "_actions",
       },
     ],
 

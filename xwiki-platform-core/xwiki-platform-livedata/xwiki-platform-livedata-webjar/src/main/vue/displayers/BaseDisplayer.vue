@@ -31,7 +31,7 @@
     :class="isView ? 'view' : 'edit'"
     @dblclick="edit"
     @keypress.self.enter="edit"
-    tabindex="0"
+    :tabindex="viewOnly ? undefined : 0"
   >
     <!--
       The base displayer contains two slots: `viewer` and `editor`.
@@ -91,6 +91,14 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
+
+  props: {
+    viewOnly: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
   data () {
     return {
       // Whether the displayer is in view or edit mode
@@ -117,6 +125,7 @@ export default {
     // This function is only used for the baseDisplayer logic
     // and should not be used inside a specific displayer
     edit () {
+      if (this.viewOnly) { return; }
       if (!this.isView) { return; }
       this.isView = false;
     },

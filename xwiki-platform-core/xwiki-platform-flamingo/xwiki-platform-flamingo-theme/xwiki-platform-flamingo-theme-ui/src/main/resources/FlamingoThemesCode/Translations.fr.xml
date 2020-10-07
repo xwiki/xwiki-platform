@@ -67,7 +67,6 @@ platform.flamingo.themes.category.breadcrumb=Fil d'Ariane
 platform.flamingo.themes.category.advanced=Avancé
 platform.flamingo.themes.defaultvalue=Par défaut
 platform.flamingo.themes.lessCode.description=Dans ce champ vous pouvez ajouter du code LESS qui sera ajouté à la skin.
-platform.flamingo.themes.incompatiblebrowser=La prévisualisation ne fonctionne pas avec cette version d'Internet Explorer. Merci d'utiliser un navigateur web plus récent.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
 
@@ -83,6 +82,11 @@ platform.flamingo.themes.global=Global
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=Malheureusement ce champ n'est pas pris en compte en prévisualisation.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=La prévisualisation ne fonctionne pas avec cette version d'Internet Explorer. Merci d'utiliser un navigateur web plus récent.
 
 #@deprecatedend</content>
 </xwikidoc>

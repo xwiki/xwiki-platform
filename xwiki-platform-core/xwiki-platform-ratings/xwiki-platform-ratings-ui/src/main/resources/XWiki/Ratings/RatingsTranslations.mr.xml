@@ -37,6 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=रेटिंग्ज
+
+rating.rate=दर !
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+
+#@deprecatedstart
+
+## until 12.9RC1
 admin.ratings.activateratings=या विकीवरील रेटिंग्ज सक्रिय करा
 ### Missing: admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) at the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents by clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
 ### Missing: admin.ratings.resetratings=Reset all the ratings on this wiki. This will make all documents start over with no vote. Be aware that this operation is irreversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a large amount of documents already rated.
@@ -44,8 +56,11 @@ admin.ratings.activateratings=या विकीवरील रेटिंग
 admin.ratings.ratingsactivated=रेटिंग सक्रिय केली गेली आहे
 admin.ratings.ratingsdeactivated=रेटिंग निष्क्रिय केली गेली आहे
 admin.ratings.illegalrequest=बेकायदेशीर विनंती
-rating.rate=दर !
+
 rating.yourvote=आपले मत
 rating.logintorate=रेट करण्यासाठी लॉगिन करा
-rating.novotes=अद्याप मते नाहीत</content>
+rating.novotes=अद्याप मते नाहीत
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

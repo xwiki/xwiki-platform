@@ -37,6 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=Votes
+
+rating.rate=Votez !
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+
+#@deprecatedstart
+
+## until 12.9RC1
 admin.ratings.activateratings=Activer les votes sur ce wiki
 admin.ratings.activateratingsinfo=Activer les votes sur ce Wiki affichera une note moyenne représentée par des étoiles en haut à droite de chaque page (sauf dans l'espace *XWiki*). Les utilisateurs connectés pourront voter pour les pages en sélectionnant les étoiles. Vous pouvez aussi activer les votes sur certains espaces uniquement, en utilisant *l'assistant panneau* depuis l'administration.
 admin.ratings.resetratings=Effacer tous les votes sur ce Wiki va remettre à zéro la note de toutes les pages. Soyez conscient que cette opération est irréversible (sauf à restaurer chaque document unitairement). Par ailleurs cette opération peut être longue si les pages et les votes sont nombreux.
@@ -44,8 +56,11 @@ admin.ratings.uninstallratings=Dé-installer l'application de gestion des votes 
 admin.ratings.ratingsactivated=Les votes ont été activés
 admin.ratings.ratingsdeactivated=Les votes ont été désactivés
 admin.ratings.illegalrequest=Requête interdite
-rating.rate=Votez !
+
 rating.yourvote=Votre vote
 rating.logintorate=Connectez-vous pour voter
-rating.novotes=Aucun vote</content>
+rating.novotes=Aucun vote
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

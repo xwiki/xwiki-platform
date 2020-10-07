@@ -37,6 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=Valoraciones
+
+rating.rate=¡Vota!
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+
+#@deprecatedstart
+
+## until 12.9RC1
 admin.ratings.activateratings=Activar las valoraciones en este wiki
 admin.ratings.activateratingsinfo=Al activar las valoraciones en este wiki se mostrará una valoración media visual (formada por estrellas) en la esquina superior derecha de cada documento de este wiki (excepto los que se encuentran en el espacio *XWiki*). Los usuarios autentificados podrán calificar los documentos haciendo clic en las estrellas. Una alternativa a esto es usar el *Panel de Calificaciones*, por ejemplo para habilitar sólo las calificaciones en los espacios deseados. Para usar el Panel de Calificaciones, por favor visite la sección de administración del *Asistente de Paneles*.
 admin.ratings.resetratings=Restablecer todas las valoraciones en este wiki. Esto hará que todos los documentos comiencen de nuevo sin votación. Tenga en cuenta que esta operación es irreversible, además de ser un proceso de reversión documento por documento. Restablecer todas las clasificaciones puede llevar un tiempo si el wiki tiene una gran cantidad de documentos ya valorados.
@@ -44,8 +56,11 @@ admin.ratings.uninstallratings=La desinstalación de la aplicación de valoracio
 admin.ratings.ratingsactivated=Las valoraciones han sido activadas
 admin.ratings.ratingsdeactivated=Las valoraciones han sido desactivadas
 admin.ratings.illegalrequest=Petición inválida
-rating.rate=¡Vota!
+
 rating.yourvote=Tu voto
 rating.logintorate=Iniciar sesión para valorar
-rating.novotes=Todavía no hay valoraciones</content>
+rating.novotes=Todavía no hay valoraciones
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

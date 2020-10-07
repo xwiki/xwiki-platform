@@ -19,7 +19,6 @@
  */
 package org.xwiki.like.internal;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.xwiki.model.EntityType;

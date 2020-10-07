@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @UITest(
+    debug = true,
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
@@ -92,7 +93,7 @@ class WikiTemplateIT
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
     @Test
-    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    void createWikiFromTemplate(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -139,6 +140,7 @@ class WikiTemplateIT
         wikiEditPage.waitUntilPageIsLoaded();
 
         // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard
+        // Note that this verifies that the Wiki Index is visible in the drawer menu even on a subwiki.
         createWikiPage = wikiHomePage.createWiki();
         assertTrue(createWikiPage.getTemplateList().contains("mynewtemplate"));
 
@@ -149,7 +151,6 @@ class WikiTemplateIT
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
         assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
-
     }
 
     private void deleteTemplateWiki() throws Exception

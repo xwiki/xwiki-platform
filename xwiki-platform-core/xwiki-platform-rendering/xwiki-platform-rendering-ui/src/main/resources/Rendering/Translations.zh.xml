@@ -20,34 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="zh">
-  <web>ExtensionCode</web>
+<xwikidoc version="1.2" reference="Rendering.Translations" locale="zh">
+  <web>Rendering</web>
   <name>Translations</name>
   <language>zh</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Extension.WebHome</parent>
+  <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Rendering Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
-extension.repository.name=名称
-extension.repository.summary=概要
-extension.repository.type=类型
-extension.repository.category=类别
-extension.repository.authors=作者
-extension.repository.doc.creationDate=创建于
-extension.repository.doc.date=最后修改
-extension.repository.rating=评分
-extension.repository.installedCount=安装次数
-
-## Administration UI
-admin.repository=扩展库</content>
+  <content>admin.syntaxes=语法
+admin.syntaxes.description=选择默认页面语法并配置可用的标记语法。
+Rendering.RenderingConfigClass_disabledSyntaxes=禁用的语法
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=无法写入页面的标记语法列表</content>
+  
 </xwikidoc>

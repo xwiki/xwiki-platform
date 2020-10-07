@@ -103,7 +103,7 @@ notifications.format.email=邮件
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=过滤器
-notifications.settings.filters.preferences.hint=创建过滤器以更精确地控制活动事件何时触发通知
+notifications.settings.filters.preferences.hint=创建过滤器以更精确地控制活动事件何时应触发通知。
 notifications.settings.filters.preferences.forGuest=登录或注册以处理您的通知过滤器。
 
 ## Header definition for notification filter preferences
@@ -156,7 +156,7 @@ notifications.preferences.scope.table.scope=范围
 notifications.preferences.scope.table.location=位置
 notifications.preferences.scope.table.scopeFilterType=过滤器类型
 notifications.preferences.scope.table._actions=操作
-notifications.email.title=Wiki上的事件
+notifications.email.title=wiki上的事件：
 notifications.email.subject=Wiki上的{0}个事件
 notifications.email.seeChanges=更改：{0}
 notifications.email.linkDetails=查看详情

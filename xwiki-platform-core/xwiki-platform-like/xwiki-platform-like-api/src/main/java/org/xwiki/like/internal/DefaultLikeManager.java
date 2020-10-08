@@ -163,13 +163,13 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
     public List<EntityReference> getUserLikes(UserReference source, int offset, int limit) throws LikeException
     {
         try {
-            List<Rating> gradings = this.ratingsManager.getRatings(
+            List<Rating> ratings = this.ratingsManager.getRatings(
                 Collections.singletonMap(RatingsManager.RatingQueryField.USER_REFERENCE, source),
                 offset,
                 limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE,
                 false);
-            return gradings.stream().map(Rating::getReference).collect(Collectors.toList());
+            return ratings.stream().map(Rating::getReference).collect(Collectors.toList());
         } catch (RatingsException e) {
             throw new LikeException(
                 String.format("Error when trying to retrieve user likes for user [%s]", source), e);
@@ -208,11 +208,11 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
             queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, source);
 
             try {
-                List<Rating> gradings =
+                List<Rating> ratings =
                     this.ratingsManager
                         .getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false);
-                if (!gradings.isEmpty()) {
-                    result = this.ratingsManager.removeRating(gradings.get(0).getId());
+                if (!ratings.isEmpty()) {
+                    result = this.ratingsManager.removeRating(ratings.get(0).getId());
                     this.likeCountCache.remove(serializedTarget);
                     this.likeExistCache.set(getExistCacheKey(source, target), false);
                     this.observationManager.notify(new UnlikeEvent(), source, target);
@@ -239,10 +239,10 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
             queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, source);
 
             try {
-                List<Rating> gradings =
+                List<Rating> ratings =
                     this.ratingsManager
                         .getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false);
-                result = !gradings.isEmpty();
+                result = !ratings.isEmpty();
                 this.likeExistCache.set(getExistCacheKey(source, target), result);
             } catch (RatingsException e) {
                 throw new LikeException("Error while checking if grading exists", e);
@@ -258,9 +258,9 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         try {
-            List<Rating> gradings = this.ratingsManager
+            List<Rating> ratings = this.ratingsManager
                 .getRatings(queryMap, offset, limit, RatingsManager.RatingQueryField.UPDATED_DATE, false);
-            return gradings.stream().map(Rating::getAuthor).collect(Collectors.toList());
+            return ratings.stream().map(Rating::getAuthor).collect(Collectors.toList());
         } catch (RatingsException e) {
             throw new LikeException(String.format("Error while getting likers of [%s]", target), e);
         }

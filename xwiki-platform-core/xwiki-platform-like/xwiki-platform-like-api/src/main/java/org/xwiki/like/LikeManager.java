@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
- * General manager to handle {@link LikedEntity}.
+ * General manager to handle likes.
  *
  * @version $Id$
  * @since 12.7RC1
@@ -43,6 +43,7 @@ public interface LikeManager
      * @param source the user who performs the like.
      * @param target the page or object to like.
      * @return the new number of likes.
+     * @throws LikeException in case of problem when saving the like.
      */
     long saveLike(UserReference source, EntityReference target) throws LikeException;
 
@@ -53,6 +54,7 @@ public interface LikeManager
      * @param offset the offset used for pagination.
      * @param limit the limit number of results to retrieve for pagination.
      * @return a list of references liked by this user.
+     * @throws LikeException in case of problem when getting the like.
      */
     List<EntityReference> getUserLikes(UserReference source, int offset, int limit) throws LikeException;
 
@@ -61,6 +63,7 @@ public interface LikeManager
      *
      * @param target the page or object for which to retrieve the like information.
      * @return the number of likes for that entity.
+     * @throws LikeException in case of problem when getting the like.
      */
     long getEntityLikes(EntityReference target) throws LikeException;
 
@@ -70,6 +73,7 @@ public interface LikeManager
      * @param source the user who performs the unlike.
      * @param target the entity to unlike.
      * @return {@code true} if the entity has been properly unliked.
+     * @throws LikeException in case of problem when removing the like.
      */
     boolean removeLike(UserReference source, EntityReference target) throws LikeException;
 

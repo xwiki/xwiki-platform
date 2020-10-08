@@ -20,11 +20,9 @@
 package org.xwiki.notifications.notifiers.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -113,10 +111,8 @@ public class UserEventManager
                 // Apply the filters that the user has defined in its notification preferences
                 // If one of the events present in the composite event does not match a user filter, remove the event
                 List<NotificationFilter> filters =
-                    new ArrayList<>(this.notificationFilterManager.getAllFilters(user, true, new HashSet<>(
-                        Arrays.asList(
-                            NotificationFilter.FilteringMoment.ONLY_PREFILTERING,
-                            NotificationFilter.FilteringMoment.BOTH))));
+                    new ArrayList<>(this.notificationFilterManager.getAllFilters(user, true,
+                        NotificationFilter.FilteringPhase.PREFILTERING));
                 filters.sort(null);
 
                 return !isEventFiltered(filters, event, user, format);

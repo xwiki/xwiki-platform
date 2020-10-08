@@ -57,10 +57,9 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
     }
 
     @Override
-    public FilteringMoment getFilteringMoment()
+    public boolean isPhaseSupported(FilteringPhase phase)
     {
-        // This filter does not make sense in pre-filtering since it requires a user action
-        // (marking the event as read) before it has an impact.
-        return FilteringMoment.ONLY_POSTFILTERING;
+        // only post-filtering is supported here.
+        return FilteringPhase.POSTFILTERING == phase;
     }
 }

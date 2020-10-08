@@ -168,9 +168,7 @@ public class DefaultNotificationParametersFactoryTest
         this.recordableEventDescriptors =
             Arrays.asList(mock(RecordableEventDescriptor.class), mock(RecordableEventDescriptor.class));
         when(notificationFilterManager.getAllFilters(true)).thenReturn(this.filterList);
-        when(notificationFilterManager.getAllFilters(USER_REFERENCE, true, new HashSet<>(Arrays.asList(
-            NotificationFilter.FilteringMoment.ONLY_POSTFILTERING,
-            NotificationFilter.FilteringMoment.BOTH))))
+        when(notificationFilterManager.getAllFilters(USER_REFERENCE, true))
             .thenReturn(Collections.singletonList(filterList.get(1)));
 
         when(notificationPreferenceManager.getPreferences(eq(USER_REFERENCE), eq(true), same(NotificationFormat.EMAIL)))

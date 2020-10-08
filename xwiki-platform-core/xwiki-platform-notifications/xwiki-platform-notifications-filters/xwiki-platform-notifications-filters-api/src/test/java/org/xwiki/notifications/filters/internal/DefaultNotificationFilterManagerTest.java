@@ -42,6 +42,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -183,10 +184,16 @@ public class DefaultNotificationFilterManagerTest
         filterActivations.put("filter4", true);
 
         when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
-        when(filter1.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.BOTH);
-        when(filter2.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_PREFILTERING);
-        when(filter3.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_POSTFILTERING);
-        when(filter4.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_PREFILTERING);
+        when(filter1.isPhaseSupported(any())).thenReturn(true);
+        when(filter2.isPhaseSupported(any()))
+            .then(invocationOnMock ->
+                NotificationFilter.FilteringPhase.POSTFILTERING == invocationOnMock.getArgument(0));
+        when(filter3.isPhaseSupported(any()))
+            .then(invocationOnMock ->
+                NotificationFilter.FilteringPhase.POSTFILTERING == invocationOnMock.getArgument(0));
+        when(filter4.isPhaseSupported(any()))
+            .then(invocationOnMock ->
+                NotificationFilter.FilteringPhase.PREFILTERING == invocationOnMock.getArgument(0));
 
         // Using subwiki so we manipulate a set instead of a map
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
@@ -194,23 +201,19 @@ public class DefaultNotificationFilterManagerTest
             .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4));
 
         Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(testUser, true,
-            new HashSet<>(
-                Arrays.asList(NotificationFilter.FilteringMoment.BOTH,
-                    NotificationFilter.FilteringMoment.ONLY_PREFILTERING)));
+            NotificationFilter.FilteringPhase.PREFILTERING);
         assertEquals(2, allFilters.size());
         assertEquals(new HashSet<>(Arrays.asList(filter1, filter4)), allFilters);
 
-        allFilters = this.filterManager.getAllFilters(testUser, false,
-            new HashSet<>(
-                Arrays.asList(NotificationFilter.FilteringMoment.BOTH,
-                    NotificationFilter.FilteringMoment.ONLY_PREFILTERING)));
-        assertEquals(3, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter4)), allFilters);
+        allFilters = this.filterManager.getAllFilters(testUser, true, NotificationFilter.FilteringPhase.POSTFILTERING);
+        assertEquals(2, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3)), allFilters);
 
-        allFilters = this.filterManager.getAllFilters(testUser, true, Collections.singleton(
-            NotificationFilter.FilteringMoment.ONLY_POSTFILTERING));
-        assertEquals(1, allFilters.size());
-        assertEquals(Collections.singleton(filter3), allFilters);
+        allFilters = this.filterManager.getAllFilters(testUser, false, NotificationFilter.FilteringPhase.POSTFILTERING);
+        assertEquals(3, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3)), allFilters);
+
+
     }
 
 }

@@ -69,28 +69,23 @@ public interface NotificationFilter extends Comparable
     }
 
     /**
-     * The different moments when a filter can be called.
+     * The different phases when a filter can be called.
      *
      * @since 12.9RC1
      * @since 12.6.3
      */
     @Unstable
-    enum FilteringMoment
+    enum FilteringPhase
     {
         /**
-         * Used if the filter can be only called for post-filtering.
+         * If the filter is used during post-filtering.
          */
-        ONLY_POSTFILTERING,
+        POSTFILTERING,
 
         /**
-         * Used if the filter can be only called for pre-filtering.
+         * If the filter is used during pre-filtering.
          */
-        ONLY_PREFILTERING,
-
-        /**
-         * Used if the filter can be used for both pre or post-filtering.
-         */
-        BOTH
+        PREFILTERING
     }
 
     /**
@@ -200,14 +195,18 @@ public interface NotificationFilter extends Comparable
     }
 
     /**
-     * @return the moment when the filter should be used.
+     * Determine if the given phase is supported by this filter.
+     *
+     * @param phase the phase to check.
+     * @return {@code true} if this filter can be called during the given phase.
      *
      * @since 12.9RC1
      * @since 12.6.3
      */
     @Unstable
-    default FilteringMoment getFilteringMoment()
+    default boolean isPhaseSupported(FilteringPhase phase)
     {
-        return FilteringMoment.BOTH;
+        // By default we consider that all phases are supported.
+        return true;
     }
 }

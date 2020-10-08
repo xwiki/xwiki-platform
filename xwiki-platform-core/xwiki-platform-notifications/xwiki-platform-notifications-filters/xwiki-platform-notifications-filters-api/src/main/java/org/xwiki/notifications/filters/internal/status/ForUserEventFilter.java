@@ -41,8 +41,9 @@ public class ForUserEventFilter extends AbstractForUserEventFilter
     }
 
     @Override
-    public FilteringMoment getFilteringMoment()
+    public boolean isPhaseSupported(FilteringPhase phase)
     {
-        return FilteringMoment.ONLY_POSTFILTERING;
+        // only post-filtering is supported here.
+        return FilteringPhase.POSTFILTERING == phase;
     }
 }

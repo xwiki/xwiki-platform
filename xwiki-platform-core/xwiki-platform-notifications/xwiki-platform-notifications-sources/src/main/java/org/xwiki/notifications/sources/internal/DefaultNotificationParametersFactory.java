@@ -395,15 +395,13 @@ public class DefaultNotificationParametersFactory
                 enableAllEventTypes(parameters);
 
                 parameters.filters.add(new ForUserEventFilter(parameters.format, null));
-                parameters.filters.addAll(notificationFilterManager.getAllFilters(parameters.user, true,
-                    Collections.singleton(NotificationFilter.FilteringMoment.ONLY_POSTFILTERING)));
+                // FIXME: This doesn't feel right: we actually also retrieve the filters for pre-filtering.
+                parameters.filters.addAll(this.notificationFilterManager.getAllFilters(parameters.user, true,
+                    NotificationFilter.FilteringPhase.POSTFILTERING));
             } else {
                 parameters.preferences =
                     notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true,
-                    new HashSet<>(Arrays.asList(
-                        NotificationFilter.FilteringMoment.ONLY_POSTFILTERING,
-                        NotificationFilter.FilteringMoment.BOTH)));
+                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
                 parameters.filterPreferences =
                     notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
             }

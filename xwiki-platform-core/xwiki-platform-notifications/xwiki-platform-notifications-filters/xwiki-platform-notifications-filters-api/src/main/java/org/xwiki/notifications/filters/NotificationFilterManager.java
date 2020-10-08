@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
@@ -30,6 +29,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification filters.
@@ -65,13 +65,15 @@ public interface NotificationFilterManager
      *
      * @param user reference to the user
      * @param onlyEnabled either or not only filters enabled for the user should be collected
-     * @param filteringMoments when the filter should be used
+     * @param filteringPhase when the filter should be used (use null for any phase)
      * @return the collection of notification filters enabled to the user.
      * @throws NotificationException if an error happens
-     * @since 10.4RC1
+     * @since 12.9RC1
+     * @since 12.6.3
      */
+    @Unstable
     default Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
-        Set<NotificationFilter.FilteringMoment> filteringMoments)
+        NotificationFilter.FilteringPhase filteringPhase)
         throws NotificationException
     {
         return getAllFilters(user, onlyEnabled);

@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -118,7 +117,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
 
     @Override
     public Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
-        Set<NotificationFilter.FilteringMoment> filteringMoments) throws NotificationException
+        NotificationFilter.FilteringPhase filteringPhase) throws NotificationException
     {
         Collection<NotificationFilter> filters = getAllFilters(
             user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
@@ -128,7 +127,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             NotificationFilter filter = it.next();
             // we use Boolean.valueOf to check in case the result is null.
             boolean filterActivation = filterActivations.getOrDefault(filter.getName(), false);
-            if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringMoments)) {
+            if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase)) {
                 it.remove();
             }
         }
@@ -136,20 +135,20 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     private boolean shouldFilterBeSelected(NotificationFilter filter, boolean filterActivation, boolean onlyEnabled,
-        Set<NotificationFilter.FilteringMoment> filteringMoments)
+        NotificationFilter.FilteringPhase filteringPhase)
     {
         boolean result = false;
         // We don't care if the filter is activated or not, or its filteringMoment: we return all
-        if (!onlyEnabled && (filteringMoments == null || filteringMoments.isEmpty())) {
+        if (!onlyEnabled && filteringPhase == null) {
             result = true;
         // We don't care if the filter is activated, but we want a specific filtering moment
-        } else if (!onlyEnabled && filteringMoments.contains(filter.getFilteringMoment())) {
+        } else if (!onlyEnabled && filter.isPhaseSupported(filteringPhase)) {
             result = true;
         // We ensure the filter is activated, but we don't care about its filtering moment
-        } else if (onlyEnabled && filterActivation && (filteringMoments == null || filteringMoments.isEmpty())) {
+        } else if (onlyEnabled && filterActivation && filteringPhase == null) {
             result = true;
         // We ensure the filter is activated and the filtering moment is the right one.
-        } else if (onlyEnabled && filterActivation && filteringMoments.contains(filter.getFilteringMoment())) {
+        } else if (onlyEnabled && filterActivation && filter.isPhaseSupported(filteringPhase)) {
             result = true;
         }
         return result;

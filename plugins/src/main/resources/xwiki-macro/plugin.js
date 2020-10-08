@@ -339,13 +339,9 @@
           var command = this;
           CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
           editor.setLoading(true);
-          var config = editor.config['xwiki-source'] || {};
-          $.post(config.htmlConverter, {
+          CKEDITOR.plugins.xwikiSource.convertHTML(editor, {
             fromHTML: true,
             toHTML: true,
-            // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
-            // in-line (because the returned HTML will be inserted directly into the main page).
-            stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE,
             text: editor.getData()
           }).done(function(html, textStatus, jqXHR) {
             var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');

@@ -132,6 +132,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-office': 1,
     'xwiki-save': 1,
     'xwiki-selection': 1,
+    'xwiki-syntax': 1,
     'xwiki-source': 1,
     'xwiki-sourcearea': 1,
     'xwiki-table': 1,

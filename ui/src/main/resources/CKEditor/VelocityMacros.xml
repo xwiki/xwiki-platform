@@ -206,6 +206,7 @@
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
     'spellcheck': false,
+    'data-syntax': 'annotatedxhtml/1.0',
     'data-sourceDocumentSyntax': $sourceDocument.syntax.toIdString(),
     'data-officeImporterSupported': $officeImporterSupported
   }))

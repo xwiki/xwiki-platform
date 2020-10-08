@@ -25,7 +25,28 @@
     __namespace: true
   };
 
-  CKEDITOR.plugins.xwikiSource = {};
+  CKEDITOR.plugins.xwikiSource = {
+    convertHTML: function(editor, params) {
+      var htmlConverterURL = (editor.config['xwiki-source'] || {}).htmlConverter;
+      return jQuery.post(htmlConverterURL, jQuery.extend({
+        // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
+        // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
+        // rather than the default wiki syntax.
+        sourceSyntax: editor.element.getAttribute('data-sourceDocumentSyntax'),
+        // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
+        // in-line (because the returned HTML will be inserted directly into the main page).
+        stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE
+      }, params));
+    },
+
+    getFullData: function(editor) {
+      var isFullData = editor.config.fullData;
+      editor.config.fullData = true;
+      var fullData = editor.getData();
+      editor.config.fullData = isFullData;
+      return fullData;
+    }
+  };
 
   CKEDITOR.plugins.add('xwiki-source', {
     requires: 'notification,xwiki-loading,xwiki-localization,xwiki-selection,xwiki-sourcearea',
@@ -75,18 +96,10 @@
         delete mode.data;
       } else {
         var oldData = mode.data;
-        var newData = this.getFullData(editor);
+        var newData = CKEDITOR.plugins.xwikiSource.getFullData(editor);
         mode.dirty = oldData !== newData;
         mode.data = newData;
       }
-    },
-
-    getFullData: function(editor) {
-      var isFullData = editor.config.fullData;
-      editor.config.fullData = true;
-      var fullData = editor.getData();
-      editor.config.fullData = isFullData;
-      return fullData;
     },
 
     onMode: function(event) {
@@ -121,21 +134,16 @@
     },
 
     convertHTML: function(editor, toHTML) {
-      var thisPlugin = this;
-      var config = editor.config['xwiki-source'] || {};
       var deferred = jQuery.Deferred();
-      jQuery.post(config.htmlConverter, {
+      CKEDITOR.plugins.xwikiSource.convertHTML(editor, {
         fromHTML: !toHTML,
         toHTML: toHTML,
-        // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
-        // in-line (because the returned HTML will be inserted directly into the main page).
-        stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE,
         text: editor._.previousModeData
       }).done(function(data) {
         editor.setData(data, {
           callback: function() {
             // Take a snapshot after the data has been set, in order to be able to detect changes.
-            editor._.modes[editor.mode].data = thisPlugin.getFullData(editor);
+            editor._.modes[editor.mode].data = CKEDITOR.plugins.xwikiSource.getFullData(editor);
             deferred.resolve(editor);
           }
         });

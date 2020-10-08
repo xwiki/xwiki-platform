@@ -105,6 +105,10 @@ ckeditor.plugin.toolbar.include=Include
 ckeditor.plugin.toolbar.code=Code Snippet
 ckeditor.plugin.toolbar.otherMacros=Other Macros
 
+ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
+ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
+ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 modal.ok=OK

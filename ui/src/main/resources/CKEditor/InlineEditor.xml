@@ -147,57 +147,23 @@
   ];
   css.forEach(loadCSS);
 
-  $(document).on('xwiki:actions:edit', function(event, data) {
-    if (data &amp;&amp; data.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; data.editMode === 'wysiwyg') {
+  $(document).on('xwiki:actions:edit', function(event, config) {
+    if (config &amp;&amp; config.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; config.editMode === 'wysiwyg') {
       var container = $(event.target);
       ckeditorPromise.done(function(ckeditor) {
-        createEditor(ckeditor, container, data);
+        createEditors(ckeditor, container, config);
       });
     }
   });
 
-  var createEditor = function(ckeditor, container, config) {
-    container.prop('contenteditable', true).attr({
+  var createEditors = function(ckeditor, container, config) {
+    container.attr({
+      'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
       'data-sourceDocumentSyntax': config.document.syntax,
       'data-officeImporterSupported': config.enableOfficeImport
-    });
-    container.each(function() {
+    }).each(function() {
       try {
-        var editor = ckeditor.inline(this, {
-          // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
-          // we implemented the maximize feature for the in-line editor.
-          resize_enabled: false
-        });
-        // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
-        if (!config.enableSourceMode) {
-          editor.once('configLoaded', function(event) {
-            if (typeof editor.config.removePlugins === 'string') {
-              editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
-            }
-          });
-        }
-        editor.on('instanceReady', function() {
-          config.deferred.resolve(config.document);
-        });
-        $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
-          config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
-        });
-        $(document).one('xwiki:actions:view', function(event, data) {
-          $(document).off('xwiki:actions:beforeSave.contentEditor');
-          // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
-          // We also do this because destroying the editor while the edited content has the focus can lead to an error.
-          // See below.
-          container.blur().prop('contenteditable', false).removeAttr('contenteditable');
-          // We destroy the editor after the edited content has lost the focus completely because the editor has a
-          // delayed event listener that tries to access the selection even after the editor has been destroyed.
-          setTimeout(function() {
-            // Don't update the edited element with the data from the editor because:
-            // * the editor data might be wiki syntax if the current mode is Source
-            // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
-            //   and we risk overwriting it.
-            editor.destroy(/* noUpdate: */ true);
-          }, 0);
-        });
+        createEditor(ckeditor, this, config).done($.proxy(config.deferred, 'resolve', config.document));
       } catch (e) {
         console.log(e);
         new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
@@ -205,6 +171,50 @@
         config.deferred.reject();
       }
     });
+  };
+
+  var createEditor = function(ckeditor, element, config, instanceConfig) {
+    var deferred = $.Deferred();
+    $(element).prop('contenteditable', true);
+    var editor = ckeditor.inline(element, $.extend({
+      // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
+      // we implemented the maximize feature for the in-line editor.
+      resize_enabled: false
+    }, instanceConfig));
+    // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
+    if (!config.enableSourceMode) {
+      editor.once('configLoaded', function(event) {
+        if (typeof editor.config.removePlugins === 'string') {
+          editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
+        }
+      });
+    }
+    editor.once('instanceReady', $.proxy(deferred, 'resolve', editor));
+    editor.once('reload', function(event) {
+      $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
+      event.data.promise = event.data.promise.then($.proxy(createEditor, null, ckeditor, element, config));
+    });
+    $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
+      config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
+      config.document.syntax = $(element).attr('data-sourceDocumentSyntax');
+    });
+    $(document).one('xwiki:actions:view.contentEditor', function(event, data) {
+      $(document).off('xwiki:actions:beforeSave.contentEditor');
+      // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
+      // We also do this because destroying the editor while the edited content has the focus can lead to an error.
+      // See below.
+      $(element).blur().prop('contenteditable', false).removeAttr('contenteditable');
+      // We destroy the editor after the edited content has lost the focus completely because the editor has a
+      // delayed event listener that tries to access the selection even after the editor has been destroyed.
+      setTimeout(function() {
+        // Don't update the edited element with the data from the editor because:
+        // * the editor data might be wiki syntax if the current mode is Source
+        // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
+        //   and we risk overwriting it.
+        editor.destroy(/* noUpdate: */ true);
+      }, 0);
+    });
+    return deferred.promise();
   };
 });</code>
     </property>

@@ -328,10 +328,6 @@ define('xwiki-ckeditor', [
         htmlConverter: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
-          // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
-          // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
-          // rather than the default wiki syntax.
-          sourceSyntax: sourceDocument.syntax,
           language: currentLocale
         }))
       },
@@ -802,21 +798,32 @@ require(['jquery'], function($) {
     </property>
     <property>
       <code>require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge'], function($, ckeditorPromise) {
+  var createEditors = function(ckeditor, container) {
+    container.find('.ckeditor-textarea').each(function() {
+      // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
+      try {
+        createEditor(ckeditor, this);
+      } catch(e) {
+        console.log(e);
+      }
+    });
+  };
+
+  var createEditor = function(ckeditor, textArea, instanceConfig) {
+    var deferred = $.Deferred();
+    var editor = ckeditor.replace(textArea, instanceConfig);
+    editor.once('instanceReady', $.proxy(deferred, 'resolve', editor));
+    editor.once('reload', function(event) {
+      event.data.promise = event.data.promise.then($.proxy(createEditor, null, ckeditor, textArea));
+    });
+    return deferred.promise();
+  };
+
   ckeditorPromise.done(function(ckeditor) {
-    var createEditors = function(container) {
-      container.find('.ckeditor-textarea').each(function() {
-        // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
-        try {
-          ckeditor.replace(this);
-        } catch(e) {
-          console.log(e);
-        }
-      });
-    };
-    createEditors($(body));
+    createEditors(ckeditor, $(body));
     // Make sure we don't register the event listener multiple times (in case this code is loaded multiple times).
     $(document).off('xwiki:dom:updated.ckeditor').on('xwiki:dom:updated.ckeditor', function(event, data) {
-      createEditors($(data.elements));
+      createEditors(ckeditor, $(data.elements));
     });
   });
 });</code>

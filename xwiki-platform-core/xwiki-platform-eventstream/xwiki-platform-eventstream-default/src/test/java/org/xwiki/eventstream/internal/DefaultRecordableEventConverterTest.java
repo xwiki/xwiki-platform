@@ -22,25 +22,32 @@ package org.xwiki.eventstream.internal;
 import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEvent;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.TargetableEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,13 +58,21 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 11.1RC1
  */
+@ComponentTest
 public class DefaultRecordableEventConverterTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultRecordableEventConverter> mocker =
-            new MockitoComponentMockingRule<>(DefaultRecordableEventConverter.class);
+    @InjectMockComponents
+    private DefaultRecordableEventConverter recordableEventConverter;
 
+    @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    @Named("context")
+    private ComponentManager componentManager;
+
+    @Mock
+    private RecordableEventDescriptor descriptor;
 
     private static final DocumentReference CURRENT_USER = new DocumentReference("xwiki", "XWiki", "User");
 
@@ -65,10 +80,9 @@ public class DefaultRecordableEventConverterTest
 
     private static final Set<String> TARGETS = Sets.newHashSet("userB", "groupC");
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        this.contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         XWikiContext context = mock(XWikiContext.class);
         when(contextProvider.get()).thenReturn(context);
         when(context.getUserReference()).thenReturn(CURRENT_USER);
@@ -89,10 +103,16 @@ public class DefaultRecordableEventConverterTest
     }
 
     @Test
-    public void convert() throws Exception
+    void convert() throws Exception
     {
+        when(this.componentManager.getInstanceList(RecordableEventDescriptor.class)).thenReturn(Arrays.asList(
+            mock(RecordableEventDescriptor.class), this.descriptor, mock(RecordableEventDescriptor.class)
+        ));
+        when(this.descriptor.getEventType()).thenReturn(MockedRecordableEvent.class.getCanonicalName());
+        when(this.descriptor.getEventTitle()).thenReturn("event.custom.title");
+
         RecordableEvent recordableEvent = new MockedRecordableEvent();
-        Event result = mocker.getComponentUnderTest().convert(recordableEvent, "source", "some data");
+        Event result = this.recordableEventConverter.convert(recordableEvent, "source", "some data");
         assertEquals("org.xwiki.eventstream.internal.DefaultRecordableEventConverterTest.MockedRecordableEvent",
                 result.getType());
         assertEquals("source", result.getApplication());
@@ -101,10 +121,11 @@ public class DefaultRecordableEventConverterTest
         assertEquals(CURRENT_WIKI, result.getWiki());
         assertEquals("some data", result.getBody());
         assertEquals(TARGETS, result.getTarget());
+        assertEquals("event.custom.title", result.getTitle());
     }
 
     @Test
-    public void convertDocumentEvent() throws Exception
+    void convertDocumentEvent() throws Exception
     {
         RecordableEvent recordableEvent = new MockedRecordableEvent();
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -113,7 +134,7 @@ public class DefaultRecordableEventConverterTest
         when(doc.getVersion()).thenReturn("5.1");
         when(doc.getRenderedTitle(any(XWikiContext.class))).thenReturn("Some title");
 
-        Event result = mocker.getComponentUnderTest().convert(recordableEvent, "source", doc);
+        Event result = this.recordableEventConverter.convert(recordableEvent, "source", doc);
         assertEquals("org.xwiki.eventstream.internal.DefaultRecordableEventConverterTest.MockedRecordableEvent",
                 result.getType());
         assertEquals("source", result.getApplication());
@@ -128,8 +149,8 @@ public class DefaultRecordableEventConverterTest
     }
 
     @Test
-    public void getSupportedEvents() throws Exception
+    void getSupportedEvents() throws Exception
     {
-        assertTrue(mocker.getComponentUnderTest().getSupportedEvents().isEmpty());
+        assertTrue(this.recordableEventConverter.getSupportedEvents().isEmpty());
     }
 }

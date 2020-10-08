@@ -48,6 +48,8 @@ import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
 
+import liquibase.util.StringUtils;
+
 /**
  * This is the default implementation of {@link NotificationRSSRenderer}.
  *
@@ -98,9 +100,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         entry.setUri(String.join("-", eventNotification.getEventIds()));
 
         // Set the entry title
-        entry.setTitle(this.contextualLocalizationManager.getTranslationPlain(
-                eventNotification.getEvents().get(0).getTitle(),
-                eventNotification.getEvents().get(0).getDocumentTitle()));
+        entry.setTitle(getTitle(eventNotification));
 
         // Render the description (the main part) of the feed entry
         try {
@@ -137,5 +137,28 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         entry.setUpdatedDate(eventNotification.getDates().get(0));
 
         return entry;
+    }
+
+    private String getTitle(CompositeEvent eventNotification)
+    {
+        String entryTitle;
+        String eventTitle = eventNotification.getEvents().get(0).getTitle();
+        String documentTitle = eventNotification.getEvents().get(0).getDocumentTitle();
+        boolean concernsDocument = !StringUtils.isEmpty(documentTitle);
+        boolean translationExist = !StringUtils.isEmpty(eventTitle)
+            && this.contextualLocalizationManager.getTranslation(eventTitle) != null;
+
+        if  (translationExist && concernsDocument) {
+            entryTitle = this.contextualLocalizationManager.getTranslationPlain(eventTitle, documentTitle);
+        } else if (translationExist && !concernsDocument) {
+            entryTitle = this.contextualLocalizationManager.getTranslationPlain(eventTitle);
+        } else if (!translationExist && concernsDocument) {
+            entryTitle = this.contextualLocalizationManager
+                .getTranslationPlain("notifications.rss.defaultTitleWithPage", documentTitle);
+        } else {
+            entryTitle = this.contextualLocalizationManager
+                .getTranslationPlain("notifications.rss.defaultTitle");
+        }
+        return entryTitle;
     }
 }

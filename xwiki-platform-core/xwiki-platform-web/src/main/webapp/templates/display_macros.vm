@@ -53,6 +53,12 @@
     'mode': $displayMode
   })
   #displayProperty_syntax($macro.parameters)
+  #if ($displayMode == 'edit')
+    #set ($discard = $xwiki.jsfx.use('syntaxPicker.js', true))
+    ## Use a hidden input to store the answer to the syntax conversion confirmation.
+    <input type="hidden" name="convertSyntax" value="false"
+      data-document-reference="$escapetool.xml($services.model.serialize($tdoc.documentReference, 'default'))" />
+  #end
 #end
 
 #macro (displayDocumentProperty_defaultLocale $displayMode)
@@ -90,24 +96,32 @@
 #macro (displayProperty_syntax $parameters)
   #if ($parameters.mode == 'edit')
     #set ($configuredSyntaxes = $services.rendering.configuredSyntaxes)
-    <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)">
+    #set ($availableParserSyntaxes = $services.rendering.availableParserSyntaxes)
+    #set ($availableRendererSyntaxes = $services.rendering.availableRendererSyntaxes)
+    <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)" data-type="syntax">
       #foreach ($syntax in $configuredSyntaxes)
-        <option value="$escapetool.xml($syntax.toIdString())"#if ($syntax.equals($parameters.value))
-          selected="selected"#end>$syntax.toString()</option>
+        <option value="$escapetool.xml($syntax.toIdString())"
+          data-syntax="$escapetool.xml($jsontool.serialize($syntax))"
+          data-parser="$!availableParserSyntaxes.contains($syntax)"
+          data-renderer="$!availableRendererSyntaxes.contains($syntax)"
+          #if ($syntax.equals($parameters.value)) selected="selected"#end>$syntax.toString()</option>
       #end
       ## Add the selected value if it's not in the list of known values.
       #if (!$configuredSyntaxes.contains($parameters.value))
         <option value="$!escapetool.xml($parameters.value.toIdString())"
+          data-syntax="$escapetool.xml($jsontool.serialize($syntax))"
+          data-parser="$!availableParserSyntaxes.contains($parameters.value)"
+          data-renderer="$!availableRendererSyntaxes.contains($parameters.value)"
           selected="selected">$!parameters.value.toString()</option>
       #end
     </select>
     #if ($hasAdmin && $configuredSyntaxes.size() < 2)
       <a href="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&section=Syntaxes')">
-        $escapetool.xml($services.localization.render('panels.documentInformation.configureSyntaxes'))
+        $escapetool.xml($services.localization.render('web.widgets.syntaxPicker.configureSyntaxes'))
       </a>
     #end
   #else
-    <span data-value="$!escapetool.xml($parameters.value.toIdString())"
+    <span data-value="$!escapetool.xml($parameters.value.toIdString())" data-type="syntax"
       >$!escapetool.xml($parameters.value.toString())</span>
   #end
 #end

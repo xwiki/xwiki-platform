@@ -1963,6 +1963,42 @@ public class XWiki implements EventListener
         saveDocument(doc, comment, false, context);
     }
 
+    private void beforeSave(XWikiDocument document, XWikiContext context) throws XWikiException
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            CancelableEvent documentEvent;
+            if (document.getOriginalDocument().isNew()) {
+                documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
+            } else {
+                documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
+            }
+            om.notify(documentEvent, document, context);
+
+            // If the action has been canceled by the user then don't perform any save and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
+                    String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
+                        document.getDocumentReference(), documentEvent.getReason()));
+            }
+        }
+    }
+
+    private void afterSave(XWikiDocument document, XWikiContext context)
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            if (document.getOriginalDocument().isNew()) {
+                om.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
+            } else {
+                om.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, context);
+            }
+        }
+    }
+
     /**
      * Save the passed document in the store.
      * <p>
@@ -1989,30 +2025,11 @@ public class XWiki implements EventListener
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
-            ObservationManager om = getObservationManager();
-
             // Notify listeners about the document about to be created or updated
 
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-
-            if (om != null) {
-                CancelableEvent documentEvent;
-                if (originalDocument.isNew()) {
-                    documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
-                } else {
-                    documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
-                }
-                om.notify(documentEvent, document, context);
-
-                // If the action has been canceled by the user then don't perform any save and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
-                        String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
-                            document.getDocumentReference(), documentEvent.getReason()));
-                }
-            }
+            beforeSave(document, context);
 
             // Delete existing document if we replace with a new one
             if (document.isNew()) {
@@ -2053,14 +2070,7 @@ public class XWiki implements EventListener
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
                 // The old version is made available using doc.getOriginalDocument()
-
-                if (om != null) {
-                    if (originalDocument.isNew()) {
-                        om.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
-                    } else {
-                        om.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, context);
-                    }
-                }
+                afterSave(document, context);
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document save notification for document ["
                     + getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()) + "]", ex);
@@ -4527,6 +4537,40 @@ public class XWiki implements EventListener
         return blankDoc;
     }
 
+    private XWikiDocument beforeDelete(XWikiDocument doc, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
+
+        ObservationManager om = getObservationManager();
+
+        // Inform notification mechanisms that a document is about to be deleted
+        // Note that for the moment the event being send is a bridge event, as we are still passing around
+        // an XWikiDocument as source and an XWikiContext as data.
+        if (om != null) {
+            CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
+            om.notify(documentEvent, blankDoc, context);
+
+            // If the action has been canceled by the user then don't perform any deletion and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
+                    String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
+                        doc.getDocumentReference(), documentEvent.getReason()));
+            }
+        }
+
+        return blankDoc;
+    }
+
+    private void afterDelete(XWikiDocument blankDoc, XWikiContext context)
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            om.notify(new DocumentDeletedEvent(blankDoc.getDocumentReference()), blankDoc, context);
+        }
+    }
+
     private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
         throws XWikiException
     {
@@ -4536,24 +4580,13 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
-
-            ObservationManager om = getObservationManager();
+            XWikiDocument blankDoc = null;
 
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            if (notify && om != null) {
-                CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
-                om.notify(documentEvent, blankDoc, context);
-
-                // If the action has been canceled by the user then don't perform any deletion and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
-                        String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
-                            doc.getDocumentReference(), documentEvent.getReason()));
-                }
+            if (notify) {
+                blankDoc = beforeDelete(doc, context);
             }
 
             if (hasRecycleBin(context) && totrash) {
@@ -4570,8 +4603,8 @@ public class XWiki implements EventListener
                 // Inform notification mechanisms that a document has been deleted
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
-                if (notify && om != null) {
-                    om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+                if (notify) {
+                    afterDelete(blankDoc, context);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document delete notifications for document [{}]",
@@ -4699,10 +4732,7 @@ public class XWiki implements EventListener
         boolean result = false;
 
         // if source and destination are same, no need to perform the rename.
-        if (sourceDocumentReference.equals(targetDocumentReference)) {
-            result = false;
-        } else {
-
+        if (!sourceDocumentReference.equals(targetDocumentReference)) {
             XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
             XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
 
@@ -4720,17 +4750,30 @@ public class XWiki implements EventListener
                     // Ensure that the current context contains the wiki reference of the source document.
                     WikiReference wikiReference = context.getWikiReference();
                     context.setWikiReference(sourceDocumentReference.getWikiReference());
-                    // Step 1: Perform atomic rename in DB
+
+                    // Step 1: Simulate creating a document and deleting a document from listeners point of view
+                    // FIXME: currently modifications made by listeners won't be applied
+                    XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
+                    futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
+                    beforeSave(futureTargetDocument, context);
+                    XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
+
+                    // Step 2: Perform atomic rename in DB
                     try {
                         this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
                     } finally {
                         context.setWikiReference(wikiReference);
                     }
 
-                    // Step 2: For each child document, update its parent reference.
-                    // Step 3: For each backlink to rename, parse the backlink document and replace the links with
+                    // Step 3: Simulate a created document and a deleted document from listeners point of view
+                    targetDocument = this.getDocument(targetDocumentReference, context);
+                    afterDelete(deletedDocument, context);
+                    afterSave(futureTargetDocument, context);
+
+                    // Step 4: For each child document, update its parent reference.
+                    // Step 5: For each backlink to rename, parse the backlink document and replace the links with
                     // the new name.
-                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
+                    // Step 6: Refactor the relative links contained in the document to make sure they are relative
                     // to the new document's location.
                     this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
                         childDocumentReferences, context);
@@ -4738,6 +4781,7 @@ public class XWiki implements EventListener
                 }
             }
         }
+
         return result;
     }
 

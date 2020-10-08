@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -364,6 +365,44 @@ public class XWikiTest
         verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
             same(this.oldcore.getXWikiContext()));
         verify(mockListener).onEvent(any(DocumentCreatedEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
+    /**
+     * We only verify here that the renameDocument API calls the Observation component.
+     */
+    @Test
+    public void testRenameDocumentSendsObservationEvents() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("xwikitest", "Some", "Source");
+        DocumentReference targetReference = new DocumentReference("xwikitest", "Some", "Target");
+
+        XWikiDocument sourceDocument = new XWikiDocument(sourceReference);
+        sourceDocument.setSyntax(Syntax.PLAIN_1_0);
+        this.xwiki.saveDocument(sourceDocument, this.oldcore.getXWikiContext());
+
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        when(mockListener.getEvents()).thenReturn(
+            Arrays.asList(new DocumentCreatedEvent(targetReference), new DocumentCreatingEvent(targetReference),
+                new DocumentDeletingEvent(sourceReference), new DocumentDeletedEvent(sourceReference)));
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        verify(mockListener).getEvents();
+
+        this.xwiki.renameDocument(sourceReference, targetReference, false, Collections.emptyList(), null,
+            this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called before and after the rename
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentCreatedEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentDeletingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+        verify(mockListener).onEvent(any(DocumentDeletedEvent.class), any(XWikiDocument.class),
             same(this.oldcore.getXWikiContext()));
     }
 

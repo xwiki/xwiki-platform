@@ -44,8 +44,11 @@
 #set ($lastIndex = $event.events.size() - 1)
 #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
 #end
-#set ($externalURL = $newdoc.getExternalURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
-#set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
+#if ($newdoc.version)
+  #set ($externalURL = $newdoc.getExternalURL('view',
+    "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
+  #set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
   $services.localization.render('notifications.rss.seeChanges', 'xwiki/2.1', [$diffLink])
+#end
 #end
 </p>

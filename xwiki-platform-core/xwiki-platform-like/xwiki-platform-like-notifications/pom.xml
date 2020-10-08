@@ -31,7 +31,7 @@
   <name>XWiki Platform - Like - Notifications</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

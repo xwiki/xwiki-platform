@@ -45,6 +45,10 @@ rating.voteoutofbounds=Le vote est hors limite.
 rating.setvote.inprogress=Votre vote est en cours d'enregistrement ...
 rating.setvote.success=Votre vote a été enregistré.
 rating.setvote.error=Erreur à l'enregistrement de votre vote.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Activer les votes
+XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Activer
+XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Activer
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=L'activation des votes permet aux utilisateurs de voter sur les pages et affiche la note moyenne. Désactiver les votes ne supprime pas les votes déjà enregistrés, les votes sont simplement masqués.
 
 #@deprecatedstart
 

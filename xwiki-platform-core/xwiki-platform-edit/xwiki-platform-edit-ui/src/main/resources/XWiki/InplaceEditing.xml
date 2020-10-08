@@ -540,7 +540,7 @@ define('editInPlace', [
       'xwiki:actions:save',
       'xwiki:actions:reload',
       'xwiki:actions:cancel',
-    ].join(' '), function(event, data) {
+    ].join(' '), '.xcontent.form', function(event, data) {
       deferred.resolve({
         name: event.type.substring('xwiki:actions:'.length),
         document: xwikiDocument,
@@ -573,8 +573,8 @@ define('editInPlace', [
     // once it was resolved or rejected. So the first event that fires will resolve/reject the promise and the remaining
     // event won't be able to change that. The remaining event listener could be called later but it won't have any
     // effect.
-    $(document).one('xwiki:document:saved', $.proxy(deferred, 'resolve', xwikiDocument));
-    $(document).one('xwiki:document:saveFailed', $.proxy(deferred, 'reject', xwikiDocument));
+    $(document).one('xwiki:document:saved', '.xcontent.form', $.proxy(deferred, 'resolve', xwikiDocument));
+    $(document).one('xwiki:document:saveFailed', '.xcontent.form', $.proxy(deferred, 'reject', xwikiDocument));
     return deferred.promise();
   };
 
@@ -621,7 +621,7 @@ define('editInPlace', [
 
   var shouldReload = function(xwikiDocument) {
     var reloadEventFired = false;
-    $(document).one('xwiki:actions:reload.maybe', function() {
+    $(document).one('xwiki:actions:reload.maybe', '.xcontent.form', function() {
       reloadEventFired = true;
     });
     var deferred = $.Deferred();
@@ -644,21 +644,30 @@ define('editInPlace', [
   };
 
   var view = function(xwikiDocument, reload) {
+    var viewContent = $('#xwikicontent');
+    var form = viewContent.closest('.form');
     // Destroy the editors before returning to view.
-    $(document).trigger('xwiki:actions:view', {document: xwikiDocument});
+    form.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
-    $('#xwikicontent').html(xwikiDocument.renderedContent);
+    viewContent.html(xwikiDocument.renderedContent);
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
       // in case they were hidden.
-      $('#xwikicontent').children(':header').children('.edit_section').removeClass('hidden');
+      viewContent.children(':header').children('.edit_section').removeClass('hidden');
       // Let others know that the DOM has been updated, in order to enhance it.
-      $(document).trigger('xwiki:dom:updated', {'elements': $('#xwikicontent').toArray()});
+      $(document).trigger('xwiki:dom:updated', {'elements': viewContent.toArray()});
     }
+    // Remove the action events scope.
+    form.removeClass('form');
     return $.Deferred().resolve(xwikiDocument).promise();
   };
 
   var edit = function(xwikiDocument) {
+    // By adding the 'form' CSS class we set the scope of the action events (e.g. xwiki:actions:beforeSave or
+    // xwiki:actions:cancel). We need this because in view mode we can have multiple forms active on the page (e.g. one
+    // for editing the document content in place and one for editing the document syntax in-place) and we don't want
+    // them to interfere (e.g. canceling one form shouldn't cancel the other forms).
+    $('#xwikicontent').closest('.xcontent').addClass('form');
     return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
       .then(startRealTimeEditingSession);
   };
@@ -683,11 +692,12 @@ define('editInPlace', [
       // If we're editing a page..
       if (xwikiDocument) {
         // ..then make sure the action buttons are displayed right away (don't wait for the user to scroll).
-        actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument).show();
+        actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument).show()
+          // but make sure the position of the action buttons is updated.
+          .trigger('xwiki:dom:refresh');
         // The action buttons are disabled on Save &amp; View. We don't reload the page on Save &amp; View and we reuse the
         // action buttons so we need to re-enable them each time we enter the edit mode.
         fakeForm.enable();
-        $(document).trigger('xwiki:dom:refresh');
       }
       return $.Deferred().resolve(xwikiDocument).promise();
     }
@@ -723,7 +733,7 @@ define('editInPlace', [
   };
 
   var loadActionButtons = function(actionButtons) {
-    $(document).on('xwiki:actions:view', function() {
+    $(document).on('xwiki:actions:view', '.xcontent.form', function() {
       // Blur the action buttons first to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit
       // shortcut), then disable the action buttons in order to disable their shortcut keys while we're not editing
       // in-place (e.g. prevent the Save shortcut while the user is only viewing the page). Finally hide the action
@@ -842,8 +852,9 @@ define('editInPlace', [
     var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
     $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
       reloadEditor: function() {
-        if ($('.inplace-editing-buttons').is(':visible')) {
-          $(document).trigger('xwiki:actions:reload');
+        var actionButtons = $('.inplace-editing-buttons');
+        if (actionButtons.is(':visible')) {
+          actionButtons.trigger('xwiki:actions:reload');
         } else {
           return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
         }
@@ -872,10 +883,10 @@ define('editInPlace', [
     }
     input.attr('placeholder', placeholder);
     $('#document-title h1').addClass('editable').empty().append([label, input]);
-    $(document).on('xwiki:actions:beforeSave.titleEditor', function(event) {
+    $(document).on('xwiki:actions:beforeSave.titleEditor', '.xcontent.form', function(event) {
       xwikiDocument.rawTitle = input.val();
     });
-    $(document).one('xwiki:actions:view', function(event, data) {
+    $(document).one('xwiki:actions:view', '.xcontent.form', function(event, data) {
       // Destroy the title editor.
       $(document).off('xwiki:actions:beforeSave.titleEditor');
       $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);

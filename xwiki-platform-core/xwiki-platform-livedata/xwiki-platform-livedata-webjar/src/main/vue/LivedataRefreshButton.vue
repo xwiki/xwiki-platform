@@ -26,7 +26,7 @@
 <template>
   <div
     class="livedata-refresh-button"
-    @click="logic.updateEntries()"
+    @click="logic.entries.update()"
     title="Refresh"
   >
     <span class="fa fa-repeat"></span>

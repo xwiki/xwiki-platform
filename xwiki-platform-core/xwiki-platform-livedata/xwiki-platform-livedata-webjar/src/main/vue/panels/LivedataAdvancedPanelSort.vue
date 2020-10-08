@@ -62,7 +62,7 @@
           :key="level"
         >
           <!-- Property name -->
-          <span>{{ logic.getPropertyDescriptor(sortEntry.property).name }}</span>
+          <span>{{ logic.properties.getPropertyDescriptor(sortEntry.property).name }}</span>
           <span style="margin: 0 1rem"> - </span>
 
           <!--
@@ -70,7 +70,7 @@
             Allow to select either Ascending or Descending
           -->
           <select
-            @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+            @change="logic.sort.sort(sortEntry.property, level, $event.target.value === 'true')"
           >
             <option
               value="false"
@@ -86,7 +86,7 @@
           <a
             class="delete-sort"
             href="#"
-            @click.prevent="logic.removeSort(sortEntry.property)"
+            @click.prevent="logic.sort.remove(sortEntry.property)"
             title="Delete Sort"
           >
             <span class="fa fa-trash-o"></span>
@@ -157,8 +157,8 @@ export default {
 
     // Property descriptors that does not have a sort entry in Livedata config
     unsortedProperties () {
-      return this.logic.getSortablePropertyDescriptors()
-        .filter(propertyDescriptor => !this.logic.getQuerySort(propertyDescriptor.id));
+      return this.logic.sort.getSortablePropertyDescriptors()
+        .filter(propertyDescriptor => !this.logic.sort.getQuerySort(propertyDescriptor.id));
     },
   },
 
@@ -166,12 +166,12 @@ export default {
     // Change event handler called by the add-sort select
     addSortLevel (value) {
       if (value === "none") { return; }
-      this.logic.addSort(value);
+      this.logic.sort.add(value);
       this.$refs.selectPropertiesNone.selected = true;
     },
     // Event handler called when sort entries are dragged and dropped
     reorderSorts (e) {
-      this.logic.reorderSort(e.moved.element.property, e.moved.newIndex)
+      this.logic.sort.reorder(e.moved.element.property, e.moved.newIndex)
       .catch(err => void console.warn(err));
     },
   },

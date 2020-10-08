@@ -51,7 +51,7 @@ export default {
 
     // The number of selected entries to be displayed
     selectedCount () {
-      return this.logic.getSelectedEntriesCount();
+      return this.logic.selection.getCount();
     },
   },
 

@@ -27,9 +27,9 @@
   - select entries matching current configuration
   - TODO: select all entries of the Livedata
 
-  When toggled, it modifies the `Logic.entrySelection` object.
+  When toggled, it modifies the `Logic.selection` object.
   When it select all the entries of the Livedata (with or without config),
-  it sets the `Logic.entrySelection.isGlobal` property to `ŧrue`
+  it sets the `Logic.selection.isGlobal` property to `ŧrue`
 
   When the LivedataSelectorAll is in global mode, unchecking the checkbox
   takes you out of this global mode.
@@ -78,7 +78,7 @@
     <ul class="dropdown-menu">
       <!-- Select all entries matching current config -->
       <li>
-        <a href="#" @click.prevent="logic.setEntrySelectGlobal(true)">
+        <a href="#" @click.prevent="logic.selection.setGlobal(true)">
           Select in all pages
         </a>
       </li>
@@ -97,14 +97,14 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
-    entrySelection () { return this.logic.entrySelection; },
+    selection () { return this.logic.selection; },
 
     // Whether the button is checked or not
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked () {
-         const allPageEntriesSeleted = this.data.data.entries.every(entry => this.logic.isEntrySelected(entry));
-         const allEntriesSelected = this.entrySelection.isGlobal && this.entrySelection.deselected.length === 0;
+         const allPageEntriesSeleted = this.data.data.entries.every(entry => this.logic.selection.isSelected(entry));
+         const allEntriesSelected = this.selection.isGlobal && this.selection.deselected.length === 0;
         return allPageEntriesSeleted || allEntriesSelected;
     },
 
@@ -112,7 +112,7 @@ export default {
     // It is in indeterminate state if at least one but not all
     // the page entries are selected
     indeterminate () {
-       const selectedCount = this.logic.getSelectedEntriesCount();
+       const selectedCount = this.logic.selection.getCount();
         return selectedCount > 0 && !this.checked;
     },
 
@@ -133,11 +133,11 @@ export default {
     // Event handler for when the user click on the checkbox
     toggle () {
       // if Global mode is on, uncheck everything
-      if (this.entrySelection.isGlobal) {
-        this.logic.setEntrySelectGlobal(false);
+      if (this.selection.isGlobal) {
+        this.logic.selection.setGlobal(false);
       // else, toggle `this.checked` state
       } else {
-        this.logic.toggleSelectEntries(this.data.data.entries, !this.checked);
+        this.logic.selection.toggleSelect(this.data.data.entries, !this.checked);
       }
     },
   },

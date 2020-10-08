@@ -38,7 +38,7 @@ export default {
   computed: {
     // The filter group (the whole filter configuration) of `this.propertyId`
     filterGroup () {
-      return this.logic.getQueryFilterGroup(this.propertyId) || {};
+      return this.logic.filters.getQueryFilterGroup(this.propertyId) || {};
     },
     // The filter entry (the filter at `this.index`) of `this.propertyId`
     filterEntry () {
@@ -46,11 +46,11 @@ export default {
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {
-      return this.logic.getPropertyDescriptor(this.propertyId);
+      return this.logic.properties.getPropertyDescriptor(this.propertyId);
     },
     // The configuration (aka filterDescriptor) of the filter
     config () {
-      return this.logic.getPropertyFilterDescriptor(this.propertyId);
+      return this.logic.filters.getDescriptorFromProperty(this.propertyId);
     },
     // The whole Livedata data object
     data () {
@@ -62,7 +62,7 @@ export default {
     // This method should be used to apply filter
     // As only the newValue has to be specified it is less error prone
     applyFilter (newValue) {
-      this.logic.filter(this.propertyId, this.index, {value: newValue});
+      this.logic.filters.filter(this.propertyId, this.index, {value: newValue});
     },
   },
 

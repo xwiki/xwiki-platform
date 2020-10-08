@@ -55,7 +55,7 @@
         v-for="layout in data.meta.layouts"
         :key="layout.id"
       >
-        <a href="#" @click.prevent="logic.changeLayout(layout.id)">
+        <a href="#" @click.prevent="logic.layout.change(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
           {{ layout.name }}
         </a>
@@ -89,7 +89,7 @@
       <!-- Design mode Section -->
       <li class="dropdown-header">Design</li>
 
-      <li v-show="!logic.designMode">
+      <li v-show="!logic.designMode.activated">
         <a href="#" @click.prevent="switchToDesignMode">
           <span class="fa fa-pencil"></span> Switch to Design Mode
         </a>
@@ -122,7 +122,7 @@ export default {
   methods: {
     async switchToDesignMode () {
       if (/* (TODO) USER IS THE ONLY ONE IN THE REALTIME SESSION */ true
-        && !this.logic.temporaryConfigEquals("initial")) {
+        && !this.logic.temporaryConfig.equals("initial")) {
         const response = await askYesNo({
           title: "Keep changes for design mode?",
           text: "Your Livedata configuration have been modified, do you want to keep it for design mode?",
@@ -131,10 +131,10 @@ export default {
         });
         if (!response) { return; }
         if (response === "no") {
-          this.logic.temporaryConfigLoad("initial");
+          this.logic.temporaryConfig.load("initial");
         }
       }
-      this.logic.toggleDesignMode(true);
+      this.logic.designMode.toggle(true);
     },
 
   },

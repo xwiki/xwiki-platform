@@ -68,7 +68,7 @@
         <!-- The rows (= the entries) -->
         <LayoutTableRow
           v-for="entry in entries"
-          :key="logic.getEntryId(entry)"
+          :key="logic.entries.getId(entry)"
           :entry="entry"
         />
 

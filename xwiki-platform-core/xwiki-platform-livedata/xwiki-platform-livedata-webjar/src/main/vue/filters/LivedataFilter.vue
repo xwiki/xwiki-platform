@@ -91,7 +91,7 @@ export default {
     // The filter id of the Filter component to load
     // corresponding to the property id
     filterId () {
-      return this.logic.getPropertyFilterDescriptor(this.propertyId).id;
+      return this.logic.filters.getDescriptorFromProperty(this.propertyId).id;
     },
   },
 

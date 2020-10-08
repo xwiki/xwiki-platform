@@ -34,10 +34,10 @@
     -->
     <select
       class="operator-select"
-      @change="logic.filter(propertyId, filterIndex, { operator: $event.target.value })"
+      @change="logic.filters.filter(propertyId, filterIndex, { operator: $event.target.value })"
     >
       <option
-        v-for="operator in logic.getPropertyFilterDescriptor(propertyId).operators"
+        v-for="operator in logic.filters.getDescriptorFromProperty(propertyId).operators"
         :key="operator.id"
         :value="operator.id"
         v-text="operator.name"
@@ -58,7 +58,7 @@
     <a
       class="delete-filter"
       href="#"
-      @click.prevent="logic.removeFilter(propertyId, filterIndex)"
+      @click.prevent="logic.filters.remove(propertyId, filterIndex)"
       title="Delete filters"
     >
       <span class="fa fa-trash-o"></span>
@@ -89,7 +89,7 @@ export default {
   computed: {
     // The filter entry corresponding to the props
     filterEntry () {
-      return this.logic.getQueryFilterGroup(this.propertyId).constrains[this.filterIndex];
+      return this.logic.filters.getQueryFilterGroup(this.propertyId).constrains[this.filterIndex];
     },
   },
 

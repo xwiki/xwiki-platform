@@ -34,7 +34,7 @@
   <XWikiDraggable
     class="column-header-names"
       :value="data.query.properties"
-      @change="reorderProperty"
+      @change="reorderProperties"
       tag="tr"
   >
     <!-- Entry Select All -->
@@ -52,12 +52,12 @@
       class="draggable-item"
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.isPropertyVisible(property.id)"
+      v-show="logic.properties.isVisible(property.id)"
     >
       <!-- Wrapper for the column header -->
       <div
         class="column-name"
-        @click="sort(property)"
+        @click="sort.sort(property)"
       >
         <!-- Specify the handle to drag properties -->
         <div class="handle">
@@ -72,7 +72,7 @@
           Only show the icon for the first-level sort property
         -->
         <span
-          v-if="logic.isPropertySortable(property.id)"
+          v-if="logic.sort.isSortable(property.id)"
           :class="[
             'sort-icon',
             'fa',
@@ -106,7 +106,7 @@ export default {
     data () { return this.logic.data; },
 
     properties () {
-      return this.logic.getPropertyDescriptors();
+      return this.logic.properties.getDescriptors();
     },
 
     // The first sort entry in the Livedata configuration sort array
@@ -129,17 +129,17 @@ export default {
     },
 
     sort (property) {
-      this.logic.sort(property.id, 0).catch(err => {
+      this.logic.sort.sort(property.id, 0).catch(err => {
         console.warn(err);
       });
     },
 
-    reorderProperty (e) {
+    reorderProperties (e) {
       // As the draggable plugin is taking in account every child it has for d&d
       // and there is the select-entry-all component as first child
       // we need to substract 1 to the indexes that the draggable plugin handles
       // so that it matches the true property order
-      this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
+      this.logic.properties.reorder(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
 
   },

@@ -43,7 +43,7 @@
     <td :colspan="colspan">
       <a
         href="#"
-        @click.prevent="logic.addEntry()"
+        @click.prevent="logic.entries.add()"
       >
         <span class="fa fa-plus-circle"></span>
         Add entry
@@ -71,7 +71,7 @@ export default {
     // It is set to the number of properties that can be displayed
     // as it is the max number of column that could be displayed at once
     colspan () {
-      return this.logic.getPropertyDescriptors().length;
+      return this.logic.properties.getDescriptors().length;
     },
   },
 

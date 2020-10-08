@@ -35,7 +35,7 @@
       class="cell"
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.isPropertyVisible(property.id)"
+      v-show="logic.properties.isVisible(property.id)"
     >
       <LivedataDisplayer
         :property-id="property.id"
@@ -68,7 +68,7 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
-    properties () { return this.logic.getPropertyDescriptors(); },
+    properties () { return this.logic.properties.getDescriptors(); },
   },
 
 };

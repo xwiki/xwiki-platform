@@ -51,7 +51,7 @@
       <XWikiDraggable
         class="property-container"
         :value="data.query.properties"
-        @change="reorderProperty"
+        @change="reorderProperties"
       >
         <!--
           Properties
@@ -60,7 +60,7 @@
         -->
         <XWikiDraggableItem
           class="property"
-          v-for="property in logic.getPropertyDescriptors()"
+          v-for="property in logic.properties.getDescriptors()"
           :key="property.id"
         >
 
@@ -88,8 +88,8 @@
               >
                 <input
                   type="checkbox"
-                  :checked="logic.isPropertyVisible(property.id)"
-                  @change="logic.setPropertyVisible(property.id, $event.target.checked)"
+                  :checked="logic.properties.isVisible(property.id)"
+                  @change="logic.properties.setVisibility(property.id, $event.target.checked)"
                 />
               </div>
 
@@ -102,7 +102,7 @@
               -->
               <a
                 class="toggle-edit-panel"
-                v-if="logic.designMode"
+                v-if="logic.designMode.activated"
                 @click.prevent="toggleEditPanel(property.id)"
                 href="#"
               >
@@ -122,7 +122,7 @@
               like their type, displayer id, filter id
             -->
             <LivedataAdvancedPanelPropertiesDesignPane
-              v-if="logic.designMode"
+              v-if="logic.designMode.activated"
               v-show="visibleEditPanels[property.id]"
               :property="property"
             />
@@ -172,8 +172,8 @@ export default {
 
   methods: {
     // Event handler for when properties are dragged and dropped
-    reorderProperty (e) {
-      this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
+    reorderProperties (e) {
+      this.logic.properties.reorder(e.moved.element, e.moved.newIndex);
     },
 
     // Event handler for when user click on button to expand / collapse edit panel

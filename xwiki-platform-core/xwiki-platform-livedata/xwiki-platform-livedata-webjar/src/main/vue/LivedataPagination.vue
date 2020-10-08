@@ -42,7 +42,7 @@
     >
       Entries per page
       <select
-        @change="logic.setPageSize(+$event.target.value)"
+        @change="logic.pagination.setPageSize(+$event.target.value)"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
@@ -63,7 +63,7 @@
       class="pagination-current-entries"
       v-if="data.meta.pagination.showEntryRange"
     >
-      {{ logic.getFirstIndexOfPage() + 1 }} - {{ logic.getLastIndexOfPage() + 1 }}
+      {{ logic.pagination.getFirstIndexOfPage() + 1 }} - {{ logic.pagination.getLastIndexOfPage() + 1 }}
       of {{ data.data.count }}
     </span>
 
@@ -84,7 +84,7 @@
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.setPageIndex(0)"
+        @click.prevent="logic.pagination.setPageIndex(0)"
       >
         <span class="fa fa-angle-double-left"></span>
       </a>
@@ -98,7 +98,7 @@
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageIndex() - 1)"
+        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageIndex() - 1)"
       >
         <span class="fa fa-angle-left"></span>
       </a>
@@ -129,10 +129,10 @@
           :key="pageIndex"
           :class="{
             'page-nav': true,
-            'current': pageIndex === logic.getPageIndex(),
+            'current': pageIndex === logic.pagination.getPageIndex(),
           }"
           href="#"
-          @click.prevent="logic.setPageIndex(pageIndex)"
+          @click.prevent="logic.pagination.setPageIndex(pageIndex)"
         >
           <!-- pageIndex + 1 because pageIndex are 0-based -->
           {{ pageIndex + 1 }}
@@ -148,7 +148,7 @@
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageIndex() + 1)"
+        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageIndex() + 1)"
       >
         <span class="fa fa-angle-right"></span>
       </a>
@@ -162,7 +162,7 @@
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageCount() - 1)"
+        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageCount() - 1)"
       >
         <span class="fa fa-angle-double-right"></span>
       </a>
@@ -192,11 +192,11 @@ export default {
     //   - page indexes around current page index, alternating before and after it
     paginationIndexes () {
       // Total count of pages
-      const pageCount = this.logic.getPageCount();
+      const pageCount = this.logic.pagination.getPageCount();
       // Number of pages to show on widget
       const maxShownPages = this.data.meta.pagination.maxShownPages;
       // Current page index
-      const currentPageIndex = this.logic.getPageIndex();
+      const currentPageIndex = this.logic.pagination.getPageIndex();
       // Page indexes to be displayed
       const pageIndexes = [];
       // Function to add a page inside the pageIndexes array

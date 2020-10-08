@@ -33,7 +33,7 @@
     <div class="property-design">
       <span class="design-title">Type</span>
       <select
-        @change="logic.setPropertyType(property.id, $event.target.value)"
+        @change="logic.properties.setType(property.id, $event.target.value)"
       >
         <!-- Available property types -->
         <option
@@ -52,14 +52,14 @@
     <div class="property-design">
       <span class="design-title">Displayer</span>
       <select
-        @change="logic.setPropertyDisplayer(property.id, $event.target.value)"
+        @change="logic.properties.setDisplayer(property.id, $event.target.value)"
       >
         <!-- Default displayers -->
         <option
           :value="undefined"
           :selected="isDisplayerSelected(undefined)"
         >
-          Default ({{ logic.getTypeDisplayerDescriptor(property.type).id }})
+          Default ({{ logic.displayers.getDescriptorFromType(property.type).id }})
         </option>
         <!-- Available displayers -->
         <option
@@ -78,13 +78,13 @@
     <div class="property-design">
       <span class="design-title">Filter</span>
       <select
-        @change="logic.setPropertyFilter(property.id, $event.target.value)"
+        @change="logic.properties.setFilter(property.id, $event.target.value)"
       >
         <option
           :value="undefined"
           :selected="isFilterSelected(undefined)"
         >
-          Default ({{ logic.getTypeFilterDescriptor(property.type).id }})
+          Default ({{ logic.filters.getDescriptorFromType(property.type).id }})
         </option>
         <option
           v-for="filterDescriptor in data.meta.filters"
@@ -117,7 +117,7 @@ export default {
     data () { return this.logic.data; },
 
     displayerId () {
-      return this.logic.getPropertyDisplayerDescriptor(this.property.id).id;
+      return this.logic.displayers.getDescriptorFromProperty(this.property.id).id;
     },
 
     isDisplayerDefaulted () {
@@ -125,7 +125,7 @@ export default {
     },
 
     filterId () {
-      return this.logic.getPropertyFilterDescriptor(this.property.id).id;
+      return this.logic.filters.getDescriptorFromProperty(this.property.id).id;
     },
 
     isFilterDefaulted () {

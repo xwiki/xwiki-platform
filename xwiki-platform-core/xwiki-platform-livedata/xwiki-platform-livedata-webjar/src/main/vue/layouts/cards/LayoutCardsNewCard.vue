@@ -33,7 +33,7 @@
 
     <a
       href="#"
-      @click.prevent="logic.addEntry()"
+      @click.prevent="logic.entries.add()"
     >
       <span class="fa fa-plus-circle fa-3x"></span>
       <span class="add-entry-text">Add entry</span>

@@ -96,7 +96,7 @@ export default {
     // The displayer id of the Displayer component to load,
     // corresponding to the property id
     displayerId () {
-      return this.logic.getPropertyDisplayerDescriptor(this.propertyId).id;
+      return this.logic.displayers.getDescriptorFromProperty(this.propertyId).id;
     },
   },
 

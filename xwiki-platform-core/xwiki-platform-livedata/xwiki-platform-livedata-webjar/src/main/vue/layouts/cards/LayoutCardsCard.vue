@@ -32,7 +32,7 @@
       <!-- Entry selector -->
       <LivedataEntrySelector :entry="entry"/>
       <!-- Title property -->
-      <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
+      <h2 v-if="!!titlePropertyId && logic.properties.isVisible(titlePropertyId)">
         <LivedataDisplayer
           :property-id="titlePropertyId"
           :entry="entry"
@@ -46,7 +46,7 @@
     -->
     <XWikiDraggable
       :value="data.query.properties"
-      @change="reorderProperty"
+      @change="reorderProperties"
     >
       <!--
         Card Properties
@@ -57,7 +57,7 @@
         class="card-property"
         v-for="property in properties"
         :key="property.id"
-        v-show="logic.isPropertyVisible(property.id) && property.id !== titlePropertyId"
+        v-show="logic.properties.isVisible(property.id) && property.id !== titlePropertyId"
       >
         <!-- Specify the handle to drag properties -->
         <template #handle>
@@ -108,19 +108,19 @@ export default {
     data () { return this.logic.data; },
 
     properties () {
-      return this.logic.getPropertyDescriptors();
+      return this.logic.properties.getDescriptors();
     },
 
     // The id of the property that is going to be in the card title
     titlePropertyId () {
-      return this.logic.getLayoutDescriptor("cards").titleProperty;
+      return this.logic.layout.getDescriptor("cards").titleProperty;
     },
 
   },
 
   methods: {
-    reorderProperty (e) {
-      this.logic.reorderProperty(e.moved.element, e.moved.newIndex);
+    reorderProperties (e) {
+      this.logic.properties.reorder(e.moved.element, e.moved.newIndex);
     },
   },
 

@@ -25,7 +25,7 @@
   One LivedataEntrySelector component is associated with one entry,
   passed as its prop.
 
-  When toggled, it modifies the `Logic.entrySelection` object.
+  When toggled, it modifies the `Logic.selection` object.
 -->
 <template>
   <!--
@@ -40,7 +40,7 @@
       ref="checkbox"
       type="checkbox"
       :checked="selected"
-      @change="logic.toggleSelectEntries(entry)"
+      @change="logic.selection.toggleSelect(entry)"
     />
   </div>
 </template>
@@ -62,7 +62,7 @@ export default {
 
     // Whether the selector property is currently selected
     selected () {
-      return this.logic.isEntrySelected(this.entry);
+      return this.logic.selection.isSelected(this.entry);
     },
 
   },

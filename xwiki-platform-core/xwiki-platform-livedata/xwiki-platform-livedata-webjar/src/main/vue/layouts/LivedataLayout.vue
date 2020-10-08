@@ -27,7 +27,7 @@
   ./<layoutid>/Layout<layoutid>.vue
 
   The LivedataLayout component directly handle for us the choice of
-  which layout to use, based on the Logic `currentLayoutId` property,
+  which layout to use, based on the Logic `layout.currentId` property,
   and dynamically import this layout component and mount it at runtime.
   If the layout can't be found, or there was an loading error,
   then it falls back to the default one
@@ -91,7 +91,7 @@ export default {
           // If the layout was not the default one, try to load default layout
           if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
             console.warn(err);
-            this.logic.changeLayout(this.data.meta.defaultLayout);
+            this.logic.layout.change(this.data.meta.defaultLayout);
           } else {
             console.error(err);
           }

@@ -51,11 +51,11 @@ export default {
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {
-      return this.logic.getPropertyDescriptor(this.propertyId);
+      return this.logic.properties.getPropertyDescriptor(this.propertyId);
     },
     // The configuration (aka displayerDescriptor) of the displayer
     config () {
-      return this.logic.getPropertyDisplayerDescriptor(this.propertyId);
+      return this.logic.displayers.getDescriptorFromProperty(this.propertyId);
     },
     // The whole Livedata data object
     data () {

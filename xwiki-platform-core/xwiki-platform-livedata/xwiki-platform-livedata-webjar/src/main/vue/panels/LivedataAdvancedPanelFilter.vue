@@ -60,7 +60,7 @@
         <div class="filter-group-title">
           <!-- Property name -->
           <span class="property-name">
-            {{ logic.getPropertyDescriptor(filterGroup.property).name }}
+            {{ logic.properties.getPropertyDescriptor(filterGroup.property).name }}
           </span>
           <!--
             Filter Group delete button
@@ -69,7 +69,7 @@
           <a
             class="delete-filter-group"
             href="#"
-            @click.prevent="logic.removeAllFilters(filterGroup.property)"
+            @click.prevent="logic.filters.removeAll(filterGroup.property)"
             title="Delete the whole property filters"
           >
             <span class="fa fa-trash-o"></span>
@@ -83,44 +83,101 @@
           for cleaner and more efficient implementation
         -->
         <div class="filters">
-          <!--
-            The filter entries are wrapped inside a XWikiDraggable component
-            in order to allow the user to reorder them easily
-            It also has a group prop set to the property filterId,
-            in order to allow to move filter entries between properties
-            of same filterId
-          -->
-          <XWikiDraggable
-            class="filter-entries"
-            :value="logic.getQueryFilterGroup(filterGroup.property).constrains"
-            @change="reorderFilter($event, filterGroup)"
-            :group="'filter-panel' + logic.getPropertyFilterDescriptor(filterGroup.property).id"
-          >
-            <!--
-              Draggable wrapper for the filter entry
-              Uses the XWikiDraggableItem component that goes along the
-              XWikiDraggable one
-            -->
-            <XWikiDraggableItem
-                v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
-                :key="filterIdx"
-              >
-              <!-- Filter entries -->
-              <LivedataAdvancedPanelFilterEntry
-                :filter-index="filterIdx"
-                :property-id="filterGroup.property"
-              />
-            </XWikiDraggableItem>
-          </XWikiDraggable>
 
-          <!-- Button to add new filter for the current Filter Group -->
-          <a
-            class="add-filter"
-            href="#"
-            @click.prevent="logic.addFilter(filterGroup.property)"
+          <div
+            class="filters-hidden"
+            v-if="logic.designMode.activated"
           >
-            + Add filter
-          </a>
+            <span class="filter-category">Hidden Filters</span>
+
+            <!--
+              The filter entries are wrapped inside a XWikiDraggable component
+              in order to allow the user to reorder them easily
+              It also has a group prop set to the property filterId,
+              in order to allow to move filter entries between properties
+              of same filterId
+            -->
+            <XWikiDraggable
+              class="filter-entries"
+              :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+              @change="reorderFilter($event, filterGroup)"
+              :group="'filter-panel' + logic.filters.getDescriptorFromProperty(filterGroup.property).id"
+            >
+              <!--
+                Draggable wrapper for the filter entry
+                Uses the XWikiDraggableItem component that goes along the
+                XWikiDraggable one
+              -->
+              <XWikiDraggableItem
+                  v-for="(filter, filterIdx) in logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+                  :key="filterIdx"
+                >
+                <!-- Filter entries -->
+                <LivedataAdvancedPanelFilterEntry
+                  :filter-index="filterIdx"
+                  :property-id="filterGroup.property"
+                />
+              </XWikiDraggableItem>
+            </XWikiDraggable>
+
+            <!-- Button to add new filter for the current Filter Group -->
+            <a
+              class="add-filter"
+              href="#"
+              @click.prevent="logic.filters.add(filterGroup.property)"
+            >
+              + Add filter
+            </a>
+          </div>
+
+          <div class="filters-normal">
+            <span
+              class="filter-category"
+              v-if="logic.designMode.activated"
+            >
+              Filters
+            </span>
+
+            <!--
+              The filter entries are wrapped inside a XWikiDraggable component
+              in order to allow the user to reorder them easily
+              It also has a group prop set to the property filterId,
+              in order to allow to move filter entries between properties
+              of same filterId
+            -->
+            <XWikiDraggable
+              class="filter-entries"
+              :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+              @change="reorderFilter($event, filterGroup)"
+              :group="'filter-panel' + logic.filters.getDescriptorFromProperty(filterGroup.property).id"
+            >
+              <!--
+                Draggable wrapper for the filter entry
+                Uses the XWikiDraggableItem component that goes along the
+                XWikiDraggable one
+              -->
+              <XWikiDraggableItem
+                  v-for="(filter, filterIdx) in logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+                  :key="filterIdx"
+                >
+                <!-- Filter entries -->
+                <LivedataAdvancedPanelFilterEntry
+                  :filter-index="filterIdx"
+                  :property-id="filterGroup.property"
+                />
+              </XWikiDraggableItem>
+            </XWikiDraggable>
+
+            <!-- Button to add new filter for the current Filter Group -->
+            <a
+              class="add-filter"
+              href="#"
+              @click.prevent="logic.filters.add(filterGroup.property)"
+            >
+              + Add filter
+            </a>
+          </div>
+
         </div>
 
       </div> <!-- end of Filter Group -->
@@ -191,8 +248,8 @@ export default {
 
     // Property descriptors that does not have a filter group in Livedata config
     unfilteredProperties () {
-      return this.logic.getFilterablePropertyDescriptors().filter(propertyDescriptor => {
-        const filter = this.logic.getQueryFilterGroup(propertyDescriptor.id);
+      return this.logic.filters.getFilterablePropertyDescriptors().filter(propertyDescriptor => {
+        const filter = this.logic.filters.getQueryFilterGroup(propertyDescriptor.id);
         return !filter || filter.constrains.length === 0;
       });
     },
@@ -204,7 +261,7 @@ export default {
     // Change event handler called by the add-filters select
     addFilterGroup (value) {
       if (value === "none") { return; }
-      this.logic.addFilter(value);
+      this.logic.filters.add(value);
       this.$refs.selectFilterPropertiesNone.selected = true;
     },
     // Event handler called when filter entries are dragged and dropped
@@ -216,19 +273,19 @@ export default {
     reorderFilter (e, filterGroup) {
       // Filter entry reordered in the same property
       if (e.moved) {
-        this.logic.filter(filterGroup.property, e.moved.oldIndex, {
+        this.logic.filters.filter(filterGroup.property, e.moved.oldIndex, {
           index: e.moved.newIndex,
         })
         .catch(err => void console.warn(err));
       }
       // Filter entry moved to another property (add handler)
       else if (e.added) {
-        this.logic.addFilter(filterGroup.property, e.added.element.operator, e.added.element.value, e.added.newIndex)
+        this.logic.filters.add(filterGroup.property, e.added.element.operator, e.added.element.value, e.added.newIndex)
         .catch(err => void console.warn(err));
       }
       // Filter entry moved to another property (remove handler)
       else if (e.removed) {
-        this.logic.removeFilter(filterGroup.property, e.removed.oldIndex)
+        this.logic.filters.remove(filterGroup.property, e.removed.oldIndex)
         .catch(err => void console.warn(err));
       }
     },

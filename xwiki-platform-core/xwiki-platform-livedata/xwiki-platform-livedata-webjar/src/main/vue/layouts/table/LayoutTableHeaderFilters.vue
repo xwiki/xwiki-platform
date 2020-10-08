@@ -38,10 +38,10 @@
     <th
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.isPropertyVisible(property.id)"
+      v-show="logic.properties.isVisible(property.id)"
     >
       <LivedataFilter
-        v-if="logic.isPropertyFilterable(property.id)"
+        v-if="logic.filters.isFilterable(property.id)"
         :property-id="property.id"
         :index="0"
       />
@@ -66,7 +66,7 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
-    properties () { return this.logic.getPropertyDescriptors(); },
+    properties () { return this.logic.properties.getDescriptors(); },
   },
 
 };

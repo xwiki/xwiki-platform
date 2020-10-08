@@ -95,8 +95,8 @@ export default {
     },
     // Current layout id
     $_currentLayoutId: {
-      get () { return this.logic.currentLayoutId; },
-      set (value) { this.logic.currentLayoutId = value; },
+      get () { return this.logic.layout.currentId; },
+      set (value) { this.logic.layout.currentId = value; },
     },
     // Property order
     $_propertyOrder: {
@@ -110,14 +110,14 @@ export default {
         // We use hidden properties because they are more likely to be
         // less numerous than visible ones
         return this.data.query.properties
-          .reduce((hiddenProperties, propertyId) => this.logic.isPropertyVisible(propertyId)
+          .reduce((hiddenProperties, propertyId) => this.logic.properties.isVisible(propertyId)
             ? hiddenProperties
             : hiddenProperties.concat(propertyId),
           []);
       },
       set (value) {
         this.data.query.properties.forEach(propertyId => {
-          this.logic.setPropertyVisible(propertyId, !value.includes(propertyId));
+          this.logic.properties.setVisibility(propertyId, !value.includes(propertyId));
         });
       }
     },
@@ -146,7 +146,7 @@ export default {
 
     // Return the u-node domain used to encode layouts
     encodingSpecsCurrentLayoutId () {
-      return ["oneOf"].concat(this.logic.getLayoutIds());
+      return ["oneOf"].concat(this.logic.layout.getIds());
     },
 
     // The whole specs used to encode the config
@@ -346,7 +346,7 @@ export default {
       return;
     }
     this.loadConfig(config);
-    this.logic.temporaryConfigSave("initial");
+    this.logic.temporaryConfig.save("initial");
   },
 
 

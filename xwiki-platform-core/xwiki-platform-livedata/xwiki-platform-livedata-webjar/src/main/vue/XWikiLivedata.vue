@@ -68,7 +68,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
     // The id of the layout to be displayed
-    layoutId () { return this.logic.currentLayoutId; }
+    layoutId () { return this.logic.layout.currentId; }
   },
 
   // The provide function allows to vue to provide the Logic object

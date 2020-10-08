@@ -39,4 +39,10 @@ public class ForUserEventFilter extends AbstractForUserEventFilter
     {
         super("forUserEventFilter", format, read, false);
     }
+
+    @Override
+    public FilteringMoment getFilteringMoment()
+    {
+        return FilteringMoment.ONLY_POSTFILTERING;
+    }
 }

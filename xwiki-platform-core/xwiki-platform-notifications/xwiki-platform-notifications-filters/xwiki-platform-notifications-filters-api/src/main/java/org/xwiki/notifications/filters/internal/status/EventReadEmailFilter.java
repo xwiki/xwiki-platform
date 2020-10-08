@@ -48,4 +48,12 @@ public class EventReadEmailFilter extends AbstractEventReadFilter
     {
         super(FILTER_NAME, NotificationFormat.EMAIL);
     }
+
+    @Override
+    public FilteringMoment getFilteringMoment()
+    {
+        // This filter does not make sense in pre-filtering since it requires a user action
+        // (marking the event as read) before it has an impact.
+        return FilteringMoment.ONLY_POSTFILTERING;
+    }
 }

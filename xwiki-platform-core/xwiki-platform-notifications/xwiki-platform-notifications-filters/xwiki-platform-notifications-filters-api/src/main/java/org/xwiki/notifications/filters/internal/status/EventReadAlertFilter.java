@@ -55,4 +55,12 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
         // It's the most important priority
         return 4000;
     }
+
+    @Override
+    public FilteringMoment getFilteringMoment()
+    {
+        // This filter does not make sense in pre-filtering since it requires a user action
+        // (marking the event as read) before it has an impact.
+        return FilteringMoment.ONLY_POSTFILTERING;
+    }
 }

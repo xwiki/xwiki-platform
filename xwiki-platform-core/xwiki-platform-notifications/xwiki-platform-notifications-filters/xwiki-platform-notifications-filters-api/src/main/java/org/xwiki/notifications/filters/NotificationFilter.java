@@ -28,6 +28,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
@@ -65,6 +66,31 @@ public interface NotificationFilter extends Comparable
          * Value used when the filter has no impact on the given event.
          */
         NO_EFFECT
+    }
+
+    /**
+     * The different moments when a filter can be called.
+     *
+     * @since 12.9RC1
+     * @since 12.6.3
+     */
+    @Unstable
+    enum FilteringMoment
+    {
+        /**
+         * Used if the filter can be only called for post-filtering.
+         */
+        ONLY_POSTFILTERING,
+
+        /**
+         * Used if the filter can be only called for pre-filtering.
+         */
+        ONLY_PREFILTERING,
+
+        /**
+         * Used if the filter can be used for both pre or post-filtering.
+         */
+        BOTH
     }
 
     /**
@@ -171,5 +197,17 @@ public interface NotificationFilter extends Comparable
             return other.getPriority() - this.getPriority();
         }
         return 0;
+    }
+
+    /**
+     * @return the moment when the filter should be used.
+     *
+     * @since 12.9RC1
+     * @since 12.6.3
+     */
+    @Unstable
+    default FilteringMoment getFilteringMoment()
+    {
+        return FilteringMoment.BOTH;
     }
 }

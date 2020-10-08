@@ -23,21 +23,25 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,29 +51,28 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.7RC1
  */
+@ComponentTest
 public class DefaultNotificationFilterManagerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultNotificationFilterManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultNotificationFilterManager.class);
+    @InjectMockComponents
+    private DefaultNotificationFilterManager filterManager;
 
+    @MockComponent
     private ComponentManager componentManager;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private DocumentReference testUser;
 
+    @MockComponent
+    @Named("cached")
     private ModelBridge modelBridge;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        componentManager = mocker.registerMockComponent(ComponentManager.class);
-
-        wikiDescriptorManager = mocker.registerMockComponent(WikiDescriptorManager.class);
-
-        modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
-
         testUser = new DocumentReference("wiki", "test", "user");
 
         // Set a default comportment for the wikiDescriptorManager
@@ -79,7 +82,7 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getAllNotificationsFiltersWithSubWiki() throws Exception
+    void getAllNotificationsFiltersWithSubWiki() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
         NotificationFilter fakeFilter2 = mock(NotificationFilter.class);
@@ -89,7 +92,7 @@ public class DefaultNotificationFilterManagerTest
         when(componentManager.getInstanceList(NotificationFilter.class))
                 .thenReturn(Arrays.asList(fakeFilter1, fakeFilter2));
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getAllFilters(testUser, false);
+        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(testUser, false);
 
         assertEquals(2, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -97,21 +100,21 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getAllFiltersWithMainWiki() throws Exception
+    void getAllFiltersWithMainWiki() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
         when(componentManager.getInstanceMap(NotificationFilter.class))
                 .thenReturn(Collections.singletonMap("1", fakeFilter1));
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getAllFilters(testUser, false);
+        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(testUser, false);
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
     }
 
     @Test
-    public void getAllFiltersWithOneDisabledFilter() throws Exception
+    void getAllFiltersWithOneDisabledFilter() throws Exception
     {
         SystemUserNotificationFilter disabledFilter = mock(SystemUserNotificationFilter.class);
 
@@ -122,14 +125,14 @@ public class DefaultNotificationFilterManagerTest
         Map<String, Boolean> filterActivations = new HashMap<>();
         filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getEnabledFilters(
-                mocker.getComponentUnderTest().getAllFilters(testUser, true), filterActivations).collect(Collectors.toList());
+        Collection<NotificationFilter> filters = this.filterManager.getEnabledFilters(
+                this.filterManager.getAllFilters(testUser, true), filterActivations).collect(Collectors.toList());
 
         assertEquals(0, filters.size());
     }
 
     @Test
-    public void getFiltersWithMatchingFilters() throws Exception
+    void getFiltersWithMatchingFilters() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
@@ -137,7 +140,7 @@ public class DefaultNotificationFilterManagerTest
 
         when(fakeFilter1.matchesPreference(preference)).thenReturn(true);
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getFiltersRelatedToNotificationPreference(
+        Collection<NotificationFilter> filters = this.filterManager.getFiltersRelatedToNotificationPreference(
                 Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
 
         assertEquals(1, filters.size());
@@ -145,7 +148,7 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getFiltersWithOneBadFilter() throws Exception
+    void getFiltersWithOneBadFilter() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
@@ -153,9 +156,61 @@ public class DefaultNotificationFilterManagerTest
 
         when(fakeFilter1.matchesPreference(preference)).thenReturn(false);
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest()
-                .getFiltersRelatedToNotificationPreference(Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
+        Collection<NotificationFilter> filters = this.filterManager
+            .getFiltersRelatedToNotificationPreference(Arrays.asList(fakeFilter1), preference)
+            .collect(Collectors.toList());
 
         assertEquals(0, filters.size());
     }
+
+    @Test
+    void getFiltersWithSpecificFilteringMoment() throws Exception
+    {
+        NotificationFilter filter1 = mock(NotificationFilter.class);
+        NotificationFilter filter2 = mock(NotificationFilter.class);
+        NotificationFilter filter3 = mock(NotificationFilter.class);
+        NotificationFilter filter4 = mock(NotificationFilter.class);
+
+        when(filter1.getName()).thenReturn("filter1");
+        when(filter2.getName()).thenReturn("filter2");
+        when(filter3.getName()).thenReturn("filter3");
+        when(filter4.getName()).thenReturn("filter4");
+
+        Map<String, Boolean> filterActivations = new HashMap<>();
+        filterActivations.put("filter1", true);
+        filterActivations.put("filter2", false);
+        filterActivations.put("filter3", true);
+        filterActivations.put("filter4", true);
+
+        when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
+        when(filter1.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.BOTH);
+        when(filter2.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_PREFILTERING);
+        when(filter3.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_POSTFILTERING);
+        when(filter4.getFilteringMoment()).thenReturn(NotificationFilter.FilteringMoment.ONLY_PREFILTERING);
+
+        // Using subwiki so we manipulate a set instead of a map
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
+        when(componentManager.getInstanceList(NotificationFilter.class))
+            .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4));
+
+        Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(testUser, true,
+            new HashSet<>(
+                Arrays.asList(NotificationFilter.FilteringMoment.BOTH,
+                    NotificationFilter.FilteringMoment.ONLY_PREFILTERING)));
+        assertEquals(2, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter4)), allFilters);
+
+        allFilters = this.filterManager.getAllFilters(testUser, false,
+            new HashSet<>(
+                Arrays.asList(NotificationFilter.FilteringMoment.BOTH,
+                    NotificationFilter.FilteringMoment.ONLY_PREFILTERING)));
+        assertEquals(3, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter4)), allFilters);
+
+        allFilters = this.filterManager.getAllFilters(testUser, true, Collections.singleton(
+            NotificationFilter.FilteringMoment.ONLY_POSTFILTERING));
+        assertEquals(1, allFilters.size());
+        assertEquals(Collections.singleton(filter3), allFilters);
+    }
+
 }

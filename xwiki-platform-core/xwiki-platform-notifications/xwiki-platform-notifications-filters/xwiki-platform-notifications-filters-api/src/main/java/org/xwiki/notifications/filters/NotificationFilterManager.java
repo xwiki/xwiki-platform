@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
@@ -58,6 +59,23 @@ public interface NotificationFilterManager
      */
     Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled)
         throws NotificationException;
+
+    /**
+     * Get all notifications filters that are enabled to the given user and matching the requested filtering moment.
+     *
+     * @param user reference to the user
+     * @param onlyEnabled either or not only filters enabled for the user should be collected
+     * @param filteringMoments when the filter should be used
+     * @return the collection of notification filters enabled to the user.
+     * @throws NotificationException if an error happens
+     * @since 10.4RC1
+     */
+    default Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
+        Set<NotificationFilter.FilteringMoment> filteringMoments)
+        throws NotificationException
+    {
+        return getAllFilters(user, onlyEnabled);
+    }
 
     /**
      * Get from the filters the one that match the given notification preference.

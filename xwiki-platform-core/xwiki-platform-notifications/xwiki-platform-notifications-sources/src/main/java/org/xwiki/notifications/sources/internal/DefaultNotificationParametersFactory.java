@@ -21,6 +21,7 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -393,10 +395,15 @@ public class DefaultNotificationParametersFactory
                 enableAllEventTypes(parameters);
 
                 parameters.filters.add(new ForUserEventFilter(parameters.format, null));
+                parameters.filters.addAll(notificationFilterManager.getAllFilters(parameters.user, true,
+                    Collections.singleton(NotificationFilter.FilteringMoment.ONLY_POSTFILTERING)));
             } else {
                 parameters.preferences =
                     notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
+                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true,
+                    new HashSet<>(Arrays.asList(
+                        NotificationFilter.FilteringMoment.ONLY_POSTFILTERING,
+                        NotificationFilter.FilteringMoment.BOTH)));
                 parameters.filterPreferences =
                     notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
             }

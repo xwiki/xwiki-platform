@@ -309,7 +309,8 @@
     </property>
     <property>
       <code>.like-button.btn-default.badge {
-  color: grey;
+  color: @btn-default-color;
+  background-color: @btn-default-bg;
 }
 .like-container {
   /* Leave some space between the like button and the next footer item (e.g. the page tags). */
@@ -317,7 +318,7 @@
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>

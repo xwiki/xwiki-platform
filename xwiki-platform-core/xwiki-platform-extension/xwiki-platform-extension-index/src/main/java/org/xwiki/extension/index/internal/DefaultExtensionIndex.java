@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.index.ExtensionIndex;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -35,7 +36,7 @@ import org.xwiki.search.solr.SolrUtils;
  * The default implementation of {@link ExtensionIndex}, based on Solr.
  * 
  * @version $Id$
- * @since 12.7RC1
+ * @since 12.9RC1
  */
 @Component
 @Singleton
@@ -47,6 +48,9 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
     @Inject
     private SolrUtils utils;
 
+    @Inject
+    private JobExecutor jobs;
+
     private SolrClient client;
 
     @Override
@@ -57,5 +61,8 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         } catch (SolrException e) {
             throw new InitializationException("Failed to get the extension index Solr core", e);
         }
+
+        // Start index job
+        this.jobs.execute(jobType, request);
     }
 }

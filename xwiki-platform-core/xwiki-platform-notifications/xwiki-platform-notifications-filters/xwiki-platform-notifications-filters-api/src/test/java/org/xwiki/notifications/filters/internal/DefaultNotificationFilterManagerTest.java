@@ -176,6 +176,7 @@ public class DefaultNotificationFilterManagerTest
         NotificationFilter filter4 = mock(NotificationFilter.class);
         NotificationFilter filter5 = mock(NotificationFilter.class);
         NotificationFilter filter6 = mock(NotificationFilter.class);
+        NotificationFilter filter7 = mock(NotificationFilter.class);
 
         when(filter1.getName()).thenReturn("filter1");
         when(filter2.getName()).thenReturn("filter2");
@@ -183,6 +184,7 @@ public class DefaultNotificationFilterManagerTest
         when(filter4.getName()).thenReturn("filter4");
         when(filter5.getName()).thenReturn("filter5");
         when(filter6.getName()).thenReturn("filter6");
+        when(filter7.getName()).thenReturn("filter7");
 
         Map<String, Boolean> filterActivations = new HashMap<>();
         filterActivations.put("filter1", true);
@@ -191,6 +193,7 @@ public class DefaultNotificationFilterManagerTest
         filterActivations.put("filter4", false);
         filterActivations.put("filter5", true);
         filterActivations.put("filter6", false);
+        // We don't put filter7 so it should default as being considered activated
 
         when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
         when(filter1.getFilteringPhases())
@@ -207,12 +210,14 @@ public class DefaultNotificationFilterManagerTest
         when(filter6.getFilteringPhases())
             .thenReturn(new HashSet<>(Arrays.asList(NotificationFilter.FilteringPhase.PRE_FILTERING,
                 NotificationFilter.FilteringPhase.POST_FILTERING)));
-
+        when(filter7.getFilteringPhases())
+            .thenReturn(new HashSet<>(Arrays.asList(NotificationFilter.FilteringPhase.PRE_FILTERING,
+                NotificationFilter.FilteringPhase.POST_FILTERING)));
 
         // Using subwiki so we manipulate a set instead of a map
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
         when(componentManager.getInstanceList(NotificationFilter.class))
-            .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6));
+            .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7));
 
         // prefiltering enabled: we request prefiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
@@ -220,8 +225,8 @@ public class DefaultNotificationFilterManagerTest
         when(this.configuration.isEventPrefilteringEnabled()).thenReturn(true);
         Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(testUser, true,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
-        assertEquals(2, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter5)), allFilters);
+        assertEquals(3, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter5, filter7)), allFilters);
 
         // prefiltering still enabled: we request postfiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
@@ -233,19 +238,19 @@ public class DefaultNotificationFilterManagerTest
         // prefiltering still enabled: we request all filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled.
         allFilters = this.filterManager.getAllFilters(testUser, true, null);
-        assertEquals(3, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5)), allFilters);
+        assertEquals(4, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5, filter7)), allFilters);
 
         // prefiltering still enabled: we request prefiltering filters whatever if they are enabled or not
         // we should not return filter3 and 4 because they are only for post-filtering
         allFilters = this.filterManager.getAllFilters(testUser, false,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
-        assertEquals(4, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter5, filter6)), allFilters);
+        assertEquals(5, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter5, filter6, filter7)), allFilters);
 
         // prefiltering still enabled: we request postfiltering filters whatever if they are enabled or not
         // we should not return filter1/2 because they are only for pre-filtering,
-        // nor filter5/6 because they are for both pre and post filtering
+        // nor filter5/6/7 because they are for both pre and post filtering
         allFilters = this.filterManager.getAllFilters(testUser, false,
             NotificationFilter.FilteringPhase.POST_FILTERING);
         assertEquals(2, allFilters.size());
@@ -254,8 +259,9 @@ public class DefaultNotificationFilterManagerTest
         // prefiltering still enabled: we request all filters  whatever if they are enabled or not:
         // we return all filters
         allFilters = this.filterManager.getAllFilters(testUser, false, null);
-        assertEquals(6, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6)), allFilters);
+        assertEquals(7, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7)),
+            allFilters);
 
         // prefiltering not enabled: we request prefiltering filters that are enabled:
         // we return nothing: this does not make sense to have prefiltering filters in that case.
@@ -268,14 +274,14 @@ public class DefaultNotificationFilterManagerTest
         // we should not return filter2/4/6 since they are not enabled,
         // nor filter1 because it's only for pre-filtering
         allFilters = this.filterManager.getAllFilters(testUser, true, NotificationFilter.FilteringPhase.POST_FILTERING);
-        assertEquals(2, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter3, filter5)), allFilters);
+        assertEquals(3, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter3, filter5, filter7)), allFilters);
 
         // prefiltering still not enabled: we request all filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled.
         allFilters = this.filterManager.getAllFilters(testUser, true, null);
-        assertEquals(3, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5)), allFilters);
+        assertEquals(4, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5, filter7)), allFilters);
 
         // prefiltering still not enabled: we request prefiltering filters whatever if they are enabled or not
         // we return nothing: this does not make sense to have prefiltering filters in that case.
@@ -287,16 +293,15 @@ public class DefaultNotificationFilterManagerTest
         // we should not return filter1/2 because they are only for pre-filtering,
         allFilters = this.filterManager.getAllFilters(testUser, false,
             NotificationFilter.FilteringPhase.POST_FILTERING);
-        assertEquals(4, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter3, filter4, filter5, filter6)), allFilters);
+        assertEquals(5, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter3, filter4, filter5, filter6, filter7)), allFilters);
 
         // prefiltering still not enabled: we request all filters  whatever if they are enabled or not:
         // we return all filters
         allFilters = this.filterManager.getAllFilters(testUser, false, null);
-        assertEquals(6, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6)), allFilters);
-
-
+        assertEquals(7, allFilters.size());
+        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7)),
+            allFilters);
     }
 
 }

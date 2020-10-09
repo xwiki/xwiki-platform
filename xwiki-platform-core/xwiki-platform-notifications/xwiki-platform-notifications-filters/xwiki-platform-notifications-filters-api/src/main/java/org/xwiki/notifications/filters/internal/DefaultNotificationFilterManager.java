@@ -128,7 +128,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         Iterator<NotificationFilter> it = filters.iterator();
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
-            boolean filterActivation = filterActivations.getOrDefault(filter.getName(), false);
+            boolean filterActivation = filterActivations.getOrDefault(filter.getName(), true);
             if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase,
                 prefilteringEnabled)) {
                 it.remove();

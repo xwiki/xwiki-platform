@@ -31,6 +31,7 @@ import org.xwiki.model.EntityType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link Right}.
@@ -92,7 +93,7 @@ public class RightTest
     }
 
     @Test
-    public void toRight()
+    void toRight()
     {
         assertSame(Right.VIEW, Right.toRight("view"));
         assertSame(Right.VIEW, Right.toRight("VIEW"));
@@ -108,5 +109,13 @@ public class RightTest
         Right myRight = new Right(new CustomRight("foo"), Collections.singleton(Right.VIEW));
         assertSame(Right.toRight("foo"), myRight);
         assertEquals(Collections.singleton(myRight), Right.VIEW.getImpliedRights());
+    }
+
+    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
+    @Test
+    void like()
+    {
+        Right myRight = new Right(new CustomRight("foo"));
+        assertTrue(myRight.like(new CustomRight("foo")));
     }
 }

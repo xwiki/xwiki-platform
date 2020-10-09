@@ -19,300 +19,174 @@
  */
 package org.xwiki.ratings;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.ratings.events.CreatedRatingEvent;
+import org.xwiki.ratings.events.UpdatedRatingEvent;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
-import com.xpn.xwiki.XWiki;
-
 /**
+ * Manager for handling Rating operations.
+ *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.9RC1
  */
 @Role
+@Unstable
 public interface RatingsManager
 {
-    String RATINGS_CLASSPAGE = "RatingsClass";
-
-    String RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + RATINGS_CLASSPAGE;
-
-    LocalDocumentReference RATINGS_CLASSREFERENCE =
-        new LocalDocumentReference(XWiki.SYSTEM_SPACE, RATINGS_CLASSPAGE);
-
-    String AVERAGE_RATINGS_CLASSPAGE = "AverageRatingsClass";
-
-    String AVERAGE_RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + AVERAGE_RATINGS_CLASSPAGE;
-
-    LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE =
-        new LocalDocumentReference("XWiki", AVERAGE_RATINGS_CLASSPAGE);
-
-    String RATING_CLASS_FIELDNAME_DATE = "date";
-
-    String RATING_CLASS_FIELDNAME_AUTHOR = "author";
-
-    String RATING_CLASS_FIELDNAME_VOTE = "vote";
-
-    String RATING_CLASS_FIELDNAME_PARENT = "parent";
-
-    String AVERAGERATING_CLASS_FIELDNAME_NBVOTES = "nbvotes";
-
-    String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE = "averagevote";
-
-    String AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD = "method";
-
-    String RATING_REPUTATION_METHOD_BALANCED = "balanced";
-
-    String RATING_REPUTATION_METHOD_AVERAGE = "average";
-
-    String RATING_REPUTATION_METHOD_DEFAULT = "average";
-
-    String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.";
-
-    String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
-
-    LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE = new LocalDocumentReference("XWiki", "RatingsConfig");
-
-    String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
-
-    LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE = new LocalDocumentReference("XWiki", "RatingsConfigClass");
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE = "storageSpace";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES = "storageSeparateSpaces";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING = "storeAverageRating";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION = "reputation";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED = "reputationStored";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD = "reputationMethod";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT = "reputationAlgorithmHint";
-
-    String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM = "reputationCustomAlgorithm";
-
-    String RATINGS_CONFIG_FIELDNAME_MANAGER_HINT = "managerHint";
-
-    String RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT = "reputationAlgorithmHint";
-
     /**
-     * Gets the ratings class.
-     * 
-     * @return the XWiki document representing the RatingsClass
+     * The fields to be used for performing queries on Ratings.
      */
-    String getRatingsClassName();
-
-    /**
-     * Gets a list of ratings.
-     * Note that if count and start are both 0, retrieve all ratings.
-     * 
-     * @param documentRef the document to which the ratings belong to
-     * @param start the offset from where to fetch the ratings
-     * @param count how many ratings to fetch
-     * @param asc sort the results in ascending order or not
-     * @return a list of Rating objects
-     * @throws RatingsException when an error occurs while fetching the list of ratings
-     */
-    List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc) throws RatingsException;
-
-    /**
-     * Retrieve the ratings performed by the given user.
-     *
-     * @param userReference the user who performed ratings.
-     * @param start the offset from where to fetch the ratings
-     * @param count how many ratings to fetch
-     * @param asc if {@code true} sort the results in ascending date order else in descending date order.
-     * @return a list of Rating objects made by the given user.
-     * @throws RatingsException when an error occurs while fetching the list of ratings
-     * @since 12.6
-     */
-    @Unstable
-    default List<Rating> getRatings(UserReference userReference, int start, int count, boolean asc)
-        throws RatingsException
+    enum RatingQueryField
     {
-        return Collections.emptyList();
+        IDENTIFIER("id"),
+        ENTITY_REFERENCE("reference"),
+        ENTITY_TYPE("entityType"),
+        USER_REFERENCE("author"),
+        VOTE("vote"),
+        CREATED_DATE("createdDate"),
+        UPDATED_DATE("updatedDate"),
+        MANAGER_ID("managerId"),
+        SCALE("scale");
+
+        private final String fieldName;
+
+        RatingQueryField(String fieldName)
+        {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName()
+        {
+            return this.fieldName;
+        }
     }
 
     /**
-     * Gets a rating based on its id.
-     * 
-     * @param ratingId the id of a certain rating
-     * @return a Rating object containing all the rating information
-     * @throws RatingsException when an error occurs while fetching the rating
+     * @return the identifier of the current manager.
      */
-    Rating getRating(String ratingId) throws RatingsException;
+    String getIdentifier();
 
     /**
-     * Gets a rating based on a document and the id of the rating.
-     * 
-     * @param documentRef the document to which the rating belongs to
-     * @param id the id of a certain rating
-     * @return a Rating object containing all the rating information
-     * @throws RatingsException when an error occurs while fetching the rating
-     */
-    Rating getRating(DocumentReference documentRef, int id) throws RatingsException;
-
-    /**
-     * Gets a rating based on a document and user.
-     * 
-     * @param documentRef the document to which the rating belongs to
-     * @param user the author of the rating
-     * @return a Rating object containing all the rating information
-     * @throws RatingsException when an error occurs while fetching the rating
-     */
-    Rating getRating(DocumentReference documentRef, DocumentReference user) throws RatingsException;
-
-    /**
-     * Sets a rating based on a document, user and vote.
-     * 
-     * @param documentRef the document to which the rating belongs to
-     * @param author the author of the rating
-     * @param vote the author's vote
-     * @return a Rating object containing all the rating information
-     * @throws RatingsException when an error occurs while setting the rating
-     */
-    Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException;
-
-    /**
-     * Removes a rating.
-     * 
-     * @param rating the rating to be removed
-     * @return whether the action was successful or not
-     * @throws RatingsException when an error occurs while removing the rating
-     */
-    boolean removeRating(Rating rating) throws RatingsException;
-
-    /**
-     * Checks if the average rating stored in the rated document as an object or is it kept in memory.
-     * 
-     * @return answer to: is the average rating stored?
-     */
-    boolean isAverageRatingStored(DocumentReference documentRef);
-
-    /**
-     * Checks if the user reputation stored in a document or is it kept in memory.
-     * 
-     * @return answer to: is user reputation kept in memory?
-     */
-    boolean isReputationStored(DocumentReference documentRef);
-
-    /**
-     * Checks if to calculate the user reputation or not.
-     * 
-     * @return answer to: calculate the user reputation or not?
-     */
-    boolean hasReputation(DocumentReference documentRef);
-
-    /**
-     * Gets or calculates the user reputation.
+     * Allows to set the identifier of the manager.
+     * This method should only be used when creating the manager in a {@link RatingsManagerFactory}.
      *
-     * @param username person to calculate the reputation for
-     * @return AverageRating of the voter
+     * @param identifier the identifier to be set.
      */
-    AverageRating getUserReputation(DocumentReference username) throws ReputationException;
+    void setIdentifer(String identifier);
 
     /**
-     * Updates user reputation.
-     * 
-     * @param author the user for which to update the reputation
-     * @param voterRating the users current reputation
+     * @return the upper bound of the scale used by this manager for rating.
      */
-    void updateUserReputation(DocumentReference author, AverageRating voterRating) throws RatingsException;
+    int getScale();
 
     /**
-     * Gets the default methods of calculating the user reputation.
-     * 
-     * @return the default methods of calculating the user reputation
+     * Allows to set the configuration of the manager.
+     * This method should only be used when creating the manager in a {@link RatingsManagerFactory}.
+     *
+     * @param configuration the configuration to be set.
      */
-    String[] getDefaultReputationMethods(DocumentReference documentRef);
+    void setRatingConfiguration(RatingsConfiguration configuration);
 
     /**
-     * Gets the average rating for a document using the default average rating calculation method.
-     * 
-     * @param documentRef the document for which to calculate the average rating
-     * @return the calculated average rating
-     * @throws RatingsException when an error occurs while fetching the average rating
+     * @return the configuration used by this manager.
      */
-    AverageRating getAverageRating(DocumentReference documentRef) throws RatingsException;
+    RatingsConfiguration getRatingConfiguration();
 
     /**
-     * Gets the average rating calculated by the specified method.
-     * 
-     * @param documentRef the document for which to get the average rating
-     * @param method the method of calculating the average rating
-     * @throws RatingsException when encountering an error while fetching the average rating
+     * Save and return a {@link Rating} information.
+     * If an existing rank has already been saved by the same user on the same reference, then this method updates the
+     * existing value.
+     * This method should check that the given grade matches the scale of the manager.
+     * It should also take into account the {@link RatingsConfiguration#isZeroStored()} configuration to handle case when
+     * the grade is equal to 0. The method returns null if the grade is equal to 0 and the configuration doesn't allow
+     * to store it, but it might perform storage side effect (such as removing a previous {@link Rating} information).
+     * This method also handles the computation of {@link AverageRating} if the
+     * {@link RatingsConfiguration#isAverageStored()} configuration is set to true.
+     * Note that this method should also handle sending the appropriate
+     * {@link CreatedRatingEvent} and {@link UpdatedRatingEvent}.
+     *
+     * @param reference the entity for which to save a rating value.
+     * @param user the user who performs the rank.
+     * @param grade the actual grade to be saved.
+     * @return the saved rating or null if none has been saved.
+     * @throws RatingsException in case of problem for saving the ranking.
      */
-    AverageRating getAverageRating(DocumentReference documentRef, String method) throws RatingsException;
+    Rating saveRating(EntityReference reference, UserReference user, int grade) throws RatingsException;
 
     /**
-     * Gets the average rating with the option to store it if it's not yet stored.
-     * 
-     * @param documentRef the document for which to get the average rating
-     * @param method the method of calculating the average rating
-     * @param create create the average rating object on the rated document if stored ratings is active
-     * @throws RatingsException when encountering an error while fetching the average rating
+     * Retrieve the list of ratings based on the given query parameters.
+     * Only exact matching can be used right now for the given query parameters. It's possible to provide some
+     * objects as query parameters: some specific treatment can be apply depending on the type of the objects, but for
+     * most type we're just relying on {@code String.valueOf(Object)}. Only the rankings of the current manager are
+     * retrieved even if the store is shared.
+     *
+     * @param queryParameters the map of parameters to rely on for query the ratings.
+     * @param offset the offset where to start getting results.
+     * @param limit the limit number of results to retrieve.
+     * @param orderBy the field to use for sorting the results.
+     * @param asc if {@code true}, use ascending order for sorting, else use descending order.
+     * @return a list containing at most {@code limit} ratings results.
+     * @throws RatingsException in case of problem for querying the ratings.
      */
-    AverageRating getAverageRating(DocumentReference documentRef, String method, boolean create)
-        throws RatingsException;
+    List<Rating> getRatings(Map<RatingQueryField, Object> queryParameters,
+        int offset, int limit, RatingQueryField orderBy, boolean asc) throws RatingsException;
 
     /**
-     * Gets the average rating for a SQL query.
-     * 
-     * @param fromsql the from clause of the SQL query
-     * @param wheresql the where clause of the SQL query
-     * @return the calculated average rating
-     * @throws RatingsException when an error occurs while fetching the average rating
+     * Retrieve the number of ratings matching the given parameters but without retrieving them directly.
+     * Only exact matching can be used right now for the given query parameters. It's possible to provide some
+     * objects as query parameters: some specific treatment can be apply depending on the type of the objects, but for
+     * most type we're just relying on {@code String.valueOf(Object)}. Only the ratings of the current manager are
+     * retrieved even if the store is shared.
+     *
+     * @param queryParameters the map of parameters to rely on for query the ratings.
+     * @return the total number of ratings matching the query parameters.
+     * @throws RatingsException in case of problem during the query.
      */
-    AverageRating getAverageRatingFromQuery(String fromsql, String wheresql) throws RatingsException;
+    long countRatings(Map<RatingQueryField, Object> queryParameters) throws RatingsException;
 
     /**
-     * Gets the average rating for a SQL query with specifying the average rating calculation method.
-     * 
-     * @param fromsql the from clause of the SQL query
-     * @param wheresql the where clause of the SQL query
-     * @param method the method used to calculate the average rating
-     * @return the calculated average rating
-     * @throws RatingsException when an error occurs while fetching the average rating
+     * Remove a rating based on its identifier.
+     * This method also performs an update of the {@link AverageRating} if the
+     * {@link RatingsConfiguration#isAverageStored()} is enabled.
+     *
+     * @param ratingIdentifier the ranking identifier to remove.
+     * @return {@code true} if a rating is deleted, {@code false} if no rating with the given identifier can be found.
+     * @throws RatingsException in case of problem during the query.
      */
-    AverageRating getAverageRatingFromQuery(String fromsql, String wheresql, String method) throws RatingsException;
+    boolean removeRating(String ratingIdentifier) throws RatingsException;
 
     /**
-     * Calculates the average rating.
-     * 
-     * @param documentRef the document for which to calculate the average rating
-     * @param method the method of calculating the average rating
-     * @return the calculated average rating
-     * @throws RatingsException when an error occurs while calculating the average rating
+     * Retrieve the average rating information of the given reference.
+     *
+     * @param entityReference the reference for which to retrieve the average rating information.
+     * @return the average rating data corresponding to the given reference.
+     * @throws RatingsException in case of problem during the query.
      */
-    AverageRating calcAverageRating(DocumentReference documentRef, String method) throws RatingsException;
+    AverageRating getAverageRating(EntityReference entityReference) throws RatingsException;
 
     /**
-     * Updates the average rating. This is done only if the average rating is stored.
-     * 
-     * @param documentRef the document for which to update the average rating
-     * @param rating the new rating which was performed
-     * @param oldVote the value of the old rating
-     * @param method the method of calculating the average rating
-     * @throws RatingsException when an error occurred while updating the average rating
+     * This method performs a direct save of the rating specified in parameter.
+     * Note that this method does not take into account the {@link RatingsConfiguration#isZeroStored()} option and does not
+     * compute back the average. Finally no event is triggered when using this method.
+     * For those to be taken into account, please check {@link #saveRating(EntityReference, UserReference, int)}.
+     *
+     * @param rating a rating object to be saved.
      */
-    void updateAverageRating(DocumentReference documentRef, Rating rating, int oldVote, String method)
-        throws RatingsException;
+    void saveRating(Rating rating) throws RatingsException;
 
     /**
-     * Updates the average rating of a document.
-     * 
-     * @param documentRef the document being rated
-     * @param rating the new rating
-     * @param oldVote the old vote
-     * @throws RatingsException when an error occurs while updating the average rating
+     * Compute back the average rating for all the ratings existing for the given reference.
+     * Note that this method might be resource consuming in case of large amount of data.
+     *
+     * @param entityReference the reference for which to compute back the ratings.
+     * @throws RatingsException in case of errors.
+     * @return the new average rating computed.
      */
-    void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote) throws RatingsException;
+    AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException;
 }

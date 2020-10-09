@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationAdministration" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationAdministration" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationAdministration</name>
   <language/>
@@ -92,10 +92,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -232,7 +232,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>link</categoryIcon>
     </property>
     <property>
       <codeToExecute>{{notificationsEmailPreferences target="wiki" /}}</codeToExecute>
@@ -244,10 +244,10 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>Notifications</displayInSection>
@@ -265,7 +265,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>400</sectionOrder>
     </property>
   </object>
   <object>
@@ -323,10 +323,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -463,7 +463,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>link</categoryIcon>
     </property>
     <property>
       <codeToExecute>{{notificationsApplicationsPreferences target="wiki" /}}</codeToExecute>
@@ -475,10 +475,10 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>Notifications</displayInSection>
@@ -496,7 +496,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>400</sectionOrder>
     </property>
   </object>
   <object>
@@ -554,10 +554,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -694,7 +694,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>link</categoryIcon>
     </property>
     <property>
       <codeToExecute>{{notificationsAutoWatchPreferences target="wiki" /}}</codeToExecute>
@@ -706,10 +706,10 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>Notifications</displayInSection>
@@ -727,7 +727,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>400</sectionOrder>
     </property>
   </object>
   <object>
@@ -925,7 +925,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>link</categoryIcon>
     </property>
     <property>
       <codeToExecute>{{template name="distribution/eventmigration.wiki"/}}</codeToExecute>
@@ -937,10 +937,10 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>Notifications</displayInSection>
@@ -958,7 +958,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>400</sectionOrder>
     </property>
   </object>
   <object>
@@ -979,6 +979,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>diffType</name>
         <number>2</number>
@@ -993,22 +995,19 @@
       </diffType>
       <interval>
         <cache>0</cache>
-        <customDisplay/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>interval</name>
         <number>1</number>
-        <picker>0</picker>
         <prettyName>Notification interval</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|, </separators>
         <size>1</size>
-        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
         <values>hourly=Hourly|daily=Daily|weekly=Weekly|live=Live</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </interval>

@@ -40,9 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.10
  * @version $Id$
  */
-// Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
-// runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
+@UITest(extraJARs = {
+    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+})
 public class UserChangePasswordIT
 {
     private static final String DEFAULT_PASSWORD = "testtest";

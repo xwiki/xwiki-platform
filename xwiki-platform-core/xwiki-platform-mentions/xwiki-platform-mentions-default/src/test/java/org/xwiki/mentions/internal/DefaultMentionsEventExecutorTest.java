@@ -177,7 +177,7 @@ class DefaultMentionsEventExecutorTest
                                  .setAuthorReference("xwiki:XWiki.Author")
                                  .setWikiId("xwiki")
                                  .setVersion("1.0");
-        when(this.blockingQueue.poll()).thenReturn(value);
+        when(this.blockingQueue.take()).thenReturn(value);
         this.executor.startThreads();
         verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
 
@@ -196,7 +196,7 @@ class DefaultMentionsEventExecutorTest
                                  .setAuthorReference("xwiki:XWiki.Author")
                                  .setWikiId("xwiki")
                                  .setVersion("1.0");
-        when(this.blockingQueue.poll()).thenReturn(value);
+        when(this.blockingQueue.take()).thenReturn(value);
         this.executor.startThreads();
         verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
 

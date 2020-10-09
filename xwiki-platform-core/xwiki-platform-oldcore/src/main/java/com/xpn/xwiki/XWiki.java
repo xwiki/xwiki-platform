@@ -170,10 +170,10 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.velocity.VelocityContextFactory;
-import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -201,6 +201,7 @@ import com.xpn.xwiki.internal.WikiInitializerRequest;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializingEvent;
 import com.xpn.xwiki.internal.event.UserCreatingDocumentEvent;
@@ -1422,7 +1423,7 @@ public class XWiki implements EventListener
                 }
             }
         } catch (XWikiException e) {
-            LOGGER.error("Failed to initialize mandatory document", e);
+            LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }
 
@@ -1962,6 +1963,42 @@ public class XWiki implements EventListener
         saveDocument(doc, comment, false, context);
     }
 
+    private void beforeSave(XWikiDocument document, XWikiContext context) throws XWikiException
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            CancelableEvent documentEvent;
+            if (document.getOriginalDocument().isNew()) {
+                documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
+            } else {
+                documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
+            }
+            om.notify(documentEvent, document, context);
+
+            // If the action has been canceled by the user then don't perform any save and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
+                    String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
+                        document.getDocumentReference(), documentEvent.getReason()));
+            }
+        }
+    }
+
+    private void afterSave(XWikiDocument document, XWikiContext context)
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            if (document.getOriginalDocument().isNew()) {
+                om.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
+            } else {
+                om.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, context);
+            }
+        }
+    }
+
     /**
      * Save the passed document in the store.
      * <p>
@@ -1988,30 +2025,11 @@ public class XWiki implements EventListener
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
-            ObservationManager om = getObservationManager();
-
             // Notify listeners about the document about to be created or updated
 
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-
-            if (om != null) {
-                CancelableEvent documentEvent;
-                if (originalDocument.isNew()) {
-                    documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
-                } else {
-                    documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
-                }
-                om.notify(documentEvent, document, context);
-
-                // If the action has been canceled by the user then don't perform any save and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
-                        String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
-                            document.getDocumentReference(), documentEvent.getReason()));
-                }
-            }
+            beforeSave(document, context);
 
             // Delete existing document if we replace with a new one
             if (document.isNew()) {
@@ -2052,14 +2070,7 @@ public class XWiki implements EventListener
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
                 // The old version is made available using doc.getOriginalDocument()
-
-                if (om != null) {
-                    if (originalDocument.isNew()) {
-                        om.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
-                    } else {
-                        om.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, context);
-                    }
-                }
+                afterSave(document, context);
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document save notification for document ["
                     + getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()) + "]", ex);
@@ -2624,49 +2635,70 @@ public class XWiki implements EventListener
      */
     public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        XWikiURLFactory urlf = context.getURLFactory();
+        String skinFile = getSkinFile(filename, null, forceSkinAction, context);
 
-        try {
-            // Try in the specified skin
-            Skin skin = getInternalSkinManager().getCurrentSkin(true);
-            if (skin != null) {
-                Resource<?> resource = skin.getResource(filename);
-                if (resource != null) {
-                    return resource.getURL(forceSkinAction);
-                }
+        if (skinFile == null) {
+            // Use the default base skin even if the URL could be invalid.
+            XWikiURLFactory urlf = context.getURLFactory();
+            URL url;
+            if (forceSkinAction) {
+                url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
             } else {
-                // Try in the current parent skin
-                Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
-                if (parentSkin != null) {
-                    Resource<?> resource = parentSkin.getResource(filename);
+                url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
+            }
+            skinFile = urlf.getURL(url, context);
+        }
+
+        return skinFile;
+    }
+
+    private String getSkinFileInternal(String fileName, String skinId, boolean forceSkinAction, XWikiContext context)
+    {
+        try {
+            if (skinId != null) {
+                // Try only in the specified skin.
+                Skin skin = getInternalSkinManager().getSkin(skinId);
+                if (skin != null) {
+                    Resource<?> resource = skin.getLocalResource(fileName);
                     if (resource != null) {
                         return resource.getURL(forceSkinAction);
                     }
                 }
+            } else {
+                // Try in the current skin.
+                Skin skin = getInternalSkinManager().getCurrentSkin(true);
+                if (skin != null) {
+                    Resource<?> resource = skin.getResource(fileName);
+                    if (resource != null) {
+                        return resource.getURL(forceSkinAction);
+                    }
+                } else {
+                    // Try in the current parent skin.
+                    Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
+                    if (parentSkin != null) {
+                        Resource<?> resource = parentSkin.getResource(fileName);
+                        if (resource != null) {
+                            return resource.getURL(forceSkinAction);
+                        }
+                    }
+                }
             }
 
-            // Look for a resource file
-            String resourceFilePath = "/resources/" + filename;
+            // Look for a resource file.
+            String resourceFilePath = "/resources/" + fileName;
+            XWikiURLFactory urlFactory = context.getURLFactory();
             if (resourceExists(resourceFilePath)) {
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
+                URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context,
                     getResourceURLCacheParameters(resourceFilePath));
-                return urlf.getURL(url, context);
+                return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [" + filename + "]", e);
+                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", fileName, skinId, e);
             }
         }
 
-        // If all else fails, use the default base skin, even if the URLs could be invalid.
-        URL url;
-
-        if (forceSkinAction) {
-            url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
-        } else {
-            url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
-        }
-        return urlf.getURL(url, context);
+        return null;
     }
 
     private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
@@ -2705,33 +2737,30 @@ public class XWiki implements EventListener
         return getSkinFile(filename, skin, false, context);
     }
 
-    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
+    public String getSkinFile(String fileName, String skinId, boolean forceSkinAction, XWikiContext context)
     {
-        try {
-            Skin skin = getInternalSkinManager().getSkin(skinId);
-
-            Resource<?> resource = skin.getLocalResource(filename);
-
-            if (resource != null) {
-                return resource.getURL(forceSkinAction);
+        if (StringUtils.endsWithAny(fileName, ".js", ".css")) {
+            String extension = StringUtils.substringAfterLast(fileName, '.');
+            String shortFileName = StringUtils.substringBeforeLast(fileName, ".");
+            if (StringUtils.endsWith(shortFileName, ".min")) {
+                shortFileName = StringUtils.substringBeforeLast(shortFileName, ".");
             }
-
-            // Look for a resource file
-            String resourceFilePath = "/resources/" + filename;
-            if (resourceExists(resourceFilePath)) {
-                XWikiURLFactory urlf = context.getURLFactory();
-
-                URL url = urlf.createResourceURL(filename, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceFilePath));
-                return urlf.getURL(url, context);
+            String fileNameSource = String.format("%s.%s", shortFileName, extension);
+            String fileNameMinified = String.format("%s.min.%s", shortFileName, extension);
+            DebugConfiguration debugConfig = Utils.getComponent(DebugConfiguration.class);
+            String[] fileNames = debugConfig.isMinify() ? new String[] {fileNameMinified, fileNameSource}
+                : new String[] {fileNameSource, fileNameMinified};
+            String skinFile = null;
+            for (String name : fileNames) {
+                skinFile = getSkinFileInternal(name, skinId, forceSkinAction, context);
+                if (skinFile != null) {
+                    break;
+                }
             }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", filename, skinId, e);
-            }
+            return skinFile;
+        } else {
+            return getSkinFileInternal(fileName, skinId, forceSkinAction, context);
         }
-
-        return null;
     }
 
     /**
@@ -4508,6 +4537,40 @@ public class XWiki implements EventListener
         return blankDoc;
     }
 
+    private XWikiDocument beforeDelete(XWikiDocument doc, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
+
+        ObservationManager om = getObservationManager();
+
+        // Inform notification mechanisms that a document is about to be deleted
+        // Note that for the moment the event being send is a bridge event, as we are still passing around
+        // an XWikiDocument as source and an XWikiContext as data.
+        if (om != null) {
+            CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
+            om.notify(documentEvent, blankDoc, context);
+
+            // If the action has been canceled by the user then don't perform any deletion and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
+                    String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
+                        doc.getDocumentReference(), documentEvent.getReason()));
+            }
+        }
+
+        return blankDoc;
+    }
+
+    private void afterDelete(XWikiDocument blankDoc, XWikiContext context)
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            om.notify(new DocumentDeletedEvent(blankDoc.getDocumentReference()), blankDoc, context);
+        }
+    }
+
     private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
         throws XWikiException
     {
@@ -4517,24 +4580,13 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
-
-            ObservationManager om = getObservationManager();
+            XWikiDocument blankDoc = null;
 
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            if (notify && om != null) {
-                CancelableEvent documentEvent = new DocumentDeletingEvent(doc.getDocumentReference());
-                om.notify(documentEvent, blankDoc, context);
-
-                // If the action has been canceled by the user then don't perform any deletion and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
-                        String.format("An Event Listener has cancelled the document deletion for [%s]. Reason: [%s]",
-                            doc.getDocumentReference(), documentEvent.getReason()));
-                }
+            if (notify) {
+                blankDoc = beforeDelete(doc, context);
             }
 
             if (hasRecycleBin(context) && totrash) {
@@ -4551,8 +4603,8 @@ public class XWiki implements EventListener
                 // Inform notification mechanisms that a document has been deleted
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
-                if (notify && om != null) {
-                    om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
+                if (notify) {
+                    afterDelete(blankDoc, context);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document delete notifications for document [{}]",
@@ -4680,10 +4732,7 @@ public class XWiki implements EventListener
         boolean result = false;
 
         // if source and destination are same, no need to perform the rename.
-        if (sourceDocumentReference.equals(targetDocumentReference)) {
-            result = false;
-        } else {
-
+        if (!sourceDocumentReference.equals(targetDocumentReference)) {
             XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
             XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
 
@@ -4701,17 +4750,30 @@ public class XWiki implements EventListener
                     // Ensure that the current context contains the wiki reference of the source document.
                     WikiReference wikiReference = context.getWikiReference();
                     context.setWikiReference(sourceDocumentReference.getWikiReference());
-                    // Step 1: Perform atomic rename in DB
+
+                    // Step 1: Simulate creating a document and deleting a document from listeners point of view
+                    // FIXME: currently modifications made by listeners won't be applied
+                    XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
+                    futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
+                    beforeSave(futureTargetDocument, context);
+                    XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
+
+                    // Step 2: Perform atomic rename in DB
                     try {
                         this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
                     } finally {
                         context.setWikiReference(wikiReference);
                     }
 
-                    // Step 2: For each child document, update its parent reference.
-                    // Step 3: For each backlink to rename, parse the backlink document and replace the links with
+                    // Step 3: Simulate a created document and a deleted document from listeners point of view
+                    targetDocument = this.getDocument(targetDocumentReference, context);
+                    afterDelete(deletedDocument, context);
+                    afterSave(futureTargetDocument, context);
+
+                    // Step 4: For each child document, update its parent reference.
+                    // Step 5: For each backlink to rename, parse the backlink document and replace the links with
                     // the new name.
-                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
+                    // Step 6: Refactor the relative links contained in the document to make sure they are relative
                     // to the new document's location.
                     this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
                         childDocumentReferences, context);
@@ -4719,6 +4781,7 @@ public class XWiki implements EventListener
                 }
             }
         }
+
         return result;
     }
 
@@ -7299,7 +7362,7 @@ public class XWiki implements EventListener
     public String addTooltipJS(XWikiContext context)
     {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("<script type=\"text/javascript\" src=\"");
+        buffer.append("<script src=\"");
         buffer.append(getSkinFile("ajax/wzToolTip.js", context));
         buffer.append("\"></script>");
         // buffer.append("<div id=\"dhtmltooltip\"></div>");

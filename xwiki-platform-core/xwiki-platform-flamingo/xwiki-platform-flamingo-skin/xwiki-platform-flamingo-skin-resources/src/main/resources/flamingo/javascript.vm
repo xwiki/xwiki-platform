@@ -25,14 +25,14 @@
 ##
 ## JS Libraries.
 ##
-<script type="text/javascript" src="$services.webjars.url('requirejs', "require$jsExtension")"
+<script src="$services.webjars.url('requirejs', "require$jsExtension")"
   data-wysiwyg="true"></script>
 ##
 $xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
-$xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
-## xwiki-min.js and xwiki-min.css aggregate a couple of JavaScript and CSS files that are used on each page. In order to
-## help debugging we provide/bundle the individual files also and you can load them instead of the aggregated files by
-## passing 'minify=false' in the request query string or setting debug.minify property in xwiki.properties file.
+## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
+## page. In order to help debugging we provide/bundle the individual files also and you can load them instead of the
+## aggregated files by passing 'minify=false' in the request query string or setting debug.minify property in
+## xwiki.properties file.
 #if (!$services.debug.minify)
   ## entityReferences.js should be loaded first because it is used by xwiki.js
   $xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
@@ -50,8 +50,8 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
   $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.locale})##
   $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##
 #else
-  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.locale})##
-  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.locale})##
+  $xwiki.jsfx.use('js/xwiki/xwiki.bundle.min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.locale})##
+  $xwiki.ssfx.use('css/xwiki.bundle.min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.locale})##
 #end
 $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : $xcontext.locale})##
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
@@ -93,16 +93,16 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+<script src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
 ## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
+<script src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 <!--[if lt IE 9]>
   ## HTML5Shiv enable the compatibility with IE8
   <script src="$services.webjars.url('html5shiv', 'html5shiv.min.js')"></script>
   ## Respond.js implements the CSS 3 media queries for IE8
-  <script type="text/javascript" src="$services.webjars.url('respond', 'dest/respond.min.js')" defer="defer"></script>
+  <script src="$services.webjars.url('respond', 'dest/respond.min.js')" defer="defer"></script>
 <![endif]-->
-<script type="text/javascript" data-wysiwyg="true">
+<script data-wysiwyg="true">
 // <![CDATA[
 ## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
 ## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since

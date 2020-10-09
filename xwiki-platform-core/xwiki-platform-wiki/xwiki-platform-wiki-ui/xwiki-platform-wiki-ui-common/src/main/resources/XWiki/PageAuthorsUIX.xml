@@ -40,45 +40,6 @@
   <object>
     <name>XWiki.PageAuthorsUIX</name>
     <number>0</number>
-    <className>XWiki.TagClass</className>
-    <guid>069a8ff9-5133-4971-9f7d-bd4b409d8258</guid>
-    <class>
-      <name>XWiki.TagClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <tags>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>tags</name>
-        <number>1</number>
-        <prettyName>Tags</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator>|</separator>
-        <separators>|,</separators>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <values/>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </tags>
-    </class>
-    <property>
-      <tags>
-        <value>machin</value>
-      </tags>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.PageAuthorsUIX</name>
-    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>4cf6cfe3-4804-4a99-8f6d-712ffce00d29</guid>
     <class>
@@ -196,6 +157,7 @@
     <property>
       <async_context>
         <value>doc.reference</value>
+        <value>locale</value>
       </async_context>
     </property>
     <property>
@@ -222,7 +184,7 @@
       <name>org.xwiki.platform.wiki.ui.common.contentFooter.authors</name>
     </property>
     <property>
-      <parameters>order=200</parameters>
+      <parameters>order=300</parameters>
     </property>
     <property>
       <scope>wiki</scope>

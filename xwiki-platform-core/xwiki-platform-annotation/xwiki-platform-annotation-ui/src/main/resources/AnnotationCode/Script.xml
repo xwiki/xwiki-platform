@@ -1238,6 +1238,8 @@ XWiki.Annotation = Class.create({
 
     // put the content in
     container.update(content);
+    // Initialize the widgets / editors used on the annotation popup.
+    document.fire('xwiki:dom:updated', {elements: [container]});
     return true;
   },
 
@@ -1277,6 +1279,9 @@ XWiki.Annotation = Class.create({
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand update
@@ -1388,8 +1393,15 @@ XWiki.Annotation = Class.create({
           // The content of the Comments tab is reloaded when a comment is added so we can't cache the reference to the
           // reply button.
           replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+          // Ensure to have the focus on the right button on which we click:
+          // it avoids to have CKEditor focusing again on the original button we clicked once loaded.
+          replyButtonInTab.focus();
           // Click the reply button from the comments tab button instead.
           replyButtonInTab.click();
+          // We want to be moved to the reply editor: we scroll to the reply button just above the editor
+          // it allows to see both the annotation + the editor. If we scrolled only in the editor, we'd have the
+          // original annotation hidden in case of many comments.
+          replyButtonInTab.scrollIntoView();
 
           // Lose the focus on the bubble so that it can go away.
           container.blur();
@@ -1546,8 +1558,6 @@ XWiki.Annotation = Class.create({
     this.createPanel.down('input[type=reset]').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
-    // Initialize the widgets / editors used on the annotation popup.
-    document.fire('xwiki:dom:updated', {elements: [container]});
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {

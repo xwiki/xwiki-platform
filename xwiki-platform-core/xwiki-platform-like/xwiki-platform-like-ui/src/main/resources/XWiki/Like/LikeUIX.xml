@@ -43,7 +43,7 @@
   #if ($newCounterOptional.isPresent())
     #set ($discard = $services.like.cleanCacheUIX())
     #jsonResponse({
-      'counter': $newCounterOptional.get().likeNumber
+      'counter': $newCounterOptional.get()
     })
   #end
 #elseif ($request.xaction == "unlike" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
@@ -52,7 +52,7 @@
     #if ($newCounterOptional.isPresent())
     #set ($discard = $services.like.cleanCacheUIX())
       #jsonResponse({
-        'counter': $newCounterOptional.get().likeNumber
+        'counter': $newCounterOptional.get()
       })
     #end
 #end
@@ -146,11 +146,19 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   var likeUIXReference = XWiki.Model.resolve('XWiki.Like.LikeUIX', XWiki.EntityType.DOCUMENT);
-  var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get', 'outputSyntax=plain');
+  var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   
+  var likeClick = function () {
+    var isLiked = $('#is-liked').val() == "true";
+    if (!isLiked) {
+      triggerLike();
+    } else {
+      triggerUnlike();
+    }
+  };
 
   var triggerLike = function () {
-     var likeButton = $(this);
+     var likeButton = $('.like-button').first();
      $.post(likeUIXurl, {
         'xaction': 'like',
         'form_token': xm.form_token,
@@ -159,33 +167,30 @@
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
+       $('#is-liked').val('true');
+       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
      }).fail(function(data) {
+       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.error'))", 'error');
      });
   };
 
   var triggerUnlike = function () {
-    var unlikeButton = $(this);
-    new XWiki.widgets.ConfirmationBox({
-      onYes : function() {
-        $.post(likeUIXurl, {
-          'xaction': 'unlike',
-          'form_token': xm.form_token,
-          'document': XWiki.Model.serialize(xm.documentReference)
-        }).done(function(data) {
-          unlikeButton.removeClass('btn-default');
-          unlikeButton.addClass('btn-primary');
-          unlikeButton.find('.like-number').text(data.counter);
-        }).fail(function(data) {
-        })
-      }
-    }, {
-      confirmationText : '$services.localization.render('like.unlike.confirmation')'
+    var unlikeButton = $('.like-button').first();
+    $.post(likeUIXurl, {
+      'xaction': 'unlike',
+      'form_token': xm.form_token,
+      'document': XWiki.Model.serialize(xm.documentReference)
+    }).done(function(data) {
+      unlikeButton.removeClass('btn-default');
+      unlikeButton.addClass('btn-primary');
+      unlikeButton.find('.like-number').text(data.counter);
+      $('#is-liked').val('false');
+      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.success'))", 'done');
+    }).fail(function(data) {
+      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
     });
-
   };
-  
-  $('.like-button.btn-primary:not(.disabled)').on('click', triggerLike);
-  $('.like-button.btn-default:not(.disabled)').on('click', triggerUnlike);
+  $('.like-button:not(.disabled)').on('click', likeClick);
 });</code>
     </property>
     <property>
@@ -195,7 +200,134 @@
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Like.LikeUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e16ca9a7-ec47-4090-87a6-d9c4637a18a1</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.like-button.btn-default.badge {
+  color: @btn-default-color;
+  background-color: @btn-default-bg;
+}
+.like-container {
+  /* Leave some space between the like button and the next footer item (e.g. the page tags). */
+  margin-right: 2em;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -227,14 +359,12 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
@@ -323,26 +453,34 @@
       </async_context>
     </property>
     <property>
-      <async_enabled>1</async_enabled>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
       <content>{{velocity}}
-{{html}}
+{{html wiki="true"}}
 #if ($services.like.displayButton($doc))
-  #set ($likeRecord = $services.like.getLikes($doc))
-  #if ($likeRecord.isPresent())
+  #set ($optLikeCount = $services.like.getLikes($doc))
+  #if ($optLikeCount.isPresent())
+    #set ($likeCount = $optLikeCount.get())
+    #set ($discard = $xwiki.ssx.use('XWiki.Like.LikeUIX'))
     #set ($discard = $xwiki.jsx.use('XWiki.Like.LikeUIX'))
     &lt;div class="like-container"&gt;
+      &lt;input id="is-liked" type="hidden" value="$services.like.isLiked($doc)" /&gt;
       #if ($isGuest || $services.like.isLiked($doc))
         #set ($btnClass = "btn-default")
+        #set ($titleMessageTranslationKey = "like.button.title.unlike")
       #elseif (!$isGuest)
         #set ($btnClass = "btn-primary")
+        #set ($titleMessageTranslationKey = "like.button.title.like")
       #end
       #set ($disabledButton = "")
       #if (!$services.like.isAuthorized($doc))
         #set ($disabledButton = "disabled")
+        #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;div class="like-button btn $btnClass $disabledButton"&gt;$services.icon.renderHTML('heart') Likes &lt;span class="like-number badge"&gt;$likeRecord.get().likeNumber&lt;/span&gt;&lt;/div&gt;
+      &lt;div class="like-button btn $btnClass $disabledButton badge" title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
+          $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   #end
 #end
@@ -356,7 +494,7 @@
       <name>org.xwiki.platform.like.contentFooter</name>
     </property>
     <property>
-      <parameters>order=3000</parameters>
+      <parameters>order=100</parameters>
     </property>
     <property>
       <scope>wiki</scope>

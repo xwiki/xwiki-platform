@@ -96,12 +96,21 @@ import static org.mockito.Mockito.when;
 public class EventStoreTest
 {
     private static final DefaultEvent EVENT1 = event("id1");
-
     private static final DefaultEvent EVENT2 = event("id2");
-
     private static final DefaultEvent EVENT3 = event("id3");
-
     private static final DefaultEvent EVENT4 = event("id4");
+    private static final DefaultEvent EVENT5 = event("id5");
+    private static final DefaultEvent EVENT6 = event("id6");
+    private static final DefaultEvent EVENT7 = event("id7");
+    private static final DefaultEvent EVENT8 = event("id8");
+    private static final DefaultEvent EVENT9 = event("id9");
+    private static final DefaultEvent EVENT10 = event("id10");
+    private static final DefaultEvent EVENT11 = event("id11");
+    private static final DefaultEvent EVENT12 = event("id12");
+    private static final DefaultEvent EVENT13 = event("id13");
+    private static final DefaultEvent EVENT14 = event("id14");
+    private static final DefaultEvent EVENT15 = event("id15");
+
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
 
@@ -277,11 +286,33 @@ public class EventStoreTest
         EVENT2.setDate(date20);
         EVENT3.setDate(date30);
         EVENT4.setDate(date40);
+        EVENT5.setDate(date40);
+        EVENT6.setDate(date40);
+        EVENT7.setDate(date40);
+        EVENT8.setDate(date40);
+        EVENT9.setDate(date40);
+        EVENT10.setDate(date40);
+        EVENT11.setDate(date40);
+        EVENT12.setDate(date40);
+        EVENT13.setDate(date40);
+        EVENT14.setDate(date40);
+        EVENT15.setDate(date40);
 
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2);
         this.eventStore.saveEvent(EVENT3);
         this.eventStore.saveEvent(EVENT4);
+        this.eventStore.saveEvent(EVENT5);
+        this.eventStore.saveEvent(EVENT6);
+        this.eventStore.saveEvent(EVENT7);
+        this.eventStore.saveEvent(EVENT8);
+        this.eventStore.saveEvent(EVENT9);
+        this.eventStore.saveEvent(EVENT10);
+        this.eventStore.saveEvent(EVENT11);
+        this.eventStore.saveEvent(EVENT12);
+        this.eventStore.saveEvent(EVENT13);
+        this.eventStore.saveEvent(EVENT14);
+        this.eventStore.saveEvent(EVENT15);
 
         DefaultEventStatus status11 = eventstatus(EVENT1, "entity1", true);
         DefaultEventStatus status12 = eventstatus(EVENT1, "entity2", false);
@@ -289,13 +320,35 @@ public class EventStoreTest
         DefaultEventStatus status22 = eventstatus(EVENT2, "entity3", true);
         DefaultEventStatus status31 = eventstatus(EVENT3, "entity1", true);
         DefaultEventStatus status41 = eventstatus(EVENT4, "entity1", true);
+        DefaultEventStatus status51 = eventstatus(EVENT5, "entity1", true);
+        DefaultEventStatus status61 = eventstatus(EVENT6, "entity1", true);
+        DefaultEventStatus status71 = eventstatus(EVENT7, "entity1", true);
+        DefaultEventStatus status81 = eventstatus(EVENT8, "entity1", true);
+        DefaultEventStatus status91 = eventstatus(EVENT9, "entity1", true);
+        DefaultEventStatus status101 = eventstatus(EVENT10, "entity1", true);
+        DefaultEventStatus status111 = eventstatus(EVENT11, "entity1", true);
+        DefaultEventStatus status121 = eventstatus(EVENT12, "entity1", true);
+        DefaultEventStatus status131 = eventstatus(EVENT13, "entity1", true);
+        DefaultEventStatus status141 = eventstatus(EVENT14, "entity1", true);
+        DefaultEventStatus status151 = eventstatus(EVENT15, "entity1", true);
 
         this.eventStore.saveEventStatus(status11);
         this.eventStore.saveEventStatus(status12);
         this.eventStore.saveEventStatus(status21);
         this.eventStore.saveEventStatus(status22);
         this.eventStore.saveEventStatus(status31);
-        this.eventStore.saveEventStatus(status41).get();
+        this.eventStore.saveEventStatus(status41);
+        this.eventStore.saveEventStatus(status51);
+        this.eventStore.saveEventStatus(status61);
+        this.eventStore.saveEventStatus(status71);
+        this.eventStore.saveEventStatus(status81);
+        this.eventStore.saveEventStatus(status91);
+        this.eventStore.saveEventStatus(status101);
+        this.eventStore.saveEventStatus(status111);
+        this.eventStore.saveEventStatus(status121);
+        this.eventStore.saveEventStatus(status131);
+        this.eventStore.saveEventStatus(status141);
+        this.eventStore.saveEventStatus(status151).get();
 
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
 
@@ -303,15 +356,21 @@ public class EventStoreTest
 
         assertSearch(Arrays.asList(), new SimpleEventQuery().withStatus("entity2"));
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4,
+            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
+            EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
 
         this.eventStore.deleteEventStatuses("entity1", date0).get();
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4,
+            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
+            EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
 
         this.eventStore.deleteEventStatuses("entity1", date20).get();
 
-        assertSearch(Arrays.asList(EVENT3, EVENT4), new SimpleEventQuery().withStatus("entity1"));
+        assertSearch(Arrays.asList(EVENT3, EVENT4,
+            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
+            EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
     }
 
     @Test

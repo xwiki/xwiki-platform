@@ -141,7 +141,7 @@ public class DefaultNotificationCacheManagerTest
         notificationParameters.onlyUnread = true;
 
         int hashCode = notificationParameters.hashCode();
-        assertEquals("5ALERT/18xwiki:XWiki.Foobar/42/22/true/" + hashCode,
+        assertEquals("5ALERT/18xwiki:XWiki.Foobar/42/true/22/true/" + hashCode,
             this.defaultNotificationCacheManager.createCacheKey(notificationParameters));
 
         NotificationParameters notificationParameters2 = new NotificationParameters();
@@ -152,7 +152,7 @@ public class DefaultNotificationCacheManagerTest
         notificationParameters2.onlyUnread = true;
 
         hashCode = notificationParameters2.hashCode();
-        assertEquals("5ALERT/18xwiki:XWiki.Foobar/42/22/true/" + hashCode,
+        assertEquals("5ALERT/18xwiki:XWiki.Foobar/42/true/22/true/" + hashCode,
             this.defaultNotificationCacheManager.createCacheKey(notificationParameters2));
 
         assertNotEquals(notificationParameters, notificationParameters2);
@@ -167,7 +167,19 @@ public class DefaultNotificationCacheManagerTest
         notificationParameters.onlyUnread = false;
 
         hashCode = notificationParameters.hashCode();
-        assertEquals("5EMAIL/19xwiki:XWiki.another/84/444/false/" + hashCode,
+        assertEquals("5EMAIL/19xwiki:XWiki.another/84/true/444/false/" + hashCode,
+            this.defaultNotificationCacheManager.createCacheKey(notificationParameters));
+
+        notificationParameters = new NotificationParameters();
+        notificationParameters.format = NotificationFormat.EMAIL;
+        notificationParameters.endDate = new Date(84);
+        notificationParameters.endDateIncluded = false;
+        notificationParameters.user = userReference2;
+        notificationParameters.expectedCount = 444;
+        notificationParameters.onlyUnread = false;
+
+        hashCode = notificationParameters.hashCode();
+        assertEquals("5EMAIL/19xwiki:XWiki.another/84/false/444/false/" + hashCode,
             this.defaultNotificationCacheManager.createCacheKey(notificationParameters));
 
         notificationParameters = new NotificationParameters();

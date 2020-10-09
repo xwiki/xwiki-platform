@@ -344,7 +344,8 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                     // Void.TYPE is used to keep track of fields that don't exist
                     this.cache.set(cacheKey, result == null ? Void.TYPE : result);
                 } catch (XWikiException e) {
-                    this.logger.error("Failed to access configuration property", e);
+                    this.logger.error("Failed to access configuration value for property [{}]. Ignoring by returning "
+                        + "null", key, e);
                 }
             }
         }

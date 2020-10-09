@@ -17,8 +17,8 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
-<script type="text/javascript">
+<script src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
+<script>
 ## Syntax elements is a list of: [identifier, start markup, end markup, image name].
 ## The identifier is used to display the button title, and the sample text.
 ## The image is retrieved from /resources/icons/silk/imageName.png

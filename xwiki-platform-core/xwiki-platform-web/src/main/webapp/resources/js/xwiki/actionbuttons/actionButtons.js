@@ -120,7 +120,7 @@ var XWiki = (function(XWiki) {
       return true;
     },
     onCancel : function(event) {
-      event.stop();
+      event.preventDefault();
 
       // Notify the others that we are going to cancel.
       this.notify(event, "cancel");
@@ -172,26 +172,28 @@ var XWiki = (function(XWiki) {
         if (this.validateForm(event.element().form)) {
           this.notify(event, action, {'continue' : continueEditing});
         } else {
-          event.stop();
+          event.preventDefault();
         }
       }
     },
     notify : function(originalEvent, action, params) {
-      var event = document.fire('xwiki:actions:' + action, Object.extend({
+      // We fire the action event on the button that triggered the action. This is useful when there are multiple forms
+      // on the same page and you want to catch the events that were triggered by a specific form.
+      var event = originalEvent.element().fire('xwiki:actions:' + action, Object.extend({
         originalEvent: originalEvent,
         form: originalEvent.element().form
       }, params || {}));
       // We check both the current event and the original event in order to preserve backwards compatibility with older
-      // code that may stop only the original event. We recommend stopping only the current event becase most of the
-      // listeners shouldn't be aware of the original event.
-      var stopped = event.stopped || originalEvent.stopped;
+      // code that may prevent default behavior only for the original event. We recommend calling preventDefault() only
+      // on the current event because most of the listeners shouldn't be aware of the original event.
+      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented;
       // Stop the original event if the current event has been stopped. Also, in Internet Explorer the original event
       // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original
-      // event we must call stop() again here.
-      if (stopped) {
-        originalEvent.stop();
+      // event we must stop it again here.
+      if (defaultPrevented) {
+        originalEvent.preventDefault();
       }
-      return !stopped;
+      return !defaultPrevented;
     }
   });
 
@@ -226,8 +228,8 @@ var XWiki = (function(XWiki) {
       }
     },
     onSave : function(event) {
-      // Don't continue if the event has been stopped already
-      if (event.stopped) {
+      // Don't continue if the event has been stopped already.
+      if (event.defaultPrevented) {
         return;
       }
 
@@ -291,8 +293,8 @@ var XWiki = (function(XWiki) {
       // - S&V from template async.
       // - S&V no template sync
 
-      // Stop the submit event.
-      event.stop();
+      // Prevent the default form submit behavior.
+      event.preventDefault();
 
       // Show the right notification message.
       if (isCreateFromTemplate) {
@@ -317,16 +319,21 @@ var XWiki = (function(XWiki) {
       if (!isContinue) {
         this.disableEditors();
       }
+      var state = {
+        isContinue: isContinue,
+        isCreateFromTemplate: isCreateFromTemplate,
+        saveButton: event.element()
+      };
       new Ajax.Request(this.form.action, {
         method : 'post',
         parameters : formData.toQueryString(),
-        onSuccess : this.onSuccess.bindAsEventListener(this, isContinue, isCreateFromTemplate),
-        on1223 : this.on1223.bindAsEventListener(this),
-        on0 : this.on0.bindAsEventListener(this),
-        on409 : this.on409.bindAsEventListener(this, isContinue),
-        on401 : this.on401.bindAsEventListener(this),
-        on403 : this.on403.bindAsEventListener(this, isContinue, isCreateFromTemplate),
-        onFailure : this.onFailure.bind(this)
+        onSuccess : this.onSuccess.bind(this, state),
+        on1223 : this.on1223.bind(this),
+        on0 : this.on0.bind(this),
+        on409 : this.on409.bind(this, state),
+        on401 : this.on401.bind(this, state),
+        on403 : this.on403.bind(this, state),
+        onFailure : this.onFailure.bind(this, state)
       });
     },
     // IE converts 204 status code into 1223...
@@ -337,7 +344,7 @@ var XWiki = (function(XWiki) {
     on0 : function(response) {
       response.request.options.onFailure(response);
     },
-    onSuccess : function(response, isContinue, isCreateFromTemplate) {
+    onSuccess : function(state, response) {
       // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
       if (this.form && this.form.template) {
         this.form.template.disabled = true;
@@ -357,10 +364,10 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
-      if (isCreateFromTemplate) {
+      if (state.isCreateFromTemplate) {
         if (response.responseJSON) {
           // Start the progress display.
-          this.getStatus(response.responseJSON.links[0].href, isContinue);
+          this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
@@ -372,9 +379,9 @@ var XWiki = (function(XWiki) {
         } else {
           this.savingBox.replace(this.savedBox);
         }
-        if (!isContinue || $('body').hasClassName('previewbody')) {
-          document.fire("xwiki:document:saved");
-          if (this.maybeRedirect(isContinue)) {
+        if (!state.isContinue || $('body').hasClassName('previewbody')) {
+          state.saveButton.fire("xwiki:document:saved");
+          if (this.maybeRedirect(state.isContinue)) {
             return;
           }
         }
@@ -389,7 +396,7 @@ var XWiki = (function(XWiki) {
 
       // Announce that the document has been saved
       // TODO: We should send the new version as a memo field
-      document.fire("xwiki:document:saved");
+      state.saveButton.fire("xwiki:document:saved");
 
       // If documents have been merged we need to reload to get latest saved version.
       if (response.responseJSON && response.responseJSON.mergedDocument) {
@@ -428,7 +435,7 @@ var XWiki = (function(XWiki) {
       window.location.reload();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
-    on401 : function (response) {
+    on401 : function (state, response) {
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
@@ -462,12 +469,12 @@ var XWiki = (function(XWiki) {
       this.displayErrorModal(createContent);
       this.enableEditors();
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 403 happens in case of CSRF issue
-    on403 : function (response, isContinue, isCreateFromTemplate) {
+    on403 : function (state, response) {
       if (!response.responseJSON || !response.responseJSON.errorType === "CSRF") {
-        return this.on401(response);
+        return this.on401(state, response);
       }
 
       this.progressBox.hide();
@@ -485,13 +492,13 @@ var XWiki = (function(XWiki) {
           new Ajax.Request(answerJson.resubmissionURI, {
             method : 'post',
             parameters : "form_token=" + answerJson.newToken,
-            onSuccess : self.onSuccess.bindAsEventListener(self, isContinue, isCreateFromTemplate),
-            on1223 : self.on1223.bindAsEventListener(self),
-            on0 : self.on0.bindAsEventListener(self),
-            on409 : self.on409.bindAsEventListener(self, isContinue),
-            on401 : self.on401.bindAsEventListener(self),
-            on403 : self.on403.bindAsEventListener(self, isContinue, isCreateFromTemplate),
-            onFailure : self.onFailure.bind(self)
+            onSuccess : self.onSuccess.bind(self, state),
+            on1223 : self.on1223.bind(self),
+            on0 : self.on0.bind(self),
+            on409 : self.on409.bind(self, state),
+            on401 : self.on401.bind(self, state),
+            on403 : self.on403.bind(self, state),
+            onFailure : self.onFailure.bind(self, state)
           });
           modal.closeDialog();
         };
@@ -521,10 +528,10 @@ var XWiki = (function(XWiki) {
       this.displayErrorModal(createContent);
 
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
-    on409 : function(response, isContinue) {
+    on409 : function(state, response) {
       var self = this;
       this.progressBox.hide();
       this.savingBox.hide();
@@ -566,7 +573,7 @@ var XWiki = (function(XWiki) {
           method : 'post',
           parameters : formData.toQueryString(),
           onSuccess : displayModal,
-          onFailure : self.onFailure.bind(self)
+          onFailure : self.onFailure.bind(self, state)
         });
       };
 
@@ -594,7 +601,7 @@ var XWiki = (function(XWiki) {
               id: "forceSave",
               value: action
             }));
-            if (isContinue) {
+            if (state.isContinue) {
               $('input[name=action_saveandcontinue]').click();
             } else {
               $('input[name=action_save]').click();
@@ -685,9 +692,9 @@ var XWiki = (function(XWiki) {
 
       previewDiff();
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
-    onFailure : function(response) {
+    onFailure : function(state, response) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
@@ -700,12 +707,12 @@ var XWiki = (function(XWiki) {
         $('ajaxRequestFailureReason').update(response.statusText);
       }
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     startStatusReport : function(statusUrl) {
       updateStatus(0);
     },
-    getStatus : function(statusUrl, isContinue, redirectUrl) {
+    getStatus : function(statusUrl, state) {
       new Ajax.Request(statusUrl, {
         method : 'get',
         parameters : { 'media' : 'json' },
@@ -714,16 +721,16 @@ var XWiki = (function(XWiki) {
           this.updateStatus(progressOffset);
           if (progressOffset < 1) {
             // Start polling for status updates, every second.
-            setTimeout(this.getStatus.bind(this, statusUrl, isContinue), 1000);
+            setTimeout(this.getStatus.bind(this, statusUrl, state), 1000);
           } else {
             // Job complete.
             this.progressBox.replace(this.savedBox);
-            this.maybeRedirect(isContinue);
+            this.maybeRedirect(state.isContinue);
           }
-        }.bindAsEventListener(this),
-        on1223 : this.on1223.bindAsEventListener(this),
-        on0 : this.on0.bindAsEventListener(this),
-        onFailure : this.onFailure.bindAsEventListener(this)
+        }.bind(this),
+        on1223 : this.on1223.bind(this),
+        on0 : this.on0.bind(this),
+        onFailure : this.onFailure.bind(this, state)
       });
     },
     updateStatus : function(progressOffset) {

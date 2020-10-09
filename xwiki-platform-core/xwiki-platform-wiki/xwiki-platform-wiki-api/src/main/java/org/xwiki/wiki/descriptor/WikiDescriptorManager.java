@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
@@ -89,6 +90,7 @@ public interface WikiDescriptorManager
      * @return the reference of the current wiki.
      * @since 12.7RC1
      */
+    @Unstable
     default WikiReference getCurrentWikiReference()
     {
         return (getCurrentWikiId() != null) ? new WikiReference(getCurrentWikiId()) : null;

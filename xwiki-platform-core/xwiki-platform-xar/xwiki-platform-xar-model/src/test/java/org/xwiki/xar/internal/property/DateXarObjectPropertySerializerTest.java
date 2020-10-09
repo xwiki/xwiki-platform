@@ -38,13 +38,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class DateXarObjectPropertySerializerTest
+class DateXarObjectPropertySerializerTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void parseDate() throws ParseException
+    void parseDate() throws ParseException
     {
         Date newDate = new Date();
         DateFormat format = new SimpleDateFormat(DateXarObjectPropertySerializer.DEFAULT_FORMAT);
@@ -55,7 +55,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void parseDateOld() throws ParseException
+    void parseDateOld() throws ParseException
     {
         Date newDate = new Date();
         DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
@@ -71,7 +71,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void parseDateInvalid()
+    void parseDateInvalid()
     {
         Date newDate = new Date();
         assertTrue(DateXarObjectPropertySerializer.parseDate("not date").after(newDate));
@@ -85,7 +85,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void serializeDate()
+    void serializeDate()
     {
         Date date = new Date();
         DateFormat format = new SimpleDateFormat(DateXarObjectPropertySerializer.DEFAULT_FORMAT);
@@ -95,7 +95,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void serializeDateNull()
+    void serializeDateNull()
     {
         assertEquals("", DateXarObjectPropertySerializer.serializeDate(null));
     }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-all</artifactId>
   <packaging>deb</packaging>
@@ -54,6 +54,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-debian-solr-search</artifactId>
+      <version>${project.version}</version>
+      <type>deb</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-debian-solr-like</artifactId>
       <version>${project.version}</version>
       <type>deb</type>
       <scope>runtime</scope>

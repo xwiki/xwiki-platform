@@ -204,14 +204,15 @@ public class DefaultModelBridge implements ModelBridge
         List<NotificationPreference> toSave = new ArrayList<>(preferences.size());
         for (NotificationPreference preference : preferences) {
             // We do not handle preferences for the emails, because they have their own starting date mechanism
-            if (preference.getFormat() == NotificationFormat.EMAIL) {
+            // We also ignore preferences that are not enabled.
+            if (preference.getFormat() == NotificationFormat.EMAIL || !preference.isNotificationEnabled()) {
                 continue;
             }
 
             // Duplicate the preference to be able to change its content and Save it
             toSave.add(notificationPreferenceBuilder.prepare()
                 .setCategory(preference.getCategory())
-                .setEnabled(true)
+                .setEnabled(preference.isNotificationEnabled())
                 .setFormat(NotificationFormat.ALERT)
                 .setProperties(preference.getProperties())
                 .setProviderHint(preference.getProviderHint())

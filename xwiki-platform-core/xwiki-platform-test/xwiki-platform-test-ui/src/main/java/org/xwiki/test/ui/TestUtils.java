@@ -720,7 +720,19 @@ public class TestUtils
      */
     public String getURLToDeletePage(EntityReference reference)
     {
-        return getURL(reference, "delete", "confirm=1");
+        return getURLToDeletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public String getURLToDeletePage(EntityReference reference, boolean affectChildren)
+    {
+        String queryString = "confirm=1&async=false";
+        if (affectChildren) {
+            queryString += "&affectChildren=true";
+        }
+        return getURL(reference, "delete", queryString);
     }
 
     /**
@@ -919,7 +931,15 @@ public class TestUtils
      */
     public void deletePage(EntityReference reference)
     {
-        getDriver().get(getURLToDeletePage(reference));
+        deletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public void deletePage(EntityReference reference, boolean affectChildren)
+    {
+        getDriver().get(getURLToDeletePage(reference, affectChildren));
     }
 
     /**

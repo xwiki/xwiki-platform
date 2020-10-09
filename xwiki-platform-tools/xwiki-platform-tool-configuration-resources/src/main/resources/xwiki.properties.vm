@@ -290,8 +290,8 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 1.8RC3]
 #-# Timeout for conversion tasks (in milliseconds) (serverType:0 only).
-#-# Default value is 30 seconds
-# openoffice.taskExecutionTimeout = 30000
+#-# Default value is 60 seconds
+# openoffice.taskExecutionTimeout = 60000
 
 #-------------------------------------------------------------------------------------
 # Velocity
@@ -882,6 +882,10 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
 
+#-# [Since 12.9RC1]
+#-# Decides if XWiki should resend automatically mails that are in the prepare + error states at restart.
+# mail.sender.database.resendAutomaticallyAtStartup = true
+
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------
@@ -1132,5 +1136,22 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default value is:
 # refactoring.rename.useAtomicRename = true
+
+#-------------------------------------------------------------------------------------
+# Skin Extensions
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.7.1, 12.8RC1]
+#-# Indicate whether the JavaScript skin extensions should be parsed and minified using strict mode. When strict mode is
+#-# enabled:
+#-# * the JavaScript minification may fail if the code is poorly written. See
+#-#   https://github.com/google/closure-compiler/wiki/Warnings for a list of errors that may occur. When this happens
+#-#   XWiki uses the original (unminified) JavaScript source as a fall-back and logs some error messages that indicate
+#-#   how the bad code can be fixed.
+#-# * the minified JavaScript includes the "use strict;" statement which means the code may fail at runtime if it doesn't
+#-#   follow the ECMAScript strict rules. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
+#-#
+#-# The default value is:
+# skinx.jsStrictModeEnabled = false
 
 $!xwikiPropertiesAdditionalProperties

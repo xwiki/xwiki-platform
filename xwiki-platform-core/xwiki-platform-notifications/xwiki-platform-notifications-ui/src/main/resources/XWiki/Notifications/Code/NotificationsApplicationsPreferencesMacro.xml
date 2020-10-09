@@ -208,7 +208,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      * happens in the meantime.
      */
     var nextSave = 0;
-    $($('.notifPreferences')).on('switchChange.bootstrapSwitch', function(event, state) {
+    $($('.notifPreferences')).off('switchChange.bootstrapSwitch').on('switchChange.bootstrapSwitch', function(event, state) {
       if (nextSave != 0) {
         clearTimeout(nextSave);
       }

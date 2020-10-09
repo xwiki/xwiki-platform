@@ -276,7 +276,6 @@ Externals.CalendarDateSelect.prototype = {
         },
         { cursor: "pointer" }
       )).build("div");
-      this.calendar_day_grid[cell_index];
     }
   },
   initButtonsDiv: function() {

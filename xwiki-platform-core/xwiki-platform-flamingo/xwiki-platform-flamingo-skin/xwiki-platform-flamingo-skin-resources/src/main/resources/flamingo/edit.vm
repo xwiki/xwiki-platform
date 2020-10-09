@@ -159,7 +159,7 @@
   </div> ## row
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.
-  <script type="text/javascript">
+  <script>
     //<![CDATA[
     if ($('tmEditWysiwyg')) {
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.

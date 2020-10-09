@@ -22,6 +22,7 @@ package org.xwiki.user.internal;
 import java.lang.reflect.Type;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -30,7 +31,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
+ * Converts a String to a {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
  *
  * @version $Id$
  * @since 12.2
@@ -40,6 +41,7 @@ import org.xwiki.user.UserReferenceResolver;
 public class UserReferenceConverter extends AbstractConverter<UserReference>
 {
     @Inject
+    @Named("current")
     private UserReferenceResolver<String> userReferenceResolver;
 
     @Override

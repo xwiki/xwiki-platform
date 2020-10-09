@@ -28,6 +28,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.EditPage;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+
 public class EditThemePage extends EditPage
 {
     @FindBy(id = "autosync")
@@ -36,31 +38,27 @@ public class EditThemePage extends EditPage
     @FindBy(id = "refresh")
     private WebElement refreshButton;
 
-    @FindBy(id = "preview-curtain")
-    private WebElement previewCurtain;
-
     public EditThemePage()
     {
-        waitUntilPageJSIsLoaded();
+        waitUntilReady();
     }
 
     public void selectVariableCategory(String category)
     {
-        WebElement categoryElem = getDriver().findElement(
-                By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
-                        + "//li//a[@data-toggle='tab' and text()='" + category + "']"));
+        WebElement categoryElem =
+            getDriver().findElement(By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
+                + "//li//a[@data-toggle='tab' and text()='" + category + "']"));
         categoryElem.click();
         // Wait until the panel is displayed
         getDriver().waitUntilElementIsVisible(
-            By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
+            By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='" + category + "']"));
     }
 
     public List<String> getVariableCategories()
     {
         List<String> results = new ArrayList<>();
         List<WebElement> categoryElems = getDriver().findElementsWithoutWaiting(
-                By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
-                        + "//li//a[@data-toggle='tab']"));
+            By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']" + "//li//a[@data-toggle='tab']"));
         for (WebElement elem : categoryElems) {
             results.add(elem.getText());
         }
@@ -70,14 +68,15 @@ public class EditThemePage extends EditPage
 
     public void setAutoRefresh(boolean enabled)
     {
-        if (autoSyncCheckBox.isEnabled() != enabled) {
-            autoSyncCheckBox.click();
+        if (this.autoSyncCheckBox.isEnabled() != enabled) {
+            this.autoSyncCheckBox.click();
         }
     }
 
     public void setVariableValue(String variableName, String value)
     {
-        WebElement variableField = getDriver().findElement(By.xpath("//label[text() = '@"+variableName+"']/..//input"));
+        WebElement variableField =
+            getDriver().findElement(By.xpath("//label[text() = '@" + variableName + "']/..//input"));
         // Remove the previous value
         variableField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         // Write the new one
@@ -89,8 +88,8 @@ public class EditThemePage extends EditPage
      */
     public void setTextareaValue(String variableName, String value)
     {
-        WebElement variableField = getDriver().findElement(
-                By.xpath("//label[text() = '@"+variableName+"']/..//textarea"));
+        WebElement variableField =
+            getDriver().findElement(By.xpath("//label[text() = '@" + variableName + "']/..//textarea"));
         // Remove the previous value
         variableField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         // Write the new one
@@ -99,23 +98,14 @@ public class EditThemePage extends EditPage
 
     public void clickOnRefreshPreview()
     {
-        refreshButton.click();
+        waitUntilReady();
+        this.refreshButton.click();
     }
 
     public void refreshPreview()
     {
         clickOnRefreshPreview();
-        waitUntilPreviewIsLoaded();
-    }
-
-    public boolean isPreviewBoxLoading()
-    {
-        return previewCurtain.isDisplayed();
-    }
-
-    public void waitUntilPreviewIsLoaded()
-    {
-        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
+        waitUntilReady();
     }
 
     public PreviewBox getPreviewBox()
@@ -123,6 +113,7 @@ public class EditThemePage extends EditPage
         return new PreviewBox();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ViewThemePage clickSaveAndView()
     {
@@ -130,4 +121,14 @@ public class EditThemePage extends EditPage
         return new ViewThemePage();
     }
 
+    /**
+     * Wait until the theme editor is ready for user interaction.
+     * 
+     * @since 12.9RC1
+     */
+    protected void waitUntilReady()
+    {
+        // The refresh button is disabled initially, until the preview is ready, and whenever a refresh is in progress.
+        getDriver().waitUntilCondition(elementToBeClickable(this.refreshButton));
+    }
 }

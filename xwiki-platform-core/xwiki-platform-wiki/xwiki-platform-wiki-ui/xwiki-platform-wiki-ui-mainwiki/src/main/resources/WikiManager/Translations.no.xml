@@ -126,7 +126,7 @@ platform.wiki.users.leave.confirmation.no=Nei
 ### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
 platform.wiki.users.leave.empty=
 platform.wiki.users.delete.title=Slett wiki "{0}"
-platform.wiki.users.delete.empty=
+### Missing: platform.wiki.users.delete.empty=Delete Wiki
 ### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
 ### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
 ### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
@@ -153,10 +153,10 @@ platform.wiki.users.profile.activity.show=vis aktivitet
 ### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
 ### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
 ### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
-### Missing: platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+platform.wiki.delete.success=Brukeren {0}{1}{2} slettet wikien ''{3}''.
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
+platform.wiki.macro.noWikis=Det er for øyeblikket ingen wikier opprettet (bortsett fra hovedwikien).
 rendering.macro.wikis.name=Wikier
 rendering.macro.wikis.description=List alle wikier
 
@@ -165,70 +165,70 @@ rendering.macro.wikis.description=List alle wikier
 ### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
 
 ## Browse
-### Missing: platform.wiki.browse=Browse Wikis
+platform.wiki.browse=Vis wikier
 platform.wiki.browse.emptyvalue=I/T
 platform.wiki.browse.wikiprettyname=Navn
 platform.wiki.browse.description=Beskrivelse
 platform.wiki.browse.owner=Eier
 platform.wiki.browse.membershipType=Medlemskapstype
-### Missing: platform.wiki.browse.doc.creationDate=Creation Date
+platform.wiki.browse.doc.creationDate=Dato opprettet
 platform.wiki.browse._actions=Handlinger
-### Missing: platform.wiki.browse._actions.join=Join
-### Missing: platform.wiki.browse._actions.requestJoin=Request Join
+platform.wiki.browse._actions.join=Bli medlem
+platform.wiki.browse._actions.requestJoin=Forespørsel for å delta
 platform.wiki.browse._actions.viewInvitation=Vis invitasjon
 platform.wiki.browse._actions.cancelJoinRequest=Avbryt forespørsel
 platform.wiki.browse._actions.leave=Forlat
 platform.wiki.browse._actions.delete=Slett
 
 ## Classes
-### Missing: WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-### Missing: WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-### Missing: WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-### Missing: platform.wiki.prop.wikiname=Wiki Identifier
-### Missing: platform.wiki.prop.wikiprettyname=Pretty Name
+WikiManager.WikiUserClass_membershipType_open=Åpent for alle brukere å delta
+WikiManager.WikiUserClass_membershipType_request=Enhver global bruker kan be om å bli med, men en administrator må godkjenne
+WikiManager.WikiUserClass_membershipType_invite=Bare en administrator kan sende invitasjoner til å bli med i denne wikien
+WikiManager.WikiUserClass_userScope_local_only=Bare lokale brukere er tilgjengelige på wikien
+WikiManager.WikiUserClass_userScope_global_only=Bare globale brukere er tilgjengelige på wikien
+WikiManager.WikiUserClass_userScope_local_and_global=Både globale og lokale brukere er tilgjengelige på wikien
+platform.wiki.prop.wikiname=Wiki identifikator
+platform.wiki.prop.wikiprettyname=Navn
 platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Beskrivelse
 platform.wiki.prop.owner=Eier
 platform.wiki.prop.membershipType.label=Medlemskapstype
-### Missing: platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+platform.wiki.prop.membershipType.hint=Måten brukerne kan bli medlem av denne wikien.
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
-### Missing: platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-### Missing: platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
-### Missing: platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
-### Missing: platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
+platform.wiki.create.wizard.desc.wikiname=Den unike identifikatoren for den nye wikien.
+platform.wiki.create.wizard.desc.wikiprettyname=Visningsnavnet på wikien.
+platform.wiki.create.wizard.desc.wikialias=Domenenavnet som vil peke på wikien.
+platform.wiki.create.wizard.desc.newTemplateHint=Mal som skal brukes på denne nye wikien (alle sider blir klonet).
+platform.wiki.create.wizard.desc.description=En kort beskrivelse av wikien og dens formål.
+platform.wiki.create.wizard.desc.owner=En bruker som alltid vil ha alle rettighetene på denne wikien, uavhengig av rettighetene som er konfigurert i administrasjonen.
+platform.wiki.create.wizard.desc.members=Brukerne som blir medlem i wikien.
 platform.wiki.create.wizard.step.nameAndType=Steg 1 - velg et navn
 platform.wiki.create.wizard.step.nameAndType.shortname=Navn
 platform.wiki.create.wizard.step.users=Steg 2 - velg medlemmer
 platform.wiki.create.wizard.step.users.shortname=Brukere
 platform.wiki.create.wizard.step.cleaningUp=Rydder
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
+platform.wiki.create.wizard.step.provisioning.cleanUp=Rengjør og slett denne wikien
+platform.wiki.create.wizard.step.cleaningup.success=Wikien {0} er slettet.
+platform.wiki.create.wizard.step.cleaningup.error=Feil, wikien {0} ble ikke slettet.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Du er i ferd med å slette wikien {0}. Vennligst bekreft.
 platform.wiki.create.wizard.step.cleaningUp.confirm=Godkjenn
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
-### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
+platform.wiki.create.wizard.setAsTemplate.label=Denne wikien vil være en mal
+platform.wiki.create.wizard.template.noTemplate=Ingen mal (standard)
 ### Missing: platform.wiki.create.wizard.userScope.label=User Scope
-### Missing: platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
+platform.wiki.create.wizard.userScope.hint=Velg hva slags brukere som kan få tilgang til wikien
 platform.wiki.create.wizard.template.label=Mal
 ### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
 ### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
 ### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
 platform.wiki.create.wizard.flavortemplate.templateTab=Mal
-### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
+platform.wiki.create.wizard.step.dw=Etter å ha klikket på "Opprett" -knappen, blir wikien opprettet og distribusjonsveiviseren starter for å hjelpe deg med å initialisere wikien. Hvis du hopper over veiviseren, vil wikien din være tom.
 platform.wiki.create.wizard.step.previous=Forrige steg
 platform.wiki.create.wizard.step.next=Neste steg
 platform.wiki.create.wizard.step.create=Opprett
 
-### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
-### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
+platform.wiki.create.wizard.step.creation=Wiki opprettelse
+platform.wiki.create.wizard.step.creation.wait=Vennligst vent til wikien er opprettet.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
 ### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
 ### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
@@ -265,8 +265,8 @@ platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Hjemmeside
 platform.wiki.sheet.prop.iswikitemplate=Wiki mal
 ### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
-### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+platform.wiki.sheet.descriptor.admin=administrasjonssiden til wikien.
+platform.wiki.sheet.aliases=Et alias er et annet navn på wikien. Du kan legge til aliaser for å opprette forskjellige nettadresser til wikien.
 
 ###############################################################################
 ## Deprecated

@@ -61,6 +61,14 @@ public class NotificationParameters
     public Date endDate;
 
     /**
+     * True if the end date should be included.
+     * 
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public boolean endDateIncluded = true;
+
+    /**
      * Don't get notification that have been triggered before the following date.
      */
     public Date fromDate;
@@ -108,6 +116,7 @@ public class NotificationParameters
             .append(user, that.user)
             .append(format, that.format)
             .append(endDate, that.endDate)
+            .append(endDateIncluded, that.endDateIncluded)
             .append(fromDate, that.fromDate)
             .append(onlyUnread, that.onlyUnread)
             .append(blackList, that.blackList)
@@ -125,6 +134,7 @@ public class NotificationParameters
             .append(format)
             .append(expectedCount)
             .append(endDate)
+            .append(endDateIncluded)
             .append(fromDate)
             .append(onlyUnread)
             .append(blackList)
@@ -142,6 +152,7 @@ public class NotificationParameters
             .append("format", format)
             .append("expectedCount", expectedCount)
             .append("endDate", endDate)
+            .append("endDateIncluded", endDateIncluded)
             .append("fromDate", fromDate)
             .append("onlyUnread", onlyUnread)
             .append("blackList", blackList)

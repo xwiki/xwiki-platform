@@ -19,8 +19,6 @@
  */
 package org.xwiki.like.internal;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.xwiki.model.EntityType;
@@ -74,7 +72,7 @@ public final class LikeRight implements RightDescription
     @Override
     public Set<Right> getImpliedRights()
     {
-        return new HashSet<>(Arrays.asList(Right.LOGIN, Right.VIEW));
+        return null;
     }
 
     @Override

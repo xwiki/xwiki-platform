@@ -17,99 +17,46 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#if (!$treeviewid)
-  #set ($treeviewid = 1)
-#else
-  #set ($treeviewid = 1 + $treeviewid)
-#end
-#if (!$formname)
-  #set ($formname = 'inline')
-#end
-#if ($treeviewid == 1)
-  <style type="text/css">
-    @import "$xwiki.getSkinFile("js/yui/treeview/assets/tree.css")";
-  </style>
-  <script type="text/javascript" src="$xwiki.getSkinFile('js/yui/yahoo/yahoo-min.js')"></script>
-  <script type="text/javascript" src="$xwiki.getSkinFile('js/yui/treeview/treeview-min.js')"></script>
-  <script type="text/javascript" src="$xwiki.getSkinFile('js/yui/treeview/checknode.js')"></script>
-#end
-##
-##
-##
-#set($tviewid = $xwiki.getCounter('treeviewid'))
-<div id="treeview${tviewid}"></div>
-<script type="text/javascript">
-  var tree${tviewid};
-  var nodes${tviewid} = {};
-  var nodeIndex${tviewid};
-
-  function onCheckClick(eventType, args, tree) {
-    var out = [];
-    for (var i in tree${tviewid}._nodes) {
-      var n = tree${tviewid}._nodes[i];
-      if (n && "undefined" != typeof n.checkState) {
-        if (n.checkState > 0) {
-          out.push(n.data);
-        }
-      }
+#template('tree_macros.vm')
+#set ($dbTreeListSettings = {
+  'id': "treeview$xwiki.getCounter('treeviewid')",
+  'class': 'xtree dbTreeList',
+  'data': [],
+  'checkboxes': $mode.equals('edit'),
+  'icons': false,
+  'config': {
+    'checkbox': {
+      'three_state': false
+    },
+    'xwiki': {
+      'fieldName': $fieldname
     }
-    $("${fieldname}").value = out.join("|");
   }
-
-  function addTreeElement(tree, nodes, id, text, parent, checked) {
-    var parentNode;
-    if (parent == "") {
-      parentNode = tree.getRoot();
-    } else {
-      parentNode = nodes[parent];
+})
+#foreach ($node in $treelist)
+  #set ($parent = $node.parent)
+  #if ("$!parent" == '')
+    ## Top level node.
+    #set ($parent = '#')
+  #end
+  #set ($discard = $dbTreeListSettings.data.add({
+    'id': $node.id,
+    'text': $node.value,
+    'parent': $parent,
+    'state': {
+      'selected': $selectlist.contains($node.id)
     }
-    nodes[id] = new YAHOO.widget.CheckNode(id, text, parentNode, checked, checked);
-    nodes[id].onCheckClick = onCheckClick;
-  }
-
-  function addTreeElementViewMode(tree, nodes, id, text, parent) {
-    var parentNode;
-    if (parent == "") {
-      parentNode = tree.getRoot();
-    } else {
-      parentNode = nodes[parent];
-    }
-    nodes[id] = new YAHOO.widget.TextNode(text, parentNode, true);
-  }
-
-  function treeInit${tviewid}() {
-    tree${tviewid} = new YAHOO.widget.TreeView("treeview${tviewid}");
-    var tree = tree${tviewid};
-    var nodes = nodes${tviewid};
-
-    ## put the list of tree node ids in a list, to be able to check if the parent of a node is in there before trying to stuff it in, otherwise we'll have a JS error
-    #set($treeIDList = [])
-    #foreach($item in $treelist)
-      #set($discard = $treeIDList.add($item.id))
-    #end
-    #foreach ($item in $treelist)
-      #set ($checked = $selectlist.contains($item.getId()))
-      #if ($item.value.length() > 80)
-        #set ($title_item = $item.value.substring(0, 80))
-      #else
-        #set ($title_item = $item.value)
-      #end
-      #set ($title_item = $title_item.replaceAll("[\r\n]"," "))
-      #set ($parentID = $item.parent)
-      #if(!$treeIDList.contains($parentID))
-        #set ($parentID = '')
-      #end
-      #if ($mode == 'view')
-        #if ($checked)
-          addTreeElementViewMode(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($parentID)}")
-        #end
-      #else
-        addTreeElement(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($parentID)}", #if($checked) true #else false #end)
-      #end
-    #end
-    tree.draw();
-  }
-
-  // Init the tree
-  treeInit${tviewid}();
+  }))
+#end
+#tree($dbTreeListSettings)
+<script>
+require(['jquery'], function($) {
+  $('.xtree.dbTreeList').on('changed.jstree', function(event, data) {
+    var fieldName = data.instance.settings.xwiki.fieldName;
+    var fieldValue = data.selected.join('|');
+    $('input[type="hidden"]').filter(function() {
+      return $(this).attr('name') === fieldName;
+    }).val(fieldValue);
+  });
+});
 </script>

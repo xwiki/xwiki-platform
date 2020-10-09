@@ -37,8 +37,26 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rightsmanager.like=Like
-like.unlike.confirmation=Are you sure to remove your Like?
-like.userprofile.menu=Liked Pages</content>
+like.unlike.modal.title=Unlike confirmation
+like.unlike.modal.body=Are you sure you wish to remove your Like for page {0}?
+like.unlike.modal.closeButton=Close
+like.unlike.modal.unlikeButton=Unlike the page
+like.unlike.modal.viewLikersButton=Likes
+like.newlike.success=The page has been liked.
+like.newlike.error=Error when trying to like the page.
+like.unlike.success=The page has been unliked.
+like.unlike.error=Error when trying to unlike the page.
+like.userprofile.menu=Liked Pages
+like.button.title=Number of likes on this page: {0}
+like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
+like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+like.likers.empty=No one likes this page yet.
+like.likers.number={0} person(s) like this page:
+like.likers.title=Likes on {0}
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
   <object>
     <name>XWiki.Like.LikeTranslations</name>
     <number>0</number>

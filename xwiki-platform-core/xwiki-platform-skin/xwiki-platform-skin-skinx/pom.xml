@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-skin</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
@@ -69,13 +69,26 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
-    <!-- CSS and JS compression tool -->
+    <!-- Used to minify the CSS code. -->
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
       <artifactId>yuicompressor</artifactId>
       <!-- See https://jira.xwiki.org/browse/XWIKI-6148 to understand why we use a specially packaged version of
            yuicompressor -->
       <version>2.4.7-xwiki</version>
+    </dependency>
+    <!-- Used to minify and optimize the JavaScript code. -->
+    <dependency>
+      <groupId>com.google.javascript</groupId>
+      <artifactId>closure-compiler-unshaded</artifactId>
+      <version>${closure-compiler.version}</version>
+      <exclusions>
+        <!-- Exclude closure-compiler-externs because externs.zip is packaged in closure-compiler-unshaded -->
+        <exclusion>
+          <groupId>com.google.javascript</groupId>
+          <artifactId>closure-compiler-externs</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

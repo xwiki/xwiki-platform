@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationPreferenceService" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationPreferenceService" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationPreferenceService</name>
   <language/>
@@ -92,15 +92,28 @@
 #elseif ("$!request.action" == 'createScopeFilterPreference')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      #set ($reference = '')
-      #if ("$!request.wiki" != '')
-        #set ($reference = $services.model.createWikiReference($request.wiki))
-      #elseif ("$!request.space" != '')
-        #set ($reference = $services.model.resolveSpace($request.space))
-      #elseif ("$!request.page" != '')
-        #set ($reference = $services.model.resolveDocument($request.page))
+      #macro (saveScopeFilterPreference $reference)
+        $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference)
       #end
-      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference)
+      #if ("$!request.wiki" != "")
+        #foreach ($wikiRequest in $request.getParameterValues('wiki'))
+          #set ($reference = $services.model.createWikiReference($wikiRequest))
+          #saveScopeFilterPreference($reference)
+        #end
+      #end
+      #if ("$!request.space" != "")
+        #foreach ($spaceRequest in $request.getParameterValues('space'))
+          SPACE REQUEST: $spaceRequest
+          #set ($reference = $services.model.resolveSpace($spaceRequest))
+          #saveScopeFilterPreference($reference)
+        #end
+      #end
+      #if ("$!request.page" != "")
+        #foreach ($pageRequest in $request.getParameterValues('page'))
+          #set ($reference = $services.model.resolveDocument($pageRequest))
+          #saveScopeFilterPreference($reference)
+        #end
+      #end
     #else
       $response.sendError(401, 'Bad CSRF Token')
     #end

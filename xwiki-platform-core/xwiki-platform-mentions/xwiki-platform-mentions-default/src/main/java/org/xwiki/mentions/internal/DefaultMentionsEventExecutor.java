@@ -192,7 +192,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         {
             MentionsData data = null;
             try {
-                data = DefaultMentionsEventExecutor.this.queue.poll();
+                data = DefaultMentionsEventExecutor.this.queue.take();
                 if (data != null) {
                     data.increaseAttempts();
                     if (data.isStop()) {

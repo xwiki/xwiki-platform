@@ -35,6 +35,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.extension.ExtensionId;
@@ -74,7 +76,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -256,11 +258,22 @@ public class XarExtensionHandlerTest
 
         MandatoryDocumentInitializer mandatoryInitializer =
             this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatory");
-        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
+        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<XWikiDocument>getArgument(0).setTitle("mandatory title");
+
+                return true;
+            }
+        });
         XWikiDocument mandatoryDocument = new XWikiDocument(new DocumentReference("wiki", "space", "mandatory"));
         mandatoryDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         mandatoryDocument.setSyntax(Syntax.PLAIN_1_0);
         mandatoryDocument.setContent("modified content");
+        mandatoryDocument.setTitle("mandatory title");
+        mandatoryDocument.setDefaultLocale(Locale.ENGLISH);
         this.oldcore.getSpyXWiki().saveDocument(mandatoryDocument, "", true, getXWikiContext());
 
         MandatoryDocumentInitializer mandatoryconfigurationInitializer = this.componentManager
@@ -399,7 +412,7 @@ public class XarExtensionHandlerTest
 
         Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
-        Assert.assertTrue("Document is not hidden", hiddenpage.isHidden());
+        assertTrue("Document is not hidden", hiddenpage.isHidden());
 
         // space.mandatory
 
@@ -407,6 +420,7 @@ public class XarExtensionHandlerTest
             .getDocument(new DocumentReference("wiki", "space", "mandatory"), getXWikiContext());
 
         Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
+        Assert.assertEquals("mandatory title", mandatorypage.getTitle());
 
         // space.mandatoryconfiguration
 
@@ -562,7 +576,7 @@ public class XarExtensionHandlerTest
         Assert.assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
         Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
-        Assert.assertTrue("Document is not hidden", hiddenpage.isHidden());
+        assertTrue("Document is not hidden", hiddenpage.isHidden());
     }
 
     @Test
@@ -648,21 +662,21 @@ public class XarExtensionHandlerTest
         XWikiDocument removedPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
+        assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
 
         // space.deletedpage
 
         deletedpage = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "deletedpage"),
             getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
+        assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
 
         // space.modifieddeletedpage
 
         modifieddeletedpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "modifieddeletedpage"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
+        assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
 
         // space.pagewithobject
 
@@ -780,21 +794,21 @@ public class XarExtensionHandlerTest
         XWikiDocument removedPage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
+        assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
 
         // space.deletedpage
 
         deletedpage = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "deletedpage"),
             getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
+        assertTrue("Document wiki:space.deleted has been restored", deletedpage.isNew());
 
         // space.modifieddeletedpage
 
         modifieddeletedpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
+        assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
 
         // space.pagewithobject
 
@@ -859,7 +873,7 @@ public class XarExtensionHandlerTest
         XWikiDocument newPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space2", "page2"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki.space2.page2 has not been removed from the database", newPage.isNew());
+        assertTrue("Document wiki.space2.page2 has not been removed from the database", newPage.isNew());
 
         // space1.page1
 
@@ -894,7 +908,7 @@ public class XarExtensionHandlerTest
         XWikiDocument page1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+        assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
     }
 
     @Test
@@ -1002,12 +1016,12 @@ public class XarExtensionHandlerTest
         pageWiki1 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space1", "page1"),
             getXWikiContext());
 
-        Assert.assertTrue("Document wiki1:space1.page1 hasn't been removed from the database", pageWiki1.isNew());
+        assertTrue("Document wiki1:space1.page1 hasn't been removed from the database", pageWiki1.isNew());
 
         pageWiki2 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "space1", "page1"),
             getXWikiContext());
 
-        Assert.assertTrue(pageWiki2.isNew());
+        assertTrue(pageWiki2.isNew());
     }
 
     // rights check
@@ -1141,12 +1155,12 @@ public class XarExtensionHandlerTest
         XWikiDocument pageWiki2 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "space", "page"), getXWikiContext());
 
-        Assert.assertTrue(pageWiki2.isNew());
+        assertTrue(pageWiki2.isNew());
 
         pageWiki2 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
             getXWikiContext());
 
-        Assert.assertTrue(pageWiki2.isNew());
+        assertTrue(pageWiki2.isNew());
 
         // install on root
 
@@ -1205,7 +1219,7 @@ public class XarExtensionHandlerTest
             .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
         Assert.assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
-        Assert.assertTrue(this.oldcore.getSpyXWiki()
+        assertTrue(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
 
         this.observation.notify(new WikiCreatingEvent("newwiki"), null, this.oldcore.getXWikiContext());

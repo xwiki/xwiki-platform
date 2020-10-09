@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -46,13 +47,18 @@ public interface MentionXDOMService
     List<MacroBlock> listMentionMacros(XDOM xdom);
 
     /**
-     * Count the number of mentions per reference.
+     * Groups the mention anchors by user references.
+     * An anchor is the unique identifier of a mention inside a document.
+     * If the anchor is not specified for a given user reference (the mentioned user), then the corresponding list
+     * contains an empty value (null or empty string).
      *
-     * @param mentions the list of mentions.
-     * @return the map of anchors of mentions per reference. If the anchor is not specified, then the list must contain
-     *          an empty value (null or empty string).
+     *
+     * @param mentions the list of mention macros in the content
+     * @param wikiReference the reference to the wiki in which the mentions occurred
+     * @return the map of the anchors grouped by user references
      */
-    Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions);
+    Map<DocumentReference, List<String>> groupAnchorsByUserReference(List<MacroBlock> mentions,
+        WikiReference wikiReference);
 
     /**
      *

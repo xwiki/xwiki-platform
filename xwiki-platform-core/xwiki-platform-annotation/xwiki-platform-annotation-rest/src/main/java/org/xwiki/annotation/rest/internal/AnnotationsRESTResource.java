@@ -22,11 +22,9 @@ package org.xwiki.annotation.rest.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -49,7 +47,6 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -72,21 +69,6 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      * Request parameter prefix for a filter in an annotation request.
      */
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
-
-    private static final String COMMENT_KEY = "comment";
-
-    private static final String COMMENT_SYNTAX_KEY = "comment_syntax";
-
-    /**
-     * The name of the request parameter value represents the parameter that requires
-     * conversion from HTML to wiki syntax.
-     * This parameter and its implementation is directly inspired from
-     * {@link org.xwiki.wysiwyg.filter.ConversionFilter}.
-     */
-    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
-
-    @Inject
-    private HTMLConverter htmlConverter;
 
     /**
      * @param wiki the wiki of the document to get annotations for
@@ -196,30 +178,5 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
-    }
-
-    private Map<String, Object> getMap(AnnotationFieldCollection annotation)
-    {
-        Map<String, Object> metadataMap = new HashMap<>();
-        for (AnnotationField f : annotation.getFields()) {
-            metadataMap.put(f.getName(), f.getValue());
-        }
-
-        // We perform conversion only if:
-        //   1. there is a RequiresHTMLConversion parameter
-        //   2. the value of this parameter is exactly "comment"
-        //   3. the syntax of comment is given in the parameters
-        // Note that this transformation only makes sense if the annotations are saved in an xobject that contains
-        // a "comment" property.
-        if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)
-            && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))
-            && metadataMap.containsKey(COMMENT_SYNTAX_KEY)) {
-            String syntax = (String) metadataMap.get(COMMENT_SYNTAX_KEY);
-
-            String convertedComment = this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax);
-            metadataMap.put(COMMENT_KEY, convertedComment);
-            metadataMap.remove(REQUIRES_HTML_CONVERSION);
-        }
-        return metadataMap;
     }
 }

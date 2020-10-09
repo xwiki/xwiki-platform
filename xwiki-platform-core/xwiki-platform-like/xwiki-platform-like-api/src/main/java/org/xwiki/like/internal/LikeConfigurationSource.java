@@ -44,7 +44,7 @@ public class LikeConfigurationSource extends AbstractDocumentConfigurationSource
     private static final List<String> SPACE_NAMES = Arrays.asList("XWiki", "Like");
 
     private static final LocalDocumentReference DOCUMENT_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "Configuration");
+        new LocalDocumentReference(SPACE_NAMES, "LikeConfiguration");
 
     private static final LocalDocumentReference CLASS_REFERENCE =
         new LocalDocumentReference(SPACE_NAMES, "LikeConfigurationClass");

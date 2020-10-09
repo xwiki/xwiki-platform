@@ -89,6 +89,14 @@ public class WatchedLocationReference implements WatchedEntityReference
     }
 
     @Override
+    public boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
+    {
+        return stateComputer.isLocationWatchedWithAllEventTypes(
+            notificationFilterPreferenceManager.getFilterPreferences(userReference),
+            this.entityReference);
+    }
+
+    @Override
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())

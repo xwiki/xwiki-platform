@@ -115,10 +115,10 @@ public class BaseElement
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
         try {
-            // The notification message may disappear before we get to click on it.
             getDriver().findElementWithoutWaiting(notificationMessageLocator).click();
         } catch (WebDriverException e) {
-            // Ignore.
+            // The notification message may disappear before we get to click on it and thus we ignore in case there's
+            // an error.
         }
     }
 

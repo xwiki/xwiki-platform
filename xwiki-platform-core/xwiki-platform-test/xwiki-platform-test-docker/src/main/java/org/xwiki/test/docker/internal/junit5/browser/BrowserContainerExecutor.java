@@ -73,7 +73,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         Browser browser = testConfiguration.getBrowser();
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        BrowserWebDriverContainer<?> webDriverContainer = new BrowserWebDriverContainer<>()
+        BrowserWebDriverContainer<?> webDriverContainer = new XWikiBrowserWebDriverContainer<>()
             // We set the width and height to one of the most used resolution by users so that we can reproduce issues
             // for the larger use case and also we use a relatively large resolution to display the maximum number of
             // elements on screen and reduce the risk of false positives in tests that could be due to elements not

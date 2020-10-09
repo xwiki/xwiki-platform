@@ -32,6 +32,7 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Base class to initialize xclass for various implementations of UI extensions.
@@ -102,6 +103,12 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
                 entriesString.append(translation);
             }
         }
-        xclass.addStaticListField(XPROPERTY_ASYNC_CONTEXT, "Context elements", 5, true, entriesString.toString());
+
+        StaticListClass asyncClass = xclass.addStaticListField(XPROPERTY_ASYNC_CONTEXT);
+        asyncClass.setPrettyName("Context elements");
+        asyncClass.setSize(5);
+        asyncClass.setMultiSelect(true);
+        asyncClass.setValues(entriesString.toString());
+        asyncClass.setSeparator(", ");
     }
 }

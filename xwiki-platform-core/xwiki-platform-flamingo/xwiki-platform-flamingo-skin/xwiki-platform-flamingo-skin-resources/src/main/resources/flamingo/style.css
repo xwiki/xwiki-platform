@@ -1,3 +1,4 @@
+/*!
 ## Get the compiled LESS code
 #set($css = $services.lesscss.compileSkinFile('style.less.vm'))
 ## Remove the useless part
@@ -14,4 +15,4 @@
   #set($css = $css.replaceAll('(?s)\.[^\{]*:empty\{[^\}]*\}', ''))
 #end
 ## Display the CSS
-$!css
+*/$!css

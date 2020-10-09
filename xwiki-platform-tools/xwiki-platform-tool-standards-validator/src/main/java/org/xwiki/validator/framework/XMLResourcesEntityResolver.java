@@ -19,13 +19,11 @@
  */
 package org.xwiki.validator.framework;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Used to overwrite the the default entity resolver and get the entities from the resources.
@@ -45,7 +43,7 @@ public class XMLResourcesEntityResolver implements EntityResolver
     private static final String ENTITIES_ROOT = "/entities";
 
     @Override
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException
+    public InputSource resolveEntity(String publicId, String systemId)
     {
         int index = systemId.lastIndexOf(URL_SEPARATOR);
 

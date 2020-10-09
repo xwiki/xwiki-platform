@@ -66,14 +66,12 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
@@ -165,11 +163,11 @@
     </property>
     <property>
       <content>{{velocity}}
-#set ($userLikes = $services.like.getUserLikes($services.user.currentUserReference))
-|=Page |=Likes
-#foreach ($userLike in $userLikes)
-  #set ($likedDocument = $xwiki.getDocument($userLike.entityReference))
-  |[[$likedDocument.title&gt;&gt;$services.model.serialize($userLike.entityReference)]]|$userLike.likeNumber
+#set ($likedReferences = $services.like.getUserLikes($services.user.currentUserReference, 0, 50))
+|=Page
+#foreach ($likeReference in $likedReferences)
+  #set ($likedDocument = $xwiki.getDocument($likeReference))
+  |[[$likedDocument.title&gt;&gt;$services.model.serialize($likeReference)]]
 #end
 {{/velocity}}</content>
     </property>

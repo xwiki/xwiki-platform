@@ -19,6 +19,9 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -57,9 +60,9 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
     }
 
     @Override
-    public boolean isPhaseSupported(FilteringPhase phase)
+    public Set<FilteringPhase> getFilteringPhases()
     {
         // only post-filtering is supported here.
-        return FilteringPhase.POSTFILTERING == phase;
+        return Collections.singleton(FilteringPhase.POST_FILTERING);
     }
 }

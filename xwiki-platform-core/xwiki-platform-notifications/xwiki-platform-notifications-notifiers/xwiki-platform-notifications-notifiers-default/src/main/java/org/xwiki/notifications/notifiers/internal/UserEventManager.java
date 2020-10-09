@@ -112,7 +112,7 @@ public class UserEventManager
                 // If one of the events present in the composite event does not match a user filter, remove the event
                 List<NotificationFilter> filters =
                     new ArrayList<>(this.notificationFilterManager.getAllFilters(user, true,
-                        NotificationFilter.FilteringPhase.PREFILTERING));
+                        NotificationFilter.FilteringPhase.PRE_FILTERING));
                 filters.sort(null);
 
                 return !isEventFiltered(filters, event, user, format);

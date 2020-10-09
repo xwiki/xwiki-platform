@@ -19,7 +19,10 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
@@ -80,12 +83,12 @@ public interface NotificationFilter extends Comparable
         /**
          * If the filter is used during post-filtering.
          */
-        POSTFILTERING,
+        POST_FILTERING,
 
         /**
          * If the filter is used during pre-filtering.
          */
-        PREFILTERING
+        PRE_FILTERING
     }
 
     /**
@@ -195,18 +198,13 @@ public interface NotificationFilter extends Comparable
     }
 
     /**
-     * Determine if the given phase is supported by this filter.
-     *
-     * @param phase the phase to check.
-     * @return {@code true} if this filter can be called during the given phase.
-     *
+     * @return the set of pĥase(s) when the filter can be used.
      * @since 12.9RC1
      * @since 12.6.3
      */
     @Unstable
-    default boolean isPhaseSupported(FilteringPhase phase)
+    default Set<FilteringPhase> getFilteringPhases()
     {
-        // By default we consider that all phases are supported.
-        return true;
+        return new HashSet<>(Arrays.asList(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING));
     }
 }

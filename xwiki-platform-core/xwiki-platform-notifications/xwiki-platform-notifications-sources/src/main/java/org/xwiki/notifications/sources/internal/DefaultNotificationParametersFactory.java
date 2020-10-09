@@ -21,7 +21,6 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -390,18 +389,21 @@ public class DefaultNotificationParametersFactory
     public void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {
         if (parameters.user != null) {
+            // We only request the filters that performs post-filtering.
+            parameters.filters = new HashSet<>(notificationFilterManager.getAllFilters(parameters.user, true,
+                NotificationFilter.FilteringPhase.POST_FILTERING));
+
             // Check if we should pre or post filter events
             if (this.configuration.isEventPrefilteringEnabled()) {
                 enableAllEventTypes(parameters);
 
+                // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
+                // in it if prefiltering is enabled. Now we are missing the format in this method for now.
                 parameters.filters.add(new ForUserEventFilter(parameters.format, null));
-                // FIXME: This doesn't feel right: we actually also retrieve the filters for pre-filtering.
-                parameters.filters.addAll(this.notificationFilterManager.getAllFilters(parameters.user, true,
-                    NotificationFilter.FilteringPhase.POSTFILTERING));
             } else {
                 parameters.preferences =
                     notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
+
                 parameters.filterPreferences =
                     notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
             }
@@ -427,7 +429,7 @@ public class DefaultNotificationParametersFactory
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
         notificationParameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
+            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toSet());
 
         enableAllEventTypes(notificationParameters);
 

@@ -65,7 +65,7 @@ public interface NotificationFilterManager
      *
      * @param user reference to the user
      * @param onlyEnabled either or not only filters enabled for the user should be collected
-     * @param filteringPhase when the filter should be used (use null for any phase)
+     * @param filteringPhase when the filter should be used ({@code null} means any phase)
      * @return the collection of notification filters enabled to the user.
      * @throws NotificationException if an error happens
      * @since 12.9RC1

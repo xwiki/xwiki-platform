@@ -168,7 +168,8 @@ public class DefaultNotificationParametersFactoryTest
         this.recordableEventDescriptors =
             Arrays.asList(mock(RecordableEventDescriptor.class), mock(RecordableEventDescriptor.class));
         when(notificationFilterManager.getAllFilters(true)).thenReturn(this.filterList);
-        when(notificationFilterManager.getAllFilters(USER_REFERENCE, true))
+        when(notificationFilterManager.getAllFilters(USER_REFERENCE, true,
+            NotificationFilter.FilteringPhase.POST_FILTERING))
             .thenReturn(Collections.singletonList(filterList.get(1)));
 
         when(notificationPreferenceManager.getPreferences(eq(USER_REFERENCE), eq(true), same(NotificationFormat.EMAIL)))
@@ -237,7 +238,7 @@ public class DefaultNotificationParametersFactoryTest
 
         NotificationParameters notificationParameters = new NotificationParameters();
         notificationParameters.format = NotificationFormat.ALERT;
-        notificationParameters.filters = this.filterList;
+        notificationParameters.filters = new HashSet<>(this.filterList);
         notificationParameters.preferences =
             Arrays.asList(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
                 new InternalNotificationPreference(this.recordableEventDescriptors.get(1)));
@@ -274,7 +275,7 @@ public class DefaultNotificationParametersFactoryTest
         notificationParameters.blackList = Arrays.asList("foo", "bar", "baz");
         notificationParameters.preferences = this.mailPreferenceList;
         notificationParameters.filterPreferences = this.filterPreferenceList;
-        notificationParameters.filters = Collections.singletonList(this.filterList.get(1));
+        notificationParameters.filters = Collections.singleton(this.filterList.get(1));
 
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
 
@@ -284,6 +285,9 @@ public class DefaultNotificationParametersFactoryTest
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
 
         when(this.configuration.isEventPrefilteringEnabled()).thenReturn(true);
+        // Prefiltering status is taken into account when getting the filters.
+        when(notificationFilterManager.getAllFilters(USER_REFERENCE, true,
+            NotificationFilter.FilteringPhase.POST_FILTERING)).thenReturn(Collections.emptyList());
 
         notificationParameters.preferences =
             Arrays.asList(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
@@ -293,19 +297,19 @@ public class DefaultNotificationParametersFactoryTest
         parametersMap.put(ParametersKey.FORMAT, NotificationFormat.EMAIL.name());
         notificationParameters.format = NotificationFormat.EMAIL;
         notificationParameters.filters =
-            Collections.singletonList(new ForUserEventFilter(NotificationFormat.EMAIL, null));
+            Collections.singleton(new ForUserEventFilter(NotificationFormat.EMAIL, null));
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
 
         parametersMap.put(ParametersKey.FORMAT, NotificationFormat.ALERT.name());
         notificationParameters.format = NotificationFormat.ALERT;
         notificationParameters.filters =
-            Collections.singletonList(new ForUserEventFilter(NotificationFormat.ALERT, null));
+            Collections.singleton(new ForUserEventFilter(NotificationFormat.ALERT, null));
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
 
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, "false");
 
         // Don't forget that "false" in DISPLAY_XXX_EVENTS means that the filter is applied to discard those events.
-        notificationParameters.filters = Arrays.asList(filterList.get(1), filterList.get(2));
+        notificationParameters.filters = new HashSet<>(Arrays.asList(filterList.get(1), filterList.get(2)));
 
         List<NotificationFilterPreference> notificationFilterPreferences = new ArrayList<>();
         DefaultNotificationFilterPreference filterPref = getFilterPreference("PAGE", 0);

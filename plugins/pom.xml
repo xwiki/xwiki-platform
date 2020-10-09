@@ -86,13 +86,6 @@
     </dependency>
   </dependencies>
   <build>
-    <!-- We need to filter jasmine-require-config.txt in order to resolve the project version. -->
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>
@@ -109,59 +102,6 @@
           <globals>CKEDITOR</globals>
           <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
           <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>set-system-properties</goal>
-            </goals>
-            <configuration>
-              <properties>
-                <property>
-                  <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
-                    installed locally. -->
-                  <name>wdm.chromeDriverVersion</name>
-                  <value>85.0.4183.87</value>
-                </property>
-                <property>
-                  <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
-                  <name>webdriver.chrome.whitelistedIps</name>
-                  <value />
-                </property>
-              </properties>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.searls</groupId>
-        <artifactId>jasmine-maven-plugin</artifactId>
-        <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
-        <version>3.0-alpha-01</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
-          <!-- jasmine-require-config.txt is filtered so we load it from the test output directory. -->
-          <customRunnerConfiguration>
-            ${project.build.testOutputDirectory}/jasmine-require-config.txt
-          </customRunnerConfiguration>
-          <preloadSources>
-            <source>/webjars/require.js</source>
-          </preloadSources>
-          <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
-          <timeout>10</timeout>
-          <debug>true</debug>
         </configuration>
       </plugin>
       <plugin>
@@ -238,4 +178,73 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <build>
+        <!-- We need to filter jasmine-require-config.txt in order to resolve the project version. -->
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>set-system-properties</goal>
+                </goals>
+                <configuration>
+                  <properties>
+                    <property>
+                      <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
+                        installed locally. -->
+                      <name>wdm.chromeDriverVersion</name>
+                      <value>85.0.4183.87</value>
+                    </property>
+                    <property>
+                      <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
+                      <name>webdriver.chrome.whitelistedIps</name>
+                      <value />
+                    </property>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <!-- We want a more recent version of Jasmine because we want to use the (headless) Chrome driver. -->
+            <version>3.0-alpha-01</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
+              <!-- jasmine-require-config.txt is filtered so we load it from the test output directory. -->
+              <customRunnerConfiguration>
+                ${project.build.testOutputDirectory}/jasmine-require-config.txt
+              </customRunnerConfiguration>
+              <preloadSources>
+                <source>/webjars/require.js</source>
+              </preloadSources>
+              <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
+              <timeout>10</timeout>
+              <debug>true</debug>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

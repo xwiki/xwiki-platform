@@ -24,15 +24,20 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
-// Docker is required for the functional tests
-node('docker') {
+node() {
+  // Build without integration and functional tests.
   xwikiBuild {
-    // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
-    // We have to do this since we can depend on an old XWiki parent pom version that can be using an old java version.
-    javaTool = 'official'        
-    profiles = 'quality,legacy,integration-tests,docker'
+    profiles = ''
     // We need a display for the CKBuilder. Note that we don't need xvnc for the functional tests themselves since they
     // execute inside Docker containers.
     xvnc = true
+  }
+  // Run the integration tests.
+  xwikiBuild {
+    pom = 'plugins/pom.xml'
+  }
+  // Run the functional (docker) tests.
+  xwikiBuild {
+    pom = 'test/tests/pom.xml'
   }
 }

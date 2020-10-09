@@ -197,22 +197,19 @@ public class DefaultNotificationFilterManagerTest
 
         when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
         when(filter1.getFilteringPhases())
-            .thenReturn(Collections.singleton(NotificationFilter.FilteringPhase.PRE_FILTERING));
+            .thenReturn(NotificationFilter.SUPPORT_ONLY_PRE_FILTERING_PHASE);
         when(filter2.getFilteringPhases())
-            .thenReturn(Collections.singleton(NotificationFilter.FilteringPhase.PRE_FILTERING));
+            .thenReturn(NotificationFilter.SUPPORT_ONLY_PRE_FILTERING_PHASE);
         when(filter3.getFilteringPhases())
-            .thenReturn(Collections.singleton(NotificationFilter.FilteringPhase.POST_FILTERING));
+            .thenReturn(NotificationFilter.SUPPORT_ONLY_POST_FILTERING_PHASE);
         when(filter4.getFilteringPhases())
-            .thenReturn(Collections.singleton(NotificationFilter.FilteringPhase.POST_FILTERING));
+            .thenReturn(NotificationFilter.SUPPORT_ONLY_POST_FILTERING_PHASE);
         when(filter5.getFilteringPhases())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFilter.FilteringPhase.PRE_FILTERING,
-                NotificationFilter.FilteringPhase.POST_FILTERING)));
+            .thenReturn(NotificationFilter.SUPPORT_BOTH_FILTERING_PHASE);
         when(filter6.getFilteringPhases())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFilter.FilteringPhase.PRE_FILTERING,
-                NotificationFilter.FilteringPhase.POST_FILTERING)));
+            .thenReturn(NotificationFilter.SUPPORT_BOTH_FILTERING_PHASE);
         when(filter7.getFilteringPhases())
-            .thenReturn(new HashSet<>(Arrays.asList(NotificationFilter.FilteringPhase.PRE_FILTERING,
-                NotificationFilter.FilteringPhase.POST_FILTERING)));
+            .thenReturn(NotificationFilter.SUPPORT_BOTH_FILTERING_PHASE);
 
         // Using subwiki so we manipulate a set instead of a map
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");

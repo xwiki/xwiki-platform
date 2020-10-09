@@ -20,24 +20,26 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterDisplayer;
@@ -72,11 +74,11 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private NotificationFilterDisplayer defaultNotificationFilterDisplayer;
 
     @Inject
-    @Named("cached")
-    private ModelBridge modelBridge;
+    private NotificationConfiguration configuration;
 
     @Inject
-    private Logger logger;
+    @Named("cached")
+    private ModelBridge modelBridge;
 
     @Override
     public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
@@ -112,20 +114,79 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled)
         throws NotificationException
     {
+        return getAllFilters(user, onlyEnabled, null);
+    }
+
+    @Override
+    public Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled,
+        NotificationFilter.FilteringPhase filteringPhase) throws NotificationException
+    {
         Collection<NotificationFilter> filters = getAllFilters(
-                user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
+            user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
         Map<String, Boolean> filterActivations = getToggeableFilterActivations(user);
+        boolean prefilteringEnabled = this.configuration.isEventPrefilteringEnabled();
         Iterator<NotificationFilter> it = filters.iterator();
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
-            Boolean filterActivation = filterActivations.get(filter.getName());
-            if (onlyEnabled && filterActivation != null && !filterActivation.booleanValue()) {
+            boolean filterActivation = filterActivations.getOrDefault(filter.getName(), true);
+            if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase,
+                prefilteringEnabled)) {
                 it.remove();
             }
         }
         return filters;
     }
 
+    private boolean shouldFilterBeSelected(NotificationFilter filter, boolean filterActivation, boolean onlyEnabled,
+        NotificationFilter.FilteringPhase filteringPhase, boolean onlyExactPhase)
+    {
+        return shouldFilterBeSelectedBasedOnStatus(filterActivation, onlyEnabled)
+            && shouldFilterBeSelectedBasedOnFilteringPhase(filter, filteringPhase, onlyExactPhase);
+    }
+
+    private boolean shouldFilterBeSelectedBasedOnStatus(boolean filterActivation, boolean onlyEnabled)
+    {
+        boolean result = false;
+        // if we don't care to get only the enabled one, we can return all of them.
+        if (!onlyEnabled) {
+            result = true;
+        // else we just need to ensure that the filter is activated
+        } else if (filterActivation) {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean shouldFilterBeSelectedBasedOnFilteringPhase(NotificationFilter filter,
+        NotificationFilter.FilteringPhase filteringPhase, boolean prefilteringEnabled)
+    {
+        boolean result;
+        Set<NotificationFilter.FilteringPhase> filterFilteringPhases = filter.getFilteringPhases();
+        // by definition if the filteringPhase provided is null we return all filters
+        if (filteringPhase == null) {
+            result = true;
+        // we consider that filters should properly set the filtering phases to be selected.
+        } else if (filterFilteringPhases == null || filterFilteringPhases.isEmpty()) {
+            result = false;
+        // if pre-filtering is enabled and we're requesting for post-filtering phases, we return only
+        // the filters that only supports post-filtering: we don't need the other ones since they have been already
+        // applied.
+        } else if (prefilteringEnabled && filteringPhase == NotificationFilter.FilteringPhase.POST_FILTERING) {
+            result = Collections.singleton(NotificationFilter.FilteringPhase.POST_FILTERING)
+                .equals(filterFilteringPhases);
+        // if pre-filtering is not enabled, but we request pre-filtering filters only, it doesn't really make sense
+        // so we don't return any filters.
+        } else if (!prefilteringEnabled
+                && filteringPhase == NotificationFilter.FilteringPhase.PRE_FILTERING) {
+            result = false;
+        // In other cases, we only want to ensure that one of the request phase is supported.
+        } else if (filterFilteringPhases.contains(filteringPhase)) {
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
+    }
 
     @Override
     public Stream<NotificationFilter> getFiltersRelatedToNotificationPreference(Collection<NotificationFilter> filters,

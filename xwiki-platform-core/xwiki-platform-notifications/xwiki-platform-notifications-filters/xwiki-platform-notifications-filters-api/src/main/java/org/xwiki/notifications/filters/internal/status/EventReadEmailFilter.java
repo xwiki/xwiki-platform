@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collections;
-import java.util.Set;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -50,12 +47,5 @@ public class EventReadEmailFilter extends AbstractEventReadFilter
     public EventReadEmailFilter()
     {
         super(FILTER_NAME, NotificationFormat.EMAIL);
-    }
-
-    @Override
-    public Set<FilteringPhase> getFilteringPhases()
-    {
-        // only post-filtering is supported here.
-        return Collections.singleton(FilteringPhase.POST_FILTERING);
     }
 }

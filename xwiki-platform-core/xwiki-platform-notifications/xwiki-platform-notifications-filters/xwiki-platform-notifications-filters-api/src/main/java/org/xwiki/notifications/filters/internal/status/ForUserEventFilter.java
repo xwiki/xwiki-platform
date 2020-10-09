@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.xwiki.notifications.NotificationFormat;
 
 /**
@@ -41,12 +38,5 @@ public class ForUserEventFilter extends AbstractForUserEventFilter
     public ForUserEventFilter(NotificationFormat format, Boolean read)
     {
         super("forUserEventFilter", format, read, false);
-    }
-
-    @Override
-    public Set<FilteringPhase> getFilteringPhases()
-    {
-        // only post-filtering is supported here.
-        return Collections.singleton(FilteringPhase.POST_FILTERING);
     }
 }

@@ -19,9 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collections;
-import java.util.Set;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -57,12 +54,5 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
     {
         // It's the most important priority
         return 4000;
-    }
-
-    @Override
-    public Set<FilteringPhase> getFilteringPhases()
-    {
-        // only post-filtering is supported here.
-        return Collections.singleton(FilteringPhase.POST_FILTERING);
     }
 }

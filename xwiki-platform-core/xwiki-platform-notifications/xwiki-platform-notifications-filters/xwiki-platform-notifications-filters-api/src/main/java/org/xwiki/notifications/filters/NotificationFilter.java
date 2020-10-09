@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,6 +91,25 @@ public interface NotificationFilter extends Comparable
          */
         PRE_FILTERING
     }
+
+    /**
+     * A static set containing both {@link FilteringPhase#POST_FILTERING} and {@link FilteringPhase#PRE_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_BOTH_FILTERING_PHASE =
+        new HashSet<>(Arrays.asList(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING));
+
+    /**
+     * A static set containing only {@link FilteringPhase#POST_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_ONLY_POST_FILTERING_PHASE = Collections.singleton(FilteringPhase.POST_FILTERING);
+
+    /**
+     * A static set containing only {@link FilteringPhase#PRE_FILTERING}.
+     * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
+     */
+    Set<FilteringPhase> SUPPORT_ONLY_PRE_FILTERING_PHASE = Collections.singleton(FilteringPhase.PRE_FILTERING);
 
     /**
      * Enable or disable an event in the notification list (post-filter).
@@ -205,6 +225,6 @@ public interface NotificationFilter extends Comparable
     @Unstable
     default Set<FilteringPhase> getFilteringPhases()
     {
-        return new HashSet<>(Arrays.asList(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING));
+        return SUPPORT_BOTH_FILTERING_PHASE;
     }
 }

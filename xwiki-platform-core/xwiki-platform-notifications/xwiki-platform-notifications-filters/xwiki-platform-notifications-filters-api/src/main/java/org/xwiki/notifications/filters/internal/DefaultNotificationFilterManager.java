@@ -165,8 +165,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         // by definition if the filteringPhase provided is null we return all filters
         if (filteringPhase == null) {
             result = true;
-        // just bulletproof in case a filter didn't properly override the method
-        } else if (filterFilteringPhases == null) {
+        // we consider that filters should properly set the filtering phases to be selected.
+        } else if (filterFilteringPhases == null || filterFilteringPhases.isEmpty()) {
             result = false;
         // if pre-filtering is enabled and we're requesting for post-filtering phases, we return only
         // the filters that only supports post-filtering: we don't need the other ones since they have been already

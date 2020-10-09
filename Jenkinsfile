@@ -25,18 +25,24 @@
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
 node() {
-  // Build without integration and functional tests.
+  // Build without integration and functional tests (we override the "profiles" since by defaut they'd run these tests).
+  // We do this so that we can get published artifacts even when integration and functional tests fail and so that we 
+  // get results faster for devs.
   xwikiBuild {
     profiles = ''
     // We need a display for the CKBuilder. Note that we don't need xvnc for the functional tests themselves since they
     // execute inside Docker containers.
     xvnc = true
   }
-  // Run the integration tests.
+  // Run the integration tests (since we don't override the "profiles", the default profiles will run integration and 
+  // functional tests). Thus we specfify the "pom" parameter to only execute the integration tests from the "plugins"
+  // module.
   xwikiBuild {
     pom = 'plugins/pom.xml'
   }
-  // Run the functional (docker) tests.
+  // Run the functional (docker) tests (since we don't override the "profiles", the default profiles will run integration
+  // and functional tests). Thus we specify the "pom" parameter to only execute the functional tests from the "test/tests"
+  // module (the PO will have been built by the first "xwikiBuild" step above.
   xwikiBuild {
     pom = 'test/tests/pom.xml'
   }

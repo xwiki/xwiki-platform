@@ -19,10 +19,9 @@
  */
 package org.xwiki.notifications.filters;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -97,7 +96,7 @@ public interface NotificationFilter extends Comparable
      * To be used in overrides of {@link #getFilteringPhases()} for performance reasons.
      */
     Set<FilteringPhase> SUPPORT_BOTH_FILTERING_PHASE =
-        new HashSet<>(Arrays.asList(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING));
+        EnumSet.of(FilteringPhase.PRE_FILTERING, FilteringPhase.POST_FILTERING);
 
     /**
      * A static set containing only {@link FilteringPhase#POST_FILTERING}.

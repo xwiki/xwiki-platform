@@ -108,6 +108,7 @@ ckeditor.plugin.toolbar.otherMacros=Other Macros
 ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
 ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
 ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 

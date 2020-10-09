@@ -59,11 +59,11 @@
 
   var maybeConvertSyntaxAndReload = function(editor, data) {
     editor.element.setAttribute('data-sourceDocumentSyntax', data.syntax.id);
-    return maybeConvertSyntax(editor, data).then($.proxy(reloadEditor, null, editor));
+    return maybeConvertSyntax(editor, data).then($.proxy(reloadEditor, null, editor, data.syntax));
   };
 
   var maybeConvertSyntax = function(editor, data) {
-    if (editor.mode === 'wysiwyg' && data.convertSyntax) {
+    if (editor.mode === 'wysiwyg' && data.convertSyntax && data.syntax.parser) {
       // We need to convert the annotated XHTML to wiki syntax, then convert the wiki syntax and finally render the
       // converted wiki syntax as annotated XHTML.
 
@@ -89,25 +89,46 @@
     } else if (editor.mode === 'source' && data.convertSyntax) {
       // Easy, just convert the source syntax.
       return data.syntaxConverter.convert(data.syntax, data.previousSyntax, editor.getData());
-    } else {
+    } else if (data.syntax.renderer || editor.mode === 'source') {
       // Return the current content as is (including the styles, if the content is HTML).
       return $.Deferred().resolve(CKEDITOR.plugins.xwikiSource.getFullData(editor)).promise();
+    } else {
+      // The new syntax doesn't have a renderer so it means it doesn't support the WYSIWYG edit mode. We need to force
+      // the source mode. We convert the current Annotated XHTML to the previous syntax, letting the user do the manual
+      // conversion to the new syntax.
+      return CKEDITOR.plugins.xwikiSource.convertHTML(editor, {
+        fromHTML: true,
+        toHTML: false,
+        sourceSyntax: data.previousSyntax.id,
+        text: editor.getData()
+      });
     }
   };
 
-  var reloadEditor = function(editor, content) {
+  var reloadEditor = function(editor, syntax, content) {
     var deferred = $.Deferred();
     var data = {promise: deferred.promise()};
-    // Save the current edit mode in order to restore it after the editor is reloaded.
-    var mode = editor.mode;
+    // Save the current edit mode in order to restore it after the editor is reloaded. If the new syntax doesn't support
+    // the WYSIWYG edit mode then we need to force the source mode instead.
+    var mode = syntax.renderer ? editor.mode : 'source';
     // Notify the owner of the editor that we're about to destroy it and that it needs to be reloaded.
     editor.fireOnce('reload', data);
     // Destroy the editor without updating the content / value of the underlying element because we're going to use the
     // given content.
     editor.destroy(/* noUpdate: */ true);
     // Restore the previous edit mode and set the updated content after the editor is reloaded.
-    data.promise = data.promise.then($.proxy(maybeSetEditMode, null, mode, content))
-      .then($.proxy(setEditedContent, null, content));
+    data.promise = data.promise
+      .then($.proxy(maybeSetEditMode, null, mode, content))
+      .then($.proxy(setEditedContent, null, content))
+      .done(function(editor) {
+        if (!syntax.renderer) {
+          // Disable the edit mode switch if the new syntax doesn't support the WYSIWYG edit mode..
+          editor.getCommand('source').disable();
+          // ..and warn the user about it.
+          editor.showNotification(editor.localization.get('xwiki-syntax.wysiwygModeUnsupported', syntax.label),
+            'warning');
+        }
+      });
     // Trigger the actual reload of the editor, passing custom editor configuration. Note that the statup mode is not
     // taken into account when the editor is loaded in-line. This is why we still need to set the edit mode above after
     // the editor is re-loaded.
@@ -146,6 +167,6 @@
 
   // An empty plugin that can be used to enable / disable the syntax change handling for a particular CKEditor instance.
   CKEDITOR.plugins.add('xwiki-syntax', {
-    requires: 'xwiki-localization'
+    requires: 'notification,xwiki-localization,xwiki-source'
   });
 })();

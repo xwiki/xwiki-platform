@@ -100,6 +100,9 @@
           editor.element.$.parentNode.replaceChild(contentsSpace.$, editor.element.$);
           editor.element.hide();
           editor.element.insertBefore(contentsSpace);
+          // Set the outermost element. This is needed in order to compute correctly the position where the notification
+          // messages are shown.
+          editor.container = editor.ui.contentsElement = contentsSpace;
         } else {
           // Preserve the height of the contents space while switching modes in order to prevent UI flickering.
           contentsSpace = editor.ui.space('contents');
@@ -117,6 +120,9 @@
         contentsSpace.$.parentNode.replaceChild(editor.element.$, contentsSpace.$);
         // Enable in-line editing.
         editor.editable(editor.element);
+        // The editable itself is the outermost element. This is needed in order to compute correctly the position where
+        // the notification messages are shown.
+        editor.container = editor.ui.contentsElement = editor.element;
         // Note that we trigger the callback without setting the editor data because this is done later by our source
         // plugin after converting the source wiki syntax to HTML.
         callback();

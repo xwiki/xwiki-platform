@@ -50,6 +50,7 @@ import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -76,6 +77,9 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
 
     @Inject
     private transient XarEntryTypeResolver typeResolver;
+
+    @Inject
+    private EntityReferenceFactory referenceFactory;
 
     /**
      * Index used to find extensions owners of a document installed on a specific wiki.
@@ -135,7 +139,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
                                 newSet.remove(installedExtension);
                             }
 
-                            this.documents.put(reference, newSet);
+                            this.documents.put(this.referenceFactory.getReference(reference), newSet);
                         }
                     }
                 } else {

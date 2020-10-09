@@ -226,7 +226,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         Event currentEvent = firstEvent;
 
         while (!this.disposed && currentEvent != null) {
-            if (currentEvent != WAKEUP_EVENT) {
+            if (currentEvent != WAKEUP_EVENT && !currentEvent.isPrefiltered()) {
                 // Dispatch event
                 dispatch(currentEvent);
             }

@@ -58,8 +58,8 @@ user.profile.network.unfollow=Slutt å følge
 user.profile.network.done=Ferdig
 user.profile.network.saving=Lagrer…
 user.profile.network.error=Feil ved lagring av varslingsinnstillingen
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+user.profile.status.done=Ferdig
+user.profile.status.saving=Lagrer...
+user.profile.status.error=Feil ved lagring av brukerstatus</content>
   
 </xwikidoc>

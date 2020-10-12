@@ -38,9 +38,6 @@ node() {
   // and functional tests). Thus we specify the "pom" parameter to only build the test page objects and execute the
   // functional tests from the "test" module.
   xwikiBuild {
-    // Force the latest Java version in order to be able to run the functional tests using a recent version of XWiki.
-    // We have to do this because we depend on an old XWiki parent POM version that is using an old java version (1.7).
-    javaTool = 'official'
     pom = 'test/pom.xml'
   }
   // Run the integration tests (since we don't override the "profiles", the default profiles will run integration and

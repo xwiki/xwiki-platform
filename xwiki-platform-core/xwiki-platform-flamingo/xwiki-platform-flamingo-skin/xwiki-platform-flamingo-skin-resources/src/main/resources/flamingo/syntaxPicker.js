@@ -77,19 +77,6 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     deferred.resolve();
   };
 
-  var maybeAskForSyntaxConversionConfirmation = function(previousSyntax, nextSyntax) {
-    var deferred = $.Deferred();
-    // In order to perform a syntax conversion we need to parse from the previous syntax and render to the next syntax.
-    if (previousSyntax.parser && nextSyntax.renderer) {
-      // Ask for confirmation to convert the syntax.
-      askForSyntaxConversionConfirmation(previousSyntax.label, nextSyntax.label, deferred);
-    } else {
-      // The syntax conversion is not possible so we just accept the next syntax.
-      deferred.resolve({convertSyntax: false});
-    }
-    return deferred.promise();
-  };
-
   var confirmationModal = $(`
     <div id="syntaxConversionConfirmation" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
@@ -102,32 +89,51 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
           </div>
           <div class="modal-body"></div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal"></button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal"></button>
+            <button type="button" class="btn btn-default dontConvertSyntax" data-dismiss="modal"></button>
+            <button type="button" class="btn btn-primary convertSyntax" data-dismiss="modal"></button>
+            <button type="button" class="btn btn-primary acknowledge" data-dismiss="modal"></button>
           </div>
         </div>
       </div>
     </div>
   `).on('shown.bs.modal', function() {
-    confirmationModal.find('.btn-primary').focus();
+    confirmationModal.find('.btn-primary').filter(':visible').focus();
   }).on('hidden.bs.modal', function() {
     confirmationModal.data('deferred').resolve(confirmationModal.data('data'));
-  }).on('click', '.btn-primary', function() {
+  }).on('click', 'button.convertSyntax', function() {
     confirmationModal.data('data').convertSyntax = true;
   }).appendTo('body').modal({show: false});
 
   confirmationModal.find('.modal-title').text($jsontool.serialize($services.localization.render(
     'web.widgets.syntaxPicker.conversionConfirmation.title')));
-  confirmationModal.find('.modal-body').html($jsontool.serialize($services.localization.render(
-    'web.widgets.syntaxPicker.conversionConfirmation.message',
-    ['<strong class="previousSyntax"></strong>', '<strong class="nextSyntax"></strong>']
-  )));
-  confirmationModal.find('.btn-default').text($jsontool.serialize($services.localization.render('no')));
-  confirmationModal.find('.btn-primary').text($jsontool.serialize($services.localization.render('yes')));
+  confirmationModal.find('button.dontConvertSyntax').text($jsontool.serialize($services.localization.render('no')));
+  confirmationModal.find('button.convertSyntax').text($jsontool.serialize($services.localization.render('yes')));
+  confirmationModal.find('button.acknowledge').text($jsontool.serialize($services.localization.render(
+    'web.widgets.syntaxPicker.conversionUnsupported.acknowledge')));
 
-  var askForSyntaxConversionConfirmation = function(previousSyntax, nextSyntax, deferred) {
-    confirmationModal.find('.previousSyntax').text(previousSyntax);
-    confirmationModal.find('.nextSyntax').text(nextSyntax);
+  var maybeAskForSyntaxConversionConfirmation = function(previousSyntax, nextSyntax) {
+    var deferred = $.Deferred();
+    var message;
+    // In order to perform a syntax conversion we need to parse from the previous syntax and render to the next syntax.
+    var canConvertSyntax = previousSyntax.parser && nextSyntax.renderer;
+    if (canConvertSyntax) {
+      // Ask for confirmation to convert the syntax.
+      message = $jsontool.serialize($services.localization.render(
+        'web.widgets.syntaxPicker.conversionConfirmation.message',
+        ['<strong class="previousSyntax"></strong>', '<strong class="nextSyntax"></strong>']
+      ));
+    } else {
+      // Let the user know that the automatic syntax conversion is not possible.
+      message = $jsontool.serialize($services.localization.render(
+        'web.widgets.syntaxPicker.conversionUnsupported.message',
+        ['<strong class="previousSyntax"></strong>', '<strong class="nextSyntax"></strong>']
+      ));
+    }
+    confirmationModal.find('.modal-body').html(message);
+    confirmationModal.find('.previousSyntax').text(previousSyntax.label);
+    confirmationModal.find('.nextSyntax').text(nextSyntax.label);
+    confirmationModal.find('button.dontConvertSyntax, button.convertSyntax').toggle(canConvertSyntax);
+    confirmationModal.find('button.acknowledge').toggle(!canConvertSyntax);
     confirmationModal.data('deferred', deferred).data('data', {convertSyntax: false}).modal('show');
     return deferred.promise();
   };
@@ -144,7 +150,7 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
         triggerSyntaxChange(syntaxPicker, {
           previousSyntax: previousSyntax,
           syntax: nextSyntax,
-          convertSyntax: syntaxPicker.next('input[name="convertSyntax"]').val(),
+          convertSyntax: syntaxPicker.next('input[name="convertSyntax"]').val() === 'true',
           reverting: true
         });
       }

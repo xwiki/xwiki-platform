@@ -184,7 +184,6 @@
   <modules>
     <module>base</module>
     <module>plugins</module>
-    <module>test</module>
     <module>ui</module>
     <module>webjar</module>
   </modules>
@@ -250,6 +249,12 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>test</module>
+      </modules>
     </profile>
   </profiles>
 </project>

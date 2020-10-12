@@ -29,7 +29,7 @@ node() {
   // We do this so that we can get published artifacts even when integration and functional tests fail and so that we 
   // get results faster for devs.
   xwikiBuild {
-    profiles = ''
+    profiles = 'quality,legacy'
     // We need a display for the CKBuilder. Note that we don't need xvnc for the functional tests themselves since they
     // execute inside Docker containers.
     xvnc = true
@@ -38,6 +38,10 @@ node() {
   // functional tests). Thus we specfify the "pom" parameter to only execute the integration tests from the "plugins"
   // module.
   xwikiBuild {
+    // Force the latest Java version in order to be able to use the latest version of the Jasmine Maven plugin to run the
+    // JavaScript integration tests. We have to do this because we depend on an old XWiki parent POM version that is
+    // using an old java version (1.7).
+    javaTool = 'official'
     pom = 'plugins/pom.xml'
   }
   // Run the functional (docker) tests (since we don't override the "profiles", the default profiles will run integration

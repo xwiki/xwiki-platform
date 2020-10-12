@@ -34,7 +34,13 @@ node() {
     // execute inside Docker containers.
     xvnc = true
   }
-  // Run the integration tests (since we don't override the "profiles", the default profiles will run integration and 
+  // Run the functional (docker) tests (since we don't override the "profiles", the default profiles will run integration
+  // and functional tests). Thus we specify the "pom" parameter to only build the test page objects and execute the
+  // functional tests from the "test" module.
+  xwikiBuild {
+    pom = 'test/pom.xml'
+  }
+  // Run the integration tests (since we don't override the "profiles", the default profiles will run integration and
   // functional tests). Thus we specfify the "pom" parameter to only execute the integration tests from the "plugins"
   // module.
   xwikiBuild {
@@ -43,11 +49,5 @@ node() {
     // using an old java version (1.7).
     javaTool = 'official'
     pom = 'plugins/pom.xml'
-  }
-  // Run the functional (docker) tests (since we don't override the "profiles", the default profiles will run integration
-  // and functional tests). Thus we specify the "pom" parameter to only execute the functional tests from the "test/tests"
-  // module (the PO will have been built by the first "xwikiBuild" step above.
-  xwikiBuild {
-    pom = 'test/tests/pom.xml'
   }
 }

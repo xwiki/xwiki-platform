@@ -24,6 +24,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +35,6 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -402,11 +402,11 @@ public class SaveAction extends PreviewAction
         Version previousVersion = new Version(request.getParameter("previousVersion"));
         Version latestVersion = originalDoc.getRCSVersion();
 
-        DateTime editingVersionDate = new DateTime(request.getParameter("editingVersionDate"));
-        DateTime latestVersionDate = new DateTime(originalDoc.getDate());
+        Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
+        Date latestVersionDate = originalDoc.getDate();
 
         // we ensure that nobody edited the document between the moment the user started to edit and now
-        if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
+        if (!latestVersion.equals(previousVersion) || latestVersionDate.after(editingVersionDate)) {
             try {
                 XWikiDocument previousDoc =
                     getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());

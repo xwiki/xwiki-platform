@@ -52,7 +52,7 @@
     <hsqldb.version>2.5.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.51-SNAPSHOT</ckeditor.version>
+    <ckeditor.version>1.50</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.13</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -86,7 +86,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.21.Final</hibernate.version>
+    <hibernate.version>5.4.22.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -102,7 +102,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.16</pgsql.version>
+    <pgsql.version>42.2.17</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -328,6 +328,13 @@
         <groupId>org.webjars</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>url-search-params-polyfill</artifactId>
+        <version>8.1.0</version>
         <scope>runtime</scope>
       </dependency>
 

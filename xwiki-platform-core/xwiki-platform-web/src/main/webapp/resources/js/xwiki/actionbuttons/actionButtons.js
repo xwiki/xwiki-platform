@@ -26,25 +26,24 @@ var XWiki = (function(XWiki) {
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
   // we need to handle the creation of document
-  var currentDocument, currentVersion, isNew, versionRefreshed;
-  var editingVersionDate = new Date();
+  var currentDocument;
+  var editingVersionDateField = $('editingVersionDate');
+  var previousVersionField = $('previousVersion');
+  var isNewField = $('isNew');
 
-  var getCurrentVersion = function (event) {
+  var refreshVersion = function (event) {
     if (currentDocument.equals(event.memo.documentReference)) {
-      // We are certainly coming from a back button navigation: the content of the editor might not reflect the real
-      // content, let's reload the editor.
-      if (!versionRefreshed && currentVersion != event.memo.version) {
-        window.location.reload();
+      if (previousVersionField) {
+        previousVersionField.setValue(event.memo.version);
       }
-      currentVersion = event.memo.version;
-      editingVersionDate = new Date();
-      isNew = "false";
-      versionRefreshed = true;
+      if (isNewField) {
+        isNewField.setValue(false);
+      }
     }
   };
 
-  // in object editor the version is updated when an object is added.
-  document.observe('xwiki:document:changeVersion', getCurrentVersion);
+  // Listen for versions change to update properly the version fields.
+  document.observe('xwiki:document:changeVersion', refreshVersion);
 
   actionButtons.EditActions = Class.create({
     initialize : function() {
@@ -245,36 +244,6 @@ var XWiki = (function(XWiki) {
         return;
       }
 
-      // We only send the version info if we are on a standard edit.
-      var isFromStandardEditor = window.location.href.indexOf("/edit/") != -1;
-
-      if (isFromStandardEditor) {
-        if ($('previousVersion')) {
-          $('previousVersion').setValue(currentVersion);
-          $('editingVersionDate').setValue(editingVersionDate.toISOString());
-          $('isNew').setValue(isNew);
-        } else {
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "previousVersion",
-            id: "previousVersion",
-            value: currentVersion
-          }));
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "editingVersionDate",
-            id: "editingVersionDate",
-            value: editingVersionDate.toISOString()
-          }));
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "isNew",
-            id: "isNew",
-            value: isNew.toString()
-          }));
-        }
-      }
-
       var isCreateFromTemplate = (this.form.template && this.form.template.value);
 
       // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
@@ -392,6 +361,11 @@ var XWiki = (function(XWiki) {
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
+
+        // We only update this field since the other ones are updated by the callback of setVersion.
+        if (editingVersionDateField) {
+          editingVersionDateField.setValue(new Date().getTime())
+        }
       }
 
       // Announce that the document has been saved
@@ -432,7 +406,15 @@ var XWiki = (function(XWiki) {
     },
     // Reload the editors in case the user want to loose his change.
     reloadEditor : function () {
-      window.location.reload();
+      // We don't rely on window.location.reload() since it might keep cached data from the form.
+      // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
+      // all browsers. Instead we rely on a query parameter with the current date.
+      // URLSearchParams is not supported by IE11 but we rely on a polyfill.
+      require(["$services.webjars.url('org.webjars.npm:url-search-params-polyfill', 'index.js')"], function() {
+        var params = new URLSearchParams(window.location.search);
+        params.set("timestamp", new Date().getTime());
+        window.location.search = "?" + params.toString();
+      });
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
     on401 : function (state, response) {
@@ -777,19 +759,7 @@ var XWiki = (function(XWiki) {
   function init() {
     require(['xwiki-meta'], function (xm) {
       currentDocument = xm.documentReference;
-      isNew = xm.isNew;
-      currentVersion = xm.version;
-
-      // in case of 404 the document is new
-      xm.refreshVersion(function () {
-        isNew = true;
-        versionRefreshed = true;
-      });
     });
-    if ($('content')) {
-      // ensure that the shown value is the true value in case of reload.
-      $('content').value = $('content').defaultValue;
-    }
 
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();

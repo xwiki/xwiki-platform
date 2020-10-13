@@ -57,5 +57,4 @@ XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Toujours afficher le bouto
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Afficher le bouton même si l'utilisateur n'a pas les droits pour intéragir avec. Utilisez cette option si vous souhaitez toujours afficher le compteur de J'aime.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacité du Cache
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Nombre d'information J'aime à conserver dans le cache. Notez que vous devrez redémarrer XWiki pour que cette option soit prise en compte.</content>
-  
 </xwikidoc>

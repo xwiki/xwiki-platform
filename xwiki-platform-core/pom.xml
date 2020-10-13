@@ -494,23 +494,28 @@
                 <new>method java.util.Optional&lt;org.xwiki.ratings.Rating&gt; org.xwiki.ratings.script.AbstractScriptRatingsManager::setRating(org.xwiki.model.reference.EntityReference, int) @ org.xwiki.ratings.script.RatingsScriptService</new>
                 <justification>Redesign of Ratings API: use new best practices for script service return if type is nullable.</justification>
               </item>
-                <item>
+              <item>
                 <code>java.method.parameterTypeChanged</code>
                 <old>parameter org.xwiki.ratings.script.RatingApi org.xwiki.ratings.script.RatingsScriptService::setRating(===org.xwiki.model.reference.DocumentReference===, org.xwiki.model.reference.DocumentReference, int)</old>
                 <new>parameter java.util.Optional&lt;org.xwiki.ratings.Rating&gt; org.xwiki.ratings.script.AbstractScriptRatingsManager::setRating(===org.xwiki.model.reference.EntityReference===, org.xwiki.user.UserReference, int) @ org.xwiki.ratings.script.RatingsScriptService</new>
                 <justification>Redesign of Ratings API: allow to set rating for any reference (not only DocumentReference)</justification>
               </item>
-                <item>
+              <item>
                 <code>java.method.parameterTypeChanged</code>
                 <old>parameter org.xwiki.ratings.script.RatingApi org.xwiki.ratings.script.RatingsScriptService::setRating(org.xwiki.model.reference.DocumentReference, ===org.xwiki.model.reference.DocumentReference===, int)</old>
                 <new>parameter java.util.Optional&lt;org.xwiki.ratings.Rating&gt; org.xwiki.ratings.script.AbstractScriptRatingsManager::setRating(org.xwiki.model.reference.EntityReference, ===org.xwiki.user.UserReference===, int) @ org.xwiki.ratings.script.RatingsScriptService</new>
                 <justification>Redesign of Ratings API: use new best practices for specifying a user by using the UserReference.</justification>
               </item>
-                <item>
+              <item>
                 <code>java.method.returnTypeChanged</code>
                 <old>method org.xwiki.ratings.script.RatingApi org.xwiki.ratings.script.RatingsScriptService::setRating(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, int)</old>
                 <new>method java.util.Optional&lt;org.xwiki.ratings.Rating&gt; org.xwiki.ratings.script.AbstractScriptRatingsManager::setRating(org.xwiki.model.reference.EntityReference, org.xwiki.user.UserReference, int) @ org.xwiki.ratings.script.RatingsScriptService</new>
                 <justification>Redesign of Ratings API: use new best practices for script service return if type is nullable.</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method long org.xwiki.like.LikeManager::countUserLikes(org.xwiki.user.UserReference) throws org.xwiki.like.LikeException</new>
+                <justification>Unstable API.</justification>
               </item>
             </revapi.ignore>
           </analysisConfiguration>

@@ -59,6 +59,17 @@ public interface LikeManager
     List<EntityReference> getUserLikes(UserReference source, int offset, int limit) throws LikeException;
 
     /**
+     * Retrieve the total number of likes performed by a user.
+     *
+     * @param source the user who performs the likes to count.
+     * @return the total number of likes performed.
+     * @throws LikeException in case of problem when getting the information.
+     * @since 12.9RC1
+     */
+    @Unstable
+    long countUserLikes(UserReference source) throws LikeException;
+
+    /**
      * Retrieve like information a specific entity.
      *
      * @param target the page or object for which to retrieve the like information.
@@ -95,7 +106,9 @@ public interface LikeManager
      * @param limit the limit used for pagination.
      * @return a list of user references of users who liked this page.
      * @throws LikeException in case of problem for performing the query.
+     * @since 12.9RC1
      */
+    @Unstable
     List<UserReference> getLikers(EntityReference target, int offset, int limit) throws LikeException;
 
     /**

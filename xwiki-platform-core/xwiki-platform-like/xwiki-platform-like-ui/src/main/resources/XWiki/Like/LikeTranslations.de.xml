@@ -57,5 +57,4 @@ XWiki.Like.LikeConfigurationClass_alwaysDisplayButton="Gefällt mir" Schaltfläc
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Die "Gefällt mir" Schaltfläche immer anzeigen - selbst wenn der Nutzer kein Recht hat diese zu benutzen. Anschalten, um die Anzahl der "Gefällt mir" immer anzuzeigen.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache-Größe
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Anzahl der "Gefällt mir"-Informationen im Cache. Sie müssen XWiki neustarten, damit veränderte Einstellungen angewendet werden.</content>
-  
 </xwikidoc>

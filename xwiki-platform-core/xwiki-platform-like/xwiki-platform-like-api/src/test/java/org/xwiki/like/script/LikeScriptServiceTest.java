@@ -20,6 +20,7 @@
 package org.xwiki.like.script;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -54,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -283,5 +285,23 @@ public class LikeScriptServiceTest
         DocumentReference uixReference = new DocumentReference("foo", Arrays.asList("XWiki", "Like"), "LikeUIX",
             Locale.ROOT);
         verify(this.asyncRendererCache).cleanCache(uixReference);
+    }
+
+    @Test
+    void countUserLikes() throws LikeException
+    {
+        when(this.likeManager.countUserLikes(userReference)).thenReturn(43L);
+        assertEquals(Optional.of(43L), this.likeScriptService.countUserLikes(this.userReference));
+    }
+
+    @Test
+    void getUserLikes() throws LikeException
+    {
+        List<EntityReference> expectedList = Arrays.asList(
+            mock(EntityReference.class),
+            mock(EntityReference.class),
+            mock(EntityReference.class));
+        when(this.likeManager.getUserLikes(this.userReference, 2, 32)).thenReturn(expectedList);
+        assertEquals(expectedList, this.likeScriptService.getUserLikes(this.userReference, 2, 32));
     }
 }

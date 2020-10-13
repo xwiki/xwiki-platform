@@ -215,6 +215,26 @@ public class LikeScriptService implements ScriptService
     }
 
     /**
+     * Count the number of likes performed by the given user.
+     *
+     * @param userReference the user for whom to count likes.
+     * @return the number of likes performed.
+     * @since 12.9RC1
+     */
+    @Unstable
+    public Optional<Long> countUserLikes(UserReference userReference)
+    {
+        Optional<Long> result = Optional.empty();
+        try {
+            result = Optional.of(this.likeManager.countUserLikes(userReference));
+        } catch (LikeException e) {
+            this.logger.warn("Error while counting likes for user [{}]", userReference,
+                ExceptionUtils.getRootCause(e));
+        }
+        return result;
+    }
+
+    /**
      * Determine if the current user already liked the given reference.
      * @param entityReference the reference for which to check if the current liked it or not already.
      * @return {@code true} if the entity has been already liked.

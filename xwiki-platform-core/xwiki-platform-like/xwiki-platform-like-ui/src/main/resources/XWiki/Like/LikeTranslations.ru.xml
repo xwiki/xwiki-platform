@@ -57,5 +57,4 @@ like.newlike.error=Ошибка при попытке поставить "Нра
 ### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
 ### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
 ### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
-  
 </xwikidoc>

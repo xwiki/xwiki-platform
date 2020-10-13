@@ -19,33 +19,44 @@
  */
 package org.xwiki.test.ui.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
 /**
- * PO for Page Information pane.
- *
- * @since 11.10
+ * The pane used to display and edit in-place the document syntax.
+ * 
  * @version $Id$
+ * @since 12.6.3
+ * @since 12.9RC1
  */
-public class InformationPane extends BaseElement
+public class DocumentSyntaxPropertyPane extends EditablePropertyPane
 {
-    @FindBy(id = "informationcontent")
-    private WebElement pane;
-
-    public boolean isOpened()
+    public DocumentSyntaxPropertyPane()
     {
-        return this.pane.isDisplayed();
+        super("syntax");
     }
 
-    public String getSyntax()
+    @Override
+    public DocumentSyntaxPropertyPane clickEdit()
     {
-        return this.pane.findElement(By.xpath(".//label[. = 'Syntax']/parent::dt/following-sibling::dd")).getText();
+        return (DocumentSyntaxPropertyPane) super.clickEdit();
     }
 
-    public DocumentSyntaxPropertyPane editSyntax()
+    @Override
+    public DocumentSyntaxPropertyPane clickCancel()
     {
-        return new DocumentSyntaxPropertyPane().clickEdit();
+        DocumentSyntaxPicker syntaxPicker = getSyntaxPicker();
+        super.clickCancel();
+        // Wait for the syntax change to be reverted.
+        syntaxPicker.waitUntilEnabled();
+        return this;
+    }
+
+    @Override
+    public DocumentSyntaxPropertyPane clickSave()
+    {
+        return (DocumentSyntaxPropertyPane) super.clickSave();
+    }
+
+    public DocumentSyntaxPicker getSyntaxPicker()
+    {
+        return new DocumentSyntaxPicker();
     }
 }

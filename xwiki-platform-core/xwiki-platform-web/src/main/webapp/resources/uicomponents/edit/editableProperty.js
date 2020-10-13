@@ -169,10 +169,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       language: xcontext.locale
     }).done(function(html, textStatus, jqXHR) {
       loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
-      // Cancel the edit if needed.
-      cancel(editableProperty);
       // Update the viewer.
       var viewer = editableProperty.next('.editableProperty-viewer').html(html);
+      // Cancel the edit if needed.
+      cancel(editableProperty);
       // Allow others to enhance the viewer.
       $(document).trigger('xwiki:dom:updated', {'elements': viewer.toArray()});
     }).fail(function() {

@@ -26,14 +26,13 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndexStatus;
-import org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer;
-import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -42,7 +41,6 @@ import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.AbstractJob;
-import org.xwiki.search.solr.Solr;
 
 /**
  * Update the index from configured repositories.
@@ -62,7 +60,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     private static final int SEARCH_BATCH_SIZE = 100;
 
     @Inject
-    private Solr solr;
+    private ExtensionIndexStore indexStore;
 
     @Inject
     private ExtensionRepositoryManager repositories;
@@ -73,39 +71,27 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     @Inject
     private CoreExtensionRepository coreExtensions;
 
-    private SolrClient client;
-
-    private int documentsToStore;
-
     @Override
     public String getType()
     {
         return JOB_TYPE;
     }
 
-    private void commit()
-    {
-        // Reset counter
-        this.documentsToStore = 0;
-
-        this.client.commit();
-    }
-
     @Override
     protected void runInternal() throws Exception
     {
-        this.client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
-
         // 1: Add local extensions
-        addLocalExtensions();
+        boolean updated = addLocalExtensions();
 
         // 1: Gather all extension from searchable repositories
-        addRemoteExtensions();
+        updated |= addRemoteExtensions();
 
-        // 2: Validate extensions to figure out if they are compatible
+        if (updated) {
+            // 2: Validate extensions to figure out if they are compatible
 
-        // 3: Analyze extensions to find specific metadata depending on the type
+            // 3: Analyze extensions to find specific metadata depending on the type
 
+        }
     }
 
     private Set<String> getSearchableExtensionIds() throws SearchException
@@ -130,58 +116,69 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         return extensions;
     }
 
-    private void addLocalExtensions()
+    private boolean addLocalExtensions()
     {
+        boolean updated = false;
+
         this.localExtensions.getLocalExtensions();
 
         // Add the extension
+
+        return updated;
     }
 
-    private void addRemoteExtensions() throws SearchException
+    private boolean addRemoteExtensions() throws SearchException, ResolveException, SolrServerException, IOException
     {
+        boolean updated = false;
+
         // Search result are not always fully complete and we want all versions so we just keep the id and go through
         // repositories
         Set<String> extensionIds = getSearchableExtensionIds();
 
-        extensionIds.forEach(this::addExtension);
+        for (String extensionId : extensionIds) {
+            updated |= addExtension(extensionId);
+        }
 
+        return updated;
     }
 
-    private void addExtension(String extensionId)
+    private boolean addExtension(String extensionId) throws SolrServerException, IOException, ResolveException
     {
+        boolean updated = false;
+
         // Get all available versions
         IterableResult<Version> versions = this.repositories.resolveVersions(extensionId, 0, -1);
 
-        versions.forEach(version -> addExtension(extensionId, version));
+        for (Version version : versions) {
+            updated |= addExtension(extensionId, version);
+        }
+
+        return updated;
     }
 
-    private void addExtension(String id, Version version) throws SolrServerException, IOException
+    private boolean addExtension(String id, Version version) throws SolrServerException, IOException, ResolveException
     {
         ExtensionId extensionId = new ExtensionId(id, version);
 
         // Not add it if it's a core extension
         if (this.coreExtensions.exists(extensionId)) {
-            return;
+            return false;
         }
 
         // Not add it if it's a local extension
         if (this.localExtensions.exists(extensionId)) {
-            return;
+            return false;
         }
 
         // Check if the extension already exist
-        String solrId = toSolrId(extensionId);
-        if (this.client.getById(solrId) == null) {
+        if (!this.indexStore.exists(extensionId)) {
             // Get extension
             Extension extension = this.repositories.resolve(extensionId);
 
             // Add the extension
-            storeExtension(extension);
+            return this.indexStore.add(extension, true);
         }
-    }
 
-    private String toSolrId(ExtensionId extensionId)
-    {
-        return ExtensionIdConverter.toString(extensionId);
+        return false;
     }
 }

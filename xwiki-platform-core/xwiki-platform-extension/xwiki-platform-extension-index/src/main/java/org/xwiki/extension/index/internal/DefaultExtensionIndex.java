@@ -22,15 +22,24 @@ package org.xwiki.extension.index.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndex;
+import org.xwiki.extension.index.ExtensionIndexStatus;
+import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
+import org.xwiki.extension.index.internal.job.ExtensionIndexRequest;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.VersionUtils;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
-import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.job.event.status.JobStatus.State;
 
 /**
  * The default implementation of {@link ExtensionIndex}, based on Solr.
@@ -43,26 +52,74 @@ import org.xwiki.search.solr.SolrUtils;
 public class DefaultExtensionIndex implements ExtensionIndex, Initializable
 {
     @Inject
-    private Solr solr;
-
-    @Inject
-    private SolrUtils utils;
-
-    @Inject
     private JobExecutor jobs;
 
-    private SolrClient client;
+    @Inject
+    private ExtensionIndexStore store;
+
+    @Inject
+    private ExtensionRepositoryManager repositories;
 
     @Override
     public void initialize() throws InitializationException
     {
+        // Start index job
         try {
-            this.client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to get the extension index Solr core", e);
+            this.jobs.execute(ExtensionIndexJob.JOB_TYPE, new ExtensionIndexRequest(true));
+        } catch (JobException e) {
+            throw new InitializationException("Failed to start indexing the available extensions", e);
+        }
+    }
+
+    @Override
+    public ExtensionIndexStatus index() throws JobException
+    {
+        Job job = this.jobs.getJob(ExtensionIndexRequest.JOB_ID);
+
+        if (job == null || job.getStatus().getState() == State.FINISHED) {
+            job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE, new ExtensionIndexRequest(false));
         }
 
-        // Start index job
-        this.jobs.execute(jobType, request);
+        return (ExtensionIndexStatus) job.getStatus();
+    }
+
+    @Override
+    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    {
+        Extension extension = this.store.getExtension(extensionId);
+
+        if (extension != null) {
+            return extension;
+        }
+
+        // Fallback on the registered remote repositories
+        extension = this.repositories.resolve(extensionId);
+
+        // Remember the found extension
+        this.store.add(extension, false);
+
+        return extension;
+    }
+
+    @Override
+    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    {
+        // Search in the index if the constraint is a unique version
+        Version uniqueVersion = VersionUtils.getUniqueVersion(extensionDependency.getVersionConstraint());
+        if (uniqueVersion != null) {
+            Extension extension = this.store.getExtension(new ExtensionId(extensionDependency.getId(), uniqueVersion));
+
+            if (extension != null) {
+                return extension;
+            }
+        }
+
+        // Fallback on the registered remote repositories
+        Extension extension = this.repositories.resolve(extensionDependency);
+
+        // Remember the found extension
+        this.store.add(extension, false);
+
+        return extension;
     }
 }

@@ -44,6 +44,26 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String NAME = "extension_index";
 
     /**
+     * We can't use {@link Extension#FIELD_ID} because it collide with {@link #SOLR_FIELD_ID}.
+     */
+    public static final String SOLR_FIELD_EXTENSIONID = "extensionId";
+
+    /**
+     * Indicate on which namespace the extension is local.
+     */
+    public static final String SOLR_FIELD_LOCAL = "local";
+
+    /**
+     * Indicate on which namespace the extension is installed.
+     */
+    public static final String SOLR_FIELD_INSTALLED = "installed";
+
+    /**
+     * Indicate on which namespaces the extension is installed.
+     */
+    public static final String SOLR_FIELD_INSTALLED_NAMESPACES = "installed_namespaces";
+
+    /**
      * The name of the field indicating if an extension is compatible with the current instance.
      */
     public static final String SOLR_FIELD_COMPATIBLE = "compatible";
@@ -53,19 +73,20 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SOLR_FIELD_INDEX_DATE = "indexDate";
 
-    private static final long SCHEMA_VERSION_12_7 = 120700000;
+    private static final long SCHEMA_VERSION_12_9 = 120900000;
 
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_6;
+        return SCHEMA_VERSION_12_9;
     }
 
     @Override
     protected void createSchema() throws SolrException
     {
-        setStringField(Extension.FIELD_ID, false, false);
+        setStringField(SOLR_FIELD_EXTENSIONID, false, false);
         setStringField(Extension.FIELD_VERSION, false, false);
+
         setStringField(Extension.FIELD_TYPE, false, false);
         setStringField(Extension.FIELD_REPOSITORY, false, false);
         setStringField(Extension.FIELD_ALLOWEDNAMESPACES, true, false);
@@ -74,16 +95,18 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setStringField(Extension.FIELD_AUTHORS, true, false);
         setStringField(Extension.FIELD_CATEGORY, false, false);
 
-        setStringField(Extension.FIELD_EXTENSIONFEATURES, false, false);
+        // setStringField(Extension.FIELD_EXTENSIONFEATURES, true, false);
 
-        setStringField(Extension.FIELD_REPOSITORIES, false, false);
+        // setStringField(Extension.FIELD_DEPENDENCIES, true, false);
 
-        setStringField(Extension.FIELD_DEPENDENCIES, true, false);
+        // setStringField(Extension.FIELD_MANAGEDDEPENDENCIES, true, false);
 
         setPDateField(SOLR_FIELD_INDEX_DATE, false, false);
         setBooleanField(SOLR_FIELD_COMPATIBLE, false, false);
 
-        migrateSchema(SCHEMA_VERSION_12_7);
+        setBooleanField(SOLR_FIELD_LOCAL, false, false);
+        setBooleanField(SOLR_FIELD_INSTALLED, false, false);
+        setBooleanField(SOLR_FIELD_INSTALLED_NAMESPACES, true, false);
     }
 
     @Override

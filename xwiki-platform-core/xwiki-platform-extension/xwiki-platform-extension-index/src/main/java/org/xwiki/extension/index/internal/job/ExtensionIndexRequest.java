@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.index.internal.job;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.job.AbstractRequest;
 
 /**
@@ -29,5 +32,29 @@ import org.xwiki.job.AbstractRequest;
  */
 public class ExtensionIndexRequest extends AbstractRequest
 {
+    /**
+     * The identifier of the job.
+     */
+    public static final List<String> JOB_ID = Arrays.asList("extension", "index");
 
+    private final boolean withLocalExtension;
+
+    /**
+     * @param withLocalExtensions true if local extensions should be loaded (generally for the first run of the job)
+     */
+    public ExtensionIndexRequest(boolean withLocalExtensions)
+    {
+        setId(JOB_ID);
+
+        this.withLocalExtension = withLocalExtensions;
+    }
+
+    /**
+     * @return the localExtensionEnabled true if local extensions should be loaded (generally for the first run of the
+     *         job)
+     */
+    public boolean isLocalExtensionEnabled()
+    {
+        return this.withLocalExtension;
+    }
 }

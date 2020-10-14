@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,14 +16,25 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
+ */
+package org.xwiki.extension.index.internal;
 
-<extension>
-  <id>installedonroot</id>
-  <version>version</version>
-  <type>test</type>
-  <properties>
-    <installed.installed type="boolean">true</installed.installed>
-  </properties>
-</extension>
+import org.xwiki.extension.AbstractExtension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.repository.ExtensionRepository;
+
+/**
+ * @version $Id$
+ */
+public class SolrExtension extends AbstractExtension
+{
+    /**
+     * @param repository the repository where this extension comes from
+     * @param id the extension identifier
+     * @param type the extension type
+     */
+    public SolrExtension(ExtensionRepository repository, ExtensionId id, String type)
+    {
+        super(repository, id, type);
+    }
+}

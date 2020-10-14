@@ -21,6 +21,7 @@ package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,8 +32,11 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -901,12 +905,30 @@ public class EditIT
 
         String pageContent = "= First heading =\n"
             + "\n"
-            + "Paragraph containing some **bold content**.";
+            + "Paragraph containing some **bold content**.\n"
+            + "\n"
+            // Add a macro to make sure that rendering transformations are not executed on syntax conversion.
+            + "{{toc/}}";
         setup.createPage(testReference, pageContent, "Test page");
+
+        // Add some meta data to the page in order to verify that it is updated.
+        setup.addClassProperty(testReference, "description", "TextArea");
+        setup.addClassProperty(testReference, "code", "TextArea");
+        setup.updateClassProperty(testReference, "description_contenttype", "FullyRenderedText", "code_contenttype",
+            "VelocityCode");
+        String className = setup.serializeReference(testReference.getLocalDocumentReference());
+        setup.addObject(testReference, className, "description", "one **two** three", "code", "a//b//c");
+
+        // Create a page translation in order to verify that it is also updated.
+        setup.setWikiPreference("multilingual", "true");
+        setup.setWikiPreference("languages", "en,fr");
+        DocumentReference testReferenceFR = new DocumentReference(testReference, Locale.FRENCH);
+        setup.createPage(testReferenceFR, "c'est ma //page// de test", "Page de test");
 
         try {
             // Test that we can switch the syntax from the Wiki edit mode without loosing unsaved changes.
-            WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
+            DocumentReference testReferenceEN = new DocumentReference(testReference, Locale.ENGLISH);
+            WikiEditPage wikiEditPage = setup.gotoPage(testReferenceEN).editWiki();
             final String newContent = pageContent + "\n\nA new paragraph with some new content.";
             wikiEditPage.setContent(newContent);
 
@@ -942,9 +964,35 @@ public class EditIT
             documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
             assertEquals("xwiki/2.1", documentSyntaxPicker.getSelectedSyntax());
             assertEquals(expectedContent, wikiEditPage.getContent());
+
+            // Verify the document meta data.
+            ObjectPropertyReference descriptionReference =
+                new ObjectPropertyReference("description", new ObjectReference(className + "[0]", testReference));
+            Property descriptionProperty = setup.rest().get(descriptionReference);
+            // The description property holds wiki syntax so its value was converted.
+            assertEquals("<p>one <strong>two</strong> three</p>", descriptionProperty.getValue());
+            ObjectPropertyReference codeReference =
+                new ObjectPropertyReference("code", new ObjectReference(className + "[0]", testReference));
+            Property codeProperty = setup.rest().get(codeReference);
+            // The code property doesn't hold wiki syntax so its value was not converted.
+            assertEquals("a//b//c", codeProperty.getValue());
+
+            // Verify the document translation.
+            wikiEditPage = setup.gotoPage(testReferenceFR).editWiki();
+            documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
+            // The translation syntax is still XHTML because the second syntax change was done without a syntax
+            // conversion which means the document translations have not been updated.
+            // In the future we may want to ask the user whether to update the translations or not when changing the
+            // syntax. But for now we update the translations only when syntax conversion is performed.
+            assertEquals("xhtml/1.0", documentSyntaxPicker.getSelectedSyntax());
+            assertEquals("<p>c'est ma <em>page</em> de test</p>", wikiEditPage.getContent());
         } finally {
             // Disable back the XHTML syntax.
             setup.deleteObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass", 0);
+
+            // Restore the localization configuration.
+            setup.setWikiPreference("multilingual", "false");
+            setup.setWikiPreference("languages", "en");
         }
     }
 

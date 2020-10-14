@@ -26,4 +26,5 @@
 
 <suppressions>
   <suppress checks="FanOutComplexity" files="DefaultMentionsDataConsumer.java"/>
+  <suppress checks="FanOutComplexity" files="UserMentionEventListener.java"/>
 </suppressions>

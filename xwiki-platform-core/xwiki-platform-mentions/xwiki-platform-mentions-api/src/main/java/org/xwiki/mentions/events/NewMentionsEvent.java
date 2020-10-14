@@ -17,25 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.events;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.notifications.MentionNotificationParameters;
+import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 
 /**
- * A service to send mentions notification.
+ * An event sent at the end of the analysis of a document change (i.e., a created or updated document).
+ * <p>
+ * The following information is sent along the event:
+ * <ul>
+ *     <li>source: the reference of the user that made the change</li>
+ *     <li>data: the {@link org.xwiki.mentions.notifications.MentionNotificationParameters} holding the
+ *     list of mentions introduced by the change on a given entity</li>
+ * </ul>
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.10RC1
  */
-@Role
 @Unstable
-public interface MentionNotificationService
+public class NewMentionsEvent implements Event
 {
-    /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
-     * @param mentionNotificationParameters Parameters of the mentions notifications.
-     */
-    void sendNotification(MentionNotificationParameters mentionNotificationParameters);
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof NewMentionsEvent;
+    }
 }

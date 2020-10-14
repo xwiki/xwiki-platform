@@ -20,8 +20,6 @@
 package org.xwiki.mentions.internal;
 
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +35,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
@@ -59,7 +54,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.MARKDOWN_1_1;
@@ -88,25 +82,10 @@ class DefaultMentionXDOMServiceTest
     @Mock
     private ComponentManager componentManager;
 
-    @MockComponent
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    private DocumentReference documentReferenceA;
-
-    private DocumentReference documentReferenceB;
-
-    private DocumentReference documentReferenceC;
-
     @BeforeEach
     void setup()
     {
-        this.documentReferenceA = new DocumentReference("xwiki", "A", "A");
-        this.documentReferenceB = new DocumentReference("ywiki", "B", "B");
-        this.documentReferenceC = new DocumentReference("xwiki", "C", "C");
-        WikiReference wikiReference = new WikiReference("xwiki");
-        when(this.documentReferenceResolver.resolve("A", wikiReference)).thenReturn(this.documentReferenceA);
-        when(this.documentReferenceResolver.resolve("B", wikiReference)).thenReturn(this.documentReferenceB);
-        when(this.documentReferenceResolver.resolve("C", wikiReference)).thenReturn(this.documentReferenceC);
+
         when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }
 
@@ -126,61 +105,64 @@ class DefaultMentionXDOMServiceTest
     @Test
     void groupAnchorsByUserReferenceEmpty()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(emptyList(), new WikiReference("xwiki"));
+        Map<MentionedActorReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(emptyList()
+        );
         assertTrue(actual.isEmpty());
     }
 
     @Test
     void groupAnchorsByUserReferenceOne()
     {
-        Map<DocumentReference, List<String>> actual =
-            this.xdomService.groupAnchorsByUserReference(singletonList(initMentionMacro("A", "A1")), new WikiReference("xwiki"));
-        Map<DocumentReference, List<String>> expected = new HashMap<>();
-        expected.put(this.documentReferenceA, Collections.singletonList("A1"));
+        Map<MentionedActorReference, List<String>> actual =
+            this.xdomService
+                .groupAnchorsByUserReference(singletonList(initMentionMacro("A", "A1")));
+        Map<MentionedActorReference, List<String>> expected = new HashMap<>();
+        expected.put(new MentionedActorReference("A", null), singletonList("A1"));
         assertEquals(expected, actual);
     }
 
     @Test
     void groupAnchorsByUserReferenceTwo()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
+        Map<MentionedActorReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("A", "A2")
-        ), new WikiReference("xwiki"));
-        Map<DocumentReference, List<String>> expected = new HashMap<>();
-        expected.put(this.documentReferenceA, Arrays.asList("A1", "A2"));
+        ));
+        Map<MentionedActorReference, List<String>> expected = new HashMap<>();
+        expected.put(new MentionedActorReference("A", null),
+            asList("A1", "A2"));
         assertEquals(expected, actual);
     }
 
     @Test
     void groupAnchorsByUserReferenceThree()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
+        Map<MentionedActorReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("B", "B1"),
             initMentionMacro("A", "A2")
-        ), new WikiReference("xwiki"));
-        Map<DocumentReference, List<String>> expected = new HashMap<>();
-        expected.put(this.documentReferenceB, Collections.singletonList("B1"));
-        expected.put(this.documentReferenceA, Arrays.asList("A1", "A2"));
+        ));
+        Map<MentionedActorReference, List<String>> expected = new HashMap<>();
+        expected.put(new MentionedActorReference("B", null), singletonList("B1"));
+        expected.put(new MentionedActorReference("A", null), asList("A1", "A2"));
         assertEquals(expected, actual);
     }
 
     @Test
     void groupAnchorsByUserReferenceWithEmptyValues()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
+        Map<MentionedActorReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", null),
             initMentionMacro("A", "A1"),
             initMentionMacro("A", ""),
             initMentionMacro("B", "B1"),
             initMentionMacro("A", "A2"),
             initMentionMacro("C", "")
-        ), new WikiReference("xwiki"));
-        Map<DocumentReference, List<String>> expected = new HashMap<>();
-        expected.put(this.documentReferenceB, Collections.singletonList("B1"));
-        expected.put(this.documentReferenceA, Arrays.asList(null, "A1", "", "A2"));
-        expected.put(this.documentReferenceC, Collections.singletonList(""));
+        ));
+        Map<MentionedActorReference, List<String>> expected = new HashMap<>();
+        expected.put(new MentionedActorReference("B", null), singletonList("B1"));
+        expected.put(new MentionedActorReference("A", null), asList(null, "A1", "", "A2"));
+        expected.put(new MentionedActorReference("C", null), singletonList(""));
         assertEquals(expected, actual);
     }
 

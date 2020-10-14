@@ -22,10 +22,12 @@ package org.xwiki.mentions.internal;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
+import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -36,14 +38,15 @@ import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
 import static org.xwiki.mentions.DisplayStyle.LOGIN;
 
 /**
- * Default implementation of {@link MentionsFormatter}.
+ * User implementation of {@link MentionsFormatter}.
  *
  * @version $Id$
- * @since 12.6
+ * @since 12.10RC1
  */
 @Singleton
+@Named("user")
 @Component
-public class DefaultMentionsFormatter implements MentionsFormatter
+public class UserMentionsFormatter implements MentionsFormatter
 {
     @Inject
     private UserPropertiesResolver userPropertiesResolver;
@@ -55,9 +58,9 @@ public class DefaultMentionsFormatter implements MentionsFormatter
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
-    public String formatMention(String userReference, DisplayStyle style)
+    public String formatMention(String actorReference, DisplayStyle style)
     {
-        UserReference resolve = this.userReferenceResolver.resolve(userReference);
+        UserReference resolve = this.userReferenceResolver.resolve(actorReference);
         UserProperties userProperties =
             this.userPropertiesResolver.resolve(resolve);
         String firstName = Objects.toString(userProperties.getFirstName(), "");
@@ -66,7 +69,9 @@ public class DefaultMentionsFormatter implements MentionsFormatter
         if (Objects.equals(style, LOGIN) || Objects.equals(firstName, "") && Objects.equals(lastName, "")) {
             // if the login is asked explicitly we display it
             // if the user has no first name and no last name, we display the login by default
-            content = this.documentReferenceResolver.resolve(userReference).getName();
+            // TODO: This works only with the document user store. Needs to be changed when the user API allows to
+            // access the user login.
+            content = this.documentReferenceResolver.resolve(actorReference).getName();
         } else if (Objects.equals(style, FIRST_NAME)) {
             content = firstName;
         } else {

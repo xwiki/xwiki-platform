@@ -17,25 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.DisplayStyle;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides services to format the user mentions.
+ * <p>
+ * Unless you know statically the type of user to format, {@link MentionFormatterProvider} should be used to resolve
+ * the formatter to use according to the type of the user.
  *
+ * @since 12.10RC1
+ * @see MentionFormatterProvider
  * @version $Id$
- * @since 12.6
  */
 @Role
+@Unstable
 public interface MentionsFormatter
 {
     /**
      * Format a user mention.
-     * @param userReference The user reference
-     * @param style The display style of the mention
+     * <p>
+     * The formatter takes the serialized reference of an actor and return an user readable string.
+     * The kind of actor handled is specific to a {@code MentionFormatter} implementation.
+     * <p>
+     * By default, the {@code actorReference} is returned without modification.
+     *
+     * @param actorReference the actor reference
+     * @param style the display style of the mention
      * @return the formatted mention
      */
-    String formatMention(String userReference, DisplayStyle style);
+    default String formatMention(String actorReference, DisplayStyle style)
+    {
+        // If no implementation of the formatter is found, the user reference is returned.
+        return actorReference;
+    }
 }

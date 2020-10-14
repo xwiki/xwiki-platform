@@ -30,11 +30,11 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.mentions.DisplayStyle;
-import org.xwiki.mentions.internal.MentionsFormatter;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 
 /**
- * Plain text rendered with a specialization to display well formatted user mentions.  
+ * Plain text rendered with a specialization to display well formatted user mentions.
  *
  * @version $Id$
  * @since 12.6
@@ -45,15 +45,25 @@ import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 public class PlainTextMentionsRenderer extends PlainTextRenderer implements Initializable
 {
     @Inject
-    private MentionsFormatter formatter;
+    private MentionFormatterProvider mentionFormatterProvider;
 
     @Override
     public void onMacro(String id, Map<String, String> parameters, String contentP, boolean inline)
     {
-        String userReference = parameters.get("reference");
-        String style = parameters.get("style");
         if (Objects.equals(id, "mention")) {
-            this.getPrinter().println(this.formatter.formatMention(userReference, DisplayStyle.valueOf(style)));
+            String userReference = parameters.get("reference");
+            String style = parameters.get("style");
+            String type = parameters.get("type");
+
+            DisplayStyle displayStyle;
+            if (style != null) {
+                displayStyle = DisplayStyle.valueOf(style);
+            } else {
+                displayStyle = DisplayStyle.FULL_NAME;
+            }
+
+            this.getPrinter()
+                .println(this.mentionFormatterProvider.get(type).formatMention(userReference, displayStyle));
         } else {
             super.onMacro(id, parameters, contentP, inline);
         }

@@ -19,10 +19,12 @@
  */
 package org.xwiki.mentions.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,12 +39,15 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mentions.MentionLocation;
-import org.xwiki.mentions.MentionNotificationService;
+import org.xwiki.mentions.events.NewMentionsEvent;
 import org.xwiki.mentions.internal.async.MentionsData;
+import org.xwiki.mentions.notifications.MentionNotificationParameter;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -65,13 +70,15 @@ import static org.xwiki.mentions.MentionLocation.ANNOTATION;
 import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
+import static org.xwiki.text.StringUtils.isEmpty;
 
 /**
  * Default implementation of {@link MentionsDataConsumer}.
- *
- * This class is responsible to analyze documents update in order to identify new user mentions.
- * Notifications are then produced for each newly introduced user mentions.
- * This analysis is done by identifying mentions macro with new identifiers in document content.
+ * <p>
+ * This class is responsible to analyze document updates in order to identify new user mentions.
+ * {@link NewMentionsEvent} are then sent for each newly introduced user mentions.
+ * This analysis is done by identifying mentions macro with new identifiers in the content of entities of the updated
+ * document.
  * In other word, in the document body as well as in the values of {@link LargeStringProperty} of the xObject objects
  * attached to the document.
  *
@@ -101,17 +108,20 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     private Logger logger;
 
     @Inject
-    private MentionNotificationService notificationService;
+    private MentionXDOMService xdomService;
 
     @Inject
-    private MentionXDOMService xdomService;
+    private ObservationManager observationManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Initialize the context.
      *
      * @param authorReference the author of the analyzed document
      * @param wikiId the wiki id
-     * @throws ExecutionContextException in case one {@link ExecutionContextInitializer} fails to execute 
+     * @throws ExecutionContextException in case one {@link ExecutionContextInitializer} fails to execute
      *
      */
     private void initContext(DocumentReference authorReference, String wikiId) throws ExecutionContextException
@@ -132,24 +142,30 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
             DocumentReference author = this.documentReferenceResolver.resolve(data.getAuthorReference());
             this.initContext(author, data.getWikiId());
             DocumentReference dr = this.documentReferenceResolver.resolve(data.getDocumentReference());
-            XWikiDocument doc = this.documentRevisionProvider.getRevision(dr, data.getVersion());
+            String version = data.getVersion();
+            XWikiDocument doc = this.documentRevisionProvider.getRevision(dr, version);
             if (doc != null) {
                 Syntax syntax = doc.getSyntax();
+                // Stores the list of mentions found in the document and its attached objects.
+                List<MentionNotificationParameters> mentionNotificationParameters = new ArrayList<>();
                 DocumentReference documentReference = doc.getDocumentReference();
-                DocumentReference authorReference = doc.getAuthorReference();
+                String authorReference = this.entityReferenceSerializer.serialize(doc.getAuthorReference());
 
                 if (doc.getPreviousVersion() == null) {
                     // CREATE
-                    handleContentOnCreate(doc.getXDOM(), documentReference, authorReference, DOCUMENT);
-                    traverseXObjectsOnCreate(doc.getXObjects(), documentReference, authorReference, syntax);
+                    handleContentOnCreate(doc.getXDOM(), documentReference, version, authorReference, DOCUMENT,
+                        mentionNotificationParameters);
+                    traverseXObjectsOnCreate(doc.getXObjects(), version, authorReference, syntax,
+                        mentionNotificationParameters);
                 } else {
                     // UPDATE
                     XWikiDocument oldDoc = this.documentRevisionProvider.getRevision(dr, doc.getPreviousVersion());
-                    handleUpdatedContent(oldDoc.getXDOM(), doc.getXDOM(), documentReference, authorReference,
-                        DOCUMENT);
-                    traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(), documentReference,
-                        authorReference, syntax);
+                    handleUpdatedContent(oldDoc.getXDOM(), doc.getXDOM(), documentReference, version, authorReference,
+                        DOCUMENT, mentionNotificationParameters);
+                    traverseXObjectsOnUpdate(oldDoc.getXObjects(), doc.getXObjects(),
+                        version, authorReference, syntax, mentionNotificationParameters);
                 }
+                sendNotification(mentionNotificationParameters);
             }
         } catch (ExecutionContextException e) {
             this.logger.warn("Failed to initalize the context of the mention update runnable. Cause [{}]",
@@ -162,17 +178,19 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     /**
      * Traverses the objects of a created document and search for mentions to notify.
      * @param xObjects the objects of the document
-     * @param documentReference the create document reference
+     * @param version the version of the document holding the analyzed xobjects when it was created
      * @param authorReference the reference of the author of the document
      * @param syntax the syntax of the document
+     * @param mentionNotificationParametersList hold the list of identified mentions
      */
-    private void traverseXObjectsOnCreate(Map<DocumentReference, List<BaseObject>> xObjects,
-        DocumentReference documentReference, DocumentReference authorReference, Syntax syntax)
+    private void traverseXObjectsOnCreate(Map<DocumentReference, List<BaseObject>> xObjects, String version,
+        String authorReference, Syntax syntax, List<MentionNotificationParameters> mentionNotificationParametersList)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
             for (BaseObject baseObject : entry.getValue()) {
                 if (baseObject != null) {
-                    handleBaseObjectOnCreate(baseObject, documentReference, authorReference, syntax);
+                    handleBaseObjectOnCreate(baseObject, version, authorReference, syntax,
+                        mentionNotificationParametersList);
                 }
             }
         }
@@ -181,42 +199,48 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     /**
      * Handles an object of a created document and search for mentions to notify its content.
      * @param baseObject the object
-     * @param documentReference the reference of the document
+     * @param version the version of the document holding the base object when it was created
      * @param authorReference the reference of the author of the document
      * @param syntax the syntax of the document
+     * @param mentionNotificationParameters hold the list of identified mentions
      */
-    private void handleBaseObjectOnCreate(BaseObject baseObject, DocumentReference documentReference,
-        DocumentReference authorReference,
-        Syntax syntax)
+    private void handleBaseObjectOnCreate(BaseObject baseObject, String version, String authorReference, Syntax syntax,
+        List<MentionNotificationParameters> mentionNotificationParameters)
     {
         for (Object o : baseObject.getProperties()) {
             if (o instanceof LargeStringProperty) {
-                String content = ((LargeStringProperty) o).getValue();
+                LargeStringProperty largeStringProperty = (LargeStringProperty) o;
+                String content = largeStringProperty.getValue();
                 this.xdomService
                     .parse(content, syntax)
-                    .ifPresent(xdom -> handleContentOnCreate(xdom, documentReference, authorReference, AWM_FIELD));
+                    .ifPresent(xdom -> handleContentOnCreate(xdom, largeStringProperty.getReference(), version,
+                        authorReference,
+                        AWM_FIELD, mentionNotificationParameters));
             }
         }
     }
 
     /**
-     * Traverses the objects of an updated document and compares them to the objects of the document
-     * before the update to search for new mentions to notify.
+     * Traverses the objects of an updated document and compares them to the objects of the document before the update
+     * to search for new mentions to notify.
+     *
      * @param oldXObjects the objects of the document before the update
      * @param xObjects the objects of the document after the update
-     * @param documentReference the reference of the updated document
+     * @param version the version of the document holding the analyzed xobjects when it was updated
      * @param authorReference the reference of the author of the update
      * @param syntax the syntax of the document
+     * @param mentionNotificationParameters hold the list of identified mentions
      */
     private void traverseXObjectsOnUpdate(Map<DocumentReference, List<BaseObject>> oldXObjects,
-        Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference documentReference,
-        DocumentReference authorReference, Syntax syntax)
+        Map<DocumentReference, List<BaseObject>> xObjects, String version, String authorReference, Syntax syntax,
+        List<MentionNotificationParameters> mentionNotificationParameters)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
             List<BaseObject> oldEntry = oldXObjects.get(entry.getKey());
             for (BaseObject baseObject : entry.getValue()) {
                 if (baseObject != null) {
-                    handleBaseObjectOnUpdate(oldEntry, baseObject, documentReference, authorReference, syntax);
+                    handleBaseObjectOnUpdate(oldEntry, baseObject, version, authorReference, syntax,
+                        mentionNotificationParameters);
                 }
             }
         }
@@ -225,25 +249,32 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     /**
      * Handles the analysis of a created content to search for mentions to notify.
      * @param xdom the xdom of the content
-     * @param documentReference the reference of the document containing the content
+     * @param entityReference the reference to the analyzed entity
+     * @param version the version of the document holding the analyzed entity when it was created
      * @param authorReference the reference of the author of the created document
      * @param location the location of the content
+     * @param mentionNotificationParametersList hold the list of identified mentions
      */
-    private void handleContentOnCreate(XDOM xdom, DocumentReference documentReference,
-        DocumentReference authorReference, MentionLocation location)
+    private void handleContentOnCreate(XDOM xdom, EntityReference entityReference, String version,
+        String authorReference, MentionLocation location,
+        List<MentionNotificationParameters> mentionNotificationParametersList)
     {
+        MentionNotificationParameters mentionNotificationParameters =
+            new MentionNotificationParameters(authorReference, entityReference, location, version);
+        mentionNotificationParametersList.add(mentionNotificationParameters);
         List<MacroBlock> blocks = this.xdomService.listMentionMacros(xdom);
 
-        Map<DocumentReference, List<String>> counts =
-            this.xdomService.groupAnchorsByUserReference(blocks, documentReference.getWikiReference());
+        Map<MentionedActorReference, List<String>> counts =
+            this.xdomService.groupAnchorsByUserReference(blocks);
 
-        for (Map.Entry<DocumentReference, List<String>> entry : counts.entrySet()) {
+        for (Map.Entry<MentionedActorReference, List<String>> entry : counts.entrySet()) {
             boolean emptyAnchorProcessed = false;
+            String type = entry.getKey().getType();
+            String reference = entry.getKey().getReference();
             for (String anchorId : entry.getValue()) {
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    sendNotification(
-                        new MentionNotificationParameters(authorReference, documentReference, entry.getKey(), location,
-                            anchorId, xdom));
+                    addNewMention(mentionNotificationParameters, type,
+                        new MentionNotificationParameter(reference, anchorId));
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }
@@ -252,50 +283,66 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
 
     /**
      * Handles the analysis of an updated content to search for new mentions to notify.
+     *
      * @param oldXDOM the old xdom of the content before the update
      * @param newXDOM the new xom of the content after the update
-     * @param documentReference the reference of the updated document containing the content
+     * @param entityReference the reference to the analyzed entity
+     * @param version the version of the document holding the analyzed entity  when it was updated
      * @param authorReference the reference of the author of the update
      * @param location the location of the content
+     * @param mentionNotificationParametersList hold the list of identified mentions
      */
-    private void handleUpdatedContent(XDOM oldXDOM, XDOM newXDOM, DocumentReference documentReference,
-        DocumentReference authorReference, MentionLocation location)
+    private void handleUpdatedContent(XDOM oldXDOM, XDOM newXDOM, EntityReference entityReference,
+        String version, String authorReference, MentionLocation location,
+        List<MentionNotificationParameters> mentionNotificationParametersList)
     {
+        MentionNotificationParameters mentionNotificationParameters =
+            new MentionNotificationParameters(authorReference, entityReference, location, version);
+        mentionNotificationParametersList.add(mentionNotificationParameters);
+
         List<MacroBlock> oldMentions = this.xdomService.listMentionMacros(oldXDOM);
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXDOM);
 
-        WikiReference wikiReference = documentReference.getWikiReference();
-        Map<DocumentReference, List<String>> oldCounts =
-            this.xdomService.groupAnchorsByUserReference(oldMentions, wikiReference);
-        Map<DocumentReference, List<String>> newCounts =
-            this.xdomService.groupAnchorsByUserReference(newMentions, wikiReference);
+        Map<MentionedActorReference, List<String>> oldCounts =
+            this.xdomService.groupAnchorsByUserReference(oldMentions);
+        Map<MentionedActorReference, List<String>> newCounts =
+            this.xdomService.groupAnchorsByUserReference(newMentions);
 
-        for (Map.Entry<DocumentReference, List<String>> entry : newCounts.entrySet()) {
-            DocumentReference key = entry.getKey();
+        for (Map.Entry<MentionedActorReference, List<String>> e : newCounts.entrySet()) {
+            MentionedActorReference mentionReference = e.getKey();
+            for (String anchorId : e.getValue()) {
+                addMention(mentionNotificationParameters, mentionReference.getType(),
+                    new MentionNotificationParameter(mentionReference.getReference(),
+                        anchorId));
+            }
+        }
+
+        for (Map.Entry<MentionedActorReference, List<String>> entry : newCounts.entrySet()) {
+            MentionedActorReference key = entry.getKey();
+            String type = key.getType();
+            String reference = key.getReference();
             List<String> newAnchorIds = entry.getValue();
             List<String> oldAnchorsIds = oldCounts.getOrDefault(key, emptyList());
 
-            // Compute if there's new mentions without an anchor
-            long newEmptyAnchorsNumber = newAnchorIds.stream().filter(org.xwiki.text.StringUtils::isEmpty).count();
-            long oldEmptyAnchorsNumber = oldAnchorsIds.stream().filter(org.xwiki.text.StringUtils::isEmpty).count();
-
             // Retrieve new mentions with a new anchor
             List<String> anchorsToNotify = newAnchorIds.stream().filter(
-                value -> !org.xwiki.text.StringUtils.isEmpty(value) && !oldAnchorsIds.contains(value))
-                                               .collect(toList());
+                value -> !isEmpty(value) && !oldAnchorsIds.contains(value))
+                .collect(toList());
+
+            // Compute if there's new mentions without an anchor
+            long newEmptyAnchorsNumber = newAnchorIds.stream().filter(StringUtils::isEmpty).count();
+            long oldEmptyAnchorsNumber = oldAnchorsIds.stream().filter(StringUtils::isEmpty).count();
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                sendNotification(
-                    new MentionNotificationParameters(authorReference, documentReference, key, location, "",
-                        newXDOM));
+                addNewMention(mentionNotificationParameters, null,
+                    new MentionNotificationParameter(reference, ""));
             }
 
             // Notify all new mentions with new anchors.
-            for (String anchorId : anchorsToNotify) {
-                sendNotification(
-                    new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
-                        newXDOM));
+            for (String anchor : anchorsToNotify) {
+                addNewMention(mentionNotificationParameters, type,
+                    new MentionNotificationParameter(reference, anchor));
             }
         }
     }
@@ -303,46 +350,53 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     /**
      * Handles the analysis of the mentions of a created content to search for mentions to notify.
      * @param newXdom the xdom of the created content
-     * @param documentReference the reference of the document holding the content
+     * @param entityReference the reference of the analyzed entity
+     * @param version the version of the document holding the analyzed entity when it was updated
      * @param authorReference the reference of the author of the change
      * @param location the location of the content
+     * @param mentionNotificationParametersList hold the list of identified mentions
      */
-    private void handleCreatedContent(XDOM newXdom, DocumentReference documentReference,
-        DocumentReference authorReference, MentionLocation location)
+    private void handleCreatedContent(XDOM newXdom, EntityReference entityReference, String version,
+        String authorReference, MentionLocation location,
+        List<MentionNotificationParameters> mentionNotificationParametersList)
     {
+        MentionNotificationParameters mentionNotificationParameters =
+            new MentionNotificationParameters(authorReference, entityReference, location, version);
+        mentionNotificationParametersList.add(mentionNotificationParameters);
+
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXdom);
 
         // the matching element has not be found in the previous version of the document
         // notification are send unconditionally to all mentioned users.
-        this.xdomService.groupAnchorsByUserReference(newMentions, documentReference.getWikiReference())
+        this.xdomService.groupAnchorsByUserReference(newMentions)
             .forEach((key, value) -> value.forEach(
-                anchorId -> sendNotification(
-                    new MentionNotificationParameters(authorReference, documentReference, key, location, anchorId,
-                        newXdom))));
+                anchorId -> addNewMention(mentionNotificationParameters, key.getType(),
+                    new MentionNotificationParameter(key.getReference(), anchorId))));
     }
 
     /**
      * Handles a base object during the update of a document to search for new mentions to notify.
      * @param oldEntry the old base object (if it exists)
      * @param baseObject the new base object
-     * @param documentReference the reference of the document holding the base object
+     * @param version the version of the document holding the analyzed object when it was updated
      * @param authorReference the reference of the author of the change
      * @param syntax the syntax of the document
+     * @param mentionNotificationParameters hold the list of identified mentions
      */
-    private void handleBaseObjectOnUpdate(List<BaseObject> oldEntry, BaseObject baseObject,
-        DocumentReference documentReference, DocumentReference authorReference, Syntax syntax)
+    private void handleBaseObjectOnUpdate(List<BaseObject> oldEntry, BaseObject baseObject, String version,
+        String authorReference, Syntax syntax, List<MentionNotificationParameters> mentionNotificationParameters)
     {
         Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
             optOldEntries -> optOldEntries
-                                 .stream()
-                                 .filter(Objects::nonNull)
-                                 .filter(it -> it.getId() == baseObject.getId())
-                                 .findAny());
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(it -> it.getId() == baseObject.getId())
+                .findAny());
         if (baseObject != null) {
             // special treatment on comment object to analyse only the comment field.
             if (Objects.equals(baseObject
-                                   .getXClassReference()
-                                   .getLocalDocumentReference(), COMMENTSCLASS_REFERENCE))
+                .getXClassReference()
+                .getLocalDocumentReference(), COMMENTSCLASS_REFERENCE))
             {
                 Optional.<Object>ofNullable(baseObject.getField("comment"))
                     .ifPresent(it -> {
@@ -350,13 +404,14 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
                         PropertyInterface field = lsp.getObject().getField(SELECTION_FIELD);
                         boolean isComment = field == null || StringUtils.isEmpty(field.toFormString());
                         MentionLocation location = isComment ? COMMENT : ANNOTATION;
-                        handleProperty(oldBaseObject, lsp, location, documentReference, authorReference, syntax);
+                        handleProperty(oldBaseObject, lsp, version, location, authorReference, syntax,
+                            mentionNotificationParameters);
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
                     if (o instanceof LargeStringProperty) {
-                        handleProperty(oldBaseObject, (LargeStringProperty) o, AWM_FIELD, documentReference,
-                            authorReference, syntax);
+                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, AWM_FIELD,
+                            authorReference, syntax, mentionNotificationParameters);
                     }
                 }
             }
@@ -367,30 +422,55 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
      * Handle a property of an object to search for new mentions to notify.
      * @param oldBaseObject the old base object (if it exists).
      * @param largeStringProperty the large string property
+     * @param version the version of the document holding the analysed property when it was updated
      * @param location the location of the property
-     * @param documentReference the reference of the document holding the property
      * @param authorReference the reference of the author change
      * @param syntax the syntax of the document
+     * @param mentionNotificationParameters hold the list of identified mentions
      */
     private void handleProperty(Optional<BaseObject> oldBaseObject, LargeStringProperty largeStringProperty,
-        MentionLocation location,
-        DocumentReference documentReference, DocumentReference authorReference, Syntax syntax)
+        String version, MentionLocation location, String authorReference, Syntax syntax,
+        List<MentionNotificationParameters> mentionNotificationParameters)
     {
         Optional<XDOM> oldDom = oldBaseObject.flatMap(it -> ofNullable(it.getField(largeStringProperty.getName())))
-                                    .filter(it -> it instanceof LargeStringProperty)
-                                    .flatMap(
-                                        it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
+            .filter(it -> it instanceof LargeStringProperty)
+            .flatMap(it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
         this.xdomService.parse(largeStringProperty.getValue(), syntax).ifPresent(xdom -> {
-            // can be replaced by ifPresentOrElse for in java 9+ 
-            oldDom.ifPresent(od -> handleUpdatedContent(od, xdom, documentReference, authorReference, location));
+            // can be replaced by ifPresentOrElse for in java 9+
+            EntityReference entityReference = largeStringProperty.getReference();
+            oldDom.ifPresent(
+                od -> handleUpdatedContent(od, xdom, entityReference, version, authorReference, location,
+                    mentionNotificationParameters));
             if (!oldDom.isPresent()) {
-                handleCreatedContent(xdom, documentReference, authorReference, location);
+                handleCreatedContent(xdom, entityReference, version, authorReference, location,
+                    mentionNotificationParameters);
             }
         });
     }
 
-    private void sendNotification(MentionNotificationParameters notificationParameters)
+    private void sendNotification(List<MentionNotificationParameters> notificationParametersList)
     {
-        this.notificationService.sendNotification(notificationParameters);
+        // Notify the listeners of the exhaustive list of identified mentions.
+        // The listeners are in charge of selecting the ones of interest for them.
+        for (MentionNotificationParameters mentionNotificationParameters : notificationParametersList) {
+            Map<String, Set<MentionNotificationParameter>> newMentions = mentionNotificationParameters.getNewMentions();
+            if (!newMentions.isEmpty()) {
+                this.observationManager
+                    .notify(new NewMentionsEvent(), mentionNotificationParameters.getAuthorReference(),
+                        mentionNotificationParameters);
+            }
+        }
+    }
+
+    private void addNewMention(MentionNotificationParameters mentionNotificationParameters, String type,
+        MentionNotificationParameter mentionedActorReference)
+    {
+        mentionNotificationParameters.addNewMention(type, mentionedActorReference);
+    }
+
+    private void addMention(MentionNotificationParameters mentionNotificationParameters, String type,
+        MentionNotificationParameter mentionedActorReference)
+    {
+        mentionNotificationParameters.addMention(type, mentionedActorReference);
     }
 }

@@ -56,7 +56,7 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }, resolveExtraJARs = true)
-public class MentionsIT
+class MentionsIT
 {
     private static final String U1_USERNAME = "U1";
 

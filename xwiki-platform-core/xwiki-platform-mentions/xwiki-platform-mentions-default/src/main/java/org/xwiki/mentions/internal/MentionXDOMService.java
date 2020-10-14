@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -54,11 +52,9 @@ public interface MentionXDOMService
      *
      *
      * @param mentions the list of mention macros in the content
-     * @param wikiReference the reference to the wiki in which the mentions occurred
      * @return the map of the anchors grouped by user references
      */
-    Map<DocumentReference, List<String>> groupAnchorsByUserReference(List<MacroBlock> mentions,
-        WikiReference wikiReference);
+    Map<MentionedActorReference, List<String>> groupAnchorsByUserReference(List<MacroBlock> mentions);
 
     /**
      *

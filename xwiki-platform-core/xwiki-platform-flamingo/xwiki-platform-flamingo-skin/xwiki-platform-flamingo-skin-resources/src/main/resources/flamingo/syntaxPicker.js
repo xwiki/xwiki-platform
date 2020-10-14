@@ -204,13 +204,11 @@ define('xwiki-syntax-converter', ['jquery', 'xwiki-meta'], function($, xcontext)
         form_token: xcontext.form_token,
         // Get only the document content (without the header, footer, panels, etc.)
         xpage: 'get',
-        // Do not apply any sheet because we want the actual document content.
-        sheet: '',
+        // Don't apply any sheet and don't execute any rendering transformation. Just convert the syntax.
+        contentTransformed: false,
         // The output syntax
         outputSyntax: outputSyntax.type.id,
-        outputSyntaxVersion: outputSyntax.version,
-        // We're converting the source syntax so we shouldn't need to execute any transformations.
-        restricted: true
+        outputSyntaxVersion: outputSyntax.version
       };
       if (inputSyntax) {
         data.syntaxId = inputSyntax.id;

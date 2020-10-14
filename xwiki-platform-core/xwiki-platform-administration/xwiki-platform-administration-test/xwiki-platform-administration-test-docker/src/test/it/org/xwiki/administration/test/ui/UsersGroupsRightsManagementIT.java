@@ -110,6 +110,8 @@ public class UsersGroupsRightsManagementIT
     }
 
     /**
+     * Verify the following group editing features, from 2 locations: from the Admin UI Group page and from the
+     * Group page itself (in inline edit mode):
      * <ul>
      * <li>Validate adding users as group members.</li>
      * <li>Validate adding sub-groups</li>
@@ -375,54 +377,10 @@ public class UsersGroupsRightsManagementIT
     }
 
     /**
-     * Test adding a group to a group. Specifically, assert that the group is added as a member itself, not adding all
-     * its members one by one.
-     */
-    @Test
-    @Order(7)
-    public void addGroupToGroup(TestUtils setup, TestReference testReference)
-    {
-        String groupName = testReference.getLastSpaceReference().getName();
-
-        // ensure the group doesn't exist yet
-        setup.deletePage("XWiki", groupName);
-
-        GroupsPage groupsPage = GroupsPage.gotoPage();
-        groupsPage = groupsPage.addNewGroup(groupName);
-
-        groupsPage.filterGroups(groupName);
-        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
-        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "0"));
-
-        EditGroupModal editGroupModal = groupsPage.clickEditGroup(groupName);
-        assertEquals(0, editGroupModal.getMembersTable().getRowCount());
-        editGroupModal.addMember("XWikiAllGroup", false);
-        assertEquals(1, editGroupModal.getMembersTable().getRowCount());
-        assertTrue(editGroupModal.getMembersTable().hasRow("Member", "XWikiAllGroup"));
-        editGroupModal.close();
-        groupsPage.getGroupsTable().waitUntilReady();
-
-        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
-        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "1"));
-
-        // Now do the same by editing the group page in Inline Form edit mode.
-        setup.deletePage("XWiki", groupName);
-
-        groupsPage = GroupsPage.gotoPage();
-        groupsPage = groupsPage.addNewGroup(groupName);
-
-        setup.gotoPage("XWiki", groupName, "edit", "editor=inline");
-        GroupEditPage groupEditPage = new GroupEditPage();
-        groupEditPage = groupEditPage.addMemberToGroup("XWikiAllGroup", false);
-
-        assertTrue(groupEditPage.getMembersTable().hasRow("Member", "XWikiAllGroup"));
-    }
-
-    /**
      * Validate member filtering on group sheet.
      */
     @Test
-    @Order(8)
+    @Order(7)
     public void testFilteringOnGroupSheet(TestUtils setup, TestReference testReference)
     {
         String groupName = testReference.getLastSpaceReference().getName();

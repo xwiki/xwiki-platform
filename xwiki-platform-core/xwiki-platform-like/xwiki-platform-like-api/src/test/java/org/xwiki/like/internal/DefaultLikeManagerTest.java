@@ -308,4 +308,14 @@ public class DefaultLikeManagerTest
         assertEquals(Arrays.asList(userReference1, userReference2, userReference3),
             this.defaultLikeManager.getLikers(this.target, 12, 4));
     }
+
+    @Test
+    void countUserLikes() throws Exception
+    {
+        when(this.ratingsManager.countRatings(
+            Collections.singletonMap(RatingsManager.RatingQueryField.USER_REFERENCE, this.userReference)))
+            .thenReturn(42L);
+
+        assertEquals(42L, this.defaultLikeManager.countUserLikes(this.userReference));
+    }
 }

@@ -53,9 +53,11 @@ like.button.title=Número de "Me gusta" de esta página: {0}
 like.likers.empty=Todavía no le gusta a nadie esta página.
 like.likers.number={0} person(as) le gustas esta página:
 like.likers.title="Me gusta" en {0}
+### Missing: like.livetable.column.title=Title
+### Missing: like.livetable.column.location=Location
+### Missing: like.livetable.column.likes=Likes
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Mostrar siempre el botón "Me gusta"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Mostrar el botón incluso si el usuario no tiene derecho de interaccionar con él.  Úsalo si deseas mostrar siempre el contador de "Me gusta".
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacidad de la caché
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Número de información de "Me gusta" guardada en la caché. Ten en cuenta que tienes que reiniciar XWiki para que se activen los cambios de esta opción.</content>
-  
 </xwikidoc>

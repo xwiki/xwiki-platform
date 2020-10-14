@@ -34,8 +34,6 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.like.LikeConfiguration;
@@ -65,7 +63,7 @@ import org.xwiki.user.UserReferenceSerializer;
  */
 @Component
 @Singleton
-public class DefaultLikeManager implements LikeManager, Initializable, Disposable
+public class DefaultLikeManager implements LikeManager, Initializable
 {
     private static final int DEFAULT_LIKE_VOTE = 1;
 
@@ -126,12 +124,6 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
         }
     }
 
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        //this.authorizationManager.
-    }
-
     private String getExistCacheKey(UserReference source, EntityReference target)
     {
         return String.format("%s_%s",
@@ -173,6 +165,18 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
         } catch (RatingsException e) {
             throw new LikeException(
                 String.format("Error when trying to retrieve user likes for user [%s]", source), e);
+        }
+    }
+
+    @Override
+    public long countUserLikes(UserReference source) throws LikeException
+    {
+        try {
+            return this.ratingsManager.countRatings(
+                Collections.singletonMap(RatingsManager.RatingQueryField.USER_REFERENCE, source));
+        } catch (RatingsException e) {
+            throw new LikeException(
+                String.format("Error when trying to count user likes for user [%s]", source), e);
         }
     }
 

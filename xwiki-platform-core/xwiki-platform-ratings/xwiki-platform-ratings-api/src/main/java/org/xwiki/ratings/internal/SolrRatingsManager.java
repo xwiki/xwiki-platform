@@ -111,7 +111,7 @@ public class SolrRatingsManager implements RatingsManager
         if (this.getRatingConfiguration().hasDedicatedCore()) {
             return this.solr.getClient(this.getIdentifier());
         } else {
-            return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE);
+            return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE);
         }
     }
 

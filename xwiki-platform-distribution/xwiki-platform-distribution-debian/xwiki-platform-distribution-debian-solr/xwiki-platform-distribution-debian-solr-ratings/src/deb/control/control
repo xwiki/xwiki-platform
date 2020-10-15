@@ -1,4 +1,4 @@
-Package: xwiki-solr-like
+Package: xwiki-solr-ratings
 Version: [[version]]
 Section: java
 Priority: optional

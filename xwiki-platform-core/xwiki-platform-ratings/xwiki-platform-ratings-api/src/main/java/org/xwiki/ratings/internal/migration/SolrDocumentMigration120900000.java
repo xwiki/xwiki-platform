@@ -78,7 +78,7 @@ public class SolrDocumentMigration120900000
 
     private SolrClient getClient() throws SolrException
     {
-        return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE);
+        return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE);
     }
 
     /**

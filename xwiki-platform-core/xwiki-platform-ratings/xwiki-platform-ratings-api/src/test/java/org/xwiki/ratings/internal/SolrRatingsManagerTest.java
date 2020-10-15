@@ -42,8 +42,6 @@ import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
@@ -63,8 +61,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -211,7 +207,7 @@ public class SolrRatingsManagerTest
         String managerId = "otherId";
         this.manager.setIdentifer(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         when(userReference.toString()).thenReturn("user:barfoo");
         String query = "filter(author:user\\:barfoo) AND filter(scale:6) AND filter(managerId:otherId)";
@@ -336,7 +332,7 @@ public class SolrRatingsManagerTest
         String managerId = "removeRating1";
         this.manager.setIdentifer(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         String query = "filter(id:ratinging389) AND filter(managerId:removeRating1)";
         SolrQuery expectedQuery = new SolrQuery()
@@ -357,7 +353,7 @@ public class SolrRatingsManagerTest
         String managerId = "removeRating2";
         this.manager.setIdentifer(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         String query = "filter(id:ratinging429) AND filter(managerId:removeRating2)";
         SolrQuery expectedQuery = new SolrQuery()
@@ -448,7 +444,7 @@ public class SolrRatingsManagerTest
         when(response.getResults()).thenReturn(this.documentList);
 
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         // Check if we don't store 0
         when(this.configuration.isZeroStored()).thenReturn(false);
@@ -547,7 +543,7 @@ public class SolrRatingsManagerTest
         when(this.documentList.stream()).thenReturn(Collections.singletonList(solrDocument).stream());
 
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         when(this.configuration.isZeroStored()).thenReturn(false);
 
@@ -638,7 +634,7 @@ public class SolrRatingsManagerTest
         when(this.documentList.get(0)).thenReturn(solrDocument);
 
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
-        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
         // Handle Average rating
         when(this.configuration.isAverageStored()).thenReturn(true);

@@ -41,13 +41,13 @@ import org.xwiki.search.solr.SolrException;
  */
 @Component
 @Singleton
-@Named(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)
+@Named(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)
 public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
 {
     /**
      * Name of the Solr core for rating.
      */
-    public static final String DEFAULT_RATING_SOLR_CORE = "rating";
+    public static final String DEFAULT_RATINGS_SOLR_CORE = "ratings";
 
     private static final long CURRENT_VERSION = 120900000;
 

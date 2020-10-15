@@ -40,7 +40,6 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
         convertSyntax: data.convertSyntax
       });
     });
-    $(this)
   });
 
   var getSelectedSyntax = function(syntaxPicker) {
@@ -77,26 +76,26 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     deferred.resolve();
   };
 
-  var confirmationModal = $(`
-    <div id="syntaxConversionConfirmation" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title"></h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default dontConvertSyntax" data-dismiss="modal"></button>
-            <button type="button" class="btn btn-primary convertSyntax" data-dismiss="modal"></button>
-            <button type="button" class="btn btn-primary acknowledge" data-dismiss="modal"></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `).on('shown.bs.modal', function() {
+  var confirmationModal = $([
+    '<div id="syntaxConversionConfirmation" class="modal" tabindex="-1" role="dialog">',
+      '<div class="modal-dialog" role="document">',
+        '<div class="modal-content">',
+          '<div class="modal-header">',
+            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">',
+              '<span aria-hidden="true">&times;</span>',
+            '</button>',
+            '<h4 class="modal-title"></h4>',
+          '</div>',
+          '<div class="modal-body"></div>',
+          '<div class="modal-footer">',
+            '<button type="button" class="btn btn-default dontConvertSyntax" data-dismiss="modal"></button>',
+            '<button type="button" class="btn btn-primary convertSyntax" data-dismiss="modal"></button>',
+            '<button type="button" class="btn btn-primary acknowledge" data-dismiss="modal"></button>',
+          '</div>',
+        '</div>',
+      '</div>',
+    '</div>'
+  ].join('')).on('shown.bs.modal', function() {
     confirmationModal.find('.btn-primary').filter(':visible').focus();
   }).on('hidden.bs.modal', function() {
     confirmationModal.data('deferred').resolve(confirmationModal.data('data'));
@@ -201,6 +200,7 @@ define('xwiki-syntax-converter', ['jquery', 'xwiki-meta'], function($, xcontext)
       var data = {
         // Preview action requires the CSRF token (in order to prevent anyone from executing arbitrary code on behalf
         // of the current user by forging a preview URL).
+        /* jshint camelcase:false */
         form_token: xcontext.form_token,
         // Get only the document content (without the header, footer, panels, etc.)
         xpage: 'get',
@@ -227,6 +227,7 @@ define('xwiki-syntax-converter', ['jquery', 'xwiki-meta'], function($, xcontext)
       var data = {
         // Preview action requires the CSRF token (in order to prevent anyone from executing arbitrary code on behalf
         // of the current user by forging a preview URL).
+        /* jshint camelcase:false */
         form_token: xcontext.form_token,
         // Get only the document content and title (without the header, footer, panels, etc.)
         xpage: 'get',
@@ -257,8 +258,8 @@ require(['jquery'], function($) {
   // Maybe convert the document content on syntax change.
   $(document).on('xwiki:document:syntaxChange.wikiEditor', function(event, data) {
     var contentField = $('#content');
-    if (contentField.data('syntax') !== data.previousSyntax.id
-        || !XWiki.currentDocument.documentReference.equals(data.documentReference)) {
+    if (contentField.data('syntax') !== data.previousSyntax.id ||
+        !XWiki.currentDocument.documentReference.equals(data.documentReference)) {
       // Either the source content is not edited directly but through an WYSIWYG editor, most probably, or the document
       // for which the syntax has changed is not the current document.
       return;

@@ -168,6 +168,13 @@
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>lint</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Minify and optimize the JavaScript code. -->
       <plugin>

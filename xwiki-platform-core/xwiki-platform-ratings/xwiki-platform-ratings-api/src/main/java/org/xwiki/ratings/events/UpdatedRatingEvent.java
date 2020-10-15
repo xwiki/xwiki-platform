@@ -54,7 +54,7 @@ public class UpdatedRatingEvent extends AbstractRatingEvent implements Event
     }
 
     /**
-     * @return the old grading, before the update.
+     * @return the old vote, before the update.
      */
     public int getOldVote()
     {

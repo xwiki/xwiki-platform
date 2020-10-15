@@ -46,7 +46,7 @@ public interface RatingsManager
     {
         IDENTIFIER("id"),
         ENTITY_REFERENCE("reference"),
-        ENTITY_TYPE("entityType"),
+        PARENTS_REFERENCE("parents"),
         USER_REFERENCE("author"),
         VOTE("vote"),
         CREATED_DATE("createdDate"),
@@ -100,11 +100,11 @@ public interface RatingsManager
 
     /**
      * Save and return a {@link Rating} information.
-     * If an existing rank has already been saved by the same user on the same reference, then this method updates the
+     * If an existing rating has already been saved by the same user on the same reference, then this method updates the
      * existing value.
-     * This method should check that the given grade matches the scale of the manager.
+     * This method should check that the given vote matches the scale of the manager.
      * It should also take into account the {@link RatingsConfiguration#isZeroStored()} configuration to handle case when
-     * the grade is equal to 0. The method returns null if the grade is equal to 0 and the configuration doesn't allow
+     * the vote is equal to 0. The method returns null if the vote is equal to 0 and the configuration doesn't allow
      * to store it, but it might perform storage side effect (such as removing a previous {@link Rating} information).
      * This method also handles the computation of {@link AverageRating} if the
      * {@link RatingsConfiguration#isAverageStored()} configuration is set to true.
@@ -112,18 +112,18 @@ public interface RatingsManager
      * {@link CreatedRatingEvent} and {@link UpdatedRatingEvent}.
      *
      * @param reference the entity for which to save a rating value.
-     * @param user the user who performs the rank.
-     * @param grade the actual grade to be saved.
+     * @param user the user who performs the rating.
+     * @param vote the actual vote to be saved.
      * @return the saved rating or null if none has been saved.
-     * @throws RatingsException in case of problem for saving the ranking.
+     * @throws RatingsException in case of problem for saving the rating.
      */
-    Rating saveRating(EntityReference reference, UserReference user, int grade) throws RatingsException;
+    Rating saveRating(EntityReference reference, UserReference user, int vote) throws RatingsException;
 
     /**
      * Retrieve the list of ratings based on the given query parameters.
      * Only exact matching can be used right now for the given query parameters. It's possible to provide some
      * objects as query parameters: some specific treatment can be apply depending on the type of the objects, but for
-     * most type we're just relying on {@code String.valueOf(Object)}. Only the rankings of the current manager are
+     * most type we're just relying on {@code String.valueOf(Object)}. Only the ratings of the current manager are
      * retrieved even if the store is shared.
      *
      * @param queryParameters the map of parameters to rely on for query the ratings.
@@ -155,11 +155,22 @@ public interface RatingsManager
      * This method also performs an update of the {@link AverageRating} if the
      * {@link RatingsConfiguration#isAverageStored()} is enabled.
      *
-     * @param ratingIdentifier the ranking identifier to remove.
+     * @param ratingIdentifier the identifier of the rating to remove.
      * @return {@code true} if a rating is deleted, {@code false} if no rating with the given identifier can be found.
      * @throws RatingsException in case of problem during the query.
      */
     boolean removeRating(String ratingIdentifier) throws RatingsException;
+
+    /**
+     * Remove all ratings concerning the given reference.
+     * Ratings targeted the given reference will be deleted, but also ratings that concerns elements having the given
+     * reference as ancestor.
+     *
+     * @param entityReference the reference used as a criteria for filtering ratings reference or parents.
+     * @return the total number of deleted ratings.
+     * @throws RatingsException in case of problem during the query.
+     */
+    long removeRatings(EntityReference entityReference) throws RatingsException;
 
     /**
      * Retrieve the average rating information of the given reference.

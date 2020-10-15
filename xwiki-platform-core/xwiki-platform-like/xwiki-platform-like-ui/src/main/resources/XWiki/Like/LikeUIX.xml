@@ -459,6 +459,8 @@
       <content>{{velocity}}
 {{html wiki="true"}}
 #if ($services.like.displayButton($doc))
+  ## We want to be sure that the async rendering framework invalidate cache if the document is modified.
+  #set ($discard = $services.async.useEntity($doc))
   #set ($optLikeCount = $services.like.getLikes($doc))
   #if ($optLikeCount.isPresent())
     #set ($likeCount = $optLikeCount.get())

@@ -37,13 +37,13 @@ import org.xwiki.ratings.RatingsConfiguration;
  */
 @Component
 @Singleton
-@Named(LikeRatingsConfiguration.RANKING_MANAGER_HINT)
+@Named(LikeRatingsConfiguration.RATING_MANAGER_HINT)
 public class LikeRatingsConfiguration implements RatingsConfiguration
 {
     /**
-     * Default hint for Ranking Manager.
+     * Default hint for Rating Manager.
      */
-    public static final String RANKING_MANAGER_HINT = "like";
+    public static final String RATING_MANAGER_HINT = "like";
 
     @Override
     public boolean isZeroStored()

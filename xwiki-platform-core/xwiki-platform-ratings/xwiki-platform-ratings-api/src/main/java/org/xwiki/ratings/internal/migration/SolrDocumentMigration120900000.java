@@ -20,7 +20,9 @@
 package org.xwiki.ratings.internal.migration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,12 +36,14 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.internal.RatingSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.user.UserReference;
 
 /**
  * A dedicated component for performing migration of Ratings Solr document before XWiki 12.9.
@@ -125,21 +129,31 @@ public class SolrDocumentMigration120900000
     {
         String id = this.solrUtils.getId(solrDocument);
         Date date = this.solrUtils.get(OLD_DATE_FIELD, solrDocument);
-        String documentReference = this.solrUtils.get(OLD_PARENT_FIELD, solrDocument);
-        String entityType = EntityType.DOCUMENT.getLowerCase();
+        // Check if it's enough to retrieve all info from the DocumentReference to serialize parents information later
+        DocumentReference documentReference = this.solrUtils.get(OLD_PARENT_FIELD, solrDocument,
+            DocumentReference.class);
         int vote = this.solrUtils.get(RatingsManager.RatingQueryField.VOTE.getFieldName(), solrDocument);
-        String author = this.solrUtils.get(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument);
+        UserReference author = this.solrUtils.get(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(),
+            solrDocument, UserReference.class);
 
         SolrInputDocument solrInputDocument = new SolrInputDocument();
         this.solrUtils.setId(id, solrInputDocument);
         this.solrUtils.set(RatingsManager.RatingQueryField.MANAGER_ID.getFieldName(), managerId, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), documentReference,
-            solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.ENTITY_TYPE.getFieldName(), entityType, solrInputDocument);
+        this.solrUtils.setString(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), documentReference,
+            EntityReference.class, solrInputDocument);
+        EntityReference parentReference = documentReference.getParent();
+        List<EntityReference> parentReferenceList = new ArrayList<>();
+        while (parentReference != null) {
+            parentReferenceList.add(parentReference);
+            parentReference = parentReference.getParent();
+        }
+        this.solrUtils.setString(RatingsManager.RatingQueryField.PARENTS_REFERENCE.getFieldName(), parentReferenceList,
+            EntityReference.class, solrInputDocument);
         this.solrUtils.set(RatingsManager.RatingQueryField.SCALE.getFieldName(), scale, solrInputDocument);
 
         this.solrUtils.set(RatingsManager.RatingQueryField.VOTE.getFieldName(), vote, solrInputDocument);
-        this.solrUtils.set(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), author, solrInputDocument);
+        this.solrUtils.setString(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), author,
+            UserReference.class, solrInputDocument);
 
         // Here the data is not completely accurate since the old "date" is more an updated date, but without more
         // information it's better to rely on it than having a null data.

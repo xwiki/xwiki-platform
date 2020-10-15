@@ -19,6 +19,7 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -27,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -97,18 +99,6 @@ public class SolrRatingsManagerTest
     private Solr solr;
 
     @MockComponent
-    private UserReferenceSerializer<String> userReferenceSerializer;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @MockComponent
-    private UserReferenceResolver<String> userReferenceResolver;
-
-    @MockComponent
-    private EntityReferenceResolver<String> entityReferenceResolver;
-
-    @MockComponent
     private ObservationManager observationManager;
 
     @MockComponent
@@ -135,6 +125,8 @@ public class SolrRatingsManagerTest
         this.manager.setRatingConfiguration(configuration);
         when(this.solrUtils.toFilterQueryString(any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
+        when(this.solrUtils.toFilterQueryString(any(), any()))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
         when(this.solrUtils.getId(any()))
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
         when(this.solrUtils.get(any(), any()))
@@ -153,6 +145,14 @@ public class SolrRatingsManagerTest
             inputDocument.setField("id", fieldValue);
             return null;
         }).when(this.solrUtils).setId(any(), any());
+        doAnswer(invocationOnMock -> {
+            String fieldName = invocationOnMock.getArgument(0);
+            Object fieldValue = invocationOnMock.getArgument(1);
+            Type type = invocationOnMock.getArgument(2);
+            SolrInputDocument inputDocument = invocationOnMock.getArgument(3);
+            inputDocument.setField(fieldName, fieldValue);
+            return null;
+        }).when(this.solrUtils).setString(any(), any(Object.class), any(), any());
         when(this.configuration.getAverageRatingStorageHint()).thenReturn("averageHint");
         componentManager.registerComponent(AverageRatingManager.class, "averageHint", this.averageRatingManager);
     }
@@ -177,7 +177,7 @@ public class SolrRatingsManagerTest
     void countRatings() throws Exception
     {
         UserReference userReference = mock(UserReference.class);
-        EntityReference reference = new EntityReference("toto", EntityType.BLOCK);
+        EntityReference reference = mock(EntityReference.class);
         Map<RatingQueryField, Object> queryParameters = new LinkedHashMap<>();
         queryParameters.put(RatingQueryField.ENTITY_REFERENCE, reference);
         queryParameters.put(RatingQueryField.USER_REFERENCE, userReference);
@@ -188,8 +188,8 @@ public class SolrRatingsManagerTest
         when(this.configuration.hasDedicatedCore()).thenReturn(true);
         when(this.solr.getClient(managerId)).thenReturn(this.solrClient);
 
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("block:toto");
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("user:Foobar");
+        when(reference.toString()).thenReturn("block:toto");
+        when(userReference.toString()).thenReturn("user:Foobar");
         String query = "filter(reference:block\\:toto) AND filter(author:user\\:Foobar) "
             + "AND filter(scale:12) AND filter(managerId:managerTest)";
         SolrQuery expectedQuery = new SolrQuery().addFilterQuery(query).setStart(0).setRows(0);
@@ -205,7 +205,6 @@ public class SolrRatingsManagerTest
     {
         UserReference userReference = mock(UserReference.class);
         Map<RatingQueryField, Object> queryParameters = new LinkedHashMap<>();
-        queryParameters.put(RatingQueryField.ENTITY_TYPE, EntityType.PAGE_ATTACHMENT);
         queryParameters.put(RatingQueryField.USER_REFERENCE, userReference);
         queryParameters.put(RatingQueryField.SCALE, "6");
 
@@ -214,10 +213,8 @@ public class SolrRatingsManagerTest
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)).thenReturn(this.solrClient);
 
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("user:barfoo");
-        when(this.userReferenceResolver.resolve("user:barfoo")).thenReturn(userReference);
-        String query = "filter(entityType:PAGE_ATTACHMENT) AND filter(author:user\\:barfoo) "
-            + "AND filter(scale:6) AND filter(managerId:otherId)";
+        when(userReference.toString()).thenReturn("user:barfoo");
+        String query = "filter(author:user\\:barfoo) AND filter(scale:6) AND filter(managerId:otherId)";
 
         int offset = 12;
         int limit = 42;
@@ -232,47 +229,53 @@ public class SolrRatingsManagerTest
 
         Map<String, Object> documentResult = new HashMap<>();
         documentResult.put("id", "result1");
-        documentResult.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE_ATTACHMENT");
         documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
         documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(1));
         documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(1111));
         documentResult.put(RatingQueryField.VOTE.getFieldName(), 8);
         documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
         documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Foo");
-        EntityReference reference1 = new EntityReference("Foo", EntityType.PAGE_ATTACHMENT);
-        when(this.entityReferenceResolver.resolve("attachment:Foo", EntityType.PAGE_ATTACHMENT)).thenReturn(reference1);
+        EntityReference reference1 = mock(EntityReference.class);
         documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
         SolrDocument result1 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result1, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result1, EntityReference.class))
+            .thenReturn(reference1);
 
         documentResult = new HashMap<>();
         documentResult.put("id", "result2");
-        documentResult.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE_ATTACHMENT");
         documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
         documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(2));
         documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(2222));
         documentResult.put(RatingQueryField.VOTE.getFieldName(), 1);
         documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
         documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Bar");
-        EntityReference reference2 = new EntityReference("Bar", EntityType.PAGE_ATTACHMENT);
-        when(this.entityReferenceResolver.resolve("attachment:Bar", EntityType.PAGE_ATTACHMENT)).thenReturn(reference2);
+        EntityReference reference2 = mock(EntityReference.class);
         documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
         SolrDocument result2 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result2, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result2, EntityReference.class))
+            .thenReturn(reference2);
 
         documentResult = new HashMap<>();
         documentResult.put("id", "result3");
-        documentResult.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE_ATTACHMENT");
         documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
         documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(3));
         documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(3333));
         documentResult.put(RatingQueryField.VOTE.getFieldName(), 3);
         documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
         documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Baz");
-        EntityReference reference3 = new EntityReference("Baz", EntityType.PAGE_ATTACHMENT);
-        when(this.entityReferenceResolver.resolve("attachment:Baz", EntityType.PAGE_ATTACHMENT)).thenReturn(reference3);
+        EntityReference reference3 = mock(EntityReference.class);
         documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
         SolrDocument result3 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result3, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result3, EntityReference.class))
+            .thenReturn(reference3);
 
-        when(this.documentList.stream()).thenReturn(Arrays.asList(result1, result2, result3).stream());
+        when(this.documentList.stream()).thenReturn(Stream.of(result1, result2, result3));
 
         List<Rating> expectedRatings = Arrays.asList(
             new DefaultRating("result1")
@@ -368,21 +371,21 @@ public class SolrRatingsManagerTest
 
         Map<String, Object> documentResult = new HashMap<>();
         documentResult.put("id", ratingingId);
-        documentResult.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE_ATTACHMENT");
         documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
         documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(1));
         documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(1111));
         documentResult.put(RatingQueryField.VOTE.getFieldName(), 8);
         documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
         documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Foo");
-        EntityReference reference1 = new EntityReference("Foo", EntityType.PAGE_ATTACHMENT);
-        when(this.entityReferenceResolver.resolve("attachment:Foo", EntityType.PAGE_ATTACHMENT)).thenReturn(reference1);
-        when(this.entityReferenceSerializer.serialize(reference1)).thenReturn("attachment:Foo");
+        EntityReference reference1 = mock(EntityReference.class);
         documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
         UserReference userReference = mock(UserReference.class);
-        when(this.userReferenceResolver.resolve("user:barfoo")).thenReturn(userReference);
         SolrDocument result1 = new SolrDocument(documentResult);
         when(this.documentList.stream()).thenReturn(Collections.singletonList(result1).stream());
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result1, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result1, EntityReference.class))
+            .thenReturn(reference1);
 
         Rating rating = new DefaultRating(ratingingId)
             .setReference(reference1)
@@ -412,12 +415,12 @@ public class SolrRatingsManagerTest
         RatingsException exception = assertThrows(RatingsException.class, () -> {
             this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), -1);
         });
-        assertEquals("The vote [-1] is out of scale [5] for [saveRating1] ranking manager.", exception.getMessage());
+        assertEquals("The vote [-1] is out of scale [5] for [saveRating1] rating manager.", exception.getMessage());
 
         exception = assertThrows(RatingsException.class, () -> {
             this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), 8);
         });
-        assertEquals("The vote [8] is out of scale [5] for [saveRating1] ranking manager.", exception.getMessage());
+        assertEquals("The vote [8] is out of scale [5] for [saveRating1] rating manager.", exception.getMessage());
     }
 
     @Test
@@ -427,15 +430,13 @@ public class SolrRatingsManagerTest
         this.manager.setIdentifer(managerId);
         int scale = 10;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
-        when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("user:Toto");
-        when(this.userReferenceResolver.resolve("user:Toto")).thenReturn(userReference);
+        when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(entityType:PAGE) "
-            + "AND filter(author:user\\:Toto) AND filter(managerId:saveRating2)";
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating2)";
         SolrQuery expectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
             .setStart(0)
@@ -470,7 +471,6 @@ public class SolrRatingsManagerTest
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
         expectedInputDocument.setField("id", "");
         expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
-        expectedInputDocument.setField(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
@@ -512,15 +512,13 @@ public class SolrRatingsManagerTest
         int newVote = 2;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
-        when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("user:Toto");
-        when(this.userReferenceResolver.resolve("user:Toto")).thenReturn(userReference);
+        when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(entityType:PAGE) "
-            + "AND filter(author:user\\:Toto) AND filter(managerId:saveRating3)";
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating3)";
         SolrQuery expectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
             .setStart(0)
@@ -538,11 +536,14 @@ public class SolrRatingsManagerTest
         fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
         fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
-        fieldMap.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
         fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
 
         SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument, EntityReference.class))
+            .thenReturn(reference);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument, UserReference.class))
+            .thenReturn(userReference);
         when(this.documentList.stream()).thenReturn(Collections.singletonList(solrDocument).stream());
 
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
@@ -565,7 +566,6 @@ public class SolrRatingsManagerTest
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
         expectedInputDocument.setField("id", "myRating");
         expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
-        expectedInputDocument.setField(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
         expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
@@ -602,15 +602,13 @@ public class SolrRatingsManagerTest
         int newVote = 0;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
-        when(this.entityReferenceResolver.resolve("wiki:foobar", EntityType.PAGE)).thenReturn(reference);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
-        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("user:Toto");
-        when(this.userReferenceResolver.resolve("user:Toto")).thenReturn(userReference);
+        when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(entityType:PAGE) "
-            + "AND filter(author:user\\:Toto) AND filter(managerId:saveRating4)";
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating4)";
         SolrQuery firstExpectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
             .setStart(0)
@@ -624,11 +622,14 @@ public class SolrRatingsManagerTest
         fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
         fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
-        fieldMap.put(RatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
         fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
 
         SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument, EntityReference.class))
+            .thenReturn(reference);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument, UserReference.class))
+            .thenReturn(userReference);
         when(this.documentList.stream())
             .thenReturn(Collections.singletonList(solrDocument).stream())
             .thenReturn(Collections.singletonList(solrDocument).stream());

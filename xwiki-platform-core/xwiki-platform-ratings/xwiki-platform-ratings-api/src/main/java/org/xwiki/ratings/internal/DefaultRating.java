@@ -129,7 +129,7 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * @param id the identifier of the ranking.
+     * @param id the identifier of the rating.
      * @return the current instance.
      */
     public DefaultRating setId(String id)
@@ -159,7 +159,7 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * @param reference the element that has been ranked.
+     * @param reference the element that has been rated.
      * @return the current instance.
      */
     public DefaultRating setReference(EntityReference reference)
@@ -189,7 +189,7 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * @param scale the scale of the ranks.
+     * @param scale the upper bound of the scale for ratings.
      * @return the current instance.
      */
     public DefaultRating setScaleUpperBound(int scale)
@@ -210,11 +210,11 @@ public class DefaultRating implements Rating
         return new XWikiToStringBuilder(this)
             .append("identifier", identifier)
             .append("managerId", managerId)
-            .append("rankedElement", reference)
-            .append("voter", user)
+            .append("reference", reference)
+            .append("user", user)
             .append("createdAt", createdAt)
             .append("updatedAt", updatedAt)
-            .append("rank", vote)
+            .append("vote", vote)
             .append("scale", scale)
             .toString();
     }

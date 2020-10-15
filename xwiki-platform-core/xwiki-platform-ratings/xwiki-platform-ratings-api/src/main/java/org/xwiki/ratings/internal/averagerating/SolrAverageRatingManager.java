@@ -20,6 +20,8 @@
 package org.xwiki.ratings.internal.averagerating;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -35,7 +37,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.search.solr.Solr;
@@ -59,9 +60,6 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     @Inject
     private Solr solr;
 
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
     private SolrClient getAverageRatingSolrClient() throws SolrException
     {
         return this.solr.getClient(AverageRatingSolrCoreInitializer.DEFAULT_AVERAGE_RATING_SOLR_CORE);
@@ -76,16 +74,22 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     {
         SolrInputDocument result = new SolrInputDocument();
         solrUtils.setId(averageRating.getId(), result);
-        solrUtils.set(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
-            this.entityReferenceSerializer.serialize(averageRating.getReference()), result);
+        solrUtils.setString(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            averageRating.getReference(), EntityReference.class, result);
+        EntityReference parent = averageRating.getReference();
+        List<EntityReference> parentReferences = new ArrayList<>();
+        while (parent != null) {
+            parentReferences.add(parent);
+            parent = parent.getParent();
+        }
+        solrUtils.setString(AverageRatingQueryField.PARENTS.getFieldName(), parentReferences, EntityReference.class,
+            result);
         solrUtils.set(AverageRatingQueryField.UPDATED_AT.getFieldName(), averageRating.getUpdatedAt(), result);
         solrUtils.set(AverageRatingQueryField.TOTAL_VOTE.getFieldName(),
             averageRating.getNbVotes(), result);
         solrUtils.set(AverageRatingQueryField.SCALE.getFieldName(), averageRating.getScaleUpperBound(), result);
         solrUtils.set(AverageRatingQueryField.MANAGER_ID.getFieldName(), averageRating.getManagerId(), result);
         solrUtils.set(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), averageRating.getAverageVote(), result);
-        solrUtils.set(AverageRatingQueryField.ENTITY_TYPE.getFieldName(),
-            averageRating.getReference().getType(), result);
         return result;
     }
 
@@ -93,12 +97,10 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
     {
         SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery(String.format("filter(%s:%s) AND filter(%s:%s) AND filter(%s:%s)",
+            .addFilterQuery(String.format("filter(%s:%s) AND filter(%s:%s)",
                 AverageRatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
                 AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
-                solrUtils.toFilterQueryString(this.entityReferenceSerializer.serialize(entityReference)),
-                AverageRatingQueryField.ENTITY_TYPE.getFieldName(),
-                solrUtils.toFilterQueryString(entityReference.getType())))
+                solrUtils.toFilterQueryString(entityReference, EntityReference.class)))
             .setStart(0)
             .setRows(1)
             .setSort(AverageRatingQueryField.UPDATED_AT.getFieldName(), this.getOrder(true));
@@ -122,7 +124,7 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
             }
             return result;
         } catch (SolrServerException | IOException | SolrException e) {
-            throw new RatingsException("Error while trying to get average ranking value.", e);
+            throw new RatingsException("Error while trying to get average rating value.", e);
         }
     }
 

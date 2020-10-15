@@ -33,9 +33,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
 
@@ -57,11 +57,15 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    /*
+     * We rely on a converter here to follow the same implementation than SolrAverageRatingManager, where the usage
+     * of the converter is actually hidden under SolrUtils.
+     */
     @Inject
-    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+    private Converter<EntityReference> entityReferenceConverter;
 
     @Inject
-    private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -87,20 +91,16 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     {
         DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
         XWikiDocument actualDoc = (XWikiDocument) documentInstance;
-        String entityType = entityReference.getType().getLowerCase();
-        String serializedReference = this.stringEntityReferenceSerializer.serialize(entityReference);
+        String serializedReference = this.entityReferenceConverter.convert(String.class, entityReference);
         for (BaseObject xObject : actualDoc
             .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE)) {
-            String xobjectEntityType = xObject.getStringValue(AverageRatingQueryField.ENTITY_TYPE.getFieldName());
             String xobjectReference =
                 xObject.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName());
             String xobjectManagerId = xObject.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName());
 
-            if (StringUtils.isEmpty(xobjectEntityType) && StringUtils.isEmpty(xobjectReference)
-                && StringUtils.isEmpty(xobjectManagerId)) {
+            if (StringUtils.isEmpty(xobjectReference) && StringUtils.isEmpty(xobjectManagerId)) {
                 return xObject;
-            } else if (getIdentifier().equals(xobjectManagerId) && entityType.equals(xobjectEntityType)
-                && serializedReference.equals(xobjectReference)) {
+            } else if (getIdentifier().equals(xobjectManagerId) && serializedReference.equals(xobjectReference)) {
                 return xObject;
             }
         }
@@ -154,12 +154,10 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
                 baseObject = actualDoc.getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE,
                     xObjectNumber);
             }
-            String serializedEntityReference = this.stringEntityReferenceSerializer.serialize(entityReference);
-            String entityType = entityReference.getType().getLowerCase();
+            String serializedEntityReference = this.entityReferenceConverter.convert(String.class, entityReference);
             baseObject.setStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName(), this.getIdentifier());
             baseObject.setStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
                 serializedEntityReference);
-            baseObject.setStringValue(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), entityType);
             baseObject.setIntValue(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), averageRating.getNbVotes());
             baseObject.setFloatValue(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(),
                 averageRating.getAverageVote());

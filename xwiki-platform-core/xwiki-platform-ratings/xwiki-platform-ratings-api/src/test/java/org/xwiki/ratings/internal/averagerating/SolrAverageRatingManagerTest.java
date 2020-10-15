@@ -19,6 +19,7 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +89,8 @@ public class SolrAverageRatingManagerTest
     {
         when(this.solrUtils.toFilterQueryString(any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
+        when(this.solrUtils.toFilterQueryString(any(), any()))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
         when(this.solrUtils.getId(any()))
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
         when(this.solrUtils.get(any(), any()))
@@ -106,6 +109,14 @@ public class SolrAverageRatingManagerTest
             inputDocument.setField("id", fieldValue);
             return null;
         }).when(this.solrUtils).setId(any(), any());
+        doAnswer(invocationOnMock -> {
+            String fieldName = invocationOnMock.getArgument(0);
+            Object fieldValue = invocationOnMock.getArgument(1);
+            Type type = invocationOnMock.getArgument(2);
+            SolrInputDocument inputDocument = invocationOnMock.getArgument(3);
+            inputDocument.setField(fieldName, fieldValue);
+            return null;
+        }).when(this.solrUtils).setString(any(), any(Object.class), any(), any());
         this.averageRatingManager.setRatingsManager(this.ratingsManager);
     }
 
@@ -133,11 +144,10 @@ public class SolrAverageRatingManagerTest
 
         String managerId = "averageId2";
         when(this.ratingsManager.getIdentifier()).thenReturn(managerId);
-        EntityReference reference = new EntityReference("xwiki:Something", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("xwiki:Something");
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("xwiki:Something");
 
-        String filterQuery = "filter(managerId:averageId2) AND filter(reference:xwiki\\:Something) "
-            + "AND filter(entityType:PAGE)";
+        String filterQuery = "filter(managerId:averageId2) AND filter(reference:xwiki\\:Something)";
         SolrQuery solrQuery = new SolrQuery().addFilterQuery(filterQuery)
             .setStart(0)
             .setRows(1)
@@ -151,11 +161,12 @@ public class SolrAverageRatingManagerTest
         fieldMap.put(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), 2.341f);
         fieldMap.put(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), 242);
         fieldMap.put(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), "xwiki:Something");
-        fieldMap.put(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         fieldMap.put(AverageRatingQueryField.MANAGER_ID.getFieldName(), managerId);
         fieldMap.put(AverageRatingQueryField.UPDATED_AT.getFieldName(), new Date(42));
         fieldMap.put(AverageRatingQueryField.SCALE.getFieldName(), 12);
         SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument,
+            EntityReference.class)).thenReturn(reference);
         when(this.documentList.get(0)).thenReturn(solrDocument);
 
         AverageRating averageRating = this.averageRatingManager.getAverageRating(reference);
@@ -179,11 +190,10 @@ public class SolrAverageRatingManagerTest
         String managerId = "averageId1";
         when(this.ratingsManager.getIdentifier()).thenReturn(managerId);
         when(this.ratingsManager.getScale()).thenReturn(7);
-        EntityReference reference = new EntityReference("xwiki:FooBarBar", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("xwiki:FooBarBar");
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("xwiki:FooBarBar");
 
-        String filterQuery = "filter(managerId:averageId1) AND filter(reference:xwiki\\:FooBarBar) "
-            + "AND filter(entityType:PAGE)";
+        String filterQuery = "filter(managerId:averageId1) AND filter(reference:xwiki\\:FooBarBar)";
         SolrQuery solrQuery = new SolrQuery().addFilterQuery(filterQuery)
             .setStart(0)
             .setRows(1)
@@ -208,15 +218,14 @@ public class SolrAverageRatingManagerTest
     {
         String managerId = "myManager";
         int scale = 12;
-        EntityReference reference = new EntityReference("foobar", EntityType.PAGE);
-        when(this.entityReferenceSerializer.serialize(reference)).thenReturn("wiki:foobar");
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
 
         SolrClient averageSolrClient = mock(SolrClient.class);
         when(this.solr.getClient(AverageRatingSolrCoreInitializer.DEFAULT_AVERAGE_RATING_SOLR_CORE))
             .thenReturn(averageSolrClient);
 
-        String filterQuery = "filter(managerId:saveRank3) AND filter(reference:wiki\\:foobar) "
-            + "AND filter(entityType:PAGE)";
+        String filterQuery = "filter(managerId:saveRank3) AND filter(reference:wiki\\:foobar)";
         SolrQuery averageQuery = new SolrQuery().addFilterQuery(filterQuery)
             .setStart(0)
             .setRows(1)
@@ -231,11 +240,12 @@ public class SolrAverageRatingManagerTest
         fieldMap.put(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), 6.0f);
         fieldMap.put(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), 2);
         fieldMap.put(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
-        fieldMap.put(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
         fieldMap.put(AverageRatingQueryField.MANAGER_ID.getFieldName(), managerId);
         fieldMap.put(AverageRatingQueryField.UPDATED_AT.getFieldName(), new Date(42));
         fieldMap.put(AverageRatingQueryField.SCALE.getFieldName(), scale);
         SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument,
+            EntityReference.class)).thenReturn(reference);
         when(averageDocumentList.get(0)).thenReturn(solrDocument);
 
         DefaultAverageRating expectedModifiedAverage = new DefaultAverageRating("average1")
@@ -252,7 +262,6 @@ public class SolrAverageRatingManagerTest
         expectedAverageInputDocument.setField(AverageRatingQueryField.SCALE.getFieldName(), scale);
         expectedAverageInputDocument.setField(AverageRatingQueryField.MANAGER_ID.getFieldName(), managerId);
         expectedAverageInputDocument.setField(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), 5.5);
-        expectedAverageInputDocument.setField(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), "PAGE");
 
         when(averageSolrClient.add(any(SolrInputDocument.class))).then(invocationOnMock -> {
             SolrInputDocument obtainedInputDocument = invocationOnMock.getArgument(0);

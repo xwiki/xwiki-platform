@@ -115,4 +115,19 @@ public interface LikeManager
      * @return a dedicated programmatic right for Like feature.
      */
     Right getLikeRight();
+
+    /**
+     * Clear like data related to the given reference from cache.
+     * @param target the reference for which data should be cleared.
+     * @since 12.9RC1
+     */
+    @Unstable
+    void clearCache(EntityReference target);
+
+    /**
+     * Clear all data from caches.
+     * @since 12.9RC1
+     */
+    @Unstable
+    void clearCache();
 }

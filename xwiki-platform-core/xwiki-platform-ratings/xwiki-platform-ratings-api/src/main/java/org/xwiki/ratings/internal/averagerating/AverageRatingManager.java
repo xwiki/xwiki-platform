@@ -46,17 +46,12 @@ public interface AverageRatingManager
         MANAGER_ID("managerId"),
 
         /**
-         * Field for storing ranked element serialized reference.
+         * Field for storing reference of the rated element.
          */
         ENTITY_REFERENCE("reference"),
 
         /**
-         * Field for storing the entity type of the serialized reference.
-         */
-        ENTITY_TYPE("entityType"),
-
-        /**
-         * Field for storing the actual average of the rank.
+         * Field for storing the average vote.
          */
         AVERAGE_VOTE("averagevote"),
 
@@ -66,9 +61,14 @@ public interface AverageRatingManager
         TOTAL_VOTE("nbvotes"),
 
         /**
-         * Field for storing the upper bound scale of the ranking manager.
+         * Field for storing the upper bound scale of the rating manager.
          */
         SCALE("scale"),
+
+        /**
+         * Store information about the parents of the entity reference.
+         */
+        PARENTS("parents"),
 
         /**
          * Field for storing the latest updated date.

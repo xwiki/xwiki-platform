@@ -56,7 +56,7 @@ public class DefaultAverageRating implements AverageRating
     }
 
     /**
-     * Constructor that allows cloning an existing average rank.
+     * Constructor that allows cloning an existing average rating.
      *
      * @param averageRating the already existing object to clone.
      */
@@ -246,9 +246,9 @@ public class DefaultAverageRating implements AverageRating
         return new XWikiToStringBuilder(this)
             .append("identifier", identifier)
             .append("managerId", managerId)
-            .append("rankedElement", reference)
-            .append("averageRank", averageVote)
-            .append("rankingNumber", totalVote)
+            .append("reference", reference)
+            .append("averageVote", averageVote)
+            .append("totalVote", totalVote)
             .append("scale", scale)
             .append("updatedAt", updatedAt)
             .toString();

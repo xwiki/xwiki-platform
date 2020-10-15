@@ -98,7 +98,7 @@ public class AllIT
     class NestedSectionEditIT extends SectionEditIT
     {
     }
-    
+
     @Nested
     @DisplayName("Document information tab tests")
     class NestedInformationIT extends InformationIT

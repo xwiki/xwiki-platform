@@ -44,24 +44,29 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String NAME = "extension_index";
 
     /**
+     * Suffix used for indexed version of standard extensions fields.
+     */
+    public static final String INDEX_SUFFIX = "_index";
+
+    /**
      * We can't use {@link Extension#FIELD_ID} because it collide with {@link #SOLR_FIELD_ID}.
      */
     public static final String SOLR_FIELD_EXTENSIONID = "extensionId";
 
     /**
-     * Indicate on which namespace the extension is local.
+     * Indicate on the available versions for this extension (to avoid indexing all versions).
      */
-    public static final String SOLR_FIELD_LOCAL = "local";
+    public static final String SOLR_FIELD_VERSIONS = "versions";
 
     /**
-     * Indicate on which namespace the extension is installed.
+     * Indicate the list of features in a search friendly manner.
      */
-    public static final String SOLR_FIELD_INSTALLED = "installed";
+    public static final String SOLR_FIELD_EXTENSIONFEATURES_INDEX = Extension.FIELD_EXTENSIONFEATURES + INDEX_SUFFIX;
 
     /**
-     * Indicate on which namespaces the extension is installed.
+     * Indicate the list of authors in a search friendly manner.
      */
-    public static final String SOLR_FIELD_INSTALLED_NAMESPACES = "installed_namespaces";
+    public static final String SOLR_FIELD_AUTHORS_INDEX = Extension.FIELD_AUTHORS + INDEX_SUFFIX;
 
     /**
      * The name of the field indicating if an extension is compatible with the current instance.
@@ -92,21 +97,21 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setStringField(Extension.FIELD_ALLOWEDNAMESPACES, true, false);
         setStringField(Extension.FIELD_SUMMARY, false, false);
         setStringField(Extension.FIELD_WEBSITE, false, false);
-        setStringField(Extension.FIELD_AUTHORS, true, false);
         setStringField(Extension.FIELD_CATEGORY, false, false);
 
-        // setStringField(Extension.FIELD_EXTENSIONFEATURES, true, false);
+        setStringField(Extension.FIELD_AUTHORS, true, false);
+        setStringField(SOLR_FIELD_AUTHORS_INDEX, true, false, SOLR_FIELD_STORED, false);
 
-        // setStringField(Extension.FIELD_DEPENDENCIES, true, false);
+        setStringField(Extension.FIELD_EXTENSIONFEATURES, true, false);
+        setStringField(SOLR_FIELD_EXTENSIONFEATURES_INDEX, true, false, SOLR_FIELD_STORED, false);
 
-        // setStringField(Extension.FIELD_MANAGEDDEPENDENCIES, true, false);
+        // TODO: add dependencies
+        // TODO: add managed dependencies
 
         setPDateField(SOLR_FIELD_INDEX_DATE, false, false);
         setBooleanField(SOLR_FIELD_COMPATIBLE, false, false);
 
-        setBooleanField(SOLR_FIELD_LOCAL, false, false);
-        setBooleanField(SOLR_FIELD_INSTALLED, false, false);
-        setBooleanField(SOLR_FIELD_INSTALLED_NAMESPACES, true, false);
+        setStringField(SOLR_FIELD_VERSIONS, true, false);
     }
 
     @Override

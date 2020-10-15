@@ -22,6 +22,8 @@ package org.xwiki.extension.index.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -33,7 +35,12 @@ import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
 import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
 import org.xwiki.extension.index.internal.job.ExtensionIndexRequest;
+import org.xwiki.extension.repository.AbstractAdvancedSearchableExtensionRepository;
+import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.Job;
@@ -49,8 +56,11 @@ import org.xwiki.job.event.status.JobStatus.State;
  */
 @Component
 @Singleton
-public class DefaultExtensionIndex implements ExtensionIndex, Initializable
+public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRepository
+    implements ExtensionIndex, Initializable
 {
+    private static final String ID = "index";
+
     @Inject
     private JobExecutor jobs;
 
@@ -59,6 +69,9 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
 
     @Inject
     private ExtensionRepositoryManager repositories;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
@@ -69,6 +82,16 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         } catch (JobException e) {
             throw new InitializationException("Failed to start indexing the available extensions", e);
         }
+
+        setDescriptor(new DefaultExtensionRepositoryDescriptor(ID, ID, null));
+    }
+
+    @Override
+    public ExtensionIndexStatus getStatus()
+    {
+        Job job = this.jobs.getJob(ExtensionIndexRequest.JOB_ID);
+
+        return job != null ? (ExtensionIndexStatus) job.getStatus() : null;
     }
 
     @Override
@@ -83,10 +106,30 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         return (ExtensionIndexStatus) job.getStatus();
     }
 
+    // ExtensionRepository
+
+    @Override
+    public IterableResult<Extension> search(ExtensionQuery query) throws SearchException
+    {
+        return this.store.search(query);
+    }
+
+    private SolrExtension getSolrExtension(ExtensionId extensionId)
+    {
+        try {
+            return this.store.getSolrExtension(extensionId);
+        } catch (Exception e) {
+            this.logger.warn("Failed to get the extension [{}] from the index: {}", extensionId,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        return null;
+    }
+
     @Override
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Extension extension = this.store.getExtension(extensionId);
+        Extension extension = getSolrExtension(extensionId);
 
         if (extension != null) {
             return extension;
@@ -96,7 +139,7 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         extension = this.repositories.resolve(extensionId);
 
         // Remember the found extension
-        this.store.add(extension, false);
+        cacheExtension(extension);
 
         return extension;
     }
@@ -107,7 +150,9 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         // Search in the index if the constraint is a unique version
         Version uniqueVersion = VersionUtils.getUniqueVersion(extensionDependency.getVersionConstraint());
         if (uniqueVersion != null) {
-            Extension extension = this.store.getExtension(new ExtensionId(extensionDependency.getId(), uniqueVersion));
+            ExtensionId extensionId = new ExtensionId(extensionDependency.getId(), uniqueVersion);
+
+            Extension extension = getSolrExtension(extensionId);
 
             if (extension != null) {
                 return extension;
@@ -118,8 +163,49 @@ public class DefaultExtensionIndex implements ExtensionIndex, Initializable
         Extension extension = this.repositories.resolve(extensionDependency);
 
         // Remember the found extension
-        this.store.add(extension, false);
+        cacheExtension(extension);
 
         return extension;
+    }
+
+    @Override
+    public boolean exists(ExtensionId extensionId)
+    {
+        try {
+            return this.store.exists(extensionId);
+        } catch (Exception e) {
+            this.logger.error("Failed to check existance of extension [{}]", extensionId, e);
+
+            return false;
+        }
+    }
+
+    private void cacheExtension(Extension extension)
+    {
+        try {
+            this.store.add(extension, false);
+        } catch (Exception e) {
+            this.logger.warn("Failed to add the extension [{}] to the index: {}", extension.getId(),
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    @Override
+    public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean isFilterable()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isSortable()
+    {
+        return true;
     }
 }

@@ -22,6 +22,3 @@ chown -R tomcat.tomcat /var/lib/xwiki/data
 
 # Need to reload systemd for the injected tomcat9 service configuration to be taken into account
 systemctl daemon-reload
-
-# Restart tomcat9 service if it's active
-systemctl -q is-active tomcat9.service && service tomcat9 restart

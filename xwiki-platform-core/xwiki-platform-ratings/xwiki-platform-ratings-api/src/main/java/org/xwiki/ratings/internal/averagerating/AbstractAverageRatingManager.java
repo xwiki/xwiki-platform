@@ -128,9 +128,9 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         AverageRating averageRating = getAverageRating(entityReference);
         int oldTotalVote = averageRating.getNbVotes();
         float oldAverageVote = averageRating.getAverageVote();
-        DefaultAverageRating defaultAverageRating = new DefaultAverageRating(averageRating);
-        defaultAverageRating.setAverageVote(averageVote);
-        defaultAverageRating.setTotalVote(totalVote);
-        return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        DefaultAverageRating updatedAverageRating = new DefaultAverageRating(averageRating);
+        updatedAverageRating.setAverageVote(averageVote);
+        updatedAverageRating.setTotalVote(totalVote);
+        return this.updateAverageRating(updatedAverageRating, oldAverageVote, oldTotalVote);
     }
 }

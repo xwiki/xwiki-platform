@@ -264,7 +264,6 @@
     <property>
       <propertiesToShow>
         <value>enabled</value>
-        <value>excludedReferences</value>
       </propertiesToShow>
     </property>
     <property>

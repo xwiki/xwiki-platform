@@ -97,6 +97,7 @@ public class SolrDocumentMigration120900000
         SolrDocumentList documentList;
         int startIndex = 0;
         int totalMigrated = 0;
+        long totalNumber = 0;
         do {
             SolrQuery solrQuery = new SolrQuery("*")
                 .setStart(startIndex)
@@ -105,6 +106,7 @@ public class SolrDocumentMigration120900000
             try {
                 QueryResponse queryResponse = solrClient.query(solrQuery);
                 documentList = queryResponse.getResults();
+                totalNumber = queryResponse.getResults().getNumFound();
                 for (SolrDocument solrDocument : documentList) {
                     this.migrateDocumentFrom120700000(solrDocument, scale, managerId);
                 }
@@ -114,7 +116,7 @@ public class SolrDocumentMigration120900000
             } catch (SolrServerException | IOException e) {
                 throw new SolrException("Error when executing query to perform 120700000 documents migration", e);
             }
-        } while (!documentList.isEmpty());
+        } while (!documentList.isEmpty() && totalMigrated < totalNumber);
 
         // We commit when all documents are migrated.
         try {

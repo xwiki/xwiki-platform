@@ -20,6 +20,7 @@
 package org.xwiki.ratings.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -45,10 +46,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.AverageRating;
@@ -64,8 +62,6 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Default implementation of {@link RatingsManager} which stores Rating and AverageRating in Solr.
@@ -90,18 +86,6 @@ public class SolrRatingsManager implements RatingsManager
     private Solr solr;
 
     @Inject
-    private UserReferenceSerializer<String> userReferenceSerializer;
-
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
-
-    @Inject
-    private EntityReferenceResolver<String> entityReferenceResolver;
-
-    @Inject
     private ObservationManager observationManager;
 
     @Inject
@@ -115,11 +99,11 @@ public class SolrRatingsManager implements RatingsManager
     private String identifier;
 
     /**
-     * Retrieve the solr client for storing rankings based on the configuration.
+     * Retrieve the solr client for storing ratings based on the configuration.
      * If the configuration specifies to use a dedicated core (see {@link RatingsConfiguration#hasDedicatedCore()}),
      * then it will use a client based on the current manager identifier, else it will use the default solr core.
      *
-     * @return the right solr client for storing rankings.
+     * @return the right solr client for storing ratings.
      * @throws SolrException in case of problem to retrieve the solr client.
      */
     private SolrClient getRatingSolrClient() throws SolrException
@@ -127,7 +111,7 @@ public class SolrRatingsManager implements RatingsManager
         if (this.getRatingConfiguration().hasDedicatedCore()) {
             return this.solr.getClient(this.getIdentifier());
         } else {
-            return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE);
+            return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE);
         }
     }
 
@@ -182,24 +166,20 @@ public class SolrRatingsManager implements RatingsManager
         return (asc) ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc;
     }
 
-    private Rating getRankingFromSolrDocument(SolrDocument document)
+    private Rating getRatingFromSolrDocument(SolrDocument document)
     {
-        String rankingId = this.solrUtils.getId(document);
+        String ratingId = this.solrUtils.getId(document);
         String managerId = this.solrUtils.get(RatingQueryField.MANAGER_ID.getFieldName(), document);
-        String serializedEntityReference = this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
-            document);
-        String serializedUserReference = this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), document);
+        EntityReference entityReference = this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            document, EntityReference.class);
+        UserReference userReference = this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), document,
+            UserReference.class);
         int vote = this.solrUtils.get(RatingQueryField.VOTE.getFieldName(), document);
         Date createdAt = this.solrUtils.get(RatingQueryField.CREATED_DATE.getFieldName(), document);
         Date updatedAt = this.solrUtils.get(RatingQueryField.UPDATED_DATE.getFieldName(), document);
         int scale = this.solrUtils.get(RatingQueryField.SCALE.getFieldName(), document);
-        String entityTypeValue = this.solrUtils.get(RatingQueryField.ENTITY_TYPE.getFieldName(), document);
 
-        EntityType entityType = EntityType.valueOf(entityTypeValue);
-        UserReference userReference = this.userReferenceResolver.resolve(serializedUserReference);
-        EntityReference entityReference = this.entityReferenceResolver.resolve(serializedEntityReference, entityType);
-
-        return new DefaultRating(rankingId)
+        return new DefaultRating(ratingId)
             .setReference(entityReference)
             .setAuthor(userReference)
             .setVote(vote)
@@ -209,10 +189,10 @@ public class SolrRatingsManager implements RatingsManager
             .setManagerId(managerId);
     }
 
-    private List<Rating> getRankingsFromQueryResult(SolrDocumentList documents)
+    private List<Rating> getRatingsFromQueryResult(SolrDocumentList documents)
     {
         if (documents != null) {
-            return documents.stream().map(this::getRankingFromSolrDocument).collect(Collectors.toList());
+            return documents.stream().map(this::getRatingFromSolrDocument).collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -235,11 +215,9 @@ public class SolrRatingsManager implements RatingsManager
             if (value instanceof String || value instanceof Date) {
                 result.append(solrUtils.toFilterQueryString(value));
             } else if (value instanceof UserReference) {
-                result.append(
-                    solrUtils.toFilterQueryString(this.userReferenceSerializer.serialize((UserReference) value)));
+                result.append(solrUtils.toFilterQueryString(value, UserReference.class));
             } else if (value instanceof EntityReference) {
-                result.append(
-                    solrUtils.toFilterQueryString(this.entityReferenceSerializer.serialize((EntityReference) value)));
+                result.append(solrUtils.toFilterQueryString(value, EntityReference.class));
             } else if (value != null) {
                 result.append(value);
             }
@@ -256,29 +234,33 @@ public class SolrRatingsManager implements RatingsManager
     {
         SolrInputDocument result = new SolrInputDocument();
         solrUtils.setId(rating.getId(), result);
-        solrUtils.set(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
-            this.entityReferenceSerializer.serialize(rating.getReference()), result);
-        solrUtils.set(RatingQueryField.ENTITY_TYPE.getFieldName(),
-            rating.getReference().getType().toString(), result);
+        solrUtils.setString(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating.getReference(),
+            EntityReference.class, result);
         solrUtils.set(RatingQueryField.CREATED_DATE.getFieldName(), rating.getCreatedAt(), result);
         solrUtils.set(RatingQueryField.UPDATED_DATE.getFieldName(), rating.getUpdatedAt(), result);
-        solrUtils.set(RatingQueryField.USER_REFERENCE.getFieldName(),
-            this.userReferenceSerializer.serialize(rating.getAuthor()), result);
+        solrUtils.setString(RatingQueryField.USER_REFERENCE.getFieldName(), rating.getAuthor(),
+            UserReference.class, result);
+        // set Parents to be able to easily request on them
+        EntityReference parentReference = rating.getReference().getParent();
+        List<EntityReference> parentReferenceList = new ArrayList<>();
+        while (parentReference != null) {
+            parentReferenceList.add(parentReference);
+            parentReference = parentReference.getParent();
+        }
+        this.solrUtils.setString(RatingsManager.RatingQueryField.PARENTS_REFERENCE.getFieldName(), parentReferenceList,
+            EntityReference.class, result);
         solrUtils.set(RatingQueryField.SCALE.getFieldName(), rating.getScaleUpperBound(), result);
         solrUtils.set(RatingQueryField.MANAGER_ID.getFieldName(), rating.getManagerId(), result);
         solrUtils.set(RatingQueryField.VOTE.getFieldName(), rating.getVote(), result);
         return result;
     }
 
-    private Optional<Rating> retrieveExistingRanking(EntityReference rankedEntity, UserReference voter)
+    private Optional<Rating> retrieveExistingRating(EntityReference reference, UserReference voter)
         throws RatingsException
     {
-        String serializedEntity = this.entityReferenceSerializer.serialize(rankedEntity);
-        String serializedUserReference = this.userReferenceSerializer.serialize(voter);
         Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingQueryField.ENTITY_REFERENCE, serializedEntity);
-        queryMap.put(RatingQueryField.ENTITY_TYPE, rankedEntity.getType());
-        queryMap.put(RatingQueryField.USER_REFERENCE, serializedUserReference);
+        queryMap.put(RatingQueryField.ENTITY_REFERENCE, reference);
+        queryMap.put(RatingQueryField.USER_REFERENCE, voter);
 
         List<Rating> ratings = this.getRatings(queryMap, 0, 1, RatingQueryField.CREATED_DATE, true);
         if (ratings.isEmpty()) {
@@ -294,12 +276,12 @@ public class SolrRatingsManager implements RatingsManager
     {
         // If the vote is outside the scope of the scale, we throw an exception immediately.
         if (vote < 0 || vote > this.getScale()) {
-            throw new RatingsException(String.format("The vote [%s] is out of scale [%s] for [%s] ranking manager.",
+            throw new RatingsException(String.format("The vote [%s] is out of scale [%s] for [%s] rating manager.",
                 vote, this.getScale(), this.getIdentifier()));
         }
 
         // Check if a vote for the same entity by the same user and on the same manager already exists.
-        Optional<Rating> existingRanking = this.retrieveExistingRanking(reference, user);
+        Optional<Rating> existingRating = this.retrieveExistingRating(reference, user);
 
         boolean storeAverage = this.getRatingConfiguration().isAverageStored();
         Event event = null;
@@ -307,7 +289,7 @@ public class SolrRatingsManager implements RatingsManager
         Rating oldRating = null;
 
         // It's the first vote for the tuple entity, user, manager.
-        if (!existingRanking.isPresent()) {
+        if (!existingRating.isPresent()) {
 
             // We only store the vote if it's not 0 or if the configuration allows to store 0
             if (vote != 0 || this.getRatingConfiguration().isZeroStored()) {
@@ -326,7 +308,7 @@ public class SolrRatingsManager implements RatingsManager
 
         // There was already a vote with the same information
         } else {
-            oldRating = existingRanking.get();
+            oldRating = existingRating.get();
 
             // If the vote is not 0 or if we store zero, we just modify the existing vote
             if (vote != 0) {
@@ -363,7 +345,7 @@ public class SolrRatingsManager implements RatingsManager
                 }
             } catch (SolrServerException | IOException | SolrException e) {
                 throw new RatingsException(
-                    String.format("Error when storing rank information for entity [%s] with user [%s].",
+                    String.format("Error when storing rating information for entity [%s] with user [%s].",
                         reference, user), e);
             }
         }
@@ -382,9 +364,9 @@ public class SolrRatingsManager implements RatingsManager
 
         try {
             QueryResponse query = this.getRatingSolrClient().query(solrQuery);
-            return this.getRankingsFromQueryResult(query.getResults());
+            return this.getRatingsFromQueryResult(query.getResults());
         } catch (SolrServerException | IOException | SolrException e) {
-            throw new RatingsException("Error while trying to get rankings", e);
+            throw new RatingsException("Error while trying to get ratings", e);
         }
     }
 
@@ -400,7 +382,7 @@ public class SolrRatingsManager implements RatingsManager
             QueryResponse query = this.getRatingSolrClient().query(solrQuery);
             return query.getResults().getNumFound();
         } catch (SolrServerException | IOException | SolrException e) {
-            throw new RatingsException("Error while trying to get count of rankings", e);
+            throw new RatingsException("Error while trying to get count of ratings", e);
         }
     }
 
@@ -422,11 +404,36 @@ public class SolrRatingsManager implements RatingsManager
                 }
                 return true;
             } catch (SolrServerException | IOException | SolrException e) {
-                throw new RatingsException("Error while removing ranking.", e);
+                throw new RatingsException("Error while removing rating.", e);
             }
         } else {
             return false;
         }
+    }
+
+    @Override
+    public long removeRatings(EntityReference entityReference) throws RatingsException
+    {
+        String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
+        String filterQuery = String.format("filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))",
+            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
+            RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
+        SolrQuery solrQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(0);
+
+        long result;
+        try {
+            QueryResponse query = this.getRatingSolrClient().query(solrQuery);
+            result = query.getResults().getNumFound();
+            this.getRatingSolrClient().deleteByQuery(filterQuery);
+            this.getRatingSolrClient().commit();
+        } catch (SolrServerException | IOException | SolrException e) {
+            throw new RatingsException("Error while trying to remove ratings", e);
+        }
+        return result;
     }
 
     @Override
@@ -456,8 +463,7 @@ public class SolrRatingsManager implements RatingsManager
     {
         if (this.getRatingConfiguration().isAverageStored()) {
             Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put(RatingQueryField.ENTITY_REFERENCE, this.entityReferenceSerializer.serialize(entityReference));
-            queryMap.put(RatingQueryField.ENTITY_TYPE, entityReference.getType());
+            queryMap.put(RatingQueryField.ENTITY_REFERENCE, entityReference);
 
             Long sumOfVotes = 0L;
             int numberOfVotes = 0;

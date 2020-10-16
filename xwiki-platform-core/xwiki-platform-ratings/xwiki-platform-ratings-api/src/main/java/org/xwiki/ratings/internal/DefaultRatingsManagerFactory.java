@@ -19,6 +19,9 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,6 +37,8 @@ import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+
+import liquibase.util.StringUtils;
 
 /**
  * Default implementation of {@link RatingsManagerFactory}.
@@ -109,7 +114,26 @@ public class DefaultRatingsManagerFactory implements RatingsManagerFactory
             }
             return result;
         } catch (ComponentLookupException | ComponentRepositoryException e) {
+            throw new RatingsException(
+                String.format("Error when trying to instantiate Rating Manager with name [%s]", managerName), e);
+        }
+    }
+
+    @Override
+    public List<RatingsManager> getInstantiatedManagers() throws RatingsException
+    {
+        List<RatingsManager> result = new ArrayList<>();
+        try {
+            List<RatingsManager> instanceList = this.contextComponentManager.getInstanceList(RatingsManager.class);
+            for (RatingsManager ratingsManager : instanceList) {
+                if (!StringUtils.isEmpty(ratingsManager.getIdentifier())) {
+                    result.add(ratingsManager);
+                }
+            }
+        } catch (ComponentLookupException e) {
             throw new RatingsException("Error when trying to get a RatingManager", e);
         }
+
+        return result;
     }
 }

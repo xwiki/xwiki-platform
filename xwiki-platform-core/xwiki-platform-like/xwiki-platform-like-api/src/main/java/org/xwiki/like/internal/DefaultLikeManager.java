@@ -19,20 +19,26 @@
  */
 package org.xwiki.like.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheEntry;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -41,6 +47,7 @@ import org.xwiki.like.LikeEvent;
 import org.xwiki.like.LikeException;
 import org.xwiki.like.LikeManager;
 import org.xwiki.like.UnlikeEvent;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -92,13 +99,76 @@ public class DefaultLikeManager implements LikeManager, Initializable
     @Inject
     private LikeConfiguration likeConfiguration;
 
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
+
     private RatingsManager ratingsManager;
 
     private Cache<Long> likeCountCache;
 
-    private Cache<Boolean> likeExistCache;
+    private Cache<Pair<EntityReference, Boolean>> likeExistCache;
 
     private Right likeRight;
+
+    private LikeExistCacheEntryListener likeExistCacheEntryListener;
+
+    /**
+     * A dedicated {@link CacheEntryListener} implementation for the likeExistCache.
+     * The purpose of this implementation is to be able to find back the keys of the cache related to a specific entity.
+     * This allows to properly clean the cache entity when using {@link #clearCache(EntityReference)}.
+     *
+     * @version $Id$
+     * @since 12.9RC1
+     */
+    static class LikeExistCacheEntryListener implements CacheEntryListener<Pair<EntityReference, Boolean>>
+    {
+        private final Map<EntityReference, List<String>> referenceKeyMapping = new ConcurrentHashMap<>();
+
+        @Override
+        public void cacheEntryAdded(CacheEntryEvent<Pair<EntityReference, Boolean>> event)
+        {
+            CacheEntry<Pair<EntityReference, Boolean>> entry = event.getEntry();
+            String key = entry.getKey();
+            EntityReference entityReference = entry.getValue().getLeft();
+            List<String> keyList;
+
+            if (this.referenceKeyMapping.containsKey(entityReference)) {
+                keyList = this.referenceKeyMapping.get(entityReference);
+                keyList.add(key);
+            } else {
+                keyList = new ArrayList<>();
+                keyList.add(key);
+                this.referenceKeyMapping.put(entityReference, keyList);
+            }
+        }
+
+        @Override
+        public void cacheEntryRemoved(CacheEntryEvent<Pair<EntityReference, Boolean>> event)
+        {
+            CacheEntry<Pair<EntityReference, Boolean>> entry = event.getEntry();
+            String key = entry.getKey();
+            EntityReference entityReference = entry.getValue().getLeft();
+
+            if (this.referenceKeyMapping.containsKey(entityReference)) {
+                List<String> keyList = this.referenceKeyMapping.get(entityReference);
+                keyList.remove(key);
+                if (keyList.isEmpty()) {
+                    this.referenceKeyMapping.remove(entityReference);
+                }
+            }
+        }
+
+        @Override
+        public void cacheEntryModified(CacheEntryEvent<Pair<EntityReference, Boolean>> event)
+        {
+            // do nothing
+        }
+
+        public Map<EntityReference, List<String>> getReferenceKeyMapping()
+        {
+            return referenceKeyMapping;
+        }
+    }
 
     @Override
     public void initialize() throws InitializationException
@@ -109,6 +179,8 @@ public class DefaultLikeManager implements LikeManager, Initializable
                 new LRUCacheConfiguration("xwiki.like.count.cache", likeCacheCapacity));
             this.likeExistCache = this.cacheManager.createNewCache(
                 new LRUCacheConfiguration("xwiki.like.exist.cache", likeCacheCapacity));
+            this.likeExistCacheEntryListener = new LikeExistCacheEntryListener();
+            this.likeExistCache.addCacheEntryListener(this.likeExistCacheEntryListener);
             this.likeRight = this.authorizationManager.register(LikeRight.INSTANCE);
         } catch (UnableToRegisterRightException e) {
             throw new InitializationException("Error while registering the Like right.", e);
@@ -118,9 +190,9 @@ public class DefaultLikeManager implements LikeManager, Initializable
 
         try {
             this.ratingsManager = this.ratingsManagerFactory
-                .getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT);
+                .getRatingsManager(LikeRatingsConfiguration.RATING_MANAGER_HINT);
         } catch (RatingsException e) {
-            throw new InitializationException("Error while trying to get the RankingManager.", e);
+            throw new InitializationException("Error while trying to get the RatingManager.", e);
         }
     }
 
@@ -136,11 +208,12 @@ public class DefaultLikeManager implements LikeManager, Initializable
         DocumentReference userDoc = this.userReferenceDocumentSerializer.serialize(source);
         if (this.authorizationManager.hasAccess(this.likeRight, userDoc, target)) {
             try {
-                this.ratingsManager.saveRating(target, source, DEFAULT_LIKE_VOTE);
-                this.likeCountCache.remove(this.entityReferenceSerializer.serialize(target));
-                this.likeExistCache.set(getExistCacheKey(source, target), true);
-                long newCount = this.getEntityLikes(target);
-                this.observationManager.notify(new LikeEvent(), source, target);
+                EntityReference dedupTarget = this.entityReferenceFactory.getReference(target);
+                this.ratingsManager.saveRating(dedupTarget, source, DEFAULT_LIKE_VOTE);
+                this.likeCountCache.remove(this.entityReferenceSerializer.serialize(dedupTarget));
+                this.likeExistCache.set(getExistCacheKey(source, target), Pair.of(dedupTarget, true));
+                long newCount = this.getEntityLikes(dedupTarget);
+                this.observationManager.notify(new LikeEvent(), source, dedupTarget);
                 return newCount;
             } catch (RatingsException e) {
                 throw new LikeException(String.format("Error while liking entity [%s]", target), e);
@@ -186,7 +259,6 @@ public class DefaultLikeManager implements LikeManager, Initializable
         Long result = this.likeCountCache.get(this.entityReferenceSerializer.serialize(target));
         if (result == null) {
             Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
             queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
             try {
                 result = this.ratingsManager.countRatings(queryMap);
@@ -206,9 +278,9 @@ public class DefaultLikeManager implements LikeManager, Initializable
         DocumentReference userDoc = this.userReferenceDocumentSerializer.serialize(source);
         boolean result = false;
         if (this.authorizationManager.hasAccess(this.getLikeRight(), userDoc, target)) {
+            EntityReference dedupTarget = this.entityReferenceFactory.getReference(target);
             Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
-            queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
+            queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, dedupTarget);
             queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, source);
 
             try {
@@ -218,11 +290,11 @@ public class DefaultLikeManager implements LikeManager, Initializable
                 if (!ratings.isEmpty()) {
                     result = this.ratingsManager.removeRating(ratings.get(0).getId());
                     this.likeCountCache.remove(serializedTarget);
-                    this.likeExistCache.set(getExistCacheKey(source, target), false);
-                    this.observationManager.notify(new UnlikeEvent(), source, target);
+                    this.likeExistCache.set(getExistCacheKey(source, dedupTarget), Pair.of(dedupTarget, false));
+                    this.observationManager.notify(new UnlikeEvent(), source, dedupTarget);
                 }
             } catch (RatingsException e) {
-                throw new LikeException("Error while removing grading", e);
+                throw new LikeException("Error while removing rating", e);
             }
         } else {
             throw new LikeException(
@@ -235,11 +307,12 @@ public class DefaultLikeManager implements LikeManager, Initializable
     @Override
     public boolean isLiked(UserReference source, EntityReference target) throws LikeException
     {
-        Boolean result = this.likeExistCache.get(getExistCacheKey(source, target));
+        Pair<EntityReference, Boolean> cacheValue = this.likeExistCache.get(getExistCacheKey(source, target));
+        Boolean result = (cacheValue != null) ? cacheValue.getRight() : null;
         if (result == null) {
+            EntityReference dedupTarget = this.entityReferenceFactory.getReference(target);
             Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-            queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
-            queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
+            queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, dedupTarget);
             queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, source);
 
             try {
@@ -247,9 +320,9 @@ public class DefaultLikeManager implements LikeManager, Initializable
                     this.ratingsManager
                         .getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false);
                 result = !ratings.isEmpty();
-                this.likeExistCache.set(getExistCacheKey(source, target), result);
+                this.likeExistCache.set(getExistCacheKey(source, dedupTarget), Pair.of(dedupTarget, result));
             } catch (RatingsException e) {
-                throw new LikeException("Error while checking if grading exists", e);
+                throw new LikeException("Error while checking if rating exists", e);
             }
         }
         return result;
@@ -259,7 +332,6 @@ public class DefaultLikeManager implements LikeManager, Initializable
     public List<UserReference> getLikers(EntityReference target, int offset, int limit) throws LikeException
     {
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         try {
             List<Rating> ratings = this.ratingsManager
@@ -274,5 +346,23 @@ public class DefaultLikeManager implements LikeManager, Initializable
     public Right getLikeRight()
     {
         return this.likeRight;
+    }
+
+    @Override
+    public void clearCache(EntityReference target)
+    {
+        this.likeCountCache.remove(this.entityReferenceSerializer.serialize(target));
+        List<String> impactedKeys =
+            this.likeExistCacheEntryListener.getReferenceKeyMapping().getOrDefault(target, Collections.emptyList());
+        for (String impactedKey : impactedKeys) {
+            this.likeExistCache.remove(impactedKey);
+        }
+    }
+
+    @Override
+    public void clearCache()
+    {
+        this.likeCountCache.removeAll();
+        this.likeExistCache.removeAll();
     }
 }

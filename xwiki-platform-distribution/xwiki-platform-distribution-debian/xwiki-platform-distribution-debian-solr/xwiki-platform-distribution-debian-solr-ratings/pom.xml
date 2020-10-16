@@ -27,14 +27,14 @@
     <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
     <version>12.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-solr-like</artifactId>
+  <artifactId>xwiki-platform-distribution-debian-solr-ratings</artifactId>
   <packaging>deb</packaging>
-  <name>XWiki Platform - Distribution - Debian - Solr - Like</name>
-  <description>Install a Solr core for likes in the right location (based on Solr default setup)</description>
+  <name>XWiki Platform - Distribution - Debian - Solr - Ratings</name>
+  <description>Install a Solr core for ratings in the right location (based on Solr default setup)</description>
   <properties>
     <data.path>${project.build.directory}/data</data.path>
 
-    <debian.package>xwiki-solr-like</debian.package>
+    <debian.package>xwiki-solr-ratings</debian.package>
 
     <debian.solr.description>
  XWiki is a free wiki software platform written in Java with a design emphasis
@@ -99,16 +99,16 @@
               <type>directory</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/var/lib/xwiki/solr/like</prefix>
+                <prefix>/var/lib/xwiki/solr/ratings</prefix>
               </mapper>
               <conffile>true</conffile>
             </data>
-            <!-- Register the events core in Solr -->
+            <!-- Register the ratings core in Solr -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/var/solr/data/xwiki_like</linkName>
-              <linkTarget>/var/lib/xwiki/solr/like</linkTarget>
+              <linkName>/var/solr/data/xwiki_ratings</linkName>
+              <linkTarget>/var/lib/xwiki/solr/ratings</linkTarget>
             </data>
           </dataSet>
         </configuration>

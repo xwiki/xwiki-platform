@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,6 +37,7 @@ import org.xwiki.like.LikeConfiguration;
 import org.xwiki.like.LikeEvent;
 import org.xwiki.like.LikeException;
 import org.xwiki.like.UnlikeEvent;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -102,11 +104,14 @@ public class DefaultLikeManagerTest
     @MockComponent
     private RatingsManagerFactory ratingsManagerFactory;
 
+    @MockComponent
+    private EntityReferenceFactory entityReferenceFactory;
+
     private RatingsManager ratingsManager;
 
     private Cache<Long> likedEntityCache;
 
-    private Cache<Boolean> likeExistCache;
+    private Cache<Pair<EntityReference, Boolean>> likeExistCache;
 
     private Right likeRight;
 
@@ -136,7 +141,7 @@ public class DefaultLikeManagerTest
             }
         });
         this.ratingsManager = mock(RatingsManager.class);
-        when(this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RANKING_MANAGER_HINT))
+        when(this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RATING_MANAGER_HINT))
             .thenReturn(this.ratingsManager);
     }
 
@@ -149,6 +154,7 @@ public class DefaultLikeManagerTest
 
         this.target = new DocumentReference("xwiki", "Foo", "WebHome");
         when(this.entityReferenceSerializer.serialize(this.target)).thenReturn("xwiki:Foo.WebHome");
+        when(this.entityReferenceFactory.getReference(any())).then(invocationOnMock -> invocationOnMock.getArgument(0));
     }
 
     @Test
@@ -157,7 +163,6 @@ public class DefaultLikeManagerTest
         when(this.authorizationManager.hasAccess(this.likeRight, this.userDocReference, target)).thenReturn(true);
 
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         when(this.ratingsManager.countRatings(queryMap)).thenReturn(42L);
 
@@ -166,7 +171,7 @@ public class DefaultLikeManagerTest
         verify(this.observationManager).notify(any(LikeEvent.class), eq(this.userReference), eq(target));
         verify(this.likedEntityCache).remove("xwiki:Foo.WebHome");
         verify(this.likedEntityCache).set("xwiki:Foo.WebHome", 42L);
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", true);
+        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, true));
     }
 
     @Test
@@ -190,7 +195,6 @@ public class DefaultLikeManagerTest
     void getEntityLikes() throws Exception
     {
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         when(this.ratingsManager.countRatings(queryMap)).thenReturn(43L);
 
@@ -236,14 +240,13 @@ public class DefaultLikeManagerTest
         assertFalse(this.defaultLikeManager.isLiked(this.userReference, target));
 
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.userReference);
 
         when(this.ratingsManager.getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false)).
             thenReturn(Collections.singletonList(mock(Rating.class)));
         assertTrue(this.defaultLikeManager.isLiked(this.userReference, target));
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", true);
+        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, true));
     }
 
     @Test
@@ -253,20 +256,19 @@ public class DefaultLikeManagerTest
         assertFalse(this.defaultLikeManager.removeLike(this.userReference, target));
 
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.userReference);
-        Rating grading = mock(Rating.class);
-        when(grading.getId()).thenReturn("grading423");
+        Rating rating = mock(Rating.class);
+        when(rating.getId()).thenReturn("grading423");
 
         when(this.ratingsManager.getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false))
-            .thenReturn(Collections.singletonList(grading));
+            .thenReturn(Collections.singletonList(rating));
         when(this.ratingsManager.removeRating("grading423")).thenReturn(true);
 
         assertTrue(this.defaultLikeManager.removeLike(this.userReference, target));
         verify(this.ratingsManager).removeRating("grading423");
         verify(this.observationManager).notify(any(UnlikeEvent.class), eq(this.userReference), eq(this.target));
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", false);
+        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, false));
         verify(this.likedEntityCache).remove("xwiki:Foo.WebHome");
     }
 
@@ -300,7 +302,6 @@ public class DefaultLikeManagerTest
         when(grading3.getAuthor()).thenReturn(userReference3);
 
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
-        queryMap.put(RatingsManager.RatingQueryField.ENTITY_TYPE, target.getType());
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
 
         when(this.ratingsManager.getRatings(queryMap, 12, 4, RatingsManager.RatingQueryField.UPDATED_DATE, false))

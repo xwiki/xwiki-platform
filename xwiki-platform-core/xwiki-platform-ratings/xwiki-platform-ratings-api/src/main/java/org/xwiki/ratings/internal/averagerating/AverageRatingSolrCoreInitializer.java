@@ -51,7 +51,7 @@ public class AverageRatingSolrCoreInitializer extends AbstractSolrCoreInitialize
     {
         this.addStringField(AverageRatingQueryField.MANAGER_ID.getFieldName(), false, false);
         this.addStringField(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), false, false);
-        this.addStringField(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), false, false);
+        this.addStringField(AverageRatingQueryField.PARENTS.getFieldName(), true, false);
         this.addPFloatField(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), false, false);
         this.addPIntField(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), false, false);
         this.addPIntField(AverageRatingQueryField.SCALE.getFieldName(), false, false);

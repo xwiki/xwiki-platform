@@ -3,3 +3,4 @@ org.xwiki.like.internal.DefaultLikeManager
 org.xwiki.like.internal.DefaultLikeConfiguration
 org.xwiki.like.internal.LikeConfigurationSource
 org.xwiki.like.internal.LikeRatingsConfiguration
+org.xwiki.like.internal.DeletedEntityLikeListener

@@ -46,12 +46,12 @@ public class DefaultRatingTest
     void simpleConstructor()
     {
         Date currentDate = new Date();
-        DefaultRating defaultRanking = new DefaultRating("myId");
-        assertEquals("myId", defaultRanking.getId());
+        DefaultRating defaultRating = new DefaultRating("myId");
+        assertEquals("myId", defaultRating.getId());
         assertTrue(currentDate.toInstant()
-            .isAfter(defaultRanking.getUpdatedAt().toInstant().minus(1, ChronoUnit.MINUTES)));
+            .isAfter(defaultRating.getUpdatedAt().toInstant().minus(1, ChronoUnit.MINUTES)));
         assertTrue(currentDate.toInstant()
-            .isAfter(defaultRanking.getCreatedAt().toInstant().minus(1, ChronoUnit.MINUTES)));
+            .isAfter(defaultRating.getCreatedAt().toInstant().minus(1, ChronoUnit.MINUTES)));
     }
 
     @Test
@@ -109,18 +109,18 @@ public class DefaultRatingTest
             }
         };
 
-        DefaultRating defaultRanking = new DefaultRating(customRating);
-        assertNotEquals(defaultRanking, customRating);
-        assertEquals("SOmething", defaultRanking.getId());
-        assertEquals("Foobarbar", defaultRanking.getManagerId());
-        assertEquals(new EntityReference("Aahahha", EntityType.CLASS_PROPERTY), defaultRanking.getReference());
-        assertEquals(EntityType.CLASS_PROPERTY, defaultRanking.getReference().getType());
-        assertSame(userReference, defaultRanking.getAuthor());
-        assertEquals(new Date(12), defaultRanking.getCreatedAt());
-        assertEquals(new Date(243), defaultRanking.getUpdatedAt());
-        assertEquals(42, defaultRanking.getVote());
-        assertEquals(43, defaultRanking.getScaleUpperBound());
+        DefaultRating defaultRating = new DefaultRating(customRating);
+        assertNotEquals(defaultRating, customRating);
+        assertEquals("SOmething", defaultRating.getId());
+        assertEquals("Foobarbar", defaultRating.getManagerId());
+        assertEquals(new EntityReference("Aahahha", EntityType.CLASS_PROPERTY), defaultRating.getReference());
+        assertEquals(EntityType.CLASS_PROPERTY, defaultRating.getReference().getType());
+        assertSame(userReference, defaultRating.getAuthor());
+        assertEquals(new Date(12), defaultRating.getCreatedAt());
+        assertEquals(new Date(243), defaultRating.getUpdatedAt());
+        assertEquals(42, defaultRating.getVote());
+        assertEquals(43, defaultRating.getScaleUpperBound());
 
-        assertEquals(defaultRanking, new DefaultRating(defaultRanking));
+        assertEquals(defaultRating, new DefaultRating(defaultRating));
     }
 }

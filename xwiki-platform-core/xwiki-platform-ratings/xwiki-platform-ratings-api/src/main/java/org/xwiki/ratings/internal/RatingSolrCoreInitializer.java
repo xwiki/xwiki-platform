@@ -41,13 +41,13 @@ import org.xwiki.search.solr.SolrException;
  */
 @Component
 @Singleton
-@Named(RatingSolrCoreInitializer.DEFAULT_RATING_SOLR_CORE)
+@Named(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)
 public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
 {
     /**
-     * Name of the Solr core for ranking.
+     * Name of the Solr core for rating.
      */
-    public static final String DEFAULT_RATING_SOLR_CORE = "rating";
+    public static final String DEFAULT_RATINGS_SOLR_CORE = "ratings";
 
     private static final long CURRENT_VERSION = 120900000;
 
@@ -68,7 +68,7 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
     {
         this.addStringField(RatingsManager.RatingQueryField.MANAGER_ID.getFieldName(), false, false);
         this.addStringField(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), false, false);
-        this.addStringField(RatingsManager.RatingQueryField.ENTITY_TYPE.getFieldName(), false, false);
+        this.addStringField(RatingsManager.RatingQueryField.PARENTS_REFERENCE.getFieldName(), true, false);
         this.addStringField(RatingsManager.RatingQueryField.USER_REFERENCE.getFieldName(), false, false);
         this.addPIntField(RatingsManager.RatingQueryField.VOTE.getFieldName(), false, false);
         this.addPIntField(RatingsManager.RatingQueryField.SCALE.getFieldName(), false, false);
@@ -92,6 +92,7 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
      *          Field "date" became "createdDate" and "updatedDate"
      *          Field "parent" became "reference"
      *          Field "ratingId" has been removed
+     *          Field "parents" has been added
      *          Field "managerId" has been added -> constant value
      *          Field "entityType" has been added -> constant value
      *          Field "scale" has been added -> constant value
@@ -103,7 +104,7 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
         // Step 1: Add missing fields (only vote and authors remains identical)
         this.addStringField(RatingsManager.RatingQueryField.MANAGER_ID.getFieldName(), false, false);
         this.addStringField(RatingsManager.RatingQueryField.ENTITY_REFERENCE.getFieldName(), false, false);
-        this.addStringField(RatingsManager.RatingQueryField.ENTITY_TYPE.getFieldName(), false, false);
+        this.addStringField(RatingsManager.RatingQueryField.PARENTS_REFERENCE.getFieldName(), true, false);
         this.addPIntField(RatingsManager.RatingQueryField.SCALE.getFieldName(), false, false);
         this.addPDateField(RatingsManager.RatingQueryField.CREATED_DATE.getFieldName(), false, false);
         this.addPDateField(RatingsManager.RatingQueryField.UPDATED_DATE.getFieldName(), false, false);

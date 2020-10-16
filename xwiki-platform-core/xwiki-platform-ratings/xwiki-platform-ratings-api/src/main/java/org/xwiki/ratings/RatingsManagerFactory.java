@@ -19,6 +19,8 @@
  */
 package org.xwiki.ratings;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -48,4 +50,12 @@ public interface RatingsManagerFactory
      * @throws RatingsException in case of problem when creating or retrieving the component.
      */
     RatingsManager getRatingsManager(String managerName) throws RatingsException;
+
+    /**
+     * Retrieve the list of instantiated managers from the factory.
+     *
+     * @return the list of {@link RatingsManager} instantiated through the factory.
+     * @throws RatingsException in case of problem when retrieving the managers.
+     */
+    List<RatingsManager> getInstantiatedManagers() throws RatingsException;
 }

@@ -143,7 +143,6 @@ public abstract class AbstractScriptRatingsManager
         try {
             Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
             queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
-            queryParameters.put(RatingsManager.RatingQueryField.ENTITY_TYPE, reference.getType());
             return this.ratingsManager.getRatings(queryParameters, offset, limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE, asc);
         } catch (RatingsException e) {
@@ -182,7 +181,6 @@ public abstract class AbstractScriptRatingsManager
         Optional<Rating> result = Optional.empty();
         Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
-        queryParameters.put(RatingsManager.RatingQueryField.ENTITY_TYPE, reference.getType());
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, author);
         try {
             List<Rating> ratings = this.ratingsManager.getRatings(queryParameters, 0, 1,

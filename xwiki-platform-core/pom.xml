@@ -517,6 +517,16 @@
                 <new>method long org.xwiki.like.LikeManager::countUserLikes(org.xwiki.user.UserReference) throws org.xwiki.like.LikeException</new>
                 <justification>Unstable API.</justification>
               </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.like.LikeManager::clearCache()</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.like.LikeManager::clearCache(org.xwiki.model.reference.EntityReference)</new>
+                <justification>Unstable API.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

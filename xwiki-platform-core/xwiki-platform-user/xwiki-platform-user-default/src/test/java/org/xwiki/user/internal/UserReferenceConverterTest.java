@@ -27,9 +27,11 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,6 +50,9 @@ class UserReferenceConverterTest
     @Named("current")
     private UserReferenceResolver<String> userReferenceResolver;
 
+    @MockComponent
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
     @Test
     void convertToType()
     {
@@ -62,5 +67,14 @@ class UserReferenceConverterTest
     void convertToTypeValueNull()
     {
         assertNull(this.converter.convertToType(null, null));
+    }
+
+    @Test
+    void convertToString()
+    {
+        UserReference userReference = mock(UserReference.class);
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn("space.userPage");
+        String convertedReference = this.converter.convert(String.class, userReference);
+        assertEquals("space.userPage", convertedReference);
     }
 }

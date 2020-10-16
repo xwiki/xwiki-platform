@@ -66,7 +66,6 @@ public class AverageRatingClassDocumentInitializer extends AbstractMandatoryClas
         xclass.addNumberField(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), "Average Vote", 5, "float");
         xclass.addTextField(AverageRatingQueryField.MANAGER_ID.getFieldName(), "Manager Identifier", 100);
         xclass.addTextField(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), "Voted Entity Reference", 255);
-        xclass.addTextField(AverageRatingQueryField.ENTITY_TYPE.getFieldName(), "Voted entity type", 100);
         xclass.addNumberField(AverageRatingQueryField.SCALE.getFieldName(), "Scale of votes", 3, INTEGER_TYPE);
         xclass.addDateField(AverageRatingQueryField.UPDATED_AT.getFieldName(), "Date of last update");
     }

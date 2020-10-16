@@ -26,9 +26,13 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,27 +51,65 @@ class DefaultRefactoringConfigurationTest
     @Named("refactoring")
     private ConfigurationSource configurationSource;
 
+    @MockComponent
+    @Named("refactoringmainwiki")
+    private ConfigurationSource mainWikiConfigurationSource;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesSource;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Test
-    void isRecycleBinSkippingActivatedDefault()
+    void isRecycleBinSkippingActivatedOnMainWikiConfigurationDefault()
     {
-        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", false)).thenReturn(false);
-        boolean actual = this.configuration.isRecycleBinSkippingActivated();
-        assertFalse(actual);
+        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class)).thenReturn(null);
+        when(this.wikiDescriptorManager.isMainWiki(any())).thenReturn(true);
+        when(this.xwikiPropertiesSource.getProperty("refactoring.isRecycleBinSkippingActivated", false))
+            .thenReturn(false);
+
+        assertFalse(this.configuration.isRecycleBinSkippingActivated());
+
+        verify(this.mainWikiConfigurationSource, never()).getProperty(any(), any());
     }
 
     @Test
-    void isRecycleBinSkippingActivatedTrue()
+    void isRecycleBinSkippingActivatedOnSubWikiConfigurationDefault()
     {
-        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", false)).thenReturn(true);
-        boolean actual = this.configuration.isRecycleBinSkippingActivated();
-        assertTrue(actual);
+        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class)).thenReturn(null);
+        when(this.wikiDescriptorManager.isMainWiki(any())).thenReturn(false);
+        when(this.mainWikiConfigurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class))
+            .thenReturn(null);
+        when(this.xwikiPropertiesSource.getProperty("refactoring.isRecycleBinSkippingActivated", false))
+            .thenReturn(false);
+
+        assertFalse(this.configuration.isRecycleBinSkippingActivated());
     }
 
     @Test
-    void isRecycleBinSkippingActivatedFalse()
+    void isRecycleBinSkippingActivatedOnSubWikiConfigurationSetOnMainWiki()
     {
-        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", false)).thenReturn(false);
-        boolean actual = this.configuration.isRecycleBinSkippingActivated();
-        assertFalse(actual);
+        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class)).thenReturn(null);
+        when(this.wikiDescriptorManager.isMainWiki(any())).thenReturn(false);
+        when(this.mainWikiConfigurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class))
+            .thenReturn(true);
+
+        assertTrue(this.configuration.isRecycleBinSkippingActivated());
+
+        verify(this.xwikiPropertiesSource, never()).getProperty("refactoring.isRecycleBinSkippingActivated", false);
+    }
+
+    @Test
+    void isRecycleBinSkippingActivatedOnSubWikiConfigurationSetOnSubWiki()
+    {
+        when(this.configurationSource.getProperty("isRecycleBinSkippingActivated", Boolean.class)).thenReturn(false);
+
+        assertFalse(this.configuration.isRecycleBinSkippingActivated());
+
+        verify(this.wikiDescriptorManager, never()).isMainWiki(any());
+        verify(this.mainWikiConfigurationSource, never()).getProperty("isRecycleBinSkippingActivated", Boolean.class);
+        verify(this.xwikiPropertiesSource, never()).getProperty("refactoring.isRecycleBinSkippingActivated", false);
     }
 }

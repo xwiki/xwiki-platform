@@ -41,12 +41,12 @@
 
 #set ($configurationObject = 'Refactoring.Code.RefactoringConfiguration')
 
-{{html clean='false'}}
+{{html clean='false' wiki='true'}}
 &lt;form id='delete_Refactoring.Code.RefactoringConfiguration' method='post' action="${xwiki.getURL($configurationObject, 'save')}" class='xform'&gt;
   &lt;fieldset&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label for='Refactoring.Code.RefactoringConfiguration_Refactoring.Code.RefactoringConfigurationClass_0_isRecycleBinSkippingActivated'&gt;
+        &lt;label for='Refactoring.Code.RefactoringConfigurationClass_0_isRecycleBinSkippingActivated'&gt;
           $services.localization.render('Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated')
         &lt;/label&gt;
         &lt;span class='xHint'&gt;
@@ -54,12 +54,10 @@
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-{{/html}}
         $doc.display('isRecycleBinSkippingActivated', 'edit')
-{{html clean='false'}}
       &lt;/dd&gt;
     &lt;/dl&gt;
-    &lt;input type='hidden' id='Refactoring.Code.RefactoringConfiguration_redirect' name='xredirect' value='$xwiki.getRequestURL()'&gt;
+    &lt;input type='hidden' id='Refactoring.Code.RefactoringConfiguration_redirect' name='xredirect' value="$escapetool.url($xwiki.getRequestURL())"&gt;
     &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}"&gt;
   &lt;/fieldset&gt;
   &lt;div class='bottombuttons'&gt;

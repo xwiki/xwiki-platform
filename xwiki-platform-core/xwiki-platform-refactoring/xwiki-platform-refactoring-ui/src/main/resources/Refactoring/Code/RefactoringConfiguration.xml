@@ -450,9 +450,10 @@ $services.localization.render('refactoring.configuration.delete.emptySection')
       <code>#if (!$xwiki.hasRecycleBin())
 ## Hides the section of the menu in which the refactoring is displayed.
 ## This should be removed if new configuration values must be displayed regardless of the recycle bin status.
-#set ($doc = $xwiki.getDocument('Refactoring.Code.RefactoringConfiguration'))
-#set ($section = $doc.getObject('XWiki.ConfigurableClass').displayInSection)
-#panel-body-content a[data-id="$section"] {
+#set ($refactoringConfigurationDoc = $xwiki.getDocument('Refactoring.Code.RefactoringConfiguration'))
+#set ($refactoringConfigurationSection =
+        $refactoringConfigurationDoc.getObject('XWiki.ConfigurableClass').displayInSection)
+#panel-body-content a[data-id="$refactoringConfigurationSection"] {
   display: none;
 }
 #end</code>

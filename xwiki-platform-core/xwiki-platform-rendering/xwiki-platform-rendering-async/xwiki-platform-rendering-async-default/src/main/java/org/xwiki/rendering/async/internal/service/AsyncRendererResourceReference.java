@@ -21,6 +21,8 @@ package org.xwiki.rendering.async.internal.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
 
@@ -99,5 +101,40 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
     public String getWiki()
     {
         return this.wiki;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder()
+            .appendSuper(super.hashCode())
+            .append(getClientId())
+            .append(getId())
+            .append(getTimeout())
+            .append(getWiki())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+
+        AsyncRendererResourceReference rhs = (AsyncRendererResourceReference) object;
+        return new EqualsBuilder()
+            .appendSuper(super.equals(object))
+            .append(getClientId(), rhs.getClientId())
+            .append(getId(), rhs.getId())
+            .append(getTimeout(), rhs.getTimeout())
+            .append(getWiki(), rhs.getWiki())
+            .isEquals();
     }
 }

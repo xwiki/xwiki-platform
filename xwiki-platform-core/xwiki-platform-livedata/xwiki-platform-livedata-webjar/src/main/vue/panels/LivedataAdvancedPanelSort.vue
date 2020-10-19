@@ -62,7 +62,7 @@
           :key="level"
         >
           <!-- Property name -->
-          <span>{{ logic.properties.getPropertyDescriptor(sortEntry.property).name }}</span>
+          <span>{{ logic.properties.getDescriptor({ propertyId: sortEntry.property }).name }}</span>
           <span style="margin: 0 1rem"> - </span>
 
           <!--
@@ -157,7 +157,7 @@ export default {
 
     // Property descriptors that does not have a sort entry in Livedata config
     unsortedProperties () {
-      return this.logic.sort.getSortablePropertyDescriptors()
+      return this.logic.properties.getDescriptors({ sortable: true })
         .filter(propertyDescriptor => !this.logic.sort.getQuerySort(propertyDescriptor.id));
     },
   },

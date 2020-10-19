@@ -55,7 +55,7 @@
         v-for="layout in data.meta.layouts"
         :key="layout.id"
       >
-        <a href="#" @click.prevent="logic.layout.change(layout.id)">
+        <a href="#" @click.prevent="logic.layout.change({ layoutId: layout.id })">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
           {{ layout.name }}
         </a>

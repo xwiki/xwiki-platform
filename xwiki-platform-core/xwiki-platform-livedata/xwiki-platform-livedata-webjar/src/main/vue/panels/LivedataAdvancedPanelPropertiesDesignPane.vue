@@ -33,7 +33,10 @@
     <div class="property-design">
       <span class="design-title">Type</span>
       <select
-        @change="logic.properties.setType(property.id, $event.target.value)"
+        @change="logic.properties.setType({
+          propertyId: property.id,
+          type: $event.target.value,
+        })"
       >
         <!-- Available property types -->
         <option
@@ -52,7 +55,10 @@
     <div class="property-design">
       <span class="design-title">Displayer</span>
       <select
-        @change="logic.properties.setDisplayer(property.id, $event.target.value)"
+        @change="logic.properties.setDisplayer({
+          propertyId: property.id,
+          displayerId: $event.target.value,
+        })"
       >
         <!-- Default displayers -->
         <option
@@ -78,7 +84,10 @@
     <div class="property-design">
       <span class="design-title">Filter</span>
       <select
-        @change="logic.properties.setFilter(property.id, $event.target.value)"
+        @change="logic.properties.setFilter({
+          propertyId: property.id,
+          filterId: $event.target.value,
+        })"
       >
         <option
           :value="undefined"

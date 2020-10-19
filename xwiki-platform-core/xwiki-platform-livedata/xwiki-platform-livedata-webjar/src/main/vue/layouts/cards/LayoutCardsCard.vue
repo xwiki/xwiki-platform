@@ -32,7 +32,7 @@
       <!-- Entry selector -->
       <LivedataEntrySelector :entry="entry"/>
       <!-- Title property -->
-      <h2 v-if="!!titlePropertyId && logic.properties.isVisible(titlePropertyId)">
+      <h2 v-if="!!titlePropertyId && logic.properties.isVisible({ propertyId: titlePropertyId })">
         <LivedataDisplayer
           :property-id="titlePropertyId"
           :entry="entry"
@@ -57,7 +57,7 @@
         class="card-property"
         v-for="property in properties"
         :key="property.id"
-        v-show="logic.properties.isVisible(property.id) && property.id !== titlePropertyId"
+        v-show="logic.properties.isVisible({ propertyId: property.id }) && property.id !== titlePropertyId"
       >
         <!-- Specify the handle to drag properties -->
         <template #handle>
@@ -120,7 +120,10 @@ export default {
 
   methods: {
     reorderProperties (e) {
-      this.logic.properties.reorder(e.moved.element, e.moved.newIndex);
+      this.logic.properties.reorder({
+        propertyId: e.moved.element,
+        toIndex: e.moved.newIndex,
+      });
     },
   },
 

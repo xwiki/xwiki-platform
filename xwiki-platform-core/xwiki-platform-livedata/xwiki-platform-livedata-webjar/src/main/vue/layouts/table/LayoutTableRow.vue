@@ -35,7 +35,7 @@
       class="cell"
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.properties.isVisible(property.id)"
+      v-show="logic.properties.isVisible({ propertyId: property.id })"
     >
       <LivedataDisplayer
         :property-id="property.id"

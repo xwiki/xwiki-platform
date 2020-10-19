@@ -42,7 +42,7 @@
     >
       Entries per page
       <select
-        @change="logic.pagination.setPageSize(+$event.target.value)"
+        @change="logic.pagination.setPageSize({ pageSize: +$event.target.value })"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
@@ -84,7 +84,7 @@
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.pagination.setPageIndex(0)"
+        @click.prevent="logic.pagination.setPageIndex({ pageIndex: 0 })"
       >
         <span class="fa fa-angle-double-left"></span>
       </a>
@@ -98,7 +98,9 @@
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageIndex() - 1)"
+        @click.prevent="logic.pagination.setPageIndex({
+          pageIndex: logic.pagination.getPageIndex() - 1
+        })"
       >
         <span class="fa fa-angle-left"></span>
       </a>
@@ -132,7 +134,7 @@
             'current': pageIndex === logic.pagination.getPageIndex(),
           }"
           href="#"
-          @click.prevent="logic.pagination.setPageIndex(pageIndex)"
+          @click.prevent="logic.pagination.setPageIndex({ pageIndex })"
         >
           <!-- pageIndex + 1 because pageIndex are 0-based -->
           {{ pageIndex + 1 }}
@@ -148,7 +150,9 @@
         class="page-nav"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageIndex() + 1)"
+        @click.prevent="logic.pagination.setPageIndex({
+          pageIndex: logic.pagination.getPageIndex() + 1
+        })"
       >
         <span class="fa fa-angle-right"></span>
       </a>
@@ -162,7 +166,9 @@
         class="page-nav"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.pagination.setPageIndex(logic.pagination.getPageCount() - 1)"
+        @click.prevent="logic.pagination.setPageIndex({
+          pageIndex: logic.pagination.getPageCount() - 1
+        })"
       >
         <span class="fa fa-angle-double-right"></span>
       </a>

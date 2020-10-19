@@ -110,14 +110,17 @@ export default {
         // We use hidden properties because they are more likely to be
         // less numerous than visible ones
         return this.data.query.properties
-          .reduce((hiddenProperties, propertyId) => this.logic.properties.isVisible(propertyId)
+          .reduce((hiddenProperties, propertyId) => this.logic.properties.isVisible({ propertyId })
             ? hiddenProperties
             : hiddenProperties.concat(propertyId),
           []);
       },
       set (value) {
         this.data.query.properties.forEach(propertyId => {
-          this.logic.properties.setVisibility(propertyId, !value.includes(propertyId));
+          this.logic.properties.toggleVisibility({
+            propertyId,
+            visible: !value.includes(propertyId),
+          });
         });
       }
     },

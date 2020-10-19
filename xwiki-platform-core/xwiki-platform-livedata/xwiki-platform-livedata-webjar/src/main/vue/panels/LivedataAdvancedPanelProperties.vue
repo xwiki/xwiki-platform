@@ -88,8 +88,11 @@
               >
                 <input
                   type="checkbox"
-                  :checked="logic.properties.isVisible(property.id)"
-                  @change="logic.properties.setVisibility(property.id, $event.target.checked)"
+                  :checked="logic.properties.isVisible({ propertyId: property.id })"
+                  @change="logic.properties.toggleVisibility({
+                    propertyId: property.id,
+                    visible: $event.target.checked
+                  })"
                 />
               </div>
 
@@ -173,7 +176,10 @@ export default {
   methods: {
     // Event handler for when properties are dragged and dropped
     reorderProperties (e) {
-      this.logic.properties.reorder(e.moved.element, e.moved.newIndex);
+      this.logic.properties.reorder({
+        propertyId: e.moved.element,
+        toIndex: e.moved.newIndex,
+      });
     },
 
     // Event handler for when user click on button to expand / collapse edit panel

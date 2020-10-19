@@ -60,7 +60,7 @@
         <div class="filter-group-title">
           <!-- Property name -->
           <span class="property-name">
-            {{ logic.properties.getPropertyDescriptor(filterGroup.property).name }}
+            {{ logic.properties.getDescriptor({ propertyId: filterGroup.property }).name }}
           </span>
           <!--
             Filter Group delete button
@@ -248,10 +248,11 @@ export default {
 
     // Property descriptors that does not have a filter group in Livedata config
     unfilteredProperties () {
-      return this.logic.filters.getFilterablePropertyDescriptors().filter(propertyDescriptor => {
-        const filter = this.logic.filters.getQueryFilterGroup(propertyDescriptor.id);
-        return !filter || filter.constrains.length === 0;
-      });
+      return this.logic.properties.getDescriptors({ filterable: true })
+        .filter(propertyDescriptor => {
+          const filter = this.logic.filters.getQueryFilterGroup(propertyDescriptor.id);
+          return !filter || filter.constrains.length === 0;
+        });
     },
 
   },

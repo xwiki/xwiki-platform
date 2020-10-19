@@ -91,7 +91,7 @@ export default {
           // If the layout was not the default one, try to load default layout
           if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
             console.warn(err);
-            this.logic.layout.change(this.data.meta.defaultLayout);
+            this.logic.layout.change({ layoutId: this.data.meta.defaultLayout });
           } else {
             console.error(err);
           }

@@ -38,10 +38,10 @@
     <th
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.properties.isVisible(property.id)"
+      v-show="logic.properties.isVisible({ propertyId: property.id })"
     >
       <LivedataFilter
-        v-if="logic.filters.isFilterable(property.id)"
+        v-if="logic.properties.isFilterable({ propertyId: property.id })"
         :property-id="property.id"
         :index="0"
       />

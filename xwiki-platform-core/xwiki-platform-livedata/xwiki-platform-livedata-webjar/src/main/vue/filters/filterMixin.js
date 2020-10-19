@@ -46,7 +46,7 @@ export default {
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {
-      return this.logic.properties.getPropertyDescriptor(this.propertyId);
+      return this.logic.properties.getDescriptor({ propertyId: this.propertyId });
     },
     // The configuration (aka filterDescriptor) of the filter
     config () {

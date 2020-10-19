@@ -36,18 +36,21 @@ define([
    */
 
 
+  /**
+   * Logic Layout Module
+   */
   class LogicLayout {
 
     constructor (logic) {
       this.logic = logic;
       this.currentId = undefined;
-      this.change(this.logic.data.meta.defaultLayout);
     }
 
 
     /**
-     * Return the list of layout ids
-     * @returns {Array}
+     * Return the list of available layout ids
+     *
+     * @returns {Object[]}
      */
     getIds () {
       return this.logic.data.meta.layouts.map(layoutDescriptor => layoutDescriptor.id);
@@ -56,10 +59,12 @@ define([
 
     /**
      * Return the layout descriptor corresponding to a layout id
-     * @param {String} propertyId
-     * @returns {Object}
+     * @param {Object} [parameters]
+     * @param {string} [parameters.propertyId] The id of the layout to get the descriptor of. If undefined use current layout.<s
+     * @returns {(Object|undefined)}
      */
-    getDescriptor (layoutId) {
+    getDescriptor ({ layoutId } = {}) {
+      layoutId = layoutId || this.currentId;
       return this.logic.data.meta.layouts
         .find(layoutDescriptor => layoutDescriptor.id === layoutId);
     }
@@ -67,14 +72,14 @@ define([
 
     /**
      * Load a layout, or default layout if none specified
-     * @param {String} layoutId The id of the layout to load with requireJS
+     * @param {Object} parameters
+     * @param {string} parameters.layoutId The id of the layout to load with requireJS
      * @returns {Promise}
      */
-    change (layoutId) {
-      console.log("LAYOUT.CHANGE", this);
-
+    change ({ layoutId }) {
+      console.log("CHANGE LAYOUT", layoutId);
       // bad layout
-      if (!this.getDescriptor(layoutId)) {
+      if (!this.getDescriptor({ layoutId })) {
         console.error("Layout of id `" + layoutId + "` does not have a descriptor");
         return;
       }
@@ -82,9 +87,12 @@ define([
       const previousLayoutId = this.currentId;
       this.currentId = layoutId;
       // dispatch events
-      this.logic.event.trigger("layoutChange", {
-        layoutId: layoutId,
-        previousLayoutId: previousLayoutId,
+      this.logic.event.trigger({
+        name: "layoutChange",
+        data: {
+          layoutId: layoutId,
+          previousLayoutId: previousLayoutId,
+        },
       });
     }
 
@@ -99,29 +107,34 @@ define([
      */
 
 
+    /**
+     * Logic Event Module
+     */
     class LogicEvent {
 
       constructor (logic) {
         this.logic = logic;
       }
 
+
       /**
        * Send custom events
-       * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
-       * @param {Object} eventData The data associated with the event.
+       * @param {Object} parameters
+       * @param {string} parameters.name The name of the event, without the prefix "xwiki:livedata"
+       * @param {Object} [parameters.data] The data associated with the event.
        *  The livedata object reference is automatically added
        */
-      trigger (eventName, eventData) {
+      trigger ({ name, data }) {
         // configure event
         const defaultData = {
           livedata: this.logic,
         };
-        eventName = "xwiki:livedata:" + eventName;
-        eventData = {
+        name = "xwiki:livedata:" + name;
+        data = {
           bubbles: true,
-          detail: Object.assign(defaultData, eventData),
+          detail: Object.assign(defaultData, data),
         };
-        const event = new CustomEvent(eventName, eventData);
+        const event = new CustomEvent(name, data);
         // dispatch event
         this.logic.element.dispatchEvent(event);
       }
@@ -129,43 +142,34 @@ define([
 
       /**
        * Listen for custom events
-       * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
-       * @param {Function} callback Function to call we the event is triggered
-       */
-      on (eventName, callback) {
-        eventName = "xwiki:livedata:" + eventName;
-        this.logic.element.addEventListener(eventName, function (e) {
-          callback(e.detail);
-        });
-      }
-
-
-      /**
-       * Listen for custom events, mathching certain conditions
-       * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
-       * @param {Object|Function} condition The condition to execute the callback
+       * @param {Object} parameters
+       * @param {string} parameters.name The name of the event, without the prefix "xwiki:livedata"
+       * @param {Object|Function} [parameters.condition] The condition to execute the callback
        *  if Object, values of object properties must match e.detail properties values
        *  if Function, the function must return true. e.detail is passed as argument
-       * @param {Function} callback Function to call we the event is triggered
+       * @param {Function} parameters.callback Function to call we the event is triggered
        */
-      onWhere (eventName, condition, callback) {
-        eventName = "xwiki:livedata:" + eventName;
-        this.logic.element.addEventListener(eventName, function (e) {
-          // Object check
+      on ({ name, condition, callback }) {
+        name = "xwiki:livedata:" + name;
+        this.logic.element.addEventListener(name, function (e) {
+
+          // Verify condition if object
           if (typeof condition === "object") {
             const every = Object.keys(condition).every(key => condition[key] === e.detail[key]);
             if (!every) { return; }
           }
-          // Function check
+
+          // Verify condition if function
           if (typeof condition === "function") {
             if (!condition(e.detail)) { return; }
           }
-          // call callback
+
+          // Call callback
           callback(e.detail);
         });
       }
-    };
 
+    };
 
 
 
@@ -184,10 +188,16 @@ define([
 
       /**
        * Return the id of the given entry
-       * @param {Object} entry
-       * @returns {String}
+       * Need one of: entry | entryIndex
+       * @param {Object} parameters
+       * @param {Object} [parameters.entry]
+       * @param {Object} [parameters.entryIndex] The index of the value. Negative value count from the end.
+       * @returns {(string|undefined)}
        */
-      getId (entry) {
+      getId ({ entry, entryIndex }) {
+        if (!entry) {
+          entry = this.logic.data.data.entries.slice(entryIndex)[0];
+        }
         const idProperty = this.logic.data.meta.entryDescriptor.idProperty || "id";
         if (entry[idProperty] === undefined) {
           console.warn("Entry has no id (at property [" + idProperty + "]", entry);
@@ -206,15 +216,17 @@ define([
       }
 
 
-      update () {
-        return this.fetch()
-          .then(entries => this.data.data.entries = entries)
-          .catch(err => console.error(err));
+      async update () {
+        try {
+          this.data.data.entries = await this.fetch();
+        } catch (err) {
+          return console.error(err);
+        }
       }
 
 
       add () {
-        const mockNewUrl = () => this.logic.entries.getId(this.logic.data.data.entries.slice(-1)[0]) + "0";
+        const mockNewUrl = () => this.logic.entries.getId({ entryIndex: -1 }) + "0";
         // TODO: CALL FUNCTION TO CREATE NEW DATA HERE
         Promise.resolve({ /* MOCK DATA */
           "doc_url": mockNewUrl(),
@@ -252,7 +264,7 @@ define([
 
       /**
        * Get total number of pages
-       * @returns {Number}
+       * @returns {number}
        */
       getPageCount () {
         return Math.ceil(this.logic.data.data.count / this.logic.data.query.limit);
@@ -261,10 +273,11 @@ define([
 
       /**
        * Get the page corresponding to the specified entry (0-based index)
-       * @param {Number} entryIndex The index of the entry. Uses current entry if undefined.
-       * @returns {Number}
+       * @param {Object} [parameters]
+       * @param {number} [parameters.entryIndex] The index of the entry. Uses current entry if undefined.
+       * @returns {number}
        */
-      getPageIndex (entryIndex) {
+      getPageIndex ({ entryIndex } = {}) {
         if (entryIndex === undefined) {
           entryIndex = this.logic.data.query.offset;
         }
@@ -274,17 +287,21 @@ define([
 
       /**
        * Set page index (0-based index), then fetch new data
-       * @param {Number} pageIndex
+       * @param {Object} parameters
+       * @param {number} parameters.pageIndex
        * @returns {Promise}
        */
-      setPageIndex (pageIndex) {
+      setPageIndex ({ pageIndex }) {
         return new Promise ((resolve, reject) => {
           if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return void reject(); }
           const previousPageIndex = this.getPageIndex();
-          this.logic.data.query.offset = this.getFirstIndexOfPage(pageIndex);
-          this.logic.event.trigger("pageChange", {
-            pageIndex: pageIndex,
-            previousPageIndex: previousPageIndex,
+          this.logic.data.query.offset = this.getFirstIndexOfPage({ pageIndex });
+          this.logic.event.trigger({
+            name: "pageChange",
+            data: {
+              pageIndex: pageIndex,
+              previousPageIndex: previousPageIndex,
+            },
           });
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
           resolve();
@@ -294,10 +311,11 @@ define([
 
       /**
        * Get the first entry index of the given page index
-       * @param {Number} pageIndex The page index. Uses current page if undefined.
-       * @returns {Number}
+       * @param {Object} [parameters]
+       * @param {number} [parameters.pageIndex] The page index. Uses current page if undefined.
+       * @returns {number}
        */
-      getFirstIndexOfPage (pageIndex) {
+      getFirstIndexOfPage ({ pageIndex } = {}) {
         if (pageIndex === undefined) {
           pageIndex = this.getPageIndex();
         }
@@ -311,15 +329,16 @@ define([
 
       /**
        * Get the last entry index of the given page index
-       * @param {Number} pageIndex The page index. Uses current page if undefined.
-       * @returns {Number}
+       * @param {Object} [parameters]
+       * @param {number} [parameters.pageIndex] The page index. Uses current page if undefined.
+       * @returns {number}
        */
-      getLastIndexOfPage (pageIndex) {
+      getLastIndexOfPage ({ pageIndex } = {}) {
         if (pageIndex === undefined) {
           pageIndex = this.getPageIndex();
         }
         if (0 <= pageIndex && pageIndex < this.getPageCount()) {
-          return Math.min(this.getFirstIndexOfPage(pageIndex) + this.logic.data.query.limit, this.logic.data.data.count) - 1;
+          return Math.min(this.getFirstIndexOfPage({ pageIndex }) + this.logic.data.query.limit, this.logic.data.data.count) - 1;
         } else {
           return -1;
         }
@@ -328,18 +347,22 @@ define([
 
       /**
        * Set the pagination page size, then fetch new data
-       * @param {Number} pageSize
+       * @param {Object} parameters
+       * @param {number} pageSize
        * @returns {Promise}
        */
-      setPageSize (pageSize) {
+      setPageSize ({ pageSize }) {
         return new Promise ((resolve, reject) => {
           if (pageSize < 0) { return void reject(); }
           const previousPageSize = this.logic.data.query.limit;
           if (pageSize === previousPageSize) { return void resolve(); }
           this.logic.data.query.limit = pageSize;
-          this.logic.event.trigger("pageSizeChange", {
-            pageSize: pageSize,
-            previousPageSize: previousPageSize,
+          this.logic.event.trigger({
+            name: "pageSizeChange",
+            data: {
+              pageSize: pageSize,
+              previousPageSize: previousPageSize,
+            },
           });
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
           resolve();
@@ -364,44 +387,75 @@ define([
 
       /**
        * Return whether the specified property id is valid (i.e. the property has a descriptor)
-       * @param {String} propertyId
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @returns {boolean}
        */
-      isIdValid (propertyId) {
+      isIdValid ({ propertyId, propertyDescriptor }) {
+        propertyId = this.getId({ propertyId, propertyDescriptor })
         return this.logic.data.query.properties.includes(propertyId);
       }
 
 
       /**
        * Return whether the specified property type is valid (i.e. there is a type descriptor in meta)
-       * @param {String} propertyType
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @returns {boolean}
        */
-      isTypeValid (propertyType) {
+      isTypeValid ({ propertyType }) {
         return this.logic.data.meta.propertyTypes
           .find(propertyTypeDescriptor => propertyTypeDescriptor.id === propertyType);
       }
 
 
-
       /**
-       * Returns the property descriptors of displayable properties
-       * @returns {Array}
+       * Return the property id corresponding to a property descriptor
+       *
+       * If propertyId is provided, returns it.
+       * It is usefull when we need to get the propertyId,
+       * whether we have the id or the descriptor:
+       * `propertyId = getId({ propertyId, propertyDescriptor })`
+       *
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @returns {(string|undefined)}
        */
-      getDescriptors () {
-        return this.logic.data.query.properties
-          .map(propertyId => this.logic.properties.getPropertyDescriptor(propertyId));
+      getId ({ propertyId, propertyDescriptor }) {
+        if (!propertyId && propertyDescriptor) {
+          propertyId = propertyDescriptor.id;
+        }
+        return propertyId;
       }
 
 
       /**
        * Return the property descriptor corresponding to a property id
-       * @param {String} propertyId
-       * @returns {Object}
+       *
+       * If propertyDescriptor is provided, returns it.
+       * It is usefull when we need to get the propertyDescriptor,
+       * whether we have the id or the descriptor:
+       * `propertyDescriptor = getDescriptor({ propertyId, propertyDescriptor })`
+       *
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @returns {(Object|undefined)}
        */
-      getPropertyDescriptor (propertyId) {
-        const propertyDescriptor = this.logic.data.meta.propertyDescriptors
-          .find(propertyDescriptor => propertyDescriptor.id === propertyId);
+      getDescriptor ({ propertyId, propertyDescriptor }) {
         if (!propertyDescriptor) {
-          console.error("Property descriptor of property `" + propertyId + "` does not exists");
+          propertyDescriptor = this.logic.data.meta.propertyDescriptors
+          .find(propertyDescriptor => propertyDescriptor.id === propertyId);
+          if (!propertyDescriptor) {
+            console.error("Property descriptor of property `" + propertyId + "` does not exists");
+          }
         }
         return propertyDescriptor;
       }
@@ -409,12 +463,24 @@ define([
 
       /**
        * Return the type descriptor corresponding to a property type
-       * @param {String} propertyType
-       * @returns {Object}
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor | propertyType
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} [parameters.propertyType]
+       * @returns {(Object|undefined)}
        */
-      getTypeDescriptor (propertyType) {
+      getTypeDescriptor ({ propertyId, propertyDescriptor, propertyType }) {
+        // If propertyType is undefined
+        // get the type from the given propertyId or propertyDescriptor
+        if (!propertyType) {
+          propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor }) || {};
+          propertyType = propertyDescriptor.type;
+        }
+        // Find the typeDescriptor corresponding to the propertyType
         const typeDescriptor = this.logic.data.meta.propertyTypes
           .find(typeDescriptor => typeDescriptor.id === propertyType);
+        // Handle errors
         if (!typeDescriptor) {
           console.error("Type descriptor of `" + propertyType + "` does not exists");
         }
@@ -423,88 +489,162 @@ define([
 
 
       /**
-       * Return the property type descriptor corresponding to a property id
-       * @param {String} propertyId
-       * @returns {Object}
+       * Returns the property descriptors of displayable properties
+       * @param {Object} [parameters]
+       * @param {boolean} [parameters.filterable = false] Return only filterable properties
+       * @param {boolean} [parameters.sortable = false] Return only sortable properties
+       * @returns {Object[]}
        */
-      getPropertyTypeDescriptor (propertyId) {
-        const propertyDescriptor = this.getPropertyDescriptor(propertyId);
-        if (!propertyDescriptor) { return; }
-        return this.logic.data.meta.propertyTypes
-          .find(typeDescriptor => typeDescriptor.id === propertyDescriptor.type);
-      }
+      getDescriptors ({ filterable = false, sortable = false } = {}) {
+        let descriptors = this.logic.data.query.properties
+          .map(propertyId => this.logic.properties.getDescriptor({ propertyId }));
 
+        if (sortable) {
+          descriptors = descriptors
+            .filter(propertyDescriptor => this.isSortable({ propertyId: propertyDescriptor.id }));
+        }
+        if (filterable) {
+          descriptors = descriptors
+            .filter(propertyDescriptor => this.isFilterable({ propertyId: propertyDescriptor.id }));
+        }
+
+        return descriptors;
+      }
 
 
       /**
        * Returns whether a certain property is visible
-       * @param {String} propertyId
-       * @returns {Boolean}
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @returns {boolean}
        */
-      isVisible (propertyId) {
-        const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      isVisible ({ propertyId, propertyDescriptor }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         return propertyDescriptor.visible;
       }
 
 
       /**
-       * Set whether the given property should be visible
-       * @param {String} propertyId
-       * @param {Boolean} visible
+       * Toggle whether the given property should be visible
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {boolean} [visible] Whether the property is visible. Undefined toggle current visibility.
        */
-      setVisibility (propertyId, visible) {
-        const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      toggleVisibility ({ propertyId, propertyDescriptor, visible }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
+        if (visible === undefined) {
+          visible = !propertyDescriptor.visible;
+        }
         propertyDescriptor.visible = visible;
       }
 
 
       /**
        * Move a property to a certain index in the property order list
-       * @param {String|Number} from The id or index of the property to move
-       * @param {Number} toIndex
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor | fromIndex
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {number} [parameters.fromIndex] The index of the property to be moved
+       * @param {number} toIndex
        */
-      reorder (from, toIndex) {
-        let fromIndex;
-        if (typeof from === "number") {
-          fromIndex = from;
-        } else if (typeof from === "string") {
-          if (!this.isIdValid(from)) { return; }
-          fromIndex = this.logic.data.query.properties.indexOf(from);
-        } else {
-          return;
+      reorder ({ propertyId, propertyDescriptor, fromIndex, toIndex }) {
+        if (fromIndex === undefined) {
+          propertyId = this.getId({ propertyId, propertyDescriptor });
+          fromIndex = this.logic.data.query.properties.indexOf(propertyId);
         }
-        if (fromIndex <= -1 || toIndex <= -1) { return; }
-        this.logic.data.query.properties.splice(toIndex, 0, this.logic.data.query.properties.splice(fromIndex, 1)[0]);
+        if (fromIndex === undefined || fromIndex <= -1 || toIndex <= -1) { return; }
+        this.logic.data.query.properties.splice(toIndex, 0,
+          this.logic.data.query.properties.splice(fromIndex, 1)[0]
+        );
       }
 
 
+      /**
+       * Returns whether a certain property is sortable or not
+       * @param {Object} parameters
+       * @param {string} parameters.propertyId
+       * @returns {boolean}
+       */
+      isSortable ({ propertyId }) {
+        const propertyDescriptor = this.getDescriptor({ propertyId });
+        const propertyTypeDescriptor = this.getTypeDescriptor({ propertyId });
+        return propertyDescriptor.sortable !== undefined ?
+          propertyDescriptor.sortable :
+          propertyTypeDescriptor.sortable;
+      }
 
-      setType (propertyId, type) {
-        const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+
+      /**
+       * Returns whether a certain property is filterable or not
+       * @param {Object} parameters
+       * @param {string} parameters.propertyId
+       * @returns {boolean}
+       */
+      isFilterable ({ propertyId }) {
+        const propertyDescriptor = this.getDescriptor({ propertyId });
+        const propertyTypeDescriptor = this.getTypeDescriptor({ propertyId });
+        return propertyDescriptor.filterable !== undefined ?
+          propertyDescriptor.filterable :
+          propertyTypeDescriptor.filterable;
+      }
+
+
+      /**
+       * Set the type of the given property.
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} type
+       */
+      setType ({ propertyId, propertyDescriptor, type }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
+        if (!propertyDescriptor) {
+          console.error("Could not set type of the given property");
+        }
         propertyDescriptor.type = type;
       }
 
 
-      setDisplayer (propertyId, displayerId) {
+      /**
+       * Set the displayer of the given property.
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {(string|undefined)} [displayerId] The new displayerId. Takes default one if undefined.
+       */
+      setDisplayer ({ propertyId, propertyDescriptor, displayerId }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         if (displayerId) {
-          Vue.set(this.getPropertyDescriptor(propertyId), "displayer", {
-            id: displayerId,
-          });
+          Vue.set(propertyDescriptor, "displayer", { id: displayerId });
         }
         else {
-          Vue.delete(this.getPropertyDescriptor(propertyId), "displayer");
+          Vue.delete(propertyDescriptor, "displayer");
         }
       }
 
 
-      setFilter (propertyId, filterId) {
+      /**
+       * Set the filter of the given property.
+       * @param {Object} parameters
+       * Need one of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {(string|undefined)} [filterId] The new filterId. Takes default one if undefined.
+       */
+      setFilter ({ propertyId, propertyDescriptor, filterId }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         if (filterId) {
-          Vue.set(this.getPropertyDescriptor(propertyId), "filter", {
-            id: filterId,
-          });
+          Vue.set(propertyDescriptor, "filter", { id: filterId });
         }
         else {
-          Vue.delete(this.getPropertyDescriptor(propertyId), "filter");
+          Vue.delete(propertyDescriptor, "filter");
         }
       }
 
@@ -535,10 +675,10 @@ define([
       /**
        * Return whether the entry is currently selected
        * @param {Object} entry
-       * @returns {Boolean}
+       * @returns {boolean}
        */
       isSelected (entry) {
-        const entryId = this.logic.entries.getId(entry);
+        const entryId = this.logic.entries.getId({ entry });
         if (this.isGlobal) {
           return !this.logic.uniqueArrayHas(this.deselected, entryId);
         } else {
@@ -554,15 +694,16 @@ define([
       select (entries) {
         const entryArray = (entries instanceof Array) ? entries : [entries];
         entryArray.forEach(entry => {
-          const entryId = this.logic.entries.getId(entry);
+          const entryId = this.logic.entries.getId({ entry });
           if (this.isGlobal) {
             this.logic.uniqueArrayRemove(this.deselected, entryId);
           }
           else {
             this.logic.uniqueArrayAdd(this.selected, entryId);
           }
-          this.logic.event.trigger("select", {
-            entry: entry,
+          this.logic.event.trigger({
+            name: "select",
+            data: { entry: entry },
           });
         });
       }
@@ -575,15 +716,16 @@ define([
       deselect (entries) {
         const entryArray = (entries instanceof Array) ? entries : [entries];
         entryArray.forEach(entry => {
-          const entryId = this.logic.entries.getId(entry);
+          const entryId = this.logic.entries.getId({ entry });
           if (this.isGlobal) {
             this.logic.uniqueArrayAdd(this.deselected, entryId);
           }
           else {
             this.logic.uniqueArrayRemove(this.selected, entryId);
           }
-          this.logic.event.trigger("deselect", {
-            entry: entry,
+          this.logic.event.trigger({
+            name: "deselect",
+            data: { entry: entry },
           });
         });
       }
@@ -592,7 +734,7 @@ define([
       /**
        * Toggle the selection of the specified entries
        * @param {Object|Array} entries
-       * @param {Boolean} select Whether to select or not the entries. Undefined toggle current state
+       * @param {boolean} select Whether to select or not the entries. Undefined toggle current state
        */
       toggleSelect (entries, select) {
         const entryArray = (entries instanceof Array) ? entries : [entries];
@@ -611,7 +753,7 @@ define([
 
       /**
        * Get number of selected entries
-       * @returns {Number}
+       * @returns {number}
        */
       getCount () {
         if (this.isGlobal) {
@@ -624,14 +766,15 @@ define([
 
       /**
        * Set the entry selection globally accross pages
-       * @param {Boolean} global
+       * @param {boolean} global
        */
       setGlobal (global) {
         this.isGlobal = global;
         this.selected.splice(0);
         this.deselected.splice(0);
-        this.logic.event.trigger("selectGlobal", {
-          state: global,
+        this.logic.event.trigger({
+          name: "selectGlobal",
+          data: { state: global },
         });
       }
 
@@ -655,55 +798,32 @@ define([
 
 
       /**
-       * Returns whether a certain property is sortable or not
-       * @param {String} propertyId
-       * @returns {Boolean}
-       */
-      isSortable (propertyId) {
-        const propertyDescriptor = this.logic.properties.getPropertyDescriptor(propertyId);
-        const propertyTypeDescriptor = this.logic.properties.getPropertyTypeDescriptor(propertyId);
-        return propertyDescriptor.sortable !== undefined ?
-        propertyDescriptor.sortable :
-        propertyTypeDescriptor.sortable;
-      }
-
-
-      /**
-       * Returns the property descriptors of sortable properties
-       * @returns {Array}
-       */
-      getSortablePropertyDescriptors () {
-        return this.logic.data.meta.propertyDescriptors
-          .filter(propertyDescriptor => this.isSortable(propertyDescriptor.id));
-      }
-
-
-      /**
        * Get the sort query associated to a property id
-       * @param {String} propertyId
+       * @param {string} propertyId
        */
       getQuerySort (propertyId) {
-        if (!this.logic.properties.isIdValid(propertyId)) { return; }
+        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
         return this.logic.data.query.sort.find(sort => sort.property === propertyId);
       }
 
 
       /**
        * Update sort configuration based on parameters, then fetch new data
-       * @param {String} property The property to sort according to
-       * @param {String} level The sort level for the property (0 is the highest).
+       * @param {string} property The property to sort according to
+       * @param {string} level The sort level for the property (0 is the highest).
        *   Undefined means keep current. Negative value removes property sort.
-       * @param {String} descending Specify whether the sort should be descending or not.
+       * @param {string} descending Specify whether the sort should be descending or not.
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
       sort (property, level, descending) {
         const err = new Error("Property `" + property + "` is not sortable");
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid(property)) { return void reject(err); }
-          if (!this.isSortable(property)) { return void reject(err); }
+          if (!this.logic.properties.isIdValid({ propertyId: property })) { return void reject(err); }
+          if (!this.logic.properties.isSortable({ propertyId: property })) { return void reject(err); }
           // find property current sort level
-          const currentLevel = this.logic.data.query.sort.findIndex(sortObject => sortObject.property === property);
+          const currentLevel = this.logic.data.query.sort
+            .findIndex(sortObject => sortObject.property === property);
           // default level
           if (level === undefined) {
             level = (currentLevel !== -1) ? currentLevel : 0;
@@ -727,10 +847,13 @@ define([
             this.logic.data.query.sort.splice(currentLevel, 1);
           }
           // dispatch events
-          this.logic.event.trigger("sort", {
-            property: property,
-            level: level,
-            descending: descending,
+          this.logic.event.trigger({
+            name: "sort",
+            data: {
+              property: property,
+              level: level,
+              descending: descending,
+            },
           });
 
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
@@ -742,8 +865,8 @@ define([
       /**
        * Add new sort entry, shorthand of sort:
        * If the property is already sorting, does nothing
-       * @param {String} property The property to add to the sort
-       * @param {String} descending Specify whether the sort should be descending or not.
+       * @param {string} property The property to add to the sort
+       * @param {string} descending Specify whether the sort should be descending or not.
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
@@ -757,7 +880,7 @@ define([
 
       /**
        * Remove a sort entry, shorthand of sort:
-       * @param {String} property The property to remove to the sort
+       * @param {string} property The property to remove to the sort
        * @returns {Promise}
        */
       remove (property) {
@@ -767,22 +890,25 @@ define([
 
       /**
        * Move a sort entry to a certain index in the query sort list
-       * @param {String} property The property to reorder the sort
-       * @param {Number} toIndex
+       * @param {string} property The property to reorder the sort
+       * @param {number} toIndex
        */
       reorder (propertyId, toIndex) {
         const err = new Error("Property `" + propertyId + "` is not sortable");
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid(propertyId)) { return void reject(err); }
+          if (!this.logic.properties.isIdValid({ propertyId })) { return void reject(err); }
           const fromIndex = this.logic.data.query.sort.findIndex(querySort => querySort.property === propertyId);
           if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
           this.logic.data.query.sort.splice(toIndex, 0, this.logic.data.query.sort.splice(fromIndex, 1)[0]);
 
           // dispatch events
-          this.logic.event.trigger("sort", {
-            type: "move",
-            property: propertyId,
-            level: toIndex,
+          this.logic.event.trigger({
+            name: "sort",
+            data: {
+              type: "move",
+              property: propertyId,
+              level: toIndex,
+            },
           });
 
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
@@ -809,42 +935,17 @@ define([
 
 
       /**
-       * Returns whether a certain property is filterable or not
-       * @param {String} propertyId
-       * @returns {Boolean}
-       */
-      isFilterable (propertyId) {
-        const propertyDescriptor = this.logic.properties.getPropertyDescriptor(propertyId);
-        const propertyTypeDescriptor = this.logic.properties.getPropertyTypeDescriptor(propertyId);
-        return propertyDescriptor.filterable !== undefined ?
-          propertyDescriptor.filterable :
-          propertyTypeDescriptor.filterable;
-      }
-
-
-      /**
-       * Returns the property descriptors of filterable properties
-       * @returns {Array}
-       */
-      getFilterablePropertyDescriptors () {
-        return this.logic.data.meta.propertyDescriptors
-          .filter(propertyDescriptor => this.isFilterable(propertyDescriptor.id));
-      }
-
-
-
-      /**
        * Get the filter descriptor associated to a property id
-       * @param {String} propertyId
+       * @param {string} propertyId
        * @returns {Object}
        */
       getDescriptorFromProperty (propertyId) {
-        if (!this.logic.properties.isIdValid(propertyId)) { return; }
+        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
         // property descriptor config
-        const propertyDescriptor = this.logic.properties.getPropertyDescriptor(propertyId) || {};
+        const propertyDescriptor = this.logic.properties.getDescriptor({ propertyId }) || {};
         const propertyDescriptorFilter = propertyDescriptor.filter || {};
         // property type descriptor config
-        const typeDescriptor = this.logic.properties.getPropertyTypeDescriptor(propertyId) || {};
+        const typeDescriptor = this.logic.properties.getTypeDescriptor({ propertyId }) || {};
         const typeDescriptorFilter = typeDescriptor.filter || {};
         // merge property and/or type filter descriptors
         let mergedFilterDescriptor;
@@ -860,13 +961,13 @@ define([
 
       /**
        * Get the filter descriptor associated to a property type
-       * @param {String} propertyType
+       * @param {string} propertyType
        * @returns {Object}
        */
       getDescriptorFromType (propertyType) {
-        if (!this.logic.properties.isTypeValid(propertyType)) { return; }
+        if (!this.logic.properties.isTypeValid({ propertyType })) { return; }
         // property type descriptor config
-        const typeDescriptor = this.logic.properties.getTypeDescriptor(propertyType) || {};
+        const typeDescriptor = this.logic.properties.getTypeDescriptor({ propertyType }) || {};
         const typeDescriptorDisplayer = typeDescriptor.displayer || {};
         // resolve filter
         return this._resolveFilterDescriptor(typeDescriptorDisplayer);
@@ -894,22 +995,22 @@ define([
 
       /**
        * Get the filter object in the query data object associated to a property id
-       * @param {String} propertyId
+       * @param {string} propertyId
        * @returns {Object}
        */
       getQueryFilterGroup (propertyId) {
-        if (!this.logic.properties.isIdValid(propertyId)) { return; }
+        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
         return this.logic.data.query.filters.find(filter => filter.property === propertyId);
       }
 
 
       /**
        * Get the filters in the query data object associated to a property id
-       * @param {String} propertyId
+       * @param {string} propertyId
        * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
        */
       getQueryFilters (propertyId) {
-        if (!this.logic.properties.isIdValid(propertyId)) { return; }
+        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
         const queryFilterGroup = this.getQueryFilterGroup(propertyId);
         return queryFilterGroup && queryFilterGroup.constrains || [];
       }
@@ -917,8 +1018,8 @@ define([
 
       /**
        * Get the default filter operator associated to a property id
-       * @param {String} propertyId
-       * @returns {String}
+       * @param {string} propertyId
+       * @returns {string}
        */
       getDefaultOperator (propertyId) {
         // get valid operator descriptor
@@ -942,16 +1043,16 @@ define([
        * Return an object containing the new and old filter entries corresponding to parameters
        *  oldEntry: the filter entry to be modified
        *  newEntry: what this.logic entry should be modified to
-       * @param {String} property The property to filter according to
-       * @param {String} index The index of the filter entry
-       * @param {String} filterEntry The filter data used to update the filter configuration
+       * @param {string} property The property to filter according to
+       * @param {string} index The index of the filter entry
+       * @param {string} filterEntry The filter data used to update the filter configuration
        *  (see Logic.prototype.filter for more)
        * @returns {Object} {oldEntry, newEntry}
        *  with oldEntry / newEntry being {property, index, operator, value}
        */
       _computeFilterEntries (property, index, filterEntry) {
-        if (!this.logic.properties.isIdValid(property)) { return; }
-        if (!this.isFilterable(property)) { return; }
+        if (!this.logic.properties.isIdValid({ propertyId: property })) { return; }
+        if (!this.logic.properties.isFilterable({ propertyId: property })) { return; }
         // default indexes
         index = index || 0;
         if (index < 0) { index = -1; }
@@ -985,7 +1086,7 @@ define([
        * Return the filtering type, based on oldEntry and newEntry
        * @param {Object} oldEntry
        * @param {Oject} newEntry
-       * @returns {String} "add" | "remove" | "move" | "modify"
+       * @returns {string} "add" | "remove" | "move" | "modify"
        */
       _getFilteringType (oldEntry, newEntry) {
         const queryFilter = this.getQueryFilterGroup(oldEntry.property);
@@ -1004,16 +1105,16 @@ define([
 
       /**
        * Update filter configuration based on parameters, then fetch new data
-       * @param {String} property The property to filter according to
-       * @param {String} index The index of the filter entry
-       * @param {String} filterEntry The filter data used to update the filter configuration
+       * @param {string} property The property to filter according to
+       * @param {string} index The index of the filter entry
+       * @param {string} filterEntry The filter data used to update the filter configuration
        *  filterEntry = {property, operator, value}
        *  undefined values are defaulted to current values, then to default values.
-       * @param {String} filterEntry.property The new property to filter according to
-       * @param {String} filterEntry.index The new index the filter should go. -1 delete filter
-       * @param {String} filterEntry.operator The operator of the filter.
+       * @param {string} filterEntry.property The new property to filter according to
+       * @param {string} filterEntry.index The new index the filter should go. -1 delete filter
+       * @param {string} filterEntry.operator The operator of the filter.
        *  Should match the filter descriptor of the filter property
-       * @param {String} filterEntry.value Value for the new filter entry
+       * @param {string} filterEntry.value Value for the new filter entry
        * @returns {Promise}
        */
       filter (property, index, filterEntry) {
@@ -1049,10 +1150,13 @@ define([
             this.removeAll(oldEntry.property);
           }
           // dispatch events
-          this.logic.event.trigger("filter", {
-            type: filteringType,
-            oldEntry: oldEntry,
-            newEntry: newEntry,
+          this.logic.event.trigger({
+            name: "filter",
+            data: {
+              type: filteringType,
+              oldEntry: oldEntry,
+              newEntry: newEntry,
+            },
           });
 
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
@@ -1063,10 +1167,10 @@ define([
 
       /**
        * Add new filter entry, shorthand of filter:
-       * @param {String} property Which property to add the filter to
-       * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
-       * @param {String} value Default value for the new filter entry
-       * @param {Number} index Index of new filter entry. Undefined means last
+       * @param {string} property Which property to add the filter to
+       * @param {string} operator The operator of the filter. Should match the filter descriptor of the property
+       * @param {string} value Default value for the new filter entry
+       * @param {number} index Index of new filter entry. Undefined means last
        * @returns {Promise}
        */
       add (property, operator, value, index) {
@@ -1084,8 +1188,8 @@ define([
 
       /**
        * Remove a filter entry in the configuration, then fetch new data
-       * @param {String} property Property to remove the filter to
-       * @param {String} index The index of the filter to remove. Undefined means last.
+       * @param {string} property Property to remove the filter to
+       * @param {string} index The index of the filter to remove. Undefined means last.
        * @returns {Promise}
        */
       remove (property, index) {
@@ -1095,21 +1199,24 @@ define([
 
       /**
        * Remove all the filters associated to a property
-       * @param {String} property Property to remove the filters to
+       * @param {string} property Property to remove the filters to
        * @returns {Promise}
        */
       removeAll (property) {
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid(property)) { return; }
+          if (!this.logic.properties.isIdValid({ propertyId: property })) { return; }
           const filterIndex = this.logic.data.query.filters
             .findIndex(filterGroup => filterGroup.property === property);
           if (filterIndex === -1) { return void reject(); }
           const removedFilterGroups = this.logic.data.query.filters.splice(filterIndex, 1);
           // dispatch events
-          this.logic.event.trigger("filter", {
-            type: "removeAll",
-            property: property,
-            removedFilters: removedFilterGroups[0].constrains,
+          this.logic.event.trigger({
+            name: "filter",
+            data: {
+              type: "removeAll",
+              property: property,
+              removedFilters: removedFilterGroups[0].constrains,
+            },
           });
           // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
           resolve();
@@ -1128,16 +1235,16 @@ define([
 
     /**
      * Get the displayer descriptor associated to a property id
-     * @param {String} propertyId
+     * @param {string} propertyId
      * @returns {Object}
      */
     getDescriptorFromProperty (propertyId) {
-      if (!this.logic.properties.isIdValid(propertyId)) { return; }
+      if (!this.logic.properties.isIdValid({ propertyId })) { return; }
       // property descriptor config
-      const propertyDescriptor = this.logic.properties.getPropertyDescriptor(propertyId) || {};
+      const propertyDescriptor = this.logic.properties.getDescriptor({ propertyId }) || {};
       const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
       // property type descriptor config
-      const typeDescriptor = this.logic.properties.getPropertyTypeDescriptor(propertyId) || {};
+      const typeDescriptor = this.logic.properties.getTypeDescriptor({ propertyId }) || {};
       const typeDescriptorDisplayer = typeDescriptor.displayer || {};
       // merge property and/or type displayer descriptors
       let mergedDisplayerDescriptor;
@@ -1153,13 +1260,13 @@ define([
 
     /**
      * Get the displayer descriptor associated to a property type
-     * @param {String} propertyType
+     * @param {string} propertyType
      * @returns {Object}
      */
     getDescriptorFromType (propertyType) {
-      if (!this.logic.properties.isTypeValid(propertyType)) { return; }
+      if (!this.logic.properties.isTypeValid({ propertyType })) { return; }
       // property type descriptor config
-      const typeDescriptor = this.logic.properties.getTypeDescriptor(propertyType) || {};
+      const typeDescriptor = this.logic.properties.getTypeDescriptor({ propertyType }) || {};
       const typeDescriptorDisplayer = typeDescriptor.displayer || {};
       // resolve displayer
       return this._resolveDisplayerDescriptor(typeDescriptorDisplayer);
@@ -1210,12 +1317,12 @@ define([
       /**
        * Return temporary config at given key if config is a string
        * or return directly the given config if it is valid
-       * @param {String|Object} config The key of an already save config, or a config object
+       * @param {string|Object} config The key of an already save config, or a config object
        * @returns
        */
       _parse (config) {
         if (typeof config === "string") {
-          // Type String: return config saved at given key
+          // Type string: return config saved at given key
           const configObject = this.dataSaves[config];
           if (!configObject) {
             console.error("Error: temporary config at key `" + config + "` can't be found");
@@ -1246,7 +1353,7 @@ define([
       /**
        * Save current or given Livedata configuration to a temporary state
        * This state could be reloaded later using the temporaryConfig.load method
-       * @param {String} configName The key used to store the config
+       * @param {string} configName The key used to store the config
        * @param {Object} config The config to save. Uses current if undefined
        */
       save (configName, config) {
@@ -1260,7 +1367,7 @@ define([
 
       /**
        * Replace current config with the given one
-       * @param {String|Object} config The key of an already save config, or a config object
+       * @param {string|Object} config The key of an already save config, or a config object
        */
       load (config) {
         const configToLoad = this._parse(config);
@@ -1272,8 +1379,8 @@ define([
 
       /**
        * Return whether the given config is equal (deeply) to the current config
-       * @param {String|Object} config The key of an already save config, or a config object
-       * @returns {Boolean}
+       * @param {string|Object} config The key of an already save config, or a config object
+       * @returns {boolean}
        */
       equals (config) {
         const configToCompare = this._parse(config);
@@ -1315,7 +1422,7 @@ define([
        * In order to keep design state when leaving design mode
        * the design config has to be saved in "initial" and "edit" saves
        * (This is done automatically in the LivedataDesignModeBar component)
-       * @param {Boolean} activated true to toggle design mode ON, false for OFF
+       * @param {boolean} activated true to toggle design mode ON, false for OFF
        * If undefined, toggle current state
        * @returns {Promise}
        */
@@ -1325,10 +1432,10 @@ define([
         }
         if (activated) {
           this.activated = true;
-          this.temporaryConfig.save("edit");
+          this.logic.temporaryConfig.save("edit");
         } else {
           this.activated = false;
-          this.temporaryConfig.load("edit");
+          this.logic.temporaryConfig.load("edit");
         }
       }
 
@@ -1393,6 +1500,8 @@ define([
       this.filters = new LogicFilters(this);
       this.displayers = new LogicDisplayers(this);
       this.designMode = new LogicDesignMode(this);
+
+      this.layout.change({ layoutId: this.data.meta.defaultLayout });
 
       // Create Livedata instance
       new Vue({
@@ -1479,7 +1588,7 @@ define([
      * Toggle the given item from the array, ensuring its uniqueness
      * @param {Array} uniqueArray An array of unique items
      * @param {Any} item
-     * @param {Boolean} force Optional: true force add / false force remove
+     * @param {boolean} force Optional: true force add / false force remove
      */
     uniqueArrayToggle (uniqueArray, item, force) {
       if (force === undefined) {

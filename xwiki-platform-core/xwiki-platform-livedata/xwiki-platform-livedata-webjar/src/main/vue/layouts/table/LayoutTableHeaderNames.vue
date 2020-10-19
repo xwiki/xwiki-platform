@@ -52,7 +52,7 @@
       class="draggable-item"
       v-for="property in properties"
       :key="property.id"
-      v-show="logic.properties.isVisible(property.id)"
+      v-show="logic.properties.isVisible({ propertyId: property.id })"
     >
       <!-- Wrapper for the column header -->
       <div
@@ -72,7 +72,7 @@
           Only show the icon for the first-level sort property
         -->
         <span
-          v-if="logic.sort.isSortable(property.id)"
+          v-if="logic.properties.isSortable({ propertyId: property.id })"
           :class="[
             'sort-icon',
             'fa',
@@ -83,7 +83,7 @@
       </div>
     </th>
 
-  </tr>
+  </XWikiDraggable>
 </template>
 
 
@@ -139,7 +139,10 @@ export default {
       // and there is the select-entry-all component as first child
       // we need to substract 1 to the indexes that the draggable plugin handles
       // so that it matches the true property order
-      this.logic.properties.reorder(e.moved.oldIndex - 1, e.moved.newIndex - 1);
+      this.logic.properties.reorder({
+        fromIndex: e.moved.oldIndex - 1,
+        toIndex: e.moved.newIndex - 1,
+      });
     },
 
   },

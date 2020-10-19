@@ -53,7 +53,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private List<SortClause> sorts = new ArrayList<>();
 
-    private boolean reversed;
+    private boolean nextReversed;
 
     private boolean nextOr;
 
@@ -131,7 +131,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery not()
     {
-        this.reversed = true;
+        this.nextReversed = true;
 
         return this;
     }
@@ -181,7 +181,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
             forceOpen(true);
 
             this.nextOr = false;
-        } else if (this.nextOpen) {
+        } else if (this.nextOpen || this.nextReversed) {
             forceOpen(false);
         } else {
             this.nextOpen = true;
@@ -192,13 +192,13 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private void forceOpen(boolean or, QueryCondition... newConditions)
     {
-        GroupQueryCondition group = new GroupQueryCondition(or, this.reversed, newConditions);
+        GroupQueryCondition group = new GroupQueryCondition(or, this.nextReversed, newConditions);
 
         this.currentConditions.add(group);
         this.groupStack.push(group);
         this.currentConditions = group.conditions;
 
-        this.reversed = false;
+        this.nextReversed = false;
     }
 
     /**
@@ -231,7 +231,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
     private void addCompareCondition(String property, Object value, CompareType type)
     {
-        addCondition(new CompareQueryCondition(property, value, type, this.reversed));
+        addCondition(new CompareQueryCondition(property, value, type, this.nextReversed));
     }
 
     private void addCondition(QueryCondition newCondition)
@@ -252,14 +252,14 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
                 // Add a OR condition with the previous and new conditions
                 this.currentConditions
-                    .add(new GroupQueryCondition(true, this.reversed, previousCondition, newCondition));
+                    .add(new GroupQueryCondition(true, this.nextReversed, previousCondition, newCondition));
             }
         } else {
             this.currentConditions.add(newCondition);
         }
 
         // Reset flags
-        this.reversed = false;
+        this.nextReversed = false;
         this.nextOr = false;
     }
 
@@ -359,7 +359,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery in(String property, List<?> values)
     {
-        addCondition(new InQueryCondition(this.reversed, property, (List) values));
+        addCondition(new InQueryCondition(this.nextReversed, property, (List) values));
 
         return this;
     }
@@ -384,7 +384,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery withStatus(String entityId)
     {
-        addCondition(new StatusQueryCondition(entityId, null, this.reversed));
+        addCondition(new StatusQueryCondition(entityId, null, this.nextReversed));
 
         return this;
     }
@@ -399,7 +399,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery withStatus(String entityId, boolean read)
     {
-        addCondition(new StatusQueryCondition(entityId, read, this.reversed));
+        addCondition(new StatusQueryCondition(entityId, read, this.nextReversed));
 
         return this;
     }
@@ -413,7 +413,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery withStatus(boolean read)
     {
-        addCondition(new StatusQueryCondition(null, read, this.reversed));
+        addCondition(new StatusQueryCondition(null, read, this.nextReversed));
 
         return this;
     }
@@ -427,7 +427,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery withMail(String entityId)
     {
-        addCondition(new MailEntityQueryCondition(entityId, this.reversed));
+        addCondition(new MailEntityQueryCondition(entityId, this.nextReversed));
 
         return this;
     }

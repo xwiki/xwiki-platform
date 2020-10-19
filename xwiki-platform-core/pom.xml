@@ -527,6 +527,16 @@
                 <new>method void org.xwiki.like.LikeManager::clearCache(org.xwiki.model.reference.EntityReference)</new>
                 <justification>Unstable API.</justification>
               </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class org.xwiki.like.LikeEvent</old>
+                <justification>Unstable API: it has been moved in package org.xwiki.like.events.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class org.xwiki.like.UnlikeEvent</old>
+                <justification>Unstable API: it has been moved in package org.xwiki.like.events.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.like.LikeEvent;
+import org.xwiki.like.events.LikeEvent;
 import org.xwiki.like.events.LikeRecordableEvent;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;

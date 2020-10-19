@@ -90,9 +90,13 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     @Override
     protected void createSchema() throws SolrException
     {
+        // Add a type to tokenize strings a bit for full test search
+        
+
         setStringField(SOLR_FIELD_EXTENSIONID, false, false);
         setStringField(Extension.FIELD_VERSION, false, false);
 
+        setStringField(Extension.FIELD_NAME, false, false);
         setStringField(Extension.FIELD_TYPE, false, false);
         setStringField(Extension.FIELD_REPOSITORY, false, false);
         setStringField(Extension.FIELD_ALLOWEDNAMESPACES, true, false);

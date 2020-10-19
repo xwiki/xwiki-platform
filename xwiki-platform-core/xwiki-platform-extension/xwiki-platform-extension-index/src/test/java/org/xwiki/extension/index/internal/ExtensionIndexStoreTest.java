@@ -155,6 +155,7 @@ class ExtensionIndexStoreTest
         ExtensionId extensionId = new ExtensionId("id2", "version");
         extension = new TestExtension(this.testRepository, extensionId, "test");
 
+        extension.setName("name");
         extension.setSummary("summary");
         extension.setWebsite("website");
         extension.setCategory("category");
@@ -178,6 +179,7 @@ class ExtensionIndexStoreTest
 
         storedExtension = this.indexStore.getSolrExtension(extension.getId());
 
+        assertEquals(extension.getName(), storedExtension.getName());
         assertEquals(extension.getSummary(), storedExtension.getSummary());
         assertEquals(extension.getWebSite(), storedExtension.getWebSite());
         assertEquals(extension.getCategory(), storedExtension.getCategory());

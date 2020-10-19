@@ -84,6 +84,14 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     }
 
     /**
+     * @param name the display name of the extension
+     */
+    public void setName(String name)
+    {
+        this.overwrites.put(FIELD_NAME, name);
+    }
+
+    /**
      * @param type the type to set
      */
     public void setType(String type)

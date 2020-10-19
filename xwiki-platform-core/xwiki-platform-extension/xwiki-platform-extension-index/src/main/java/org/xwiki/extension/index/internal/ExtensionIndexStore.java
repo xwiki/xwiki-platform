@@ -228,6 +228,8 @@ public class ExtensionIndexStore implements Initializable
 
         this.utils.set(Extension.FIELD_TYPE, extension.getType(), document);
         this.utils.set(Extension.FIELD_REPOSITORY, extension.getRepository().getDescriptor().getId(), document);
+
+        this.utils.set(Extension.FIELD_NAME, extension.getName(), document);
         this.utils.set(Extension.FIELD_SUMMARY, extension.getSummary(), document);
         this.utils.set(Extension.FIELD_WEBSITE, extension.getWebSite(), document);
 
@@ -322,6 +324,8 @@ public class ExtensionIndexStore implements Initializable
         SolrExtension extension = new SolrExtension(getRepository(document), extensionId);
 
         extension.setType(this.utils.get(Extension.FIELD_TYPE, document));
+
+        extension.setName(this.utils.get(Extension.FIELD_NAME, document));
         extension.setSummary(this.utils.get(Extension.FIELD_SUMMARY, document));
         extension.setWebsite(this.utils.get(Extension.FIELD_WEBSITE, document));
         extension.setCategory(this.utils.get(Extension.FIELD_CATEGORY, document));

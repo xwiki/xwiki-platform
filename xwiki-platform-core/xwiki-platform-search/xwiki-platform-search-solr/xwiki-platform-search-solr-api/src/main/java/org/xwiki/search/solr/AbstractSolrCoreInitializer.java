@@ -78,9 +78,16 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_6 = 120600000;
 
     /**
+     * The base schema version for XWiki 12.10.
+     * 
+     * @since 12.10
+     */
+    public static final long SCHEMA_VERSION_12_10 = 121000000;
+
+    /**
      * The base schema version.
      */
-    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_3;
+    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_10;
 
     /**
      * The name of the attribute containing the name of the Solr field.
@@ -197,51 +204,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             // because they are required for things located in solrconfig.xml which is unfortunately impossible to
             // update at runtime
 
-            //////////
-            // TYPES
-            //////////
-
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, StrField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
-                SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
-
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEAN, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
-                true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEANS, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
-                true, SOLR_FIELD_MULTIVALUED, true);
-
-            // Numeric field types that index values using KD-trees.
-            // Point fields don't support FieldCache, so they must have docValues="true" if needed for sorting,
-            // faceting, functions, etc.
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
-                true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
-                true);
-
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PINTS, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-                SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOATS, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
-                true, SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONGS, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-                SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLES, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
-                true, SOLR_FIELD_MULTIVALUED, true);
-
-            // Since fields of this type are by default not stored or indexed, any data added to them will be ignored
-            // outright
-            addFieldType("ignored", "solr.StrField", SOLR_FIELD_STORED, false, SOLR_FIELD_INDEXED, false,
-                SOLR_FIELD_MULTIVALUED, true);
-
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATE, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATES, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-                SOLR_FIELD_MULTIVALUED, true);
-
-            // Binary data type. The data should be sent/retrieved in as Base64 encoded Strings
-            addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, BinaryField.class.getName());
-
-            //////////
-            // FIELDS
-            //////////
+            createBaseSchema();
 
             // Save scheme version
             setCurrentXWikiVersion(true);
@@ -251,6 +214,56 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         }
     }
 
+    private void createBaseSchema() throws SolrException
+    {
+        //////////
+        // TYPES
+        //////////
+
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, StrField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
+            SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
+
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEAN, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
+            true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEANS, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
+            true, SOLR_FIELD_MULTIVALUED, true);
+
+        // Numeric field types that index values using KD-trees.
+        // Point fields don't support FieldCache, so they must have docValues="true" if needed for sorting,
+        // faceting, functions, etc.
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
+            true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
+            true);
+
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINTS, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOATS, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
+            true, SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONGS, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLES, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
+            true, SOLR_FIELD_MULTIVALUED, true);
+
+        // Since fields of this type are by default not stored or indexed, any data added to them will be ignored
+        // outright
+        addFieldType("ignored", "solr.StrField", SOLR_FIELD_STORED, false, SOLR_FIELD_INDEXED, false,
+            SOLR_FIELD_MULTIVALUED, true);
+
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATE, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATES, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            SOLR_FIELD_MULTIVALUED, true);
+
+        // Binary data type. The data should be sent/retrieved in as Base64 encoded Strings
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, BinaryField.class.getName());
+    }
+
+    private migrateBaseSchema(long xversion)
+    {
+        
+    }
+    
     protected void initializeCoreSchema() throws SolrException
     {
         Long cversion = getCurrentCoreVersion();

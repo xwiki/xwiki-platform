@@ -33,12 +33,12 @@
     <!-- Entry cells -->
     <td
       class="cell"
-      v-for="property in properties"
-      :key="property.id"
-      v-show="logic.properties.isVisible({ propertyId: property.id })"
+      v-for="propertyDescriptor in propertyDescriptors"
+      :key="propertyDescriptor.id"
+      v-show="logic.properties.isVisible({ propertyDescriptor })"
     >
       <LivedataDisplayer
-        :property-id="property.id"
+        :property-id="propertyDescriptor.id"
         :entry="entry"
       />
     </td>
@@ -67,7 +67,7 @@ export default {
   },
 
   computed: {
-    properties () { return this.logic.properties.getDescriptors(); },
+    propertyDescriptors () { return this.logic.properties.getDescriptors(); },
   },
 
 };

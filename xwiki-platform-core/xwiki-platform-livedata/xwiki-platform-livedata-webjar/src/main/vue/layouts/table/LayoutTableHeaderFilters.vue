@@ -36,13 +36,13 @@
 
     <!-- The filters cells -->
     <th
-      v-for="property in properties"
-      :key="property.id"
-      v-show="logic.properties.isVisible({ propertyId: property.id })"
+      v-for="propertyDescriptor in propertyDescriptors"
+      :key="propertyDescriptor.id"
+      v-show="logic.properties.isVisible({ propertyDescriptor })"
     >
       <LivedataFilter
-        v-if="logic.properties.isFilterable({ propertyId: property.id })"
-        :property-id="property.id"
+        v-if="logic.properties.isFilterable({ propertyDescriptor })"
+        :property-id="propertyDescriptor.id"
         :index="0"
       />
     </th>
@@ -65,7 +65,7 @@ export default {
   inject: ["logic"],
 
   computed: {
-    properties () { return this.logic.properties.getDescriptors(); },
+    propertyDescriptors () { return this.logic.properties.getDescriptors(); },
   },
 
 };

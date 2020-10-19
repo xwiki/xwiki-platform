@@ -55,9 +55,9 @@
       -->
       <XWikiDraggableItem
         class="card-property"
-        v-for="property in properties"
-        :key="property.id"
-        v-show="logic.properties.isVisible({ propertyId: property.id }) && property.id !== titlePropertyId"
+        v-for="propertyDescriptor in propertyDescriptors"
+        :key="propertyDescriptor.id"
+        v-show="logic.properties.isVisible({ propertyDescriptor }) && propertyDescriptor.id !== titlePropertyId"
       >
         <!-- Specify the handle to drag properties -->
         <template #handle>
@@ -65,11 +65,11 @@
         </template>
 
         <!-- Property Name -->
-        <strong class="property-name">{{ property.name }}:</strong>
+        <strong class="property-name">{{ propertyDescriptor.name }}:</strong>
         <!-- Property Value -->
         <span class="value">
           <LivedataDisplayer
-            :property-id="property.id"
+            :property-id="propertyDescriptor.id"
             :entry="entry"
           />
         </span>
@@ -105,7 +105,7 @@ export default {
   },
 
   computed: {
-    properties () {
+    propertyDescriptors () {
       return this.logic.properties.getDescriptors();
     },
 

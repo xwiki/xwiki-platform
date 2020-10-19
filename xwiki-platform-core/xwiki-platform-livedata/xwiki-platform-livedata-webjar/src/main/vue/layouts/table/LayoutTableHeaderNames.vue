@@ -50,21 +50,21 @@
     -->
     <th
       class="draggable-item"
-      v-for="property in properties"
-      :key="property.id"
-      v-show="logic.properties.isVisible({ propertyId: property.id })"
+      v-for="propertyDescriptor in propertyDescriptors"
+      :key="propertyDescriptor.id"
+      v-show="logic.properties.isVisible({ propertyDescriptor })"
     >
       <!-- Wrapper for the column header -->
       <div
         class="column-name"
-        @click="sort.sort(property)"
+        @click="sort(propertyDescriptor.id)"
       >
         <!-- Specify the handle to drag properties -->
         <div class="handle">
           <span class="fa fa-ellipsis-v"></span>
         </div>
         <!-- Property Name -->
-        <span>{{ property.name }}</span>
+        <span>{{ propertyDescriptor.name }}</span>
         <!-- Spacer between the property name and the sort icon -->
         <span class="flex-spacer"></span>
         <!--
@@ -72,12 +72,12 @@
           Only show the icon for the first-level sort property
         -->
         <span
-          v-if="logic.properties.isSortable({ propertyId: property.id })"
+          v-if="logic.properties.isSortable({ propertyDescriptor })"
           :class="[
             'sort-icon',
             'fa',
-            { 'sorted': isFirstSortLevel(property) },
-            (isFirstSortLevel(property) && firstSortLevel.descending) ? 'fa-caret-up' : 'fa-caret-down',
+            { 'sorted': isFirstSortLevel(propertyDescriptor.id) },
+            (isFirstSortLevel(propertyDescriptor.id) && firstSortLevel.descending) ? 'fa-caret-up' : 'fa-caret-down',
           ]"
         ></span>
       </div>
@@ -105,7 +105,7 @@ export default {
 
   computed: {
 
-    properties () {
+    propertyDescriptors () {
       return this.logic.properties.getDescriptors();
     },
 
@@ -120,16 +120,16 @@ export default {
   methods: {
 
     /**
-     * Return whether the given property the one of `this.firstSortLevel`
-     * @param {property} Object A property descriptor
-     * @returns {Boolean}
+     * Return whether the given property id is the same as `this.firstSortLevel`
+     * @param {string} propertyId A property id
+     * @returns {boolean}
      */
-    isFirstSortLevel (property) {
-      return this.firstSortLevel.property === property.id
+    isFirstSortLevel (propertyId) {
+      return this.firstSortLevel.property === propertyId;
     },
 
-    sort (property) {
-      this.logic.sort.sort(property.id, 0).catch(err => {
+    sort (propertyId) {
+      this.logic.sort.sort(propertyId, 0).catch(err => {
         console.warn(err);
       });
     },

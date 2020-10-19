@@ -386,30 +386,71 @@ define([
       }
 
       /**
-       * Return whether the specified property id is valid (i.e. the property has a descriptor)
+       * Return whether the specified property is valid
+       * If given a property id, return whether the id exists in config
+       * If given a property descriptor, return whether the given object is one of the config property descriptors
+       *
        * @param {Object} parameters
        * Need one of: propertyId | propertyDescriptor
        * @param {string} [parameters.propertyId]
        * @param {Object} [parameters.propertyDescriptor]
        * @returns {boolean}
        */
-      isIdValid ({ propertyId, propertyDescriptor }) {
-        propertyId = this.getId({ propertyId, propertyDescriptor })
-        return this.logic.config.query.properties.includes(propertyId);
+      isValid ({ propertyId, propertyDescriptor }) {
+        if (propertyId) {
+          const isValid = this.logic.config.query.properties.includes(propertyId);
+          if (!isValid) {
+            // const err = new Error(`Error: property "${propertyId}" is not valid`);
+            // console.err(err);
+            return;
+          }
+        } else if (propertyDescriptor) {
+          const isValid = this.logic.config.meta.propertyDescriptors.includes(propertyDescriptor);
+          if (!isValid) {
+            // const err = new Error(`Error: object "${propertyDescriptor}" is not a valid property descriptor`);
+            // console.err(err);
+            return;
+          }
+        } else {
+            const err = new Error(`Error: no property where given to test`);
+            return void console.error(err);
+        }
+        return true;
       }
 
 
       /**
-       * Return whether the specified property type is valid (i.e. there is a type descriptor in meta)
+       * Return whether the specified property type is valid
+       * If given a property type, return whether the type exists in config
+       * If given a type descriptor, return whether the given object is one of the config type descriptors
+       *
        * @param {Object} parameters
-       * Need one of: propertyId | propertyDescriptor
+       * Need one of: propertyId | typeDescriptor
        * @param {string} [parameters.propertyId]
-       * @param {Object} [parameters.propertyDescriptor]
+       * @param {Object} [parameters.typeDescriptor]
        * @returns {boolean}
        */
-      isTypeValid ({ propertyType }) {
-        return this.logic.config.meta.propertyTypes
-          .find(propertyTypeDescriptor => propertyTypeDescriptor.id === propertyType);
+      isTypeValid ({ propertyType, typeDescriptor }) {
+        if (propertyType) {
+          const isValid = this.logic.config.meta.propertyTypes
+            .find(typeDescriptor => typeDescriptor.id === propertyType);
+          if (!isValid) {
+            // const err = new Error(`Error: property type "${propertyType}" is not valid`);
+            // console.err(err);
+            return;
+          }
+        } else if (typeDescriptor) {
+          const isValid = this.logic.config.meta.propertyTypes.includes(typeDescriptor);
+          if (!isValid) {
+            // const err = new Error(`Error: object "${typeDescriptor}" is not a valid property descriptor`);
+            // console.err(err);
+            return;
+          }
+        } else {
+            const err = new Error(`Error: no property type where given to test`);
+            return void console.error(err);
+        }
+        return true;
       }
 
 
@@ -453,38 +494,44 @@ define([
         if (!propertyDescriptor) {
           propertyDescriptor = this.logic.config.meta.propertyDescriptors
           .find(propertyDescriptor => propertyDescriptor.id === propertyId);
-          if (!propertyDescriptor) {
-            console.error("Property descriptor of property `" + propertyId + "` does not exists");
-          }
         }
-        return propertyDescriptor;
+        if (this.isValid({ propertyDescriptor })) {
+          return propertyDescriptor;
+        }
       }
 
 
       /**
        * Return the type descriptor corresponding to a property type
+       *
+       * If typeDescriptor is provided, returns it.
+       * It is usefull when we need to get the typeDescriptor,
+       * whether we have the id or the descriptor:
+       * `typeDescriptor = getTypeDescriptor({ propertyType, typeDescriptor })`
+       *
        * @param {Object} parameters
-       * Need of of: propertyId | propertyDescriptor | propertyType
+       * Need of of: propertyId | propertyDescriptor | propertyType | typeDescriptor
        * @param {string} [parameters.propertyId]
        * @param {Object} [parameters.propertyDescriptor]
        * @param {string} [parameters.propertyType]
+       * @param {string} [parameters.typeDescriptor]
        * @returns {(Object|undefined)}
        */
-      getTypeDescriptor ({ propertyId, propertyDescriptor, propertyType }) {
-        // If propertyType is undefined
-        // get the type from the given propertyId or propertyDescriptor
-        if (!propertyType) {
-          propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor }) || {};
-          propertyType = propertyDescriptor.type;
-        }
-        // Find the typeDescriptor corresponding to the propertyType
-        const typeDescriptor = this.logic.config.meta.propertyTypes
-          .find(typeDescriptor => typeDescriptor.id === propertyType);
-        // Handle errors
+      getTypeDescriptor ({ propertyId, propertyDescriptor, propertyType, typeDescriptor }) {
         if (!typeDescriptor) {
-          console.error("Type descriptor of `" + propertyType + "` does not exists");
+          // If propertyType is undefined
+          // get the type from the given propertyId or propertyDescriptor
+          if (!propertyType) {
+            propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor }) || {};
+            propertyType = propertyDescriptor.type;
+          }
+          // Find the typeDescriptor corresponding to the propertyType
+          typeDescriptor = this.logic.config.meta.propertyTypes
+            .find(typeDescriptor => typeDescriptor.id === propertyType);
         }
-        return typeDescriptor;
+        if (this.isTypeValid({ typeDescriptor })) {
+          return typeDescriptor;
+        }
       }
 
 
@@ -567,30 +614,34 @@ define([
       /**
        * Returns whether a certain property is sortable or not
        * @param {Object} parameters
-       * @param {string} parameters.propertyId
+       * Need of of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
        * @returns {boolean}
        */
-      isSortable ({ propertyId }) {
-        const propertyDescriptor = this.getDescriptor({ propertyId });
-        const propertyTypeDescriptor = this.getTypeDescriptor({ propertyId });
+      isSortable ({ propertyId, propertyDescriptor }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
+        const typeDescriptor = this.getTypeDescriptor({ propertyId, propertyDescriptor });
         return propertyDescriptor.sortable !== undefined ?
           propertyDescriptor.sortable :
-          propertyTypeDescriptor.sortable;
+          typeDescriptor.sortable;
       }
 
 
       /**
        * Returns whether a certain property is filterable or not
        * @param {Object} parameters
-       * @param {string} parameters.propertyId
+       * Need of of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
        * @returns {boolean}
        */
-      isFilterable ({ propertyId }) {
-        const propertyDescriptor = this.getDescriptor({ propertyId });
-        const propertyTypeDescriptor = this.getTypeDescriptor({ propertyId });
+      isFilterable ({ propertyId, propertyDescriptor }) {
+        propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
+        const typeDescriptor = this.getTypeDescriptor({ propertyId, propertyDescriptor });
         return propertyDescriptor.filterable !== undefined ?
           propertyDescriptor.filterable :
-          propertyTypeDescriptor.filterable;
+          typeDescriptor.filterable;
       }
 
 
@@ -802,7 +853,7 @@ define([
        * @param {string} propertyId
        */
       getQuerySort (propertyId) {
-        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
+        if (!this.logic.properties.isValid({ propertyId })) { return; }
         return this.logic.config.query.sort.find(sort => sort.property === propertyId);
       }
 
@@ -819,7 +870,7 @@ define([
       sort (property, level, descending) {
         const err = new Error("Property `" + property + "` is not sortable");
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid({ propertyId: property })) { return void reject(err); }
+          if (!this.logic.properties.isValid({ propertyId: property })) { return void reject(err); }
           if (!this.logic.properties.isSortable({ propertyId: property })) { return void reject(err); }
           // find property current sort level
           const currentLevel = this.logic.config.query.sort
@@ -896,7 +947,7 @@ define([
       reorder (propertyId, toIndex) {
         const err = new Error("Property `" + propertyId + "` is not sortable");
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid({ propertyId })) { return void reject(err); }
+          if (!this.logic.properties.isValid({ propertyId })) { return void reject(err); }
           const fromIndex = this.logic.config.query.sort.findIndex(querySort => querySort.property === propertyId);
           if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
           this.logic.config.query.sort.splice(toIndex, 0, this.logic.config.query.sort.splice(fromIndex, 1)[0]);
@@ -940,7 +991,7 @@ define([
        * @returns {Object}
        */
       getDescriptorFromProperty (propertyId) {
-        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
+        if (!this.logic.properties.isValid({ propertyId })) { return; }
         // property descriptor config
         const propertyDescriptor = this.logic.properties.getDescriptor({ propertyId }) || {};
         const propertyDescriptorFilter = propertyDescriptor.filter || {};
@@ -999,7 +1050,7 @@ define([
        * @returns {Object}
        */
       getQueryFilterGroup (propertyId) {
-        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
+        if (!this.logic.properties.isValid({ propertyId })) { return; }
         return this.logic.config.query.filters.find(filter => filter.property === propertyId);
       }
 
@@ -1010,7 +1061,7 @@ define([
        * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
        */
       getQueryFilters (propertyId) {
-        if (!this.logic.properties.isIdValid({ propertyId })) { return; }
+        if (!this.logic.properties.isValid({ propertyId })) { return; }
         const queryFilterGroup = this.getQueryFilterGroup(propertyId);
         return queryFilterGroup && queryFilterGroup.constrains || [];
       }
@@ -1051,7 +1102,7 @@ define([
        *  with oldEntry / newEntry being {property, index, operator, value}
        */
       _computeFilterEntries (property, index, filterEntry) {
-        if (!this.logic.properties.isIdValid({ propertyId: property })) { return; }
+        if (!this.logic.properties.isValid({ propertyId: property })) { return; }
         if (!this.logic.properties.isFilterable({ propertyId: property })) { return; }
         // default indexes
         index = index || 0;
@@ -1204,7 +1255,7 @@ define([
        */
       removeAll (property) {
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isIdValid({ propertyId: property })) { return; }
+          if (!this.logic.properties.isValid({ propertyId: property })) { return; }
           const filterIndex = this.logic.config.query.filters
             .findIndex(filterGroup => filterGroup.property === property);
           if (filterIndex === -1) { return void reject(); }
@@ -1239,7 +1290,7 @@ define([
      * @returns {Object}
      */
     getDescriptorFromProperty (propertyId) {
-      if (!this.logic.properties.isIdValid({ propertyId })) { return; }
+      if (!this.logic.properties.isValid({ propertyId })) { return; }
       // property descriptor config
       const propertyDescriptor = this.logic.properties.getDescriptor({ propertyId }) || {};
       const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};

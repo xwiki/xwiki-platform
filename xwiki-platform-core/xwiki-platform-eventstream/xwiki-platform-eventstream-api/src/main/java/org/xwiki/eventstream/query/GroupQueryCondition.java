@@ -109,6 +109,7 @@ public class GroupQueryCondition extends QueryCondition
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
 
+        builder.appendSuper(super.toString());
         builder.append("or", isOr());
         builder.append("conditions", getConditions());
 

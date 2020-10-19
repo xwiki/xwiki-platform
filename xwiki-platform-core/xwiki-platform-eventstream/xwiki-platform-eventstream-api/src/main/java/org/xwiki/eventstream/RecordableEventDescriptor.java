@@ -20,6 +20,7 @@
 package org.xwiki.eventstream;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide a description for a specific implementation of RecordableEvent so that users can know what the event is
@@ -107,5 +108,16 @@ public interface RecordableEventDescriptor
     default boolean isEnabled(String wikiId)
     {
         return true;
+    }
+
+    /**
+     * @return the title of the event to be used in notifications. The returned value should be preferably a translation
+     *          key.
+     * @since 12.9RC1
+     */
+    @Unstable
+    default String getEventTitle()
+    {
+        return "";
     }
 }

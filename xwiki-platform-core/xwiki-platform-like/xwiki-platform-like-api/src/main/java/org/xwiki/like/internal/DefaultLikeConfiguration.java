@@ -52,11 +52,4 @@ public class DefaultLikeConfiguration implements LikeConfiguration
     {
         return this.configurationSource.getProperty("cacheCapacity", 500);
     }
-
-    @Override
-    public UIClickBehaviour getUIClickBehaviour()
-    {
-        String propertyValue = this.configurationSource.getProperty("uiClickBehaviour", "ALWAYS_DISPLAY_LIKERS");
-        return UIClickBehaviour.valueOf(propertyValue);
-    }
 }

@@ -38,6 +38,6 @@
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Standardmäßig Captcha
-### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.</content>
+captcha.admin.defaultCaptchaName.hint=Das Standard-Captcha-Verfahren. Im Extension Manager erhalten Sie weitere Verfahren, die installiert und genutzt werden können.</content>
   
 </xwikidoc>

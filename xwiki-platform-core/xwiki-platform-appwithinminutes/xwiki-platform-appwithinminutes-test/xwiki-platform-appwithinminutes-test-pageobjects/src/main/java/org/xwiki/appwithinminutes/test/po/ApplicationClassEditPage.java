@@ -51,6 +51,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
     private WebElement updateClassSheetCheckbox;
 
     /**
+     * Default constructor which waits on xaction_save button.
+     */
+    public ApplicationClassEditPage()
+    {
+        super(true, true);
+    }
+
+    /**
      * Clicks on the Next Step button.
      *
      * @return the page that represents the next step of the App Within Minutes wizard

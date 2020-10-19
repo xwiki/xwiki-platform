@@ -113,7 +113,7 @@ public @interface UITest
 
     /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
-     * depending on the database)
+     *         depending on the database)
      * @since 10.10RC1
      */
     String jdbcDriverVersion() default "";
@@ -125,8 +125,9 @@ public @interface UITest
     boolean vnc() default true;
 
     /**
-     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
-     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as
+     *         {@code xwiki.properties} with Velocity (check {@code xwiki.properties.vm} to find the list of supported
+     *         properties)
      * @since 10.10RC1
      */
     String[] properties() default {};

@@ -36,9 +36,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.like.LikeConfiguration;
 import org.xwiki.like.LikeException;
 import org.xwiki.like.LikeManager;
-import org.xwiki.like.LikedEntity;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.async.internal.AsyncRendererCache;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -61,8 +61,8 @@ import com.xpn.xwiki.XWikiContext;
 @Unstable
 public class LikeScriptService implements ScriptService
 {
-    private static final EntityReference UIX_REFERENCE =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Like"), "LikeUIX", Locale.ROOT);
+    private static final LocalDocumentReference UIX_REFERENCE =
+        new LocalDocumentReference(new LocalDocumentReference(Arrays.asList("XWiki", "Like"), "LikeUIX"), Locale.ROOT);
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -93,13 +93,15 @@ public class LikeScriptService implements ScriptService
 
     /**
      * Check if current user is allowed to use Like on the given reference.
+     * Note that we explicitely deny the right for guests.
      * @param entityReference the reference on which to use like.
-     * @return {@code true} only if current user has Like right on the reference.
+     * @return {@code true} only if current user is not guest and has Like right on the reference.
      */
     public boolean isAuthorized(EntityReference entityReference)
     {
-        return this.authorizationManager.hasAccess(getLikeRight(),
-            this.contextProvider.get().getUserReference(), entityReference);
+        DocumentReference userReference = this.contextProvider.get().getUserReference();
+        return userReference != null && this.authorizationManager.hasAccess(getLikeRight(),
+            userReference, entityReference);
     }
 
     /**
@@ -119,9 +121,9 @@ public class LikeScriptService implements ScriptService
      * Perform a like on the given reference with the current user, only if allowed.
      *
      * @param entityReference the reference on which to perform a like.
-     * @return an entity containing like information if the operation succeeded, else return an empty optional.
+     * @return the new number of likes if the operation succeeded, else return an empty optional.
      */
-    public Optional<LikedEntity> like(EntityReference entityReference)
+    public Optional<Long> like(EntityReference entityReference)
     {
         XWikiContext xWikiContext = this.contextProvider.get();
         DocumentReference currentUser = xWikiContext.getUserReference();
@@ -149,9 +151,9 @@ public class LikeScriptService implements ScriptService
      * Perform a unlike on the given reference with the current user, only if allowed.
      *
      * @param entityReference the reference on which to perform a like.
-     * @return an entity containing like information if the operation succeeded, else return an empty optional.
+     * @return the new number of likes if the operation succeeded, else return an empty optional.
      */
-    public Optional<LikedEntity> unlike(EntityReference entityReference)
+    public Optional<Long> unlike(EntityReference entityReference)
     {
         XWikiContext xWikiContext = this.contextProvider.get();
         DocumentReference currentUser = xWikiContext.getUserReference();
@@ -180,9 +182,9 @@ public class LikeScriptService implements ScriptService
      * Retrieve like information for the given reference.
      *
      * @param entityReference the reference for which to retrieve like information.
-     * @return an entity containing like informations, or an empty optional in case of problem.
+     * @return the number of likes, or an empty optional in case of problem.
      */
-    public Optional<LikedEntity> getLikes(EntityReference entityReference)
+    public Optional<Long> getLikes(EntityReference entityReference)
     {
         try {
             return Optional.of(this.likeManager.getEntityLikes(entityReference));
@@ -194,20 +196,42 @@ public class LikeScriptService implements ScriptService
     }
 
     /**
-     * Retrieve all likes performed by the given user.
+     * Retrieve likes performed by the given user.
      *
      * @param userReference the user for whom to retrieve likes.
-     * @return a list of like information.
+     * @param offset the offset used for pagination.
+     * @param limit the limit used for pagination.
+     * @return a list of liked references.
      */
-    public List<LikedEntity> getUserLikes(UserReference userReference)
+    public List<EntityReference> getUserLikes(UserReference userReference, int offset, int limit)
     {
         try {
-            return this.likeManager.getUserLikes(userReference);
+            return this.likeManager.getUserLikes(userReference, offset, limit);
         } catch (LikeException e) {
             this.logger.warn("Error while retrieving likes for user [{}]", userReference,
                 ExceptionUtils.getRootCause(e));
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Count the number of likes performed by the given user.
+     *
+     * @param userReference the user for whom to count likes.
+     * @return the number of likes performed.
+     * @since 12.9RC1
+     */
+    @Unstable
+    public Optional<Long> countUserLikes(UserReference userReference)
+    {
+        Optional<Long> result = Optional.empty();
+        try {
+            result = Optional.of(this.likeManager.countUserLikes(userReference));
+        } catch (LikeException e) {
+            this.logger.warn("Error while counting likes for user [{}]", userReference,
+                ExceptionUtils.getRootCause(e));
+        }
+        return result;
     }
 
     /**
@@ -229,19 +253,32 @@ public class LikeScriptService implements ScriptService
     }
 
     /**
+     * Return the likers of a reference.
+     *
+     * @param target the reference being liked.
+     * @param offset the start offset for pagination.
+     * @param limit the limit of results for pagination.
+     * @return a list of user references who liked the reference.
+     * @since 12.8RC1
+     */
+    @Unstable
+    public List<UserReference> getLikers(EntityReference target, int offset, int limit)
+    {
+        try {
+            return this.likeManager.getLikers(target, offset, limit);
+        } catch (LikeException e) {
+            this.logger.warn("Error while checking getting likers for [{}]", target, ExceptionUtils.getRootCause(e));
+        }
+        return Collections.emptyList();
+    }
+
+    /**
      * Clean the async rendering cache for the Like UIX.
      */
     public void cleanCacheUIX()
     {
-        this.asyncRendererCache.cleanCache(UIX_REFERENCE);
-    }
-
-    /**
-     * @return the Like button behaviour.
-     * See {@link org.xwiki.like.LikeConfiguration.UIClickBehaviour} for more information on the values.
-     */
-    public String getUIClickBehaviour()
-    {
-        return this.likeConfiguration.getUIClickBehaviour().name();
+        DocumentReference localUIXReference = new DocumentReference(UIX_REFERENCE,
+            contextProvider.get().getWikiReference());
+        this.asyncRendererCache.cleanCache(localUIXReference);
     }
 }

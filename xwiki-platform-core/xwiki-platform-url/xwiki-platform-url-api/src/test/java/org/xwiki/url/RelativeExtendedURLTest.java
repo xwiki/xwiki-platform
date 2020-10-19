@@ -24,7 +24,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.xwiki.url.internal.RelativeExtendedURL;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link RelativeExtendedURL}.

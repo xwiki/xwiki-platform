@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultWikiReferenceProviderTest implements TestConstants
+class DefaultWikiReferenceProviderTest implements TestConstants
 {
     @MockComponent
     private EntityReferenceFactory entityReferenceFactory;
@@ -50,14 +50,14 @@ public class DefaultWikiReferenceProviderTest implements TestConstants
     private DefaultWikiReferenceProvider provider;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.entityProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
     }
 
     @Test
-    public void testGetDefaultValue()
+    void getDefaultValue()
     {
         assertEquals(DEFAULT_WIKI_REFERENCE, this.provider.get());
     }

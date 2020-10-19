@@ -252,9 +252,14 @@ Object.extend(XWiki, {
                         }
                       });
 
-                      // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
-                      // Note: This also does stripScripts internally, but it's OK now, since we have already added the necessary external scripts to head.
-                      $(extraID + "pane").update(container.innerHTML);
+                      // Replaces the element's content with the temporary container's content, while also evaluating
+                      // any inline scripts.
+                      // The replacement is done by inserting the child elements of the temporary container into the
+                      // element's content.
+                      var pane = $(extraID + "pane");
+                      container.childElements().forEach(function(e) {
+                        pane.insert(e);
+                      });
 
                       // Notify the others that the DOM has been updated.
                       document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
@@ -561,7 +566,7 @@ Object.extend(XWiki, {
      */
     initialize: function(container) {
         container = $(container || 'body');
-        for (button in XWiki.watchlist.actionsMap) {
+        for (var button in XWiki.watchlist.actionsMap) {
           var element = container.down('#' + button);
           if (element) {
             var self = this;
@@ -912,7 +917,7 @@ function updateName(field1, field2, removeclass) {
  * @return The cleaned string.
  */
 function noaccent(txt) {
-    temp = txt.replace(/[\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u0100\u0102\u0104\u01cd\u01de\u01e0\u01fa\u0200\u0202\u0226]/g,"A");
+    var temp = txt.replace(/[\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u0100\u0102\u0104\u01cd\u01de\u01e0\u01fa\u0200\u0202\u0226]/g,"A");
     temp = temp.replace(/[\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u0101\u0103\u0105\u01ce\u01df\u01e1\u01fb\u0201\u0203\u0227]/g,"a");
     temp = temp.replace(/[\u00c6\u01e2\u01fc]/g,"AE");
     temp = temp.replace(/[\u00e6\u01e3\u01fd]/g,"ae");
@@ -1015,7 +1020,7 @@ function checkAdvancedContent(message) {
  * Manage the keyboards shortcuts.
  * This object interfaces with the bundled Keypress JS library.
  */
-shortcut = new Object({
+window.shortcut = new Object({
 
     /**
      * @returns {Array} of registered shortcuts

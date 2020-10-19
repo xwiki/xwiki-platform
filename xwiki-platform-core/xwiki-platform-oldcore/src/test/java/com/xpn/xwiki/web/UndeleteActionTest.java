@@ -48,9 +48,9 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -67,7 +67,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class UndeleteActionTest
+class UndeleteActionTest
 {
     private static final DocumentReference DELETED_REFERENCE =
         new DocumentReference("xwiki", "Main", "DeletedDocument");
@@ -110,7 +110,7 @@ public class UndeleteActionTest
     private UndeleteAction undeleteAction = new UndeleteAction();
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.oldcore.getXWikiContext().setRequest(this.request);
 
@@ -139,7 +139,7 @@ public class UndeleteActionTest
      * Launches a RestoreJob with the current deleted document ID.
      */
     @Test
-    public void restoreSingleDocument() throws Exception
+    void restoreSingleDocument() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
@@ -153,7 +153,7 @@ public class UndeleteActionTest
     }
 
     @Test
-    public void restoreSingleDocumentWhenDeleter() throws Exception
+    void restoreSingleDocumentWhenDeleter() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
@@ -168,7 +168,7 @@ public class UndeleteActionTest
     }
 
     @Test
-    public void missingCSRFToken() throws Exception
+    void missingCSRFToken() throws Exception
     {
         // Invalid CSRF token.
         when(this.csrfToken.isTokenValid(null)).thenReturn(false);
@@ -183,7 +183,7 @@ public class UndeleteActionTest
      * When the recycle bin is disabled or when the deleted document ID is invalid, the document should not be restored.
      */
     @Test
-    public void recycleBinDisabledOrInvalidId() throws Exception
+    void recycleBinDisabledOrInvalidId() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
@@ -201,7 +201,7 @@ public class UndeleteActionTest
      * the current deleted document.
      */
     @Test
-    public void showBatch() throws Exception
+    void showBatch() throws Exception
     {
         when(this.request.getParameter("showBatch")).thenReturn("true");
 
@@ -219,7 +219,7 @@ public class UndeleteActionTest
      * Launches a RestoreJob with the batchId of the current deleted document.
      */
     @Test
-    public void restoreBatch() throws Exception
+    void restoreBatch() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
@@ -250,7 +250,7 @@ public class UndeleteActionTest
      * restore.
      */
     @Test
-    public void notAllowedToRestoreSinglePage() throws Exception
+    void notAllowedToRestoreSinglePage() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
@@ -269,7 +269,7 @@ public class UndeleteActionTest
      * restore.
      */
     @Test
-    public void notAllowedToRestoreBatch() throws Exception
+    void notAllowedToRestoreBatch() throws Exception
     {
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 

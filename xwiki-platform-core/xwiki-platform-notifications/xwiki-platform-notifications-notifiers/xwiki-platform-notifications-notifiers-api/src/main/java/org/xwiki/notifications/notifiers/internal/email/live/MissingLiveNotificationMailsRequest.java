@@ -58,6 +58,9 @@ public class MissingLiveNotificationMailsRequest extends AbstractRequest
     public MissingLiveNotificationMailsRequest(String wiki)
     {
         setWiki(wiki);
+
+        // This job's log is not isolated so we only want important log
+        setVerbose(false);
     }
 
     /**

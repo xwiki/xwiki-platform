@@ -71,35 +71,35 @@
 ###############################################################################
 
 ## Menus
-platform.wiki.menu.wikiindex=Wiki Index
-### Missing: platform.wiki.menu.deletewiki=Delete wiki
-### Missing: platform.wiki.menu.userwikis=Wikis
+platform.wiki.menu.wikiindex=Wiki 索引
+platform.wiki.menu.deletewiki=删除wiki
+platform.wiki.menu.userwikis=wiki
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=未安装“ Wiki” java组件。此页面将无法正常工作。确保安装了“ Wiki API”和“ Wiki Script”扩展（使用扩展管理器）或文件“ xwiki-platform-wiki-api- &lt;版本&gt; .jar”和“ xwiki-platform-wiki-script- &lt;版本&gt; .jar”位于“ WEB-INF / lib /” Web应用程序的文件夹下（如果是手动安装）。
+platform.wiki.dependencies.template.missing=未安装“Wiki Template” java组件。此页面将无法正常工作。确保已安装“Wiki Template API”和“Wiki Template Script”扩展（使用扩展管理器）或文件'xwiki-platform-wiki-template-api- &lt;version&gt; .jar'和'xwiki-platform-wiki-template-script- &lt;version&gt; .jar'位于"WEB-INF / lib / "Web应用程序的文件夹下（如果是手动安装）。
+platform.wiki.dependencies.user.missing=未安装“Wiki User” java组件。此页面将无法正常工作。确保已安装“Wiki User API”和“Wiki User Script”扩展（使用扩展管理器）或文件'xwiki-platform-wiki-user-api- &lt;version&gt; .jar'和'xwiki-platform-wiki-user-script- &lt;version&gt; .jar'位于“WEB-INF / lib / ”Web应用程序的文件夹下（如果是手动安装）。
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
-### Missing: platform.wiki.create.title=Create a new wiki
-### Missing: platform.wiki.create.members=MEMBERS
-### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
-### Missing: platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
+platform.wiki.create.button=创建Wiki
+platform.wiki.create.title=创建一个新的wiki
+platform.wiki.create.members=成员
+platform.wiki.create.prettyname.empty=Pretty name不能为空
+platform.wiki.create.error=Wiki "{0}" 创建失败: {1}.
 ### Missing: platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
 ### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
 ### Missing: platform.wiki.create.error.wikiname.empty=Identifier can't be empty
 
 ## Common errors and messages
-### Missing: platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
-### Missing: platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] 不存在
+platform.wiki.error.oneParameterNotSpecified=未指定''{0}'' 参数。
+platform.wiki.error.parameterAcceptsMultipleValues=接受多个值。
+platform.wiki.error.exceptionWithMessage=异常: {0}
+platform.wiki.form.requiredField=需要
+platform.wiki.csrf.error=无效的安全令牌。请重试您的操作。
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
+platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4}{5}的成员。
 ### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
 ### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
@@ -126,7 +126,7 @@ platform.wiki.menu.wikiindex=Wiki Index
 ### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
 platform.wiki.users.leave.empty=
 ### Missing: platform.wiki.users.delete.title=Delete Wiki "{0}"
-platform.wiki.users.delete.empty=
+### Missing: platform.wiki.users.delete.empty=Delete Wiki
 ### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
 ### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
 ### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.

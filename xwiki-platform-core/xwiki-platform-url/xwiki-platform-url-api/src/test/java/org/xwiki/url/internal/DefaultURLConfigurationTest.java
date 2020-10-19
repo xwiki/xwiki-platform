@@ -48,7 +48,7 @@ class DefaultURLConfigurationTest
     private ConfigurationSource configurationSource;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(configuration.get()).thenReturn(configurationSource);
     }

@@ -43,6 +43,19 @@ class DatabaseProductTest
         assertEquals(DatabaseProduct.ORACLE, product);
         assertSame(DatabaseProduct.ORACLE, product);
 
+        product = DatabaseProduct.toProduct("MySQL");
+        assertEquals(DatabaseProduct.MYSQL, product);
+        assertSame(DatabaseProduct.MYSQL, product);
+        product = DatabaseProduct.toProduct("mysql");
+        assertEquals(DatabaseProduct.MYSQL, product);
+        assertSame(DatabaseProduct.MYSQL, product);
+        product = DatabaseProduct.toProduct("MariaDB");
+        assertEquals(DatabaseProduct.MYSQL, product);
+        assertSame(DatabaseProduct.MYSQL, product);
+        product = DatabaseProduct.toProduct("mariadb");
+        assertEquals(DatabaseProduct.MYSQL, product);
+        assertSame(DatabaseProduct.MYSQL, product);
+
         product = DatabaseProduct.toProduct("Apache Derby");
         assertEquals(DatabaseProduct.DERBY, product);
         assertSame(DatabaseProduct.DERBY, product);

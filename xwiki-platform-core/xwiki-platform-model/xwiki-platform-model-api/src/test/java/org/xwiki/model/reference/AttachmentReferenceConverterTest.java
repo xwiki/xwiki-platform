@@ -21,7 +21,6 @@ package org.xwiki.model.reference;
 
 import javax.inject.Named;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,15 +37,24 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * Validate {@link AttachmentReferenceConverter} component.
  *
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(value = { DefaultConverterManager.class, ContextComponentManagerProvider.class, EnumConverter.class,
-    ConvertUtilsConverter.class })
-public class AttachmentReferenceConverterTest
+// @formatter:off
+@ComponentList(value = {
+    DefaultConverterManager.class,
+    ContextComponentManagerProvider.class,
+    EnumConverter.class,
+    ConvertUtilsConverter.class
+})
+// @formatter:on
+class AttachmentReferenceConverterTest
 {
     @InjectMockComponents
     private AttachmentReferenceConverter documentReferenceConverter;
@@ -72,29 +80,28 @@ public class AttachmentReferenceConverterTest
     }
 
     @Test
-    public void testConvertFromString()
+    void testConvertFromString()
     {
         AttachmentReference attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("wiki", "space", "page"));
         Mockito.when(this.mockStringResolver.resolve("wiki:space.page@file.txt")).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
+        assertEquals(attachmentReference,
             this.converterManager.convert(AttachmentReference.class, "wiki:space.page@file.txt"));
 
         attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("currentwiki", "space", "page"));
         Mockito.when(this.mockStringResolver.resolve("space.page@file.txt")).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
+        assertEquals(attachmentReference,
             this.converterManager.convert(AttachmentReference.class, "space.page@file.txt"));
 
         attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("currentwiki", "currentspace", "page"));
         Mockito.when(this.mockStringResolver.resolve("page@file.txt")).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
-            this.converterManager.convert(AttachmentReference.class, "page@file.txt"));
+        assertEquals(attachmentReference, this.converterManager.convert(AttachmentReference.class, "page@file.txt"));
     }
 
     @Test
-    public void testConvertFromReference()
+    void testConvertFromReference()
     {
         EntityReference reference;
 
@@ -105,7 +112,7 @@ public class AttachmentReferenceConverterTest
         AttachmentReference attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("wiki", "space", "page"));
         Mockito.when(this.mockReferenceResolver.resolve(reference)).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
+        assertEquals(attachmentReference,
             this.converterManager.convert(AttachmentReference.class, reference));
 
         reference =
@@ -114,37 +121,33 @@ public class AttachmentReferenceConverterTest
         attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("currentwiki", "space", "page"));
         Mockito.when(this.mockReferenceResolver.resolve(reference)).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
-            this.converterManager.convert(AttachmentReference.class, reference));
+        assertEquals(attachmentReference, this.converterManager.convert(AttachmentReference.class, reference));
 
         reference =
             new EntityReference("file.txt", EntityType.ATTACHMENT, new EntityReference("page", EntityType.DOCUMENT));
         attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("currentwiki", "currentspace", "page"));
         Mockito.when(this.mockReferenceResolver.resolve(reference)).thenReturn(attachmentReference);
-        Assert.assertEquals(attachmentReference,
-            this.converterManager.convert(AttachmentReference.class, reference));
+        assertEquals(attachmentReference, this.converterManager.convert(AttachmentReference.class, reference));
     }
 
     @Test
-    public void testConvertFromNull()
+    void testConvertFromNull()
     {
-        Assert.assertNull(this.converterManager.convert(AttachmentReference.class, null));
+        assertNull(this.converterManager.convert(AttachmentReference.class, null));
     }
 
     @Test
-    public void testConvertToString()
+    void testConvertToString()
     {
         AttachmentReference attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("wiki", "space", "page"));
         Mockito.when(this.mockSerialier.serialize(attachmentReference)).thenReturn("wiki:space.page@file.txt");
-        Assert.assertEquals("wiki:space.page@file.txt",
-            this.converterManager.convert(String.class, attachmentReference));
+        assertEquals("wiki:space.page@file.txt", this.converterManager.convert(String.class, attachmentReference));
 
         attachmentReference = new AttachmentReference("file.txt",
             new DocumentReference("currentwiki", "space", "page"));
         Mockito.when(this.mockSerialier.serialize(attachmentReference)).thenReturn("space.page@file.txt");
-        Assert.assertEquals("space.page@file.txt",
-            this.converterManager.convert(String.class, attachmentReference));
+        assertEquals("space.page@file.txt", this.converterManager.convert(String.class, attachmentReference));
     }
 }

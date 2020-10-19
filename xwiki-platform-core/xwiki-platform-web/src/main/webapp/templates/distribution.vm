@@ -70,7 +70,6 @@
 #end
         <img alt="XWiki Logo" src="$logourl"/>
       </div>
-      #set ($currentStep = $services.distribution.jobStatus.question.step)
       #set ($stepId = $currentStep.id)
       <div#if($stepId) id="$stepId"#end class="xdialog-content">
         #if ($request.extensionId)
@@ -182,9 +181,12 @@
   #end
 #end
 
+#set ($currentStep = $services.distribution.jobStatus.question.step)
+
+## Assume that no current step means we are done
 ## Keep displaying the wizard after the distribution job is done if the request targets a specific extension (e.g. if
 ## you follow the link to an extension dependency).
-#if ($services.distribution.jobStatus.state == 'FINISHED' && "$!request.extensionId" == '')
+#if (!$currentStep && "$!request.extensionId" == '')
   #set ($redirectURL = $request.xredirect)
   #if ("$!redirectURL" == '')
     #set ($redirectURL = $xwiki.getURL($services.model.resolveDocument('', 'default')))

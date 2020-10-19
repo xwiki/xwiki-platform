@@ -74,7 +74,7 @@ With Velocity and HTML:
 \#set(\$discard = \$xwiki.ssx.use('IconThemesCode.IconPicker'))
 
 // JavaScript code:
-&lt;script language="javascript"&gt;
+&lt;script&gt;
 
 // Configure requirejs to load the picker code
 require.config({

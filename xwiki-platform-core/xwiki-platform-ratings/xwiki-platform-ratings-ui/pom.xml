@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ratings</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ratings-ui</artifactId>
   <packaging>xar</packaging>
@@ -48,52 +48,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <!-- Force the "use" field of JSX and CSS extensions to be the correct ones when building the final XAR.
-           This is to avoid programmers mistakes, as it is very easy to forget to check they have the proper ones
-           When committing changes based on a XAR export.
-      -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xml-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <id>force-sx-use-property</id>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <transformationSets>
-            <!-- Make sure the extensions in the ratings admin sheet are always used, in order for the rating admin
-                 category to appear in the wiki administration menu when importing this application XAR.
-            -->
-            <transformationSet>
-              <dir>src/main/resources</dir>
-              <outputDir>${project.build.outputDirectory}</outputDir>
-              <includes>
-                <include>XWiki/AdminRatingsSheet</include>
-              </includes>
-              <stylesheet>src/main/build/transformation/sx-always.xsl</stylesheet>
-            </transformationSet>
-            <!-- Make sure the extensions in XWiki.Ratings are not used always by default, so that the default behavior
-                 when importing the XAR is that ratings are not activated. (They are activable through the Ratings
-                 admin category))
-            -->
-            <transformationSet>
-              <dir>src/main/resources</dir>
-              <outputDir>${project.build.outputDirectory}</outputDir>
-              <includes>
-                <include>XWiki/Ratings</include>
-              </includes>
-              <stylesheet>src/main/build/transformation/sx-ondemand.xsl</stylesheet>
-            </transformationSet>
-          </transformationSets>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

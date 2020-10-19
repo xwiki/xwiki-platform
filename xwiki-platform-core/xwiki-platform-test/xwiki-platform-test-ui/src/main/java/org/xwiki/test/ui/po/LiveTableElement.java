@@ -247,15 +247,10 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                // Refresh the current page since we need the livetable to fetch the JSON again
-                driver.navigate().refresh();
-                return driver.findElements(by).size() >= minimalExpectedRowCount;
-            }
+        getDriver().waitUntilCondition(driver -> {
+            // Refresh the current page since we need the livetable to fetch the JSON again
+            driver.navigate().refresh();
+            return driver.findElements(by).size() >= minimalExpectedRowCount;
         });
     }
 
@@ -265,7 +260,7 @@ public class LiveTableElement extends BaseElement
      *
      * @since 9.1RC1
      */
-    // We need to decide if it's bettter to introduce this method or to globally increase the default timeout.
+    // We need to decide if it's better to introduce this method or to globally increase the default timeout.
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount, int timeout)
     {
         int originalTimeout = getDriver().getTimeout();

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tag</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-ui</artifactId>
   <name>XWiki Platform - Tag - UI</name>
@@ -48,6 +48,14 @@
       <artifactId>xwiki-platform-notifications-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- FIXME: We shouldn't rely on hibernate store since the default in the Solr store now.
+         Needed to have an implementation of EventStatusManager -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

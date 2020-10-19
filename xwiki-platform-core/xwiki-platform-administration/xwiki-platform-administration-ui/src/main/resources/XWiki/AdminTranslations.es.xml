@@ -147,6 +147,10 @@ admin.other.description=Diversas configuraciones de extensiones.
 administration.section.analytics.status=Estado
 administration.section.analytics.status.hint=Determinar si el seguimiento en Google Analytics™ está activo o no
 
+# Social category
+admin.social=Social
+admin.social.description=Configuración de funciones sociales.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 

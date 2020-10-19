@@ -24,10 +24,13 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -45,8 +48,20 @@ import org.xwiki.security.authorization.Right;
 @Named(RefactoringJobs.DELETE)
 public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
 {
+    /**
+     * Key of the optional property that indicates whether the document should be send to the recycle bin
+     * or removed permanently.
+     */
+    public static final String SHOULD_SKIP_RECYCLE_BIN_PROPERTY = "shouldSkipRecycleBin";
+
     @Inject
     private BatchOperationExecutor batchOperationExecutor;
+
+    @Inject
+    private RefactoringConfiguration configuration;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     public String getType()
@@ -111,7 +126,11 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        EntitySelection entitySelection = concernedEntities.get(documentReference);
+        Boolean shouldSkipRecycleBinProperty = this.getRequest().getProperty(SHOULD_SKIP_RECYCLE_BIN_PROPERTY);
+        boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()
+                                     && this.documentAccessBridge.isAdvancedUser()
+                                     && ObjectUtils.defaultIfNull(shouldSkipRecycleBinProperty, false);
+        EntitySelection entitySelection = this.concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             // TODO: handle entitySelection == null which means something is wrong
             this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
@@ -119,8 +138,12 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);
-        } else {
+        } else if (!skipRecycleBin) {
             this.modelBridge.delete(documentReference);
+            this.logger.debug("[{}] has been successfully moved to the recycle bin.", documentReference);
+        } else {
+            this.modelBridge.delete(documentReference, true);
+            this.logger.debug("[{}] has been successfully deleted.", documentReference);
         }
     }
 }

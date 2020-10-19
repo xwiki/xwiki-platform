@@ -19,34 +19,11 @@
  */
 package org.xwiki.mentions.internal.descriptors;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.mentions.events.MentionEvent;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.preferences.TargetableNotificationPreference;
-import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
-import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.xwiki.mentions.events.MentionEvent.EVENT_TYPE;
 
@@ -60,54 +37,8 @@ import static org.xwiki.mentions.events.MentionEvent.EVENT_TYPE;
 @Component
 @Singleton
 @Named(EVENT_TYPE)
-public class MentionEventDescriptor implements RecordableEventDescriptor, Initializable
+public class MentionEventDescriptor implements RecordableEventDescriptor
 {
-    @Inject
-    private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
-
-    @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
-    private Logger logger;
-
-    /**
-     * {@inheritDoc}
-     *
-     * This initialization save a new notification filter in preferences to enable automatically mentions notification.
-     */
-    @Override
-    public void initialize() throws InitializationException
-    {
-        WikiReference wikiReference = this.contextProvider.get().getWikiReference();
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
-        properties.put(NotificationPreferenceProperty.EVENT_TYPE, MentionEvent.EVENT_TYPE);
-
-        // Create the preference
-        TargetableNotificationPreference notificationPreference = this.targetableNotificationPreferenceBuilder
-            .prepare()
-            .setCategory(NotificationPreferenceCategory.DEFAULT)
-            .setEnabled(true)
-            .setFormat(NotificationFormat.ALERT)
-            .setProperties(properties)
-            .setProviderHint(WikiNotificationPreferenceProvider.NAME)
-            .setStartDate(new Date())
-            .setTarget(wikiReference)
-            .build();
-
-        // Save it
-        try {
-            this.notificationPreferenceManager.savePreferences(Collections.singletonList(notificationPreference));
-        } catch (NotificationException e) {
-            // We don't throw an InitializationException since it doesn't prevent the component to be used.
-            this.logger.warn("Error while enabling MentionEvent for the wiki {}: {}", wikiReference,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-    }
-
     @Override
     public String getEventType()
     {
@@ -130,5 +61,11 @@ public class MentionEventDescriptor implements RecordableEventDescriptor, Initia
     public String getApplicationIcon()
     {
         return "bell";
+    }
+
+    @Override
+    public String getEventTitle()
+    {
+        return "mentions.event.mention.title";
     }
 }

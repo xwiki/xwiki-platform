@@ -1048,14 +1048,13 @@ var XWiki = (function(XWiki){
     var ele = $(this.container);
     var pointer = this;
     if (ele && ele.parentNode) {
-      if (this.options.fadeOnClear) {
+      if (this.options.fadeOnClear && window.Effect) {
         var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
           if($(pointer.container)) {
             $(pointer.container).remove();
           }
         }});
-      }
-      else {
+      } else {
         $(this.container).remove();
       }
       document.fire("xwiki:suggest:clearSuggestions", { 'suggest' : this});

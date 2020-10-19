@@ -75,7 +75,7 @@ Get the actual notifications.
       ##
       #if ($services.notification.watch.isEnabled())
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
-          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
+          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatchedWithAllEventTypes($scope))checked="checked"#end#end
           &lt;pre&gt;
             #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
             #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')

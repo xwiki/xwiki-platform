@@ -65,4 +65,10 @@ public class LikeEventDescriptor implements RecordableEventDescriptor
     {
         return "heart";
     }
+
+    @Override
+    public String getEventTitle()
+    {
+        return "like.event.title";
+    }
 }

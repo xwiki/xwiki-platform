@@ -129,9 +129,16 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         if (currentDocument != null) {
             // Check if a mandatory document initializer exists for the current document
-            XWikiDocument mandatoryDocument = getMandatoryDocument(nextDocument.getDocumentReference());
+            MandatoryDocumentInitializer initializer =
+                this.initializerManager.getMandatoryDocumentInitializer(nextDocument.getDocumentReference());
+
+            XWikiDocument mandatoryDocument = getMandatoryDocument(nextDocument.getDocumentReference(), initializer);
 
             if (mandatoryDocument != null) {
+                // Update the new version with the initializer since we want to keep modification made by the
+                // initializer in the new version
+                initializer.updateDocument(nextDocument);
+
                 // 3 ways merge
                 result = merge3(currentDocument, mandatoryDocument, nextDocument, configuration);
             } else {
@@ -232,11 +239,9 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         return askDocumentToSave(currentDocument, previousDocument, nextDocument, configuration, documentMergeResult);
     }
 
-    private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
+    private XWikiDocument getMandatoryDocument(DocumentReference documentReference,
+        MandatoryDocumentInitializer initializer)
     {
-        MandatoryDocumentInitializer initializer =
-            this.initializerManager.getMandatoryDocumentInitializer(documentReference);
-
         XWikiDocument mandatoryDocument;
         if (initializer != null) {
             // Generate clean mandatory document

@@ -34,6 +34,7 @@ import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script Service to handle the watched entities. We call `Watched Entities` the locations or the users for that we
@@ -100,13 +101,27 @@ public class NotificationWatchScriptService implements ScriptService
 
     /**
      * @param location the location
-     * @return either or not the location is already watched by the current user
+     * @return either or not the location is already watched by the current user for any event type.
      * @throws NotificationException if an error happens
      */
     public boolean isLocationWatched(EntityReference location) throws NotificationException
     {
         return watchedEntityFactory.createWatchedLocationReference(location).isWatched(
                 documentAccessBridge.getCurrentUserReference()
+        );
+    }
+
+    /**
+     * @param location the location
+     * @return either or not the location is already watched by the current user, only for all events type.
+     * @throws NotificationException if an error happens
+     * @since 12.8RC1
+     */
+    @Unstable
+    public boolean isLocationWatchedWithAllEventTypes(EntityReference location) throws NotificationException
+    {
+        return watchedEntityFactory.createWatchedLocationReference(location).isWatchedWithAllEventTypes(
+            documentAccessBridge.getCurrentUserReference()
         );
     }
 

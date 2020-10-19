@@ -4,7 +4,8 @@ org.xwiki.user.internal.SuperAdminConfigurationSource
 org.xwiki.user.internal.AllSuperAdminConfigurationSource
 org.xwiki.user.internal.GuestConfigurationSource
 org.xwiki.user.internal.AllGuestConfigurationSource
-org.xwiki.user.internal.ConfiguredStringUserReferenceResolver
+org.xwiki.user.internal.DefaultConfiguredStringUserReferenceResolver
+org.xwiki.user.internal.CurrentConfiguredStringUserReferenceResolver
 org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer
 org.xwiki.user.internal.UserReferenceConverter
 org.xwiki.user.internal.AllUserPropertiesResolver
@@ -14,7 +15,8 @@ org.xwiki.user.internal.SecureUserPropertiesResolver
 org.xwiki.user.internal.document.DocumentUserManager
 org.xwiki.user.internal.document.CurrentUserManager
 org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver
-org.xwiki.user.internal.document.DocumentStringUserReferenceResolver
+org.xwiki.user.internal.document.DefaultDocumentStringUserReferenceResolver
+org.xwiki.user.internal.document.CurrentDocumentStringUserReferenceResolver
 org.xwiki.user.internal.document.DocumentStringUserReferenceSerializer
 org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource
 org.xwiki.user.internal.document.UserPreferencesConfigurationSource

@@ -145,6 +145,7 @@
       <code>require.config({
   paths: {
     'actionButtons': $jsontool.serialize($xwiki.getSkinFile('js/xwiki/actionbuttons/actionButtons.js', true)),
+    'autoSave': $jsontool.serialize($xwiki.getSkinFile('js/xwiki/editors/autosave.js', true)),
     // Required in case the user needs to resolve merge conflicts on save.
     'xwiki-diff': $jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.js'))
   }
@@ -161,7 +162,17 @@ define('xwiki-document-api', ['jquery'], function($) {
      * @return this document's real locale
      */
     getRealLocale: function() {
-      return this.language || (this.translations &amp;&amp; this.translations['default']) || $('html').attr('lang');
+      var realLocale = this.language;
+      if (typeof realLocale === 'string' &amp;&amp; realLocale !== '') {
+        // This document is a translation.
+      } else if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
+        // This is the original document.
+        realLocale = this.translations['default'];
+      } else {
+        // The document locale is not specified. Use the UI locale.
+        realLocale = $('html').attr('lang');
+      }
+      return realLocale;
     },
 
     /**
@@ -319,6 +330,7 @@ define('editInPlace', [
 ], function($, xcontext, xwikiDocumentAPI) {
   var preload = function() {
     loadCSS($jsontool.serialize($xwiki.getSkinFile('js/xwiki/actionbuttons/actionButtons.css', true)));
+    loadCSS($jsontool.serialize($xwiki.getSkinFile('js/xwiki/editors/autosave.css', true)));
     // Required in case the user needs to resolve merge conflicts on save.
     loadCSS($jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.css', true)));
     return initActionButtons();
@@ -528,7 +540,7 @@ define('editInPlace', [
       'xwiki:actions:save',
       'xwiki:actions:reload',
       'xwiki:actions:cancel',
-    ].join(' '), function(event, data) {
+    ].join(' '), '.xcontent.form', function(event, data) {
       deferred.resolve({
         name: event.type.substring('xwiki:actions:'.length),
         document: xwikiDocument,
@@ -561,8 +573,8 @@ define('editInPlace', [
     // once it was resolved or rejected. So the first event that fires will resolve/reject the promise and the remaining
     // event won't be able to change that. The remaining event listener could be called later but it won't have any
     // effect.
-    $(document).one('xwiki:document:saved', $.proxy(deferred, 'resolve', xwikiDocument));
-    $(document).one('xwiki:document:saveFailed', $.proxy(deferred, 'reject', xwikiDocument));
+    $(document).one('xwiki:document:saved', '.xcontent.form', $.proxy(deferred, 'resolve', xwikiDocument));
+    $(document).one('xwiki:document:saveFailed', '.xcontent.form', $.proxy(deferred, 'reject', xwikiDocument));
     return deferred.promise();
   };
 
@@ -609,7 +621,7 @@ define('editInPlace', [
 
   var shouldReload = function(xwikiDocument) {
     var reloadEventFired = false;
-    $(document).one('xwiki:actions:reload.maybe', function() {
+    $(document).one('xwiki:actions:reload.maybe', '.xcontent.form', function() {
       reloadEventFired = true;
     });
     var deferred = $.Deferred();
@@ -632,21 +644,30 @@ define('editInPlace', [
   };
 
   var view = function(xwikiDocument, reload) {
+    var viewContent = $('#xwikicontent');
+    var form = viewContent.closest('.form');
     // Destroy the editors before returning to view.
-    $(document).trigger('xwiki:actions:view', {document: xwikiDocument});
+    form.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
-    $('#xwikicontent').html(xwikiDocument.renderedContent);
+    viewContent.html(xwikiDocument.renderedContent);
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
       // in case they were hidden.
-      $('#xwikicontent').children(':header').children('.edit_section').removeClass('hidden');
+      viewContent.children(':header').children('.edit_section').removeClass('hidden');
       // Let others know that the DOM has been updated, in order to enhance it.
-      $(document).trigger('xwiki:dom:updated', {'elements': $('#xwikicontent').toArray()});
+      $(document).trigger('xwiki:dom:updated', {'elements': viewContent.toArray()});
     }
+    // Remove the action events scope.
+    form.removeClass('form');
     return $.Deferred().resolve(xwikiDocument).promise();
   };
 
   var edit = function(xwikiDocument) {
+    // By adding the 'form' CSS class we set the scope of the action events (e.g. xwiki:actions:beforeSave or
+    // xwiki:actions:cancel). We need this because in view mode we can have multiple forms active on the page (e.g. one
+    // for editing the document content in place and one for editing the document syntax in-place) and we don't want
+    // them to interfere (e.g. canceling one form shouldn't cancel the other forms).
+    $('#xwikicontent').closest('.xcontent').addClass('form');
     return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
       .then(startRealTimeEditingSession);
   };
@@ -671,11 +692,12 @@ define('editInPlace', [
       // If we're editing a page..
       if (xwikiDocument) {
         // ..then make sure the action buttons are displayed right away (don't wait for the user to scroll).
-        actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument).show();
+        actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument).show()
+          // but make sure the position of the action buttons is updated.
+          .trigger('xwiki:dom:refresh');
         // The action buttons are disabled on Save &amp; View. We don't reload the page on Save &amp; View and we reuse the
         // action buttons so we need to re-enable them each time we enter the edit mode.
         fakeForm.enable();
-        $(document).trigger('xwiki:dom:refresh');
       }
       return $.Deferred().resolve(xwikiDocument).promise();
     }
@@ -711,7 +733,7 @@ define('editInPlace', [
   };
 
   var loadActionButtons = function(actionButtons) {
-    $(document).on('xwiki:actions:view', function() {
+    $(document).on('xwiki:actions:view', '.xcontent.form', function() {
       // Blur the action buttons first to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit
       // shortcut), then disable the action buttons in order to disable their shortcut keys while we're not editing
       // in-place (e.g. prevent the Save shortcut while the user is only viewing the page). Finally hide the action
@@ -732,9 +754,13 @@ define('editInPlace', [
       // We need a place where actionButtons.js can add more hidden inputs.
       actionButtons.append('&lt;div class="hidden extra"/&gt;');
       var deferred = $.Deferred();
-      require(['actionButtons', 'xwiki-diff'], function() {
+      require(['actionButtons', 'xwiki-diff', 'autoSave'], function() {
         overrideEditActions();
         overrideAjaxSaveAndContinue();
+        // Activate the auto-save feature passing our fake edit form. Note that autosave.js also creates an instance of
+        // AutoSave but it doesn't do anything because it doesn't find a real edit form in the page. This is why we have
+        // to create our own instance of AutoSave passing the right (fake) form.
+        new XWiki.editors.AutoSave({form: fakeForm});
         var xwikiDocument = actionButtons.data('xwikiDocument');
         // Enable the action buttons (and their shortcut keys) only if we're editing a document.
         actionButtons.find(':input').prop('disabled', !xwikiDocument);
@@ -771,6 +797,9 @@ define('editInPlace', [
     insert: function(element) {
       this._getActionButtons().find('.hidden.extra').append(element);
     },
+    down: function(selector) {
+      return this._getActionButtons().find(selector)[0];
+    },
     serialize: function() {
       var extra = this._getActionButtons().find(':input').serializeArray().reduce(function(extra, entry) {
         var value = extra[entry.name] || [];
@@ -798,8 +827,7 @@ define('editInPlace', [
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
         formData.previousVersion = xwikiDocument.version;
-        // It would have been easier to send the timestamp but that's what the Save action expects.
-        formData.editingVersionDate = new Date(xwikiDocument.modified).toISOString();
+        formData.editingVersionDate = new Date(xwikiDocument.modified).getTime();
       }
       return $.extend(formData, extra);
     }
@@ -823,8 +851,9 @@ define('editInPlace', [
     var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
     $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
       reloadEditor: function() {
-        if ($('.inplace-editing-buttons').is(':visible')) {
-          $(document).trigger('xwiki:actions:reload');
+        var actionButtons = $('.inplace-editing-buttons');
+        if (actionButtons.is(':visible')) {
+          actionButtons.trigger('xwiki:actions:reload');
         } else {
           return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
         }
@@ -853,10 +882,10 @@ define('editInPlace', [
     }
     input.attr('placeholder', placeholder);
     $('#document-title h1').addClass('editable').empty().append([label, input]);
-    $(document).on('xwiki:actions:beforeSave.titleEditor', function(event) {
+    $(document).on('xwiki:actions:beforeSave.titleEditor', '.xcontent.form', function(event) {
       xwikiDocument.rawTitle = input.val();
     });
-    $(document).one('xwiki:actions:view', function(event, data) {
+    $(document).one('xwiki:actions:view', '.xcontent.form', function(event, data) {
       // Destroy the title editor.
       $(document).off('xwiki:actions:beforeSave.titleEditor');
       $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);
@@ -876,17 +905,11 @@ define('editInPlace', [
       // Keep the focus while the edit content is being prepared.
       viewContent.focus();
     }
-    var data = {
-      contentType: 'org.xwiki.rendering.syntax.SyntaxContent',
-      editMode: 'wysiwyg',
+    var data = $.extend({}, $('div[data-inplace-editing-config]').data('inplaceEditingConfig'), {
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
-      deferred: $.Deferred(),
-      // We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
-      // could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so
-      // the content editor cannot enable the source mode by default).
-      enableSourceMode: true
-    };
+      deferred: $.Deferred()
+    });
     var editContentPromise = data.deferred.promise();
     editContentPromise.done(function() {
       editContent.show();
@@ -1304,9 +1327,15 @@ input#document-title-input:focus,
   ## We support in-place editing only for the WYSIWYG edit mode ATM.
   #getDefaultDocumentEditor($defaultEditMode)
   #if ($defaultEditMode == 'wysiwyg')
+    ## We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
+    ## could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so the
+    ## content editor cannot enable the source mode by default).
     #set ($inplaceEditingConfig = {
+      'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
-      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id
+      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id,
+      'enableSourceMode': true,
+      'enableOfficeImport': $services.officemanager.isConnected()
     })
     &lt;div class="hidden" data-inplace-editing-config="$escapetool.xml($jsontool.serialize($inplaceEditingConfig))"&gt;&lt;/div&gt;
     ## We didn't move this to the file system because it uses LESS and we didn't want to include it in the skin.

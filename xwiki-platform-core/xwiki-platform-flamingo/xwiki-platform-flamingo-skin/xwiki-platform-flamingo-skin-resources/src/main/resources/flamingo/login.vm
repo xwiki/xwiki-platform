@@ -94,7 +94,7 @@
 </div>## mainContentArea
 </div>## main
 ## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
-<script type="text/javascript">
+<script>
 //<![CDATA[
   document.forms.loginForm.j_username.focus();
 //]]>

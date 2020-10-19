@@ -200,7 +200,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 #macro (generateJavascript, $fields)
   ## Load only the JS since the CSS is loaded after the declaration of 'LV_validation_message LV_invalid'.
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
-  <script type='text/javascript'>
+  <script>
   /* <![CDATA[ */
   var initRegistrationFormValidation = function() {
   ##

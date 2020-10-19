@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  *
  * The following information are sent along with the event:
  *   - source: a {@link org.xwiki.user.UserReference} of the user who performs the like
- *   - data: a {@link LikedEntity} containing the target of the like.
+ *   - data: the {@link org.xwiki.model.reference.EntityReference} being target of the like.
  *
  * @version $Id$
  * @since 12.7RC1

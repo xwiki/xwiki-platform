@@ -25,19 +25,19 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-notifications</artifactId>
   <name>XWiki Platform - Mentions - Notifications</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     <!-- This component must be installed at the farm level because 
-    org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses 
-    org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
+         org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
+         org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
-  <description>Handles the notififcations of user mentions.</description>
+  <description>Handles the notifications of user mentions.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -54,7 +54,7 @@
       <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- FIXME: We shouldn't rely on hibernate store since the default in the Solr store now -->
+    <!-- FIXME: We shouldn't rely on hibernate store since the default is the Solr store now -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>

@@ -75,30 +75,5 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </cacheCapacity>
-    <uiClickBehaviour>
-      <cache>0</cache>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayType>select</displayType>
-      <freeText>forbidden</freeText>
-      <hint/>
-      <largeStorage>0</largeStorage>
-      <multiSelect>0</multiSelect>
-      <name>uiClickBehaviour</name>
-      <number>3</number>
-      <picker>0</picker>
-      <prettyName>uiClickBehaviour</prettyName>
-      <relationalStorage>0</relationalStorage>
-      <separator> </separator>
-      <separators>|, </separators>
-      <size>1</size>
-      <sort>none</sort>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <values>ALWAYS_DISPLAY_LIKERS|NEVER_DISPLAY_LIKERS|LIKE_FIRST_AND_DISPLAY_LIKERS</values>
-      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-    </uiClickBehaviour>
   </class>
 </xwikidoc>

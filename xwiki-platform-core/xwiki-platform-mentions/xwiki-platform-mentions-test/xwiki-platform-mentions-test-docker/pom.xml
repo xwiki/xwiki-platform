@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions-test</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-test-docker</artifactId>
   <name>XWiki Platform - Mentions - Test - Functional Docker Tests</name>
@@ -45,8 +45,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
-   
     <!-- ================================
         Test only dependencies
         ================================ -->
@@ -56,11 +54,10 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
     <!-- page objects -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-mentions-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -68,14 +65,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -110,5 +103,4 @@
       </build>
     </profile>
   </profiles>
-
 </project>

@@ -4167,6 +4167,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             Constructor<? extends XWikiDocument> constructor = getClass().getConstructor(DocumentReference.class);
             doc = constructor.newInstance(newDocumentReference);
 
+            // Make sure the coordinate of the document is fully accurate before any other manipulation
+            doc.setLocale(getLocale());
+
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.id = this.id;
@@ -4196,7 +4199,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setDefaultLocale(getDefaultLocale());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
-            doc.setLocale(getLocale());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
@@ -6223,6 +6225,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         this.keyCache = null;
         this.localKeyCache = null;
+        this.documentReferenceWithLocaleCache = null;
+        this.pageReferenceWithLocaleCache = null;
     }
 
     /**

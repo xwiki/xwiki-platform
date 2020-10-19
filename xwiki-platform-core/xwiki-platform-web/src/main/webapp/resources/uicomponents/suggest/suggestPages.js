@@ -163,5 +163,5 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

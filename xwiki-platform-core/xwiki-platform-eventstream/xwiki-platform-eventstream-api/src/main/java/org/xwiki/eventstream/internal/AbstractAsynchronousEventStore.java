@@ -193,6 +193,37 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     private boolean disposed;
 
+    /**
+     * Give an estimation of the number of events that are going to be added to the store. Can be negative if there is
+     * more deletes than add.
+     * 
+     * @return the current number of events to add to the store
+     * @since 12.8RC1
+     * @since 12.7.1
+     * @since 12.6.2
+     */
+    public int getQueueSize()
+    {
+        int size = 0;
+        for (EventStoreTask<?, ?> task : this.queue) {
+            switch (task.type) {
+                case DELETE_EVENT:
+                case DELETE_EVENT_BY_ID:
+                    --size;
+                    break;
+
+                case SAVE_EVENT:
+                    ++size;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        return size;
+    }
+
     private <O, I> CompletableFuture<O> addTask(I input, EventStoreTaskType type)
     {
         // Remember a few standard things from the context
@@ -423,11 +454,11 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 break;
 
             case DELETE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityAddedEvent(), task.output);
+                this.observation.notify(new MailEntityDeleteEvent(), task.output);
                 break;
 
             case SAVE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityDeleteEvent(), task.output);
+                this.observation.notify(new MailEntityAddedEvent(), task.output);
                 break;
 
             default:
@@ -494,12 +525,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         }
     }
 
-    protected void initialize(int queueSize, boolean notifyEach, boolean notifyAll)
+    protected void initialize(int queueCapacity, boolean notifyEach, boolean notifyAll)
     {
         this.notifyEach = notifyEach;
         this.notifyAll = !notifyEach && notifyAll;
 
-        this.queue = new LinkedBlockingQueue<>(queueSize);
+        this.queue = new LinkedBlockingQueue<>(queueCapacity);
 
         this.thread = new Thread(this::run);
         this.thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");

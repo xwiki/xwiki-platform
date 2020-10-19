@@ -29,10 +29,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -91,6 +91,8 @@ public class EditForm extends XWikiForm
 
     private String syntaxId;
 
+    private boolean convertSyntax;
+
     private String hidden;
     
     private ObjectPolicyType objectPolicy;
@@ -120,6 +122,7 @@ public class EditForm extends XWikiForm
         setLockForce("1".equals(request.getParameter("force")));
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
+        setConvertSyntax(Boolean.valueOf(request.getParameter("convertSyntax")));
         setHidden(request.getParameter("xhidden"));
         setObjectPolicy(request.getParameter("objectPolicy"));
         setUpdateOrCreateMap(request);
@@ -311,6 +314,31 @@ public class EditForm extends XWikiForm
     public void setSyntaxId(String syntaxId)
     {
         this.syntaxId = syntaxId;
+    }
+
+    /**
+     * @return {@code true} if the document content and meta data should be converted to the new syntax specified on the
+     *         edit form, {@code false} otherwise
+     * @see #syntaxId
+     * @since 12.6.3
+     * @since 12.9RC1
+     */
+    public boolean isConvertSyntax()
+    {
+        return convertSyntax;
+    }
+
+    /**
+     * Sets whether to convert the document content and meta data to the new syntax specified on the edit form.
+     * 
+     * @param convertSyntax {@code true} to convert the document content and meta data to the new syntax, {@code false}
+     *            to only change the syntax identifier
+     * @since 12.6.3
+     * @since 12.9RC1
+     */
+    public void setConvertSyntax(boolean convertSyntax)
+    {
+        this.convertSyntax = convertSyntax;
     }
 
     public String getHidden()

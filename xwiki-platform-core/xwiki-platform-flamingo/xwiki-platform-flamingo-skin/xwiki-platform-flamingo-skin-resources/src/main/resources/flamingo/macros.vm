@@ -295,7 +295,7 @@
           ## table cells contain long words that cannot be wrapped otherwise).
           ## See https://justmarkup.com/articles/2015-07-31-dealing-with-long-words-in-css/
           <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body hyphenate">
-            <tr><td>&nbsp;</td></tr>
+            <tr><td colspan="${columnCount}">&nbsp;</td></tr>
           </tbody>
         </table>
       </td>

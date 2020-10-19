@@ -46,8 +46,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Mark the viewer.
     var viewer = $(this).next('dd').addClass('editableProperty-viewer');
 
-    // Prepare the editor.
-    $('<dd class="editableProperty-editor"/>').hide().insertAfter(viewer);
+    // Prepare the editor. The 'form' CSS class is important because it ensures the action events (e.g.
+    // xwiki:actions:beforeSave or xwiki:actions:cancel) don't have effects outside of this element. For instance,
+    // saving or canceling one editable property shouldn't affect the other properties or the other forms on the page.
+    $('<dd class="editableProperty-editor form"/>').hide().insertAfter(viewer);
   };
 
   // Event listeners
@@ -111,7 +113,11 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   };
 
   var cancel = function(editableProperty) {
-    editableProperty.next('.editableProperty-viewer').show().next('.editableProperty-editor').hide();
+    editableProperty.next('.editableProperty-viewer').show()
+      // Notify the widgets used to edit the property that the user has canceled the edit. This allows the widgets to
+      // perform some cleanup before the editor is destroyed. We trigger the event only if the editor is not already
+      // destroyed.
+      .next('.editableProperty-editor').filter(':visible').trigger('xwiki:actions:cancel').hide();
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').hide();
     editableProperty.find('.editableProperty-edit').show();
   };
@@ -119,6 +125,11 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var save = function(editableProperty) {
     // Disable the save and cancel actions while the property is being saved.
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').addClass('disabled');
+    // Show progress notification message.
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.inprogress')),
+      'inprogress'
+    );
     // Collect the submit data.
     var editor = editableProperty.next('.editableProperty-viewer').next('.editableProperty-editor');
     // Notify the others that we're about to save so that they have the chance to update the submit data.
@@ -129,10 +140,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     data.push({name: 'minorEdit', value: true});
     data.push({name: 'form_token', value: xcontext.form_token});
     data.push({name: 'ajax', value: true});
-    var notification = new XWiki.widgets.Notification(
-      $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.inprogress')),
-      'inprogress'
-    );
+    // Make the request to save the property.
     return $.post(XWiki.currentDocument.getURL('save'), data).done(function() {
       editor.trigger('xwiki:document:saved');
       notification.replace(new XWiki.widgets.Notification(
@@ -161,10 +169,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       language: xcontext.locale
     }).done(function(html, textStatus, jqXHR) {
       loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
-      // Cancel the edit if needed.
-      cancel(editableProperty);
       // Update the viewer.
       var viewer = editableProperty.next('.editableProperty-viewer').html(html);
+      // Cancel the edit if needed.
+      cancel(editableProperty);
       // Allow others to enhance the viewer.
       $(document).trigger('xwiki:dom:updated', {'elements': viewer.toArray()});
     }).fail(function() {
@@ -205,5 +213,5 @@ require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

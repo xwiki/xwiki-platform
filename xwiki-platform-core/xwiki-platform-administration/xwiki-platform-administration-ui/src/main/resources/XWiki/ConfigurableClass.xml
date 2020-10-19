@@ -165,7 +165,7 @@ $doc.dropPermissions()##
             {{warning}}{{translation key="xe.admin.configurable.cannotLockNoJavascript"/}}{{/warning}}
 
           &lt;/noscript&gt;
-          &lt;script type="text/javascript"&gt;
+          &lt;script&gt;
             document.observe("xwiki:dom:loaded", function() {
               XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.prefixedFullName)').lock();
             });
@@ -304,7 +304,7 @@ $doc.dropPermissions()##
   #end## Foreach document name in names to configure
 
   {{html}}
-  &lt;script type="text/javascript"&gt;
+  &lt;script&gt;
   /* &lt;![CDATA[ */
   ## Alt+Shift+S presses the first saveAndContinue button it finds, not what we want so we will disable edit shortcuts.
   document.observe('xwiki:dom:loaded', function() {

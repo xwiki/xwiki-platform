@@ -42,6 +42,7 @@ usage() {
   echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
   echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
   echo "--suspend: if defined then debug is in suspend mode (i.e. wait for a debugger to connect before progressing)."
+  echo "-dp, --debugPort: The Jetty JVM port to use for remote debugging. Defaults to 5005."
   echo ""
   echo "Example: start_xwiki_debug.sh -yp \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
 }
@@ -108,6 +109,10 @@ while [[ $# > 0 ]]; do
       ;;
     --suspend)
       SUSPEND="y"
+      shift
+      ;;
+    -dp|--debugPort)
+      JETTY_DEBUG_PORT="$1"
       shift
       ;;
     -h|--help)

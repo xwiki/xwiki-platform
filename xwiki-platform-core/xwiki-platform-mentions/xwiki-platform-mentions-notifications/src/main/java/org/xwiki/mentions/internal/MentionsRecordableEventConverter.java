@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.eventstream.Event;
@@ -68,6 +69,10 @@ public class MentionsRecordableEventConverter implements RecordableEventConverte
     private MentionsNotificationsObjectMapper objectMapper;
 
     @Inject
+    @Named(EVENT_TYPE)
+    private RecordableEventDescriptor descriptor;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -92,6 +97,7 @@ public class MentionsRecordableEventConverter implements RecordableEventConverte
                 convertedEvent.setDocument(document);
                 convertedEvent.setType(EVENT_TYPE);
                 convertedEvent.setWiki(document.getWikiReference());
+                convertedEvent.setTitle(descriptor.getEventTitle());
                 Map<String, String> parameters = initializeParameters(json);
                 convertedEvent.setParameters(parameters);
                 return convertedEvent;

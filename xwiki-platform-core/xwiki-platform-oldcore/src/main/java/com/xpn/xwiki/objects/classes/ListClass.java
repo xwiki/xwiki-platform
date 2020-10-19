@@ -724,25 +724,24 @@ public abstract class ListClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        List<String> selectlist;
-        String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        Map<String, ListItem> map = getMap(context);
 
         // Skip unset values.
         if (prop == null) {
             return;
         }
 
+        Map<String, ListItem> map = getMap(context);
         if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+            String separator = getSeparator();
+            List<String> selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
-                newlist.add(getDisplayValue(value, name, map, context));
+                newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 

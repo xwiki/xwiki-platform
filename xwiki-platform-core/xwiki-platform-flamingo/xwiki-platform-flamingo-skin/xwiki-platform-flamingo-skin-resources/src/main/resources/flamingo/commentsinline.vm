@@ -221,7 +221,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author"><input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /> says:</label>
-          <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>$services.localization.render('login')</a></strong>
+          <strong>
+            <a href='$xwiki.getURL('XWiki.XWikiLogin',
+                'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>
+              $escapetool.xml($services.localization.render('login'))
+            </a>
+          </strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -229,7 +234,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
           <div class="commenteditor">
-              <!-- loaded by javascript (see comments.js) -->
+            <!-- loaded by javascript (see comments.js) -->
+            <!-- stores the submitted comment in case of error during the submission (eg, invalid captcha). -->
+            #if ($captchaAnswerWrong)
+              <input type="hidden" id="submittedcomment" value="$!comment" />
+            #end
           </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
@@ -242,6 +251,15 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       </fieldset>
     </form>
   #end
+#end
+##
+##
+##
+#macro(displayCommentButton)
+<button type="button" id="openCommentForm" class="btn btn-default">
+  $services.icon.renderHTML('comment')
+  $services.localization.render('core.viewers.comments.add.comment.label')
+</button>
 #end
 ##
 ##
@@ -413,7 +431,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #if(!$replied)
-  #displayCommentForm()
+  #if($xwiki.hasAccessLevel('comment'))
+    #displayCommentButton()
+    <div id="commentFormPlaceholder" class="hidden">
+      #displayCommentForm()
+    </div>
+  #end
 #end
   </div> ## comments
   #showPermalinkModal

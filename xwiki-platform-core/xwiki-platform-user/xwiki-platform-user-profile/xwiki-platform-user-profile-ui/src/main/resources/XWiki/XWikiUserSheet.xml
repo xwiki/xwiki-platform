@@ -294,7 +294,7 @@ Object.extend(XWiki, {
       if (history.pushState) {
         var params = window.location.search.toQueryParams();
         params.category = category;
-        newQueryString = Object.toQueryString(params);
+        var newQueryString = Object.toQueryString(params);
 
         var newURL = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + newQueryString;
         window.history.pushState({category : category}, '', newURL);

@@ -352,8 +352,8 @@ public class DefaultLikeManager implements LikeManager, Initializable
     public void clearCache(EntityReference target)
     {
         this.likeCountCache.remove(this.entityReferenceSerializer.serialize(target));
-        List<String> impactedKeys =
-            this.likeExistCacheEntryListener.getReferenceKeyMapping().getOrDefault(target, Collections.emptyList());
+        List<String> impactedKeys = new ArrayList<>(
+            this.likeExistCacheEntryListener.getReferenceKeyMapping().getOrDefault(target, Collections.emptyList()));
         for (String impactedKey : impactedKeys) {
             this.likeExistCache.remove(impactedKey);
         }

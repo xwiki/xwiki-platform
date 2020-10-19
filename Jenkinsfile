@@ -141,36 +141,38 @@ if (!params.type || params.type == 'standard') {
     }
   }
 } else {
-  // If the build is docker-latest, only build if the previous build was triggered by some source code changes.
+  // If the build is docker-latest, only build if the previous build was triggered by some source code changes, 
+  // to save agent build time and save the planet! (We don't need to re-run docker tests if there's been no
+  // source changes).	
   // Also always build if triggered manually by a user.
   if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
-		// We trigger the build under two conditions:
-		// - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
-		//   seems we need that too since it happens when we push changes to master)
-		// - The previous build was triggered by an upstream job (like rendering triggering platform)
-		def shouldExecute = false
-		currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
-		  echoXWiki "Build trigger cause: [${it.toString()}]"
-			if (it.toString().contains('SCMTriggerCause')) {
-				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
-				shouldExecute = true
-			}
-			if (it.toString().contains('BranchEventCause')) {
-				echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
-				shouldExecute = true
-			}
-			if (it.toString().contains('UpstreamCause')) {
-				echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
-				shouldExecute = true
-			}
-		}
-		if (shouldExecute) {
-			buildDocker(params.type)
-		} else {
-		  echoXWiki 'No SCM trigger nor upstream job trigger, thus not executing the docker latest tests. Aborting.'
-		  // Aborting so that the build isn't displayed as successful without doing anything.
-		  currentBuild.result = 'ABORTED'
-		}
+    // We trigger the build under two conditions:
+    // - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
+    //   seems we need that too since it happens when we push changes to master)
+    // - The previous build was triggered by an upstream job (like rendering triggering platform)
+    def shouldExecute = false
+    currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
+      echoXWiki "Build trigger cause: [${it.toString()}]"
+      if (it.toString().contains('SCMTriggerCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('BranchEventCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('UpstreamCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+    }
+    if (shouldExecute) {
+      buildDocker(params.type)
+    } else {
+      echoXWiki "No SCM trigger nor upstream job trigger, thus not executing the docker latest tests (since there's been no source changes; this saves agent build time and help save humanity!). Aborting."
+      // Aborting so that the build isn't displayed as successful without doing anything.
+      currentBuild.result = 'ABORTED'
+    }
   } else {
     buildDocker(params.type)
   }

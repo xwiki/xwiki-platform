@@ -53,7 +53,7 @@ import com.xpn.xwiki.XWikiContext;
  * @since 12.9RC1
  */
 @Unstable
-public abstract class AbstractScriptRatingsManager
+public abstract class AbstractScriptRatingsManager implements RatingsScriptServiceAPI
 {
     private RatingsManager ratingsManager;
 
@@ -77,28 +77,13 @@ public abstract class AbstractScriptRatingsManager
         return this.userReferenceResolver.resolve(this.contextProvider.get().getUserReference());
     }
 
-    /**
-     * Allows to save a rating for the given reference, with the current user reference.
-     *
-     * @param reference the reference for which to save a rating.
-     * @param vote the rating to save.
-     * @return an optional containing the {@link Rating} value, or empty in case of problem or if the rating is 0 and
-     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#isZeroStored()}).
-     */
+    @Override
     public Optional<Rating> setRating(EntityReference reference, int vote)
     {
         return this.setRating(reference, this.getCurrentUserReference(), vote);
     }
 
-    /**
-     * Allows to save a rating for the given reference, with the given user reference.
-     *
-     * @param reference the reference for which to save a rating.
-     * @param userReference the reference of the user who performs the rating.
-     * @param vote the rating to save.
-     * @return an optional containing the {@link Rating} value, or empty in case of problem or if the rating is 0 and
-     *      the configuration doesn't allow to save 0 values (see {@link RatingsConfiguration#isZeroStored()}).
-     */
+    @Override
     public Optional<Rating> setRating(EntityReference reference, UserReference userReference, int vote)
     {
         Optional<Rating> result = Optional.empty();
@@ -115,29 +100,13 @@ public abstract class AbstractScriptRatingsManager
         return result;
     }
 
-    /**
-     * Retrieve ratings information for the given reference on the given manager.
-     *
-     * @param reference the reference for which to retrieve rating information.
-     * @param offset the offset at which to start for retrieving information.
-     * @param limit the limit number of information to retrieve.
-     * @return a list of ratings containing a maximum of {@code limit} values sorted by
-     *         updated date in descending order.
-     */
+    @Override
     public List<Rating> getRatings(EntityReference reference, int offset, int limit)
     {
         return getRatings(reference, offset, limit, false);
     }
 
-    /**
-     * Retrieve ratings information for the given reference on the given manager.
-     *
-     * @param reference the reference for which to retrieve rating information.
-     * @param offset the offset at which to start for retrieving information.
-     * @param limit the limit number of information to retrieve.
-     * @param asc if {@code true} return the results sorted by updated date in ascending order, else in descending order
-     * @return a list of ratings containing a maximum of {@code limit} values.
-     */
+    @Override
     public List<Rating> getRatings(EntityReference reference, int offset, int limit, boolean asc)
     {
         try {
@@ -151,12 +120,7 @@ public abstract class AbstractScriptRatingsManager
         }
     }
 
-    /**
-     * Retrieve the average rating of a specific reference.
-     *
-     * @param reference the reference for which to retrieve the average rating information.
-     * @return the average rating in an optional or an empty optional in case of error.
-     */
+    @Override
     public Optional<AverageRating> getAverageRating(EntityReference reference)
     {
         try {
@@ -168,14 +132,7 @@ public abstract class AbstractScriptRatingsManager
         return Optional.empty();
     }
 
-    /**
-     * Retrieve the rating performed by the given author on the given reference.
-     * The method returns an empty optional if the rating cannot be found.
-     *
-     * @param reference the entity being rated
-     * @param author the author of the rate
-     * @return an optional containing the rating object or being empty if it cannot be found or in case of error.
-     */
+    @Override
     public Optional<Rating> getRating(EntityReference reference, UserReference author)
     {
         Optional<Rating> result = Optional.empty();
@@ -195,13 +152,7 @@ public abstract class AbstractScriptRatingsManager
         return result;
     }
 
-    /**
-     * Retrieve all the ratings of the current user.
-     * @param offset offset of ratings to start retrieve.
-     * @param limit maximum number of ratings to retrieve.
-     * @param asc if the results should be ordered in updated date ascending or descending order.
-     * @return a list of ratings.
-     */
+    @Override
     public List<Rating> getCurrentUserRatings(int offset, int limit, boolean asc)
     {
         List<Rating> result;
@@ -218,20 +169,13 @@ public abstract class AbstractScriptRatingsManager
         return result;
     }
 
-    /**
-     * @return the current configuration.
-     */
+    @Override
     public RatingsConfiguration getConfiguration()
     {
         return this.ratingsManager.getRatingConfiguration();
     }
 
-    /**
-     * Define if the given reference is excluded from ratings.
-     *
-     * @param entityReference the reference to check.
-     * @return {@code true} only if the given reference is excluded from ratings.
-     */
+    @Override
     public boolean isExcludedFromRatings(EntityReference entityReference)
     {
         boolean result = false;

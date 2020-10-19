@@ -45,6 +45,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -128,7 +129,6 @@ public class ExtensionIndexStore implements Initializable
     @Inject
     private SolrUtils utils;
 
-    @Inject
     private SolrClient client;
 
     @Inject
@@ -193,8 +193,8 @@ public class ExtensionIndexStore implements Initializable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery("id:" + this.utils.toFilterQueryString(extensionId.getId()));
-        solrQuery.addFilterQuery("version:" + this.utils.toFilterQueryString(extensionId.getVersion().getValue()));
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ":"
+            + this.utils.toFilterQueryString(toSolrId(extensionId)));
 
         if (local != null) {
             solrQuery.addFilterQuery("local:" + local.booleanValue());
@@ -228,18 +228,25 @@ public class ExtensionIndexStore implements Initializable
 
         this.utils.set(Extension.FIELD_TYPE, extension.getType(), document);
         this.utils.set(Extension.FIELD_REPOSITORY, extension.getRepository().getDescriptor().getId(), document);
-        this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, extension.getAllowedNamespaces(), document);
         this.utils.set(Extension.FIELD_SUMMARY, extension.getSummary(), document);
         this.utils.set(Extension.FIELD_WEBSITE, extension.getWebSite(), document);
-        this.utils.set(Extension.FIELD_AUTHORS,
-            extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
+
+        if (extension.getAllowedNamespaces() != null) {
+            this.utils.set(Extension.FIELD_ALLOWEDNAMESPACES, extension.getAllowedNamespaces(), document);
+        }
+
         this.utils.set(Extension.FIELD_CATEGORY, extension.getCategory(), document);
+
+        if (extension instanceof RemoteExtension) {
+            this.utils.set(RemoteExtension.FIELD_RECOMMENDED, ((RemoteExtension) extension).isRecommended(), document);
+        }
 
         this.utils.setString(Extension.FIELD_AUTHORS, extension.getAuthors(), ExtensionAuthor.class, document);
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
             extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
 
-        this.utils.set(Extension.FIELD_EXTENSIONFEATURES, extension.getExtensionFeatures(), document);
+        this.utils.setString(Extension.FIELD_EXTENSIONFEATURES, extension.getExtensionFeatures(), ExtensionId.class,
+            document);
         ArrayList<String> indexedFeatures = new ArrayList<>(extension.getExtensionFeatures().size() * 2);
         for (ExtensionId feature : extension.getExtensionFeatures()) {
             indexedFeatures.add(feature.getId());
@@ -319,12 +326,13 @@ public class ExtensionIndexStore implements Initializable
         extension.setWebsite(this.utils.get(Extension.FIELD_WEBSITE, document));
         extension.setCategory(this.utils.get(Extension.FIELD_CATEGORY, document));
         extension.setAllowedNamespaces(this.utils.getCollection(Extension.FIELD_ALLOWEDNAMESPACES, document));
-        extension
-            .setExtensionFeatures(this.utils.getCollection(Extension.FIELD_AUTHORS, document, ExtensionAuthor.class));
+
+        extension.setRecommended(this.utils.get(RemoteExtension.FIELD_RECOMMENDED, document, false));
+
+        extension.setAuthors(this.utils.getCollection(Extension.FIELD_AUTHORS, document, ExtensionAuthor.class));
         extension.setExtensionFeatures(
             this.utils.getCollection(Extension.FIELD_EXTENSIONFEATURES, document, ExtensionId.class));
 
-        // TODO: add authors
         // TODO: add dependencies
         // TODO: add managed dependencies
 
@@ -343,8 +351,12 @@ public class ExtensionIndexStore implements Initializable
         SolrQuery solrQuery = new SolrQuery(query.getQuery());
 
         // Pagination
-        solrQuery.setStart(query.getOffset());
-        solrQuery.setRows(query.getLimit());
+        if (query.getOffset() > 0) {
+            solrQuery.setStart(query.getOffset());
+        }
+        if (query.getLimit() > 0) {
+            solrQuery.setRows(query.getLimit());
+        }
 
         // Sort
         for (SortClause sortClause : query.getSortClauses()) {

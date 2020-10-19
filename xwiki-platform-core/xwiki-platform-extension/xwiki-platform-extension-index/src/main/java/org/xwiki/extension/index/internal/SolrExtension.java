@@ -20,20 +20,26 @@
 package org.xwiki.extension.index.internal;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.wrap.AbstractWrappingExtension;
 
 /**
+ * An extension stored in the Solr based index of extensions.
+ * 
  * @version $Id$
+ * @since 12.9RC1
  */
-public class SolrExtension extends AbstractWrappingExtension<Extension>
+public class SolrExtension extends AbstractWrappingExtension<Extension> implements RemoteExtension
 {
     private final ExtensionRepository repository;
 
@@ -65,12 +71,24 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
 
     // Extension
 
+    @Override
+    public ExtensionId getId()
+    {
+        return this.extensionId;
+    }
+
+    @Override
+    public ExtensionRepository getRepository()
+    {
+        return this.repository;
+    }
+
     /**
      * @param type the type to set
      */
     public void setType(String type)
     {
-        this.overwrites.put(Extension.FIELD_TYPE, type);
+        this.overwrites.put(FIELD_TYPE, type);
     }
 
     /**
@@ -78,7 +96,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
      */
     public void setSummary(String summary)
     {
-        this.overwrites.put(Extension.FIELD_SUMMARY, summary);
+        this.overwrites.put(FIELD_SUMMARY, summary);
     }
 
     /**
@@ -86,7 +104,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
      */
     public void setWebsite(String website)
     {
-        this.overwrites.put(Extension.FIELD_WEBSITE, website);
+        this.overwrites.put(FIELD_WEBSITE, website);
     }
 
     /**
@@ -94,7 +112,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
      */
     public void setCategory(String categrory)
     {
-        this.overwrites.put(Extension.FIELD_CATEGORY, categrory);
+        this.overwrites.put(FIELD_CATEGORY, categrory);
     }
 
     /**
@@ -102,7 +120,8 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
      */
     public void setAllowedNamespaces(Collection<String> namespaces)
     {
-        this.overwrites.put(Extension.FIELD_ALLOWEDNAMESPACES, namespaces);
+        this.overwrites.put(FIELD_ALLOWEDNAMESPACES,
+            namespaces != null ? Collections.unmodifiableCollection(namespaces) : null);
     }
 
     /**
@@ -110,7 +129,37 @@ public class SolrExtension extends AbstractWrappingExtension<Extension>
      */
     public void setExtensionFeatures(Collection<ExtensionId> features)
     {
-        this.overwrites.put(Extension.FIELD_EXTENSIONFEATURES, features);
+        this.overwrites.put(FIELD_EXTENSIONFEATURES,
+            features != null ? Collections.unmodifiableCollection(features) : null);
+    }
+
+    /**
+     * @param authors the authors of the extension
+     */
+    public void setAuthors(Collection<? extends ExtensionAuthor> authors)
+    {
+        this.overwrites.put(FIELD_AUTHORS, authors);
+    }
+
+    // RemoteExtension
+
+    @Override
+    public boolean isRecommended()
+    {
+        if (this.overwrites.containsKey(FIELD_RECOMMENDED)) {
+            return (boolean) this.overwrites.get(FIELD_RECOMMENDED);
+        }
+
+        return getWrapped() instanceof RemoteExtension && ((RemoteExtension) getWrapped()).isRecommended();
+    }
+
+    /**
+     * @param recommended true if the extension is recommended
+     * @see #isRecommended()
+     */
+    public void setRecommended(boolean recommended)
+    {
+        this.overwrites.put(FIELD_RECOMMENDED, recommended);
     }
 
     // SolrExtension

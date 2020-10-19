@@ -60,7 +60,6 @@
           #if ("$!request.search" != '') value="$escapetool.xml($request.search)"#{end}
           placeholder="$services.localization.render('extensions.search.tip')"/>
         <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
-        #set ($selectedRepositoryId = 'recommended')
         #if ($request.repo)
           #set ($selectedRepositoryId = $request.repo)
         #end
@@ -69,10 +68,6 @@
             ## Remote extensions repository
             <option value=""#if ($selectedRepositoryId == '') selected="selected"#end>
               $services.localization.render('extensions.search.repository.remote.label')
-            </option>
-            ## Recommended extensions repository (default)
-            <option value="recommended"#if ($selectedRepositoryId == 'recommended') selected="selected"#end>
-              $services.localization.render("extensions.search.repository.recommended.label")
             </option>
           </optgroup>
           <optgroup label="$services.localization.render('extension.search.repositoryGroup.local.label')">

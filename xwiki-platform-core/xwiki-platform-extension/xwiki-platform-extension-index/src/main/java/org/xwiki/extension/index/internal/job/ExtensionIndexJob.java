@@ -34,11 +34,12 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndexStatus;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.AbstractJob;
 
@@ -78,6 +79,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     }
 
     @Override
+    protected ExtensionIndexStatus createNewStatus(ExtensionIndexRequest request)
+    {
+        return new DefaultExtensionIndexStatus(request, null, this.observationManager, this.loggerManager);
+    }
+
+    @Override
     protected void runInternal() throws Exception
     {
         // 1: Add local extensions
@@ -98,18 +105,19 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     {
         Set<String> extensions = new HashSet<>();
 
-        ExtensionQuery query = new ExtensionQuery();
-        query.setLimit(SEARCH_BATCH_SIZE);
+        for (ExtensionRepository repository : this.repositories.getRepositories()) {
+            if (repository instanceof Searchable) {
+                Searchable searchableRepository = (Searchable) repository;
 
-        for (int offset = 0; true; offset += SEARCH_BATCH_SIZE) {
-            query.setOffset(offset);
+                for (int offset = 0; true; offset += SEARCH_BATCH_SIZE) {
+                    IterableResult<Extension> result = searchableRepository.search("", offset, SEARCH_BATCH_SIZE);
 
-            IterableResult<Extension> result = this.repositories.search(query);
+                    result.forEach(extension -> extensions.add(extension.getId().getId()));
 
-            result.forEach(extension -> extensions.add(extension.getId().getId()));
-
-            if (result.getSize() < SEARCH_BATCH_SIZE) {
-                break;
+                    if (result.getSize() < SEARCH_BATCH_SIZE) {
+                        break;
+                    }
+                }
             }
         }
 

@@ -84,6 +84,13 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
         }
 
         setDescriptor(new DefaultExtensionRepositoryDescriptor(ID, ID, null));
+
+        // Trigger first indexing
+        try {
+            index();
+        } catch (JobException e) {
+            this.logger.error("Failed to run indexing job", e);
+        }
     }
 
     @Override

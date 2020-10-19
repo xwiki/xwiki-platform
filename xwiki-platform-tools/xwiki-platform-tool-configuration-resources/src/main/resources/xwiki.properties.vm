@@ -1137,6 +1137,20 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default value is:
 # refactoring.rename.useAtomicRename = true
 
+#-# [Since 12.9RC1]
+#-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.
+#-# It is disabled by default.
+#-# This setting is only used if the wiki has a recycle bin activated (xwiki.recyclebin=1 in xwiki.cfg).
+#-# This setting can be overloaded:
+#-# * By the main wiki in the Refactoring.Code.RefactoringConfigurationClass class of the
+#-#   Refactoring.Code.RefactoringConfiguration document of the main wiki.
+#-# * By sub-wikis in the Refactoring.Code.RefactoringConfigurationClass class of the
+#-#   Refactoring.Code.RefactoringConfiguration document of the sub-wikis (itself overloading the main wiki's
+#-#   configuration).
+#-#
+#-# The default value is:
+# refactoring.isRecycleBinSkippingActivated = false
+
 #-------------------------------------------------------------------------------------
 # Skin Extensions
 #-------------------------------------------------------------------------------------

@@ -248,6 +248,25 @@ public class SimpleEventQueryTest
 
         assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
             group1.getConditions().get(1));
+
+        query = new SimpleEventQuery();
+
+        query.not();
+        query.open();
+        query.eq("property1", "value1");
+        query.eq("property2", "value2");
+        query.close();
+
+        assertEquals(1, query.getConditions().size());
+
+        group = (GroupQueryCondition) query.getConditions().get(0);
+
+        assertEquals(2, group.getConditions().size());
+
+        assertEquals(new CompareQueryCondition("property1", "value1", CompareType.EQUALS),
+            group.getConditions().get(0));
+        assertEquals(new CompareQueryCondition("property2", "value2", CompareType.EQUALS),
+            group.getConditions().get(1));
     }
 
     @Test

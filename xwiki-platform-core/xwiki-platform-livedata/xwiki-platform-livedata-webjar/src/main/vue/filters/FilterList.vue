@@ -88,7 +88,7 @@ export default {
   computed: {
     // The list of all the options available for the static list
     options () {
-      return this.config.options;
+      return this.filterConfig.options;
     },
 
     // The filter value is String that contains an Array,

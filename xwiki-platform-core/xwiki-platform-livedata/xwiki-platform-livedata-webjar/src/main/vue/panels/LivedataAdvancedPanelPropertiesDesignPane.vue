@@ -40,7 +40,7 @@
       >
         <!-- Available property types -->
         <option
-          v-for="typeDescriptor in data.meta.propertyTypes"
+          v-for="typeDescriptor in logic.config.meta.propertyTypes"
           :key="typeDescriptor.id"
           :value="typeDescriptor.id"
           :selected="typeDescriptor.id === property.type"
@@ -69,7 +69,7 @@
         </option>
         <!-- Available displayers -->
         <option
-          v-for="displayerDescriptor in data.meta.displayers"
+          v-for="displayerDescriptor in logic.config.meta.displayers"
           :key="displayerDescriptor.id"
           :value="displayerDescriptor.id"
           :selected="isDisplayerSelected(displayerDescriptor.id)"
@@ -96,7 +96,7 @@
           Default ({{ logic.filters.getDescriptorFromType(property.type).id }})
         </option>
         <option
-          v-for="filterDescriptor in data.meta.filters"
+          v-for="filterDescriptor in logic.config.meta.filters"
           :key="filterDescriptor.id"
           :value="filterDescriptor.id"
           :selected="isFilterSelected(filterDescriptor.id)"
@@ -123,7 +123,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
 
     displayerId () {
       return this.logic.displayers.getDescriptorFromProperty(this.property.id).id;

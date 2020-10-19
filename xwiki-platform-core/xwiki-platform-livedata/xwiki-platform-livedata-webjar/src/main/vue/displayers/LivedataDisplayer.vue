@@ -92,7 +92,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
     // The displayer id of the Displayer component to load,
     // corresponding to the property id
     displayerId () {
@@ -111,7 +110,7 @@ export default {
         this.loadDisplayer(this.displayerId).catch(err => {
           // Try to load default Displayer
           console.warn(err);
-          this.loadDisplayer(this.data.meta.defaultDisplayer).catch(err => {
+          this.loadDisplayer(this.logic.config.meta.defaultDisplayer).catch(err => {
             console.error(err);
           });
         });

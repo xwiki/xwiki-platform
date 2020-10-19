@@ -79,7 +79,7 @@ export default {
   computed: {
     // The link href taken from the propertyHref property of the entry
     href () {
-      return this.config.propertyHref && this.entry[this.config.propertyHref] || "#";
+      return this.displayerConfig.propertyHref && this.entry[this.displayerConfig.propertyHref] || "#";
     },
   },
 

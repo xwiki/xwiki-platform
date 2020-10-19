@@ -53,7 +53,7 @@
       -->
       <div
         class="livedata-filter-group"
-        v-for="filterGroup in data.query.filters"
+        v-for="filterGroup in logic.config.query.filters"
         :key="filterGroup.property"
       >
         <!-- Filter Group title (property name) -->
@@ -242,9 +242,8 @@ export default {
 
   inject: ["logic"],
 
-  computed: {
 
-    data () { return this.logic.data; },
+  computed: {
 
     // Property descriptors that does not have a filter group in Livedata config
     unfilteredProperties () {

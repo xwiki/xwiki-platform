@@ -51,10 +51,6 @@ export default {
 
   inject: ["logic"],
 
-  computed: {
-    data () { return this.logic.data; },
-  },
-
 };
 </script>
 

@@ -87,7 +87,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
     // The filter id of the Filter component to load
     // corresponding to the property id
     filterId () {
@@ -106,7 +105,7 @@ export default {
         this.loadFilter(this.filterId).catch(err => {
           // Try to load default Filter
           console.warn(err);
-          this.loadFilter(this.data.meta.defaultFilter).catch(err => {
+          this.loadFilter(this.logic.config.meta.defaultFilter).catch(err => {
             console.error(err);
           });
         });

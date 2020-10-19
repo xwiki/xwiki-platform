@@ -45,7 +45,7 @@
       in order to allow the user to reorder them easily
     -->
     <XWikiDraggable
-      :value="data.query.properties"
+      :value="logic.config.query.properties"
       @change="reorderProperties"
     >
       <!--
@@ -105,8 +105,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
-
     properties () {
       return this.logic.properties.getDescriptors();
     },
@@ -115,7 +113,6 @@ export default {
     titlePropertyId () {
       return this.logic.layout.getDescriptor("cards").titleProperty;
     },
-
   },
 
   methods: {

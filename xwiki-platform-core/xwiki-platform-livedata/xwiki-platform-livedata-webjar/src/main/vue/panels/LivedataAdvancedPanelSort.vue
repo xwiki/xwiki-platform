@@ -48,7 +48,7 @@
         in order to allow the user to reorder them easily
       -->
       <XWikiDraggable
-        :value="data.query.sort"
+        :value="logic.config.query.sort"
         @change="reorderSorts"
       >
         <!--
@@ -58,7 +58,7 @@
         -->
         <XWikiDraggableItem
           class="sort-entry"
-          v-for="(sortEntry, level) in data.query.sort"
+          v-for="(sortEntry, level) in logic.config.query.sort"
           :key="level"
         >
           <!-- Property name -->
@@ -153,8 +153,6 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
-
     // Property descriptors that does not have a sort entry in Livedata config
     unsortedProperties () {
       return this.logic.properties.getDescriptors({ sortable: true })

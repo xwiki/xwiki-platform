@@ -50,7 +50,7 @@
       -->
       <XWikiDraggable
         class="property-container"
-        :value="data.query.properties"
+        :value="logic.config.query.properties"
         @change="reorderProperties"
       >
         <!--
@@ -161,6 +161,7 @@ export default {
 
   inject: ["logic"],
 
+
   data () {
     return {
       // Each key correspond to a Livedata property, and the value is
@@ -169,9 +170,6 @@ export default {
     }
   },
 
-  computed: {
-    data () { return this.logic.data; },
-  },
 
   methods: {
     // Event handler for when properties are dragged and dropped

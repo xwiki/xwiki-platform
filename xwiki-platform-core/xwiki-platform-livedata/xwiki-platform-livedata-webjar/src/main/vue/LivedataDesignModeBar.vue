@@ -75,7 +75,7 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
+    config () { return this.logic.config; },
   },
 
 

@@ -53,7 +53,7 @@ define([
      * @returns {Object[]}
      */
     getIds () {
-      return this.logic.data.meta.layouts.map(layoutDescriptor => layoutDescriptor.id);
+      return this.logic.config.meta.layouts.map(layoutDescriptor => layoutDescriptor.id);
     }
 
 
@@ -65,7 +65,7 @@ define([
      */
     getDescriptor ({ layoutId } = {}) {
       layoutId = layoutId || this.currentId;
-      return this.logic.data.meta.layouts
+      return this.logic.config.meta.layouts
         .find(layoutDescriptor => layoutDescriptor.id === layoutId);
     }
 
@@ -196,9 +196,9 @@ define([
        */
       getId ({ entry, entryIndex }) {
         if (!entry) {
-          entry = this.logic.data.data.entries.slice(entryIndex)[0];
+          entry = this.logic.config.data.entries.slice(entryIndex)[0];
         }
-        const idProperty = this.logic.data.meta.entryDescriptor.idProperty || "id";
+        const idProperty = this.logic.config.meta.entryDescriptor.idProperty || "id";
         if (entry[idProperty] === undefined) {
           console.warn("Entry has no id (at property [" + idProperty + "]", entry);
           return;
@@ -218,7 +218,7 @@ define([
 
       async update () {
         try {
-          this.data.data.entries = await this.fetch();
+          this.logic.config.data.entries = await this.fetch();
         } catch (err) {
           return console.error(err);
         }
@@ -242,8 +242,8 @@ define([
           "other": undefined,
         })
         .then(newEntry => {
-          this.logic.data.data.entries.push(newEntry);
-          this.logic.data.data.count++; // TODO: remove when merging with backend
+          this.logic.config.data.entries.push(newEntry);
+          this.logic.config.data.count++; // TODO: remove when merging with backend
         });
       }
 
@@ -267,7 +267,7 @@ define([
        * @returns {number}
        */
       getPageCount () {
-        return Math.ceil(this.logic.data.data.count / this.logic.data.query.limit);
+        return Math.ceil(this.logic.config.data.count / this.logic.config.query.limit);
       }
 
 
@@ -279,9 +279,9 @@ define([
        */
       getPageIndex ({ entryIndex } = {}) {
         if (entryIndex === undefined) {
-          entryIndex = this.logic.data.query.offset;
+          entryIndex = this.logic.config.query.offset;
         }
-        return Math.floor(entryIndex / this.logic.data.query.limit);
+        return Math.floor(entryIndex / this.logic.config.query.limit);
       }
 
 
@@ -295,7 +295,7 @@ define([
         return new Promise ((resolve, reject) => {
           if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return void reject(); }
           const previousPageIndex = this.getPageIndex();
-          this.logic.data.query.offset = this.getFirstIndexOfPage({ pageIndex });
+          this.logic.config.query.offset = this.getFirstIndexOfPage({ pageIndex });
           this.logic.event.trigger({
             name: "pageChange",
             data: {
@@ -320,7 +320,7 @@ define([
           pageIndex = this.getPageIndex();
         }
         if (0 <= pageIndex && pageIndex < this.getPageCount()) {
-          return pageIndex * this.logic.data.query.limit;
+          return pageIndex * this.logic.config.query.limit;
         } else {
           return -1;
         }
@@ -338,7 +338,7 @@ define([
           pageIndex = this.getPageIndex();
         }
         if (0 <= pageIndex && pageIndex < this.getPageCount()) {
-          return Math.min(this.getFirstIndexOfPage({ pageIndex }) + this.logic.data.query.limit, this.logic.data.data.count) - 1;
+          return Math.min(this.getFirstIndexOfPage({ pageIndex }) + this.logic.config.query.limit, this.logic.config.data.count) - 1;
         } else {
           return -1;
         }
@@ -354,9 +354,9 @@ define([
       setPageSize ({ pageSize }) {
         return new Promise ((resolve, reject) => {
           if (pageSize < 0) { return void reject(); }
-          const previousPageSize = this.logic.data.query.limit;
+          const previousPageSize = this.logic.config.query.limit;
           if (pageSize === previousPageSize) { return void resolve(); }
-          this.logic.data.query.limit = pageSize;
+          this.logic.config.query.limit = pageSize;
           this.logic.event.trigger({
             name: "pageSizeChange",
             data: {
@@ -395,7 +395,7 @@ define([
        */
       isIdValid ({ propertyId, propertyDescriptor }) {
         propertyId = this.getId({ propertyId, propertyDescriptor })
-        return this.logic.data.query.properties.includes(propertyId);
+        return this.logic.config.query.properties.includes(propertyId);
       }
 
 
@@ -408,7 +408,7 @@ define([
        * @returns {boolean}
        */
       isTypeValid ({ propertyType }) {
-        return this.logic.data.meta.propertyTypes
+        return this.logic.config.meta.propertyTypes
           .find(propertyTypeDescriptor => propertyTypeDescriptor.id === propertyType);
       }
 
@@ -451,7 +451,7 @@ define([
        */
       getDescriptor ({ propertyId, propertyDescriptor }) {
         if (!propertyDescriptor) {
-          propertyDescriptor = this.logic.data.meta.propertyDescriptors
+          propertyDescriptor = this.logic.config.meta.propertyDescriptors
           .find(propertyDescriptor => propertyDescriptor.id === propertyId);
           if (!propertyDescriptor) {
             console.error("Property descriptor of property `" + propertyId + "` does not exists");
@@ -478,7 +478,7 @@ define([
           propertyType = propertyDescriptor.type;
         }
         // Find the typeDescriptor corresponding to the propertyType
-        const typeDescriptor = this.logic.data.meta.propertyTypes
+        const typeDescriptor = this.logic.config.meta.propertyTypes
           .find(typeDescriptor => typeDescriptor.id === propertyType);
         // Handle errors
         if (!typeDescriptor) {
@@ -496,7 +496,7 @@ define([
        * @returns {Object[]}
        */
       getDescriptors ({ filterable = false, sortable = false } = {}) {
-        let descriptors = this.logic.data.query.properties
+        let descriptors = this.logic.config.query.properties
           .map(propertyId => this.logic.properties.getDescriptor({ propertyId }));
 
         if (sortable) {
@@ -555,11 +555,11 @@ define([
       reorder ({ propertyId, propertyDescriptor, fromIndex, toIndex }) {
         if (fromIndex === undefined) {
           propertyId = this.getId({ propertyId, propertyDescriptor });
-          fromIndex = this.logic.data.query.properties.indexOf(propertyId);
+          fromIndex = this.logic.config.query.properties.indexOf(propertyId);
         }
         if (fromIndex === undefined || fromIndex <= -1 || toIndex <= -1) { return; }
-        this.logic.data.query.properties.splice(toIndex, 0,
-          this.logic.data.query.properties.splice(fromIndex, 1)[0]
+        this.logic.config.query.properties.splice(toIndex, 0,
+          this.logic.config.query.properties.splice(fromIndex, 1)[0]
         );
       }
 
@@ -757,7 +757,7 @@ define([
        */
       getCount () {
         if (this.isGlobal) {
-          return this.logic.data.data.count - this.deselected.length;
+          return this.logic.config.data.count - this.deselected.length;
         } else {
           return this.selected.length;
         }
@@ -803,7 +803,7 @@ define([
        */
       getQuerySort (propertyId) {
         if (!this.logic.properties.isIdValid({ propertyId })) { return; }
-        return this.logic.data.query.sort.find(sort => sort.property === propertyId);
+        return this.logic.config.query.sort.find(sort => sort.property === propertyId);
       }
 
 
@@ -822,7 +822,7 @@ define([
           if (!this.logic.properties.isIdValid({ propertyId: property })) { return void reject(err); }
           if (!this.logic.properties.isSortable({ propertyId: property })) { return void reject(err); }
           // find property current sort level
-          const currentLevel = this.logic.data.query.sort
+          const currentLevel = this.logic.config.query.sort
             .findIndex(sortObject => sortObject.property === property);
           // default level
           if (level === undefined) {
@@ -832,7 +832,7 @@ define([
           }
           // default descending
           if (descending === undefined) {
-            descending = (currentLevel !== -1) ? !this.logic.data.query.sort[currentLevel].descending : false;
+            descending = (currentLevel !== -1) ? !this.logic.config.query.sort[currentLevel].descending : false;
           }
           // create sort object
           const sortObject = {
@@ -841,10 +841,10 @@ define([
           };
           // apply sort
           if (level !== -1) {
-            this.logic.data.query.sort.splice(level, 1, sortObject);
+            this.logic.config.query.sort.splice(level, 1, sortObject);
           }
           if (currentLevel !== -1 && currentLevel !== level) {
-            this.logic.data.query.sort.splice(currentLevel, 1);
+            this.logic.config.query.sort.splice(currentLevel, 1);
           }
           // dispatch events
           this.logic.event.trigger({
@@ -872,9 +872,9 @@ define([
        */
       add (property, descending) {
         const err = new Error("Property `" + property + "` is already sorting");
-        const propertyQuerySort = this.logic.data.query.sort.find(sortObject => sortObject.property === property);
+        const propertyQuerySort = this.logic.config.query.sort.find(sortObject => sortObject.property === property);
         if (propertyQuerySort) { return Promise.reject(err); }
-        return this.sort(property, this.logic.data.query.sort.length, descending);
+        return this.sort(property, this.logic.config.query.sort.length, descending);
       }
 
 
@@ -897,9 +897,9 @@ define([
         const err = new Error("Property `" + propertyId + "` is not sortable");
         return new Promise ((resolve, reject) => {
           if (!this.logic.properties.isIdValid({ propertyId })) { return void reject(err); }
-          const fromIndex = this.logic.data.query.sort.findIndex(querySort => querySort.property === propertyId);
+          const fromIndex = this.logic.config.query.sort.findIndex(querySort => querySort.property === propertyId);
           if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
-          this.logic.data.query.sort.splice(toIndex, 0, this.logic.data.query.sort.splice(fromIndex, 1)[0]);
+          this.logic.config.query.sort.splice(toIndex, 0, this.logic.config.query.sort.splice(fromIndex, 1)[0]);
 
           // dispatch events
           this.logic.event.trigger({
@@ -981,31 +981,31 @@ define([
        */
       _resolveFilterDescriptor (filterDescriptor) {
         const filterId = filterDescriptor.id;
-        const filter = this.logic.data.meta.filters.find(filter => filter.id === filterId);
+        const filter = this.logic.config.meta.filters.find(filter => filter.id === filterId);
         // merge filters
         if (filterDescriptor.id) {
           return Object.assign({}, filter, filterDescriptor);
         } else {
           // default filter
-          return { id: this.logic.data.meta.defaultFilter };
+          return { id: this.logic.config.meta.defaultFilter };
         }
       }
 
 
 
       /**
-       * Get the filter object in the query data object associated to a property id
+       * Get the filter object in the query config object associated to a property id
        * @param {string} propertyId
        * @returns {Object}
        */
       getQueryFilterGroup (propertyId) {
         if (!this.logic.properties.isIdValid({ propertyId })) { return; }
-        return this.logic.data.query.filters.find(filter => filter.property === propertyId);
+        return this.logic.config.query.filters.find(filter => filter.property === propertyId);
       }
 
 
       /**
-       * Get the filters in the query data object associated to a property id
+       * Get the filters in the query config object associated to a property id
        * @param {string} propertyId
        * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
        */
@@ -1133,7 +1133,7 @@ define([
           if (newEntry.index !== -1) {
             // create filterGroup if not exists
             if (!this.getQueryFilterGroup(newEntry.property)) {
-              this.logic.data.query.filters.push({
+              this.logic.config.query.filters.push({
                 property: newEntry.property,
                 matchAll: true,
                 constrains: [],
@@ -1205,10 +1205,10 @@ define([
       removeAll (property) {
         return new Promise ((resolve, reject) => {
           if (!this.logic.properties.isIdValid({ propertyId: property })) { return; }
-          const filterIndex = this.logic.data.query.filters
+          const filterIndex = this.logic.config.query.filters
             .findIndex(filterGroup => filterGroup.property === property);
           if (filterIndex === -1) { return void reject(); }
-          const removedFilterGroups = this.logic.data.query.filters.splice(filterIndex, 1);
+          const removedFilterGroups = this.logic.config.query.filters.splice(filterIndex, 1);
           // dispatch events
           this.logic.event.trigger({
             name: "filter",
@@ -1280,13 +1280,13 @@ define([
      */
     _resolveDisplayerDescriptor (displayerDescriptor) {
       const displayerId = displayerDescriptor.id;
-      const displayer = this.logic.data.meta.displayers.find(displayer => displayer.id === displayerId);
+      const displayer = this.logic.config.meta.displayers.find(displayer => displayer.id === displayerId);
       // merge displayers
       if (displayerDescriptor.id) {
         return Object.assign({}, displayer, displayerDescriptor);
       } else {
         // default displayer
-        return { id: this.logic.data.meta.defaultDisplayer };
+        return { id: this.logic.config.meta.defaultDisplayer };
       }
     }
 
@@ -1358,7 +1358,7 @@ define([
        */
       save (configName, config) {
         if (config === undefined) {
-          config = config || this.logic.data;
+          config = config || this.logic.config;
         }
         const configToSave = this._format(config);
         this.dataSaves[configName] = configToSave;
@@ -1372,8 +1372,8 @@ define([
       load (config) {
         const configToLoad = this._parse(config);
         if (!configToLoad) { return; }
-        this.logic.data.query = configToLoad.query;
-        this.logic.data.meta = configToLoad.meta;
+        this.logic.config.query = configToLoad.query;
+        this.logic.config.meta = configToLoad.meta;
       }
 
 
@@ -1387,7 +1387,7 @@ define([
         if (!configToCompare) { return; }
         return this.logic.isDeepEqual(
           this._format(configToCompare),
-          this._format(this.logic.data)
+          this._format(this.logic.config)
         );
       }
 
@@ -1448,8 +1448,8 @@ define([
 
 
   /**
-   * Map the element to its data object
-   * So that each instance of the livedata on the page handle there own data
+   * Map the element to its config object
+   * So that each instance of the livedata on the page handle there own config
    */
   const instancesMap = new WeakMap();
 
@@ -1457,8 +1457,8 @@ define([
 
   /**
    * The init function of the logic script
-   * For each livedata element on the page, returns its corresponding data / API
-   * If the data does not exists yet, create it from the element
+   * For each livedata element on the page, returns its corresponding config / API
+   * If the config does not exists yet, create it from the element
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
    */
   const init = function (element) {
@@ -1486,8 +1486,8 @@ define([
       this.openedPanels = [];
 
       // The Livedata configuration object
-      this.data = JSON.parse(element.getAttribute("data-data") || "{}");
-      element.removeAttribute("data-data");
+      this.config = JSON.parse(element.getAttribute("data-config") || "{}");
+      element.removeAttribute("data-config");
 
       this.event = new LogicEvent(this);
       this.temporaryConfig = new LogicTemporaryConfig(this);
@@ -1501,7 +1501,7 @@ define([
       this.displayers = new LogicDisplayers(this);
       this.designMode = new LogicDesignMode(this);
 
-      this.layout.change({ layoutId: this.data.meta.defaultLayout });
+      this.layout.change({ layoutId: this.config.meta.defaultLayout });
 
       // Create Livedata instance
       new Vue({

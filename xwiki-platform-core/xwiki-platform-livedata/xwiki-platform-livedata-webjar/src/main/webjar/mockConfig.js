@@ -19,8 +19,8 @@
  */
 
 
-// This is mock data used while the front-end is not communicating with the macros
-// The data structure is not definitive, and may change to match the final specs
+// This is mock config used while the front-end is not communicating with the macros
+// The config structure is not definitive, and may change to match the final specs
 
 define({
 

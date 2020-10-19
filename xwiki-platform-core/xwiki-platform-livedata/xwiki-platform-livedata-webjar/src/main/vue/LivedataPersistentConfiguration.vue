@@ -33,7 +33,7 @@
 -->
 <template>
   <div
-    v-if="data.id"
+    v-if="logic.config.id"
     v-show="false"
   ></div>
 </template>
@@ -66,8 +66,6 @@ export default {
 
 
   computed: {
-    data () { return this.logic.data; },
-
     // The following computed properties, prefixed by "$_",
     // are the values that are going to be stored.
     // They also have setters so that it can easily be set
@@ -75,23 +73,23 @@ export default {
 
     // Filters
     $_filters: {
-      get () { return this.data.query.filters; },
-      set (value) { this.data.query.filters = value; },
+      get () { return this.logic.config.query.filters; },
+      set (value) { this.logic.config.query.filters = value; },
     },
     // Sort
     $_sort: {
-      get () { return this.data.query.sort; },
-      set (value) { this.data.query.sort = value; },
+      get () { return this.logic.config.query.sort; },
+      set (value) { this.logic.config.query.sort = value; },
     },
     // Pagination offset
     $_offset: {
-      get () { return this.data.query.offset; },
-      set (value) { this.data.query.offset = value; },
+      get () { return this.logic.config.query.offset; },
+      set (value) { this.logic.config.query.offset = value; },
     },
     // Pagination limit
     $_limit: {
-      get () { return this.data.query.limit; },
-      set (value) { this.data.query.limit = value; },
+      get () { return this.logic.config.query.limit; },
+      set (value) { this.logic.config.query.limit = value; },
     },
     // Current layout id
     $_currentLayoutId: {
@@ -100,8 +98,8 @@ export default {
     },
     // Property order
     $_propertyOrder: {
-      get () { return this.data.query.properties; },
-      set (value) { this.data.query.properties = value; },
+      get () { return this.logic.config.query.properties; },
+      set (value) { this.logic.config.query.properties = value; },
     },
     // Property visibility
     $_propertyVisibility: {
@@ -109,14 +107,14 @@ export default {
         // Return an array of hidden properties
         // We use hidden properties because they are more likely to be
         // less numerous than visible ones
-        return this.data.query.properties
+        return this.logic.config.query.properties
           .reduce((hiddenProperties, propertyId) => this.logic.properties.isVisible({ propertyId })
             ? hiddenProperties
             : hiddenProperties.concat(propertyId),
           []);
       },
       set (value) {
-        this.data.query.properties.forEach(propertyId => {
+        this.logic.config.query.properties.forEach(propertyId => {
           this.logic.properties.toggleVisibility({
             propertyId,
             visible: !value.includes(propertyId),
@@ -129,7 +127,7 @@ export default {
     // Return the u-node domain used to encode properties
     encodingSpecsProperties () {
       // The whole list of property ids
-      const propertyIds = this.data.query.properties.slice().sort();
+      const propertyIds = this.logic.config.query.properties.slice().sort();
       return ["oneOf"].concat(propertyIds);
     },
 
@@ -137,7 +135,7 @@ export default {
     encodingSpecsFilterOperators () {
       // The whole list of operators ids
       const operatorIds = [];
-      this.data.meta.filters.forEach(filterDescriptor => {
+      this.logic.config.meta.filters.forEach(filterDescriptor => {
         (filterDescriptor.operators || []).forEach(operator => {
           if (!operatorIds.includes(operator.id)) {
             operatorIds.push(operator.id);
@@ -192,7 +190,7 @@ export default {
     },
 
 
-    // Get the whole object of data that need to be saved
+    // Get the whole configuration object that need to be saved
     // Use the encodingSpecs object and the computed properties getters
     // to map the specs keys to the values to save
     dataToSave () {
@@ -211,7 +209,7 @@ export default {
     // The key where to save the encoded config
     // (in the url query param and localStorage)
     saveKey () {
-      return "livedata-config-" + this.data.id;
+      return "livedata-config-" + this.logic.config.id;
     },
 
   },

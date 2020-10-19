@@ -33,7 +33,7 @@
   -->
   <XWikiDraggable
     class="column-header-names"
-      :value="data.query.properties"
+      :value="logic.config.query.properties"
       @change="reorderProperties"
       tag="tr"
   >
@@ -102,8 +102,8 @@ export default {
 
   inject: ["logic"],
 
+
   computed: {
-    data () { return this.logic.data; },
 
     properties () {
       return this.logic.properties.getDescriptors();
@@ -111,7 +111,7 @@ export default {
 
     // The first sort entry in the Livedata configuration sort array
     firstSortLevel () {
-      return this.data.query.sort[0] || {};
+      return this.logic.config.query.sort[0] || {};
     },
 
   },

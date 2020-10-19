@@ -49,12 +49,12 @@ export default {
       return this.logic.properties.getDescriptor({ propertyId: this.propertyId });
     },
     // The configuration (aka filterDescriptor) of the filter
-    config () {
+    filterConfig () {
       return this.logic.filters.getDescriptorFromProperty(this.propertyId);
     },
-    // The whole Livedata data object
-    data () {
-      return this.logic.data;
+    // The whole Livedata config object
+    config () {
+      return this.logic.config;
     },
   },
 

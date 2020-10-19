@@ -110,8 +110,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
-
     // returns whether the panel is opened based on the `Logic.openedPanels` array
     panelOpened () {
       return this.logic.uniqueArrayHas(this.logic.openedPanels, this.panelId);

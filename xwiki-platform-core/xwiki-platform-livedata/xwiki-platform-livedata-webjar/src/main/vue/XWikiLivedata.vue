@@ -37,7 +37,7 @@
       <LivedataLayout :layout-id="layoutId"/>
 
       <!-- Persitent configuration module (if supported by the config) -->
-      <LivedataPersistentConfiguration v-if="data.id"/>
+      <LivedataPersistentConfiguration v-if="logic.config.id"/>
 
   </div>
 </template>
@@ -66,7 +66,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
     // The id of the layout to be displayed
     layoutId () { return this.logic.layout.currentId; }
   },

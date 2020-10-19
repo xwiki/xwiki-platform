@@ -74,10 +74,6 @@ export default {
     };
   },
 
-  computed: {
-    data () { return this.logic.data; },
-  },
-
 
   // On mounted and whener the `layoutId` prop change,
   // try to load the layout corresponding to the layoutId
@@ -89,9 +85,9 @@ export default {
         // Try to load layout
         this.loadLayout(this.layoutId).catch(err => {
           // If the layout was not the default one, try to load default layout
-          if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
+          if (this.layoutId && this.layoutId !== this.logic.config.meta.defaultLayout) {
             console.warn(err);
-            this.logic.layout.change({ layoutId: this.data.meta.defaultLayout });
+            this.logic.layout.change({ layoutId: this.logic.config.meta.defaultLayout });
           } else {
             console.error(err);
           }

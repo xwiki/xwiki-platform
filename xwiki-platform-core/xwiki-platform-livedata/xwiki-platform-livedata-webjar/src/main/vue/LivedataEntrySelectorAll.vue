@@ -96,14 +96,13 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
     selection () { return this.logic.selection; },
 
     // Whether the button is checked or not
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked () {
-         const allPageEntriesSeleted = this.data.data.entries.every(entry => this.logic.selection.isSelected(entry));
+         const allPageEntriesSeleted = this.logic.config.data.entries.every(entry => this.logic.selection.isSelected(entry));
          const allEntriesSelected = this.selection.isGlobal && this.selection.deselected.length === 0;
         return allPageEntriesSeleted || allEntriesSelected;
     },
@@ -137,7 +136,7 @@ export default {
         this.logic.selection.setGlobal(false);
       // else, toggle `this.checked` state
       } else {
-        this.logic.selection.toggleSelect(this.data.data.entries, !this.checked);
+        this.logic.selection.toggleSelect(this.logic.config.data.entries, !this.checked);
       }
     },
   },

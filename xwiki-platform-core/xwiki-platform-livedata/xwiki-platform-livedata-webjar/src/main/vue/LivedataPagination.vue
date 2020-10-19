@@ -24,7 +24,7 @@
   displayed by the layout.
   What it actually does is that it fetches new data corresponding
   to the chosen page number,
-  which then updates the entries array in `config.data.data.entries`,
+  which then updates the entries array in `logic.config.data.entries`,
   which has the effect of changing the displayed entries in the layout
 -->
 <template>
@@ -38,7 +38,7 @@
     -->
     <span
       class="pagination-page-size"
-      v-if="data.meta.pagination.showPageSizeDropdown"
+      v-if="logic.config.meta.pagination.showPageSizeDropdown"
     >
       Entries per page
       <select
@@ -46,10 +46,10 @@
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
-          v-for="pageSize in data.meta.pagination.pageSizes"
+          v-for="pageSize in logic.config.meta.pagination.pageSizes"
           :key="pageSize"
           :value="pageSize"
-          :selected="pageSize === data.query.limit"
+          :selected="pageSize === logic.config.query.limit"
         >{{ pageSize }}</option>
       </select>
     </span>
@@ -61,10 +61,10 @@
     -->
     <span
       class="pagination-current-entries"
-      v-if="data.meta.pagination.showEntryRange"
+      v-if="logic.config.meta.pagination.showEntryRange"
     >
       {{ logic.pagination.getFirstIndexOfPage() + 1 }} - {{ logic.pagination.getLastIndexOfPage() + 1 }}
-      of {{ data.data.count }}
+      of {{ logic.config.data.count }}
     </span>
 
     <!--
@@ -82,7 +82,7 @@
       -->
       <a
         class="page-nav"
-        v-if="data.meta.pagination.showFirstLast"
+        v-if="logic.config.meta.pagination.showFirstLast"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({ pageIndex: 0 })"
       >
@@ -96,7 +96,7 @@
       -->
       <a
         class="page-nav"
-        v-if="data.meta.pagination.showNextPrevious"
+        v-if="logic.config.meta.pagination.showNextPrevious"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
           pageIndex: logic.pagination.getPageIndex() - 1
@@ -148,7 +148,7 @@
       -->
       <a
         class="page-nav"
-        v-if="data.meta.pagination.showNextPrevious"
+        v-if="logic.config.meta.pagination.showNextPrevious"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
           pageIndex: logic.pagination.getPageIndex() + 1
@@ -164,7 +164,7 @@
       -->
       <a
         class="page-nav"
-        v-if="data.meta.pagination.showFirstLast"
+        v-if="logic.config.meta.pagination.showFirstLast"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
           pageIndex: logic.pagination.getPageCount() - 1
@@ -187,8 +187,6 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
-
     // Return the page indexes (= page number but 0-based) to be displayed
     // It follows the following algorithm:
     // - always display the current page index
@@ -200,7 +198,7 @@ export default {
       // Total count of pages
       const pageCount = this.logic.pagination.getPageCount();
       // Number of pages to show on widget
-      const maxShownPages = this.data.meta.pagination.maxShownPages;
+      const maxShownPages = this.logic.config.meta.pagination.maxShownPages;
       // Current page index
       const currentPageIndex = this.logic.pagination.getPageIndex();
       // Page indexes to be displayed

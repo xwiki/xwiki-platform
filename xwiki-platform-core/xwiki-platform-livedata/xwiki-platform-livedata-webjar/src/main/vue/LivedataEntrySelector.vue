@@ -58,8 +58,6 @@ export default {
   },
 
   computed: {
-    data () { return this.logic.data; },
-
     // Whether the selector property is currently selected
     selected () {
       return this.logic.selection.isSelected(this.entry);

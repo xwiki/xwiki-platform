@@ -34,7 +34,7 @@
     class="livedata-entry-selector-info-bar"
     v-if="selectedCount > 0"
   >
-  {{ selectedCount }} / {{ data.data.count }} entries selected
+  {{ selectedCount }} / {{ logic.config.data.count }} entries selected
   </div>
 </template>
 
@@ -47,8 +47,6 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
-
     // The number of selected entries to be displayed
     selectedCount () {
       return this.logic.selection.getCount();

@@ -100,8 +100,7 @@ export default {
   inject: ["logic"],
 
   computed: {
-    data () { return this.logic.data; },
-    entries () { return this.logic.data.data.entries; },
+    entries () { return this.logic.config.data.entries; },
   },
 
 };

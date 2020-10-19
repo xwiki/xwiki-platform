@@ -52,7 +52,7 @@
 
       <!-- Layout options -->
       <li
-        v-for="layout in data.meta.layouts"
+        v-for="layout in logic.config.meta.layouts"
         :key="layout.id"
       >
         <a href="#" @click.prevent="logic.layout.change({ layoutId: layout.id })">
@@ -114,10 +114,6 @@ export default {
   },
 
   inject: ["logic"],
-
-  computed: {
-    data () { return this.logic.data; },
-  },
 
   methods: {
     async switchToDesignMode () {

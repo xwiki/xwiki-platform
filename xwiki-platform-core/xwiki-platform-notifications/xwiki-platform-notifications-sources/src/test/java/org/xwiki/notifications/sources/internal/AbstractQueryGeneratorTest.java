@@ -51,6 +51,7 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractQueryGeneratorTest
 {
     protected static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "UserA");
+    protected static final String SERIALIZED_USER_REFERENCE = "xwiki:XWiki.UserA";
 
     @MockComponent
     protected WikiDescriptorManager wikiDescriptorManager;

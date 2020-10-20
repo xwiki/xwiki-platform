@@ -166,7 +166,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     private Map<String, String[]> clone(Map<String, String[]> map)
     {
         Map<String, String[]> clone;
-        if (this.parameters != null) {
+        if (map != null) {
             clone = new LinkedHashMap<>(map.size());
             for (Map.Entry<String, String[]> entry : map.entrySet()) {
                 clone.put(entry.getKey(), entry.getValue().clone());

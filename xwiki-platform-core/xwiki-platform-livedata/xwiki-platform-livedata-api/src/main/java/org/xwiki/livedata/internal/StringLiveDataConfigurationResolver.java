@@ -32,8 +32,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfiguration.LayoutDescriptor;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Resolves the live data configuration from a JSON string input.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Singleton
@@ -267,7 +267,7 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
     private JsonNode normalizeLayout(JsonNode layoutConfig, ObjectMapper objectMapper)
     {
         if (layoutConfig.isTextual()) {
-            return objectMapper.valueToTree(new LayoutDescriptor(layoutConfig.asText()));
+            return objectMapper.valueToTree(new LiveDataLayoutDescriptor(layoutConfig.asText()));
         } else if (layoutConfig.isObject()) {
             normalizeIcon((ObjectNode) layoutConfig, objectMapper);
         }

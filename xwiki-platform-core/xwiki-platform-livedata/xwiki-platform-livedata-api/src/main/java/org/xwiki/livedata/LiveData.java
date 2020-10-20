@@ -31,10 +31,10 @@ import org.xwiki.stability.Unstable;
  * The live data to display.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Unstable
-public class LiveData extends WithParameters
+public class LiveData
 {
     /**
      * The total number of entries available. This is used for pagination.

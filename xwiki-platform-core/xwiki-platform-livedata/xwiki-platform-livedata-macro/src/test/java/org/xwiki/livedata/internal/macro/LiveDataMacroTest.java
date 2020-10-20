@@ -51,7 +51,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * Unit tests for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @ComponentTest
 @ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,
@@ -97,17 +97,20 @@ class LiveDataMacroTest
     {
         StringBuilder expectedConfig = new StringBuilder();
         expectedConfig.append("{");
+        expectedConfig.append("  'id':'test',".trim());
         expectedConfig.append("  'query':{".trim());
         expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
         expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
-        expectedConfig.append("    'filters':[{'property':'firstName','constraints':[{'value':'m'}]}],".trim());
+        expectedConfig.append("    'filters':[".trim());
+        expectedConfig.append("      {'property':'position','readOnly':true,'constraints':[{'value':'lead'}]},".trim());
+        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]}".trim());
+        expectedConfig.append("    ],".trim());
         expectedConfig.append("    'sort':[".trim());
         expectedConfig.append("      {'property':'firstName'},".trim());
         expectedConfig.append("      {'property':'lastName','descending':true},".trim());
         expectedConfig.append("      {'property':'position'}],".trim());
         expectedConfig.append("    'offset':20,".trim());
-        expectedConfig.append("    'limit':10,".trim());
-        expectedConfig.append("    'hiddenFilters':[{'property':'position','constraints':[{'value':'lead'}]}]".trim());
+        expectedConfig.append("    'limit':10".trim());
         expectedConfig.append("  },".trim());
         expectedConfig.append("  'meta':{".trim());
         expectedConfig.append("    'layouts':[".trim());
@@ -118,8 +121,7 @@ class LiveDataMacroTest
         expectedConfig.append("      'pageSizes':[15,25,50],".trim());
         expectedConfig.append("      'showPageSizeDropdown':true".trim());
         expectedConfig.append("    }".trim());
-        expectedConfig.append("  },".trim());
-        expectedConfig.append("  'id':'test'".trim());
+        expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
         String expected = "<div class=\"liveData\" id=\"test\" data-config=\""

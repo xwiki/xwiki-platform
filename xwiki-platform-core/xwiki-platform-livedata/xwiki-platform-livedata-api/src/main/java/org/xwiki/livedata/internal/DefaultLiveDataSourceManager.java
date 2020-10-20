@@ -42,7 +42,7 @@ import org.xwiki.livedata.WithParameters;
  * Default {@link LiveDataSourceManager} implementation.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Singleton

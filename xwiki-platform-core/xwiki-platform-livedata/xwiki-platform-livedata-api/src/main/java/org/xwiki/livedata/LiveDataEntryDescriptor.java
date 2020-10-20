@@ -19,31 +19,44 @@
  */
 package org.xwiki.livedata;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
- * The component that provides the live data entries and their meta data.
+ * Describes a live data entry.
  * 
  * @version $Id$
  * @since 12.9
  */
-@Role
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
-public interface LiveDataSource
+public class LiveDataEntryDescriptor
 {
-    /**
-     * @return the entry store
-     */
-    LiveDataEntryStore getEntries();
+    private String idProperty;
 
     /**
-     * @return the property store
+     * @return the name of the property that identifies the live data entry
      */
-    LiveDataPropertyDescriptorStore getProperties();
+    public String getIdProperty()
+    {
+        return idProperty;
+    }
 
     /**
-     * @return the property type store
+     * Sets the name of the property that identifies the live data entry.
+     * 
+     * @param idProperty the name of a property of a live data entry
      */
-    LiveDataPropertyDescriptorStore getPropertyTypes();
+    public void setIdProperty(String idProperty)
+    {
+        this.idProperty = idProperty;
+    }
+
+    /**
+     * Prevent {@code null} values where it's possible.
+     */
+    public void initialize()
+    {
+    }
 }

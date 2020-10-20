@@ -19,6 +19,7 @@
 }
 ---
 {
+  "id":"panels",
   "query":{
     "properties":["name","description","type","category","_actions"],
     "source":{
@@ -67,6 +68,5 @@
       "pageSizes":[10,20,30,40,50,60,70,80,90,100],
       "showPageSizeDropdown":true
     }
-  },
-  "id":"panels"
+  }
 }

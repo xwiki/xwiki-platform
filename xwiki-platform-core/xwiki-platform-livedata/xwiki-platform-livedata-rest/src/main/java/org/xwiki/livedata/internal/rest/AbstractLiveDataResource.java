@@ -54,7 +54,7 @@ import org.xwiki.rest.model.jaxb.Link;
  * Base class for live data REST resources.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 public abstract class AbstractLiveDataResource extends XWikiResource
 {
@@ -121,7 +121,7 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         icon.putAll(descriptor.getIcon());
 
         return (PropertyDescriptor) new PropertyDescriptor().withId(descriptor.getId()).withName(descriptor.getName())
-            .withDescription(descriptor.getDescription()).withIcon(icon).withHidden(descriptor.isHidden())
+            .withDescription(descriptor.getDescription()).withIcon(icon).withVisible(descriptor.isVisible())
             .withDisplayer(descriptor.getDisplayer()).withSortable(descriptor.isSortable())
             .withFilterable(descriptor.isFilterable()).withFilter(descriptor.getFilter()).withType(descriptor.getType())
             .withStyleName(descriptor.getStyleName());
@@ -178,7 +178,7 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         propertyDescriptor.setDescription(descriptor.getDescription());
         propertyDescriptor.getIcon().putAll(descriptor.getIcon());
         propertyDescriptor.setType(descriptor.getType());
-        propertyDescriptor.setHidden(descriptor.isHidden());
+        propertyDescriptor.setVisible(descriptor.isVisible());
         propertyDescriptor.setSortable(descriptor.isSortable());
         propertyDescriptor.setFilterable(descriptor.isFilterable());
         propertyDescriptor.setDisplayer(descriptor.getDisplayer());

@@ -37,7 +37,7 @@ import org.xwiki.stability.Unstable;
  * Represents a live data property.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Path("/liveData/sources/{sourceId}/properties/{propertyId}")
 @Unstable

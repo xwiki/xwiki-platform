@@ -17,6 +17,7 @@
 }
 ---
 {
+  "id":"deletedBatch",
   "query":{
     "properties":["doc.name","doc.location","_actions"],
     "source":{
@@ -66,6 +67,5 @@
       "pageSizes":[5,15,25],
       "showPageSizeDropdown":true
     }
-  },
-  "id":"deletedBatch"
+  }
 }

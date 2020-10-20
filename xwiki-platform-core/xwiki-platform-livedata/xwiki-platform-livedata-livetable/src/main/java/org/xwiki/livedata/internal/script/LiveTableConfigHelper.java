@@ -41,8 +41,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfiguration.LiveDataMeta;
-import org.xwiki.livedata.LiveDataConfiguration.PaginationConfiguration;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Helper component for converting the Live Table configuration into Live Data configuration.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component(roles = LiveTableConfigHelper.class)
 @Singleton
@@ -132,7 +132,7 @@ public class LiveTableConfigHelper
         ObjectNode options)
     {
         LiveDataConfiguration config = new LiveDataConfiguration();
-        config.setParameter("id", id);
+        config.setId(id);
         config.setQuery(getQueryConfig(columns, options));
         config.setMeta(getMetaConfig(columnProperties, options));
         return config;
@@ -143,7 +143,7 @@ public class LiveTableConfigHelper
         LiveDataQuery queryConfig = new LiveDataQuery();
         queryConfig.setProperties(columns);
         queryConfig.setSource(getSourceConfig(options));
-        queryConfig.setParameter("hiddenFilters", getHiddenFiltersConfig(options));
+        queryConfig.setFilters(getReadOnlyFiltersConfig(options));
         queryConfig.setSort(getSortConfig(columns, options));
 
         JsonNode rowCount = options.path("rowCount");
@@ -218,7 +218,7 @@ public class LiveTableConfigHelper
         return parameters;
     }
 
-    private List<Filter> getHiddenFiltersConfig(ObjectNode options)
+    private List<Filter> getReadOnlyFiltersConfig(ObjectNode options)
     {
         List<Filter> filters = null;
         JsonNode extraParamsNode = options.path("extraParams");
@@ -229,6 +229,7 @@ public class LiveTableConfigHelper
                 Map<String, List<String>> parameters = getURLParameters('?' + extraParams);
                 for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                     Filter filter = new Filter();
+                    filter.setReadOnly(true);
                     filter.setProperty(entry.getKey());
                     filter.getConstraints()
                         .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
@@ -294,7 +295,7 @@ public class LiveTableConfigHelper
         propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
 
         if (HIDDEN.equals(columnProperties.path(TYPE).asText())) {
-            propertyDescriptor.setHidden(true);
+            propertyDescriptor.setVisible(false);
         }
 
         propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
@@ -364,9 +365,9 @@ public class LiveTableConfigHelper
         return hasFilter ? filterConfig : null;
     }
 
-    private PaginationConfiguration getPaginationConfig(ObjectNode options)
+    private LiveDataPaginationConfiguration getPaginationConfig(ObjectNode options)
     {
-        PaginationConfiguration pagination = new PaginationConfiguration();
+        LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
         pagination.setMaxShownPages(options.path("maxPages").asInt(10));
         boolean showPageSizeDropdown = options.path("pageSize").asBoolean(true);
         pagination.setShowPageSizeDropdown(showPageSizeDropdown);

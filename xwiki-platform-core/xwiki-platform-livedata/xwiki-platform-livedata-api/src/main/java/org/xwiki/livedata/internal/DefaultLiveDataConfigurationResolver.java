@@ -29,8 +29,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfiguration.LayoutDescriptor;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
@@ -44,7 +44,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Adds default values to a live data configuration.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Singleton
@@ -102,7 +102,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return config;
     }
 
-    private void translate(LayoutDescriptor layout)
+    private void translate(LiveDataLayoutDescriptor layout)
     {
         if (layout.getName() == null && layout.getId() != null) {
             layout.setName(this.l10n.getTranslationPlain("liveData.layout." + layout.getId()));

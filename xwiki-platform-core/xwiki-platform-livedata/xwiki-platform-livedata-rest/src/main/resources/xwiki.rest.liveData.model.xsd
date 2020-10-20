@@ -100,7 +100,7 @@
         <attribute name="id" type="string"></attribute>
         <attribute name="name" type="string"></attribute>
         <attribute name="type" type="string"></attribute>
-        <attribute name="hidden" type="boolean" default="false"></attribute>
+        <attribute name="visible" type="boolean" default="true"></attribute>
         <attribute name="sortable" type="boolean" default="false"></attribute>
         <attribute name="filterable" type="boolean" default="false"></attribute>
         <attribute name="styleName" type="string"></attribute>

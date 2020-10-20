@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Unit tests for {@link JSONMerge}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 class JSONMergeTest
 {

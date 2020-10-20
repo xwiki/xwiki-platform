@@ -26,17 +26,19 @@ import java.util.Map;
 
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Describes how the user interacts with a given property.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Unstable
-public class LiveDataPropertyDescriptor extends BaseDescriptor
+public class LiveDataPropertyDescriptor
 {
     /**
      * Holds the filter configuration.
@@ -200,6 +202,11 @@ public class LiveDataPropertyDescriptor extends BaseDescriptor
     }
 
     /**
+     * The property id.
+     */
+    private String id;
+
+    /**
      * The property pretty name, usually displayed before the property value.
      */
     private String name;
@@ -228,7 +235,7 @@ public class LiveDataPropertyDescriptor extends BaseDescriptor
     /**
      * Whether this property should be displayed or not.
      */
-    private Boolean hidden;
+    private Boolean visible;
 
     /**
      * Whether the user can filter by this property or not.
@@ -249,6 +256,24 @@ public class LiveDataPropertyDescriptor extends BaseDescriptor
      * Optional CSS class name to add to the HTML element used to display this property.
      */
     private String styleName;
+
+    /**
+     * @return the property id
+     */
+    public String getId()
+    {
+        return id;
+    }
+
+    /**
+     * Set the property id.
+     * 
+     * @param id the new property id
+     */
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
     /**
      * @return the property pretty name
@@ -364,21 +389,21 @@ public class LiveDataPropertyDescriptor extends BaseDescriptor
      * @return whether this property should be displayed or not; the returned value can be {@code null} in which case
      *         the value should be inherited from the property type descriptor
      */
-    public Boolean isHidden()
+    public Boolean isVisible()
     {
-        return hidden;
+        return visible;
     }
 
     /**
      * Sets whether this property should be displayed or not. Pass {@code null} to inherit from the property type
      * descriptor.
      * 
-     * @param hidden {@code true} to hide this property, {@code false} to display this property, {@code null} to inherit
-     *            from the property type descriptor
+     * @param visible {@code true} to display this property, {@code false} to hide it, {@code null} to inherit from the
+     *            property type descriptor
      */
-    public void setHidden(Boolean hidden)
+    public void setVisible(Boolean visible)
     {
-        this.hidden = hidden;
+        this.visible = visible;
     }
 
     /**

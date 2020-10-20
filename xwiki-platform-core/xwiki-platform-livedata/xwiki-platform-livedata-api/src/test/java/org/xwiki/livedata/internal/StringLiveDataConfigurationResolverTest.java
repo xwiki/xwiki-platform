@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link StringLiveDataConfigurationResolver}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @ComponentTest
 class StringLiveDataConfigurationResolverTest extends AbstractLiveDataConfigurationResolverTest

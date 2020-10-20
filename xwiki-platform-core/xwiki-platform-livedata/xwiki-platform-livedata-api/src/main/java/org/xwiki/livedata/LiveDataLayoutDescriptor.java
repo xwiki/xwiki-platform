@@ -19,57 +19,76 @@
  */
 package org.xwiki.livedata;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Map;
+
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
- * Base class for various live data configuration descriptors.
+ * Holds the layout configuration.
  * 
  * @version $Id$
  * @since 12.9
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
-public class BaseDescriptor extends WithParameters
+public class LiveDataLayoutDescriptor extends BaseDescriptor
 {
-    private String id;
+    private String name;
+
+    private Map<String, Object> icon;
 
     /**
-     * @return the id
+     * Default constructor.
      */
-    public String getId()
+    public LiveDataLayoutDescriptor()
     {
-        return id;
     }
 
     /**
-     * Set the id.
+     * Creates a descriptor for the layout with the given id.
      * 
-     * @param id the new id
+     * @param id the layout id
      */
-    public void setId(String id)
+    public LiveDataLayoutDescriptor(String id)
     {
-        this.id = id;
+        setId(id);
     }
 
-    @Override
-    public int hashCode()
+    /**
+     * @return the layout pretty name
+     */
+    public String getName()
     {
-        return new HashCodeBuilder().appendSuper(super.hashCode()).append(getId()).build();
+        return name;
     }
 
-    @Override
-    public boolean equals(Object obj)
+    /**
+     * Set the layout pretty name.
+     * 
+     * @param name the new layout name
+     */
+    public void setName(String name)
     {
-        if (obj == this) {
-            return true;
-        }
+        this.name = name;
+    }
 
-        if (obj instanceof BaseDescriptor) {
-            BaseDescriptor other = (BaseDescriptor) obj;
-            return new EqualsBuilder().appendSuper(super.equals(other)).append(getId(), other.getId()).build();
-        }
+    /**
+     * @return the icon meta data
+     */
+    public Map<String, Object> getIcon()
+    {
+        return icon;
+    }
 
-        return false;
+    /**
+     * Set the icon meta data.
+     * 
+     * @param icon the icon meta data
+     */
+    public void setIcon(Map<String, Object> icon)
+    {
+        this.icon = icon;
     }
 }

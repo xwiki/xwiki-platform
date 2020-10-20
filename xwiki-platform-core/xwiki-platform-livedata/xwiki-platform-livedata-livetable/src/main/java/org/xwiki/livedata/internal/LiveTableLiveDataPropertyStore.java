@@ -54,7 +54,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * properties.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Named("liveTable/property")

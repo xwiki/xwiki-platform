@@ -25,17 +25,19 @@ import java.util.stream.Stream;
 
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * The query used to get the live data.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Unstable
-public class LiveDataQuery extends WithParameters
+public class LiveDataQuery
 {
     /**
      * Specifies where to take the data from. Represents the "from" clause.
@@ -76,6 +78,11 @@ public class LiveDataQuery extends WithParameters
          * Specifies whether all the constraints need to be met or any of them.
          */
         private boolean matchAll;
+
+        /**
+         * Specifies whether the user should be able to change this filter or not.
+         */
+        private boolean readOnly;
 
         /**
          * The constraints to apply to property values.
@@ -178,6 +185,24 @@ public class LiveDataQuery extends WithParameters
         public void setMatchAll(boolean matchAll)
         {
             this.matchAll = matchAll;
+        }
+
+        /**
+         * @return {@code true} if the user shouldn't be able to change this filter, {@code false} otherwise
+         */
+        public boolean isReadOnly()
+        {
+            return readOnly;
+        }
+
+        /**
+         * Sets whether the user can change this filter or not.
+         * 
+         * @param readOnly {@code true} to prevent the user from changing this filter, {@code false} otherwise
+         */
+        public void setReadOnly(boolean readOnly)
+        {
+            this.readOnly = readOnly;
         }
 
         /**

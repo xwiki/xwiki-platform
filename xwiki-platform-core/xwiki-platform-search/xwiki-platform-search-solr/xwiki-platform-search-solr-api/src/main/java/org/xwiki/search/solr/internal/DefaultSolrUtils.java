@@ -130,6 +130,20 @@ public class DefaultSolrUtils implements SolrUtils
      */
     public static final String SOLR_TYPE_BINARY = "binary";
 
+    /**
+     * The name of the type text_general.
+     * 
+     * @since 12.9RC1
+     */
+    public static final String SOLR_TYPE_TEXT_GENERAL = "text_general";
+
+    /**
+     * The name of the type text_generals.
+     * 
+     * @since 12.9RC1
+     */
+    public static final String SOLR_TYPE_TEXT_GENERALS = "text_generals";
+
     private static final String PATTERN_GROUP = "(.+)";
 
     private static final Map<Class<?>, String> CLASS_SUFFIX_MAPPING = new HashMap<>();

@@ -90,27 +90,25 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     @Override
     protected void createSchema() throws SolrException
     {
-        // Add a type to tokenize strings a bit for full test search
-        
-
         setStringField(SOLR_FIELD_EXTENSIONID, false, false);
         setStringField(Extension.FIELD_VERSION, false, false);
 
-        setStringField(Extension.FIELD_NAME, false, false);
         setStringField(Extension.FIELD_TYPE, false, false);
         setStringField(Extension.FIELD_REPOSITORY, false, false);
         setStringField(Extension.FIELD_ALLOWEDNAMESPACES, true, false);
-        setStringField(Extension.FIELD_SUMMARY, false, false);
-        setStringField(Extension.FIELD_WEBSITE, false, false);
         setStringField(Extension.FIELD_CATEGORY, false, false);
+
+        setTextGeneralField(Extension.FIELD_NAME, false, false);
+        setTextGeneralField(Extension.FIELD_SUMMARY, false, false);
+        setTextGeneralField(Extension.FIELD_WEBSITE, false, false);
 
         setBooleanField(RemoteExtension.FIELD_RECOMMENDED, false, false);
 
         setStringField(Extension.FIELD_AUTHORS, true, false);
-        setStringField(SOLR_FIELD_AUTHORS_INDEX, true, false, SOLR_FIELD_STORED, false);
+        setTextGeneralField(SOLR_FIELD_AUTHORS_INDEX, true, false, SOLR_FIELD_STORED, false);
 
         setStringField(Extension.FIELD_EXTENSIONFEATURES, true, false);
-        setStringField(SOLR_FIELD_EXTENSIONFEATURES_INDEX, true, false, SOLR_FIELD_STORED, false);
+        setTextGeneralField(SOLR_FIELD_EXTENSIONFEATURES_INDEX, true, false, SOLR_FIELD_STORED, false);
 
         // TODO: add dependencies
         // TODO: add managed dependencies

@@ -1473,36 +1473,6 @@ define([
 
 
 
-
-
-
-  /**
-   * Map the element to its config object
-   * So that each instance of the livedata on the page handle there own config
-   */
-  const instancesMap = new WeakMap();
-
-
-
-  /**
-   * The init function of the logic script
-   * For each livedata element on the page, returns its corresponding config / API
-   * If the config does not exists yet, create it from the element
-   * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
-   */
-  const init = function (element) {
-
-    if (!instancesMap.has(element)) {
-      // create a new logic object associated to the element
-      const logic = new Logic(element);
-      instancesMap.set(element, logic);
-    }
-
-    return instancesMap.get(element);
-  };
-
-
-
   class Logic {
 
     constructor (element) {
@@ -1636,10 +1606,7 @@ define([
 
 
 
-
-
-  // return the init function to be used in the layouts
-  return init;
+  return Logic;
 
 });
 

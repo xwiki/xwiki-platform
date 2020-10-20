@@ -347,7 +347,7 @@ export default {
       return;
     }
     this.loadConfig(config);
-    this.logic.temporaryConfig.save("initial");
+    this.logic.temporaryConfig.save({ configName: "initial" });
   },
 
 

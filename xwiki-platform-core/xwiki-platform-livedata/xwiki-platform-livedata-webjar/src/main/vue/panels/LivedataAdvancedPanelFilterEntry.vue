@@ -37,7 +37,7 @@
       @change="logic.filters.filter(propertyId, filterIndex, { operator: $event.target.value })"
     >
       <option
-        v-for="operator in logic.filters.getDescriptorFromProperty(propertyId).operators"
+        v-for="operator in logic.filters.getDescriptor({ propertyId }).operators"
         :key="operator.id"
         :value="operator.id"
         v-text="operator.name"

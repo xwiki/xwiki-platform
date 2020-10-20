@@ -65,7 +65,7 @@
           :value="undefined"
           :selected="isDisplayerSelected(undefined)"
         >
-          Default ({{ logic.displayers.getDescriptorFromType(property.type).id }})
+          Default ({{ logic.displayers.getDescriptor({ propertyType: property.type }).id }})
         </option>
         <!-- Available displayers -->
         <option
@@ -93,7 +93,7 @@
           :value="undefined"
           :selected="isFilterSelected(undefined)"
         >
-          Default ({{ logic.filters.getDescriptorFromType(property.type).id }})
+          Default ({{ logic.filters.getDescriptor({ propertyType: property.type }).id }})
         </option>
         <option
           v-for="filterDescriptor in logic.config.meta.filters"
@@ -125,7 +125,7 @@ export default {
   computed: {
 
     displayerId () {
-      return this.logic.displayers.getDescriptorFromProperty(this.property.id).id;
+      return this.logic.displayers.getDescriptor({ propertyId: this.property.id }).id;
     },
 
     isDisplayerDefaulted () {
@@ -133,7 +133,7 @@ export default {
     },
 
     filterId () {
-      return this.logic.filters.getDescriptorFromProperty(this.property.id).id;
+      return this.logic.filters.getDescriptor({ propertyId: this.property.id }).id;
     },
 
     isFilterDefaulted () {

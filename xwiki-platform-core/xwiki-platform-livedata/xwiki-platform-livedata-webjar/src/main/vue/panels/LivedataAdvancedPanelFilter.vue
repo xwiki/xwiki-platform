@@ -101,7 +101,7 @@
               class="filter-entries"
               :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
               @change="reorderFilter($event, filterGroup)"
-              :group="'filter-panel' + logic.filters.getDescriptorFromProperty(filterGroup.property).id"
+              :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
               <!--
                 Draggable wrapper for the filter entry
@@ -149,7 +149,7 @@
               class="filter-entries"
               :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
               @change="reorderFilter($event, filterGroup)"
-              :group="'filter-panel' + logic.filters.getDescriptorFromProperty(filterGroup.property).id"
+              :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
               <!--
                 Draggable wrapper for the filter entry

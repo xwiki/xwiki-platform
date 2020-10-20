@@ -91,8 +91,8 @@ export default {
       // Continue only on success
       if (!success) { return; }
       // TODO: brodcast new config to everyone
-      this.logic.temporaryConfig.save("initial");
-      this.logic.temporaryConfig.save("edit");
+      this.logic.temporaryConfig.save({ configName: "initial" });
+      this.logic.temporaryConfig.save({ configName: "edit" });
       // Show snackbar to inform user
       new XWiki.widgets.Notification("Changes were applied globally", "done");
     },
@@ -100,7 +100,7 @@ export default {
     async confirmLeave () {
       // if there is only one user in the realtime session and changes are not saved
       if (/* (TODO) USER IS THE ONLY ONE IN THE REALTIME SESSION */ true
-        && !this.logic.temporaryConfig.equals("edit")) {
+        && !this.logic.temporaryConfig.equals({ configName: "edit" })) {
         const response = await confirm({
           title: "Leave Design mode?",
           text: "Some changes made in design mode were not saved, and will be lost. Do you really want to leave design mode?",
@@ -108,7 +108,7 @@ export default {
         });
         if (!response) { return; }
       // else if changes were not saved, tell user it will be reverted
-      } else if (!this.logic.temporaryConfig.equals("initial")) {
+      } else if (!this.logic.temporaryConfig.equals({ configName: "edit" })) {
         const response = await confirm({
           title: "Leave Design mode?",
           text: "The Livedata configuration will be reverted to the last saved state",
@@ -117,7 +117,7 @@ export default {
         if (!response) { return; }
       }
       // Continue only on success
-      this.logic.designMode.toggle(false);
+      this.logic.designMode.toggle({ on: false });
     },
 
   },

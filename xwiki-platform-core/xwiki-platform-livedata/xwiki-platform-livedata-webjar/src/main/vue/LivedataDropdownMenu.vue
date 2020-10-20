@@ -118,7 +118,7 @@ export default {
   methods: {
     async switchToDesignMode () {
       if (/* (TODO) USER IS THE ONLY ONE IN THE REALTIME SESSION */ true
-        && !this.logic.temporaryConfig.equals("initial")) {
+        && !this.logic.temporaryConfig.equals({ configName: "initial" })) {
         const response = await askYesNo({
           title: "Keep changes for design mode?",
           text: "Your Livedata configuration have been modified, do you want to keep it for design mode?",
@@ -127,10 +127,10 @@ export default {
         });
         if (!response) { return; }
         if (response === "no") {
-          this.logic.temporaryConfig.load("initial");
+          this.logic.temporaryConfig.load({ configName: "initial" });
         }
       }
-      this.logic.designMode.toggle(true);
+      this.logic.designMode.toggle({ on: true });
     },
 
   },

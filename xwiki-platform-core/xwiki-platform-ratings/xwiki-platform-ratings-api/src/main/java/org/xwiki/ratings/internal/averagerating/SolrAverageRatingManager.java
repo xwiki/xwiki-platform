@@ -129,6 +129,31 @@ public class SolrAverageRatingManager extends AbstractAverageRatingManager
     }
 
     @Override
+    public long removeAverageRatings(EntityReference entityReference) throws RatingsException
+    {
+        String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
+        String filterQuery = String.format("filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))",
+            AverageRatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
+            AverageRatingQueryField.PARENTS.getFieldName(), escapedEntityReference);
+        SolrQuery solrQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(0);
+
+        long result;
+        try {
+            QueryResponse query = this.getAverageRatingSolrClient().query(solrQuery);
+            result = query.getResults().getNumFound();
+            this.getAverageRatingSolrClient().deleteByQuery(filterQuery);
+            this.getAverageRatingSolrClient().commit();
+        } catch (SolrServerException | IOException | SolrException e) {
+            throw new RatingsException("Error while trying to remove ratings", e);
+        }
+        return result;
+    }
+
+    @Override
     protected void saveAverageRating(AverageRating averageRating) throws RatingsException
     {
         try {

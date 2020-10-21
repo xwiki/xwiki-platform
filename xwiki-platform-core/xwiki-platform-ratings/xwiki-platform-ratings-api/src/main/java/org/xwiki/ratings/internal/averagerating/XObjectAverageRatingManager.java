@@ -87,6 +87,30 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         }
     }
 
+    @Override
+    public long removeAverageRatings(EntityReference entityReference) throws RatingsException
+    {
+        long result = 0;
+        // if the reference is a wiki, then everything's already deleted we don't need to do anything here
+        // and we avoid trying to load document to avoid errors.
+        if (entityReference.getType() != EntityType.WIKI) {
+            try {
+                BaseObject baseObject = retrieveAverageRatingXObject(entityReference);
+                if (baseObject != null) {
+                    XWikiDocument ownerDocument = baseObject.getOwnerDocument();
+                    ownerDocument.removeXObject(baseObject);
+                    XWikiContext context = this.contextProvider.get();
+                    context.getWiki().saveDocument(ownerDocument, "Remove average rating", true, context);
+                    result = 1;
+                }
+            } catch (Exception e) {
+                throw new RatingsException(String.format(
+                    "Error while trying to remove average ratings related to [%s]", entityReference), e);
+            }
+        }
+        return result;
+    }
+
     private BaseObject retrieveAverageRatingXObject(EntityReference entityReference) throws Exception
     {
         DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);

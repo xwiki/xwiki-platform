@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Default implementation of {@link LiveDataConfigHelper}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component(roles = LiveDataConfigHelper.class)
 @Singleton

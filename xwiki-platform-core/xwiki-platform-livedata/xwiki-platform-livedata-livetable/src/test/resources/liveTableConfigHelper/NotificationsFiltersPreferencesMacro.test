@@ -21,6 +21,7 @@
 }
 ---
 {
+  "id":"notificationFilterPreferencesLiveTable",
   "query":{
     "properties":["name","filterType","eventTypes","notificationFormats","isEnabled","_actions"],
     "source":{
@@ -28,22 +29,34 @@
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
       "translationPrefix":"notifications.settings.filters.preferences.table."
     },
+    "filters":[
+      {
+        "property":"format",
+        "readOnly":true,
+        "constraints":[{"value":""}]
+      },
+      {
+        "property":"eventType",
+        "readOnly":true,
+        "constraints":[{"value":""}]
+      },
+      {
+        "property":"user",
+        "readOnly":true,
+        "constraints":[{"value":"xwiki:XWiki.mflorea"}]
+      }
+    ],
     "sort":[
       {"property":"name"}
     ],
-    "limit":10,
-    "hiddenFilters":[
-      {"property":"format","constraints":[{"value":""}]},
-      {"property":"eventType","constraints":[{"value":""}]},
-      {"property":"user","constraints":[{"value":"xwiki:XWiki.mflorea"}]}
-    ]
+    "limit":10
   },
   "meta":{
     "propertyDescriptors":[
       {"id":"name","sortable":false,"filterable":false,"displayer":{"id":"html"}},
       {"id":"filterType","sortable":false,"filterable":false},
       {"id":"eventTypes","sortable":false,"filterable":false,"displayer":{"id":"html"}},
-      {"id":"notificationFormats","sortable":true,"hidden":true,"filterable":true},
+      {"id":"notificationFormats","sortable":true,"visible":false,"filterable":true},
       {"id":"isEnabled","sortable":false,"filterable":false,"displayer":{"id":"html"}},
       {
         "id":"_actions",
@@ -59,6 +72,5 @@
       "maxShownPages":10,
       "showPageSizeDropdown":false
     }
-  },
-  "id":"notificationFilterPreferencesLiveTable"
+  }
 }

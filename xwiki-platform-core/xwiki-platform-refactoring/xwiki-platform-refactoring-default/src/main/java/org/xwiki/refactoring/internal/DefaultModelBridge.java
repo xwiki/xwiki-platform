@@ -180,19 +180,30 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public boolean delete(DocumentReference reference)
     {
+        return delete(reference, false);
+    }
+
+    @Override
+    public boolean delete(DocumentReference reference, boolean skipRecycleBin)
+    {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
-                xcontext.getWiki().deleteDocument(document, xcontext);
-                this.logger.info("Document [{}] has been deleted.", reference);
+                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, xcontext);
+                this.logger
+                    .info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference, !skipRecycleBin);
             } else {
-                xcontext.getWiki().deleteAllDocuments(document, xcontext);
-                this.logger.info("Document [{}] has been deleted with all its translations.", reference);
+                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, xcontext);
+                this.logger
+                    .info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+                        reference,
+                        !skipRecycleBin);
             }
             return true;
         } catch (Exception e) {
-            this.logger.error("Failed to delete document [{}].", reference, e);
+            this.logger
+                .error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin, e);
             return false;
         }
     }

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PageResourceReferenceEntityReferenceResolverTest
+class PageResourceReferenceEntityReferenceResolverTest
 {
     @MockComponent
     @Named("current")
@@ -58,7 +58,7 @@ public class PageResourceReferenceEntityReferenceResolverTest
     private PageResourceReferenceEntityReferenceResolver resolver;
 
     @Test
-    public void resolve()
+    void resolve()
     {
         PageResourceReference page = new PageResourceReference("page1/page2");
         page.addBaseReference("wiki:space.document");

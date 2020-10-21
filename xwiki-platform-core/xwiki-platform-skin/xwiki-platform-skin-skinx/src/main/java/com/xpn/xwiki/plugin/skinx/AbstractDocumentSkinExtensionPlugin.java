@@ -83,7 +83,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Used to match events on "use" property.
      */
-    private final List<Event> events = new ArrayList<Event>(3);
+    private final List<Event> events = new ArrayList<>(3);
 
     /**
      * XWiki plugin constructor.
@@ -138,7 +138,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         super.init(context);
 
-        this.alwaysUsedExtensions = new HashMap<String, Set<DocumentReference>>();
+        this.alwaysUsedExtensions = new HashMap<>();
         getExtensionClass(context);
 
         Utils.getComponent(ObservationManager.class).addListener(this);
@@ -176,7 +176,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         Set<DocumentReference> references = getAlwaysUsedExtensions();
-        Set<String> names = new HashSet<String>(references.size());
+        Set<String> names = new HashSet<>(references.size());
         for (DocumentReference reference : references) {
             names.add(serializer.serialize(reference));
         }
@@ -203,7 +203,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             return this.alwaysUsedExtensions.get(currentWiki);
         } else {
             // Otherwise, we look them up in the database.
-            Set<DocumentReference> extensions = new HashSet<DocumentReference>();
+            Set<DocumentReference> extensions = new HashSet<>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
                     + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
@@ -315,7 +315,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (event instanceof WikiDeletedEvent) {
             this.alwaysUsedExtensions.remove(((WikiDeletedEvent) event).getWikiId());
         } else {
-            onDocumentEvent((XWikiDocument) source, (XWikiContext) data);
+            onDocumentEvent((XWikiDocument) source);
         }
     }
 
@@ -323,9 +323,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * A document related event has been received.
      * 
      * @param document the modified document
-     * @param context the XWiki context
      */
-    private void onDocumentEvent(XWikiDocument document, XWikiContext context)
+    private void onDocumentEvent(XWikiDocument document)
     {
         boolean remove = false;
         if (document.getObject(getExtensionClassName()) != null) {
@@ -461,6 +460,4 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
         return context.getWiki().getURL(documentReference, pluginName, queryString, "", context);
     }
-    
-    
 }

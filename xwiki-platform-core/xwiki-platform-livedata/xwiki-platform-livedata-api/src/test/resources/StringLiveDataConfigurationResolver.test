@@ -8,13 +8,14 @@
 ## Invalid query and meta
 ## 
 {
+  "id":"test",
   "query":23,
   "meta":[],
   "foo":"bar"
 }
 ---
 {
-  "foo":"bar"
+  "id":"test"
 }
 ##
 ## Invalid query (properties, source, sort, filters, limit, offset)
@@ -32,9 +33,7 @@
 }
 ---
 {
-  "query":{
-    "alice":"bob"
-  }
+  "query":{}
 }
 ##
 ## Sort and source as text, filters as object
@@ -112,13 +111,14 @@
   "meta":{
     "foo":"bar",
     "propertyDescriptors":{"two":2},
-    "propertyTypes":"test"
+    "propertyTypes":"test",
+    "entryDescriptor":{"idProperty":"doc_fullName"}
   }
 }
 ---
 {
   "meta":{
-    "foo":"bar"
+    "entryDescriptor":{"idProperty":"doc_fullName"}
   }
 }
 ##
@@ -161,7 +161,7 @@
     ],
     "propertyTypes":[
       {
-        "filterable":false
+        "visible":false
       }
     ]
   }
@@ -182,7 +182,7 @@
     ],
     "propertyTypes":[
       {
-        "filterable":false
+        "visible":false
       }
     ]
   }

@@ -56,7 +56,7 @@ public class Tag implements Comparable<Tag>
      */
     public String getHtml()
     {
-        return "<a class=\"f" + this.size + "\">" + XMLUtils.escapeElementContent(this.name) + "</a> ";
+        return "<a class=\"f" + this.size + "\">" + XMLUtils.escapeElementText(this.name) + "</a> ";
     }
 
     @Override

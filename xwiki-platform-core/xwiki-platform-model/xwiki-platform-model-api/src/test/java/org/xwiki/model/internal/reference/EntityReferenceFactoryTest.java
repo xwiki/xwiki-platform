@@ -36,19 +36,19 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @version $Id$
  */
 @ComponentTest
-public class EntityReferenceFactoryTest
+class EntityReferenceFactoryTest
 {
     @InjectMockComponents
     private EntityReferenceFactory factory;
 
     @Test
-    public void getReferenceWhenNull()
+    void getReferenceWhenNull()
     {
         assertNull(this.factory.getReference(null));
     }
 
     @Test
-    public void getReference()
+    void getReference()
     {
         PageReference page = new PageReference("wiki", "parent", "page");
         PageReference pageClone = new PageReference("wiki", "parent", "page");
@@ -68,7 +68,7 @@ public class EntityReferenceFactoryTest
     }
 
     @Test
-    public void getReferenceWhenExistingIsLowerType()
+    void getReferenceWhenExistingIsLowerType()
     {
         PageReference page = new PageReference("wiki", "parent", "page");
         EntityReference entity = new EntityReference(page);

@@ -50,6 +50,7 @@ org.xwiki.mentions.DisplayStyle.LOGIN=Имя пользователя
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Цвет упоминания
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Цвет упоминаний для текущего пользователя (Примечание: используется в качестве значения атрибута css background-color).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Цвета самоупоминания
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activate the quotes
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.</content>
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Включить цитирование
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Определяет, включена ли цитата текста, окружающего упоминание, в уведомления об упоминании пользователя.
+mentions.tip=При редактировании в WYSIWYG введите @, а затем начните вводить буквы, чтобы получить предложения по упоминанию пользователя.</content>
 </xwikidoc>

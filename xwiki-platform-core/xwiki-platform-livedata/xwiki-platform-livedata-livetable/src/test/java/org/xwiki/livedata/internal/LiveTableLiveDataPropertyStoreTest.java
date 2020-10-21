@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link LiveTableLiveDataPropertyStore}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @ComponentTest
 class LiveTableLiveDataPropertyStoreTest

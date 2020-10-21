@@ -1,0 +1,112 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#if ($request.livetable == "true")
+    #macro (displayUserAliasWithAvatar $userReference $disabled)
+    <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($userReference $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+      <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
+    </div>
+    #end
+    $response.setContentType('application/json')
+    #set ($documentReference = $doc.documentReference)
+    ##==============================
+    ## Offset = item # at which to start displaying data
+    ##==============================
+    #set($offset = $numbertool.toNumber($request.get('offset')))
+    ## offset starts from 0 in velocity and 1 in javascript
+    #set($offset = $offset - 1)
+    #if($offset < 0)
+        #set($offset = 0)
+    #end
+    ##==================
+    ## Limit = # of items to display
+    ##==================
+    #set($limit = $numbertool.toNumber($request.get('limit')))
+    ##==========
+    ## Sort direction
+    ##==========
+    #set($order = "$!request.sort")
+    #if($order != '')
+        #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+        #if("$!orderDirection" != '' && "$!orderDirection" != 'asc')
+            #set($orderDirection = 'desc')
+        #end
+    #end
+    #set ($likeRecords = $services.like.getLikers($documentReference, $offset, $limit))
+    #set ($userRows = [])
+    #foreach($userReference in $likeRecords)
+        #set ($grayed = $xcontext.userReference == $userReference.reference)
+        #set ($userDoc = $xwiki.getDocument($userReference.reference))
+        #set ($userProperties = $services.user.getProperties($userReference))
+        #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
+        #set ($row = {
+            'grayed': $grayed,
+            'doc_fullName': $userDoc.fullName,
+            'doc_wiki': $userDoc.wiki,
+            'doc_url': $userDoc.getURL(),
+            'doc_viewable': $services.security.authorization.hasAccess('view', $userDoc.documentReference),
+            'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
+            'first_name': $userProperties.firstName,
+            'last_name': $userProperties.lastName
+        })
+        #set ($discard = $userRows.add($row))
+    #end
+    ## ===
+    ## JSON
+    ## ===
+    #set ($newOffset = $offset + 1)
+    #set ($optLikesNumber = $services.like.getLikes($documentReference))
+    #if ($optLikesNumber.isPresent())
+      #set ($totalRows = $optLikesNumber.get())
+    #else
+      #set ($totalRows = $likeRecords.size())
+    #end
+    {
+        "totalrows": $totalRows,
+        "returnedrows":  $likeRecords.size(),
+        "offset": $newOffset,
+        "reqNo": $numbertool.toNumber($request.reqNo),
+        "rows": $jsontool.serialize($userRows)
+    }
+#else
+    <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
+    #set($columns = ["name", "first_name", "last_name"])
+    #set($columnsProperties = {
+        "name" : { "type" : "text", "sortable": false, "filterable": false, "html": true },
+        "first_name" : { "type" : "text", "sortable": false, "filterable": false},
+        "last_name" : { "type" : "text", "sortable": false, "filterable": false}
+    })
+    #set ($queryParams = {
+        "livetable": "true",
+        "xpage": "likers",
+        "outputSyntax": "plain"
+    })
+    ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
+    #set($options = {
+        'url': $doc.getURL('get', $escapetool.url($queryParams)),
+        'outputOnlyHtml': true,
+        'translationPrefix' : "xe.admin.users."
+    })
+
+    #livetable("likers" $columns $columnsProperties $options)
+#end

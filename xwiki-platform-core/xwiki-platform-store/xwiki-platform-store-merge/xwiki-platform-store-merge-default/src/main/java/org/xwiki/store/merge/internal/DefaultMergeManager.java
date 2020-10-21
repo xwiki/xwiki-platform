@@ -267,7 +267,7 @@ public class DefaultMergeManager implements MergeManager
             // Default locale
             MergeManagerResult<Locale, Locale> localeMergeResult = this.mergeObject(previousDoc.getDefaultLocale(),
                 newDoc.getDefaultLocale(), currentDoc.getDefaultLocale(), configuration);
-            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.LOCALE, localeMergeResult);
+            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.DEFAULT_LOCALE, localeMergeResult);
             mergedDocument.setDefaultLocale(localeMergeResult.getMergeResult());
 
             // Parent

@@ -41,16 +41,22 @@ import static org.xwiki.test.ui.AbstractTest.validateConsole;
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
         // Note that the Notifications feature is drawn by the Tag UI extension that is a dependency of User Directory
-        // UI dependency (it's used to display the tag cloud for the User Directory Livetable). Ideally the Tag UI
-        // extension would only optionnally draw the Notifications feature, since it's used only in the UI for
+        // UI dependency (it's used to display the tag cloud for the User Directory LiveTable). Ideally the Tag UI
+        // extension would only optionally draw the Notifications feature, since it's used only in the UI for
         // displaying documents tagged with a given tag, where the Activity Stream for a tag is displayed too (and
         // Activity Stream is implemented with the Notifications feature).
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib
-        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
+        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
+        // Notifications, as otherwise even streams won't have a store.
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     })
 public class UserDirectoryIT
 {

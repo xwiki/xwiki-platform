@@ -56,10 +56,10 @@ if (typeof XWiki.widgets == 'object' && typeof XWiki.widgets.FullScreen == 'func
 if (window.useXWKns) {
   warn("_xwk namespace is deprecated since XWiki 2.6RC1. Use the XWiki namespace instead.");
   if (typeof _xwk == "undefined") {
-    _xwk = new Object();
+    window._xwk = new Object();
   }
 } else {
-  _xwk = window;
+  window._xwk = window;
 }
 
 /**

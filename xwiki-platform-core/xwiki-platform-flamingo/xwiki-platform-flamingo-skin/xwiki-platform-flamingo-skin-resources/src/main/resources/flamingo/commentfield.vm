@@ -42,6 +42,11 @@
   #set ($value = '')
 #end
 
+## Forces the value of the comment to the content from the request if it exists.
+#if ($request.content)
+  #set ($value = $request.content)
+#end
+
 ## We can't simply call $doc.display() on this object because we would get comment as the
 ## field name. Instead we want the field name to be XWiki.XWikiComments_comment for new comments
 ## and XWiki.XWikiComments_N_comment for edited comments.

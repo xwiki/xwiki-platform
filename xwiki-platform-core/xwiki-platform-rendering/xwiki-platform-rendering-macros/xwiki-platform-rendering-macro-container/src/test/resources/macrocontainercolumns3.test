@@ -14,7 +14,7 @@
 beginDocument
 beginMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
 (((bar)))]
-beginGroup [[class]=[container-columns]]
+beginGroup [[class]=[container-columns container-columns-2]]
 beginGroup [[class]=[column first-column]]
 beginParagraph
 onWord [foo]
@@ -27,11 +27,11 @@ endParagraph
 endGroup [[class]=[column last-column]]
 beginGroup [[class]=[clearfloats]]
 endGroup [[class]=[clearfloats]]
-endGroup [[class]=[container-columns]]
+endGroup [[class]=[container-columns container-columns-2]]
 endMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
 (((bar)))]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div class="container-columns"><div class="column first-column"><p>foo</p></div><div class="column last-column"><p>bar</p></div><div class="clearfloats"></div></div>
+<div class="container-columns container-columns-2"><div class="column first-column"><p>foo</p></div><div class="column last-column"><p>bar</p></div><div class="clearfloats"></div></div>

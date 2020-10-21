@@ -26,16 +26,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -49,6 +48,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiConstant;
@@ -60,19 +60,21 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -86,6 +88,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
 @XWikiDocumentFilterUtilsComponentList
 public class XWikiDocumentMockitoTest
@@ -100,8 +103,8 @@ public class XWikiDocumentMockitoTest
 
     private static final DocumentReference CLASS_REFERENCE = DOCUMENT_REFERENCE;
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /**
      * The object being tested.
@@ -118,8 +121,8 @@ public class XWikiDocumentMockitoTest
 
     private List<XWikiAttachment> attachmentList;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void beforeEach() throws Exception
     {
         this.oldcore.registerMockEnvironment();
 
@@ -165,7 +168,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void getChildrenReferences() throws Exception
+    void getChildrenReferences() throws Exception
     {
         Query query = mock(Query.class);
         when(this.oldcore.getQueryManager().createQuery(any(), eq(Query.XWQL))).thenReturn(query);
@@ -184,9 +187,9 @@ public class XWikiDocumentMockitoTest
         verify(query).setLimit(7);
         verify(query).setOffset(3);
 
-        Assert.assertEquals(2, childrenReferences.size());
-        Assert.assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
-        Assert.assertEquals(new DocumentReference("wiki", "A", "b"), childrenReferences.get(1));
+        assertEquals(2, childrenReferences.size());
+        assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
+        assertEquals(new DocumentReference("wiki", "A", "b"), childrenReferences.get(1));
     }
 
     /**
@@ -276,7 +279,7 @@ public class XWikiDocumentMockitoTest
      * Unit test for {@link XWikiDocument#readObjectsFromForm(EditForm, XWikiContext)}.
      */
     @Test
-    public void readObjectsFromForm() throws Exception
+    void readObjectsFromForm() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
@@ -325,7 +328,7 @@ public class XWikiDocumentMockitoTest
      * Unit test for {@link XWikiDocument#readObjectsFromFormUpdateOrCreate(EditForm, XWikiContext)} .
      */
     @Test
-    public void readObjectsFromFormUpdateOrCreate() throws Exception
+    void readObjectsFromFormUpdateOrCreate() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
@@ -378,7 +381,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testDeprecatedConstructors()
+    void testDeprecatedConstructors()
     {
         DocumentReference defaultReference = new DocumentReference("xwiki", "Main", "WebHome");
 
@@ -410,7 +413,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testMinorMajorVersions()
+    void testMinorMajorVersions()
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
 
@@ -434,7 +437,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testGetPreviousVersion() throws XWikiException
+    void testGetPreviousVersion() throws XWikiException
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
 
@@ -479,7 +482,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testCloneNullObjects()
+    void testCloneNullObjects()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
 
@@ -521,14 +524,14 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testToStringReturnsFullName()
+    void testToStringReturnsFullName()
     {
         assertEquals("space.page", this.document.toString());
         assertEquals("Main.WebHome", new XWikiDocument().toString());
     }
 
     @Test
-    public void testCloneSaveVersions()
+    void testCloneSaveVersions()
     {
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("qwe", "qwe", "qwe"));
         XWikiDocument doc2 = doc1.clone();
@@ -538,16 +541,16 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testAddObject() throws XWikiException
+    void testAddObject() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("test", "test", "document"));
         BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", this.oldcore.getXWikiContext());
         doc.addObject("XWiki.XWikiUsers", object);
-        assertEquals("XWikiDocument.addObject does not set the object's name", doc.getFullName(), object.getName());
+        assertEquals(doc.getFullName(), object.getName(), "XWikiDocument.addObject does not set the object's name");
     }
 
     @Test
-    public void testObjectNumbersAfterXMLRoundrip() throws XWikiException
+    void testObjectNumbersAfterXMLRoundrip() throws XWikiException
     {
         String wiki = oldcore.getXWikiContext().getWikiId();
 
@@ -588,35 +591,36 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testGetXObjectWithObjectReference()
+    void testGetXObjectWithObjectReference()
     {
-        Assert.assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
+        assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
 
-        Assert.assertSame(this.baseObject,
+        assertSame(this.baseObject,
             this.document.getXObject(new ObjectReference(
                 this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()),
                 this.document.getDocumentReference())));
     }
 
     @Test
-    public void testGetXObjectWithNumber()
+    void testGetXObjectWithNumber()
     {
-        Assert.assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber()));
-        Assert.assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber()));
-        Assert.assertSame(this.baseObject,
+        assertSame(this.baseObject, this.document.getXObject(CLASS_REFERENCE, this.baseObject.getNumber()));
+        assertSame(this.baseObject2, this.document.getXObject(CLASS_REFERENCE, this.baseObject2.getNumber()));
+        assertSame(this.baseObject,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject.getNumber()));
-        Assert.assertSame(this.baseObject2,
+        assertSame(this.baseObject2,
             this.document.getXObject((EntityReference) CLASS_REFERENCE, this.baseObject2.getNumber()));
     }
 
     @Test
-    public void testGetXObjectsWhenClassDoesNotExist()
+    void testGetXObjectsWhenClassDoesNotExist()
     {
-        Assert.assertEquals(Collections.emptyList(), this.document.getXObjects(new DocumentReference("not", "existing", "class")));
+        assertEquals(Collections.emptyList(),
+            this.document.getXObjects(new DocumentReference("not", "existing", "class")));
     }
 
     @Test
-    public void testSetXObjectswithPreviousObject()
+    void testSetXObjectswithPreviousObject()
     {
         BaseObject object = new BaseObject();
         object.setXClassReference(this.baseObject.getXClassReference());
@@ -624,24 +628,24 @@ public class XWikiDocumentMockitoTest
 
         this.document.setXObjects(this.baseObject.getXClassReference(), Arrays.asList(object));
 
-        Assert.assertEquals(Arrays.asList(object), this.document.getXObjects(this.baseObject.getXClassReference()));
+        assertEquals(Arrays.asList(object), this.document.getXObjects(this.baseObject.getXClassReference()));
     }
 
     @Test
-    public void testSetXObjectWhithNoPreviousObject()
+    void testSetXObjectWhithNoPreviousObject()
     {
         XWikiDocument document = new XWikiDocument(this.document.getDocumentReference());
 
         document.setXObject(this.baseObject.getXClassReference(), 0, this.baseObject);
 
-        Assert.assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
+        assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
     }
 
     /**
      * Test that the parent remain the same relative value whatever the context.
      */
     @Test
-    public void testGetParent()
+    void testGetParent()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -660,7 +664,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testGetParentReference()
+    void testGetParentReference()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -694,7 +698,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testSetRelativeParentReference()
+    void testSetRelativeParentReference()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -710,7 +714,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetCreatorReferenceSetsMetadataDirtyFlag()
+    void testSetCreatorReferenceSetsMetadataDirtyFlag()
     {
         // Make sure we set the flag to false to verify it's changed
         this.document.setMetaDataDirty(false);
@@ -728,7 +732,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
+    void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
     {
         // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
         DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
@@ -748,7 +752,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetAuthorReferenceSetsMetadataDirtyFlag()
+    void testSetAuthorReferenceSetsMetadataDirtyFlag()
     {
         // Make sure we set the flag to false to verify it's changed
         this.document.setMetaDataDirty(false);
@@ -766,7 +770,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
+    void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
     {
         // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
@@ -786,7 +790,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
+    void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
     {
         // Make sure we set the flag to false to verify it's changed
         this.document.setMetaDataDirty(false);
@@ -804,7 +808,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
-    public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
+    void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
     {
         // Make sure we set the metadata dirty flag to false to verify it's not changed thereafter
         DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
@@ -818,7 +822,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testSetContentSetsContentDirtyFlag()
+    void testSetContentSetsContentDirtyFlag()
     {
         // Make sure we set the flags to false to verify it's changed
         this.document.setContentDirty(false);
@@ -831,7 +835,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testSetSameContentDoesNotSetContentDirtyFlag()
+    void testSetSameContentDoesNotSetContentDirtyFlag()
     {
         this.document.setContent("something");
         // Make sure we set the flag to false to verify it's changed
@@ -844,7 +848,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testModifyObjectsSetsOnlyMetadataDirtyFlag() throws Exception
+    void testModifyObjectsSetsOnlyMetadataDirtyFlag() throws Exception
     {
         DocumentReference classReference = this.document.getDocumentReference();
 
@@ -880,7 +884,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testModifyAttachmentsSetsOnlyMetadataDirtyFlag() throws Exception
+    void testModifyAttachmentsSetsOnlyMetadataDirtyFlag() throws Exception
     {
         // Make sure we set the flags to false to verify it's changed
         this.document.setContentDirty(false);
@@ -924,13 +928,13 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testEqualsDatas()
+    void testEqualsDatas()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         XWikiDocument otherDocument = document.clone();
 
-        Assert.assertTrue(document.equals(otherDocument));
-        Assert.assertTrue(document.equalsData(otherDocument));
+        assertTrue(document.equals(otherDocument));
+        assertTrue(document.equalsData(otherDocument));
 
         otherDocument.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
         otherDocument.setContentAuthorReference(otherDocument.getAuthorReference());
@@ -941,12 +945,12 @@ public class XWikiDocumentMockitoTest
 
         document.setMinorEdit(false);
 
-        Assert.assertFalse(document.equals(otherDocument));
-        Assert.assertTrue(document.equalsData(otherDocument));
+        assertFalse(document.equals(otherDocument));
+        assertTrue(document.equalsData(otherDocument));
     }
 
     @Test
-    public void testEqualsAttachments() throws XWikiException
+    void testEqualsAttachments() throws XWikiException
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         XWikiDocument otherDocument = document.clone();
@@ -955,17 +959,17 @@ public class XWikiDocumentMockitoTest
         XWikiAttachment otherAttachment =
             otherDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
-        Assert.assertTrue(document.equals(otherDocument));
-        Assert.assertTrue(document.equalsData(otherDocument));
+        assertTrue(document.equals(otherDocument));
+        assertTrue(document.equalsData(otherDocument));
 
         otherAttachment.setContent(new byte[] {1, 2, 3});
 
-        Assert.assertFalse(document.equals(otherDocument));
-        Assert.assertFalse(document.equalsData(otherDocument));
+        assertFalse(document.equals(otherDocument));
+        assertFalse(document.equalsData(otherDocument));
     }
 
     @Test
-    public void testSetMetadataDirtyWhenAttachmenListChanges() throws XWikiException
+    void testSetMetadataDirtyWhenAttachmenListChanges() throws XWikiException
     {
         XWikiDocument document = new XWikiDocument();
 
@@ -979,24 +983,24 @@ public class XWikiDocumentMockitoTest
         attachments.clear();
 
         // Check that the the metadata is now dirty as a result.
-        Assert.assertTrue(document.isMetaDataDirty());
+        assertTrue(document.isMetaDataDirty());
 
         // Check adding to list
         document.setMetaDataDirty(false);
         attachments.add(new XWikiAttachment());
-        Assert.assertTrue(document.isMetaDataDirty());
+        assertTrue(document.isMetaDataDirty());
 
         // Check removing from the list
         document.setMetaDataDirty(false);
         attachments.remove(0);
-        Assert.assertTrue(document.isMetaDataDirty());
+        assertTrue(document.isMetaDataDirty());
     }
 
     /**
      * XWIKI-8463: Backwards compatibility issue with setting the same attachment list to a document
      */
     @Test
-    public void testSetGetAttachmentList() throws Exception
+    void testSetGetAttachmentList() throws Exception
     {
         String attachmentName1 = "someFile.txt";
         String attachmentName2 = "someOtherFile.txt";
@@ -1005,31 +1009,31 @@ public class XWikiDocumentMockitoTest
 
         List<String> attachmentNames = new ArrayList<String>();
 
-        Assert.assertEquals(2, this.document.getAttachmentList().size());
+        assertEquals(2, this.document.getAttachmentList().size());
         for (XWikiAttachment attachment : this.document.getAttachmentList()) {
             attachmentNames.add(attachment.getFilename());
         }
-        Assert.assertTrue(attachmentNames.contains(attachmentName1));
-        Assert.assertTrue(attachmentNames.contains(attachmentName2));
+        assertTrue(attachmentNames.contains(attachmentName1));
+        assertTrue(attachmentNames.contains(attachmentName2));
 
         // Set back the same list returned by the getter.
         this.document.setAttachmentList(this.document.getAttachmentList());
 
         // The result needs to stay the same.
-        Assert.assertEquals(2, this.document.getAttachmentList().size());
+        assertEquals(2, this.document.getAttachmentList().size());
         attachmentNames.clear();
         for (XWikiAttachment attachment : this.document.getAttachmentList()) {
             attachmentNames.add(attachment.getFilename());
         }
-        Assert.assertTrue(attachmentNames.contains(attachmentName1));
-        Assert.assertTrue(attachmentNames.contains(attachmentName2));
+        assertTrue(attachmentNames.contains(attachmentName1));
+        assertTrue(attachmentNames.contains(attachmentName2));
     }
 
     /**
      * Unit test for {@link XWikiDocument#readFromTemplate(DocumentReference, XWikiContext)}.
      */
     @Test
-    public void testReadFromTemplate() throws Exception
+    void testReadFromTemplate() throws Exception
     {
         SpaceReference spaceReference = new SpaceReference("Space", new WikiReference("wiki"));
         XWikiDocument template = new XWikiDocument(new DocumentReference("Template", spaceReference));
@@ -1061,11 +1065,11 @@ public class XWikiDocumentMockitoTest
 
         target.readFromTemplate(template.getDocumentReference(), xcontext);
 
-        Assert.assertEquals(template.getDocumentReference(), target.getTemplateDocumentReference());
-        Assert.assertEquals(template.getParentReference(), target.getParentReference());
-        Assert.assertEquals(template.getTitle(), target.getTitle());
-        Assert.assertEquals(template.getSyntax(), target.getSyntax());
-        Assert.assertEquals(template.getContent(), target.getContent());
+        assertEquals(template.getDocumentReference(), target.getTemplateDocumentReference());
+        assertEquals(template.getParentReference(), target.getParentReference());
+        assertEquals(template.getTitle(), target.getTitle());
+        assertEquals(template.getSyntax(), target.getSyntax());
+        assertEquals(template.getContent(), target.getContent());
 
         assertEquals(3, target.getAttachmentList().size());
         assertTrue(IOUtils.contentEquals(target.getAttachment("alice.png").getContentInputStream(xcontext),
@@ -1077,7 +1081,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testResolveClassReference() throws Exception
+    void testResolveClassReference() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -1098,7 +1102,7 @@ public class XWikiDocumentMockitoTest
      * Verify that cloning objects modify their references to point to the document in which they are cloned into.
      */
     @Test
-    public void testCloneObjectsHaveCorrectReference()
+    void testCloneObjectsHaveCorrectReference()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
         doc.cloneXObjects(this.document);
@@ -1117,7 +1121,7 @@ public class XWikiDocumentMockitoTest
      * that GUID for merged objects are different from the original GUIDs.
      */
     @Test
-    public void testMergeObjectsHaveCorrectReferenceAndDifferentGuids()
+    void testMergeObjectsHaveCorrectReferenceAndDifferentGuids()
     {
         List<String> originalGuids = new ArrayList<String>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
@@ -1140,7 +1144,7 @@ public class XWikiDocumentMockitoTest
                 // Verify that the object references point to the doc in which it's cloned.
                 assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
                 // Verify that GUIDs are not the same as the original ones
-                assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
+                assertFalse(originalGuids.contains(baseObject.getGuid()), "Non unique object GUID found!");
             }
         }
     }
@@ -1149,7 +1153,7 @@ public class XWikiDocumentMockitoTest
      * Tests that objects are not copied again when {@link XWikiDocument#mergeXObjects(XWikiDocument)} is called twice.
      */
     @Test
-    public void testMergeObjectsTwice()
+    void testMergeObjectsTwice()
     {
         // Make sure the target document and the template document are from different wikis.
         XWikiDocument targetDoc = new XWikiDocument(new DocumentReference("someWiki", "someSpace", "somePage"));
@@ -1172,14 +1176,14 @@ public class XWikiDocumentMockitoTest
 
     /** Check that a new empty document has empty content (used to have a new line before 2.5). */
     @Test
-    public void testInitialContent()
+    void testInitialContent()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
         assertEquals("", doc.getContent());
     }
 
     @Test
-    public void testAuthorAfterDocumentCopy() throws XWikiException
+    void testAuthorAfterDocumentCopy() throws XWikiException
     {
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Albatross");
         this.document.setAuthorReference(author);
@@ -1190,7 +1194,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testCreatorAfterDocumentCopy() throws XWikiException
+    void testCreatorAfterDocumentCopy() throws XWikiException
     {
         DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Condor");
         this.document.setCreatorReference(creator);
@@ -1201,7 +1205,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testCreationDateAfterDocumentCopy() throws Exception
+    void testCreationDateAfterDocumentCopy() throws Exception
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
@@ -1212,7 +1216,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testObjectGuidsAfterDocumentCopy() throws Exception
+    void testObjectGuidsAfterDocumentCopy() throws Exception
     {
         assertTrue(this.document.getXObjects().size() > 0);
 
@@ -1229,13 +1233,13 @@ public class XWikiDocumentMockitoTest
         // Verify that the cloned objects have different GUIDs
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : copy.getXObjects().entrySet()) {
             for (BaseObject baseObject : entry.getValue()) {
-                assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
+                assertFalse(originalGuids.contains(baseObject.getGuid()), "Non unique object GUID found!");
             }
         }
     }
 
     @Test
-    public void testRelativeObjectReferencesAfterDocumentCopy() throws Exception
+    void testRelativeObjectReferencesAfterDocumentCopy() throws Exception
     {
         XWikiDocument copy = this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
             this.oldcore.getXWikiContext());
@@ -1252,7 +1256,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testCustomMappingAfterDocumentCopy() throws Exception
+    void testCustomMappingAfterDocumentCopy() throws Exception
     {
         this.document.getXClass().setCustomMapping("internal");
 
@@ -1267,7 +1271,7 @@ public class XWikiDocumentMockitoTest
      * to remove it should indeed remove that object, and no other.
      */
     @Test
-    public void testRemovingObjectWithWrongObjectVector()
+    void testRemovingObjectWithWrongObjectVector()
     {
         // Setup: Create a document and two xobjects
         BaseObject o1 = new BaseObject();
@@ -1309,21 +1313,31 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testCopyDocument() throws XWikiException
+    void testCopyDocument() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument();
+        DocumentReference oldReference =
+            new DocumentReference(CLASS_REFERENCE.getWikiReference().getName(), "space1", "document1");
+        DocumentReference newReference =
+            new DocumentReference(CLASS_REFERENCE.getWikiReference().getName(), "space2", "document2");
+
+        XWikiDocument doc = new XWikiDocument(oldReference);
         doc.setTitle("Some title");
         BaseObject o = new BaseObject();
         o.setXClassReference(CLASS_REFERENCE);
         doc.addXObject(o);
+        doc.setLocale(Locale.ENGLISH);
 
-        XWikiDocument newDoc = doc.copyDocument("newdoc", this.oldcore.getXWikiContext());
+        XWikiDocument newDoc = doc.copyDocument(newReference, this.oldcore.getXWikiContext());
         BaseObject newO = newDoc.getXObject(CLASS_REFERENCE);
-
+        
         assertNotSame(o, newDoc.getXObject(CLASS_REFERENCE));
         assertFalse(newO.getGuid().equals(o.getGuid()));
         // Verify that the title is copied
         assertEquals("Some title", newDoc.getTitle());
+        assertEquals(Locale.ENGLISH, newDoc.getLocale());
+        assertEquals(newReference, newDoc.getDocumentReference());
+        assertEquals(new DocumentReference(newReference, Locale.ENGLISH),
+            newDoc.getDocumentReferenceWithLocale());
     }
 
     /**
@@ -1331,7 +1345,7 @@ public class XWikiDocumentMockitoTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-12349">XWIKI-12349</a>
      */
     @Test
-    public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
+    void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
     {
         copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "page1"), "page1",
             new DocumentReference("wiki2", "space2", "page2"), "page2");
@@ -1356,7 +1370,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testValidate() throws XWikiException, AccessDeniedException
+    void testValidate() throws XWikiException, AccessDeniedException
     {
         this.document.setValidationScript("validationScript");
         this.baseClass.setValidationScript("validationScript");
@@ -1391,7 +1405,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void tofromXMLDocument() throws XWikiException
+    void tofromXMLDocument() throws XWikiException
     {
         // equals won't work on password fields because of https://jira.xwiki.org/browse/XWIKI-12561
         this.baseClass.removeField("passwd");
@@ -1408,13 +1422,13 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void getAttachmentWithNullFilename() throws XWikiException
+    void getAttachmentWithNullFilename() throws XWikiException
     {
         assertNull(this.document.getAttachment(null));
     }
 
     @Test
-    public void listAdd() throws XWikiException
+    void listAdd() throws XWikiException
     {
         // reset
         attachmentList.clear();
@@ -1436,7 +1450,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listMaintainsOrder() throws XWikiException
+    void listMaintainsOrder() throws XWikiException
     {
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
         XWikiAttachment attachment2 = new XWikiAttachment(this.document, "attachmentB");
@@ -1452,14 +1466,14 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listClear() throws XWikiException
+    void listClear() throws XWikiException
     {
         attachmentList.clear();
         assertTrue(attachmentList.isEmpty());
     }
 
     @Test
-    public void listRemove() throws XWikiException
+    void listRemove() throws XWikiException
     {
         // remove through object parameter
         XWikiAttachment attachment = new XWikiAttachment(this.document, "remove");
@@ -1479,7 +1493,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listSet() throws XWikiException
+    void listSet() throws XWikiException
     {
         XWikiAttachment attachment = new XWikiAttachment(this.document, "testAttachment");
         attachmentList.set(0, attachment);
@@ -1494,7 +1508,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listAddAll() throws XWikiException
+    void listAddAll() throws XWikiException
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
@@ -1518,7 +1532,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listRemoveAll() throws XWikiException
+    void listRemoveAll() throws XWikiException
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
@@ -1538,7 +1552,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void listRetainAll() throws XWikiException
+    void listRetainAll() throws XWikiException
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
@@ -1558,7 +1572,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void modifyAttachmentName()
+    void modifyAttachmentName()
     {
         XWikiAttachment attachment = new XWikiAttachment();
 

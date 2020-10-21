@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -38,4 +39,13 @@ public class InformationPane extends BaseElement
         return this.pane.isDisplayed();
     }
 
+    public String getSyntax()
+    {
+        return this.pane.findElement(By.xpath(".//label[. = 'Syntax']/parent::dt/following-sibling::dd")).getText();
+    }
+
+    public DocumentSyntaxPropertyPane editSyntax()
+    {
+        return new DocumentSyntaxPropertyPane().clickEdit();
+    }
 }

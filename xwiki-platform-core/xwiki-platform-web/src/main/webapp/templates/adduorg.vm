@@ -20,12 +20,27 @@
 #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 #if ($services.csrf.isTokenValid($request.form_token))
   #set ($dirty = false)
+  #set ($ignoredGroups = [])
   #foreach ($name in $request.getParameterValues('name'))
     ## Verify if the user or group is already in the target group.
-    #if ($name.trim() != '' && !$doc.getObject('XWiki.XWikiGroups', 'member', $name))
+    #if ($name.trim() == '')
+      #set ($accept = false)
+    #else
+      #set ($candidateDoc = $xwiki.getDocument($name))
+      #set ($isGroup = $candidateDoc.getObject('XWiki.XWikiGroups'))
+      #if ($isGroup)
+        #set ($accept = $services.user.group.canAddGroupAsMember($candidateDoc.getDocumentReference(),
+          $doc.getDocumentReference()))
+      #else
+        #set ($accept = !$doc.getObject('XWiki.XWikiGroups', 'member', $name))
+      #end
+    #end
+    #if ($accept)
       #set ($obj = $doc.newObject('XWiki.XWikiGroups'))
       #set ($discard = $obj.set('member', $name))
       #set ($dirty = true)
+    #elseif($name != '' && $isGroup)
+      #set ($discard = $ignoredGroups.add($name))
     #end
   #end
   #if ($dirty)
@@ -33,6 +48,15 @@
   #end
   #if (!$isAjaxRequest)
     $response.sendRedirect($doc.getURL())
+  #else
+    #set ($hasIgnored = !$ignoredGroups.isEmpty())
+    #set ($jsonObject = { 'hasIgnored': $hasIgnored})
+    #if ($hasIgnored)
+      #set ($ignoredGroupsStr = "$stringtool.join($ignoredGroups, ', ')")
+      #set ($discard = $jsonObject.put('ignoredMessage',
+        "$services.localization.render('web.groups.administration.groupsIgnored', [$ignoredGroupsStr])"))
+    #end
+    #jsonResponse($jsonObject)
   #end
 #elseif ($isAjaxRequest)
   $response.sendError(401, 'CSRF token verification failed!')

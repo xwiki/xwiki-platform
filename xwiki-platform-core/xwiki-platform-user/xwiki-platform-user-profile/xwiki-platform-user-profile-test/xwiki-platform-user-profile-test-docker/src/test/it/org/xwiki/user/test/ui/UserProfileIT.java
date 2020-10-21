@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -41,7 +40,6 @@ import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -50,9 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.10
  */
-// Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
-// runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
+@UITest(extraJARs = {
+    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+})
 public class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";

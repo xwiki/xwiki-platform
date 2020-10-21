@@ -57,9 +57,8 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     public void initialize(Map<DocumentReference, CompositeEvent> events, Map<String, Object> factoryParameters,
         EntityReference templateReference)
     {
-        super.initialize(events.keySet().iterator(), factoryParameters, templateReference);
-
         this.events = events;
+        super.initialize(events.keySet().iterator(), factoryParameters, templateReference);
     }
 
     /**

@@ -189,5 +189,5 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

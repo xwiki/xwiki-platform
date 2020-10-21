@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-mentions-default</artifactId>
@@ -34,8 +34,8 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
     <!-- This component must be installed at the farm level because
-    org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
-    org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
+         org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
+         org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -65,8 +64,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.ratings.AverageRatingApi;
+import org.xwiki.ratings.AverageRating;
+import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.internal.XWikiRepositoryModel.SolrField;
@@ -156,10 +157,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     @Inject
     protected ContextualAuthorizationManager authorization;
 
-    @Inject
-    @Named("separate")
-    protected RatingsManager ratingsManager;
-
     /**
      * Used to extract a document reference from a {@link SolrDocument}.
      */
@@ -168,6 +165,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     @Inject
     protected ExtensionFactory extensionFactory;
+
+    @Inject
+    private RatingsManagerFactory ratingsManagerFactory;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -771,11 +771,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionRating extensionRating = this.extensionObjectFactory.createExtensionRating();
 
         try {
-            AverageRatingApi averageRating =
-                new AverageRatingApi(ratingsManager.getAverageRating(extensionDocumentReference));
+            RatingsManager ratingsManager = this.ratingsManagerFactory
+                .getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT);
+            AverageRating averageRating = ratingsManager.getAverageRating(extensionDocumentReference);
             extensionRating.setTotalVotes(averageRating.getNbVotes());
             extensionRating.setAverageVote(averageRating.getAverageVote());
-        } catch (XWikiException e) {
+        } catch (RatingsException e) {
             extensionRating.setTotalVotes(0);
             extensionRating.setAverageVote(0);
         }

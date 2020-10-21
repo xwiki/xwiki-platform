@@ -164,9 +164,11 @@
 )))## xwikirightstips
 #panelfooter()
 )))## xwikirightstipspanel
+## accordion.js requires effects.js
+$xwiki.jsfx.use('js/scriptaculous/effects.js')##
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
 {{html clean="false"}}
-&lt;script type="text/javascript"&gt;
+&lt;script&gt;
 document.observe('xwiki:dom:loaded', function() {
   var obj = {div:'xwikirightstips', no:0, height:250};
   var acc = createAccordion(obj);

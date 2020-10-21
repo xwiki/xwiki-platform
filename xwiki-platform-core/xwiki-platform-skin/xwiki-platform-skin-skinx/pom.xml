@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-skin</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
@@ -81,7 +81,14 @@
     <dependency>
       <groupId>com.google.javascript</groupId>
       <artifactId>closure-compiler-unshaded</artifactId>
-      <version>v20200719</version>
+      <version>${closure-compiler.version}</version>
+      <exclusions>
+        <!-- Exclude closure-compiler-externs because externs.zip is packaged in closure-compiler-unshaded -->
+        <exclusion>
+          <groupId>com.google.javascript</groupId>
+          <artifactId>closure-compiler-externs</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

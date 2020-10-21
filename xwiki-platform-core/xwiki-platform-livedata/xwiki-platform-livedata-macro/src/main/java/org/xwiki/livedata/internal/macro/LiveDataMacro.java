@@ -40,10 +40,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfiguration.LayoutDescriptor;
-import org.xwiki.livedata.LiveDataConfiguration.LiveDataMeta;
-import org.xwiki.livedata.LiveDataConfiguration.PaginationConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
@@ -62,7 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Display dynamic lists of data.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Named("liveData")
@@ -72,8 +72,6 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     private static final Pattern PATTERN_COMMA = Pattern.compile("\\s*,\\s*");
 
     private static final String UTF8 = "UTF-8";
-
-    private static final String ID = "id";
 
     @Inject
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
@@ -95,7 +93,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         GroupBlock output = new GroupBlock();
         output.setParameter("class", "liveData");
         if (parameters.getId() != null) {
-            output.setParameter(ID, parameters.getId());
+            output.setParameter("id", parameters.getId());
         }
         try {
             // Compute the live data configuration based on the macro parameters.
@@ -121,9 +119,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         throws MalformedURLException, UnsupportedEncodingException
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
-        if (parameters.getId() != null) {
-            liveDataConfig.setParameter(ID, parameters.getId());
-        }
+        liveDataConfig.setId(parameters.getId());
         liveDataConfig.setQuery(getQuery(parameters));
         liveDataConfig.setData(getData(content));
         liveDataConfig.setMeta(getMeta(parameters));
@@ -138,11 +134,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         query.setSource(new Source(parameters.getSource()));
         query.getSource().getParameters().putAll(getSourceParameters(parameters.getSourceParameters()));
         query.setSort(getSortEntries(parameters.getSort()));
-        query.setFilters(getFilters(parameters.getFilters()));
-        List<Filter> hiddenFilters = getFilters(parameters.getHiddenFilters());
-        if (hiddenFilters != null) {
-            query.setParameter("hiddenFilters", hiddenFilters);
-        }
+        query.setFilters(getFilters(parameters));
         query.setLimit(parameters.getLimit());
         query.setOffset(parameters.getOffset());
         return query;
@@ -200,12 +192,20 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
 
     private List<Filter> getFilters(String filtersString) throws MalformedURLException, UnsupportedEncodingException
     {
-        if (filtersString == null) {
-            return null;
-        }
-
-        return getURLParameters('?' + filtersString).entrySet().stream().map(this::getFilter)
+        return getURLParameters('?' + StringUtils.defaultString(filtersString)).entrySet().stream().map(this::getFilter)
             .collect(Collectors.toList());
+    }
+
+    private List<Filter> getFilters(LiveDataMacroParameters parameters)
+        throws MalformedURLException, UnsupportedEncodingException
+    {
+        List<Filter> filters = new ArrayList<>();
+        // Add hidden filters that the user cannot change.
+        filters.addAll(getFilters(parameters.getHiddenFilters()));
+        filters.forEach(filter -> filter.setReadOnly(true));
+        // Add visible filters.
+        filters.addAll(getFilters(parameters.getFilters()));
+        return filters.isEmpty() ? null : filters;
     }
 
     private Filter getFilter(Map.Entry<String, List<String>> entry)
@@ -230,19 +230,19 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return meta;
     }
 
-    private List<LayoutDescriptor> getLayouts(LiveDataMacroParameters parameters)
+    private List<LiveDataLayoutDescriptor> getLayouts(LiveDataMacroParameters parameters)
     {
         if (parameters.getLayouts() == null) {
             return null;
         } else {
-            return Stream.of(PATTERN_COMMA.split(parameters.getLayouts())).map(LayoutDescriptor::new)
+            return Stream.of(PATTERN_COMMA.split(parameters.getLayouts())).map(LiveDataLayoutDescriptor::new)
                 .collect(Collectors.toList());
         }
     }
 
-    private PaginationConfiguration getPagination(LiveDataMacroParameters parameters)
+    private LiveDataPaginationConfiguration getPagination(LiveDataMacroParameters parameters)
     {
-        PaginationConfiguration pagination = new PaginationConfiguration();
+        LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
         pagination.setShowPageSizeDropdown(parameters.getShowPageSizeDropdown());
         if (parameters.getPageSizes() != null) {
             pagination.setPageSizes(Stream.of(PATTERN_COMMA.split(parameters.getPageSizes())).map(Integer::parseInt)

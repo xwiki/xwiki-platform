@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * Provides the list of existing {@link LiveDataSource} implementations.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Path("/liveData/sources")
 @Unstable

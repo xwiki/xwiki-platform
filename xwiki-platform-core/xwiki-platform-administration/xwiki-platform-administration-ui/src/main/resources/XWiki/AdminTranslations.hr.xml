@@ -147,6 +147,10 @@ admin.other.description=Razna podešenja za ekstenzije.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Odredite je li Google Analytics™ praćenje aktivno ili ne
 
+# Social category
+### Missing: admin.social=Social
+### Missing: admin.social.description=Configuration for social features.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 

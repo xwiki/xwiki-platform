@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * Wraps an XWiki request in order to allow overwriting its parameters.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 class LiveTableRequest extends WrappingXWikiRequest
 {

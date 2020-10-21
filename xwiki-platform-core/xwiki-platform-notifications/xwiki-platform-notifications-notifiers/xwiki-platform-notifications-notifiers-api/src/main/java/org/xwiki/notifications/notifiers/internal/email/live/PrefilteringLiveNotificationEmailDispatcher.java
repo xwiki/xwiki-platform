@@ -32,13 +32,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
@@ -78,6 +81,10 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
 
     @Inject
     private NotificationConfiguration notificationConfiguration;
+
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
 
     private ScheduledExecutorService processingService;
 
@@ -124,7 +131,8 @@ public class PrefilteringLiveNotificationEmailDispatcher implements Initializabl
         Instant instant = event.getDate().toInstant().plusMillis(this.grace);
         Duration duration = Duration.between(Instant.now(), instant);
 
-        this.processingService.schedule(this::dispatch, duration.getNano(), TimeUnit.NANOSECONDS);
+        this.processingService.schedule(new ExecutionContextRunnable(this::dispatch, this.componentManager),
+            duration.getSeconds(), TimeUnit.SECONDS);
     }
 
     private void dispatch()

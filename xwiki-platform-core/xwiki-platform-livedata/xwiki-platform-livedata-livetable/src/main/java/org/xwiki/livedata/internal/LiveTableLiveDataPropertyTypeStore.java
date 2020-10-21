@@ -40,7 +40,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
  * property types.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Named("liveTable/propertyType")

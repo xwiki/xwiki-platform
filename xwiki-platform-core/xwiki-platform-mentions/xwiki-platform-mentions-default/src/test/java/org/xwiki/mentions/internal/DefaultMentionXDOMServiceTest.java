@@ -39,6 +39,7 @@ import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.NewLineBlock;
@@ -58,6 +59,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.MARKDOWN_1_1;
@@ -71,7 +73,7 @@ import static org.xwiki.test.LogLevel.WARN;
  * @since 12.5RC1
  */
 @ComponentTest
-public class DefaultMentionXDOMServiceTest
+class DefaultMentionXDOMServiceTest
 {
     @InjectMockComponents
     private DefaultMentionXDOMService xdomService;
@@ -101,9 +103,10 @@ public class DefaultMentionXDOMServiceTest
         this.documentReferenceA = new DocumentReference("xwiki", "A", "A");
         this.documentReferenceB = new DocumentReference("ywiki", "B", "B");
         this.documentReferenceC = new DocumentReference("xwiki", "C", "C");
-        when(this.documentReferenceResolver.resolve("A")).thenReturn(this.documentReferenceA);
-        when(this.documentReferenceResolver.resolve("B")).thenReturn(this.documentReferenceB);
-        when(this.documentReferenceResolver.resolve("C")).thenReturn(this.documentReferenceC);
+        WikiReference wikiReference = new WikiReference("xwiki");
+        when(this.documentReferenceResolver.resolve("A", wikiReference)).thenReturn(this.documentReferenceA);
+        when(this.documentReferenceResolver.resolve("B", wikiReference)).thenReturn(this.documentReferenceB);
+        when(this.documentReferenceResolver.resolve("C", wikiReference)).thenReturn(this.documentReferenceC);
         when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }
 
@@ -121,61 +124,60 @@ public class DefaultMentionXDOMServiceTest
     }
 
     @Test
-    void countByIdentifierEmpty()
+    void groupAnchorsByUserReferenceEmpty()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(emptyList());
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(emptyList(), new WikiReference("xwiki"));
         assertTrue(actual.isEmpty());
     }
 
     @Test
-    void countByIdentifierOne()
+    void groupAnchorsByUserReferenceOne()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(singletonList(
-            initMentionMacro("A", "A1")
-        ));
-        HashMap<DocumentReference, List<String>> expected = new HashMap<>();
+        Map<DocumentReference, List<String>> actual =
+            this.xdomService.groupAnchorsByUserReference(singletonList(initMentionMacro("A", "A1")), new WikiReference("xwiki"));
+        Map<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceA, Collections.singletonList("A1"));
         assertEquals(expected, actual);
     }
 
     @Test
-    void countByIdentifierTwo()
+    void groupAnchorsByUserReferenceTwo()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("A", "A2")
-        ));
-        HashMap<DocumentReference, List<String>> expected = new HashMap<>();
+        ), new WikiReference("xwiki"));
+        Map<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceA, Arrays.asList("A1", "A2"));
         assertEquals(expected, actual);
     }
 
     @Test
-    void countByIdentifierThree()
+    void groupAnchorsByUserReferenceThree()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", "A1"),
             initMentionMacro("B", "B1"),
             initMentionMacro("A", "A2")
-        ));
-        HashMap<DocumentReference, List<String>> expected = new HashMap<>();
+        ), new WikiReference("xwiki"));
+        Map<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceB, Collections.singletonList("B1"));
         expected.put(this.documentReferenceA, Arrays.asList("A1", "A2"));
         assertEquals(expected, actual);
     }
 
     @Test
-    void countByIdentifierWithEmptyValues()
+    void groupAnchorsByUserReferenceWithEmptyValues()
     {
-        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+        Map<DocumentReference, List<String>> actual = this.xdomService.groupAnchorsByUserReference(asList(
             initMentionMacro("A", null),
             initMentionMacro("A", "A1"),
             initMentionMacro("A", ""),
             initMentionMacro("B", "B1"),
             initMentionMacro("A", "A2"),
             initMentionMacro("C", "")
-        ));
-        HashMap<DocumentReference, List<String>> expected = new HashMap<>();
+        ), new WikiReference("xwiki"));
+        Map<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceB, Collections.singletonList("B1"));
         expected.put(this.documentReferenceA, Arrays.asList(null, "A1", "", "A2"));
         expected.put(this.documentReferenceC, Collections.singletonList(""));
@@ -187,8 +189,7 @@ public class DefaultMentionXDOMServiceTest
     {
 
         Parser parser = mock(Parser.class);
-        when(this.componentManager.getInstance(Parser.class, MARKDOWN_1_1.toIdString())).thenReturn(
-            parser);
+        when(this.componentManager.getInstance(Parser.class, MARKDOWN_1_1.toIdString())).thenReturn(parser);
 
         XDOM xdom = new XDOM(emptyList());
         when(parser.parse(ArgumentMatchers.any(Reader.class))).thenReturn(xdom);

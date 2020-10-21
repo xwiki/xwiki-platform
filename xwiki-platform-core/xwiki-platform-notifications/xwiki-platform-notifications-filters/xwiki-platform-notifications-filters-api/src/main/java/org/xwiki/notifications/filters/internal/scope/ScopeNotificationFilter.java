@@ -76,15 +76,22 @@ public class ScopeNotificationFilter implements NotificationFilter
             return FilterPolicy.NO_EFFECT;
         }
 
+        // We don't check the inclusive filters if the target is specified since it means the notification already
+        // targets an user. We still check the exclusive one in case the user would want to avoid spam.
+        boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
+
         // We dismiss the event if the location is not watched or if the starting date of the location is after
         // the date of the event.
         // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
         // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
         // scope preference.
         WatchedLocationState state
-                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format);
-        if (!state.isWatched()
-                || (state.getStartingDate() != null && state.getStartingDate().after(event.getDate()))) {
+                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
+            checkInclusiveFilters);
+        if (!state.isWatched() || (state.getStartingDate() != null
+            // We only filter if the inclusive filter is strictly after the event date.
+            // Event that occurs at the same date that the inclusive filters are kept.
+            && state.getStartingDate().after(event.getDate()))) {
             return FilterPolicy.FILTER;
         }
 

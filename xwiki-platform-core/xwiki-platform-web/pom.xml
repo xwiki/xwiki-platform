@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>12.7-SNAPSHOT</version>
+    <version>12.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web</artifactId>
   <name>XWiki Platform - Web Resources</name>
@@ -94,10 +94,40 @@
         <artifactId>closure-compiler-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>minify</id>
+            <id>minify-strict</id>
             <goals>
               <goal>minify</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <!-- See the next execution for the reason we exclude these files. -->
+                <exclude>**/prototype.js</exclude>
+                <exclude>**/scriptaculous/dragdrop.js</exclude>
+                <exclude>**/panelWizard.js</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <!-- Some JavaScript files cannot run in strict mode so we minify them separately. -->
+          <execution>
+            <id>minify-non-strict</id>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <!-- Sets the read-only 'prototype' property of native objects. -->
+                <include>**/prototype.js</include>
+                <!-- Uses "arguments.callee" and "with" statement. -->
+                <include>**/scriptaculous/dragdrop.js</include>
+                <!-- Sets many global variables. -->
+                <include>**/panelWizard.js</include>
+              </includes>
+              <closureStrictModeInput>false</closureStrictModeInput>
+              <closureEmitUseStrict>false</closureEmitUseStrict>
+              <closureWarningLevels>
+                <es5Strict>WARNING</es5Strict>
+              </closureWarningLevels>
+            </configuration>
           </execution>
           <execution>
             <id>merge</id>
@@ -124,11 +154,6 @@
           </execution>
         </executions>
         <configuration>
-          <!-- Disable strict mode because Scriptaculous uses "arguments.callee" and "with" statement.. -->
-          <closureStrictModeInput>false</closureStrictModeInput>
-          <closureWarningLevels>
-            <es5Strict>WARNING</es5Strict>
-          </closureWarningLevels>
           <!-- TODO: Find a way to fix the path to the source file from the generated source maps. The following doesn't
             work but it makes the source paths shorter. -->
           <closureSourceMapLocationMappings>

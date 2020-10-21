@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * The component that provides the live data entries and their meta data.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Role
 @Unstable

@@ -32,7 +32,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.ModelBridge;
-import org.xwiki.refactoring.internal.job.AbstractEntityJob.Visitor;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -41,9 +40,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -107,7 +106,7 @@ public class EntityJobTest
     private NoopEntityJob job;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
@@ -119,7 +118,7 @@ public class EntityJobTest
     }
 
     @Test
-    public void getGroupPath()
+    void getGroupPath()
     {
         EntityRequest request = new EntityRequest();
 
@@ -129,23 +128,23 @@ public class EntityJobTest
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess")), job.getGroupPath());
 
         DocumentReference bobReference = new DocumentReference("dev", Arrays.asList("Path", "To"), "Bob");
-        request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, bobReference));
+        request.setEntityReferences(Arrays.asList(aliceReference, bobReference));
         initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring")), job.getGroupPath());
 
         DocumentReference carolReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Carol");
-        request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference));
+        request.setEntityReferences(Arrays.asList(aliceReference, carolReference));
         initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path", "To")), job.getGroupPath());
 
         DocumentReference daveReference = new DocumentReference("chess", Arrays.asList("Path", "To2"), "Dave");
-        request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference, daveReference));
+        request.setEntityReferences(Arrays.asList(aliceReference, carolReference, daveReference));
         initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path")), job.getGroupPath());
     }
 
     @Test
-    public void processEachEntity()
+    void processEachEntity()
     {
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Success");
         EntityRequest request = new EntityRequest();
@@ -156,7 +155,7 @@ public class EntityJobTest
     }
 
     @Test
-    public void visitDocuments()
+    void visitDocuments()
     {
         DocumentReference alice = new DocumentReference("foo", "Alice", "WebHome");
         DocumentReference alicePrefs = new DocumentReference("WebPreferences", alice.getLastSpaceReference());
@@ -175,20 +174,13 @@ public class EntityJobTest
         initialize(new EntityRequest());
 
         final List<DocumentReference> documentReferences = new ArrayList<>();
-        this.job.visitDocuments(spaceReference, new Visitor<DocumentReference>()
-        {
-            @Override
-            public void visit(DocumentReference documentReference)
-            {
-                documentReferences.add(documentReference);
-            }
-        });
+        this.job.visitDocuments(spaceReference, documentReference -> documentReferences.add(documentReference));
         // Space preferences documents are handled after their siblings.
         assertEquals(Arrays.asList(carolBio, aliceBio, bobBio, bob, bobPrefs, alice, alicePrefs), documentReferences);
     }
 
     @Test
-    public void hasAccess()
+    void hasAccess()
     {
         EntityRequest request = mock(EntityRequest.class);
         when(request.isCheckRights()).thenReturn(true, true, false);

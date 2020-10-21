@@ -19,47 +19,60 @@
  */
 package org.xwiki.ratings.internal;
 
-import java.sql.Date;
-import java.util.ArrayList;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
+import org.xwiki.ratings.RatingsException;
+import org.xwiki.ratings.RatingsManager.RatingQueryField;
+import org.xwiki.ratings.events.CreatedRatingEvent;
+import org.xwiki.ratings.events.DeletedRatingEvent;
+import org.xwiki.ratings.events.UpdatedRatingEvent;
+import org.xwiki.ratings.internal.averagerating.AverageRatingManager;
+import org.xwiki.ratings.internal.averagerating.DefaultAverageRating;
 import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceSerializer;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,22 +80,13 @@ import static org.mockito.Mockito.when;
  * Tests for {@link SolrRatingsManager}.
  *
  * @version $Id$
+ * @since 12.9RC1
  */
 @ComponentTest
 public class SolrRatingsManagerTest
 {
     @InjectMockComponents
-    private SolrRatingsManager solrRatingsManager;
-
-    @MockComponent
-    @Named("document")
-    protected UserReferenceSerializer<DocumentReference> userReferenceSerializer;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @MockComponent
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private SolrRatingsManager manager;
 
     @MockComponent
     private SolrUtils solrUtils;
@@ -90,686 +94,594 @@ public class SolrRatingsManagerTest
     @MockComponent
     private Solr solr;
 
+    @MockComponent
+    private ObservationManager observationManager;
+
+    @MockComponent
+    private RatingsConfiguration configuration;
+
+    @MockComponent
+    private AverageRatingManager averageRatingManager;
+
     @Mock
     private SolrClient solrClient;
 
-    DocumentReference ratedPageReference;
-    DocumentReference fooDocumentReference;
-    DocumentReference barDocumentReference;
-
     @Mock
-    UserReference fooUserReference;
+    private SolrDocumentList documentList;
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
 
     @BeforeEach
-    void beforeEach() throws SolrException
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
-        when(this.solr.getClient(RatingCoreSolrInitializer.NAME)).thenReturn(solrClient);
-        when(solrUtils.get(any(), any())).then(invocationOnMock -> {
-            String parameterName = invocationOnMock.getArgument(0);
-            SolrDocument solrDocument = invocationOnMock.getArgument(1);
-            return solrDocument.get(parameterName);
-        });
-        when(solrUtils.getId(any())).then(invocationOnMock -> {
-            SolrDocument solrDocument = invocationOnMock.getArgument(0);
-            return solrDocument.get("id");
-        });
-
-        ratedPageReference = new DocumentReference("xwiki", "Foo", "RatedPage");
-        when(this.entityReferenceSerializer.serialize(ratedPageReference)).thenReturn("xwiki:Foo.RatedPage");
-        when(this.documentReferenceResolver.resolve("xwiki:Foo.RatedPage")).thenReturn(ratedPageReference);
-
-        fooDocumentReference = new DocumentReference("xwiki", "XWiki", "Foo");
-        when(this.entityReferenceSerializer.serialize(fooDocumentReference)).thenReturn("xwiki:XWiki.Foo");
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Foo")).thenReturn(fooDocumentReference);
-
-        barDocumentReference = new DocumentReference("xwiki", "XWiki", "Bar");
-        when(this.entityReferenceSerializer.serialize(barDocumentReference)).thenReturn("xwiki:XWiki.Bar");
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Bar")).thenReturn(barDocumentReference);
-
-        when(this.solrUtils.toFilterQueryString(any())).then(invocationOnMock -> {
-            String value = invocationOnMock.getArgument(0);
-            return value.replaceAll("\\:", "\\\\:");
-        });
-
-        when(this.userReferenceSerializer.serialize(fooUserReference)).thenReturn(fooDocumentReference);
-    }
-
-    @Test
-    void getRatingsFromDocumentReference() throws Exception
-    {
-        int start = 12;
-        int count = 20;
-
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:Foo.RatedPage)")
-            .setStart(start)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(count);
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "id-doc-1");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 1);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 4);
-        solrDocumentList.add(new SolrDocument(document));
-
-        document = new HashMap<>();
-        document.put("id", "id-doc-2");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 12);
-        document.put("date", Date.valueOf("2018-12-26"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 1);
-        solrDocumentList.add(new SolrDocument(document));
-
-        document = new HashMap<>();
-        document.put("id", "id-doc-3");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 31);
-        document.put("date", Date.valueOf("2020-07-21"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 3);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        DocumentReference fooDocumentReference = new DocumentReference("xwiki", "XWiki", "Foo");
-        DocumentReference barDocumentReference = new DocumentReference("xwiki", "XWiki", "Bar");
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Foo")).thenReturn(fooDocumentReference);
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Bar")).thenReturn(barDocumentReference);
-
-        List<Rating> expectedRatings = new ArrayList<>();
-        SolrRating rating = new SolrRating(ratedPageReference, "id-doc-1", 1);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(4);
-        rating.setAuthor(barDocumentReference);
-        expectedRatings.add(rating);
-
-        rating = new SolrRating(ratedPageReference, "id-doc-2", 12);
-        rating.setDate(Date.valueOf("2018-12-26"));
-        rating.setVote(1);
-        rating.setAuthor(fooDocumentReference);
-        expectedRatings.add(rating);
-
-        rating = new SolrRating(ratedPageReference, "id-doc-3", 31);
-        rating.setDate(Date.valueOf("2020-07-21"));
-        rating.setVote(3);
-        rating.setAuthor(barDocumentReference);
-        expectedRatings.add(rating);
-
-        assertEquals(expectedRatings, this.solrRatingsManager.getRatings(ratedPageReference, start, count, true));
-        verify(this.solrClient).query(any());
-    }
-
-    @Test
-    void getRatingsFromDocumentReferenceWithCount0() throws Exception
-    {
-        int start = 0;
-        int count = 0;
-
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:Foo.RatedPage)")
-            .setStart(start)
-            .setSort("id", SolrQuery.ORDER.asc);
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "id-doc-1");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 1);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 4);
-        solrDocumentList.add(new SolrDocument(document));
-
-        document = new HashMap<>();
-        document.put("id", "id-doc-2");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 12);
-        document.put("date", Date.valueOf("2018-12-26"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 1);
-        solrDocumentList.add(new SolrDocument(document));
-
-        document = new HashMap<>();
-        document.put("id", "id-doc-3");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 31);
-        document.put("date", Date.valueOf("2020-07-21"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 3);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        DocumentReference fooDocumentReference = new DocumentReference("xwiki", "XWiki", "Foo");
-        DocumentReference barDocumentReference = new DocumentReference("xwiki", "XWiki", "Bar");
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Foo")).thenReturn(fooDocumentReference);
-        when(this.documentReferenceResolver.resolve("xwiki:XWiki.Bar")).thenReturn(barDocumentReference);
-
-        List<Rating> expectedRatings = new ArrayList<>();
-        SolrRating rating = new SolrRating(ratedPageReference, "id-doc-1", 1);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(4);
-        rating.setAuthor(barDocumentReference);
-        expectedRatings.add(rating);
-
-        rating = new SolrRating(ratedPageReference, "id-doc-2", 12);
-        rating.setDate(Date.valueOf("2018-12-26"));
-        rating.setVote(1);
-        rating.setAuthor(fooDocumentReference);
-        expectedRatings.add(rating);
-
-        rating = new SolrRating(ratedPageReference, "id-doc-3", 31);
-        rating.setDate(Date.valueOf("2020-07-21"));
-        rating.setVote(3);
-        rating.setAuthor(barDocumentReference);
-        expectedRatings.add(rating);
-
-        assertEquals(expectedRatings, this.solrRatingsManager.getRatings(ratedPageReference, start, count, true));
-        verify(this.solrClient).query(any());
-    }
-
-    @Test
-    void getRatingsFromUserReference() throws Exception
-    {
-        int start = 48;
-        int count = 2;
-
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(author:xwiki\\:XWiki.Foo)")
-            .setStart(start)
-            .setSort("id", SolrQuery.ORDER.desc)
-            .setRows(count);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "id-doc-1");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 1);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 4);
-        solrDocumentList.add(new SolrDocument(document));
-
-        document = new HashMap<>();
-        document.put("id", "id-doc-2");
-        document.put("parent", "xwiki:XWiki.Bar");
-        document.put("ratingId", 12);
-        document.put("date", Date.valueOf("2018-12-26"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 1);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        List<Rating> expectedRatings = new ArrayList<>();
-        SolrRating rating = new SolrRating(ratedPageReference, "id-doc-1", 1);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(4);
-        rating.setAuthor(fooDocumentReference);
-        expectedRatings.add(rating);
-
-        rating = new SolrRating(barDocumentReference, "id-doc-2", 12);
-        rating.setDate(Date.valueOf("2018-12-26"));
-        rating.setVote(1);
-        rating.setAuthor(fooDocumentReference);
-        expectedRatings.add(rating);
-
-        assertEquals(expectedRatings, this.solrRatingsManager.getRatings(fooUserReference, start, count, false));
-        verify(this.solrClient).query(any());
-    }
-
-    @Test
-    void getRatingGlobalId() throws Exception
-    {
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(id:myId)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "myId");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 1);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 4);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(ratedPageReference, "myId", 1);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(4);
-        rating.setAuthor(fooDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.getRating("myId"));
-        verify(this.solrClient).query(any());
-    }
-
-    @Test
-    void getRatingDocumentAndLocalId() throws Exception
-    {
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:XWiki.Foo) AND filter(ratingId:12)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "myId-12");
-        document.put("parent", "xwiki:XWiki.Foo");
-        document.put("ratingId", 12);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 0);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(fooDocumentReference, "myId-12", 12);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(0);
-        rating.setAuthor(barDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.getRating(fooDocumentReference, 12));
-        verify(this.solrClient).query(any());
-    }
-
-    @Test
-    void getRatingDocumentAndAuthor() throws Exception
-    {
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:XWiki.Foo) AND filter(author:xwiki\\:XWiki.Bar)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return null;
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "myId-12");
-        document.put("parent", "xwiki:XWiki.Foo");
-        document.put("ratingId", 12);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 0);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(fooDocumentReference, "myId-12", 12);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(0);
-        rating.setAuthor(barDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.getRating(fooDocumentReference, barDocumentReference));
-        verify(this.solrClient).query(any());
-    }
-
-    /**
-     * Test setting a rating to a document that has never been rated.
-     */
-    @Test
-    void setRatingNewAuthorNewDoc() throws Exception
-    {
-        SolrInputDocument expectedInputDocument = new SolrInputDocument();
+        this.manager.setRatingConfiguration(configuration);
+        when(this.solrUtils.toFilterQueryString(any()))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
+        when(this.solrUtils.toFilterQueryString(any(), any()))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
+        when(this.solrUtils.getId(any()))
+            .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
+        when(this.solrUtils.get(any(), any()))
+            .then(invocationOnMock ->
+                ((SolrDocument) invocationOnMock.getArgument(1)).get((String) invocationOnMock.getArgument(0)));
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);
             SolrInputDocument inputDocument = invocationOnMock.getArgument(2);
-            if (fieldName.equals("date")) {
-                assertNotNull(fieldValue);
-                assertTrue(fieldValue instanceof java.util.Date);
-                expectedInputDocument.setField("date", fieldValue);
-            }
             inputDocument.setField(fieldName, fieldValue);
             return null;
-        }).when(solrUtils).set(any(String.class), any(Object.class), any(SolrInputDocument.class));
-
+        }).when(this.solrUtils).set(any(), any(Object.class), any());
         doAnswer(invocationOnMock -> {
             Object fieldValue = invocationOnMock.getArgument(0);
             SolrInputDocument inputDocument = invocationOnMock.getArgument(1);
             inputDocument.setField("id", fieldValue);
             return null;
-        }).when(solrUtils).setId(any(), any());
-
-
-        expectedInputDocument.setField("id", "xwiki:Foo.RatedPage_0");
-        expectedInputDocument.setField("ratingId", 0);
-        expectedInputDocument.setField("parent", "xwiki:Foo.RatedPage");
-        expectedInputDocument.setField("author", "xwiki:XWiki.Bar");
-        expectedInputDocument.setField("vote", 3);
-
-        doAnswer(invocationOnMock -> {
-            SolrInputDocument inputDoc = invocationOnMock.getArgument(0);
-            assertEquals(expectedInputDocument.toString(), inputDoc.toString());
-            return null;
-        }).when(this.solrClient).add(any(SolrInputDocument.class));
-
-        QueryResponse queryResponse = mock(QueryResponse.class);
-        SolrQuery solrQuery = new SolrQuery()
-            .addFilterQuery("filter(id:xwiki\\:Foo.RatedPage_0)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (solrQuery.toQueryString().equals(query.toQueryString())) {
-                return queryResponse;
-            }
-            return mock(QueryResponse.class);
-        });
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "xwiki:Foo.RatedPage_0");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 0);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 3);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(queryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(ratedPageReference, "xwiki:Foo.RatedPage_0", 0);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(3);
-        rating.setAuthor(barDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.setRating(ratedPageReference, barDocumentReference, 3));
-
-        // 3 times:
-        //  - first: to check if the author already voted for the doc
-        //  - second: to retrieve the ratingId if anyone already voted for the doc
-        //  - third: to retrieve the actual rating performed after the vote is committed.
-        verify(this.solrClient, times(3)).query(any());
-        verify(this.solrClient).add(any(SolrInputDocument.class));
-        verify(this.solrClient).commit();
-    }
-
-    /**
-     * Test setting a rating to a document that has already been rated
-     */
-    @Test
-    void setRatingNewAuthorDoc() throws Exception
-    {
-        SolrInputDocument expectedInputDocument = new SolrInputDocument();
+        }).when(this.solrUtils).setId(any(), any());
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);
-            SolrInputDocument inputDocument = invocationOnMock.getArgument(2);
-            if (fieldName.equals("date")) {
-                assertNotNull(fieldValue);
-                assertTrue(fieldValue instanceof java.util.Date);
-                expectedInputDocument.setField("date", fieldValue);
-            }
+            Type type = invocationOnMock.getArgument(2);
+            SolrInputDocument inputDocument = invocationOnMock.getArgument(3);
             inputDocument.setField(fieldName, fieldValue);
             return null;
-        }).when(solrUtils).set(any(String.class), any(Object.class), any(SolrInputDocument.class));
-
-        QueryResponse ratingIdQueryResponse = mock(QueryResponse.class);
-        SolrQuery ratingIdSolrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:Foo.RatedPage)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.desc)
-            .setRows(1);
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "xwiki:Foo.RatedPage_42");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 42);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Foo");
-        document.put("vote", 1);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(ratingIdQueryResponse.getResults()).thenReturn(solrDocumentList);
-
-        doAnswer(invocationOnMock -> {
-            Object fieldValue = invocationOnMock.getArgument(0);
-            SolrInputDocument inputDocument = invocationOnMock.getArgument(1);
-            inputDocument.setField("id", fieldValue);
-            return null;
-        }).when(solrUtils).setId(any(), any());
-
-
-        expectedInputDocument.setField("id", "xwiki:Foo.RatedPage_43");
-        expectedInputDocument.setField("ratingId", 43);
-        expectedInputDocument.setField("parent", "xwiki:Foo.RatedPage");
-        expectedInputDocument.setField("author", "xwiki:XWiki.Bar");
-        expectedInputDocument.setField("vote", 5);
-
-        doAnswer(invocationOnMock -> {
-            SolrInputDocument inputDoc = invocationOnMock.getArgument(0);
-            assertEquals(expectedInputDocument.toString(), inputDoc.toString());
-            return null;
-        }).when(this.solrClient).add(any(SolrInputDocument.class));
-
-        QueryResponse finalQueryResponse = mock(QueryResponse.class);
-        SolrQuery finalSolrQuery = new SolrQuery()
-            .addFilterQuery("filter(id:xwiki\\:Foo.RatedPage_43)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (ratingIdSolrQuery.toQueryString().equals(query.toQueryString())) {
-                return ratingIdQueryResponse;
-            } else if (finalSolrQuery.toQueryString().equals(query.toQueryString())) {
-                return finalQueryResponse;
-            }
-            return mock(QueryResponse.class);
-        });
-
-        solrDocumentList = new SolrDocumentList();
-        document = new HashMap<>();
-        document.put("id", "xwiki:Foo.RatedPage_43");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 43);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 5);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(finalQueryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(ratedPageReference, "xwiki:Foo.RatedPage_43", 43);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(5);
-        rating.setAuthor(barDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.setRating(ratedPageReference, barDocumentReference, 5));
-
-        // 3 times:
-        //  - first: to check if the author already voted for the doc
-        //  - second: to retrieve the ratingId if anyone already voted for the doc
-        //  - third: to retrieve the actual rating performed after the vote is committed.
-        verify(this.solrClient, times(3)).query(any());
-        verify(this.solrClient).add(any(SolrInputDocument.class));
-        verify(this.solrClient).commit();
+        }).when(this.solrUtils).setString(any(), any(Object.class), any(), any());
+        when(this.configuration.getAverageRatingStorageHint()).thenReturn("averageHint");
+        componentManager.registerComponent(AverageRatingManager.class, "averageHint", this.averageRatingManager);
     }
 
-    /**
-     * Test setting a rating to a document that the author already rated
-     */
-    @Test
-    void setRatingAuthorDoc() throws Exception
+    private QueryResponse prepareSolrClientQueryWhenStatement(SolrClient solrClient, SolrQuery expectedQuery)
+        throws Exception
     {
+        QueryResponse response = mock(QueryResponse.class);
+        when(solrClient.query(any())).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            assertEquals(expectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(expectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(expectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(expectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(expectedQuery.getSorts(), givenQuery.getSorts());
+            return response;
+        });
+        return response;
+    }
+
+    @Test
+    void countRatings() throws Exception
+    {
+        UserReference userReference = mock(UserReference.class);
+        EntityReference reference = mock(EntityReference.class);
+        Map<RatingQueryField, Object> queryParameters = new LinkedHashMap<>();
+        queryParameters.put(RatingQueryField.ENTITY_REFERENCE, reference);
+        queryParameters.put(RatingQueryField.USER_REFERENCE, userReference);
+        queryParameters.put(RatingQueryField.SCALE, 12);
+
+        String managerId = "managerTest";
+        this.manager.setIdentifer(managerId);
+        when(this.configuration.hasDedicatedCore()).thenReturn(true);
+        when(this.solr.getClient(managerId)).thenReturn(this.solrClient);
+
+        when(reference.toString()).thenReturn("block:toto");
+        when(userReference.toString()).thenReturn("user:Foobar");
+        String query = "filter(reference:block\\:toto) AND filter(author:user\\:Foobar) "
+            + "AND filter(scale:12) AND filter(managerId:managerTest)";
+        SolrQuery expectedQuery = new SolrQuery().addFilterQuery(query).setStart(0).setRows(0);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+        when(response.getResults()).thenReturn(this.documentList);
+        when(this.documentList.getNumFound()).thenReturn(455L);
+
+        assertEquals(455L, this.manager.countRatings(queryParameters));
+    }
+
+    @Test
+    void getRatings() throws Exception
+    {
+        UserReference userReference = mock(UserReference.class);
+        Map<RatingQueryField, Object> queryParameters = new LinkedHashMap<>();
+        queryParameters.put(RatingQueryField.USER_REFERENCE, userReference);
+        queryParameters.put(RatingQueryField.SCALE, "6");
+
+        String managerId = "otherId";
+        this.manager.setIdentifer(managerId);
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        when(userReference.toString()).thenReturn("user:barfoo");
+        String query = "filter(author:user\\:barfoo) AND filter(scale:6) AND filter(managerId:otherId)";
+
+        int offset = 12;
+        int limit = 42;
+        String orderField = RatingQueryField.USER_REFERENCE.getFieldName();
+        boolean asc = false;
+        SolrQuery expectedQuery = new SolrQuery().addFilterQuery(query)
+            .setStart(offset)
+            .setRows(limit)
+            .addSort(orderField, SolrQuery.ORDER.desc);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+        when(response.getResults()).thenReturn(this.documentList);
+
+        Map<String, Object> documentResult = new HashMap<>();
+        documentResult.put("id", "result1");
+        documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
+        documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(1));
+        documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(1111));
+        documentResult.put(RatingQueryField.VOTE.getFieldName(), 8);
+        documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
+        documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Foo");
+        EntityReference reference1 = mock(EntityReference.class);
+        documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
+        SolrDocument result1 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result1, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result1, EntityReference.class))
+            .thenReturn(reference1);
+
+        documentResult = new HashMap<>();
+        documentResult.put("id", "result2");
+        documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
+        documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(2));
+        documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(2222));
+        documentResult.put(RatingQueryField.VOTE.getFieldName(), 1);
+        documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
+        documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Bar");
+        EntityReference reference2 = mock(EntityReference.class);
+        documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
+        SolrDocument result2 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result2, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result2, EntityReference.class))
+            .thenReturn(reference2);
+
+        documentResult = new HashMap<>();
+        documentResult.put("id", "result3");
+        documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), "otherId");
+        documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(3));
+        documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(3333));
+        documentResult.put(RatingQueryField.VOTE.getFieldName(), 3);
+        documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
+        documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Baz");
+        EntityReference reference3 = mock(EntityReference.class);
+        documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
+        SolrDocument result3 = new SolrDocument(documentResult);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result3, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result3, EntityReference.class))
+            .thenReturn(reference3);
+
+        when(this.documentList.stream()).thenReturn(Stream.of(result1, result2, result3));
+
+        List<Rating> expectedRatings = Arrays.asList(
+            new DefaultRating("result1")
+                .setManagerId("otherId")
+                .setCreatedAt(new Date(1))
+                .setUpdatedAt(new Date(1111))
+                .setVote(8)
+                .setReference(reference1)
+                .setAuthor(userReference)
+                .setScaleUpperBound(10),
+
+            new DefaultRating("result2")
+                .setManagerId("otherId")
+                .setCreatedAt(new Date(2))
+                .setUpdatedAt(new Date(2222))
+                .setVote(1)
+                .setReference(reference2)
+                .setAuthor(userReference)
+                .setScaleUpperBound(10),
+
+            new DefaultRating("result3")
+                .setManagerId("otherId")
+                .setCreatedAt(new Date(3))
+                .setUpdatedAt(new Date(3333))
+                .setVote(3)
+                .setReference(reference3)
+                .setAuthor(userReference)
+                .setScaleUpperBound(10)
+        );
+        assertEquals(expectedRatings,
+            this.manager.getRatings(queryParameters, offset, limit, RatingQueryField.USER_REFERENCE, asc));
+    }
+
+    @Test
+    void getAverageRating() throws Exception
+    {
+        String managerId = "averageId2";
+        this.manager.setIdentifer(managerId);
+        EntityReference reference = new EntityReference("xwiki:Something", EntityType.PAGE);
+        AverageRating expectedAverageRating = new DefaultAverageRating("average1")
+            .setAverageVote(2.341f)
+            .setTotalVote(242)
+            .setUpdatedAt(new Date(42))
+            .setManagerId(managerId)
+            .setScaleUpperBound(12)
+            .setReference(reference);
+        when(this.averageRatingManager.getAverageRating(reference)).thenReturn(expectedAverageRating);
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        AverageRating averageRating = this.manager.getAverageRating(reference);
+        assertEquals(expectedAverageRating, averageRating);
+    }
+
+    @Test
+    void removeRatingNotExisting() throws Exception
+    {
+        String ratingingId = "ratinging389";
+        String managerId = "removeRating1";
+        this.manager.setIdentifer(managerId);
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        String query = "filter(id:ratinging389) AND filter(managerId:removeRating1)";
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(query)
+            .setStart(0)
+            .setRows(1)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+        when(response.getResults()).thenReturn(this.documentList);
+        assertFalse(this.manager.removeRating(ratingingId));
+        verify(this.solrClient, never()).deleteById(any(String.class));
+    }
+
+    @Test
+    void removeRatingExisting() throws Exception
+    {
+        String ratingingId = "ratinging429";
+        String managerId = "removeRating2";
+        this.manager.setIdentifer(managerId);
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        String query = "filter(id:ratinging429) AND filter(managerId:removeRating2)";
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(query)
+            .setStart(0)
+            .setRows(1)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+        when(response.getResults()).thenReturn(this.documentList);
+        when(this.documentList.isEmpty()).thenReturn(false);
+
+        Map<String, Object> documentResult = new HashMap<>();
+        documentResult.put("id", ratingingId);
+        documentResult.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+        documentResult.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(1));
+        documentResult.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(1111));
+        documentResult.put(RatingQueryField.VOTE.getFieldName(), 8);
+        documentResult.put(RatingQueryField.SCALE.getFieldName(), 10);
+        documentResult.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "attachment:Foo");
+        EntityReference reference1 = mock(EntityReference.class);
+        documentResult.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:barfoo");
+        UserReference userReference = mock(UserReference.class);
+        SolrDocument result1 = new SolrDocument(documentResult);
+        when(this.documentList.stream()).thenReturn(Collections.singletonList(result1).stream());
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), result1, UserReference.class))
+            .thenReturn(userReference);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), result1, EntityReference.class))
+            .thenReturn(reference1);
+
+        Rating rating = new DefaultRating(ratingingId)
+            .setReference(reference1)
+            .setManagerId(managerId)
+            .setCreatedAt(new Date(1))
+            .setUpdatedAt(new Date(1111))
+            .setAuthor(userReference)
+            .setScaleUpperBound(10)
+            .setVote(8);
+
+        // Average rating handling
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        assertTrue(this.manager.removeRating(ratingingId));
+        verify(this.solrClient).deleteById(ratingingId);
+        verify(this.solrClient).commit();
+        verify(this.observationManager).notify(any(DeletedRatingEvent.class), eq(managerId), eq(rating));
+        verify(this.configuration).isAverageStored();
+        verify(this.averageRatingManager).removeVote(reference1, 8);
+    }
+
+    @Test
+    void saveRatingOutScale()
+    {
+        when(this.configuration.getScaleUpperBound()).thenReturn(5);
+        this.manager.setIdentifer("saveRating1");
+        RatingsException exception = assertThrows(RatingsException.class, () -> {
+            this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), -1);
+        });
+        assertEquals("The vote [-1] is out of scale [5] for [saveRating1] rating manager.", exception.getMessage());
+
+        exception = assertThrows(RatingsException.class, () -> {
+            this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), 8);
+        });
+        assertEquals("The vote [8] is out of scale [5] for [saveRating1] rating manager.", exception.getMessage());
+    }
+
+    @Test
+    void saveRatingZeroNotExisting() throws Exception
+    {
+        String managerId = "saveRating2";
+        this.manager.setIdentifer(managerId);
+        int scale = 10;
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
+        UserReference userReference = mock(UserReference.class);
+        when(userReference.toString()).thenReturn("user:Toto");
+
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating2)";
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(1)
+            .addSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+
+        // We don't mock stream behaviour, so that the returned result is empty.
+        when(response.getResults()).thenReturn(this.documentList);
+
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        // Check if we don't store 0
+        when(this.configuration.isZeroStored()).thenReturn(false);
+        assertNull(this.manager.saveRating(reference, userReference, 0));
+
+        // Check if we store 0
+        when(this.configuration.isZeroStored()).thenReturn(true);
+        // Handle Average rating
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        DefaultRating expectedRating = new DefaultRating("")
+            .setManagerId(managerId)
+            .setReference(reference)
+            .setCreatedAt(new Date())
+            .setUpdatedAt(new Date())
+            .setVote(0)
+            .setScaleUpperBound(scale)
+            .setAuthor(userReference);
+
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
-        doAnswer(invocationOnMock -> {
-            String fieldName = invocationOnMock.getArgument(0);
-            Object fieldValue = invocationOnMock.getArgument(1);
-            SolrInputDocument inputDocument = invocationOnMock.getArgument(2);
-            if (fieldName.equals("date")) {
-                assertNotNull(fieldValue);
-                assertTrue(fieldValue instanceof java.util.Date);
-                expectedInputDocument.setField("date", fieldValue);
-            }
-            inputDocument.setField(fieldName, fieldValue);
+        expectedInputDocument.setField("id", "");
+        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date());
+        expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
+        expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
+        expectedInputDocument.setField(RatingQueryField.SCALE.getFieldName(), scale);
+        expectedInputDocument.setField(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+        expectedInputDocument.setField(RatingQueryField.VOTE.getFieldName(), 0);
+
+        when(this.solrClient.add(any(SolrInputDocument.class))).then(invocationOnMock -> {
+            SolrInputDocument obtainedInputDocument = invocationOnMock.getArgument(0);
+            Date updatedAt = (Date) obtainedInputDocument.getFieldValue(RatingQueryField.UPDATED_DATE.getFieldName());
+            Date createdAt = (Date) obtainedInputDocument.getFieldValue(RatingQueryField.CREATED_DATE.getFieldName());
+            String id = (String) obtainedInputDocument.getFieldValue("id");
+            expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), createdAt);
+            expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), updatedAt);
+            expectedInputDocument.setField("id", id);
+
+            expectedRating
+                .setId(id)
+                .setCreatedAt(createdAt)
+                .setUpdatedAt(updatedAt);
+            // We rely on the toString method since there's no proper equals method
+            assertEquals(expectedInputDocument.toString(), obtainedInputDocument.toString());
             return null;
-        }).when(solrUtils).set(any(String.class), any(Object.class), any(SolrInputDocument.class));
-
-        QueryResponse originalRatingQueryResponse = mock(QueryResponse.class);
-        SolrQuery originalRatingSolrQuery = new SolrQuery()
-            .addFilterQuery("filter(parent:xwiki\\:Foo.RatedPage) AND filter(author:xwiki\\:XWiki.Bar)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        SolrDocumentList solrDocumentList = new SolrDocumentList();
-        Map<String, Object> document = new HashMap<>();
-        document.put("id", "xwiki:Foo.RatedPage_42");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 42);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 2);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(originalRatingQueryResponse.getResults()).thenReturn(solrDocumentList);
-
-        doAnswer(invocationOnMock -> {
-            Object fieldValue = invocationOnMock.getArgument(0);
-            SolrInputDocument inputDocument = invocationOnMock.getArgument(1);
-            inputDocument.setField("id", fieldValue);
-            return null;
-        }).when(solrUtils).setId(any(), any());
-
-
-        expectedInputDocument.setField("id", "xwiki:Foo.RatedPage_42");
-        expectedInputDocument.setField("ratingId", 42);
-        expectedInputDocument.setField("parent", "xwiki:Foo.RatedPage");
-        expectedInputDocument.setField("author", "xwiki:XWiki.Bar");
-        expectedInputDocument.setField("vote", 1);
-
-        doAnswer(invocationOnMock -> {
-            SolrInputDocument inputDoc = invocationOnMock.getArgument(0);
-            assertEquals(expectedInputDocument.toString(), inputDoc.toString());
-            return null;
-        }).when(this.solrClient).add(any(SolrInputDocument.class));
-
-        QueryResponse finalQueryResponse = mock(QueryResponse.class);
-        SolrQuery finalSolrQuery = new SolrQuery()
-            .addFilterQuery("filter(id:xwiki\\:Foo.RatedPage_42)")
-            .setStart(0)
-            .setSort("id", SolrQuery.ORDER.asc)
-            .setRows(1);
-
-        when(this.solrClient.query(any())).then(invocationOnMock -> {
-            SolrQuery query = invocationOnMock.getArgument(0);
-            if (originalRatingSolrQuery.toQueryString().equals(query.toQueryString())) {
-                return originalRatingQueryResponse;
-            } else if (finalSolrQuery.toQueryString().equals(query.toQueryString())) {
-                return finalQueryResponse;
-            }
-            return mock(QueryResponse.class);
         });
 
-        solrDocumentList = new SolrDocumentList();
-        document = new HashMap<>();
-        document.put("id", "xwiki:Foo.RatedPage_42");
-        document.put("parent", "xwiki:Foo.RatedPage");
-        document.put("ratingId", 42);
-        document.put("date", Date.valueOf("2020-05-01"));
-        document.put("author", "xwiki:XWiki.Bar");
-        document.put("vote", 1);
-        solrDocumentList.add(new SolrDocument(document));
-
-        when(finalQueryResponse.getResults()).thenReturn(solrDocumentList);
-
-        SolrRating rating = new SolrRating(ratedPageReference, "xwiki:Foo.RatedPage_42", 42);
-        rating.setDate(Date.valueOf("2020-05-01"));
-        rating.setVote(1);
-        rating.setAuthor(barDocumentReference);
-
-        assertEquals(rating, this.solrRatingsManager.setRating(ratedPageReference, barDocumentReference, 1));
-
-        // 2 times:
-        //  - first: to check if the author already voted for the doc
-        //  - second: to retrieve the actual rating performed after the vote is committed.
-        verify(this.solrClient, times(2)).query(any());
+        assertEquals(expectedRating, this.manager.saveRating(reference, userReference, 0));
         verify(this.solrClient).add(any(SolrInputDocument.class));
         verify(this.solrClient).commit();
+        verify(this.observationManager).notify(any(CreatedRatingEvent.class), eq(managerId), eq(expectedRating));
+        verify(this.averageRatingManager).addVote(reference, 0);
     }
 
     @Test
-    void removeRating() throws Exception
+    void saveRatingExisting() throws Exception
     {
-        Rating rating = mock(Rating.class);
-        when(rating.getGlobalRatingId()).thenReturn("globalRatingId");
-        UpdateResponse updateResponse = mock(UpdateResponse.class);
-        when(this.solrClient.commit()).thenReturn(updateResponse);
-        when(updateResponse.getStatus()).thenReturn(200);
-        assertTrue(this.solrRatingsManager.removeRating(rating));
-        verify(this.solrClient).deleteById("globalRatingId");
-        verify(this.solrClient).commit();
+        String managerId = "saveRating3";
+        this.manager.setIdentifer(managerId);
+        int scale = 8;
+        int newVote = 2;
+        int oldVote = 3;
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
+        UserReference userReference = mock(UserReference.class);
+        when(userReference.toString()).thenReturn("user:Toto");
 
-        when(updateResponse.getStatus()).thenReturn(400);
-        assertFalse(this.solrRatingsManager.removeRating(rating));
-        verify(this.solrClient, times(2)).deleteById("globalRatingId");
-        verify(this.solrClient, times(2)).commit();
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating3)";
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(1)
+            .addSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+
+        // We don't mock stream behaviour, so that the returned result is empty.
+        when(response.getResults()).thenReturn(this.documentList);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("id", "myRating");
+        fieldMap.put(RatingQueryField.VOTE.getFieldName(), oldVote);
+        fieldMap.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
+        fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
+        fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
+        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
+        fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+
+        SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument, EntityReference.class))
+            .thenReturn(reference);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument, UserReference.class))
+            .thenReturn(userReference);
+        when(this.documentList.stream()).thenReturn(Collections.singletonList(solrDocument).stream());
+
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        when(this.configuration.isZeroStored()).thenReturn(false);
+
+        // Handle Average rating
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        DefaultRating expectedRating = new DefaultRating("myRating")
+            .setManagerId(managerId)
+            .setReference(reference)
+            .setCreatedAt(new Date(422))
+            .setUpdatedAt(new Date())
+            .setVote(newVote)
+            .setScaleUpperBound(scale)
+            .setAuthor(userReference);
+
+        SolrInputDocument expectedInputDocument = new SolrInputDocument();
+        expectedInputDocument.setField("id", "myRating");
+        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
+        expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
+        expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
+        expectedInputDocument.setField(RatingQueryField.SCALE.getFieldName(), scale);
+        expectedInputDocument.setField(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+        expectedInputDocument.setField(RatingQueryField.VOTE.getFieldName(), newVote);
+
+        when(this.solrClient.add(any(SolrInputDocument.class))).then(invocationOnMock -> {
+            SolrInputDocument obtainedInputDocument = invocationOnMock.getArgument(0);
+            Date updatedAt = (Date) obtainedInputDocument.getFieldValue(RatingQueryField.UPDATED_DATE.getFieldName());
+            expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), updatedAt);
+
+            expectedRating
+                .setUpdatedAt(updatedAt);
+            // We rely on the toString method since there's no proper equals method
+            assertEquals(expectedInputDocument.toString(), obtainedInputDocument.toString());
+            return null;
+        });
+
+        assertEquals(expectedRating, this.manager.saveRating(reference, userReference, newVote));
+        verify(this.solrClient).add(any(SolrInputDocument.class));
+        verify(this.solrClient).commit();
+        verify(this.observationManager).notify(new UpdatedRatingEvent(expectedRating, oldVote), managerId,
+            expectedRating);
+        verify(this.averageRatingManager).updateVote(reference, oldVote, newVote);
+    }
+
+    @Test
+    void saveRatingExistingToZero() throws Exception
+    {
+        String managerId = "saveRating4";
+        this.manager.setIdentifer(managerId);
+        int scale = 8;
+        int newVote = 0;
+        int oldVote = 3;
+        when(this.configuration.getScaleUpperBound()).thenReturn(scale);
+        EntityReference reference = mock(EntityReference.class);
+        when(reference.toString()).thenReturn("wiki:foobar");
+        UserReference userReference = mock(UserReference.class);
+        when(userReference.toString()).thenReturn("user:Toto");
+
+        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+            + "AND filter(managerId:saveRating4)";
+        SolrQuery firstExpectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(1)
+            .addSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("id", "myRating");
+        fieldMap.put(RatingQueryField.VOTE.getFieldName(), oldVote);
+        fieldMap.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
+        fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
+        fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
+        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
+        fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+
+        SolrDocument solrDocument = new SolrDocument(fieldMap);
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), solrDocument, EntityReference.class))
+            .thenReturn(reference);
+        when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument, UserReference.class))
+            .thenReturn(userReference);
+        when(this.documentList.stream())
+            .thenReturn(Collections.singletonList(solrDocument).stream())
+            .thenReturn(Collections.singletonList(solrDocument).stream());
+        // Those are used for deletion.
+        when(this.documentList.isEmpty()).thenReturn(false);
+        when(this.documentList.get(0)).thenReturn(solrDocument);
+
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        // Handle Average rating
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        DefaultRating oldRating = new DefaultRating("myRating")
+            .setManagerId(managerId)
+            .setReference(reference)
+            .setCreatedAt(new Date(422))
+            .setUpdatedAt(new Date(422))
+            .setVote(oldVote)
+            .setScaleUpperBound(scale)
+            .setAuthor(userReference);
+
+        filterQuery = "filter(id:myRating) AND filter(managerId:saveRating4)";
+        SolrQuery secondExpectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setStart(0)
+            .setRows(1)
+            .addSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        QueryResponse response = mock(QueryResponse.class);
+        final AtomicBoolean flag = new AtomicBoolean(false);
+        when(solrClient.query(any())).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            SolrQuery checkExpectedQuery;
+            if (!flag.get()) {
+                checkExpectedQuery = firstExpectedQuery;
+                flag.set(true);
+            } else {
+                checkExpectedQuery = secondExpectedQuery;
+            }
+
+            assertEquals(checkExpectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(checkExpectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(checkExpectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(checkExpectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(checkExpectedQuery.getSorts(), givenQuery.getSorts());
+            return response;
+        });
+        when(response.getResults()).thenReturn(this.documentList);
+
+        when(this.configuration.isZeroStored()).thenReturn(true);
+        assertNull(this.manager.saveRating(reference, userReference, newVote));
+        verify(this.solrClient, never()).add(any(SolrInputDocument.class));
+        verify(this.solrClient).deleteById("myRating");
+        verify(this.solrClient).commit();
+        verify(this.observationManager).notify(any(DeletedRatingEvent.class), eq(managerId), eq(oldRating));
+        verify(this.averageRatingManager).removeVote(reference, oldVote);
     }
 }

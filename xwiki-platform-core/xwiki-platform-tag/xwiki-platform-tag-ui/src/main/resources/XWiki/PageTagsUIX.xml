@@ -160,7 +160,7 @@
       </async_context>
     </property>
     <property>
-      <async_enabled>1</async_enabled>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
       <content>{{velocity}}
@@ -176,7 +176,7 @@
       <name>org.xwiki.platform.tag.ui.contentFooter</name>
     </property>
     <property>
-      <parameters>order=100</parameters>
+      <parameters>order=200</parameters>
     </property>
     <property>
       <scope>wiki</scope>

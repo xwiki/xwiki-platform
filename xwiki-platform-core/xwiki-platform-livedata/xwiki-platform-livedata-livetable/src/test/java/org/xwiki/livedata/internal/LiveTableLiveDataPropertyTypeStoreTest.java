@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for {@link LiveTableLiveDataPropertyTypeStore}.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @ComponentTest
 class LiveTableLiveDataPropertyTypeStoreTest

@@ -930,6 +930,33 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    /**
+     * Adds a new Static List xproperty to this xclass. This allows calling the various methods on
+     * the returned {@link StaticListClass}.
+     *
+     * @param fieldName the id of the Static List xproperty to add
+     * @return the added Static List xproperty or the existing xproperty if it was already existing
+     * @since 12.8RC1
+     */
+    public StaticListClass addStaticListField(String fieldName)
+    {
+        // Return the existing class if it exists, otherwise create a new one.
+        StaticListClass result = (StaticListClass) get(fieldName);
+        if (result == null) {
+            result = new StaticListClass();
+            result.setName(fieldName);
+            // Set default values which can be overridden by the caller
+            result.setSize(1);
+            result.setMultiSelect(false);
+            result.setRelationalStorage(false);
+            result.setFreeText(ListClass.FREE_TEXT_FORBIDDEN);
+            result.setLargeStorage(false);
+            result.setObject(this);
+            put(fieldName, result);
+        }
+        return result;
+    }
+
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
     {
         if (get(fieldName) == null) {

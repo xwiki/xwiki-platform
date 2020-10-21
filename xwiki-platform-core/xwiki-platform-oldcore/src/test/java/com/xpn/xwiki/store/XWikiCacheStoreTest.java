@@ -25,7 +25,6 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.annotation.ComponentList;
@@ -37,9 +36,9 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ComponentList(UidStringEntityReferenceSerializer.class)
-public class XWikiCacheStoreTest
+class XWikiCacheStoreTest
 {    
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -66,7 +65,7 @@ public class XWikiCacheStoreTest
     private Cache<Boolean> existCache;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.oldcore.getMocker().registerMockComponent(RemoteObservationManagerContext.class);
         this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
@@ -81,7 +80,7 @@ public class XWikiCacheStoreTest
     }
 
     @Test
-    public void loadXWikiDoc() throws Exception
+    void loadXWikiDoc() throws Exception
     {
         // Set current wiki
         this.oldcore.getXWikiContext().setWikiId("wiki");
@@ -123,7 +122,7 @@ public class XWikiCacheStoreTest
     }
 
     @Test
-    public void saveXWikiDocumentFailing() throws XWikiException
+    void saveXWikiDocumentFailing() throws XWikiException
     {
         // Set current wiki
         this.oldcore.getXWikiContext().setWikiId("wiki");

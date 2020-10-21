@@ -34,7 +34,7 @@ import org.xwiki.livedata.WithParameters;
  * {@link LiveDataSource} implementation that reuses existing live table data.
  * 
  * @version $Id$
- * @since 12.6
+ * @since 12.9
  */
 @Component
 @Named("liveTable")

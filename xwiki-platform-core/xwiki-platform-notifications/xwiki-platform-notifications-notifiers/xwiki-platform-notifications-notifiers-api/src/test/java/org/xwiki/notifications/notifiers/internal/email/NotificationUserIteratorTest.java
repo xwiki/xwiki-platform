@@ -42,9 +42,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -57,8 +57,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({IntervalUsersManager.class, EntityReferenceFactory.class})
-public class NotificationUserIteratorTest
+// @formatter:off
+@ComponentList({
+    IntervalUsersManager.class,
+    EntityReferenceFactory.class
+})
+// @formatter:on
+class NotificationUserIteratorTest
 {
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -85,7 +90,7 @@ public class NotificationUserIteratorTest
     }
 
     @Test
-    public void iterate() throws Exception
+    void iterate() throws Exception
     {
         // Mocks
         Query query = mock(Query.class);
@@ -133,7 +138,7 @@ public class NotificationUserIteratorTest
     }
 
     @Test
-    public void iterateWhenException() throws Exception
+    void iterateWhenException() throws Exception
     {
         when(this.queryManager.createQuery(ArgumentMatchers.anyString(), eq(Query.XWQL)))
             .thenThrow(new QueryException("error", null, null));

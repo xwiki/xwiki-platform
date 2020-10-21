@@ -421,6 +421,19 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * Specific delete action when the delete action is performed on a page.
+     *
+     * @return a specialized confirmation page for page deletion
+     *
+     * @since 12.8RC1
+     */
+    public DeletePageConfirmationPage deletePage()
+    {
+        clickAdminActionsSubMenuEntry("tmActionDelete");
+        return new DeletePageConfirmationPage();
+    }
+
+    /**
      * @since 4.5M1
      */
     public boolean canDelete()

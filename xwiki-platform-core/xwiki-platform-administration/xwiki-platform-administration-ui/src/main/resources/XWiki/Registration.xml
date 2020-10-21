@@ -478,7 +478,7 @@
         &lt;/form&gt;
         ## We don't want autoLogin if we are administrators adding users...
         #if ($autoLogin &amp;&amp; $request.xpage != 'registerinline')
-          &lt;script type='text/javascript'&gt;
+          &lt;script&gt;
             document.observe('xwiki:dom:loaded', function() {
               document.forms['loginForm'].submit();
             });

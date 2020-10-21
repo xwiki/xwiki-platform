@@ -265,12 +265,21 @@
     &lt;div class="panel panel-primary"&gt;
       &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.preview")&lt;/div&gt;
       &lt;div class="panel-body"&gt;
-        #if($isEdit)
-          &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
+        #if ($isEdit)
+          &lt;p&gt;
+            &lt;input type="checkbox" id="autosync" checked="checked"/&gt;
+            &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;
+          &lt;/p&gt;
         #end
-        &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
-        &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
-        &lt;/iframe&gt;
+        &lt;p class="alert alert-info"&gt;
+          ## We disable the refresh button initially until the JavaScript code that handles the refresh is ready.
+          &lt;input type="button" id="refresh" class="btn btn-primary" disabled="disabled"
+            value="$services.localization.render('platform.flamingo.themes.refresh')" /&gt;
+          $services.localization.render('platform.flamingo.themes.refreshwarning')
+        &lt;/p&gt;
+        &lt;div id="preview-curtain"&gt;
+          &lt;h2&gt;$escapetool.xml($services.localization.render('platform.flamingo.themes.loading'))&lt;/h2&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -400,225 +409,198 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>// Require jQuery
-require(['jquery', 'xwiki-meta'], function($, xm) {
+      <code>require(['jquery', 'bootstrap'], function($) {
   'use strict';
 
-  // Waiting jQuery to be ready
-  $(document).ready(function() {
-  
-    // Usefull variables
-    var iframe = $("#iframe");
-    var autoSync = $("#autosync");
-    var variableInputs = $("#bt-variables input,#bt-variables select");
-    
-    // Need IE9+ or any other recent browser
-    var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
-    if (match &amp;&amp; parseInt(match[1]) &lt; 9) {
-      iframe.parent().replaceWith("&lt;div class=\"panel-body\"&gt;&lt;div class=\"alert alert-danger\"&gt;$services.localization.render('platform.flamingo.themes.incompatiblebrowser')&lt;/div&gt;&lt;/div&gt;");
-      return;
-    }
-    
-    // Put a gray curtain in front of the iframe
-    var addCurtain = function() {
-      var previewCurtain = $("#preview-curtain");
-      if (previewCurtain.length &gt; 0) {
-        // The curtain already exist, do nothing.
-        return;
-      }
-      var iframePosition = iframe.position();
-      previewCurtain = $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;");
-      previewCurtain.insertAfter(iframe);
-      previewCurtain.width(iframe.outerWidth(true));
-      previewCurtain.height(iframe.outerHeight(true));
-      previewCurtain.css("left", iframePosition.left);
-      previewCurtain.css("right", iframePosition.right);
-    }
-    
-    // Remove the curtain
-    var removeCurtain = function() {
-      $("#preview-curtain").remove();
-    }
-    
-    // Function that waits the iframe to be fully loaded
-    var waitUntilIFrameIsLoaded = function(callback) {
-      var iframeHead = $(iframe).contents().find("head")[0];
-      if (iframeHead !== undefined) {
-        callback();
-      } else {
-        setTimeout(function(){ waitUntilIFrameIsLoaded(callback); }, 100);
-      }
-    };
-    
-    // Function that waits the iframe has loaded LESS
-    var waitUntilLessIsLoadedInIFrame = function(callback) {
-      if (iframe[0].contentWindow.lessJs !== undefined) {
-        callback();
-      } else {
-        setTimeout(function(){ waitUntilLessIsLoadedInIFrame(callback); }, 100 );
-      }
-    }
-    
-    // Refresh the preview
-    var refreshPreview = function () {
-      addCurtain();
-      
-      // Set the good logo when the iframe is refreshed
-      setLogo();
-      
-      // Get the variables' values
-      var varMap = {};
-      for (var i=0; i&lt;variableInputs.length; ++i) {
-        var variableInput = variableInputs[i];
-        // 'logo' is handled by the 'setLogo' function
-        // 'lessCode' is handled afterwards
-        if (variableInput.value != '' &amp;&amp; !variableInput.name.match("_0_logo$") &amp;&amp; variableInput.id != 'var-lessCode') {
-          var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
-          var value = variableInput.value
-          var input = $(variableInput);
-          // Some values need to be placed inside a string
-          if (input.hasClass('type-image')) {
-            var url = $("#attachmentsURL").attr('data-value');
-            value = 'url('+ url.replace("__tochange__", value) + ')';
-          }
-          if (input.hasClass('type-escapedText')) {
-            value = '"' + value.replace('"', '\\"') + '"';
-          }
-          varMap[name] = value;
-        }
-      }
-      
-      // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file.
-      // It is handled by our LessCodePlugin.
-      iframe[0].contentWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
-      
-      // We run LESS in a thread in order to not block the main thread
-      setTimeout(function(){
-        // Run LESS (which use promises)
-        // Note: because of yuicompressor which does not support Promise.prototype.catch() properly, we cannot
-        // call p.catch() directly (it generates an error in the logs).
-        // See https://jira.xwiki.org/browse/XWIKI-13772
-        // Instead, we use the following trick: p['catch']()
-        // TODO: remove this trick when we replace yuicompressor by something else.
-        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);
-      }, 100);
-    };
-    
-    // Function called when an input is changed by the user
-    var onChange = function () {
-      var input = $(this);
-      if (autoSync.prop("checked") &amp;&amp; input.closest('.type-image').length == 0) {
-        var oldValue = variableInput.value;
-        setTimeout(function(){
-          if (variableInput.value == oldValue) {
-            refreshPreview();
-          }
-        }, 1000);
-      }
-    }
-    
-    // Function that change the logo in the iframe
-    var setLogo = function(event) {
-      var value = $("[name$='_logo']").val();
-      var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
-      if (value == "") {
-        var url = "$xwiki.getSkinFile('logo.svg')";
-        iFrameLogo.attr("src", url);
-      } else {
-        var url = $("#attachmentsURL").attr('data-value');
-        iFrameLogo.attr("src", url.replace("__tochange__", value));
-      }
-    }
-    
-    // Function that adds LESS scripts to the iframe document
-    var initIframe = function() {
-      addCurtain();
-      var iframeHead = iframe.contents().find("head")[0];
-      
-      // 1: Add a link to the LESS source code of the skin
-      var link = document.createElement("link");
-      link.rel = "stylesheet/less";
-      link.type = "text/css";
-      link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
-      iframeHead.appendChild(link);
-      
-      // 2: Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable
-      // to the LESS code of the skin.
-      
-      // The plugin is an AMD module defined in an other page (we add a query string so require.js does not append the '.js' suffix).
-      var pluginURL = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['FlamingoThemesCode'], 'LessCodePluginJs')).getURL('jsx', 'r=1');
-      
-      // We add a script tag to the iframe that will load our plugin and the LESS preprocessor
-      var script = document.createElement("script");
-      script.innerHTML  = "\
-        require.config({ \n\
-          paths: { \n\
-            'lessJs': '$services.webjars.url('less', 'less.min.js')', \n\
-            'lessCodePlugin': '" + pluginURL + "' \n\
-          } \n\
-        }); \n\
-        // Now we load the LessCodePlugin BEFORE loading the LESS prepocessor. \n\
-        // This is needed because the 'less' variable defining the list of enabled plugins \n\
-        // must be declared *before* the LESS preprocessor. \n\
-        // See: http://lesscss.org/usage/#plugins-in-the-browser \n\
-        require(['lessCodePlugin'], function(lessCodePlugin) { \n\
-          // We defined it as a global variable so we can re-use it afterwards.\n\
-          window.lessCodePlugin = lessCodePlugin; \n\
-          less = { plugins: [lessCodePlugin] }; \n\
-          // Now we can load the LESS preprocessor. \n\
-          require(['lessJs'], function(lessJs) { \n\
-            // We defined it as a global variable so we can re-use it afterwards.\n\
-            window.lessJs = lessJs; \n\
-          }); \n\
-        });";
-      iframeHead.appendChild(script);
-      
-      // 3: Refresh the live preview
-      waitUntilLessIsLoadedInIFrame(function(){
+  var createPreview = function() {
+    var deferred = $.Deferred();
+    var iframe = $('&lt;iframe/&gt;').attr({
+      src: new XWiki.Document('WebHome', 'Main').getURL('view', 'colortheme=no'),
+      id: 'iframe',
+      'class': 'col-xs-12'
+    // We need to register the load listener before the iframe is attached to the DOM otherwise we can't catch reliably
+    // the load event (because the iframe might load before we register our listener).
+    }).load(function() {
+      initPreview(iframe).done(function() {
         // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
         // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
-        // We refresh it in a thread to avoid blocking the browser.
-        setTimeout(refreshPreview, 1);
+        refreshPreview().done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
       });
-    };
-    
-    // Add the curtain which will be removed when the iframe will be loaded and the LESS code compiled
-    addCurtain()
-    // The user can navigate to an other page inside the iframe, so when the page changes (onload),
-    // we re-init the iframe to use LESS
-    iframe.load(initIframe);
-    // Initialize the event handlers
-    $("#refresh").click( function() { 
-      // We refresh it in a thread to avoid blocking the browser.
-      setTimeout(refreshPreview, 1);
-    });
-    for (var i=0; i&lt;variableInputs.length; ++i) {
-      var variableInput = variableInputs[i];
-      $(variableInput).on("change", onChange);
-    }
-    // Event handler for the logo field
-    var logoFieldInput = $("#var-logo input");
-    logoFieldInput.on("change", setLogo);
+    }).insertBefore('#preview-curtain');
 
-    // Since the input is hidden (by the attachmentSelector macro), we need to do some black magic (i.e. register a MutationObserver) to make it trigger the "change" event.
-    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-    var trackChange = function(element) {
-      if (typeof element !== 'undefined') {
-        var observer = new MutationObserver(function(mutations, observer) {
-          if (mutations[0].attributeName == "value") {
-            $(element).trigger("change");
-          }
+    // Update the preview curtain size and position.
+    showPreviewCurtain();
+
+    return deferred.promise();
+  };
+
+  var initPreview = function(iframe) {
+    window.colorThemePreviewInitDeferred = $.Deferred();
+    var iframeHead = iframe.contents().find('head')[0];
+
+    // Add a link to the LESS source code of the skin.
+    var link = document.createElement('link');
+    link.rel = 'stylesheet/less';
+    link.type = 'text/css';
+    link.href = $jsontool.serialize($xwiki.getSkinFile('less/style.less.vm', true)) + '?colorTheme=no';
+    iframeHead.appendChild(link);
+
+    // Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable to the
+    // LESS code of the skin. The plugin is an AMD module defined in an other page (we add a query string so require.js
+    // does not append the '.js' suffix).
+    var pluginURL = new XWiki.Document('LessCodePluginJs', 'FlamingoThemesCode').getURL('jsx', 'r=1');
+
+    // We add a script tag to the iframe that will load our plugin and the LESS preprocessor.
+    var script = document.createElement('script');
+    script.innerHTML = `
+      require.config({
+        paths: {
+          lessJs: $jsontool.serialize($services.webjars.url('less', 'less.min.js')),
+          lessCodePlugin: '$escapetool.d{pluginURL}'
+        }
+      });
+      // Now we load the LessCodePlugin BEFORE loading the LESS prepocessor.
+      // This is needed because the 'less' variable defining the list of enabled plugins
+      // must be declared *before* the LESS preprocessor.
+      // See: http://lesscss.org/usage/#plugins-in-the-browser
+      require(['lessCodePlugin'], function(lessCodePlugin) {
+        // We defined it as a global variable so we can re-use it afterwards.
+        window.lessCodePlugin = lessCodePlugin;
+        window.less = {plugins: [lessCodePlugin]};
+        // Now we can load the LESS preprocessor.
+        require(['lessJs'], function(lessJs) {
+          // We defined it as a global variable so we can re-use it afterwards.
+          window.lessJs = lessJs;
+          // Notify the parent window that we finished the initialization.
+          window.parent.colorThemePreviewInitDeferred.resolve();
         });
-        observer.observe(element, {
-          attributes: true
-        });
+      });
+    `;
+    iframeHead.appendChild(script);
+
+    return colorThemePreviewInitDeferred.promise();
+  };
+
+  // Refresh the color theme preview.
+  var refreshPreview = function() {
+    var deferred = $.Deferred();
+    showPreviewCurtain();
+
+    // Update the logo.
+    updatePreviewLogo();
+
+    // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file. It
+    // is handled by our LessCodePlugin.
+    var previewWindow = $('#iframe').prop('contentWindow');
+    previewWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
+
+    // We run LESS in a thread in order to not block the main thread.
+    setTimeout(function() {
+      previewWindow.lessJs.modifyVars(getLessVariables())
+        .then($.proxy(deferred, 'resolve'), $.proxy(deferred, 'reject'))
+        .finally(hidePreviewCurtain);
+    }, 0);
+
+    return deferred.promise();
+  };
+
+  // Show the curtain on top of the preview while the LESS code is recompiled.
+  var showPreviewCurtain = function() {
+    // Disable the refresh button while the refresh is in progress.
+    $('#refresh').prop('disabled', true);
+
+    // Update the position and size of the curtain to match the preview.
+    var previewCurtain = $('#preview-curtain').show();
+    var iframe = $('#iframe');
+    previewCurtain.width(iframe.outerWidth(true));
+    previewCurtain.height(iframe.outerHeight(true));
+    previewCurtain.css('position', 'absolute');
+  };
+
+  var hidePreviewCurtain = function() {
+    $("#preview-curtain").hide();
+    // Re-enable the refresh button after the preview refresh is done.
+    $("#refresh").prop('disabled', false);
+  };
+
+  var getLessVariables = function() {
+    var variables = {};
+    var variableInputs = $('#bt-variables input, #bt-variables select');
+    for (var i = 0; i &lt; variableInputs.length; ++i) {
+      var variableInput = variableInputs[i];
+      // 'logo' is handled by the 'updatePreviewLogo' function.
+      // 'lessCode' is handled separately afterwards.
+      if (variableInput.value !== '' &amp;&amp; !variableInput.name.match('_0_logo$') &amp;&amp; variableInput.id !== 'var-lessCode') {
+        // Remove the 'var-' part of the id to get the real variable name.
+        var name = '@' + variableInput.id.substr(4);
+        var value = variableInput.value;
+        var input = $(variableInput);
+        // Some values need to be placed inside a string.
+        if (input.hasClass('type-image')) {
+          var url = $('#attachmentsURL').attr('data-value');
+          value = 'url('+ url.replace('__tochange__', value) + ')';
+        } else if (input.hasClass('type-escapedText')) {
+          value = '"' + value.replace('"', '\\"') + '"';
+        }
+        variables[name] = value;
       }
     }
-    // Enable change tracking for the logo field.
-    trackChange(logoFieldInput[0]);
+    return variables;
+  };
+
+  var updatePreviewLogo = function(event) {
+    var value = $('[name$="_logo"]').val();
+    var previewLogo = $('#iframe').contents().find('#companylogo &gt; a &gt; img');
+    if (value === '') {
+      var url = $jsontool.serialize($xwiki.getSkinFile('logo.svg'));
+      previewLogo.attr('src', url);
+    } else {
+      var url = $('#attachmentsURL').attr('data-value');
+      previewLogo.attr('src', url.replace('__tochange__', value));
+    }
+  };
+
+  var previewTimeout;
+
+  // Function called when the value of an input associated to a LESS variable is chaned by the user.
+  var onLESSVariableChange = function() {
+    if ($('#autosync').prop('checked') &amp;&amp; $(this).closest('.type-image').length === 0) {
+      clearTimeout(previewTimeout);
+      // Schedule a new preview refresh.
+      previewTimeout = setTimeout(refreshPreview, 1000);
+    }
+  };
+
+  MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+  var trackValueChange = function(element) {
+    if (typeof element !== 'undefined') {
+      var observer = new MutationObserver(function(mutations, observer) {
+        if (mutations[0].attributeName === 'value') {
+          $(element).trigger('change');
+        }
+      });
+      observer.observe(element, {
+        attributes: true
+      });
+    }
+  };
+
+  $(document).ready(function() {
+    $('#refresh').click(refreshPreview);
+
+    // Update the preview when the user modifies the LESS variables.
+    $('#bt-variables').on('change', 'input, select', onLESSVariableChange);
+
+    // Event handler for the logo field.
+    var logoFieldInput = $('#var-logo input');
+    logoFieldInput.change(updatePreviewLogo);
+    // Since the logo input is hidden (by the attachment selector macro), we need to do some black magic (i.e. register
+    // a mutation observer) to make it trigger the "change" event.
+    trackValueChange(logoFieldInput[0]);
+
+    createPreview();
   });
-});
-</code>
+});</code>
     </property>
     <property>
       <name>JS</name>
@@ -745,9 +727,12 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 #preview-curtain {
   background-color: $theme.pageBackgroundColor;
   opacity: 0.9;
-  position: absolute;
   text-align: center;
-  vertical-align: center;
+  height: 400px;
+}
+
+#iframe {
+  height: 400px;
 }</code>
     </property>
     <property>

@@ -71,7 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib -->
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
         "org.xwiki.platform:xwiki-platform-mail-send-storage"
     }
 )
@@ -231,7 +231,9 @@ public class MailIT
         // but the last mail's status in the database may not have been updated yet. Note that The first 2 are
         // guaranteed to have been updated since we send mail in one thread one after another and we update the
         // database after sending each mail.
-        liveTableElement.waitUntilRowCountGreaterThan(3);
+        // TODO: waitUntilRowCountGreaterThan(3) is timing out on some CI agents from time to time. Increasing the
+        // timeout to verify if that's the issues. To be removed if the issue is still present.
+        liveTableElement.waitUntilRowCountGreaterThan(3, webDriver.getTimeout() * 10);
 
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);

@@ -287,7 +287,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
-    <script type="text/javascript">
+    <script>
     //<![CDATA[
 (function() {
   function hideScopeForUsers() {

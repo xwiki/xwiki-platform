@@ -137,6 +137,9 @@ public class DefaultSolrTest
         fieldAttributes.put("name", "testlist");
         fieldAttributes.put("multiValued", true);
         new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "testlocales");
+        fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
 
         SolrInputDocument inputDocument = new SolrInputDocument();
 
@@ -156,6 +159,8 @@ public class DefaultSolrTest
 
         solrUtils.setString("testlocale", Locale.FRANCE, inputDocument);
 
+        solrUtils.setString("testlocales", Arrays.asList(Locale.ENGLISH, Locale.FRENCH), Locale.class, inputDocument);
+
         client.add(inputDocument);
         client.commit();
 
@@ -164,6 +169,8 @@ public class DefaultSolrTest
         assertEquals("42", solrUtils.getId(storedDocument));
         assertEquals("content1", solrUtils.get("content", storedDocument));
         assertEquals(Locale.FRANCE, solrUtils.get("testlocale", storedDocument, Locale.class));
+        assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH),
+            solrUtils.getCollection("testlocales", storedDocument, Locale.class));
 
         Map<String, Object> storedMap = solrUtils.getMap("testmap", storedDocument);
 

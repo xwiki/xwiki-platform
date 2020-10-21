@@ -652,7 +652,7 @@ editors.XDataEditors = Class.create({
   // ------------------------------------
   // Expand/collapse objects and object properties
   expandCollapseObject : function(object) {
-    totalItems = $$('#xwikiobjects .xobject').size();
+    var totalItems = $$('#xwikiobjects .xobject').size();
     object.addClassName('collapsable');
     if (totalItems > 1) {
       object.toggleClassName('collapsed');

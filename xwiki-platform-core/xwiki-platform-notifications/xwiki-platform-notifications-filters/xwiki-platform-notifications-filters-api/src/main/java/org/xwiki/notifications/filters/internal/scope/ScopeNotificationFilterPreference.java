@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
@@ -32,7 +33,6 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.text.StringUtils;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**

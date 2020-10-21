@@ -480,7 +480,7 @@ public class SolrRatingsManager implements RatingsManager
                 offsetIndex += AVERAGE_COMPUTATION_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
-            float newAverage = sumOfVotes / numberOfVotes;
+            float newAverage = Float.valueOf(sumOfVotes) / numberOfVotes;
             return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);

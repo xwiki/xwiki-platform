@@ -25,8 +25,103 @@ define([
   //"polyfills"
 ], function (
   Vue,
-  XWikiLivedata
+  XWikiLivedata,
 ) {
+
+
+
+
+  /**
+   * ---------------------------------------------------------------
+   * UTILS
+   */
+
+  /**
+   * The Utils class only contains static methods
+   * The methods of Utils are ones that don't directly
+   * have something to do with the Livedata
+   */
+  class Utils {
+
+    /**
+     * Compare two objects deeply, using SameValue comparison
+     * @param {string} a A first object to compare
+     * @param {string} b A second object to compare
+     */
+    static isDeepEqual (a, b) {
+      // Check direct equality (using sameValue comparison)
+      if (Object.is(a, b)) { return true; }
+      // If properties are not equal and not object, return false
+      if (typeof a !== "object" || typeof b !== "object") { return false; }
+      // Check class equality
+      if (a.constructor !== b.constructor) { return false; }
+      // check if objects  contain the same entries
+      const aKeys = Object.keys(a);
+      const bKeys = Object.keys(b);
+      if (aKeys.length !== bKeys.length) { return false; }
+      return aKeys.every(key => this.isDeepEqual(a[key], b[key]));
+    }
+
+
+    /*
+      As Sets are not reactive in Vue 2.x, if we want to create
+      a reactive collection of unique objects, we have to use arrays.
+      So here are some handy functions to do what Sets do, but with arrays
+    */
+
+    /**
+     * Return whether the array has the given item
+     * @param {Array} uniqueArray An array of unique items
+     * @param {string} item
+     */
+    static uniqueArrayHas (uniqueArray, item) {
+      return uniqueArray.includes(item);
+    }
+
+
+    /**
+     * Add the given item if not present in the array, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {string} item
+     */
+    static uniqueArrayAdd (uniqueArray, item) {
+      if (Utils.uniqueArrayHas(uniqueArray, item)) { return; }
+      uniqueArray.push(item);
+    }
+
+
+    /**
+     * Remove the given item from the array if present, or does nothing
+     * @param {Array} uniqueArray An array of unique items
+     * @param {string} item
+     */
+    static uniqueArrayRemove (uniqueArray, item) {
+      const index = uniqueArray.indexOf(item);
+      if (index === -1) { return; }
+      uniqueArray.splice(index, 1);
+    }
+
+
+    /**
+     * Toggle the given item from the array, ensuring its uniqueness
+     * @param {Array} uniqueArray An array of unique items
+     * @param {string} item
+     * @param {boolean} force Optional: true force add / false force remove
+     */
+    static uniqueArrayToggle (uniqueArray, item, force) {
+      if (force === undefined) {
+        force = !Utils.uniqueArrayHas(uniqueArray, item);
+      }
+      if (force) {
+        Utils.uniqueArrayAdd(uniqueArray, item);
+      } else {
+        Utils.uniqueArrayRemove(uniqueArray, item);
+      }
+    }
+
+  };
+
+
 
 
 
@@ -77,7 +172,6 @@ define([
      * @returns {Promise}
      */
     change ({ layoutId }) {
-      console.log("CHANGE LAYOUT", layoutId);
       // bad layout
       if (!this.getDescriptor({ layoutId })) {
         console.error("Layout of id `" + layoutId + "` does not have a descriptor");
@@ -727,36 +821,41 @@ define([
 
       /**
        * Return whether the entry is currently selected
-       * @param {Object} entry
+       * @param {Object} parameters
+       * @param {Object} parameters.entry
        * @returns {boolean}
        */
-      isSelected (entry) {
+      isSelected ({ entry }) {
         const entryId = this.logic.entries.getId({ entry });
         if (this.isGlobal) {
-          return !this.logic.uniqueArrayHas(this.deselected, entryId);
+          return !Utils.uniqueArrayHas(this.deselected, entryId);
         } else {
-          return this.logic.uniqueArrayHas(this.selected, entryId);
+          return Utils.uniqueArrayHas(this.selected, entryId);
         }
       }
 
 
       /**
        * Select the specified entries
-       * @param {Object|Array} entries
+       * @param {Object} parameters
+       * Need one of: entry | entries
+       * @param {(Object|Object[])} parameters.entry
+       * @param {(Object|Object[])} parameters.entries
        */
-      select (entries) {
-        const entryArray = (entries instanceof Array) ? entries : [entries];
+      select ({ entry, entries }) {
+        const entryArray = entries || [entry];
         entryArray.forEach(entry => {
           const entryId = this.logic.entries.getId({ entry });
+          if (entryId === undefined) { return; }
           if (this.isGlobal) {
-            this.logic.uniqueArrayRemove(this.deselected, entryId);
+            Utils.uniqueArrayRemove(this.deselected, entryId);
           }
           else {
-            this.logic.uniqueArrayAdd(this.selected, entryId);
+            Utils.uniqueArrayAdd(this.selected, entryId);
           }
           this.logic.event.trigger({
             name: "select",
-            data: { entry: entry },
+            data: { entry },
           });
         });
       }
@@ -764,21 +863,24 @@ define([
 
       /**
        * Deselect the specified entries
-       * @param {Object|Array} entries
+       * @param {Object} parameters
+       * Need one of: entry | entries
+       * @param {(Object|Object[])} parameters.entry
+       * @param {(Object|Object[])} parameters.entries
        */
-      deselect (entries) {
-        const entryArray = (entries instanceof Array) ? entries : [entries];
+      deselect ({ entry, entries }) {
+        const entryArray = entries || [entry];
         entryArray.forEach(entry => {
           const entryId = this.logic.entries.getId({ entry });
           if (this.isGlobal) {
-            this.logic.uniqueArrayAdd(this.deselected, entryId);
+            Utils.uniqueArrayAdd(this.deselected, entryId);
           }
           else {
-            this.logic.uniqueArrayRemove(this.selected, entryId);
+            Utils.uniqueArrayRemove(this.selected, entryId);
           }
           this.logic.event.trigger({
             name: "deselect",
-            data: { entry: entry },
+            data: { entry },
           });
         });
       }
@@ -786,19 +888,22 @@ define([
 
       /**
        * Toggle the selection of the specified entries
-       * @param {Object|Array} entries
-       * @param {boolean} select Whether to select or not the entries. Undefined toggle current state
+       * @param {Object} parameters
+       * Need one of: entry | entries
+       * @param {(Object|Object[])} parameters.entry
+       * @param {(Object|Object[])} parameters.entries
+       * @param {boolean} [parameters.select] Whether to select or not the entries. Undefined toggle current state
        */
-      toggleSelect (entries, select) {
-        const entryArray = (entries instanceof Array) ? entries : [entries];
+      toggleSelect ({ entry, entries, select }) {
+        const entryArray = entries || [entry];
         entryArray.forEach(entry => {
           if (select === undefined) {
-            select = !this.isSelected(entry);
+            select = !this.isSelected({ entry });
           }
           if (select) {
-            this.select(entry);
+            this.select({ entry });
           } else {
-            this.deselect(entry);
+            this.deselect({ entry });
           }
         });
       }
@@ -819,9 +924,10 @@ define([
 
       /**
        * Set the entry selection globally accross pages
-       * @param {boolean} global
+       * @param {Object} parameters
+       * @param {boolean} parameter.global
        */
-      setGlobal (global) {
+      setGlobal ({ global }) {
         this.isGlobal = global;
         this.selected.splice(0);
         this.deselected.splice(0);
@@ -852,31 +958,43 @@ define([
 
       /**
        * Get the sort query associated to a property id
-       * @param {string} propertyId
+       * @param {Object} parameters
+       * Need one of propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {string} [parameters.propertyDescriptor]
        */
-      getQuerySort (propertyId) {
-        if (!this.logic.properties.isValid({ propertyId })) { return; }
+      getConfig ({ propertyId, propertyDescriptor }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        if (!propertyId) { return; }
         return this.logic.config.query.sort.find(sort => sort.property === propertyId);
       }
 
 
       /**
        * Update sort configuration based on parameters, then fetch new data
-       * @param {string} property The property to sort according to
-       * @param {string} level The sort level for the property (0 is the highest).
+       * @param {Object} parameters
+       * Need one of propertyId | propertyDescriptor
+       * The property to sort according to
+       * @param {string} [parameters.propertyId]
+       * @param {string} [parameters.propertyDescriptor]
+       *
+       * @param {string} [parameters.level] The sort level for the property (0 is the highest).
        *   Undefined means keep current. Negative value removes property sort.
-       * @param {string} descending Specify whether the sort should be descending or not.
+       * @param {string} [parameters.descending] Specify whether the sort should be descending or not.
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
-      sort (property, level, descending) {
-        const err = new Error(`Property "${property}" is not sortable`);
+      sort ({ propertyId, propertyDescriptor, level, descending }) {
+        const err = new Error(`Property "${propertyId}" is not sortable`);
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        if (!propertyId) { return Promise.reject(err); }
+        if (!this.logic.properties.isSortable({ propertyId })) { return Promise.reject(err); }
+
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isValid({ propertyId: property })) { return void reject(err); }
-          if (!this.logic.properties.isSortable({ propertyId: property })) { return void reject(err); }
+
           // find property current sort level
           const currentLevel = this.logic.config.query.sort
-            .findIndex(sortObject => sortObject.property === property);
+            .findIndex(sortObject => sortObject.property === propertyId);
           // default level
           if (level === undefined) {
             level = (currentLevel !== -1) ? currentLevel : 0;
@@ -885,13 +1003,17 @@ define([
           }
           // default descending
           if (descending === undefined) {
-            descending = (currentLevel !== -1) ? !this.logic.config.query.sort[currentLevel].descending : false;
+            descending = (currentLevel !== -1) ?
+              !this.logic.config.query.sort[currentLevel].descending :
+              false;
           }
+
           // create sort object
           const sortObject = {
-            property: property,
+            property: propertyId,
             descending: descending,
           };
+
           // apply sort
           if (level !== -1) {
             this.logic.config.query.sort.splice(level, 1, sortObject);
@@ -899,13 +1021,14 @@ define([
           if (currentLevel !== -1 && currentLevel !== level) {
             this.logic.config.query.sort.splice(currentLevel, 1);
           }
+
           // dispatch events
           this.logic.event.trigger({
             name: "sort",
             data: {
-              property: property,
-              level: level,
-              descending: descending,
+              propertyId,
+              level,
+              descending,
             },
           });
 
@@ -918,40 +1041,56 @@ define([
       /**
        * Add new sort entry, shorthand of sort:
        * If the property is already sorting, does nothing
-       * @param {string} property The property to add to the sort
-       * @param {string} descending Specify whether the sort should be descending or not.
+       * @param {Object} parameters
+       * Need one of propertyId | propertyDescriptor
+       * The property to sort according to
+       * @param {string} [parameters.propertyId]
+       * @param {string} [parameters.propertyDescriptor]
+       * @param {string} [parameters.descending] Specify whether the sort should be descending or not.
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
-      add (property, descending) {
-        const err = new Error(`Property "${property}" is already sorting`);
-        const propertyQuerySort = this.logic.config.query.sort.find(sortObject => sortObject.property === property);
+      add ({ propertyId, propertyDescriptor, descending }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        const err = new Error(`Property "${propertyId}" is already sorting`);
+        const propertyQuerySort = this.logic.config.query.sort.find(sortObject => sortObject.property === propertyId);
         if (propertyQuerySort) { return Promise.reject(err); }
-        return this.sort(property, this.logic.config.query.sort.length, descending);
+        return this.sort({ propertyId, level: this.logic.config.query.sort.length, descending });
       }
 
 
       /**
        * Remove a sort entry, shorthand of sort:
-       * @param {string} property The property to remove to the sort
+       * @param {Object} parameters
+       * Need one of propertyId | propertyDescriptor
+       * The property to sort according to
+       * @param {string} [parameters.propertyId]
+       * @param {string} [parameters.propertyDescriptor]
        * @returns {Promise}
        */
-      remove (property) {
-        return this.sort(property, -1);
+      remove ({ propertyId, propertyDescriptor }) {
+        return this.sort({ propertyId, propertyDescriptor, level: -1 });
       }
 
 
       /**
        * Move a sort entry to a certain index in the query sort list
-       * @param {string} property The property to reorder the sort
-       * @param {number} toIndex
+       * @param {Object} parameters
+       * Need one of propertyId | propertyDescriptor | fromIndex
+       * The property to sort according to
+       * @param {string} [parameters.propertyId]
+       * @param {string} [parameters.propertyDescriptor]
+       * @param {number} [parameters.fromIndex]
+       * @param {number} [parameters.toIndex]
        */
-      reorder (propertyId, toIndex) {
+      reorder ({ propertyId, propertyDescriptor, fromIndex, toIndex }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         const err = new Error(`Property "${propertyId}" is not sortable`);
+        if (!propertyId) { return Promise.reject(err); }
+        fromIndex = this.logic.config.query.sort.findIndex(querySort => querySort.property === propertyId);
+        if (fromIndex <= -1 || toIndex <= -1) { return Promise.reject(err); }
+
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isValid({ propertyId })) { return void reject(err); }
-          const fromIndex = this.logic.config.query.sort.findIndex(querySort => querySort.property === propertyId);
-          if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
           this.logic.config.query.sort.splice(toIndex, 0, this.logic.config.query.sort.splice(fromIndex, 1)[0]);
 
           // dispatch events
@@ -959,7 +1098,7 @@ define([
             name: "sort",
             data: {
               type: "move",
-              property: propertyId,
+              propertyId,
               level: toIndex,
             },
           });
@@ -1032,35 +1171,36 @@ define([
 
       /**
        * Get the filter object in the query config object associated to a property id
-       * @param {string} propertyId
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {Object} [parameters.constrainsOnly] Only return the constrains array instead of the whole object
        * @returns {Object}
        */
-      getQueryFilterGroup (propertyId) {
-        if (!this.logic.properties.isValid({ propertyId })) { return; }
-        return this.logic.config.query.filters.find(filter => filter.property === propertyId);
-      }
-
-
-      /**
-       * Get the filters in the query config object associated to a property id
-       * @param {string} propertyId
-       * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
-       */
-      getQueryFilters (propertyId) {
-        if (!this.logic.properties.isValid({ propertyId })) { return; }
-        const queryFilterGroup = this.getQueryFilterGroup(propertyId);
-        return queryFilterGroup && queryFilterGroup.constrains || [];
+      getConfig ({ propertyId, propertyDescriptor, constrainsOnly = false }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        if (!propertyId) { return; }
+        const filterGroup = this.logic.config.query.filters
+          .find(filter => filter.property === propertyId);
+        if (constrainsOnly) {
+          return (filterGroup || {}).constrains || [];
+        }
+        return filterGroup;
       }
 
 
       /**
        * Get the default filter operator associated to a property id
-       * @param {string} propertyId
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
        * @returns {string}
        */
-      getDefaultOperator (propertyId) {
+      getDefaultOperator ({ propertyId, propertyDescriptor}) {
         // get valid operator descriptor
-        const filterDescriptor = this.getDescriptor({ propertyId });
+        const filterDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         if (!filterDescriptor) { return; }
         const filterOperators = filterDescriptor.operators;
         if (!(filterOperators instanceof Array)) { return; }
@@ -1080,53 +1220,61 @@ define([
        * Return an object containing the new and old filter entries corresponding to parameters
        *  oldEntry: the filter entry to be modified
        *  newEntry: what this.logic entry should be modified to
-       * @param {string} property The property to filter according to
-       * @param {string} index The index of the filter entry
-       * @param {string} filterEntry The filter data used to update the filter configuration
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} [parameters.index] The index of the filter entry
+       * @param {string} [parameters.filterEntry] The filter data used to update the filter configuration
        *  (see Logic.prototype.filter for more)
-       * @returns {Object} {oldEntry, newEntry}
+       * @returns {(Object|undefined)} {oldEntry, newEntry}
        *  with oldEntry / newEntry being {property, index, operator, value}
+       * Returns undefined if the given parameters are invalid
        */
-      _computeFilterEntries (property, index, filterEntry) {
-        if (!this.logic.properties.isValid({ propertyId: property })) { return; }
-        if (!this.logic.properties.isFilterable({ propertyId: property })) { return; }
+      _computeFilterEntries ({ propertyId, propertyDescriptor, index, filterEntry = {} }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        if (!propertyId) { return; }
+        if (!this.logic.properties.isFilterable({ propertyId })) { return; }
         // default indexes
         index = index || 0;
         if (index < 0) { index = -1; }
         if (filterEntry.index < 0) { filterEntry.index = -1; }
         // old entry
         let oldEntry = {
-          property: property,
-          index: index,
+          propertyId,
+          index,
         };
-        const queryFilters = this.getQueryFilters(property);
-        const currentEntry = queryFilters[index] || {};
+        const configConstrains = this.getConfig({ propertyId, constrainsOnly: true });
+        const currentEntry = configConstrains[index] || {};
         oldEntry = Object.assign({}, currentEntry, oldEntry);
         // new entry
         let newEntry = filterEntry || {};
         const self = this;
         const defaultEntry = {
-          property: property,
+          propertyId,
           value: "",
-          get operator () { return self.getDefaultOperator(this.property); },
+          operator: self.getDefaultOperator({ propertyId }),
           index: 0,
         };
         newEntry = Object.assign({}, defaultEntry, oldEntry, newEntry);
+        newEntry.operator = this.getDefaultOperator({ propertyId: newEntry.propertyId });
         return {
-          oldEntry: oldEntry,
-          newEntry: newEntry,
+          oldEntry,
+          newEntry,
         };
       }
 
 
       /**
        * Return the filtering type, based on oldEntry and newEntry
-       * @param {Object} oldEntry
-       * @param {Oject} newEntry
-       * @returns {string} "add" | "remove" | "move" | "modify"
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * @param {Object} [parameters.oldEntry]
+       * @param {Object} [parameters.newEntry]
+       * @returns {string} One of: "add" | "remove" | "move" | "modify"
        */
-      _getFilteringType (oldEntry, newEntry) {
-        const queryFilter = this.getQueryFilterGroup(oldEntry.property);
+      _getFilteringType ({ oldEntry, newEntry }) {
+        const queryFilter = this.getConfig({ propertyId: oldEntry.propertyId });
         if (queryFilter && oldEntry.index === -1) {
           return "add";
         }
@@ -1142,49 +1290,62 @@ define([
 
       /**
        * Update filter configuration based on parameters, then fetch new data
-       * @param {string} property The property to filter according to
-       * @param {string} index The index of the filter entry
-       * @param {string} filterEntry The filter data used to update the filter configuration
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * The property to filter according to
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} [parameters.index] The index of the filter entry
+       * @param {string} [parameters.filterEntry] The filter data used to update the filter configuration
        *  filterEntry = {property, operator, value}
        *  undefined values are defaulted to current values, then to default values.
-       * @param {string} filterEntry.property The new property to filter according to
-       * @param {string} filterEntry.index The new index the filter should go. -1 delete filter
-       * @param {string} filterEntry.operator The operator of the filter.
+       * @param {string} [parameters.filterEntry.property] The new property to filter according to
+       * @param {string} [parameters.filterEntry.index] The new index the filter should go. -1 delete filter
+       * @param {string} [parameters.filterEntry.operator] The operator of the filter.
        *  Should match the filter descriptor of the filter property
-       * @param {string} filterEntry.value Value for the new filter entry
+       * @param {string} [parameters.filterEntry.value] Value for the new filter entry
        * @returns {Promise}
        */
-      filter (property, index, filterEntry) {
-        const err = new Error(`Property "${property}" is not filterable`);
+      filter ({ propertyId, propertyDescriptor, index, filterEntry }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        const err = new Error(`Property "${propertyId}" is not filterable`);
+        const filterEntries = this._computeFilterEntries({ propertyId, index, filterEntry });
+        if (!filterEntries) { return void Promise.reject(err); }
+
         return new Promise ((resolve, reject) => {
-          const filterEntries = this._computeFilterEntries(property, index, filterEntry);
-          if (!filterEntries) { return void reject(err); }
           const oldEntry = filterEntries.oldEntry;
           const newEntry = filterEntries.newEntry;
-          const filteringType = this._getFilteringType(oldEntry, newEntry);
+          const filteringType = this._getFilteringType({ oldEntry, newEntry });
           // remove filter at current property and index
           if (oldEntry.index !== -1) {
-            this.getQueryFilters(oldEntry.property).splice(index, 1);
+            this.getConfig({
+              propertyId: oldEntry.propertyId,
+              constrainsOnly: true
+            })
+              .splice(index, 1);
           }
           // add filter at new property and index
           if (newEntry.index !== -1) {
             // create filterGroup if not exists
-            if (!this.getQueryFilterGroup(newEntry.property)) {
+            if (!this.getConfig({ propertyId: newEntry.propertyId })) {
               this.logic.config.query.filters.push({
-                property: newEntry.property,
+                property: newEntry.propertyId,
                 matchAll: true,
                 constrains: [],
               });
             }
             // add entry
-            this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+            this.getConfig({ propertyId: newEntry.propertyId }).constrains.splice(newEntry.index, 0, {
               operator: newEntry.operator,
               value: newEntry.value,
             });
           }
           // remove filter group if empty
-          if (this.getQueryFilters(oldEntry.property).length === 0) {
-            this.removeAll(oldEntry.property);
+          if (this.getConfig({
+            propertyId: oldEntry.propertyId,
+            constrainsOnly: true,
+          }).length === 0) {
+            this.removeAll({ propertyId: oldEntry.propertyId });
           }
           // dispatch events
           this.logic.event.trigger({
@@ -1204,54 +1365,80 @@ define([
 
       /**
        * Add new filter entry, shorthand of filter:
-       * @param {string} property Which property to add the filter to
-       * @param {string} operator The operator of the filter. Should match the filter descriptor of the property
-       * @param {string} value Default value for the new filter entry
-       * @param {number} index Index of new filter entry. Undefined means last
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * The property to filter according to
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} [parameters.operator] The operator of the filter. Should match the filter descriptor of the property
+       * @param {string} [parameters.value] Default value for the new filter entry
+       * @param {number} [parameters.index] Index of new filter entry. Undefined means last
        * @returns {Promise}
        */
-      add (property, operator, value, index) {
+      add ({ propertyId, propertyDescriptor, operator, value, index }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         if (index === undefined) {
-          index = ((this.getQueryFilterGroup(property) || {}).constrains || []).length;
+          index = ((this.getConfig({ propertyId }) || {}).constrains || []).length;
         }
-        return this.filter(property, -1, {
-          property: property,
-          operator: operator,
-          value: value,
-          index: index,
+        return this.filter({
+          propertyId,
+          index: -1,
+          filterEntry: {
+            propertyId,
+            operator,
+            value,
+            index,
+          },
         });
       }
 
 
       /**
        * Remove a filter entry in the configuration, then fetch new data
-       * @param {string} property Property to remove the filter to
-       * @param {string} index The index of the filter to remove. Undefined means last.
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * The property to filter according to
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
+       * @param {string} [parameters.index] The index of the filter to remove. Undefined means last.
        * @returns {Promise}
        */
-      remove (property, index) {
-        return this.filter(property, index, {index: -1});
+      remove ({ propertyId, propertyDescriptor, index }) {
+        return this.filter({
+          propertyId,
+          propertyDescriptor,
+          index,
+          filterEntry: { index: -1 },
+        });
       }
 
 
       /**
        * Remove all the filters associated to a property
-       * @param {string} property Property to remove the filters to
+       * @param {Object} parameters
+       * Need of of: propertyId | propertyDescriptor
+       * The property to filter according to
+       * @param {string} [parameters.propertyId]
+       * @param {Object} [parameters.propertyDescriptor]
        * @returns {Promise}
        */
-      removeAll (property) {
+      removeAll ({ propertyId, propertyDescriptor }) {
+        propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
+        if (!propertyId) { return; }
+        if (!this.logic.properties.isValid({ propertyId })) { return; }
+        const filterIndex = this.logic.config.query.filters
+          .findIndex(filterGroup => filterGroup.property === propertyId);
+        if (filterIndex === -1) { return void Promise.reject(); }
+
         return new Promise ((resolve, reject) => {
-          if (!this.logic.properties.isValid({ propertyId: property })) { return; }
-          const filterIndex = this.logic.config.query.filters
-            .findIndex(filterGroup => filterGroup.property === property);
-          if (filterIndex === -1) { return void reject(); }
           const removedFilterGroups = this.logic.config.query.filters.splice(filterIndex, 1);
+
           // dispatch events
           this.logic.event.trigger({
             name: "filter",
             data: {
               type: "removeAll",
-              property: property,
+              propertyId,
               removedFilters: removedFilterGroups[0].constrains,
             },
           });
@@ -1413,7 +1600,7 @@ define([
       equals ({ configName, config }) {
         config = this._getConfig({ configName, config });
         if (!config) { return; }
-        return this.logic.isDeepEqual(
+        return Utils.isDeepEqual(
           this._format({ config }),
           this._format({ config: this.logic.config })
         );
@@ -1473,6 +1660,72 @@ define([
 
 
 
+    /**
+     * ---------------------------------------------------------------
+     * PANELS
+     */
+
+
+    class LogicPanels {
+
+      constructor (logic) {
+        this.logic = logic;
+        // The array of opened panels
+        this.opened = [];
+      }
+      /**
+       * Return whether the given panel is opened
+       * @param {Object} parameters
+       * @param {string} parameters.panelId
+       */
+      isOpened ({ panelId }) {
+        return Utils.uniqueArrayHas(this.opened, panelId);
+      }
+
+
+      /**
+       * Open the given panel if not already opened
+       * @param {Object} parameters
+       * @param {string} parameters.panelId
+       */
+      open ({ panelId }) {
+        Utils.uniqueArrayAdd(this.opened, panelId);
+      }
+
+
+      /**
+       * Close the given panel if not already closed
+       * @param {Object} parameters
+       * @param {string} parameters.panelId
+       */
+      close ({ panelId }) {
+        Utils.uniqueArrayRemove(this.opened, panelId);
+      }
+
+
+      /**
+       * Open / close the given panel according to its current state
+       * @param {Object} parameters
+       * @param {string} parameters.panelId
+       * @param {boolean} [force] true: open, false: close
+       */
+      toggle ({ panelId, force }) {
+        Utils.uniqueArrayToggle(this.opened, panelId);
+      }
+
+
+      /**
+       * Close all panels
+       */
+      closeAll () {
+        this.opened = [];
+      }
+
+    };
+
+
+
+
   class Logic {
 
     constructor (element) {
@@ -1480,9 +1733,6 @@ define([
 
       // The element where the Livedata vue component is mounted
       this.element = element;
-
-      // A helper object to track opened configuration panels
-      this.openedPanels = [];
 
       // The Livedata configuration object
       this.config = JSON.parse(element.getAttribute("data-config") || "{}");
@@ -1499,6 +1749,7 @@ define([
       this.filters = new LogicFilters(this);
       this.displayers = new LogicDisplayers(this);
       this.designMode = new LogicDesignMode(this);
+      this.panels = new LogicPanels(this);
 
       this.layout.change({ layoutId: this.config.meta.defaultLayout });
       this.temporaryConfig.save({ configName: "initial" });
@@ -1517,93 +1768,7 @@ define([
 
     }
 
-
-    /**
-     * ---------------------------------------------------------------
-     * UTILS
-     */
-
-
-
-    /**
-     * Compare two objects deeply, using SameValue comparison
-     * @param {Any} a A first object to compare
-     * @param {Any} b A second object to compare
-     */
-    isDeepEqual (a, b) {
-      // Check direct equality (using sameValue comparison)
-      if (Object.is(a, b)) { return true; }
-      // If properties are not equal and not object, return false
-      if (typeof a !== "object" || typeof b !== "object") { return false; }
-      // Check class equality
-      if (a.constructor !== b.constructor) { return false; }
-      // check if objects  contain the same entries
-      const aKeys = Object.keys(a);
-      const bKeys = Object.keys(b);
-      if (aKeys.length !== bKeys.length) { return false; }
-      return aKeys.every(key => this.isDeepEqual(a[key], b[key]));
-    }
-
-
-    /*
-      As Sets are not reactive in Vue 2.x, if we want to create
-      a reactive collection of unique objects, we have to use arrays.
-      So here are some handy functions to do what Sets do, but with arrays
-    */
-
-    /**
-     * Return whether the array has the given item
-     * @param {Array} uniqueArray An array of unique items
-     * @param {Any} item
-     */
-    uniqueArrayHas (uniqueArray, item) {
-      return uniqueArray.includes(item);
-    }
-
-
-    /**
-     * Add the given item if not present in the array, or does nothing
-     * @param {Array} uniqueArray An array of unique items
-     * @param {Any} item
-     */
-    uniqueArrayAdd (uniqueArray, item) {
-      if (this.uniqueArrayHas(uniqueArray, item)) { return; }
-      uniqueArray.push(item);
-    }
-
-
-    /**
-     * Remove the given item from the array if present, or does nothing
-     * @param {Array} uniqueArray An array of unique items
-     * @param {Any} item
-     */
-    uniqueArrayRemove (uniqueArray, item) {
-      const index = uniqueArray.indexOf(item);
-      if (index === -1) { return; }
-      uniqueArray.splice(index, 1);
-    }
-
-
-    /**
-     * Toggle the given item from the array, ensuring its uniqueness
-     * @param {Array} uniqueArray An array of unique items
-     * @param {Any} item
-     * @param {boolean} force Optional: true force add / false force remove
-     */
-    uniqueArrayToggle (uniqueArray, item, force) {
-      if (force === undefined) {
-        force = !this.uniqueArrayHas(uniqueArray, item);
-      }
-      if (force) {
-        this.uniqueArrayAdd(uniqueArray, item);
-      } else {
-        this.uniqueArrayRemove(uniqueArray, item);
-      }
-    }
-
   };
-
-
 
 
   return Logic;

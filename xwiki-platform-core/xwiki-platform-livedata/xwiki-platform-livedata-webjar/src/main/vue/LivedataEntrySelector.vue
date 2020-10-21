@@ -40,7 +40,7 @@
       ref="checkbox"
       type="checkbox"
       :checked="selected"
-      @change="logic.selection.toggleSelect(entry)"
+      @change="logic.selection.toggleSelect({ entry })"
     />
   </div>
 </template>
@@ -60,7 +60,7 @@ export default {
   computed: {
     // Whether the selector property is currently selected
     selected () {
-      return this.logic.selection.isSelected(this.entry);
+      return this.logic.selection.isSelected({ entry: this.entry });
     },
 
   },

@@ -70,7 +70,11 @@
             Allow to select either Ascending or Descending
           -->
           <select
-            @change="logic.sort.sort(sortEntry.property, level, $event.target.value === 'true')"
+            @change="logic.sort.sort({
+              propertyId: sortEntry.property,
+              level,
+              direction: $event.target.value === 'true'
+            })"
           >
             <option
               value="false"
@@ -86,7 +90,7 @@
           <a
             class="delete-sort"
             href="#"
-            @click.prevent="logic.sort.remove(sortEntry.property)"
+            @click.prevent="logic.sort.remove({ propertyId: sortEntry.property })"
             title="Delete Sort"
           >
             <span class="fa fa-trash-o"></span>
@@ -156,21 +160,24 @@ export default {
     // Property descriptors that does not have a sort entry in Livedata config
     unsortedProperties () {
       return this.logic.properties.getDescriptors({ sortable: true })
-        .filter(propertyDescriptor => !this.logic.sort.getQuerySort(propertyDescriptor.id));
+        .filter(propertyDescriptor => !this.logic.sort.getConfig({ propertyDescriptor }));
     },
   },
 
   methods: {
     // Change event handler called by the add-sort select
-    addSortLevel (value) {
-      if (value === "none") { return; }
-      this.logic.sort.add(value);
+    addSortLevel (propertyId) {
+      if (propertyId === "none") { return; }
+      this.logic.sort.add({ propertyId });
       this.$refs.selectPropertiesNone.selected = true;
     },
     // Event handler called when sort entries are dragged and dropped
     reorderSorts (e) {
-      this.logic.sort.reorder(e.moved.element.property, e.moved.newIndex)
-      .catch(err => void console.warn(err));
+      this.logic.sort.reorder({
+        propertyId: e.moved.element.property,
+        toIndex: e.moved.newIndex
+      })
+        .catch(err => void console.warn(err));
     },
   },
 

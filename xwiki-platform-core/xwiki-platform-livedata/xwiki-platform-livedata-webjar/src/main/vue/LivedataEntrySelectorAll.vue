@@ -78,7 +78,7 @@
     <ul class="dropdown-menu">
       <!-- Select all entries matching current config -->
       <li>
-        <a href="#" @click.prevent="logic.selection.setGlobal(true)">
+        <a href="#" @click.prevent="logic.selection.setGlobal({ global: true })">
           Select in all pages
         </a>
       </li>
@@ -102,7 +102,7 @@ export default {
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked () {
-         const allPageEntriesSeleted = this.logic.config.data.entries.every(entry => this.logic.selection.isSelected(entry));
+         const allPageEntriesSeleted = this.logic.config.data.entries.every(entry => this.logic.selection.isSelected({ entry }));
          const allEntriesSelected = this.selection.isGlobal && this.selection.deselected.length === 0;
         return allPageEntriesSeleted || allEntriesSelected;
     },
@@ -133,10 +133,13 @@ export default {
     toggle () {
       // if Global mode is on, uncheck everything
       if (this.selection.isGlobal) {
-        this.logic.selection.setGlobal(false);
+        this.logic.selection.setGlobal({ global: false });
       // else, toggle `this.checked` state
       } else {
-        this.logic.selection.toggleSelect(this.logic.config.data.entries, !this.checked);
+        this.logic.selection.toggleSelect({
+          entries: this.logic.config.data.entries,
+          select: !this.checked,
+        });
       }
     },
   },

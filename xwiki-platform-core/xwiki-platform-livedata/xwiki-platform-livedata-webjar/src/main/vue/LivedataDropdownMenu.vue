@@ -66,21 +66,21 @@
 
       <!-- Properties Panel -->
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
+        <a href="#" @click.prevent="logic.panels.toggle({ panelId: 'propertiesPanel' })">
           <span class="fa fa-list-ul"></span> Advanced Properties
         </a>
       </li>
 
       <!-- Sort Panel -->
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
+        <a href="#" @click.prevent="logic.panels.toggle({ panelId: 'sortPanel' })">
           <span class="fa fa-sort"></span> Advanced Sorting
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
+        <a href="#" @click.prevent="logic.panels.toggle({ panelId: 'filterPanel' })">
           <span class="fa fa-filter"></span> Advanced Filtering
         </a>
       </li>

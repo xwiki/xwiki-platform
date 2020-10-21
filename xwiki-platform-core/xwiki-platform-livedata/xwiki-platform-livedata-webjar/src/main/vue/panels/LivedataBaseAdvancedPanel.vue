@@ -65,7 +65,7 @@
         <!-- Close panel button -->
         <span
           class="action close-button"
-          @click="logic.uniqueArrayRemove(logic.openedPanels, panelId)"
+          @click="logic.panels.close({ panelId })"
         >
           <span class="fa fa-times"></span>
         </span>
@@ -97,7 +97,7 @@ export default {
 
   props: {
     // The panel id is used to open the panel in the dropdown menu
-    // and is used as item in the `Logic.openedPanels` array
+    // and is used as item in the `Logic.panels` array
     panelId: String,
   },
 
@@ -110,9 +110,9 @@ export default {
   },
 
   computed: {
-    // returns whether the panel is opened based on the `Logic.openedPanels` array
+    // returns whether the panel is opened based on the `Logic.panels` array
     panelOpened () {
-      return this.logic.uniqueArrayHas(this.logic.openedPanels, this.panelId);
+      return this.logic.panels.isOpened({ panelId: this.panelId });
     },
   },
 

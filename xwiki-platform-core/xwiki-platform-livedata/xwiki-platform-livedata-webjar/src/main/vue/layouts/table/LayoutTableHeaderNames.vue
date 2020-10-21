@@ -129,7 +129,7 @@ export default {
     },
 
     sort (propertyId) {
-      this.logic.sort.sort(propertyId, 0).catch(err => {
+      this.logic.sort.sort({ propertyId, level: 0}).catch(err => {
         console.warn(err);
       });
     },

@@ -69,7 +69,7 @@
           <a
             class="delete-filter-group"
             href="#"
-            @click.prevent="logic.filters.removeAll(filterGroup.property)"
+            @click.prevent="logic.filters.removeAll({ propertyId: filterGroup.property })"
             title="Delete the whole property filters"
           >
             <span class="fa fa-trash-o"></span>
@@ -99,7 +99,7 @@
             -->
             <XWikiDraggable
               class="filter-entries"
-              :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+              :value="logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
               @change="reorderFilter($event, filterGroup)"
               :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
@@ -109,7 +109,7 @@
                 XWikiDraggable one
               -->
               <XWikiDraggableItem
-                  v-for="(filter, filterIdx) in logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+                  v-for="(filter, filterIdx) in logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
                   :key="filterIdx"
                 >
                 <!-- Filter entries -->
@@ -124,7 +124,7 @@
             <a
               class="add-filter"
               href="#"
-              @click.prevent="logic.filters.add(filterGroup.property)"
+              @click.prevent="logic.filters.add({ propertyId: filterGroup.property })"
             >
               + Add filter
             </a>
@@ -147,7 +147,7 @@
             -->
             <XWikiDraggable
               class="filter-entries"
-              :value="logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+              :value="logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
               @change="reorderFilter($event, filterGroup)"
               :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
@@ -157,7 +157,7 @@
                 XWikiDraggable one
               -->
               <XWikiDraggableItem
-                  v-for="(filter, filterIdx) in logic.filters.getQueryFilterGroup(filterGroup.property).constrains"
+                  v-for="(filter, filterIdx) in logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
                   :key="filterIdx"
                 >
                 <!-- Filter entries -->
@@ -172,7 +172,7 @@
             <a
               class="add-filter"
               href="#"
-              @click.prevent="logic.filters.add(filterGroup.property)"
+              @click.prevent="logic.filters.add({ propertyId: filterGroup.property })"
             >
               + Add filter
             </a>
@@ -249,7 +249,7 @@ export default {
     unfilteredProperties () {
       return this.logic.properties.getDescriptors({ filterable: true })
         .filter(propertyDescriptor => {
-          const filter = this.logic.filters.getQueryFilterGroup(propertyDescriptor.id);
+          const filter = this.logic.filters.getConfig({ propertyDescriptor });
           return !filter || filter.constrains.length === 0;
         });
     },
@@ -259,9 +259,9 @@ export default {
 
   methods: {
     // Change event handler called by the add-filters select
-    addFilterGroup (value) {
-      if (value === "none") { return; }
-      this.logic.filters.add(value);
+    addFilterGroup (propertyId) {
+      if (propertyId === "none") { return; }
+      this.logic.filters.add({ propertyId });
       this.$refs.selectFilterPropertiesNone.selected = true;
     },
     // Event handler called when filter entries are dragged and dropped
@@ -273,20 +273,32 @@ export default {
     reorderFilter (e, filterGroup) {
       // Filter entry reordered in the same property
       if (e.moved) {
-        this.logic.filters.filter(filterGroup.property, e.moved.oldIndex, {
-          index: e.moved.newIndex,
+        this.logic.filters.filter({
+          propertyId: filterGroup.property,
+          index: e.moved.oldIndex,
+          filterEntry: {
+            index: e.moved.newIndex,
+          },
         })
-        .catch(err => void console.warn(err));
+          .catch(err => void console.warn(err));
       }
       // Filter entry moved to another property (add handler)
       else if (e.added) {
-        this.logic.filters.add(filterGroup.property, e.added.element.operator, e.added.element.value, e.added.newIndex)
-        .catch(err => void console.warn(err));
+        this.logic.filters.add({
+          propertyId: filterGroup.property,
+          operator: e.added.element.operator,
+          value: e.added.element.value,
+          index: e.added.newIndex
+        })
+          .catch(err => void console.warn(err));
       }
       // Filter entry moved to another property (remove handler)
       else if (e.removed) {
-        this.logic.filters.remove(filterGroup.property, e.removed.oldIndex)
-        .catch(err => void console.warn(err));
+        this.logic.filters.remove({
+          propertyId: filterGroup.property,
+          index: e.removed.oldIndex
+        })
+          .catch(err => void console.warn(err));
       }
     },
   },

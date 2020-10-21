@@ -31,8 +31,14 @@ module.exports = {
     parser: 'babel-eslint'
   },
   rules: {
+    'camelcase': 'error',
+    'max-params': ['error', 5],
+    'max-depth': ['error', 3],
+    'max-statements': ['error', 20],
+    'complexity': ['error', 10],
+    'max-len': ['error', 120],
     'no-console': ['warn', { allow: ['warn', 'error'] }],
-    'no-debugger': 'warn'
+    'no-debugger': 'warn',
   },
   globals: {
     define: 'readonly',

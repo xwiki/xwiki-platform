@@ -99,7 +99,7 @@
         v-if="logic.config.meta.pagination.showNextPrevious"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
-          pageIndex: logic.pagination.getPageIndex() - 1
+          pageIndex: logic.pagination.getPageIndex() - 1,
         })"
       >
         <span class="fa fa-angle-left"></span>
@@ -151,7 +151,7 @@
         v-if="logic.config.meta.pagination.showNextPrevious"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
-          pageIndex: logic.pagination.getPageIndex() + 1
+          pageIndex: logic.pagination.getPageIndex() + 1,
         })"
       >
         <span class="fa fa-angle-right"></span>
@@ -167,7 +167,7 @@
         v-if="logic.config.meta.pagination.showFirstLast"
         href="#"
         @click.prevent="logic.pagination.setPageIndex({
-          pageIndex: logic.pagination.getPageCount() - 1
+          pageIndex: logic.pagination.getPageCount() - 1,
         })"
       >
         <span class="fa fa-angle-double-right"></span>

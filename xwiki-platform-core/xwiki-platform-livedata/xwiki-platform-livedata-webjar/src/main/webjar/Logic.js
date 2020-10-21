@@ -125,6 +125,8 @@ define([
 
 
 
+
+
   /**
    * ---------------------------------------------------------------
    * LAYOUT
@@ -166,10 +168,12 @@ define([
 
 
     /**
-     * Load a layout, or default layout if none specified
+     * Change layout to given one, or default layout if none specified
+     * This function only update the configuration object
+     * Then the LivedataLayout vue component which is watching the config for changes
+     * will update the DOM accordingly
      * @param {Object} parameters
      * @param {string} parameters.layoutId The id of the layout to load with requireJS
-     * @returns {Promise}
      */
     change ({ layoutId }) {
       // bad layout
@@ -238,7 +242,7 @@ define([
        * Listen for custom events
        * @param {Object} parameters
        * @param {string} parameters.name The name of the event, without the prefix "xwiki:livedata"
-       * @param {Object|Function} [parameters.condition] The condition to execute the callback
+       * @param {(Object|Function)} [parameters.condition] The condition to execute the callback
        *  if Object, values of object properties must match e.detail properties values
        *  if Function, the function must return true. e.detail is passed as argument
        * @param {Function} parameters.callback Function to call we the event is triggered
@@ -301,28 +305,36 @@ define([
       }
 
 
-      fetch () {
-        return new Promise(function (resolve, reject) {
-          const err = new Error("Error while fetching entries");
-          // TODO: FETCH ENTRIES FROM HERE
-          reject(err);
-        });
+      /**
+       * Fetch entries using current Livedata configuration
+       * @returns {Promise}
+       */
+      async fetch () {
+        const err = new Error("Error while fetching entries");
+        // TODO: FETCH ENTRIES FROM HERE
+        throw err;
       }
 
 
+      /**
+       * Update the Livedata entries
+       */
       async update () {
         try {
           this.logic.config.data.entries = await this.fetch();
         } catch (err) {
-          return console.error(err);
+          return void console.error(err);
         }
       }
 
 
-      add () {
+      /**
+       * Add a new entry in the Livedata
+       */
+      async add () {
         const mockNewUrl = () => this.logic.entries.getId({ entryIndex: -1 }) + "0";
         // TODO: CALL FUNCTION TO CREATE NEW DATA HERE
-        Promise.resolve({ /* MOCK DATA */
+        const newEntry = await Promise.resolve({ /* MOCK DATA */
           "doc_url": mockNewUrl(),
           "doc_name": undefined,
           "doc_date": "2020/03/27 13:23",
@@ -334,11 +346,9 @@ define([
           "tags": undefined,
           "country": undefined,
           "other": undefined,
-        })
-        .then(newEntry => {
-          this.logic.config.data.entries.push(newEntry);
-          this.logic.config.data.count++; // TODO: remove when merging with backend
         });
+        this.logic.config.data.entries.push(newEntry);
+        this.logic.config.data.count++; // TODO: remove when merging with backend
       }
 
     };
@@ -381,25 +391,25 @@ define([
 
       /**
        * Set page index (0-based index), then fetch new data
+       * Clamp the given pageIndex into a valid index range: [0, pageCount[
        * @param {Object} parameters
        * @param {number} parameters.pageIndex
        * @returns {Promise}
        */
-      setPageIndex ({ pageIndex }) {
-        return new Promise ((resolve, reject) => {
-          if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return void reject(); }
-          const previousPageIndex = this.getPageIndex();
-          this.logic.config.query.offset = this.getFirstIndexOfPage({ pageIndex });
-          this.logic.event.trigger({
-            name: "pageChange",
-            data: {
-              pageIndex: pageIndex,
-              previousPageIndex: previousPageIndex,
-            },
-          });
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+      async setPageIndex ({ pageIndex }) {
+        if (pageIndex < 0) { pageIndex = 0 }
+        else if (pageIndex >= this.getPageCount()) { pageIndex = this.getPageCount() - 1; }
+
+        const previousPageIndex = this.getPageIndex();
+        this.logic.config.query.offset = this.getFirstIndexOfPage({ pageIndex });
+        this.logic.event.trigger({
+          name: "pageChange",
+          data: {
+            pageIndex: pageIndex,
+            previousPageIndex: previousPageIndex,
+          },
         });
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
 
@@ -445,22 +455,21 @@ define([
        * @param {number} pageSize
        * @returns {Promise}
        */
-      setPageSize ({ pageSize }) {
-        return new Promise ((resolve, reject) => {
-          if (pageSize < 0) { return void reject(); }
-          const previousPageSize = this.logic.config.query.limit;
-          if (pageSize === previousPageSize) { return void resolve(); }
-          this.logic.config.query.limit = pageSize;
-          this.logic.event.trigger({
-            name: "pageSizeChange",
-            data: {
-              pageSize: pageSize,
-              previousPageSize: previousPageSize,
-            },
-          });
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+      async setPageSize ({ pageSize }) {
+        const err = new Error (`Error: page size ${pageIndex} is invalid`);
+        if (pageSize < 0) { throw err; }
+
+        const previousPageSize = this.logic.config.query.limit;
+        if (pageSize === previousPageSize) { return; }
+        this.logic.config.query.limit = pageSize;
+        this.logic.event.trigger({
+          name: "pageSizeChange",
+          data: {
+            pageSize: pageSize,
+            previousPageSize: previousPageSize,
+          },
         });
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
     };
@@ -795,7 +804,7 @@ define([
         }
       }
 
-     };
+    };
 
 
 
@@ -984,57 +993,53 @@ define([
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
-      sort ({ propertyId, propertyDescriptor, level, descending }) {
+      async sort ({ propertyId, propertyDescriptor, level, descending }) {
         const err = new Error(`Property "${propertyId}" is not sortable`);
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
-        if (!propertyId) { return Promise.reject(err); }
-        if (!this.logic.properties.isSortable({ propertyId })) { return Promise.reject(err); }
+        if (!propertyId) { throw err; }
+        if (!this.logic.properties.isSortable({ propertyId })) { throw err; }
 
-        return new Promise ((resolve, reject) => {
+        // find property current sort level
+        const currentLevel = this.logic.config.query.sort
+          .findIndex(sortObject => sortObject.property === propertyId);
+        // default level
+        if (level === undefined) {
+          level = (currentLevel !== -1) ? currentLevel : 0;
+        } else if (level < 0) {
+          level = -1;
+        }
+        // default descending
+        if (descending === undefined) {
+          descending = (currentLevel !== -1) ?
+            !this.logic.config.query.sort[currentLevel].descending :
+            false;
+        }
 
-          // find property current sort level
-          const currentLevel = this.logic.config.query.sort
-            .findIndex(sortObject => sortObject.property === propertyId);
-          // default level
-          if (level === undefined) {
-            level = (currentLevel !== -1) ? currentLevel : 0;
-          } else if (level < 0) {
-            level = -1;
-          }
-          // default descending
-          if (descending === undefined) {
-            descending = (currentLevel !== -1) ?
-              !this.logic.config.query.sort[currentLevel].descending :
-              false;
-          }
+        // create sort object
+        const sortObject = {
+          property: propertyId,
+          descending: descending,
+        };
 
-          // create sort object
-          const sortObject = {
-            property: propertyId,
-            descending: descending,
-          };
+        // apply sort
+        if (level !== -1) {
+          this.logic.config.query.sort.splice(level, 1, sortObject);
+        }
+        if (currentLevel !== -1 && currentLevel !== level) {
+          this.logic.config.query.sort.splice(currentLevel, 1);
+        }
 
-          // apply sort
-          if (level !== -1) {
-            this.logic.config.query.sort.splice(level, 1, sortObject);
-          }
-          if (currentLevel !== -1 && currentLevel !== level) {
-            this.logic.config.query.sort.splice(currentLevel, 1);
-          }
-
-          // dispatch events
-          this.logic.event.trigger({
-            name: "sort",
-            data: {
-              propertyId,
-              level,
-              descending,
-            },
-          });
-
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+        // dispatch events
+        this.logic.event.trigger({
+          name: "sort",
+          data: {
+            propertyId,
+            level,
+            descending,
+          },
         });
+
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
 
@@ -1050,12 +1055,13 @@ define([
        *   Undefined means toggle current direction
        * @returns {Promise}
        */
-      add ({ propertyId, propertyDescriptor, descending }) {
+      async add ({ propertyId, propertyDescriptor, descending }) {
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         const err = new Error(`Property "${propertyId}" is already sorting`);
         const propertyQuerySort = this.logic.config.query.sort.find(sortObject => sortObject.property === propertyId);
         if (propertyQuerySort) { return Promise.reject(err); }
-        return this.sort({ propertyId, level: this.logic.config.query.sort.length, descending });
+
+        return await this.sort({ propertyId, level: this.logic.config.query.sort.length, descending });
       }
 
 
@@ -1068,8 +1074,8 @@ define([
        * @param {string} [parameters.propertyDescriptor]
        * @returns {Promise}
        */
-      remove ({ propertyId, propertyDescriptor }) {
-        return this.sort({ propertyId, propertyDescriptor, level: -1 });
+      async remove ({ propertyId, propertyDescriptor }) {
+        return await this.sort({ propertyId, propertyDescriptor, level: -1 });
       }
 
 
@@ -1082,30 +1088,28 @@ define([
        * @param {string} [parameters.propertyDescriptor]
        * @param {number} [parameters.fromIndex]
        * @param {number} [parameters.toIndex]
+       * @returns {Promise}
        */
-      reorder ({ propertyId, propertyDescriptor, fromIndex, toIndex }) {
+      async reorder ({ propertyId, propertyDescriptor, fromIndex, toIndex }) {
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         const err = new Error(`Property "${propertyId}" is not sortable`);
-        if (!propertyId) { return Promise.reject(err); }
+        if (!propertyId) { throw err; }
         fromIndex = this.logic.config.query.sort.findIndex(querySort => querySort.property === propertyId);
-        if (fromIndex <= -1 || toIndex <= -1) { return Promise.reject(err); }
+        if (fromIndex <= -1 || toIndex <= -1) { throw err; }
 
-        return new Promise ((resolve, reject) => {
-          this.logic.config.query.sort.splice(toIndex, 0, this.logic.config.query.sort.splice(fromIndex, 1)[0]);
+        this.logic.config.query.sort.splice(toIndex, 0, this.logic.config.query.sort.splice(fromIndex, 1)[0]);
 
-          // dispatch events
-          this.logic.event.trigger({
-            name: "sort",
-            data: {
-              type: "move",
-              propertyId,
-              level: toIndex,
-            },
-          });
-
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+        // dispatch events
+        this.logic.event.trigger({
+          name: "sort",
+          data: {
+            type: "move",
+            propertyId,
+            level: toIndex,
+          },
         });
+
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
     };
@@ -1306,60 +1310,57 @@ define([
        * @param {string} [parameters.filterEntry.value] Value for the new filter entry
        * @returns {Promise}
        */
-      filter ({ propertyId, propertyDescriptor, index, filterEntry }) {
+      async filter ({ propertyId, propertyDescriptor, index, filterEntry }) {
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         const err = new Error(`Property "${propertyId}" is not filterable`);
         const filterEntries = this._computeFilterEntries({ propertyId, index, filterEntry });
-        if (!filterEntries) { return void Promise.reject(err); }
+        if (!filterEntries) { throw err; }
 
-        return new Promise ((resolve, reject) => {
-          const oldEntry = filterEntries.oldEntry;
-          const newEntry = filterEntries.newEntry;
-          const filteringType = this._getFilteringType({ oldEntry, newEntry });
-          // remove filter at current property and index
-          if (oldEntry.index !== -1) {
-            this.getConfig({
-              propertyId: oldEntry.propertyId,
-              constrainsOnly: true
-            })
-              .splice(index, 1);
-          }
-          // add filter at new property and index
-          if (newEntry.index !== -1) {
-            // create filterGroup if not exists
-            if (!this.getConfig({ propertyId: newEntry.propertyId })) {
-              this.logic.config.query.filters.push({
-                property: newEntry.propertyId,
-                matchAll: true,
-                constrains: [],
-              });
-            }
-            // add entry
-            this.getConfig({ propertyId: newEntry.propertyId }).constrains.splice(newEntry.index, 0, {
-              operator: newEntry.operator,
-              value: newEntry.value,
+        const oldEntry = filterEntries.oldEntry;
+        const newEntry = filterEntries.newEntry;
+        const filteringType = this._getFilteringType({ oldEntry, newEntry });
+        // remove filter at current property and index
+        if (oldEntry.index !== -1) {
+          this.getConfig({
+            propertyId: oldEntry.propertyId,
+            constrainsOnly: true
+          })
+            .splice(index, 1);
+        }
+        // add filter at new property and index
+        if (newEntry.index !== -1) {
+          // create filterGroup if not exists
+          if (!this.getConfig({ propertyId: newEntry.propertyId })) {
+            this.logic.config.query.filters.push({
+              property: newEntry.propertyId,
+              matchAll: true,
+              constrains: [],
             });
           }
-          // remove filter group if empty
-          if (this.getConfig({
-            propertyId: oldEntry.propertyId,
-            constrainsOnly: true,
-          }).length === 0) {
-            this.removeAll({ propertyId: oldEntry.propertyId });
-          }
-          // dispatch events
-          this.logic.event.trigger({
-            name: "filter",
-            data: {
-              type: filteringType,
-              oldEntry: oldEntry,
-              newEntry: newEntry,
-            },
+          // add entry
+          this.getConfig({ propertyId: newEntry.propertyId }).constrains.splice(newEntry.index, 0, {
+            operator: newEntry.operator,
+            value: newEntry.value,
           });
-
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+        }
+        // remove filter group if empty
+        if (this.getConfig({
+          propertyId: oldEntry.propertyId,
+          constrainsOnly: true,
+        }).length === 0) {
+          this.removeAll({ propertyId: oldEntry.propertyId });
+        }
+        // dispatch events
+        this.logic.event.trigger({
+          name: "filter",
+          data: {
+            type: filteringType,
+            oldEntry: oldEntry,
+            newEntry: newEntry,
+          },
         });
+
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
 
@@ -1375,12 +1376,12 @@ define([
        * @param {number} [parameters.index] Index of new filter entry. Undefined means last
        * @returns {Promise}
        */
-      add ({ propertyId, propertyDescriptor, operator, value, index }) {
+      async add ({ propertyId, propertyDescriptor, operator, value, index }) {
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
         if (index === undefined) {
           index = ((this.getConfig({ propertyId }) || {}).constrains || []).length;
         }
-        return this.filter({
+        return await this.filter({
           propertyId,
           index: -1,
           filterEntry: {
@@ -1403,8 +1404,8 @@ define([
        * @param {string} [parameters.index] The index of the filter to remove. Undefined means last.
        * @returns {Promise}
        */
-      remove ({ propertyId, propertyDescriptor, index }) {
-        return this.filter({
+      async remove ({ propertyId, propertyDescriptor, index }) {
+        return await this.filter({
           propertyId,
           propertyDescriptor,
           index,
@@ -1422,29 +1423,26 @@ define([
        * @param {Object} [parameters.propertyDescriptor]
        * @returns {Promise}
        */
-      removeAll ({ propertyId, propertyDescriptor }) {
+      async removeAll ({ propertyId, propertyDescriptor }) {
+        const err = new Error(`Property "${propertyId}" is not filterable`);
         propertyId = this.logic.properties.getId({ propertyId, propertyDescriptor });
-        if (!propertyId) { return; }
-        if (!this.logic.properties.isValid({ propertyId })) { return; }
+        if (!propertyId) { throw err; }
         const filterIndex = this.logic.config.query.filters
           .findIndex(filterGroup => filterGroup.property === propertyId);
-        if (filterIndex === -1) { return void Promise.reject(); }
+        if (filterIndex === -1) { throw err; }
 
-        return new Promise ((resolve, reject) => {
-          const removedFilterGroups = this.logic.config.query.filters.splice(filterIndex, 1);
+        const removedFilterGroups = this.logic.config.query.filters.splice(filterIndex, 1);
 
-          // dispatch events
-          this.logic.event.trigger({
-            name: "filter",
-            data: {
-              type: "removeAll",
-              propertyId,
-              removedFilters: removedFilterGroups[0].constrains,
-            },
-          });
-          // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-          resolve();
+        // dispatch events
+        this.logic.event.trigger({
+          name: "filter",
+          data: {
+            type: "removeAll",
+            propertyId,
+            removedFilters: removedFilterGroups[0].constrains,
+          },
         });
+        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
     };

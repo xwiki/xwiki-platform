@@ -430,6 +430,9 @@ public class SolrRatingsManager implements RatingsManager
             result = query.getResults().getNumFound();
             this.getRatingSolrClient().deleteByQuery(filterQuery);
             this.getRatingSolrClient().commit();
+            if (this.getRatingConfiguration().isAverageStored()) {
+                this.getAverageRatingManager().removeAverageRatings(entityReference);
+            }
         } catch (SolrServerException | IOException | SolrException e) {
             throw new RatingsException("Error while trying to remove ratings", e);
         }

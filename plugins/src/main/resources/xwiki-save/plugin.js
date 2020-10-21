@@ -49,24 +49,11 @@
         }
       }, this));
 
-      editor.addCommand('xwiki-saveAndContinue', {
-        canUndo: false,
-        context: false,
-        contextSensitive: false,
-        editorFocus: false,
-        exec: function(editor) {
-          if (editor.checkDirty()) {
-            var config = editor.config['xwiki-save'] || {};
-            var saveAndContinueButton = config.saveAndContinueButton || 'input[name=action_saveandcontinue]';
-            $(saveAndContinueButton).click();
-          }
-        },
-        modes: {
-          wysiwyg: 1
-        }
-      });
-
-      editor.setKeystroke(CKEDITOR.ALT + CKEDITOR.SHIFT + 83 /*S*/, 'xwiki-saveAndContinue');
+      // Keyboard shortcuts for the edit form.
+      this.addEditFormShortcutKey(editor, 'cancel', CKEDITOR.ALT + 67 /*C*/);
+      this.addEditFormShortcutKey(editor, 'preview', CKEDITOR.ALT + 80 /*P*/);
+      this.addEditFormShortcutKey(editor, 'saveAndContinue', CKEDITOR.ALT + CKEDITOR.SHIFT + 83 /*S*/);
+      this.addEditFormShortcutKey(editor, 'save', CKEDITOR.ALT + 83 /*S*/);
     },
 
     onLoad: function() {
@@ -169,6 +156,25 @@
         }
       }
       return false;
+    },
+
+    addEditFormShortcutKey: function(editor, action, shortcut) {
+      var commandName = 'xwiki-' + action;
+      editor.addCommand(commandName, {
+        canUndo: false,
+        context: false,
+        contextSensitive: false,
+        editorFocus: false,
+        exec: function(editor) {
+          var config = editor.config['xwiki-save'] || {};
+          var actionButton = config[action + 'Button'] || ('input[name=action_' + action.toLowerCase() + ']');
+          $(editor.container.$).closest('form, .form, body').find(actionButton).click();
+        },
+        modes: {
+          wysiwyg: 1
+        }
+      });
+      editor.setKeystroke(shortcut, commandName);
     }
   });
 })();

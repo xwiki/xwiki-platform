@@ -25,7 +25,7 @@ define([
   //"polyfills"
 ], function (
   Vue,
-  XWikiLivedata,
+  XWikiLivedata
 ) {
 
 
@@ -119,7 +119,7 @@ define([
       }
     }
 
-  };
+  }
 
 
 
@@ -157,7 +157,8 @@ define([
     /**
      * Return the layout descriptor corresponding to a layout id
      * @param {Object} [parameters]
-     * @param {string} [parameters.propertyId] The id of the layout to get the descriptor of. If undefined use current layout.<s
+     * @param {string} [parameters.propertyId] The id of the layout to get the descriptor of.
+     * If undefined use current layout.
      * @returns {(Object|undefined)}
      */
     getDescriptor ({ layoutId } = {}) {
@@ -194,7 +195,7 @@ define([
       });
     }
 
-  };
+  }
 
 
 
@@ -267,7 +268,7 @@ define([
         });
       }
 
-    };
+    }
 
 
 
@@ -351,7 +352,7 @@ define([
         this.logic.config.data.count++; // TODO: remove when merging with backend
       }
 
-    };
+    }
 
 
 
@@ -442,7 +443,10 @@ define([
           pageIndex = this.getPageIndex();
         }
         if (0 <= pageIndex && pageIndex < this.getPageCount()) {
-          return Math.min(this.getFirstIndexOfPage({ pageIndex }) + this.logic.config.query.limit, this.logic.config.data.count) - 1;
+          return Math.min(
+            this.getFirstIndexOfPage({ pageIndex }) + this.logic.config.query.limit,
+            this.logic.config.data.count
+          ) - 1;
         } else {
           return -1;
         }
@@ -472,7 +476,7 @@ define([
         // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
-    };
+    }
 
 
 
@@ -804,7 +808,7 @@ define([
         }
       }
 
-    };
+    }
 
 
 
@@ -946,7 +950,7 @@ define([
         });
       }
 
-    };
+    }
 
 
 
@@ -1112,7 +1116,7 @@ define([
         // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
-    };
+    }
 
 
 
@@ -1148,7 +1152,9 @@ define([
         if (!propertyType && !typeDescriptor) {
           propertyDescriptor = this.logic.properties.getDescriptor({ propertyId, propertyDescriptor });
         }
-        typeDescriptor = this.logic.properties.getTypeDescriptor({ propertyId, propertyDescriptor, propertyType, typeDescriptor });
+        typeDescriptor = this.logic.properties.getTypeDescriptor({
+          propertyId, propertyDescriptor, propertyType, typeDescriptor
+        });
 
         // Merge property filter with type filter (if their id correspond)
         const propertyFilterDescriptor = (propertyDescriptor || {}).filter || {};
@@ -1371,7 +1377,8 @@ define([
        * The property to filter according to
        * @param {string} [parameters.propertyId]
        * @param {Object} [parameters.propertyDescriptor]
-       * @param {string} [parameters.operator] The operator of the filter. Should match the filter descriptor of the property
+       * @param {string} [parameters.operator] The operator of the filter.
+       * Should match the filter descriptor of the property
        * @param {string} [parameters.value] Default value for the new filter entry
        * @param {number} [parameters.index] Index of new filter entry. Undefined means last
        * @returns {Promise}
@@ -1445,7 +1452,7 @@ define([
         // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
       }
 
-    };
+    }
 
 
     class LogicDisplayers {
@@ -1496,7 +1503,7 @@ define([
         }
       }
 
-    };
+    }
 
 
 
@@ -1605,7 +1612,7 @@ define([
       }
 
 
-    };
+    }
 
 
 
@@ -1653,7 +1660,7 @@ define([
         }
       }
 
-    };
+    }
 
 
 
@@ -1719,7 +1726,7 @@ define([
         this.opened = [];
       }
 
-    };
+    }
 
 
 
@@ -1766,7 +1773,7 @@ define([
 
     }
 
-  };
+  }
 
 
   return Logic;

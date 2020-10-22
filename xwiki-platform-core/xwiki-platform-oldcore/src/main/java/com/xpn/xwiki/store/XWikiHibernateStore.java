@@ -2437,10 +2437,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            if (start != 0) {
+            if (start > 0) {
                 query.setFirstResult(start);
             }
-            if (nb != 0) {
+            if (nb > 0) {
                 query.setMaxResults(nb);
             }
             List<T> list = new ArrayList<>();
@@ -2520,10 +2520,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             checkHibernate(context);
             bTransaction = beginTransaction(context);
-            if (start != 0) {
+            if (start > 0) {
                 query.setFirstResult(start);
             }
-            if (nb != 0) {
+            if (nb > 0) {
                 query.setMaxResults(nb);
             }
             Iterator it = query.list().iterator();
@@ -2646,10 +2646,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
             Query query = createQuery(session, filterSQL(sql), parameterValues);
 
-            if (start != 0) {
+            if (start > 0) {
                 query.setFirstResult(start);
             }
-            if (nb != 0) {
+            if (nb > 0) {
                 query.setMaxResults(nb);
             }
             Iterator it = query.list().iterator();
@@ -2719,10 +2719,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Query query = createQuery(session, filterSQL(sql), parameterValues);
 
-            if (start != 0) {
+            if (start > 0) {
                 query.setFirstResult(start);
             }
-            if (nb != 0) {
+            if (nb > 0) {
                 query.setMaxResults(nb);
             }
             documentDatas.addAll(query.list());

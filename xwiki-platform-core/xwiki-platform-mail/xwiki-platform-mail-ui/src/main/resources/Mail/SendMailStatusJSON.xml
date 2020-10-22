@@ -137,7 +137,7 @@
       #set($discard  = $row.put('wiki', $!item.wiki))
     #end
     #if("$!item.state" != 'sent')
-      #set($discard  = $row.put('actions', "&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+      #set($discard  = $row.put('actions', "&lt;form action='' method='post'&gt;
               &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
               &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
               &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;

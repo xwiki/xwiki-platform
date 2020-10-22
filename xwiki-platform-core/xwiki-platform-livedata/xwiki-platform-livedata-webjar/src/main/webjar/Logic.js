@@ -19,14 +19,7 @@
  */
 
 
-define([
-  "Vue",
-  //"polyfills"
-], function (
-  Vue,
-) {
-
-
+define([], function () {
 
 
   /**
@@ -780,10 +773,14 @@ define([
       setDisplayer ({ propertyId, propertyDescriptor, displayerId }) {
         propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         if (displayerId) {
-          Vue.set(propertyDescriptor, "displayer", { id: displayerId });
+          // Using Object.assign so that we the added property is reactive in vuejs
+          Object.assign(propertyDescriptor, {
+            displayer: { id: displayerId },
+          });
         }
         else {
-          Vue.delete(propertyDescriptor, "displayer");
+          // Using Object.assign so that we the property is deleted reactively
+          Object.assign(propertyDescriptor, { displayer: undefined });
         }
       }
 
@@ -799,10 +796,14 @@ define([
       setFilter ({ propertyId, propertyDescriptor, filterId }) {
         propertyDescriptor = this.getDescriptor({ propertyId, propertyDescriptor });
         if (filterId) {
-          Vue.set(propertyDescriptor, "filter", { id: filterId });
+          // Using Object.assign so that we the added property is reactive in vuejs
+          Object.assign(propertyDescriptor, {
+            filter: { id: filterId },
+          });
         }
         else {
-          Vue.delete(propertyDescriptor, "filter");
+          // Using Object.assign so that we the property is deleted reactively
+          Object.assign(propertyDescriptor, { filter: undefined });
         }
       }
 

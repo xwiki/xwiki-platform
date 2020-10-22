@@ -21,11 +21,9 @@
 
 define([
   "Vue",
-  "xwiki-livedata",
   //"polyfills"
 ], function (
   Vue,
-  XWikiLivedata
 ) {
 
 
@@ -221,6 +219,7 @@ define([
        *  The livedata object reference is automatically added
        */
       trigger ({ name, data }) {
+        if (!this.logic.element) { return; }
         // configure event
         const defaultData = {
           livedata: this.logic,
@@ -246,6 +245,8 @@ define([
        * @param {Function} parameters.callback Function to call we the event is triggered
        */
       on ({ name, condition, callback }) {
+        if (!this.logic.element) { return; }
+
         name = "xwiki:livedata:" + name;
         this.logic.element.addEventListener(name, function (e) {
 
@@ -1730,15 +1731,14 @@ define([
 
   class Logic {
 
-    constructor (element) {
+    /**
+     * @param {Object} parameters
+     * @param {HTMLElement} [parameters.element] The element where the Livedata component is mounter
+     * @param {Object} parameters.config The initial config of the Livedata
+     */
+    constructor ({ element, config }) {
       this.element = element;
-
-      // The element where the Livedata vue component is mounted
-      this.element = element;
-
-      // The Livedata configuration object
-      this.config = JSON.parse(element.getAttribute("data-config") || "{}");
-      element.removeAttribute("data-config");
+      this.config = config;
 
       this.event = new LogicEvent(this);
       this.temporaryConfig = new LogicTemporaryConfig(this);
@@ -1755,23 +1755,9 @@ define([
 
       this.layout.change({ layoutId: this.config.meta.defaultLayout });
       this.temporaryConfig.save({ configName: "initial" });
-
-      // Create Livedata instance
-      new Vue({
-        el: this.element,
-        components: {
-          "XWikiLivedata": XWikiLivedata,
-        },
-        template: "<XWikiLivedata :logic='logic'></XWikiLivedata>",
-        data: {
-          logic: this,
-        },
-      });
-
     }
 
   }
-
 
   return Logic;
 

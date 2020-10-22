@@ -102,17 +102,18 @@ export default {
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked () {
-         const allPageEntriesSeleted = this.logic.config.data.entries.every(entry => this.logic.selection.isSelected({ entry }));
-         const allEntriesSelected = this.selection.isGlobal && this.selection.deselected.length === 0;
-        return allPageEntriesSeleted || allEntriesSelected;
+      const allPageEntriesSeleted = this.logic.config.data.entries
+      .every(entry => this.logic.selection.isSelected({ entry }));
+      const allEntriesSelected = this.selection.isGlobal && this.selection.deselected.length === 0;
+      return allPageEntriesSeleted || allEntriesSelected;
     },
 
     // Whether the button is indeterminate
     // It is in indeterminate state if at least one but not all
     // the page entries are selected
     indeterminate () {
-       const selectedCount = this.logic.selection.getCount();
-        return selectedCount > 0 && !this.checked;
+      const selectedCount = this.logic.selection.getCount();
+      return selectedCount > 0 && !this.checked;
     },
 
   },

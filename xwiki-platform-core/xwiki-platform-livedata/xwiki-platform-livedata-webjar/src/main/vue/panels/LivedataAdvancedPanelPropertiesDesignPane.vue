@@ -157,7 +157,7 @@ export default {
       } else {
         return filterId === this.filterId;
       }
-    }
+    },
   },
 
 };

@@ -175,7 +175,7 @@ export default {
     reorderSorts (e) {
       this.logic.sort.reorder({
         propertyId: e.moved.element.property,
-        toIndex: e.moved.newIndex
+        toIndex: e.moved.newIndex,
       })
         .catch(err => void console.warn(err));
     },

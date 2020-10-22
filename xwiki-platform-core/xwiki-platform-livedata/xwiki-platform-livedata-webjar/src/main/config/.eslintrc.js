@@ -21,27 +21,35 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
   },
-  'extends': [
-    'plugin:vue/essential',
-    'eslint:recommended'
+  "extends": [
+    "plugin:vue/essential",
+    "eslint:recommended",
   ],
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: "babel-eslint",
   },
   rules: {
-    'camelcase': 'error',
-    'max-params': ['error', 5],
-    'max-depth': ['error', 3],
-    'max-statements': ['error', 20],
-    'complexity': ['error', 10],
-    'max-len': ['error', 120],
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
-    'no-debugger': 'warn',
+    "no-console": ["warn", { allow: ["warn", "error"] }],
+    "no-debugger": "warn",
+    /* XWiki rules */
+    "camelcase": "error",
+    "max-params": ["error", 5],
+    "max-depth": ["error", 3],
+    "max-statements": ["error", 20],
+    "complexity": ["error", 10],
+    "max-len": ["error", { code: 120, ignoreStrings: true, ignoreTemplateLiterals: true, }],
+    /* stronger rules */
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "no-undef": "error",
+    "no-unused-vars": "error",
+    "yoda": ["error", "never", { exceptRange: true }],
+
   },
   globals: {
-    define: 'readonly',
-    XWiki: 'writable'
+    define: "readonly",
+    XWiki: "writable",
   }
 };

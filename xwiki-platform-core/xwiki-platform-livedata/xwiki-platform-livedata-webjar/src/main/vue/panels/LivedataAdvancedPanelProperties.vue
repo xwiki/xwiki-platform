@@ -167,7 +167,7 @@ export default {
       // Each key correspond to a Livedata property, and the value is
       // a boolean indicating whether its edit panel is expanded or not.
       visibleEditPanels: {},
-    }
+    };
   },
 
 

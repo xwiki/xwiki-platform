@@ -44,7 +44,7 @@
 
 
 <script>
-import XWikiDialog, { dialogFactory } from "./XWikiDialog"
+import XWikiDialog, { dialogFactory } from "./XWikiDialog";
 
 const XWikiDialogYesNo = {
 

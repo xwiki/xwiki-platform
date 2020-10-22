@@ -65,7 +65,7 @@ export default {
       this.logic.filters.filter({
         propertyId: this.propertyId,
         index: this.index,
-        filterEntry: {value: newValue}
+        filterEntry: {value: newValue},
       });
     },
   },

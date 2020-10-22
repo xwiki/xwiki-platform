@@ -37,6 +37,7 @@
       <!-- utf-8 wrench icon -->
       &#128295; You are in
       <!-- Display a popover on hover explaining what is Design mode -->
+      <!-- eslint-disable max-len -->
       <span
         class="design-mode-info-span"
         data-toggle="popover"
@@ -46,6 +47,7 @@
       >
         Design mode
       </span>
+      <!-- eslint-enable max-len -->
     </span>
     <div class="buttons">
       <button

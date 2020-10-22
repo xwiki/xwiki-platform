@@ -71,6 +71,8 @@ export default {
     // They also have setters so that it can easily be set
     // and update the current config on load
 
+    /* eslint camelcase: ["error", { allow: ["^\$_"] }] */
+
     // Filters
     $_filters: {
       get () { return this.logic.config.query.filters; },
@@ -120,8 +122,9 @@ export default {
             visible: !value.includes(propertyId),
           });
         });
-      }
+      },
     },
+
 
 
     // Return the u-node domain used to encode properties

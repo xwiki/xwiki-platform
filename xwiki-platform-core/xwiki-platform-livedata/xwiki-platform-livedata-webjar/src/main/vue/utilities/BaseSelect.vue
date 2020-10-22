@@ -101,7 +101,7 @@ export default {
     sort: {
       type: Boolean,
       default: false,
-    }
+    },
   },
 
   methods: {
@@ -112,7 +112,7 @@ export default {
     select (option) {
       if (!this.options.includes(option)) { return; }
       if (this.isSelected(option)) { return; }
-      let _selected = this.selected.slice()
+      let _selected = this.selected.slice();
       _selected.push(option);
       this.formatSelected(_selected);
       this.$emit("change", _selected);

@@ -96,6 +96,12 @@
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-lint</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>

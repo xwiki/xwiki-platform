@@ -99,7 +99,10 @@
             -->
             <XWikiDraggable
               class="filter-entries"
-              :value="logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
+              :value="logic.filters.getConfig({
+                propertyId: filterGroup.property,
+                constrainsOnly: true,
+              })"
               @change="reorderFilter($event, filterGroup)"
               :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
@@ -109,7 +112,10 @@
                 XWikiDraggable one
               -->
               <XWikiDraggableItem
-                  v-for="(filter, filterIdx) in logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
+                  v-for="(filter, filterIdx) in logic.filters.getConfig({
+                    propertyId: filterGroup.property,
+                    constrainsOnly: true,
+                  })"
                   :key="filterIdx"
                 >
                 <!-- Filter entries -->
@@ -147,7 +153,10 @@
             -->
             <XWikiDraggable
               class="filter-entries"
-              :value="logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
+              :value="logic.filters.getConfig({
+                propertyId: filterGroup.property,
+                constrainsOnly: true,
+              })"
               @change="reorderFilter($event, filterGroup)"
               :group="'filter-panel' + logic.filters.getDescriptor({ propertyId: filterGroup.property }).id"
             >
@@ -157,7 +166,10 @@
                 XWikiDraggable one
               -->
               <XWikiDraggableItem
-                  v-for="(filter, filterIdx) in logic.filters.getConfig({ propertyId: filterGroup.property }).constrains"
+                  v-for="(filter, filterIdx) in logic.filters.getConfig({
+                    propertyId: filterGroup.property,
+                    constrainsOnly: true,
+                  })"
                   :key="filterIdx"
                 >
                 <!-- Filter entries -->
@@ -288,7 +300,7 @@ export default {
           propertyId: filterGroup.property,
           operator: e.added.element.operator,
           value: e.added.element.value,
-          index: e.added.newIndex
+          index: e.added.newIndex,
         })
           .catch(err => void console.warn(err));
       }
@@ -296,7 +308,7 @@ export default {
       else if (e.removed) {
         this.logic.filters.remove({
           propertyId: filterGroup.property,
-          index: e.removed.oldIndex
+          index: e.removed.oldIndex,
         })
           .catch(err => void console.warn(err));
       }

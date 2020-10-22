@@ -64,7 +64,7 @@
 
 
 <script>
-import Vue from "vue"
+import Vue from "vue";
 import $ from "jquery";
 
 const XWikiDialog = {
@@ -117,29 +117,29 @@ export default XWikiDialog;
  */
 export const dialogFactory = function (dialogComponent) {
   return function (paramObject) {
-  return new Promise (resolve => {
-    // callback parameter
-    paramObject.callback = function (buttonId) {
-      resolve(buttonId);
-    };
-    // Programatically create the dialog vue component
-    const dialogClass = Vue.extend(dialogComponent);
-    const dialogInstance = new dialogClass({
-        propsData: paramObject,
+    return new Promise (resolve => {
+      // callback parameter
+      paramObject.callback = function (buttonId) {
+        resolve(buttonId);
+      };
+      // Programatically create the dialog vue component
+      const dialogClass = Vue.extend(dialogComponent);
+      const dialogInstance = new dialogClass({
+          propsData: paramObject,
+      });
+      dialogInstance.$mount();
+      // Insert component in body
+      document.body.appendChild(dialogInstance.$el);
+      $(dialogInstance.$el).modal("show");
+      // Remove component when modal is hidden
+      $(dialogInstance.$el).on("hidden.bs.modal", () => {
+        dialogInstance.$el.remove();
+        dialogInstance.$destroy();
+      });
     });
-    dialogInstance.$mount();
-    // Insert component in body
-    document.body.appendChild(dialogInstance.$el);
-    $(dialogInstance.$el).modal("show");
-    // Remove component when modal is hidden
-    $(dialogInstance.$el).on("hidden.bs.modal", () => {
-      dialogInstance.$el.remove();
-      dialogInstance.$destroy();
-    });
-  });
 
-  }
-}
+  };
+};
 
 /**
  * Display a dialog modal using the XWikiDialog component

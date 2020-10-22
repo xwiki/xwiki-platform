@@ -29,8 +29,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -39,7 +37,6 @@ import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 

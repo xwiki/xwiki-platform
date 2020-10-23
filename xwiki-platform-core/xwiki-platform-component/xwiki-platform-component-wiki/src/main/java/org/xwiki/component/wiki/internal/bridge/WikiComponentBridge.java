@@ -110,7 +110,7 @@ public interface WikiComponentBridge
      * @return the Map of dependencies declared by the wiki component
      * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
      */
-    Map<String, ComponentDescriptor> getDependencies(DocumentReference reference) throws WikiComponentException;
+    Map<String, ComponentDescriptor<?>> getDependencies(DocumentReference reference) throws WikiComponentException;
 
     /**
      * Determine if the document has been saved by a user with programming rights.

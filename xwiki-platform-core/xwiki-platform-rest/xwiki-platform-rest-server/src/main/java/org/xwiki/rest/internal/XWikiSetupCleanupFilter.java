@@ -86,7 +86,7 @@ public class XWikiSetupCleanupFilter extends Filter
             }
         }
 
-        /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
+        // Avoid that empty entities make the engine forward the response creation to the XWiki servlet.
         if (response.getEntity() != null) {
             if (!response.getEntity().isAvailable()) {
                 response.setEntity(null);
@@ -106,7 +106,7 @@ public class XWikiSetupCleanupFilter extends Filter
             @SuppressWarnings("unchecked")
             List<XWikiRestComponent> releasableComponents =
                 (List<XWikiRestComponent>) executionContext.getProperty(Constants.RELEASABLE_COMPONENT_REFERENCES);
-            return releasableComponents != null ? releasableComponents : Collections.<XWikiRestComponent>emptyList();
+            return releasableComponents != null ? releasableComponents : Collections.emptyList();
         } catch (Exception e) {
             getLogger().log(Level.WARNING, "Failed to retrieve the list of releasable components.", e);
             return Collections.emptyList();

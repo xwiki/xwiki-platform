@@ -104,6 +104,9 @@ basehome:modules/ssl/keystore|etc/keystore
 ## Same as javax.net.ssl.SSLParameters#setEndpointIdentificationAlgorithm(String)
 #jetty.sslContext.endpointIdentificationAlgorithm=
 
+## Warn on common vulnerable SslContext configurations
+jetty.sslContext.warnOnCommonVulnerabilities=false
+
 ## SSL JSSE Provider
 # jetty.sslContext.provider=
 

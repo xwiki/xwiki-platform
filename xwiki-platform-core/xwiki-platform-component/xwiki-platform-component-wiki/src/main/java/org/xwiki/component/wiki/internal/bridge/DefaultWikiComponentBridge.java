@@ -159,9 +159,10 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     }
 
     @Override
-    public Map<String, ComponentDescriptor> getDependencies(DocumentReference reference) throws WikiComponentException
+    public Map<String, ComponentDescriptor<?>> getDependencies(DocumentReference reference)
+        throws WikiComponentException
     {
-        Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+        Map<String, ComponentDescriptor<?>> dependencies = new HashMap<>();
         XWikiDocument componentDocument = this.getDocument(reference);
         if (componentDocument.getObjectNumbers(DEPENDENCY_CLASS) > 0) {
             for (BaseObject dependency : componentDocument.getObjects(DEPENDENCY_CLASS)) {

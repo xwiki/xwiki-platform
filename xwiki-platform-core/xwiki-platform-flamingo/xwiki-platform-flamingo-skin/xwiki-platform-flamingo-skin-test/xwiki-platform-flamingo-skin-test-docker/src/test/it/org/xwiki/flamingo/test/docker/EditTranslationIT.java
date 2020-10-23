@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EditTranslationIT
 {
     @BeforeAll
-    public void setup(TestUtils setup) throws Exception
+    public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }

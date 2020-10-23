@@ -75,7 +75,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
         "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
         // The Solr store is not ready yet to be installed as extension
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
+        // by XWiki at startup, i.e. before extensions are provisioned for the tests
+        "org.xwiki.platform:xwiki-platform-scheduler-api"
     }
 )
 public class NotificationsEmailsIT

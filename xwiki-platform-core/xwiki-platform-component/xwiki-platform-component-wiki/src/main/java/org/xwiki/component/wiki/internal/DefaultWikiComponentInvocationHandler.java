@@ -85,7 +85,7 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
      */
     private void injectComponentDependencies(Map<String, Object> methodContext)
     {
-        for (Map.Entry<String, ComponentDescriptor> dependency : this.wikiComponent.getDependencies().entrySet()) {
+        for (Map.Entry<String, ComponentDescriptor<?>> dependency : this.wikiComponent.getDependencies().entrySet()) {
             ComponentDescriptor cd = dependency.getValue();
             Class<?> roleTypeClass = ReflectionUtils.getTypeClass(cd.getRoleType());
             Object componentDependency = null;

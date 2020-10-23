@@ -62,7 +62,7 @@ public class XWikiJaxRsApplication extends Application
     {
         Set<Class<?>> jaxRsClasses = new HashSet<>();
 
-        /* Look up all the component that are marked as XWikiRestComponent. */
+        // Look up all the component that are marked as XWikiRestComponent.
         List<ComponentDescriptor<XWikiRestComponent>> cds =
             this.componentManagerProvider.get().getComponentDescriptorList((Type) XWikiRestComponent.class);
 

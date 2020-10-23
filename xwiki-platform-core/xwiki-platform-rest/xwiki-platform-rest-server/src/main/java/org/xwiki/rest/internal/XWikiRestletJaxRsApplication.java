@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
 /**
@@ -54,7 +53,7 @@ public class XWikiRestletJaxRsApplication extends JaxRsApplication implements In
     private ObjectFactory objectFactory;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         setObjectFactory(this.objectFactory);
     }

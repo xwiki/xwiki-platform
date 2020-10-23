@@ -78,7 +78,7 @@ public class DefaultWikiComponent implements WikiComponent
     /**
      * @see {@link #getDependencies()}
      */
-    private Map<String, ComponentDescriptor> dependencies = new HashMap<String, ComponentDescriptor>();
+    private Map<String, ComponentDescriptor<?>> dependencies = new HashMap<>();
 
     /**
      * @see {@link #getSyntax()}
@@ -165,7 +165,7 @@ public class DefaultWikiComponent implements WikiComponent
      *
      * @return the map of dependencies of this component
      */
-    public Map<String, ComponentDescriptor> getDependencies()
+    public Map<String, ComponentDescriptor<?>> getDependencies()
     {
         return this.dependencies;
     }
@@ -207,7 +207,7 @@ public class DefaultWikiComponent implements WikiComponent
      *
      * @param dependencies the dependencies of this component
      */
-    public void setDependencies(Map<String, ComponentDescriptor> dependencies)
+    public void setDependencies(Map<String, ComponentDescriptor<?>> dependencies)
     {
         this.dependencies = dependencies;
     }

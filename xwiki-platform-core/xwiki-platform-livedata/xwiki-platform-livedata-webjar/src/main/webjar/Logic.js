@@ -1760,6 +1760,9 @@ define([], function () {
 
   }
 
+  Logic.Utils = Utils;
+
+
   return Logic;
 
 });

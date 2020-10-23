@@ -1,3 +1,6 @@
 paths: {
-  'jquery': '/webjars/jquery'
+  'jquery': '/webjars/jquery',
+
+  'testConfig': 'testConfig.js',
+  'Logic': 'Logic.js',
 }

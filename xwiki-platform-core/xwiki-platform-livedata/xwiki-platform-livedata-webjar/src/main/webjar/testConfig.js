@@ -19,16 +19,11 @@
  */
 
 
-// This is mock config used while the front-end is not communicating with the macros
-// The config structure is not definitive, and may change to match the final specs
-
 define({
 
-  // The unique id of the Livedata
   id: "LD0",
 
 
-  // The configuration send to the server to fetch entries
   query: {
     properties: ["doc_title", "age", "country", "tags", "other", "_actions"],
 
@@ -56,7 +51,6 @@ define({
   },
 
 
-  // The "meta" configuration of the Livedata
   meta: {
 
     defaultLayout: "table",
@@ -65,12 +59,10 @@ define({
       {
         id: "table",
         name: "Table",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
       },
       {
         id: "cards",
         name: "Cards",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
         titleProperty: "doc_title",
       },
     ],
@@ -254,7 +246,6 @@ define({
 
 
 
-  // The entries fetches from the server
   data: {
 
     count: 545,

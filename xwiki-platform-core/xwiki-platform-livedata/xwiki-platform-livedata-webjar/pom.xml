@@ -137,6 +137,13 @@
           <workingDirectory>${project.build.directory}/vue</workingDirectory>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <configuration>
+          <jsSrcDir>${project.basedir}/src/main/webjar</jsSrcDir>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -167,6 +167,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         try {
             EntityReference entityReference = averageRating.getReference();
             BaseObject baseObject = this.retrieveAverageRatingXObject(entityReference);
+            XWikiContext context = this.contextProvider.get();
 
             // if the base object is null, we create it.
             if (baseObject == null) {
@@ -174,7 +175,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
                 XWikiDocument actualDoc = (XWikiDocument) documentInstance;
                 int xObjectNumber =
                     actualDoc.createXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE,
-                        this.contextProvider.get());
+                        context);
                 baseObject = actualDoc.getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE,
                     xObjectNumber);
             }
@@ -188,7 +189,6 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
             baseObject.setIntValue(AverageRatingQueryField.SCALE.getFieldName(), this.getScale());
             baseObject.setDateValue(AverageRatingQueryField.UPDATED_AT.getFieldName(), averageRating.getUpdatedAt());
 
-            XWikiContext context = this.contextProvider.get();
             context.getWiki().saveDocument(baseObject.getOwnerDocument(), "Update average rating", true, context);
         } catch (Exception e) {
             throw new RatingsException(String.format("Error while saving Average Rating [%s].", averageRating), e);

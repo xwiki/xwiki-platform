@@ -207,7 +207,9 @@ public class ViewPage extends BasePage
                 @Override
                 public Boolean apply(WebDriver driver)
                 {
-                    driver.navigate().refresh();
+                    // Note: don't refresh the page here since that would fail use cases (imagine some async process
+                    // executing, the refresh will just start over that async process!). In addition users don't need
+                    // to click refresh so the tests shouldn't do that either.
                     lastContent[0] = getContent();
                     return Boolean.valueOf(pattern.matcher(lastContent[0]).matches());
                 }

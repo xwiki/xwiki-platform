@@ -119,9 +119,7 @@
     ## Add user-defined Meta directives.
     ## ---------------------------------------------------------------------------------------------------------------
     ## Note: Velocity code, so it needs to be evaluated.
-    #try()
-      #evaluate($!xwiki.getSpacePreference("meta"))
-    #end
+    #evaluate($!xwiki.getSpacePreference("meta"))
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

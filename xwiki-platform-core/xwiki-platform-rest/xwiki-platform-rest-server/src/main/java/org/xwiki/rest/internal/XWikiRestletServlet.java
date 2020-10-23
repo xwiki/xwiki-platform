@@ -110,11 +110,11 @@ public class XWikiRestletServlet extends ServerServlet
         super.init();
 
         try {
-            // Try first in WEB-INF
+            /* Try first in WEB-INF */
             InputStream is =
                 getServletContext().getResourceAsStream(String.format("/WEB-INF/%s", JAVA_LOGGING_PROPERTY_FILE));
 
-            // If nothing is there then try in the current jar
+            /* If nothing is there then try in the current jar */
             if (is == null) {
                 is = getClass().getClassLoader().getResourceAsStream(JAVA_LOGGING_PROPERTY_FILE);
             }

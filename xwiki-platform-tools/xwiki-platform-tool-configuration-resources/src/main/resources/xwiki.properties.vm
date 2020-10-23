@@ -883,9 +883,7 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail.sender.sendQueueCapacity = 1000
 
 #-# [Since 12.9RC1]
-#-# Decides if XWiki should resend automatically mails that were prepared but not sent, at restart.
-#-# Note that emails that were in the prepare_error state are not resent since they failed to be saved and thus cannot
-#-# be resent.
+#-# Decides if XWiki should resend automatically mails that are in the prepare + error states at restart.
 # mail.sender.database.resendAutomaticallyAtStartup = true
 
 #-------------------------------------------------------------------------------------

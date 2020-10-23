@@ -180,18 +180,17 @@ Generates:
   'rowCount' : $xcontext.macro.params.count,
   'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
 })
-#set ($extraParams = [])
-#if ("$!xcontext.macro.params.space" != "")
-  #set ($discard = $extraParams.add("space=$escapetool.url($xcontext.macro.params.space)"))
+#if ("$!xcontext.macro.params.space" != "") 
+  #set ($extraParams = "&amp;space=$escapetool.url($xcontext.macro.params.space)")
 #end
 #if ("$!xcontext.macro.params.location" != "") 
-  #set ($discard = $extraParams.add("location=$escapetool.url($xcontext.macro.params.location)"))
+  #set ($extraParams = "$!{extraParams}&amp;location=$escapetool.url($xcontext.macro.params.location)")
 #end
 #if ("$!xcontext.macro.params.parent" != "") 
-  #set ($discard = $extraParams.add("parent=$escapetool.url($xcontext.macro.params.parent)"))
+  #set ($extraParams = "$!{extraParams}&amp;parent=$escapetool.url($xcontext.macro.params.parent)")
 #end
 #if ("$!extraParams" != "")
-  #set($discard = $options.put('extraParams', $stringtool.join($extraParams, '&amp;')))
+  #set($discard = $options.put('extraParams', $extraParams))
 #end
 #if(!$isGuest &amp;&amp; $xcontext.macro.params.actions == "true")
   #set($discard = $collist.add('_actions'))

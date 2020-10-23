@@ -31,6 +31,7 @@ import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.util.Series;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
@@ -69,8 +70,10 @@ public class XWikiAuthentication extends ChallengeAuthenticator
     @Override
     public boolean authenticate(Request request, Response response)
     {
-        // Browser authentication resource is a special resource that allows to trigger the authentication dialog box in
-        // web browsers.
+        /*
+         * Browser authentication resource is a special resource that allows to trigger the authentication dialog box in
+         * web browsers
+         */
         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
             return super.authenticate(request, response);
         }
@@ -80,18 +83,22 @@ public class XWikiAuthentication extends ChallengeAuthenticator
         XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
         XWiki xwiki = Utils.getXWiki(componentManager);
 
+        DocumentReferenceResolver<String> resolver;
         EntityReferenceSerializer<String> serializer;
         try {
+            resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
             serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         } catch (ComponentLookupException e1) {
             return false;
         }
 
-        // By default set XWiki.Guest as the user that is sending the request.
+        /* By default set XWiki.Guest as the user that is sending the request. */
         xwikiContext.setUserReference(null);
 
-        // After performing the authentication we should add headers to the response to allow applications to
-        // verify if the authentication is still valid We are also adding the XWiki version at the same moment.
+        /*
+         * After performing the authentication we should add headers to the response to allow applications to verify if
+         * the authentication is still valid We are also adding the XWiki version at the same moment.
+         */
         Series<Header> responseHeaders =
             (Series<Header>) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (responseHeaders == null) {
@@ -106,9 +113,9 @@ public class XWikiAuthentication extends ChallengeAuthenticator
             XWikiUser xwikiUser = xwiki.checkAuth(xwikiContext);
             if (xwikiUser != null) {
                 // Make sure the user is in the context
-                xwikiContext.setUserReference(xwikiUser.getUserReference());
+                xwikiContext.setUserReference(resolver.resolve(xwikiUser.getUser()));
 
-                getLogger().fine(String.format("Authenticated as [%s].", xwikiUser.getUserReference()));
+                getLogger().fine(String.format("Authenticated as '%s'.", xwikiUser.getUser()));
 
                 // the user has changed so we need to reset the header
                 responseHeaders.set("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));
@@ -119,7 +126,7 @@ public class XWikiAuthentication extends ChallengeAuthenticator
             getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
         }
 
-        // Fallback on restlet auth
+        // Falback on restlet auth
         return super.authenticate(request, response);
     }
 

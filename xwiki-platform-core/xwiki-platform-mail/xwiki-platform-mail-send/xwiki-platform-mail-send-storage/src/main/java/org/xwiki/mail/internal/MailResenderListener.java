@@ -93,7 +93,7 @@ public class MailResenderListener implements EventListener
             MailResender resender = this.mailResenderProvider.get();
 
             // Resend all mails that in some prepare state since they've not been sent
-            resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "prepare_success"));
+            resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "prepare_%"));
         }
     }
 

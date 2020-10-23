@@ -160,7 +160,7 @@
     </property>
     <property>
       <script>import org.apache.commons.lang3.exception.ExceptionUtils
-services.mail.storage.resend(['state' : 'prepare_success'], 0, 0)
+services.mail.storage.resend(['state' : 'prepare_%'], 0, 0)
 if (services.mail.sender.lastError) {
   // Send a mail to the administrator with the exception, using the default "from" for both
   // the sender and the recipient. If no default from is used then don't send anything.

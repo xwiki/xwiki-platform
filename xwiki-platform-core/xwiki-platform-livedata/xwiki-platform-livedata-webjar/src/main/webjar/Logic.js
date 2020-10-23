@@ -62,7 +62,7 @@ define([
    */
   const Logic = function (element) {
     this.element = element;
-    this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    this.data = JSON.parse(element.getAttribute("data-config") || "{}");
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -72,7 +72,7 @@ define([
     };
     this.openedPanels = [];
 
-    element.removeAttribute("data-data");
+    element.removeAttribute("data-config");
     // create Vuejs instance
     new Vue({
       el: this.element,

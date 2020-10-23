@@ -19,8 +19,6 @@
  */
 package org.xwiki.livedata.internal.macro;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -55,6 +53,7 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.skinx.SkinExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -77,6 +76,13 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
 
     /**
+     * The component used to load the JavaScript code of the Live Data widget.
+     */
+    @Inject
+    @Named("jsfx")
+    private SkinExtension jsfx;
+
+    /**
      * Default constructor.
      */
     public LiveDataMacro()
@@ -89,7 +95,10 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     public List<Block> execute(LiveDataMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // TODO: Load the JavaScript and CSS.
+        // Load the JavaScript code of the Live Data widget.
+        Map<String, Object> skinExtensionParameters = Collections.singletonMap("forceSkinAction", Boolean.TRUE);
+        this.jsfx.use("uicomponents/widgets/liveData.js", skinExtensionParameters);
+
         GroupBlock output = new GroupBlock();
         output.setParameter("class", "liveData");
         if (parameters.getId() != null) {
@@ -116,7 +125,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     }
 
     private LiveDataConfiguration getLiveDataConfiguration(LiveDataMacroParameters parameters, String content)
-        throws MalformedURLException, UnsupportedEncodingException
+        throws Exception
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
         liveDataConfig.setId(parameters.getId());
@@ -126,8 +135,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return liveDataConfig;
     }
 
-    private LiveDataQuery getQuery(LiveDataMacroParameters parameters)
-        throws MalformedURLException, UnsupportedEncodingException
+    private LiveDataQuery getQuery(LiveDataMacroParameters parameters) throws Exception
     {
         LiveDataQuery query = new LiveDataQuery();
         query.setProperties(getProperties(parameters.getProperties()));
@@ -149,8 +157,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         }
     }
 
-    private Map<String, Object> getSourceParameters(String sourceParametersString)
-        throws MalformedURLException, UnsupportedEncodingException
+    private Map<String, Object> getSourceParameters(String sourceParametersString) throws Exception
     {
         if (StringUtils.isEmpty(sourceParametersString)) {
             return Collections.emptyMap();
@@ -190,14 +197,13 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return sortEntry;
     }
 
-    private List<Filter> getFilters(String filtersString) throws MalformedURLException, UnsupportedEncodingException
+    private List<Filter> getFilters(String filtersString) throws Exception
     {
         return getURLParameters('?' + StringUtils.defaultString(filtersString)).entrySet().stream().map(this::getFilter)
             .collect(Collectors.toList());
     }
 
-    private List<Filter> getFilters(LiveDataMacroParameters parameters)
-        throws MalformedURLException, UnsupportedEncodingException
+    private List<Filter> getFilters(LiveDataMacroParameters parameters) throws Exception
     {
         List<Filter> filters = new ArrayList<>();
         // Add hidden filters that the user cannot change.
@@ -251,8 +257,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return pagination;
     }
 
-    private Map<String, List<String>> getURLParameters(String url)
-        throws MalformedURLException, UnsupportedEncodingException
+    private Map<String, List<String>> getURLParameters(String url) throws Exception
     {
         URL baseURL = new URL("http://www.xwiki.org");
         String queryString = new URL(baseURL, url).getQuery();

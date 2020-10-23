@@ -48,12 +48,14 @@ CKEDITOR.editorConfig = function(config) {
     linkShowAdvancedTab: false,
     linkShowTargetTab: false,
     pasteFilter: {
+      // Allowed anchor attributes.
       a: {
         propertiesOnly: true,
         attributes: {
           href: true
         }
       },
+      // Allowed image attributes.
       img: {
         propertiesOnly: true,
         attributes: {
@@ -63,6 +65,7 @@ CKEDITOR.editorConfig = function(config) {
           width: true
         }
       },
+      // Allowed table header and table cell attributes.
       'th td': {
         propertiesOnly: true,
         attributes: {
@@ -70,23 +73,27 @@ CKEDITOR.editorConfig = function(config) {
           rowspan: true
         }
       },
+      // Allowed elements.
       $1: {
-        // Allow all elements except DIV and SPAN which are generally used for styling.
+        // Allow all elements except for:
+        // * DIV and SPAN, which are generally used for styling (DIVs will be replaced with paragraphs, if possible,
+        //   otherwise with their child nodes; SPANs will be replaced with their child nodes)
+        // * lone paragraphs, when inside a list item, table cell, definition list or block quote (in order to simplify
+        //   the generated wiki syntax; they will be replaced by their child nodes)
         match: function(element) {
+          var loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
           var name = element.name.toLowerCase();
-          return name !== 'div' && name !== 'span';
-        }
-      },
-      $2: {
-        // Replace lone paragraphs with their children in order to simplify the wiki syntax.
-        match: function(element) {
-          var targetParentNames = ['li', 'td', 'th', 'dd', 'blockquote'];
-          if (element.name.toLowerCase() === 'p' && element.parent && element.parent.name &&
-              targetParentNames.indexOf(element.parent.name.toLowerCase()) >= 0 &&
-              element.parent.children.length === 1) {
-            element.replaceWithChildren();
-            return true;
+          var allowed = name !== 'div' && name !== 'span' && (
+            name !== 'p' || !element.parent || !element.parent.name ||
+            element.parent.children.length > 1 || loneParagraphParents.indexOf(element.parent.name.toLowerCase()) < 0
+          );
+          if (!allowed && name === 'p') {
+            // In order to remove this lone paragraph we need to change its name, otherwise CKEditor will simply replace
+            // it with another paragraph (it does this with most of the block level elements, when possible, in order to
+            // preserve the content structure).
+            element.name = 'lone-paragraph';
           }
+          return allowed;
         }
       }
     },

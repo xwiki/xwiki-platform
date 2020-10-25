@@ -70,7 +70,7 @@ public class FlamingoThemeIT
         // Only caveat is that if you run this test several times and it fails the first time then it may fail the
         // second time when we test that the default CT is Charcoal...
 
-        // Go to the Theme section of the administration
+        // Go to the Theme section of the wiki administration UI
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         ThemesAdministrationSectionPage presentationAdministrationSectionPage =
             administrationPage.clickThemesSection();
@@ -89,7 +89,23 @@ public class FlamingoThemeIT
         assertTrue(otherThemes.contains("Kitty"));
         assertFalse(otherThemes.contains("Charcoal"));
 
-        // Create a new theme
+        // Create a new theme both to validate that the feature works and to be used as the new theme to set in the
+        // tests below.
+        validateThemeCreation(themeApplicationWebHomePage, testMethodName);
+
+        // Validate viewing and setting a color theme from the color theme home page
+        validateViewAndSetThemeFromThemeHomePage(themeApplicationWebHomePage, testMethodName);
+
+        // Validate setting a color theme from the wiki Admin UI
+        validateSetThemeFromWikiAdminUI(testMethodName);
+
+        // Switch back to Charcoal (just to set the default back if you need to execute the test again)
+        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        themeApplicationWebHomePage.useTheme("Charcoal");
+    }
+
+    private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)
+    {
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
 
         // First, disable auto refresh because it slows down the test
@@ -101,7 +117,11 @@ public class FlamingoThemeIT
         verifyThatPreviewWorks(editThemePage);
 
         editThemePage.clickSaveAndView();
+    }
 
+    private void validateViewAndSetThemeFromThemeHomePage(ThemeApplicationWebHomePage themeApplicationWebHomePage,
+        String testMethodName)
+    {
         // Go back to the theme application
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
 
@@ -119,17 +139,20 @@ public class FlamingoThemeIT
         assertColor(0, 0, 255, themeApplicationWebHomePage.getTextColor());
         assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
 
-        // Verify we can select a theme by clicking the "use this theme" link, and view it
+        // Verify we can view a theme by clicking it
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
         themeApplicationWebHomePage.seeTheme(testMethodName);
 
         // Switch back to Charcoal
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
         themeApplicationWebHomePage.useTheme("Charcoal");
+    }
 
+    private void validateSetThemeFromWikiAdminUI(String testMethodName)
+    {
         // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
-        administrationPage = AdministrationPage.gotoPage();
-        presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
         // Set the newly created color theme as the active theme
         presentationAdministrationSectionPage.setColorTheme(testMethodName);
@@ -138,13 +161,9 @@ public class FlamingoThemeIT
 
         // Click on the 'customize' button to edit the theme to verify it works
         presentationAdministrationSectionPage.clickOnCustomize();
-        editThemePage = new EditThemePage();
+        EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
-
-        // Switch back to Charcoal (just to set the default back if you need to execute the test again)
-        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
-        themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
     private void assertColor(int red, int green, int blue, String obtainedValue)

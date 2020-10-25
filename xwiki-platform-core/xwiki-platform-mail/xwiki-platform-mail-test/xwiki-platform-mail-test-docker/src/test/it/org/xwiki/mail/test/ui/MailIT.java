@@ -148,6 +148,7 @@ public class MailIT
         // setup is not correct
 
         // Make sure there's an invalid mail server set.
+        // Also verifies that the mail sending page works in general.
         wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("invalidmailserver");
@@ -158,6 +159,8 @@ public class MailIT
 
         // Step 3: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
         wikiAdministrationPage = AdministrationPage.gotoPage();
+        // Also verifies that the Mail Sending section works. From now on below, we'll navigate directly to that page
+        // without navigation since navigation is validated here.
         wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost(testConfiguration.getServletEngine().getHostIP());
@@ -229,9 +232,7 @@ public class MailIT
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
-        wikiAdministrationPage = AdministrationPage.gotoPage();
-        wikiAdministrationPage.clickSection("Mail", "Mail Sending Status");
-        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         LiveTableElement liveTableElement = statusPage.getLiveTable();
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_success");
@@ -249,8 +250,27 @@ public class MailIT
         assertTrue(liveTableElement.getRowCount() > 0);
         assertTrue(liveTableElement.hasRow("Error", ""));
 
-        // Step 8: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
+        // Step 8: Verify that the Resend button in the Mail Status LT works fine by trying to resend the mail in error
+        // now that the mail server is set correctly.
+        verifyIndividualResend();
+
+        // Step 9: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
         verifyMailResenderSchedulerJob(setup);
+    }
+
+    private void verifyIndividualResend()
+    {
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        LiveTableElement liveTableElement = statusPage.getLiveTable();
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_error");
+        liveTableElement.clickAction("mailsendingaction_resend", 1);
+
+        // Refresh the page and verify the mail to to@doe.com is in send_success state now
+        statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        liveTableElement = statusPage.getLiveTable();
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "to@doe.com");
+        assertEquals(1, liveTableElement.getRowCount());
+        assertEquals("send_success", liveTableElement.getCell(1, 5).getText());
     }
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
@@ -324,9 +344,7 @@ public class MailIT
         this.mail.purgeEmailFromAllMailboxes();
 
         // Verify that we have a mail in the prepare_success state
-        AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
-        wikiAdministrationPage.clickSection("Mail", "Mail Sending Status");
-        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         LiveTableElement liveTableElement = statusPage.getLiveTable();
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "prepare_success");
         assertEquals(1, liveTableElement.getRowCount());

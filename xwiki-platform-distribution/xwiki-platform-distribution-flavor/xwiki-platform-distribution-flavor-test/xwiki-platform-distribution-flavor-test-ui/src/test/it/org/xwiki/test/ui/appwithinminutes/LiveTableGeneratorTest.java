@@ -73,7 +73,7 @@ public class LiveTableGeneratorTest extends AbstractTest
     {
         // Create an application that has a Static List field and add a corresponding column to the live table.
         classEditPage.addField("Static List");
-        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep().waitUntilPageIsLoaded();
+        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
         homeEditPage.addLiveTableColumn("Static List");
 
         // Add first entry.
@@ -113,7 +113,7 @@ public class LiveTableGeneratorTest extends AbstractTest
     {
         // Create an application that has a Title field and add a corresponding column to the live table.
         classEditPage.addField("Title");
-        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep().waitUntilPageIsLoaded();
+        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
         homeEditPage.addLiveTableColumn("Title");
         homeEditPage.moveLiveTableColumnBefore("Title", "Page Title");
 

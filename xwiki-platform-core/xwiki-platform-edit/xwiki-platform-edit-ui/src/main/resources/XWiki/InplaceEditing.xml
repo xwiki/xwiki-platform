@@ -829,7 +829,8 @@ define('editInPlace', [
         formData.previousVersion = xwikiDocument.version;
         formData.editingVersionDate = new Date(xwikiDocument.modified).getTime();
       }
-      return $.extend(formData, extra);
+      // Ensure that formData information has priority over extra information.
+      return $.extend({}, extra, formData);
     }
   };
 

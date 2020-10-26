@@ -157,14 +157,19 @@ public class WARBuilder
             }
 
             // Step: Copy the JARs in WEB-INF/lib
-            File libDirectory = new File(webInfDirectory, "lib");
-            copyJARs(this.testConfiguration, jarDependencies, libDirectory);
+            File webInfLibDirectory = new File(webInfDirectory, "lib");
+            copyJARs(this.testConfiguration, jarDependencies, webInfLibDirectory);
+
+            // Step: Copy target/classes to WEB-INF/classes to allow docker tests to provide custom java code that is
+            // deployed in the custom WAR.
+            File webInfClassesDirectory = new File(webInfDirectory, "classes");
+            copyClasses(webInfClassesDirectory);
 
             // Step: Add the webapp resources (web.xml, templates VM files, etc)
             copyWebappResources(this.testConfiguration, warDependencies, this.targetWARDirectory);
 
             // Step: Add the JDBC driver for the selected DB
-            copyJDBCDriver(libDirectory);
+            copyJDBCDriver(webInfLibDirectory);
 
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
@@ -176,6 +181,11 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+    }
+
+    private void copyClasses(File webInfClassesDirectory) throws Exception
+    {
+        copyDirectory(new File("target/classes"), webInfClassesDirectory);
     }
 
     private void copyJDBCDriver(File libDirectory) throws Exception

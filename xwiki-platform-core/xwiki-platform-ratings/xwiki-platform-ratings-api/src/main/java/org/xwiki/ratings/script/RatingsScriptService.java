@@ -53,7 +53,7 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class RatingsScriptService extends AbstractScriptRatingsManager implements Initializable, ScriptService
 {
-    private static final String EXECUTION_CONTEXT_PREFIX = "ratings.script.";
+    static final String EXECUTION_CONTEXT_PREFIX = "ratings.script.";
 
     @Inject
     private RatingsManagerFactory ratingsManagerFactory;

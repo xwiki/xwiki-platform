@@ -40,6 +40,8 @@ import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.like.LikeConfiguration;
@@ -70,7 +72,7 @@ import org.xwiki.user.UserReferenceSerializer;
  */
 @Component
 @Singleton
-public class DefaultLikeManager implements LikeManager, Initializable
+public class DefaultLikeManager implements LikeManager, Initializable, Disposable
 {
     private static final int DEFAULT_LIKE_VOTE = 1;
 
@@ -194,6 +196,13 @@ public class DefaultLikeManager implements LikeManager, Initializable
         } catch (RatingsException e) {
             throw new InitializationException("Error while trying to get the RatingManager.", e);
         }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.likeExistCache.dispose();
+        this.likeCountCache.dispose();
     }
 
     private String getExistCacheKey(UserReference source, EntityReference target)
@@ -352,8 +361,8 @@ public class DefaultLikeManager implements LikeManager, Initializable
     public void clearCache(EntityReference target)
     {
         this.likeCountCache.remove(this.entityReferenceSerializer.serialize(target));
-        List<String> impactedKeys =
-            this.likeExistCacheEntryListener.getReferenceKeyMapping().getOrDefault(target, Collections.emptyList());
+        List<String> impactedKeys = new ArrayList<>(
+            this.likeExistCacheEntryListener.getReferenceKeyMapping().getOrDefault(target, Collections.emptyList()));
         for (String impactedKey : impactedKeys) {
             this.likeExistCache.remove(impactedKey);
         }

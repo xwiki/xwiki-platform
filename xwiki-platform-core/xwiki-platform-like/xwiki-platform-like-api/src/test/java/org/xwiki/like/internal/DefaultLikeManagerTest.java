@@ -319,4 +319,12 @@ public class DefaultLikeManagerTest
 
         assertEquals(42L, this.defaultLikeManager.countUserLikes(this.userReference));
     }
+
+    @Test
+    void dispose() throws Exception
+    {
+        this.defaultLikeManager.dispose();
+        verify(this.likeExistCache).dispose();
+        verify(this.likedEntityCache).dispose();
+    }
 }

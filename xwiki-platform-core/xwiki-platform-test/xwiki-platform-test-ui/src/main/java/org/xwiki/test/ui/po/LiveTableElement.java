@@ -290,4 +290,17 @@ public class LiveTableElement extends BaseElement
 
         waitUntilReady();
     }
+
+    /**
+     * Clicks a form element (usually a button) with the passed name at the passed row number.
+     *
+     * @param actionName the HTML form element name attribute value
+     * @param rowNumber the LT row number (starts at 1)
+     * @since 12.10RC1
+     */
+    public void clickAction(String actionName, int rowNumber)
+    {
+        WebElement rowElement = getRow(rowNumber);
+        rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
+    }
 }

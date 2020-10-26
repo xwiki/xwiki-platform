@@ -36,7 +36,7 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
  * Default implementation of {@link LiveDataEntryPropertyResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryPropertyResource")

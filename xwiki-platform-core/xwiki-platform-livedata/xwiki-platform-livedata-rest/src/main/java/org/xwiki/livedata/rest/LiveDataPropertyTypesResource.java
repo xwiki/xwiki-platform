@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * Provides the list of known property types from an existing {@link LiveDataSource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Path("/liveData/sources/{sourceId}/types")
 @Unstable

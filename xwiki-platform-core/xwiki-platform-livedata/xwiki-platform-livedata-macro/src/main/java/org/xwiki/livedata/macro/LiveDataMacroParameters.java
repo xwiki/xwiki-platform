@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Parameters for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Unstable
 public class LiveDataMacroParameters

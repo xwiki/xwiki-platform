@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Resolves the live data configuration from a string map.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component
 @Singleton

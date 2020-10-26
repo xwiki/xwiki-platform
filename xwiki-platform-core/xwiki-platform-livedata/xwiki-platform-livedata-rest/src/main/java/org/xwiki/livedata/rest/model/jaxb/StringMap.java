@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * schema-generated class from the separate bindings file but none succeeded.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @XmlJavaTypeAdapter(MapAdapter.class)
 @Unstable

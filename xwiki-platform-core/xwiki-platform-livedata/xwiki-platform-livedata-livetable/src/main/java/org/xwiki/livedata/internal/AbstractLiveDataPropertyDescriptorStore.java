@@ -37,7 +37,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Base {@link LiveDataPropertyDescriptorStore} implementation.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 public abstract class AbstractLiveDataPropertyDescriptorStore extends WithParameters
     implements LiveDataPropertyDescriptorStore

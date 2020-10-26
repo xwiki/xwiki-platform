@@ -44,7 +44,7 @@ import org.xwiki.rest.model.jaxb.Link;
  * Default implementation of {@link LiveDataPropertyTypesResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypesResource")

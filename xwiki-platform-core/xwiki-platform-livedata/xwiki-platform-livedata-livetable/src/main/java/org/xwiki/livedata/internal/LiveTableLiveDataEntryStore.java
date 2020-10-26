@@ -63,7 +63,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * {@link LiveDataEntryStore} implementation that reuses existing live table data.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component
 @Named("liveTable")

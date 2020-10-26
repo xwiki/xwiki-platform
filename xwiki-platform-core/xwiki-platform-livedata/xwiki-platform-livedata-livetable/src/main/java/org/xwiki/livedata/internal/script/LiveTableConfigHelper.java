@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Helper component for converting the Live Table configuration into Live Data configuration.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component(roles = LiveTableConfigHelper.class)
 @Singleton

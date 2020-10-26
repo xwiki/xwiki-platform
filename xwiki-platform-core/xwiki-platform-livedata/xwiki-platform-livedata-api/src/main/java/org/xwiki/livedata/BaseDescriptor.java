@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Base class for various live data configuration descriptors.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Unstable
 public class BaseDescriptor extends WithParameters

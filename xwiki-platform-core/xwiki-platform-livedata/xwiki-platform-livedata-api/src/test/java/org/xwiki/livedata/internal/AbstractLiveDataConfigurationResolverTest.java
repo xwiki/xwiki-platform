@@ -33,7 +33,7 @@ import org.xwiki.livedata.LiveDataConfigurationResolver;
  * Base class for {@link LiveDataConfigurationResolver} tests.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 class AbstractLiveDataConfigurationResolverTest
 {

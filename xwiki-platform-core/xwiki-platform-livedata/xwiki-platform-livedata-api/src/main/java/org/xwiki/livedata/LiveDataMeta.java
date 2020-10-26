@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * Describes the configuration used to display the live data.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

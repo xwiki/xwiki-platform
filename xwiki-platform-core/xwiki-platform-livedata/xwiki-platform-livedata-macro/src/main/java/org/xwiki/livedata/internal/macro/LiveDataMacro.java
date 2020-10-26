@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Display dynamic lists of data.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @Component
 @Named("liveData")

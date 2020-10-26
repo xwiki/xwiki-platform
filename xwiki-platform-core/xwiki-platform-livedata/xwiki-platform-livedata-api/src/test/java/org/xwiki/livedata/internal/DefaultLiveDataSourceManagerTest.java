@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultLiveDataSourceManager}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10RC1
  */
 @ComponentTest
 class DefaultLiveDataSourceManagerTest

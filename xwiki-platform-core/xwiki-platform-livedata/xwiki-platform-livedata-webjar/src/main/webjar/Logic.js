@@ -19,7 +19,7 @@
  */
 
 
-define([], function () {
+define("Logic", [], function () {
 
 
   /**

@@ -22,7 +22,7 @@
 // This is mock config used while the front-end is not communicating with the macros
 // The config structure is not definitive, and may change to match the final specs
 
-define({
+define("mockConfig", {
 
   // The unique id of the Livedata
   id: "LD0",

@@ -19,7 +19,7 @@
  */
 
 
-define([
+define("Livedata", [
   "Vue",
   "Logic",
   "xwiki-livedata",

@@ -50,7 +50,7 @@ import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
 
 
-export default {
+const XWikiLivedata = {
 
   name: "XWikiLivedata",
 
@@ -82,6 +82,9 @@ export default {
   },
 
 };
+
+export default XWikiLivedata;
+export { XWikiLivedata };
 </script>
 
 

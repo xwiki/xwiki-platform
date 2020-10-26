@@ -81,7 +81,7 @@ public class DocumentFieldsTest extends AbstractTest
         contentField.setDefaultValue(defaultContent);
 
         // Add live table columns for Title and Content.
-        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep().waitUntilPageIsLoaded();
+        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
         homeEditPage.addLiveTableColumn("My Title");
         homeEditPage.addLiveTableColumn("My Content");
 

@@ -35,6 +35,12 @@ public class MailStatusAdministrationSectionPage extends AdministrationSectionPa
         super("Mail Sending Status");
     }
 
+    public static MailStatusAdministrationSectionPage gotoPage()
+    {
+        gotoPage("emailStatus");
+        return new MailStatusAdministrationSectionPage();
+    }
+
     /**
      * @return the status live table
      */

@@ -19,6 +19,8 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -123,5 +126,19 @@ public class DefaultRatingsManagerFactoryTest
 
         assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);
+    }
+
+    @Test
+    void getInstantiatedManagers() throws Exception
+    {
+        RatingsManager manager1 = mock(RatingsManager.class);
+        RatingsManager manager2 = mock(RatingsManager.class);
+        RatingsManager manager3 = mock(RatingsManager.class);
+        when(this.contextComponentManager.getInstanceList(RatingsManager.class)).thenReturn(Arrays.asList(
+            manager1, manager2, manager3
+        ));
+        when(manager1.getIdentifier()).thenReturn("foo");
+        when(manager3.getIdentifier()).thenReturn("bar");
+        assertEquals(Arrays.asList(manager1, manager3), this.factory.getInstantiatedManagers());
     }
 }

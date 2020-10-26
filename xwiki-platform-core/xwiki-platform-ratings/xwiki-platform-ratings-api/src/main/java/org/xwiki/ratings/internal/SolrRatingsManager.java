@@ -430,6 +430,9 @@ public class SolrRatingsManager implements RatingsManager
             result = query.getResults().getNumFound();
             this.getRatingSolrClient().deleteByQuery(filterQuery);
             this.getRatingSolrClient().commit();
+            if (this.getRatingConfiguration().isAverageStored()) {
+                this.getAverageRatingManager().removeAverageRatings(entityReference);
+            }
         } catch (SolrServerException | IOException | SolrException e) {
             throw new RatingsException("Error while trying to remove ratings", e);
         }
@@ -477,7 +480,7 @@ public class SolrRatingsManager implements RatingsManager
                 offsetIndex += AVERAGE_COMPUTATION_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
-            float newAverage = sumOfVotes / numberOfVotes;
+            float newAverage = Float.valueOf(sumOfVotes) / numberOfVotes;
             return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);

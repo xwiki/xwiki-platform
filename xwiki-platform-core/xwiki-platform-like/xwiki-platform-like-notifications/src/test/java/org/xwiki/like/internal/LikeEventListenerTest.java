@@ -22,7 +22,7 @@ package org.xwiki.like.internal;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.like.LikeEvent;
+import org.xwiki.like.events.LikeEvent;
 import org.xwiki.like.events.LikeRecordableEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

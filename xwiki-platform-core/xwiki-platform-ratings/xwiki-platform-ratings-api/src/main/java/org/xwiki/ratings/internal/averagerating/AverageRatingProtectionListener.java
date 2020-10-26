@@ -19,6 +19,8 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -61,18 +63,19 @@ public class AverageRatingProtectionListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
-        BaseObject ratingObject = document
-            .getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE);
 
-        if (ratingObject != null) {
-            // If the modification is not part of an official rating cancel it
-            if (!this.observationContext.isIn(PARENT)) {
-                XWikiDocument previousDocument = document.getOriginalDocument();
+        // If the modification is not part of an official rating cancel it
+        if (!this.observationContext.isIn(PARENT)) {
+            List<BaseObject> xObjects =
+                document.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE);
+            XWikiDocument previousDocument = document.getOriginalDocument();
+
+            for (BaseObject ratingXObject : xObjects) {
+                int number = ratingXObject.getNumber();
                 BaseObject previousObject = previousDocument
-                    .getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE);
-
+                    .getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, number);
                 if (previousObject != null) {
-                    ratingObject.apply(previousObject, true);
+                    ratingXObject.apply(previousObject, true);
                 }
             }
         }

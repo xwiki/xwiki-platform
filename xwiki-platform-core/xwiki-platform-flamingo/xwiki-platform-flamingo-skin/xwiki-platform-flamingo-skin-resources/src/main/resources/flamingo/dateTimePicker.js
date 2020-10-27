@@ -70,20 +70,16 @@ require(['moment'], function(moment) {
         dateTimeInput.on('dp.show', function() {
           var dateTimePicker = $('body').children('.bootstrap-datetimepicker-widget').last();
           if (dateTimePicker.hasClass('bottom')) {
-            var top = dateTimeInput.offset().top + dateTimeInput.outerHeight();
-            var left = dateTimeInput.offset().left;
             dateTimePicker.css({
-              top: top + 'px',
+              top: (dateTimeInput.offset().top + dateTimeInput.outerHeight()) + 'px',
               bottom: 'auto',
-              left: left + 'px'
+              left: dateTimeInput.offset().left + 'px'
             });
           } else if (dateTimePicker.hasClass('top')) {
-            var top = dateTimeInput.offset().top - dateTimePicker.outerHeight() - 4;
-            var left = dateTimeInput.offset().left;
             dateTimePicker.css({
-              top: top + 'px',
+              top: (dateTimeInput.offset().top - dateTimePicker.outerHeight() - 4) + 'px',
               bottom: 'auto',
-              left: left + 'px'
+              left: dateTimeInput.offset().left + 'px'
             });
           }
         });

@@ -105,6 +105,11 @@ ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
 ### Missing: ckeditor.plugin.toolbar.code=Code Snippet
 ### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
 
+### Missing: ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
+### Missing: ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+
 ### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 modal.ok=OK

@@ -92,7 +92,7 @@ public class XWikiSecretVerifier extends SecretVerifier
 
                 return RESULT_VALID;
             } else {
-                authenticationFailureManager.recordAuthenticationFailure(identifier);
+                authenticationFailureManager.recordAuthenticationFailure(identifier, securityRequestWrapper);
                 if (principal != null) {
                     ContextualLocalizationManager contextualLocalizationManager =
                         componentManager.getInstance(ContextualLocalizationManager.class);

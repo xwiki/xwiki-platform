@@ -19,6 +19,8 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,13 +32,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.securityfilter.filter.SecurityRequestWrapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
@@ -56,7 +66,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
  */
 @Component
 @Singleton
-public class DefaultAuthenticationFailureManager implements AuthenticationFailureManager
+public class DefaultAuthenticationFailureManager implements AuthenticationFailureManager, Initializable, Disposable
 {
     private static final String STRING_AGGREGATION_SEPARATOR = "\n";
 
@@ -79,6 +89,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    private CacheManager cacheManager;
+
+    @Inject
     private Logger logger;
 
     private String[] failureStrategyNames;
@@ -87,6 +100,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     private Map<String, AuthFailureRecord> authFailures = new HashMap<>();
 
+    private Cache<Instant> sessionFailures;
+
     private Map<DocumentReference, String> userAndAssociatedUsernames = new HashMap<>();
 
     /**
@@ -94,6 +109,24 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
      */
     public DefaultAuthenticationFailureManager()
     {
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        int cacheCapacity = 100;
+        try {
+            this.sessionFailures = this.cacheManager.createNewCache(
+                new LRUCacheConfiguration("xwiki.security.authentication.failingSession.cache", cacheCapacity));
+        } catch (CacheException e) {
+            throw new InitializationException("Error while initializing the failing session cache.", e);
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.sessionFailures.dispose();
     }
 
     private void buildStrategyList()
@@ -142,7 +175,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     }
 
     @Override
-    public boolean recordAuthenticationFailure(String username)
+    public boolean recordAuthenticationFailure(String username, HttpServletRequest request)
     {
         // An authentication failure just happened, so we trigger the appropriate event.
         observationManager.notify(AUTHENTICATION_FAILURE_EVENT, username);
@@ -167,6 +200,11 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             }
         }
 
+
+        if (isSessionAlreadyFailing(request)) {
+            authFailures.get(username).setThresholdReached();
+        }
+
         boolean isThresholdReached = authFailures.get(username).isThresholdReached();
 
         // The threshold is reached: we need to notify the strategies and the listeners.
@@ -174,6 +212,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
                 authenticationFailureStrategy.notify(username);
             }
+            // We store the current session ID with the date when we won't consider the session as attacking
+            // right now the default value is to consider it as an attacker for 1 day.
+            this.sessionFailures.set(request.getSession().getId(), new Date().toInstant().plus(1, ChronoUnit.DAYS));
             observationManager.notify(AUTHENTICATION_FAILURE_LIMIT_REACHED_EVENT, username);
         }
 
@@ -199,13 +240,19 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         return this.authFailures.containsKey(username) && this.authFailures.get(username).isThresholdReached();
     }
 
+    private boolean isSessionAlreadyFailing(HttpServletRequest request)
+    {
+        Instant limitDateOfAttackingSession = this.sessionFailures.get(request.getSession().getId());
+        return limitDateOfAttackingSession != null && new Date().toInstant().isBefore(limitDateOfAttackingSession);
+    }
+
     @Override
-    public String getForm(String username)
+    public String getForm(String username, HttpServletRequest request)
     {
         StringBuilder builder = new StringBuilder();
 
         // We only call the strategies if the threshold is reached.
-        if (!skipUsername(username) && isThresholdReached(username)) {
+        if ((!skipUsername(username) && isThresholdReached(username)) || isSessionAlreadyFailing(request)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
                 builder.append(authenticationFailureStrategy.getForm(username));
                 builder.append(STRING_AGGREGATION_SEPARATOR);
@@ -216,7 +263,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     }
 
     @Override
-    public boolean validateForm(String username, SecurityRequestWrapper request)
+    public boolean validateForm(String username, HttpServletRequest request)
     {
         boolean result = true;
 
@@ -227,9 +274,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         }
 
         // We only call the strategies if the threshold is reached.
-        if (!skipUsername(username) && isThresholdReached(username)) {
+        if ((!skipUsername(username) && isThresholdReached(username)) || isSessionAlreadyFailing(request)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
-
                 // The form is validated if ALL strategies validated it.
                 result = result && authenticationFailureStrategy.validateForm(username, request);
             }
@@ -327,6 +373,11 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             } else {
                 this.nbAttempts++;
             }
+        }
+
+        void setThresholdReached()
+        {
+            this.nbAttempts = getMaxNbAttempts();
         }
 
         boolean isThresholdReached()

@@ -19,12 +19,21 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -95,6 +104,9 @@ public class DefaultAuthenticationFailureManagerTest
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
+    @MockComponent
+    private CacheManager cacheManager;
+
     @Mock
     private XWikiContext context;
 
@@ -103,6 +115,8 @@ public class DefaultAuthenticationFailureManagerTest
 
     @Mock
     private XWiki xWiki;
+
+    private Cache<Instant> sessionFailing;
 
     private String failingLogin = "foobar";
 
@@ -113,6 +127,13 @@ public class DefaultAuthenticationFailureManagerTest
     {
         Utils.setComponentManager(componentManager);
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+
+        sessionFailing = mock(Cache.class);
+        when(cacheManager.createNewCache(any())).then(invocationOnMock -> {
+            CacheConfiguration cacheConfiguration = invocationOnMock.getArgument(0);
+            assertEquals("xwiki.security.authentication.failingSession.cache", cacheConfiguration.getConfigurationId());
+            return sessionFailing;
+        });
     }
 
     @BeforeEach
@@ -128,14 +149,26 @@ public class DefaultAuthenticationFailureManagerTest
         when(xWiki.getDocument(any(DocumentReference.class), eq(context))).thenReturn(userDocument);
     }
 
+    private HttpServletRequest getRequest(String sessionId)
+    {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpSession session = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(session);
+        when(session.getId()).thenReturn(sessionId);
+
+        return request;
+    }
+
     /**
      * Ensure that a AuthenticationFailureEvent is triggered.
      */
     @Test
     public void authenticationFailureIsTriggered()
     {
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureEvent(), this.failingLogin);
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin,
+            getRequest("something")));
+        verify(this.observationManager).notify(new AuthenticationFailureEvent(), this.failingLogin);
+        verify(this.sessionFailing).get("something");
     }
 
     /**
@@ -144,25 +177,29 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     void authenticationFailureLimitReached()
     {
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        HttpServletRequest request = getRequest("customId");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(4)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, times(2)).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
         verify(this.strategy1, times(2)).notify(failingLogin);
         verify(this.strategy2, times(2)).notify(failingLogin);
+        verify(this.sessionFailing, times(2)).set(eq("customId"), any(Instant.class));
+        verify(this.sessionFailing, times(4)).get("customId");
     }
 
     @Test
     void authenticationFailureEmptyLogin()
     {
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(""));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(""));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null));
+        HttpServletRequest request = getRequest("customId2");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure("", request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure("", request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null, request));
 
         verify(this.observationManager, times(2)).notify(new AuthenticationFailureEvent(), "");
         verify(this.observationManager, times(2)).notify(new AuthenticationFailureEvent(), null);
@@ -177,19 +214,22 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void repeatedAuthenticationFailureOutOfTimeWindow() throws InterruptedException
     {
+        HttpServletRequest request = getRequest("anotherId");
         when(configuration.getTimeWindow()).thenReturn(1);
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
         Thread.sleep(1500);
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
         verify(this.strategy1, times(1)).notify(failingLogin);
         verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.sessionFailing).set(eq("anotherId"), any(Instant.class));
+        verify(this.sessionFailing, times(5)).get("anotherId");
     }
 
     /**
@@ -198,18 +238,21 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void repeatedAuthenticationFailureDifferentThreshold()
     {
+        HttpServletRequest request = getRequest("foobar");
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(5);
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
         verify(this.strategy1, times(1)).notify(failingLogin);
         verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.sessionFailing).set(eq("foobar"), any(Instant.class));
+        verify(this.sessionFailing, times(5)).get("foobar");
     }
 
     /**
@@ -218,18 +261,21 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void resetAuthFailureRecord()
     {
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        HttpServletRequest request = getRequest("reset");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
         this.defaultAuthenticationFailureManager.resetAuthenticationFailureCounter(this.failingLogin);
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
         verify(this.strategy1, times(1)).notify(failingLogin);
         verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.sessionFailing).set(eq("reset"), any(Instant.class));
+        verify(this.sessionFailing, times(5)).get("reset");
     }
 
     /**
@@ -238,18 +284,21 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void resetAuthFailureRecordWithDocumentReference()
     {
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        HttpServletRequest request = getRequest("reset2");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
         this.defaultAuthenticationFailureManager.resetAuthenticationFailureCounter(this.userFailingDocumentReference);
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
         verify(this.strategy1, times(1)).notify(failingLogin);
         verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.sessionFailing).set(eq("reset2"), any(Instant.class));
+        verify(this.sessionFailing, times(5)).get("reset2");
     }
 
     /**
@@ -258,21 +307,22 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void recordAuthFailureDifferentLogin()
     {
+        HttpServletRequest request = getRequest("multilogin");
         String login1 = this.failingLogin.toLowerCase();
         String login2 = this.failingLogin.toUpperCase();
         String login3 = "barfoo";
 
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3, request));
 
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2));
-        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3, request));
 
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2));
-        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3, request));
 
         verify(this.observationManager, times(3)).notify(new AuthenticationFailureEvent(), login1);
         verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
@@ -291,6 +341,27 @@ public class DefaultAuthenticationFailureManagerTest
             login3);
         verify(this.strategy1, times(1)).notify(login3);
         verify(this.strategy2, times(1)).notify(login3);
+        verify(this.sessionFailing, times(3)).set(eq("multilogin"), any(Instant.class));
+        verify(this.sessionFailing, times(9)).get("multilogin");
+    }
+
+    @Test
+    void recordAuthenticationFailureWithFailingSession()
+    {
+        HttpServletRequest request = getRequest("failingSession1");
+
+        when(this.sessionFailing.get("failingSession1")).thenReturn(new Date().toInstant());
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+
+        when(this.sessionFailing.get("failingSession1")).thenReturn(new Date().toInstant().plus(1, ChronoUnit.DAYS));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+
+        verify(this.observationManager, times(2)).notify(new AuthenticationFailureEvent(), this.failingLogin);
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
+            this.failingLogin);
+        verify(this.strategy1).notify(failingLogin);
+        verify(this.strategy2).notify(failingLogin);
+        verify(this.sessionFailing).set(eq("failingSession1"), any(Instant.class));
     }
 
     /**
@@ -299,14 +370,18 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void deactivateThresholdAuthWithMaxAttempt()
     {
+        HttpServletRequest request = getRequest("manyattempt");
         when(this.configuration.getMaxAuthorizedAttempts()).thenReturn(0);
 
         for (int i = 0; i < 100; i++) {
-            assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+            assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin,
+                request));
         }
         verify(this.observationManager, times(100)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, never()).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
+        verify(this.sessionFailing, never()).set(eq("manyattempt"), any(Instant.class));
+        verify(this.sessionFailing, never()).get("manyattempt");
     }
 
     /**
@@ -315,14 +390,18 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void deactivateThresholdAuthWithTimeWindow()
     {
+        HttpServletRequest request = getRequest("manyattempt2");
         when(this.configuration.getTimeWindow()).thenReturn(0);
 
         for (int i = 0; i < 100; i++) {
-            assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+            assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin,
+                request));
         }
         verify(this.observationManager, times(100)).notify(new AuthenticationFailureEvent(), this.failingLogin);
         verify(this.observationManager, never()).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
+        verify(this.sessionFailing, never()).set(eq("manyattempt2"), any(Instant.class));
+        verify(this.sessionFailing, never()).get("manyattempt2");
     }
 
     /**
@@ -331,18 +410,36 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void getForm()
     {
+        HttpServletRequest request = getRequest("getForm");
         String formStrategy1 = "formStrategy1";
         String formStrategy2 = "formStrategy2";
         when(this.strategy1.getForm(eq(this.failingLogin))).thenReturn(formStrategy1);
         when(this.strategy2.getForm(eq(this.failingLogin))).thenReturn(formStrategy2);
 
-        assertEquals("", this.defaultAuthenticationFailureManager.getForm(this.failingLogin));
+        assertEquals("", this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
 
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
         assertEquals(String.format("%s\n%s\n", formStrategy1, formStrategy2),
-            this.defaultAuthenticationFailureManager.getForm(this.failingLogin));
+            this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
+    }
+
+    @Test
+    void getFormFailingSession()
+    {
+        HttpServletRequest request = getRequest("failingSession2");
+        String formStrategy1 = "formStrategy1";
+        String formStrategy2 = "formStrategy2";
+        when(this.strategy1.getForm(eq(this.failingLogin))).thenReturn(formStrategy1);
+        when(this.strategy2.getForm(eq(this.failingLogin))).thenReturn(formStrategy2);
+
+        when(this.sessionFailing.get("failingSession2")).thenReturn(new Date().toInstant());
+        assertEquals("", this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
+
+        when(this.sessionFailing.get("failingSession2")).thenReturn(new Date().toInstant().plus(1, ChronoUnit.DAYS));
+        assertEquals(String.format("%s\n%s\n", formStrategy1, formStrategy2),
+            this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
     }
 
     /**
@@ -351,6 +448,7 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void getErrorMessages()
     {
+        HttpServletRequest request = getRequest("errorMsg");
         String errorMessage1 = "errorMessage1";
         String errorMessage2 = "errorMessage2";
         when(this.strategy1.getErrorMessage(eq(this.failingLogin))).thenReturn(errorMessage1);
@@ -358,9 +456,9 @@ public class DefaultAuthenticationFailureManagerTest
 
         assertEquals("", this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
 
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
         assertEquals(String.format("%s\n%s\n", errorMessage1, errorMessage2),
             this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
     }
@@ -371,19 +469,20 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void validateForm()
     {
+        HttpServletRequest request = getRequest("validate");
         String login1 = this.failingLogin;
         String login2 = "barfoo";
 
-        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login1, null));
-        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login2, null));
+        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login1, request));
+        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login2, request));
 
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login1, request);
 
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request);
 
         when(this.strategy1.validateForm(login1, null)).thenReturn(true);
         when(this.strategy2.validateForm(login1, null)).thenReturn(true);
@@ -392,6 +491,18 @@ public class DefaultAuthenticationFailureManagerTest
         when(this.strategy1.validateForm(login2, null)).thenReturn(true);
         when(this.strategy2.validateForm(login2, null)).thenReturn(false);
         assertFalse(this.defaultAuthenticationFailureManager.validateForm(login2, null));
+    }
+
+    @Test
+    void validateFormFailingSession()
+    {
+        HttpServletRequest request = getRequest("failingSession3");
+
+        when(this.sessionFailing.get("failingSession3")).thenReturn(new Date().toInstant());
+        assertTrue(this.defaultAuthenticationFailureManager.validateForm(this.failingLogin, request));
+
+        when(this.sessionFailing.get("failingSession3")).thenReturn(new Date().toInstant().plus(1, ChronoUnit.DAYS));
+        assertFalse(this.defaultAuthenticationFailureManager.validateForm(this.failingLogin, request));
     }
 
     /**
@@ -466,16 +577,17 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void strategiesAreRebuildInCaseOfReset()
     {
+        HttpServletRequest request = getRequest("reset");
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(1);
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo");
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo", request);
         verify(configuration, times(3)).getFailureStrategies();
         verify(strategy1, times(1)).notify("foo");
         verify(strategy2, never()).notify(any());
 
         // we change the configuration strategy, but we don't reset the list
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy2" });
-        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo");
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo", request);
 
         // the list is already existing, we still call the old strategy
         verify(configuration, times(6)).getFailureStrategies();

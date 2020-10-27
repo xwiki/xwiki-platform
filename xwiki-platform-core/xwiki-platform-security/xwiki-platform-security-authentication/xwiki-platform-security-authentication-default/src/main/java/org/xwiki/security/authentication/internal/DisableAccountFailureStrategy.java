@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
-import org.securityfilter.filter.SecurityRequestWrapper;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -103,7 +103,7 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
      * @return true if the user account associated to the username is enabled. False in other cases.
      */
     @Override
-    public boolean validateForm(String username, SecurityRequestWrapper request)
+    public boolean validateForm(String username, HttpServletRequest request)
     {
         DocumentReference userDocumentReference = this.authenticationFailureManager.get().findUser(username);
         if (userDocumentReference != null) {

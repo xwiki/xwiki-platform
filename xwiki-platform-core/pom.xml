@@ -118,7 +118,32 @@
 
                  Note: you can use regexes by using the syntax: <regex>true</regex>
                  Don't forget to '\'-escape dots and other special characters in this case ;) -->
-            
+            <revapi.ignore>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method java.lang.String org.xwiki.security.authentication.api.AuthenticationFailureManager::getForm(java.lang.String)</old>
+                <new>method java.lang.String org.xwiki.security.authentication.api.AuthenticationFailureManager::getForm(java.lang.String, javax.servlet.http.HttpServletRequest)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::recordAuthenticationFailure(java.lang.String)</old>
+                <new>method boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::recordAuthenticationFailure(java.lang.String, javax.servlet.http.HttpServletRequest)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::validateForm(java.lang.String, ===org.securityfilter.filter.SecurityRequestWrapper===)</old>
+                <new>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::validateForm(java.lang.String, ===javax.servlet.http.HttpServletRequest===)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureStrategy::validateForm(java.lang.String, ===org.securityfilter.filter.SecurityRequestWrapper===)</old>
+                <new>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureStrategy::validateForm(java.lang.String, ===javax.servlet.http.HttpServletRequest===)</new>
+                <justification>Unstable API.</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

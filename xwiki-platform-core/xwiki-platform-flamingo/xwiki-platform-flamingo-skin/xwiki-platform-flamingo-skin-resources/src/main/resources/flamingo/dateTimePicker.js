@@ -47,10 +47,51 @@ require(['moment'], function(moment) {
     var init = function(event, data) {
       var container = $((data && data.elements) || document);
       container.find('input.datetime').each(function() {
-        $(this).datetimepicker({
-          locale: $(this).data('locale'),
-          format: moment().toMomentFormatString($(this).data('format'))
+        var dateTimeInput = $(this);
+
+        // Attach the date picker to the body element if the date input has a parent with position relative and overflow
+        // hidden, otherwise the date picker might not be fully visible and accessible.
+        var shouldAttachToBody = dateTimeInput.parentsUntil('body').filter(function() {
+          var parent = $(this);
+          return (parent.css('overflow-x') !== 'visible' || parent.css('overflow-y') !== 'visible') &&
+            parent.css('position') === 'relative';
+        }).length > 0;
+
+        dateTimeInput.datetimepicker({
+          // See http://eonasdan.github.io/bootstrap-datetimepicker/Options/
+          locale: dateTimeInput.data('locale'),
+          format: moment().toMomentFormatString(dateTimeInput.data('format')),
+          // Attach the date picker to the body element if needed, in order to be sure it's fully visible.
+          widgetParent: shouldAttachToBody ? 'body' : null
         });
+
+        // Fix the date picker position when it is attached to the body element.
+        // See https://github.com/Eonasdan/bootstrap-datetimepicker/issues/1762
+        dateTimeInput.on('dp.show', function() {
+          var dateTimePicker = $('body').children('.bootstrap-datetimepicker-widget').last();
+          if (dateTimePicker.hasClass('bottom')) {
+            var top = dateTimeInput.offset().top + dateTimeInput.outerHeight();
+            var left = dateTimeInput.offset().left;
+            dateTimePicker.css({
+              top: top + 'px',
+              bottom: 'auto',
+              left: left + 'px'
+            });
+          } else if (dateTimePicker.hasClass('top')) {
+            var top = dateTimeInput.offset().top - dateTimePicker.outerHeight() - 4;
+            var left = dateTimeInput.offset().left;
+            dateTimePicker.css({
+              top: top + 'px',
+              bottom: 'auto',
+              left: left + 'px'
+            });
+          }
+        });
+
+        // Open the date time picker if the input is already focused.
+        if (dateTimeInput.is(':focus')) {
+          dateTimeInput.data('DateTimePicker').show();
+        }
       });
     };
 

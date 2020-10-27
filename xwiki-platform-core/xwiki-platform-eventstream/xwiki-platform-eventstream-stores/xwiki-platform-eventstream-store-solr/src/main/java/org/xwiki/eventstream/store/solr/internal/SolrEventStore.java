@@ -567,10 +567,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return null;
     }
 
-    /**
-     * @param condition
-     * @return
-     */
     private String serializeInCondition(InQueryCondition condition)
     {
         StringBuilder builder = new StringBuilder();
@@ -580,7 +576,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         builder.append(':');
 
         builder.append('(');
-        builder.append(StringUtils.join(condition.getValues(), " OR "));
+        builder.append(
+            StringUtils.join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
         builder.append(')');
 
         return builder.toString();

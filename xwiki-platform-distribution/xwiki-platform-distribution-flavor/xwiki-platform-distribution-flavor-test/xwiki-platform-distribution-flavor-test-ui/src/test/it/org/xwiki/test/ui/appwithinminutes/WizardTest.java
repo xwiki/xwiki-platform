@@ -127,7 +127,7 @@ public class WizardTest extends AbstractTest
         templateProviderEditPage.setDescription("A city page");
 
         // Move to the next step.
-        ApplicationHomeEditPage homeEditPage = templateProviderEditPage.clickNextStep().waitUntilPageIsLoaded();
+        ApplicationHomeEditPage homeEditPage = templateProviderEditPage.clickNextStep();
 
         // Step 4
         // Enter the application description.

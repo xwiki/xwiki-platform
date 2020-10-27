@@ -22,14 +22,17 @@ package org.xwiki.extension.index.internal;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -38,6 +41,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -46,6 +50,7 @@ import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -56,6 +61,7 @@ import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
 import org.xwiki.extension.repository.search.ExtensionQuery.Filter;
 import org.xwiki.extension.repository.search.ExtensionQuery.SortClause;
 import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.version.Version;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -123,6 +129,11 @@ public class ExtensionIndexStore implements Initializable
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_FEATURES, SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
     }
 
+    private static final String BOOST = ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 "
+        + Extension.FIELD_NAME + "^9.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX
+        + "^8.0 " + Extension.FIELD_SUMMARY + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE
+        + "^5.0 " + Extension.FIELD_DESCRIPTION + "^4.0";
+
     @Inject
     private Solr solr;
 
@@ -172,6 +183,15 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
+     * @param solrId the identifier of the Solr document holding the extension
+     * @return the extension id
+     */
+    public ExtensionId fromSolrId(String solrId)
+    {
+        return ExtensionIdConverter.toExtensionId(solrId, null);
+    }
+
+    /**
      * @param extensionId the extension id and version
      * @return true if a document corresponding to the passed extension can be found in the index
      * @throws SolrServerException
@@ -184,20 +204,20 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * @param extensionId the extension id and version
-     * @param local true/false to explicitly search of a local extension, null otherwise
+     * @param last true if it's the last version among extensions with the same id
      * @return true if a document corresponding to the passed extension can be found in the index
      * @throws SolrServerException
      * @throws IOException
      */
-    public boolean exists(ExtensionId extensionId, Boolean local) throws SolrServerException, IOException
+    public boolean exists(ExtensionId extensionId, Boolean last) throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ":"
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toFilterQueryString(toSolrId(extensionId)));
 
-        if (local != null) {
-            solrQuery.addFilterQuery("local:" + local.booleanValue());
+        if (last != null) {
+            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + last.booleanValue());
         }
 
         // We don't want to actually get the document, we just want to know if one exist
@@ -207,15 +227,38 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
+     * @param extensionId the id of the extension to add to the index
+     * @param last true if it's the last version of this extension id
+     * @param newVersions the versions available for the extension
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public void update(ExtensionId extensionId, boolean last, List<Version> newVersions)
+        throws SolrServerException, IOException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST,
+            last, document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS, newVersions, document);
+
+        add(document);
+    }
+
+    /**
      * @param extension the extension to add to the index
      * @param force true if the extension should always be saved even if it already exist
+     * @param last true if it's the last version of this extension id
      * @return true of the extension was saved
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public boolean add(Extension extension, boolean force) throws SolrServerException, IOException
+    public boolean add(Extension extension, boolean force, boolean last) throws SolrServerException, IOException
     {
-        if (!force && exists(extension.getId())) {
+        if (!force && exists(extension.getId(), last ? Boolean.TRUE : null)) {
             return false;
         }
 
@@ -260,6 +303,8 @@ public class ExtensionIndexStore implements Initializable
         // TODO: add managed dependencies
 
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INDEX_DATE, new Date(), document);
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, last, document);
 
         add(document);
 
@@ -337,6 +382,8 @@ public class ExtensionIndexStore implements Initializable
         extension.setExtensionFeatures(
             this.utils.getCollection(Extension.FIELD_EXTENSIONFEATURES, document, ExtensionId.class));
 
+        extension.setLast(this.utils.get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, document, false));
+
         // TODO: add dependencies
         // TODO: add managed dependencies
 
@@ -353,6 +400,11 @@ public class ExtensionIndexStore implements Initializable
     public IterableResult<Extension> search(ExtensionQuery query) throws SearchException
     {
         SolrQuery solrQuery = new SolrQuery(query.getQuery());
+
+        // Use the Extended DisMax Query Parser to set a boost configuration (which is not a feature supported by the
+        // Standard Query Parser)
+        solrQuery.set("defType", "edismax");
+        solrQuery.set("bf", BOOST);
 
         // Pagination
         if (query.getOffset() > 0) {
@@ -373,13 +425,28 @@ public class ExtensionIndexStore implements Initializable
             solrQuery.addFilterQuery(serializeFilter(filter));
         }
 
-        // Execute the search
-        QueryResponse response;
-        try {
-            response = this.client.query(solrQuery);
-        } catch (Exception e) {
-            throw new SearchException("Failed to execute Solr query", e);
+        // Compatible
+        if (query instanceof IndexedExtensionQuery) {
+            IndexedExtensionQuery indexedQuery = (IndexedExtensionQuery) query;
+
+            if (indexedQuery.getCompatible() != null) {
+                StringBuilder builder = new StringBuilder();
+
+                if (!indexedQuery.getCompatible()) {
+                    builder.append('-');
+                }
+                builder.append(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES);
+                builder.append(':');
+
+                builder.append('(');
+                builder.append(StringUtils.join(indexedQuery.getNamespaces().stream()
+                    .map(n -> this.utils.toFilterQueryString(n.serialize())).iterator(), " OR "));
+                builder.append(')');
+            }
         }
+
+        // Execute the search
+        QueryResponse response = search(solrQuery);
 
         SolrDocumentList documents = response.getResults();
 
@@ -425,5 +492,73 @@ public class ExtensionIndexStore implements Initializable
         } else {
             return this.utils.toFilterQueryString(filter.getValue());
         }
+    }
+
+    /**
+     * @param params an object holding all key/value parameters to send along the request
+     * @return a {@link org.apache.solr.client.solrj.response.QueryResponse} containing the response from the server
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public List<ExtensionId> searchExtensionIds(SolrParams params) throws SearchException
+    {
+        if (params instanceof SolrQuery) {
+            ((SolrQuery) params).setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
+        }
+
+        QueryResponse response = search(params);
+
+        SolrDocumentList documents = response.getResults();
+
+        List<ExtensionId> extensionId = new ArrayList<>(documents.size());
+        for (SolrDocument document : documents) {
+            extensionId.add(fromSolrId(this.utils.getId(document)));
+        }
+
+        return extensionId;
+    }
+
+    /**
+     * Performs a query to the Solr server.
+     *
+     * @param params an object holding all key/value parameters to send along the request
+     * @return a {@link org.apache.solr.client.solrj.response.QueryResponse} containing the response from the server
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public QueryResponse search(SolrParams params) throws SearchException
+    {
+        try {
+            return this.client.query(params);
+        } catch (Exception e) {
+            throw new SearchException("Failed execute Solr query", e);
+        }
+    }
+
+    /**
+     * @param id the identifier of the extension
+     * @return the versions available for the provided id, null if no extension can be found with this id
+     * @throws SearchException when failing to search the versions
+     */
+    public Collection<Version> getExtensionVersions(String id) throws SearchException
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS);
+
+        solrQuery.addFilterQuery(
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + this.utils.toFilterQueryString(id));
+
+        solrQuery.setRows(1);
+
+        QueryResponse response = search(solrQuery);
+
+        SolrDocumentList documents = response.getResults();
+        if (documents.isEmpty()) {
+            return null;
+        }
+
+        return this.utils.getCollection(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS, documents.get(0),
+            Version.class);
     }
 }

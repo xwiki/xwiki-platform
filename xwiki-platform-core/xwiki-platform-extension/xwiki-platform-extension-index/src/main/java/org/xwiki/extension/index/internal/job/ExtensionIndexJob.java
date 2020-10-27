@@ -20,18 +20,27 @@
 package org.xwiki.extension.index.internal.job;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndexStatus;
+import org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -81,7 +90,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     @Override
     protected ExtensionIndexStatus createNewStatus(ExtensionIndexRequest request)
     {
-        return new DefaultExtensionIndexStatus(request, null, this.observationManager, this.loggerManager);
+        return new DefaultExtensionIndexStatus(request, this.observationManager, this.loggerManager);
     }
 
     @Override
@@ -94,16 +103,67 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         updated |= addRemoteExtensions();
 
         if (updated) {
+            // 2: Gather other versions
+            updateVersions();
+
             // 2: Validate extensions to figure out if they are compatible
+            validateExtensions();
 
-            // 3: Analyze extensions to find specific metadata depending on the type
-
+            // TODO: 3: Analyze extensions to find specific metadata depending on the type
         }
     }
 
-    private Set<String> getSearchableExtensionIds() throws SearchException
+    private void validateExtensions()
     {
-        Set<String> extensions = new HashSet<>();
+        
+    }
+
+    private void updateVersions() throws SearchException, SolrServerException, IOException
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+
+        List<ExtensionId> extensoinIds = this.indexStore.searchExtensionIds(solrQuery);
+        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensoinIds.size());
+        for (ExtensionId extensionId : extensoinIds) {
+            extensions.computeIfAbsent(extensionId.getId(), key -> new TreeSet<>()).add(extensionId.getVersion());
+        }
+
+        extensions.forEach(this::updateVersions);
+
+        this.indexStore.commit();
+    }
+
+    private void updateVersions(String id, SortedSet<Version> storedVersions)
+    {
+        // Get all available versions
+        IterableResult<Version> versions;
+        try {
+            versions = this.repositories.resolveVersions(id, 0, -1);
+        } catch (ResolveException e) {
+            return;
+        }
+
+        // TODO: remove indexed extensions not part of the resolved versions ?
+
+        List<Version> newVersions = IterableUtils.toList(versions);
+
+        for (Iterator<Version> it = storedVersions.iterator(); it.hasNext();) {
+            Version version = it.next();
+
+            ExtensionId extensionId = new ExtensionId(id, version);
+            try {
+                this.indexStore.update(extensionId, !it.hasNext(), newVersions);
+            } catch (Exception e) {
+                this.logger.error("Failed to update the extension [{}]", extensionId, e);
+            }
+        }
+    }
+
+    private Set<ExtensionId> getSearchableExtensionIds() throws SearchException
+    {
+        Set<ExtensionId> extensions = new HashSet<>();
 
         for (ExtensionRepository repository : this.repositories.getRepositories()) {
             if (repository instanceof Searchable) {
@@ -112,7 +172,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
                 for (int offset = 0; true; offset += SEARCH_BATCH_SIZE) {
                     IterableResult<Extension> result = searchableRepository.search("", offset, SEARCH_BATCH_SIZE);
 
-                    result.forEach(extension -> extensions.add(extension.getId().getId()));
+                    result.forEach(extension -> extensions.add(extension.getId()));
 
                     if (result.getSize() < SEARCH_BATCH_SIZE) {
                         break;
@@ -141,33 +201,20 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
 
         // Search result are not always fully complete and we want all versions so we just keep the id and go through
         // repositories
-        Set<String> extensionIds = getSearchableExtensionIds();
+        Set<ExtensionId> extensionIds = getSearchableExtensionIds();
 
-        for (String extensionId : extensionIds) {
+        for (ExtensionId extensionId : extensionIds) {
             updated |= addExtension(extensionId);
         }
 
-        return updated;
-    }
-
-    private boolean addExtension(String extensionId) throws SolrServerException, IOException, ResolveException
-    {
-        boolean updated = false;
-
-        // Get all available versions
-        IterableResult<Version> versions = this.repositories.resolveVersions(extensionId, 0, -1);
-
-        for (Version version : versions) {
-            updated |= addExtension(extensionId, version);
-        }
+        // Make sure all found extensions are in the store
+        this.indexStore.commit();
 
         return updated;
     }
 
-    private boolean addExtension(String id, Version version) throws SolrServerException, IOException, ResolveException
+    private boolean addExtension(ExtensionId extensionId) throws SolrServerException, IOException, ResolveException
     {
-        ExtensionId extensionId = new ExtensionId(id, version);
-
         // Not add it if it's a core extension
         if (this.coreExtensions.exists(extensionId)) {
             return false;
@@ -184,7 +231,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             Extension extension = this.repositories.resolve(extensionId);
 
             // Add the extension
-            return this.indexStore.add(extension, true);
+            return this.indexStore.add(extension, true, true);
         }
 
         return false;

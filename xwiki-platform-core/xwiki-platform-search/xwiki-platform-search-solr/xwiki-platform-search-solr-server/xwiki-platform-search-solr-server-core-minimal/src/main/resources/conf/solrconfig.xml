@@ -39,8 +39,26 @@
   <!-- Required to do queries -->
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
+      <!-- Only parameters included in the actual request, plus the _ parameter
+           (which is a 64-bit numeric timestamp) will be added to the params section
+           of the response header.
+      -->
+      <str name="echoParams">explicit</str>
+
+      <!-- Select everything by default -->
       <str name="q">*</str>
-      <str name="df">id</str>
     </lst>
   </requestHandler>
+
+  <!-- Query configuration that should be beneficial to most cores -->
+  <query>
+    <!-- Lazy Field Loading
+         If true, stored fields that are not requested will be loaded
+         lazily.  This can result in a significant speed improvement
+         if the usual case is to not load all stored fields,
+         especially if the skipped fields are large compressed text
+         fields.
+    -->
+    <enableLazyFieldLoading>true</enableLazyFieldLoading>
+  </query>
 </config>

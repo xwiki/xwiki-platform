@@ -143,10 +143,10 @@ class ExtensionIndexStoreTest
     {
         TestExtension extension = new TestExtension(this.testRepository, new ExtensionId("id", "version"), "test");
 
-        assertTrue(this.indexStore.add(extension, false));
+        assertTrue(this.indexStore.add(extension, false, true));
         this.indexStore.commit();
 
-        assertFalse(this.indexStore.add(extension, false));
+        assertFalse(this.indexStore.add(extension, false, true));
 
         SolrExtension storedExtension = this.indexStore.getSolrExtension(extension.getId());
 
@@ -172,7 +172,7 @@ class ExtensionIndexStoreTest
             new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
         extension.setDependencies(Arrays.asList(dependency1, dependency2));
 
-        assertTrue(this.indexStore.add(extension, false));
+        assertTrue(this.indexStore.add(extension, false, true));
         this.indexStore.commit();
 
         when(this.testRepository.resolve(extensionId)).thenReturn(extension);

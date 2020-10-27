@@ -49,6 +49,8 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
 
     private Date indexDate;
 
+    private boolean last;
+
     /**
      * @param repository the repository where this extension comes from
      * @param extensionId the extension identifier
@@ -186,5 +188,21 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     public Date getIndexDate()
     {
         return this.indexDate;
+    }
+
+    /**
+     * @return true if it's the last version among the extension with this id
+     */
+    public boolean isLast()
+    {
+        return this.last;
+    }
+
+    /**
+     * @param last true if it's the last version among the extension with this id
+     */
+    public void setLast(boolean last)
+    {
+        this.last = last;
     }
 }

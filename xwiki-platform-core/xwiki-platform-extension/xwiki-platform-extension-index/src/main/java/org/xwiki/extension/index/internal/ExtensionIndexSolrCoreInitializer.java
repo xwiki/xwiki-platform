@@ -50,16 +50,6 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String INDEX_SUFFIX = "_index";
 
     /**
-     * We can't use {@link Extension#FIELD_ID} because it collide with {@link #SOLR_FIELD_ID}.
-     */
-    public static final String SOLR_FIELD_EXTENSIONID = "extensionId";
-
-    /**
-     * Indicate on the available versions for this extension (to avoid indexing all versions).
-     */
-    public static final String SOLR_FIELD_VERSIONS = "versions";
-
-    /**
      * Indicate the list of features in a search friendly manner.
      */
     public static final String SOLR_FIELD_EXTENSIONFEATURES_INDEX = Extension.FIELD_EXTENSIONFEATURES + INDEX_SUFFIX;
@@ -70,14 +60,29 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String SOLR_FIELD_AUTHORS_INDEX = Extension.FIELD_AUTHORS + INDEX_SUFFIX;
 
     /**
-     * The name of the field indicating if an extension is compatible with the current instance.
+     * We can't use {@link Extension#FIELD_ID} because it collide with {@link #SOLR_FIELD_ID}.
      */
-    public static final String SOLR_FIELD_COMPATIBLE = "compatible";
+    public static final String SOLR_FIELD_EXTENSIONID = "s_extensionId";
+
+    /**
+     * Indicate on the available versions for this extension (to avoid indexing all versions).
+     */
+    public static final String SOLR_FIELD_VERSIONS = "s_versions";
+
+    /**
+     * The name of the field indicating in which namespaces an extension is compatible.
+     */
+    public static final String SOLR_FIELD_COMPATIBLE_NAMESPACES = "s_compatibleNamespaces";
+
+    /**
+     * The name of the field indicating if an entry is the last version of an extension.
+     */
+    public static final String SOLR_FIELD_LAST = "s_last";
 
     /**
      * The name of the field containing the date at which the extension was indexed.
      */
-    public static final String SOLR_FIELD_INDEX_DATE = "indexDate";
+    public static final String SOLR_FIELD_INDEX_DATE = "s_indexDate";
 
     private static final long SCHEMA_VERSION_12_9 = 120900000;
 
@@ -114,9 +119,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         // TODO: add managed dependencies
 
         setPDateField(SOLR_FIELD_INDEX_DATE, false, false);
-        setBooleanField(SOLR_FIELD_COMPATIBLE, false, false);
+
+        setBooleanField(SOLR_FIELD_LAST, false, false);
 
         setStringField(SOLR_FIELD_VERSIONS, true, false);
+
+        setStringField(SOLR_FIELD_COMPATIBLE_NAMESPACES, true, false);
     }
 
     @Override

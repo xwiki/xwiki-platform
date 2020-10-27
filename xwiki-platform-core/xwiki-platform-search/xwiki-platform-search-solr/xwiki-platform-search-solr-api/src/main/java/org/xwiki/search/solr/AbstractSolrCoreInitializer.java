@@ -19,7 +19,6 @@
  */
 package org.xwiki.search.solr;
 
-import java.awt.TextField;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +28,7 @@ import javax.inject.Inject;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.analysis.synonym.SynonymGraphFilterFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.schema.AnalyzerDefinition;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
@@ -47,6 +44,7 @@ import org.apache.solr.schema.FloatPointField;
 import org.apache.solr.schema.IntPointField;
 import org.apache.solr.schema.LongPointField;
 import org.apache.solr.schema.StrField;
+import org.apache.solr.schema.TextField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.stability.Unstable;
@@ -265,6 +263,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
         // Binary data type. The data should be sent/retrieved in as Base64 encoded Strings
         addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, BinaryField.class.getName());
+
+        migrateBaseSchema(SCHEMA_VERSION_12_3);
     }
 
     private void migrateBaseSchema(long xversion) throws SolrException
@@ -286,36 +286,24 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         Map<String, Object> tokenizer = new HashMap<>();
         tokenizer.put(FieldType.CLASS_NAME, StandardTokenizerFactory.class.getName());
 
-        Map<String, Object> stopFilter = new HashMap<>();
-        stopFilter.put(FieldType.CLASS_NAME, StopFilterFactory.class.getName());
-        stopFilter.put(SOLR_IGNORECASE, true);
-        stopFilter.put("words", "stopwords.txt");
-
-        Map<String, Object> synonymFilter = new HashMap<>();
-        stopFilter.put(FieldType.CLASS_NAME, SynonymGraphFilterFactory.class.getName());
-        stopFilter.put(SOLR_IGNORECASE, true);
-        stopFilter.put("synonyms", "synonyms.txt");
-        stopFilter.put("expand", true);
-
         Map<String, Object> lowerCaseFilter = new HashMap<>();
-        stopFilter.put(FieldType.CLASS_NAME, LowerCaseFilterFactory.class.getName());
+        lowerCaseFilter.put(FieldType.CLASS_NAME, LowerCaseFilterFactory.class.getName());
 
         AnalyzerDefinition indexAnalyzer = new AnalyzerDefinition();
         indexAnalyzer.setTokenizer(tokenizer);
-        indexAnalyzer.setFilters(Arrays.asList(stopFilter));
 
         AnalyzerDefinition queryAnalyzer = new AnalyzerDefinition();
         queryAnalyzer.setTokenizer(tokenizer);
-        queryAnalyzer.setFilters(Arrays.asList(stopFilter, synonymFilter, lowerCaseFilter));
+        queryAnalyzer.setFilters(Arrays.asList(lowerCaseFilter));
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("class", SynonymGraphFilterFactory.class.getName());
-
         attributes.put(FieldType.TYPE_NAME, DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL);
         attributes.put(FieldType.CLASS_NAME, TextField.class.getName());
 
         FieldTypeDefinition definition = new FieldTypeDefinition();
         definition.setAttributes(attributes);
+        definition.setIndexAnalyzer(indexAnalyzer);
+        definition.setQueryAnalyzer(queryAnalyzer);
 
         setFieldType(definition, true);
     }

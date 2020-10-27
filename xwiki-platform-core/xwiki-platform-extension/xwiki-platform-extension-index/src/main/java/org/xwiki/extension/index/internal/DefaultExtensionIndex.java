@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.index.internal;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -30,6 +33,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
@@ -38,6 +42,8 @@ import org.xwiki.extension.index.internal.job.ExtensionIndexRequest;
 import org.xwiki.extension.repository.AbstractAdvancedSearchableExtensionRepository;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.internal.RepositoryUtils;
+import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
@@ -190,7 +196,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     private void cacheExtension(Extension extension)
     {
         try {
-            this.store.add(extension, false);
+            this.store.add(extension, false, false);
         } catch (Exception e) {
             this.logger.warn("Failed to add the extension [{}] to the index: {}", extension.getId(),
                 ExceptionUtils.getRootCauseMessage(e));
@@ -200,8 +206,22 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     @Override
     public IterableResult<Version> resolveVersions(String id, int offset, int nb) throws ResolveException
     {
-        // TODO Auto-generated method stub
-        return null;
+        Collection<Version> versions;
+        try {
+            versions = this.store.getExtensionVersions(id);
+        } catch (SearchException e) {
+            throw new ResolveException("Failed to search for exetnsion versions", e);
+        }
+
+        if (versions == null) {
+            throw new ExtensionNotFoundException("Can't find extension with id [" + id + "]");
+        }
+
+        if (nb == 0 || offset >= versions.size()) {
+            return new CollectionIterableResult<>(versions.size(), offset, Collections.<Version>emptyList());
+        }
+
+        return RepositoryUtils.getIterableResult(offset, nb, versions);
     }
 
     @Override

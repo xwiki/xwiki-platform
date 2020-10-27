@@ -20,8 +20,7 @@
 package org.xwiki.extension.index.internal.job;
 
 import org.xwiki.extension.index.ExtensionIndexStatus;
-import org.xwiki.job.AbstractJobStatus;
-import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -31,19 +30,16 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 12.9RC1
  */
-public class DefaultExtensionIndexStatus extends AbstractJobStatus<ExtensionIndexRequest>
-    implements ExtensionIndexStatus
+public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndexRequest> implements ExtensionIndexStatus
 {
     /**
      * @param request the request provided when started the job
-     * @param parentJobStatus the status of the parent job (i.e. the status of the job that started this one); pass
-     *            {@code null} if this job hasn't been started by another job (i.e. if this is not a sub-job)
      * @param observationManager the observation manager component
      * @param loggerManager the logger manager component
      */
-    public DefaultExtensionIndexStatus(ExtensionIndexRequest request, JobStatus parentJobStatus,
-        ObservationManager observationManager, LoggerManager loggerManager)
+    public DefaultExtensionIndexStatus(ExtensionIndexRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
-        super(ExtensionIndexJob.JOB_TYPE, request, parentJobStatus, observationManager, loggerManager);
+        super(ExtensionIndexJob.JOB_TYPE, request, null, observationManager, loggerManager);
     }
 }

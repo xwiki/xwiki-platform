@@ -53,7 +53,7 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
     private WikiDescriptorManager wikis;
 
     @Override
-    public void initialize(ExecutionContext context) throws ExecutionContextException
+    public void initialize(ExecutionContext context)
     {
         if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
             Thread.currentThread().setContextClassLoader(

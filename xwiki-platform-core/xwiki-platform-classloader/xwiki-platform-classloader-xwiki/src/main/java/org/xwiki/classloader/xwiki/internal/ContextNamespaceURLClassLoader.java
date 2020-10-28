@@ -181,7 +181,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
     /**
      * {@inheritDoc}
      * <p>
-     * Yes it's a protected method but it's sometime called directly from {@link ClassLoader#loadClass(String, String)}.
+     * Yes it's a protected method but it's sometime called directly from {@link ClassLoader#loadClass(String, boolean)} 
      * </p>
      * 
      * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)

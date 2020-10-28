@@ -229,10 +229,10 @@ public class LiveTableConfigHelper
                 Map<String, List<String>> parameters = getURLParameters('?' + extraParams);
                 for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                     Filter filter = new Filter();
-                    filter.setReadOnly(true);
                     filter.setProperty(entry.getKey());
                     filter.getConstraints()
                         .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
+                    filter.getConstraints().forEach(constraint -> constraint.setReadOnly(true));
                     filters.add(filter);
                 }
             } catch (MalformedURLException | UnsupportedEncodingException e) {

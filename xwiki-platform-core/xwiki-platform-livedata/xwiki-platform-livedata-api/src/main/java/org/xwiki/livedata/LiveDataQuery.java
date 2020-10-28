@@ -80,11 +80,6 @@ public class LiveDataQuery
         private boolean matchAll;
 
         /**
-         * Specifies whether the user should be able to change this filter or not.
-         */
-        private boolean readOnly;
-
-        /**
          * The constraints to apply to property values.
          */
         private final List<Constraint> constraints = new ArrayList<>();
@@ -188,24 +183,6 @@ public class LiveDataQuery
         }
 
         /**
-         * @return {@code true} if the user shouldn't be able to change this filter, {@code false} otherwise
-         */
-        public boolean isReadOnly()
-        {
-            return readOnly;
-        }
-
-        /**
-         * Sets whether the user can change this filter or not.
-         * 
-         * @param readOnly {@code true} to prevent the user from changing this filter, {@code false} otherwise
-         */
-        public void setReadOnly(boolean readOnly)
-        {
-            this.readOnly = readOnly;
-        }
-
-        /**
          * @return the list of constraints to apply to a given property
          */
         public List<Constraint> getConstraints()
@@ -229,6 +206,11 @@ public class LiveDataQuery
          * The target value that is compared with the property value using the specified operator.
          */
         private Object value;
+
+        /**
+         * Specifies whether the user should be able to change / remove this constraint or not.
+         */
+        private boolean readOnly;
 
         /**
          * Default constructor.
@@ -257,6 +239,20 @@ public class LiveDataQuery
         {
             this.value = value;
             this.operator = operator;
+        }
+
+        /**
+         * Creates a new constraint that uses the given value and operator.
+         * 
+         * @param value the value to match
+         * @param operator the operator to use
+         * @param readOnly whether the user can change the constraint or not
+         */
+        public Constraint(Object value, String operator, boolean readOnly)
+        {
+            this.value = value;
+            this.operator = operator;
+            this.readOnly = readOnly;
         }
 
         /**
@@ -293,6 +289,26 @@ public class LiveDataQuery
         public void setValue(Object value)
         {
             this.value = value;
+        }
+
+        /**
+         * @return {@code true} if the user shouldn't be able to change or remove this constraint, {@code false}
+         *         otherwise
+         */
+        public boolean isReadOnly()
+        {
+            return readOnly;
+        }
+
+        /**
+         * Sets whether the user can change / remove this constraint or not.
+         * 
+         * @param readOnly {@code true} to prevent the user from changing or removing this constraint, {@code false}
+         *            otherwise
+         */
+        public void setReadOnly(boolean readOnly)
+        {
+            this.readOnly = readOnly;
         }
     }
 

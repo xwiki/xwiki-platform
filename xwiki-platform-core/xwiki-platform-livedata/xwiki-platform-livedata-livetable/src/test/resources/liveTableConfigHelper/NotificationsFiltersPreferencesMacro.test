@@ -32,18 +32,15 @@
     "filters":[
       {
         "property":"format",
-        "readOnly":true,
-        "constraints":[{"value":""}]
+        "constraints":[{"value":"","readOnly":true}]
       },
       {
         "property":"eventType",
-        "readOnly":true,
-        "constraints":[{"value":""}]
+        "constraints":[{"value":"","readOnly":true}]
       },
       {
         "property":"user",
-        "readOnly":true,
-        "constraints":[{"value":"xwiki:XWiki.mflorea"}]
+        "constraints":[{"value":"xwiki:XWiki.mflorea","readOnly":true}]
       }
     ],
     "sort":[

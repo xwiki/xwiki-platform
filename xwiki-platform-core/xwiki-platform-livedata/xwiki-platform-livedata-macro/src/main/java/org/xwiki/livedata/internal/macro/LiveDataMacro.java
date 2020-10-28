@@ -197,6 +197,19 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return sortEntry;
     }
 
+    private void addFilters(Map<String, Filter> filters, String filtersString, boolean readOnly) throws Exception
+    {
+        for (Filter filter : getFilters(filtersString)) {
+            filter.getConstraints().forEach(constraint -> constraint.setReadOnly(readOnly));
+            Filter existingFilter = filters.get(filter.getProperty());
+            if (existingFilter != null) {
+                existingFilter.getConstraints().addAll(filter.getConstraints());
+            } else {
+                filters.put(filter.getProperty(), filter);
+            }
+        }
+    }
+
     private List<Filter> getFilters(String filtersString) throws Exception
     {
         return getURLParameters('?' + StringUtils.defaultString(filtersString)).entrySet().stream().map(this::getFilter)
@@ -205,13 +218,12 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
 
     private List<Filter> getFilters(LiveDataMacroParameters parameters) throws Exception
     {
-        List<Filter> filters = new ArrayList<>();
+        Map<String, Filter> filters = new HashMap<>();
         // Add hidden filters that the user cannot change.
-        filters.addAll(getFilters(parameters.getHiddenFilters()));
-        filters.forEach(filter -> filter.setReadOnly(true));
+        addFilters(filters, parameters.getHiddenFilters(), true);
         // Add visible filters.
-        filters.addAll(getFilters(parameters.getFilters()));
-        return filters.isEmpty() ? null : filters;
+        addFilters(filters, parameters.getFilters(), false);
+        return filters.isEmpty() ? null : filters.values().stream().collect(Collectors.toList());
     }
 
     private Filter getFilter(Map.Entry<String, List<String>> entry)

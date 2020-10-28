@@ -102,8 +102,8 @@ class LiveDataMacroTest
         expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
         expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
         expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {'property':'position','readOnly':true,'constraints':[{'value':'lead'}]},".trim());
-        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]}".trim());
+        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m','readOnly':false}]},".trim());
+        expectedConfig.append("      {'property':'position','constraints':[{'value':'lead','readOnly':true}]}".trim());
         expectedConfig.append("    ],".trim());
         expectedConfig.append("    'sort':[".trim());
         expectedConfig.append("      {'property':'firstName'},".trim());

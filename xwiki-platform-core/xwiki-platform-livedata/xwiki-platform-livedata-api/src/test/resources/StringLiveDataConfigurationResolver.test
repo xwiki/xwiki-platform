@@ -57,7 +57,10 @@
     },
     "filters":[{
       "property":"doc.author",
-      "constraints":[{"value":"mflorea"}]
+      "constraints":[{
+        "value":"mflorea",
+        "readOnly":false
+      }]
     }],
     "sort":[{
       "property":"publishDate"

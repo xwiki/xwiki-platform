@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.GlobalRightsAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -43,16 +42,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 2.3M1
  */
-@UITest(servletEngine = ServletEngine.EXTERNAL,
+@UITest(
     properties = {
         // The RightsManagerPlugin is needed to change rights in the UI
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
     }
 )
-public class LoginIT
+class LoginIT
 {
     @BeforeAll
-    static void beforeAll(TestUtils setup, XWikiWebDriver driver)
+    static void beforeAll(TestUtils setup)
     {
         // By default the minimal distribution used for the tests doesn't have any rights setup. For this test class
         // we'll need:
@@ -148,6 +147,8 @@ public class LoginIT
             setup.loginAsAdmin();
             GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
             grasp.unforceAuthenticatedView();
+            // Make sure to log out to leave a deterministic state for the following tests.
+            setup.gotoPage(setup.getURLToLogout());
         }
     }
 
@@ -155,10 +156,11 @@ public class LoginIT
     @Order(4)
     void correctUrlIsAccessedAfterLogin(TestUtils setup, TestReference testReference)
     {
-        // Create a page that can only be viewed by logged-in users
+        // Create a page that can only be viewed by logged-in users.
+        setup.loginAsAdmin();
         setup.deletePage(testReference);
         setup.createPage(testReference, "whatever");
-        setup.setRights(testReference, "XWiki.XWikiAllGroup", "", "view", true);
+        setup.setRights(testReference, null, "XWiki.XWikiGuest", "view", false);
         setup.forceGuestUser();
 
         // Navigate to it and verify we're asked to log in and that we're not logged-in.

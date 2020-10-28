@@ -21,7 +21,6 @@ package org.xwiki.classloader.xwiki.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -77,7 +76,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
             if (this.currentClassLoader == null) {
                 // Fallback on system classloader in the very weird edge case where ClassLoaderManager does not return
                 // any (which is already supposed to fallback on system classloader)
-                this.currentClassLoader = new NamespaceURLClassLoader(new URI[] {}, getSystemClassLoader(), null);
+                this.currentClassLoader = new NamespaceURLClassLoader(new URL[] {}, getSystemClassLoader(), null);
             }
 
             this.cachedCurrentWiki = currentWiki;

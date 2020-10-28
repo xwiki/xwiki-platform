@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 

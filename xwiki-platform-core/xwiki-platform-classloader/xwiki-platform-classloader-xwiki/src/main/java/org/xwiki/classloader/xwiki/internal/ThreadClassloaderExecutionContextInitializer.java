@@ -56,7 +56,7 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
     {
         if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
             Thread.currentThread().setContextClassLoader(
-                new ContextNamespaceURLClassLoader(wikis, this.classLoaderManager));
+                new ContextNamespaceURLClassLoader(this.wikis, this.classLoaderManager));
         }
     }
 }

@@ -88,6 +88,7 @@ public class DefaultMessageStream implements MessageStream
         e.setRelatedEntity(userDoc);
         e.setImportance(Importance.MINOR);
         e.setStream(this.serializer.serialize(userDoc));
+        e.setTitle("messagestream.descriptors.rss.publicMessage.title");
         this.stream.addEvent(e);
     }
 
@@ -98,6 +99,7 @@ public class DefaultMessageStream implements MessageStream
         DocumentReference userDoc = this.bridge.getCurrentUserReference();
         e.setRelatedEntity(userDoc);
         e.setStream(this.serializer.serialize(userDoc));
+        e.setTitle("messagestream.descriptors.rss.personalMessage.title");
         this.stream.addEvent(e);
     }
 
@@ -111,6 +113,7 @@ public class DefaultMessageStream implements MessageStream
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiUsers", user));
         e.setStream(this.serializer.serialize(user));
         e.setImportance(Importance.CRITICAL);
+        e.setTitle("messagestream.descriptors.rss.directMessage.title");
         this.stream.addEvent(e);
     }
 
@@ -124,6 +127,7 @@ public class DefaultMessageStream implements MessageStream
         e.setRelatedEntity(new ObjectReference("XWiki.XWikiGroups", group));
         e.setStream(this.serializer.serialize(group));
         e.setImportance(Importance.MAJOR);
+        e.setTitle("messagestream.descriptors.rss.groupMessage.title");
         this.stream.addEvent(e);
     }
 

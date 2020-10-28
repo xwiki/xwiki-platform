@@ -31,7 +31,7 @@
   <name>XWiki Platform - Message Stream - API</name>
   <description>API to publish and display user status messages in different streams</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>88</xwiki.pitest.mutationThreshold>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>xwiki-platform-messagestream</xwiki.extension.features>

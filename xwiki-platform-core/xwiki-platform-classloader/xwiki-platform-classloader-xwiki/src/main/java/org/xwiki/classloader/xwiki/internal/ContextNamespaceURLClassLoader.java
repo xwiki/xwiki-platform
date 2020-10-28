@@ -73,9 +73,10 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
             this.currentClassLoader =
                 this.classLoaderManager.getURLClassLoader(currentWiki != null ? "wiki:" + currentWiki : null, false);
 
+            // We protect against overridden implementations of ClassLoaderManager#getURLClassLoader() returning null
+            // (note that our default implementation doesn't and already falls back on the system classloader and thus
+            // this "if" is never going to be true with the default implementation).
             if (this.currentClassLoader == null) {
-                // Fallback on system classloader in the very weird edge case where ClassLoaderManager does not return
-                // any (which is already supposed to fallback on system classloader)
                 this.currentClassLoader = new NamespaceURLClassLoader(new URL[] {}, getSystemClassLoader(), null);
             }
 

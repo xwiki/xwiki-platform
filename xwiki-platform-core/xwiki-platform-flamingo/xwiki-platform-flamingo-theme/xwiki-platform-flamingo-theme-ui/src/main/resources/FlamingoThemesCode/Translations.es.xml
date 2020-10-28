@@ -71,7 +71,6 @@ platform.flamingo.themes.category.breadcrumb=Miga de pan
 platform.flamingo.themes.category.advanced=Avanzado
 platform.flamingo.themes.defaultvalue=Predeterminado
 platform.flamingo.themes.lessCode.description=En este campo, puede escribir directamente un código LESS que se añadirá al skin.
-platform.flamingo.themes.incompatiblebrowser=Lo sentimos, la vista previa no funciona con esta versión de Internet Explorer. Necesitas usar un navegador más nuevo.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
 
@@ -87,6 +86,11 @@ platform.flamingo.themes.global=Global
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=Desafortunadamente, este campo no se tiene en cuenta en la vista previa en directo.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Lo sentimos, la vista previa no funciona con esta versión de Internet Explorer. Necesitas usar un navegador más nuevo.
 
 #@deprecatedend</content>
 </xwikidoc>

@@ -932,7 +932,7 @@ Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
     <property>
       <description>Comma separated list of visibility options that the macro should allow the user to choose from.
 
-This list should be a sublist of the defualt ones: 'everyone', 'followers', 'group', 'user'.</description>
+This list should be a sublist of the default ones: 'everyone', 'followers', 'group', 'user'.</description>
     </property>
     <property>
       <mandatory/>

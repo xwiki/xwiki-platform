@@ -58,7 +58,7 @@ class PlainTextMentionsRendererTest
     void setUp()
     {
         this.formatter = mock(MentionsFormatter.class);
-        when(this.mentionFormatterProvider.get(null)).thenReturn(this.formatter);
+        when(this.mentionFormatterProvider.get("user")).thenReturn(this.formatter);
     }
 
     @Test

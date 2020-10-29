@@ -23,12 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionsConfiguration;
+import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
-import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -108,6 +109,13 @@ public class MentionsScriptService implements ScriptService
     @Unstable
     public String format(String actorReference, DisplayStyle style, String type)
     {
-        return this.mentionFormatterProvider.get(type).formatMention(actorReference, style);
+        // Uses the "user" type when the mention has an undefined type.
+        String hint;
+        if (StringUtils.isEmpty(type)) {
+            hint = MentionsConfiguration.USER_MENTION_TYPE;
+        } else {
+            hint = type;
+        }
+        return this.mentionFormatterProvider.get(hint).formatMention(actorReference, style);
     }
 }

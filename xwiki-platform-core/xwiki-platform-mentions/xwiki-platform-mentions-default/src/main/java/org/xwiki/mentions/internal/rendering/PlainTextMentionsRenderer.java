@@ -25,11 +25,13 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.mentions.DisplayStyle;
+import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 
@@ -62,8 +64,16 @@ public class PlainTextMentionsRenderer extends PlainTextRenderer implements Init
                 displayStyle = DisplayStyle.FULL_NAME;
             }
 
+            // Uses the "user" type when the mention has an undefined type.
+            String hint;
+            if (StringUtils.isEmpty(type)) {
+                hint = MentionsConfiguration.USER_MENTION_TYPE;
+            } else {
+                hint = type;
+            }
+
             this.getPrinter()
-                .println(this.mentionFormatterProvider.get(type).formatMention(userReference, displayStyle));
+                .println(this.mentionFormatterProvider.get(hint).formatMention(userReference, displayStyle));
         } else {
             super.onMacro(id, parameters, contentP, inline);
         }

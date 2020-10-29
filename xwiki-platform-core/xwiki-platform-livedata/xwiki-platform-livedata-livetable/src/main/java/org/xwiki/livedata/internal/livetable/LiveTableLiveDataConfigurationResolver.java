@@ -17,11 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.internal.script;
+package org.xwiki.livedata.internal.livetable;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -34,6 +31,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +39,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -51,21 +51,22 @@ import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
+import org.xwiki.livedata.livetable.LiveTableConfiguration;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Helper component for converting the Live Table configuration into Live Data configuration.
+ * Converts the Live Table configuration into Live Data configuration.
  * 
  * @version $Id$
  * @since 12.10RC1
  */
-@Component(roles = LiveTableConfigHelper.class)
+@Component
+@Named("liveTable")
 @Singleton
-public class LiveTableConfigHelper
+public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigurationResolver<LiveTableConfiguration>
 {
     private static final String UTF8 = "UTF-8";
 
@@ -92,40 +93,13 @@ public class LiveTableConfigHelper
     @Inject
     private Logger logger;
 
-    /**
-     * Converts the Live Table configuration into Live Data configuration.
-     * 
-     * @param id the live table id
-     * @param columns the list of live table columns
-     * @param columnProperties the column properties
-     * @param options the live table options
-     * @return the live data configuration
-     */
-    public Map<String, Object> getConfig(String id, List<String> columns, Map<String, Object> columnProperties,
-        Map<String, Object> options) throws IOException
-    {
-        return new ObjectMapper().readerForMapOf(Object.class)
-            .readValue(getConfigJSON(id, columns, columnProperties, options));
-    }
-
-    /**
-     * Converts the Live Table configuration into Live Data configuration.
-     * 
-     * @param id the live table id
-     * @param columns the list of live table columns
-     * @param columnProperties the column properties
-     * @param options the live table options
-     * @return the live data configuration JSON
-     */
-    public String getConfigJSON(String id, List<String> columns, Map<String, Object> columnProperties,
-        Map<String, Object> options) throws IOException
+    @Override
+    public LiveDataConfiguration resolve(LiveTableConfiguration liveTableConfig) throws LiveDataException
     {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-        ObjectNode columnPropertiesJSON = objectMapper.valueToTree(columnProperties);
-        ObjectNode optionsJSON = objectMapper.valueToTree(options);
-        LiveDataConfiguration config = getConfig(id, columns, columnPropertiesJSON, optionsJSON);
-        return objectMapper.writeValueAsString(config);
+        ObjectNode columnPropertiesJSON = objectMapper.valueToTree(liveTableConfig.getColumnProperties());
+        ObjectNode optionsJSON = objectMapper.valueToTree(liveTableConfig.getOptions());
+        return getConfig(liveTableConfig.getId(), liveTableConfig.getColumns(), columnPropertiesJSON, optionsJSON);
     }
 
     private LiveDataConfiguration getConfig(String id, List<String> columns, ObjectNode columnProperties,
@@ -169,7 +143,7 @@ public class LiveTableConfigHelper
             String url = urlNode.asText();
             try {
                 addSourceParametersFromURL(source, url);
-            } catch (MalformedURLException | UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 this.logger.warn("Failed to extract live data source parameters from live table results URL [{}]. "
                     + "Root cause is [{}].", url, ExceptionUtils.getRootCauseMessage(e));
             }
@@ -178,8 +152,7 @@ public class LiveTableConfigHelper
         return source;
     }
 
-    private void addSourceParametersFromURL(Source source, String url)
-        throws MalformedURLException, UnsupportedEncodingException
+    private void addSourceParametersFromURL(Source source, String url) throws Exception
     {
         Map<String, List<String>> parameters = getURLParameters(url);
         List<String> xpage = parameters.remove("xpage");
@@ -195,8 +168,7 @@ public class LiveTableConfigHelper
         }
     }
 
-    private Map<String, List<String>> getURLParameters(String url)
-        throws MalformedURLException, UnsupportedEncodingException
+    private Map<String, List<String>> getURLParameters(String url) throws Exception
     {
         URL baseURL = new URL("http://www.xwiki.org");
         String queryString = new URL(baseURL, url).getQuery();
@@ -235,7 +207,7 @@ public class LiveTableConfigHelper
                     filter.getConstraints().forEach(constraint -> constraint.setReadOnly(true));
                     filters.add(filter);
                 }
-            } catch (MalformedURLException | UnsupportedEncodingException e) {
+            } catch (Exception e) {
                 this.logger.warn("Failed to extract live data hidden filters from live table extra parameters [{}]."
                     + " Root cause is [{}].", extraParams, ExceptionUtils.getRootCauseMessage(e));
             }

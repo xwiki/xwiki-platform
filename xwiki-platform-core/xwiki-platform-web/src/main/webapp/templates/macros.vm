@@ -1310,7 +1310,8 @@ $Msz MB##
 
 #macro (livetable_liveData $divid $collist $colprops $options)
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/liveData.js', true))
-  #set ($liveDataConfigJSON = $services.liveData.liveTable.getConfigJSON($divid, $collist, $colprops, $options))
+  #set ($liveDataConfig = $services.liveData.liveTable.getConfig($divid, $collist, $colprops, $options))
+  #set ($liveDataConfigJSON = $jsontool.serialize($liveDataConfig))
   <div class="liveData" id="$!escapetool.xml($divid)" data-config="$escapetool.xml($liveDataConfigJSON)"></div>
 #end
 

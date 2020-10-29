@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.script;
+package org.xwiki.livedata.script.livetable;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,11 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.internal.script.LiveTableConfigHelper;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.livedata.script.LiveDataScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -48,11 +52,21 @@ public class LiveTableScriptService implements ScriptService
     @Inject
     private Logger logger;
 
+    /**
+     * Used to convert the live table configuration into live data configuration.
+     */
     @Inject
-    private LiveTableConfigHelper configHelper;
+    @Named("liveTable")
+    private LiveDataConfigurationResolver<LiveTableConfiguration> liveTableLiveDataConfigResolver;
 
     /**
-     * Converts the Live Table configuration into Live Data configuration.
+     * Used to add the default live data configuration.
+     */
+    @Inject
+    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
+
+    /**
+     * Converts the Live Table configuration into Live Data configuration, also adding the default values.
      * 
      * @param id the live table id
      * @param columns the list of live table columns
@@ -60,38 +74,19 @@ public class LiveTableScriptService implements ScriptService
      * @param options the live table options
      * @return the live data configuration
      */
-    public Map<String, Object> getConfig(String id, List<String> columns, Map<String, Object> columnProperties,
+    public LiveDataConfiguration getConfig(String id, List<String> columns, Map<String, Object> columnProperties,
         Map<String, Object> options)
     {
         try {
-            return this.configHelper.getConfig(id, columns, columnProperties, options);
-        } catch (Exception e) {
+            LiveTableConfiguration liveTableConfig = new LiveTableConfiguration(id, columns, columnProperties, options);
+            // Compute the live data configuration from the live table configuration.
+            LiveDataConfiguration liveDataConfig = this.liveTableLiveDataConfigResolver.resolve(liveTableConfig);
+            // Add the default values.
+            return this.defaultLiveDataConfigurationResolver.resolve(liveDataConfig);
+        } catch (LiveDataException e) {
             this.logger.warn(
                 "Failed to get live data config for id [{}], columns [{}], "
                     + "columnProperties [{}] and options [{}]. Root cause is [{}].",
-                id, columns, columnProperties, options, ExceptionUtils.getRootCauseMessage(e));
-            return null;
-        }
-    }
-
-    /**
-     * Converts the Live Table configuration into Live Data configuration.
-     * 
-     * @param id the live table id
-     * @param columns the list of live table columns
-     * @param columnProperties the column properties
-     * @param options the live table options
-     * @return the live data configuration JSON
-     */
-    public String getConfigJSON(String id, List<String> columns, Map<String, Object> columnProperties,
-        Map<String, Object> options)
-    {
-        try {
-            return this.configHelper.getConfigJSON(id, columns, columnProperties, options);
-        } catch (Exception e) {
-            this.logger.warn(
-                "Failed to get live data config JSON for id [{}], columns [{}],"
-                    + " columnProperties [{}] and options [{}]. Root cause is [{}].",
                 id, columns, columnProperties, options, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }

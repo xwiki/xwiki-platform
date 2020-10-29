@@ -17,59 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.internal.script;
+package org.xwiki.livedata.internal.livetable;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.livetable.LiveTableConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link LiveTableConfigHelper}.
+ * Unit tests for {@link LiveTableLiveDataConfigurationResolver}.
  * 
  * @version $Id$
  * @since 12.10RC1
  */
 @ComponentTest
-class LiveTableConfigHelperTest
+class LiveTableLiveDataConfigurationResolverTest
 {
     @InjectMockComponents
-    private LiveTableConfigHelper configHelper;
+    private LiveTableLiveDataConfigurationResolver liveTableLiveDataConfigResolver;
 
     @ParameterizedTest
     @MethodSource("getTestData")
     void getConfigJSON(String input, String output) throws Exception
     {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode liveTableConfig = objectMapper.readTree(input);
-        String id = liveTableConfig.path("id").asText();
-        List<String> columns = objectMapper.readerForListOf(String.class).readValue(liveTableConfig.path("columns"));
-        Map<String, Object> columnProperties =
-            objectMapper.readerForMapOf(Object.class).readValue(liveTableConfig.path("columnProperties"));
-        Map<String, Object> options =
-            objectMapper.readerForMapOf(Object.class).readValue(liveTableConfig.path("options"));
-        assertEquals(output, this.configHelper.getConfigJSON(id, columns, columnProperties, options));
+        LiveTableConfiguration liveTableConfig = objectMapper.readerFor(LiveTableConfiguration.class).readValue(input);
+        LiveDataConfiguration liveDataConfig = this.liveTableLiveDataConfigResolver.resolve(liveTableConfig);
+        assertEquals(output, objectMapper.writeValueAsString(liveDataConfig));
     }
 
     private static Stream<String[]> getTestData() throws Exception
     {
         File inputFolder = new File("src/test/resources/liveTableConfigHelper");
         return Stream.of(inputFolder.listFiles(file -> file.getName().endsWith(".test")))
-            .map(LiveTableConfigHelperTest::getTestData);
+            .map(LiveTableLiveDataConfigurationResolverTest::getTestData);
     }
 
     private static String[] getTestData(File file)

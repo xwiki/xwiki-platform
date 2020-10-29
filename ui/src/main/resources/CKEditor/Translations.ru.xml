@@ -89,7 +89,7 @@ ckeditor.plugin.save.leaveConfirmationMessage=Есть несохраненны�
 ckeditor.plugin.save.failed=Содержимое не может быть сохранено из-за внутренней ошибки CKEditor. Вы должны попытаться скопировать ваши важные изменения и перезагрузить редактор.
 ckeditor.plugin.source.conversionFailed=Не удалось выполнить преобразование.
 
-ckeditor.plugin.toolbar.basicStyles=Базовые стили
+ckeditor.plugin.toolbar.basicStyles=Основные стили
 ckeditor.plugin.toolbar.lists=Списки
 ckeditor.plugin.toolbar.bulletedlist=Маркированный список
 ckeditor.plugin.toolbar.numberedlist=Нумерованный список
@@ -99,16 +99,16 @@ ckeditor.plugin.toolbar.specialchar=Cпециальные символы
 ckeditor.plugin.toolbar.infoBox=Информация
 ckeditor.plugin.toolbar.successBox=Успешное завершение
 ckeditor.plugin.toolbar.warningBox=Предупреждение
-ckeditor.plugin.toolbar.errorBox=Ошибка!
+ckeditor.plugin.toolbar.errorBox=Ошибка
 ckeditor.plugin.toolbar.toc=Оглавление
 ckeditor.plugin.toolbar.include=Вставка
 ckeditor.plugin.toolbar.code=Фрагмент кода
 ckeditor.plugin.toolbar.otherMacros=Другие макросы
 
-### Missing: ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
-### Missing: ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
-### Missing: ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
-### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+ckeditor.plugin.syntax.update.inProgress=Обновление редактора WYSIWYG
+ckeditor.plugin.syntax.update.done=WYSIWYG редактор обновлен
+ckeditor.plugin.syntax.update.failed=Не удалось обновить редактор WYSIWYG
+ckeditor.plugin.syntax.wysiwygModeUnsupported=Режим редактирования WYSIWYG не поддерживается синтаксисом {0}.
 
 ckeditor.inline.failedToInit=Не удалось инициализировать CKEditor.
 

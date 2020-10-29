@@ -68,12 +68,12 @@
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>xml-dtd</artifactId>
-      <version>3.0.0</version>
+      <version>3.1.0</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>3.0.0</version>
+      <version>3.1.0</version>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->

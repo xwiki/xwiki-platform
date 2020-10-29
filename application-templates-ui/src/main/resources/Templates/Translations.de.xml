@@ -23,7 +23,7 @@
 <xwikidoc version="1.2" reference="Templates.Translations" locale="de">
   <web>Templates</web>
   <name>Translations</name>
-  <language>de<language/>
+  <language>de</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>

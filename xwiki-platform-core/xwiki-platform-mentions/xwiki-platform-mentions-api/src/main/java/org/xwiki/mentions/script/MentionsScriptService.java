@@ -96,19 +96,6 @@ public class MentionsScriptService implements ScriptService
     }
 
     /**
-     * Format a user mention.
-     *
-     * @param userReference the user reference
-     * @param style the display style
-     * @return the formatted mention
-     * @see MentionsFormatter#formatMention(String, DisplayStyle)
-     */
-    public String format(String userReference, DisplayStyle style)
-    {
-        return format(userReference, style, null);
-    }
-
-    /**
      * Format an actor mention according to its type.
      *
      * @param actorReference the reference of the mentioned actor

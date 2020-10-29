@@ -180,6 +180,12 @@
                 <old>method org.xwiki.rendering.block.XDOM org.xwiki.mentions.notifications.MentionNotificationParameters::getXdom()</old>
                 <justification>Young API. Redesign of the mention notifications mechanism.</justification>
               </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method java.lang.String org.xwiki.mentions.script.MentionsScriptService::format(java.lang.String, org.xwiki.mentions.DisplayStyle)</old>
+                <new>method java.lang.String org.xwiki.mentions.script.MentionsScriptService::format(java.lang.String, org.xwiki.mentions.DisplayStyle, java.lang.String)</new>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

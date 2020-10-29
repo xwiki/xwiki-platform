@@ -49,13 +49,8 @@ public class DefaultMentionsFormatterProvider implements MentionFormatterProvide
     @Inject
     private Logger logger;
 
-    /**
-     * Anonymous instance of the mention formater. Used as a default implementation if no specific implementation is
-     * found for a given type.
-     */
-    private final MentionsFormatter defaultFormatter = new MentionsFormatter()
-    {
-    };
+    @Inject
+    private MentionsFormatter defaultFormatter;
 
     @Override
     public MentionsFormatter get(String type)

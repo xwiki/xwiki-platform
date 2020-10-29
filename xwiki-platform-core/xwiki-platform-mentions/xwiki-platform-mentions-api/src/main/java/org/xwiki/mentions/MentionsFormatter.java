@@ -40,18 +40,12 @@ public interface MentionsFormatter
     /**
      * Format a user mention.
      * <p>
-     * The formatter takes the serialized reference of an actor and return an user readable string.
+     * The formatter takes the serialized reference of an actor and returns an user readable string.
      * The kind of actor handled is specific to a {@code MentionFormatter} implementation.
-     * <p>
-     * By default, the {@code actorReference} is returned without modification.
      *
      * @param actorReference the actor reference
      * @param style the display style of the mention
      * @return the formatted mention
      */
-    default String formatMention(String actorReference, DisplayStyle style)
-    {
-        // If no implementation of the formatter is found, the user reference is returned.
-        return actorReference;
-    }
+    String formatMention(String actorReference, DisplayStyle style);
 }

@@ -31,13 +31,8 @@ import org.xwiki.messagestream.PersonalMessageDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
-import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 /**
  * Filter that make sure a message from the message stream is visible by the current user.
@@ -49,7 +44,7 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 @Component
 @Singleton
 @Named("PersonalMessageStreamNotificationFilter")
-public class PersonalMessageStreamNotificationFilter implements NotificationFilter
+public class PersonalMessageStreamNotificationFilter extends AbstractMessageStreamNotificationFilter
 {
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -62,44 +57,24 @@ public class PersonalMessageStreamNotificationFilter implements NotificationFilt
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
         // Don't handle events that are not personal messages!
-        if (!PersonalMessageDescriptor.EVENT_TYPE.equals(event.getType())) {
+        if (!getEventType().equals(event.getType())) {
             return FilterPolicy.NO_EFFECT;
         }
 
-        String sender = serializer.serialize(event.getUser());
-        return preferencesGetter.isUsedFollowed(sender, filterPreferences, format) ? FilterPolicy.KEEP
+        String sender = this.serializer.serialize(event.getUser());
+        return this.preferencesGetter.isUsedFollowed(sender, filterPreferences, format) ? FilterPolicy.KEEP
                 : FilterPolicy.FILTER;
-    }
-
-    @Override
-    public boolean matchesPreference(NotificationPreference preference)
-    {
-        return PersonalMessageDescriptor.EVENT_TYPE.equals(getEventType(preference));
-    }
-
-    @Override
-    public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
-    {
-        return null;
-    }
-
-    private String getEventType(NotificationPreference preference)
-    {
-        return (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-    }
-
-    @Override
-    public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
-            NotificationFormat format)
-    {
-        return null;
     }
 
     @Override
     public String getName()
     {
         return "Personal Message Stream Notification Filter";
+    }
+
+    @Override
+    String getEventType()
+    {
+        return PersonalMessageDescriptor.EVENT_TYPE;
     }
 }

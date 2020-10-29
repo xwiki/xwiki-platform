@@ -135,7 +135,7 @@ class UserMentionEventListenerTest
         this.notificationService.onEvent(null, null,
             new MentionNotificationParameters(AUTHOR_REFERENCE,
                 new ObjectPropertyReference("comment", commentObjectReference), MentionLocation.COMMENT, "4.6")
-                .addNewMention(null, mentionNotificationParameter));
+                .addNewMention("user", mentionNotificationParameter));
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
@@ -163,8 +163,8 @@ class UserMentionEventListenerTest
             new MentionNotificationParameters(AUTHOR_REFERENCE,
                 new ObjectPropertyReference("comment", commentObjectReference),
                 MentionLocation.COMMENT, "2.3")
-                .addNewMention("UserMentionEventListener", mention1)
-                .addNewMention(null, mention2)
+                .addNewMention("user", mention1)
+                .addNewMention("user", mention2)
         );
 
         MentionEvent event = new MentionEvent(singleton(MENTIONED_IDENTITY_USER),
@@ -215,7 +215,7 @@ class UserMentionEventListenerTest
                 new MentionNotificationParameters(AUTHOR_REFERENCE,
                     new ObjectPropertyReference("comment",
                         objectReference), MentionLocation.COMMENT, "4.9")
-                    .addNewMention(null, mentionNotificationParameter));
+                    .addNewMention("user", mentionNotificationParameter));
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
@@ -255,7 +255,7 @@ class UserMentionEventListenerTest
             new MentionNotificationParameters(AUTHOR_REFERENCE,
                 new ObjectPropertyReference("comment", objectReference),
                 MentionLocation.COMMENT, "7.5")
-                .addNewMention(null, mentionNotificationParameter));
+                .addNewMention("user", mentionNotificationParameter));
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()

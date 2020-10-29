@@ -19,9 +19,7 @@
  */
 package org.xwiki.mentions.internal;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -118,35 +116,27 @@ public class UserMentionEventListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // We send notification to the mentions explicitly typed as local user, but also untyped mentions (i.e., with a
-        // null type).
         MentionNotificationParameters mentionNotificationParameters = (MentionNotificationParameters) data;
-        Map<String, Set<MentionNotificationParameter>> newMentionsMap = mentionNotificationParameters.getNewMentions();
-        Set<MentionNotificationParameter> newMentions = new HashSet<>();
-        Set<MentionNotificationParameter> untypedMentionsMap = newMentionsMap.get(null);
-        if (untypedMentionsMap != null) {
-            newMentions.addAll(untypedMentionsMap);
-        }
-        Set<MentionNotificationParameter> userMentionsMap = newMentionsMap.get(TYPE);
-        if (userMentionsMap != null) {
-            newMentions.addAll(userMentionsMap);
-        }
-
-        Optional<XWikiDocument> optionalDoc;
-        EntityReference entityReference = mentionNotificationParameters.getEntityReference();
-        try {
-            optionalDoc = Optional.of(this.documentRevisionProvider
-                .getRevision((DocumentReference) entityReference.extractReference(EntityType.DOCUMENT),
-                    mentionNotificationParameters.getVersion()));
-        } catch (XWikiException e) {
-            this.logger.warn("Failed to send the mentions notifications. Cause: [{}]", getRootCauseMessage(e));
-            optionalDoc = Optional.empty();
-        }
-        optionalDoc.ifPresent(doc -> {
-            for (MentionNotificationParameter mentionNotificationParameter : newMentions) {
-                handleNotification(mentionNotificationParameters, entityReference, doc, mentionNotificationParameter);
+        // We send notifications to the mentions typed as "user" (representing the local wiki users)
+        Set<MentionNotificationParameter> newMentions = mentionNotificationParameters.getNewMentions().get("user");
+        if (newMentions != null) {
+            Optional<XWikiDocument> optionalDoc;
+            EntityReference entityReference = mentionNotificationParameters.getEntityReference();
+            try {
+                optionalDoc = Optional.of(this.documentRevisionProvider
+                    .getRevision((DocumentReference) entityReference.extractReference(EntityType.DOCUMENT),
+                        mentionNotificationParameters.getVersion()));
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to send the mentions notifications. Cause: [{}]", getRootCauseMessage(e));
+                optionalDoc = Optional.empty();
             }
-        });
+            optionalDoc.ifPresent(doc -> {
+                for (MentionNotificationParameter mentionNotificationParameter : newMentions) {
+                    handleNotification(mentionNotificationParameters, entityReference, doc,
+                        mentionNotificationParameter);
+                }
+            });
+        }
     }
 
     private void handleNotification(MentionNotificationParameters mentionNotificationParameters,

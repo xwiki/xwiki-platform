@@ -117,7 +117,7 @@ class DefaultMentionXDOMServiceTest
             this.xdomService
                 .groupAnchorsByUserReference(singletonList(initMentionMacro("A", "A1")));
         Map<MentionedActorReference, List<String>> expected = new HashMap<>();
-        expected.put(new MentionedActorReference("A", null), singletonList("A1"));
+        expected.put(new MentionedActorReference("A", "user"), singletonList("A1"));
         assertEquals(expected, actual);
     }
 
@@ -129,7 +129,7 @@ class DefaultMentionXDOMServiceTest
             initMentionMacro("A", "A2")
         ));
         Map<MentionedActorReference, List<String>> expected = new HashMap<>();
-        expected.put(new MentionedActorReference("A", null),
+        expected.put(new MentionedActorReference("A", "user"),
             asList("A1", "A2"));
         assertEquals(expected, actual);
     }
@@ -143,8 +143,8 @@ class DefaultMentionXDOMServiceTest
             initMentionMacro("A", "A2")
         ));
         Map<MentionedActorReference, List<String>> expected = new HashMap<>();
-        expected.put(new MentionedActorReference("B", null), singletonList("B1"));
-        expected.put(new MentionedActorReference("A", null), asList("A1", "A2"));
+        expected.put(new MentionedActorReference("B", "user"), singletonList("B1"));
+        expected.put(new MentionedActorReference("A", "user"), asList("A1", "A2"));
         assertEquals(expected, actual);
     }
 
@@ -160,9 +160,9 @@ class DefaultMentionXDOMServiceTest
             initMentionMacro("C", "")
         ));
         Map<MentionedActorReference, List<String>> expected = new HashMap<>();
-        expected.put(new MentionedActorReference("B", null), singletonList("B1"));
-        expected.put(new MentionedActorReference("A", null), asList(null, "A1", "", "A2"));
-        expected.put(new MentionedActorReference("C", null), singletonList(""));
+        expected.put(new MentionedActorReference("B", "user"), singletonList("B1"));
+        expected.put(new MentionedActorReference("A", "user"), asList(null, "A1", "", "A2"));
+        expected.put(new MentionedActorReference("C", "user"), singletonList(""));
         assertEquals(expected, actual);
     }
 

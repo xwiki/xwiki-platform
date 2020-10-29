@@ -90,7 +90,9 @@ public class DefaultMentionXDOMService implements MentionXDOMService
             String userReference = block.getParameter(REFERENCE_PARAM_NAME);
             // We are currently resolving to DocumentReference to allow us to support the mention of groups.
 
-            ret.merge(new MentionedActorReference(userReference, block.getParameter(TYPE_PARAM_NAME)),
+            // If the type is not defined, we use the default "user" type.
+            String type = Optional.ofNullable(block.getParameter(TYPE_PARAM_NAME)).orElse("user");
+            ret.merge(new MentionedActorReference(userReference, type),
                 new ArrayList<>(singletonList(block.getParameter(ANCHORID_PARAM_NAME))), (l1, l2) -> {
                     l1.addAll(l2);
                     return l1;

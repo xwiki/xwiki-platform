@@ -166,8 +166,8 @@ class MentionsIT
             properties
                 .put("comment",
                     "AAAAA\n\n"
-                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" /}} XYZ\n\n"
-                        + "BBBBB");
+                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
+                        + "type=\"user\" /}} XYZ\n\nBBBBB");
             setup.addObject(reference, "XWiki.XWikiComments", properties);
         });
 

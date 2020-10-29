@@ -22,9 +22,6 @@ module.exports = {
   // See https://cli.vuejs.org/config/
   publicPath: "/xwiki/resources/uicomponents/livedata/",
   filenameHashing: false,
-  chainWebpack: config => {
-    config.optimization.delete("splitChunks");
-  },
   css: {
     extract: false,
   },

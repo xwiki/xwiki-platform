@@ -86,6 +86,9 @@
               <resources>
                 <resource>
                   <directory>${project.build.directory}/vue/dist</directory>
+                  <excludes>
+                    <exclude>demo.html</exclude>
+                  </excludes>
                 </resource>
               </resources>
             </configuration>

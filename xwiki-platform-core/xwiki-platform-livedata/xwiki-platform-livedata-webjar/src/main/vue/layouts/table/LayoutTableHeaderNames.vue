@@ -83,7 +83,7 @@
       </div>
     </th>
 
-  </tr>
+  </XWikiDraggable>
 </template>
 
 

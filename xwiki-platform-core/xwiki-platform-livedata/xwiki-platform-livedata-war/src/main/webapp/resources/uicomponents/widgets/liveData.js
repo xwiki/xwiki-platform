@@ -19,12 +19,14 @@
  */
 require.config({
   paths: {
+    Logic: "$services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'Logic.min.js')",
     Vue: "$services.webjars.url('vue', 'vue.runtime.min.js')",
-    LiveData: "$services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'webjar.bundle.min.js')"
+    'xwiki-livedata': $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'xwiki-livedata.umd.min.js'))
   }
 });
 
-require(['jquery', 'LiveData'], function($, LiveData) {
+require(['jquery', 'Logic'], function($, LiveData) {
   "use strict";
 
   $.fn.liveData = function(config) {

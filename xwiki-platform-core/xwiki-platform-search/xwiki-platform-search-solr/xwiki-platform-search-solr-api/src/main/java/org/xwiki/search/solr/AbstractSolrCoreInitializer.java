@@ -132,8 +132,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
 
-    private static final String SOLR_IGNORECASE = "ignoreCase";
-
     @Inject
     protected ComponentDescriptor<SolrCoreInitializer> descriptor;
 
@@ -274,14 +272,15 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             // TYPES
             //////////
 
-            addTextGeneralFieldType();
+            addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, false);
+            addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERALS, true);
         }
     }
 
     /**
      * Add the standard Solr text_general type as defined in the default schema.
      */
-    private void addTextGeneralFieldType() throws SolrException
+    private void addTextGeneralFieldType(String fieldName, boolean multiValued) throws SolrException
     {
         Map<String, Object> tokenizer = new HashMap<>();
         tokenizer.put(FieldType.CLASS_NAME, StandardTokenizerFactory.class.getName());
@@ -297,8 +296,12 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         queryAnalyzer.setFilters(Arrays.asList(lowerCaseFilter));
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(FieldType.TYPE_NAME, DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL);
+        attributes.put(FieldType.TYPE_NAME, fieldName);
         attributes.put(FieldType.CLASS_NAME, TextField.class.getName());
+
+        if (multiValued) {
+            attributes.put(SOLR_FIELD_MULTIVALUED, multiValued);
+        }
 
         FieldTypeDefinition definition = new FieldTypeDefinition();
         definition.setAttributes(attributes);

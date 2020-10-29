@@ -28,7 +28,7 @@ import org.xwiki.observation.ObservationManager;
  * Default implementation of {@link ExtensionIndexStatus}.
  * 
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.10RC1
  */
 public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndexRequest> implements ExtensionIndexStatus
 {

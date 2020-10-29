@@ -37,7 +37,7 @@ import org.xwiki.extension.wrap.AbstractWrappingExtension;
  * An extension stored in the Solr based index of extensions.
  * 
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.10RC1
  */
 public class SolrExtension extends AbstractWrappingExtension<Extension> implements RemoteExtension
 {

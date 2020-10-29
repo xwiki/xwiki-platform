@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -70,7 +72,7 @@ import org.xwiki.search.solr.SolrUtils;
  * An helper to manipulate the store of indexed extensions.
  * 
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.10RC1
  */
 @Component(roles = ExtensionIndexStore.class)
 @Singleton
@@ -188,7 +190,7 @@ public class ExtensionIndexStore implements Initializable
      */
     public ExtensionId fromSolrId(String solrId)
     {
-        return ExtensionIdConverter.toExtensionId(solrId, null);
+        return ExtensionIdConverter.toExtensionId(solrId, null, this.factory);
     }
 
     /**
@@ -204,26 +206,26 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * @param extensionId the extension id and version
-     * @param last true if it's the last version among extensions with the same id
+     * @param local true if it's the searched extension is a local extension
      * @return true if a document corresponding to the passed extension can be found in the index
      * @throws SolrServerException
      * @throws IOException
      */
-    public boolean exists(ExtensionId extensionId, Boolean last) throws SolrServerException, IOException
+    public boolean exists(ExtensionId extensionId, Boolean local) throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
 
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toFilterQueryString(toSolrId(extensionId)));
 
-        if (last != null) {
-            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + last.booleanValue());
+        if (local != null) {
+            solrQuery.addFilterQuery(Extension.FIELD_REPOSITORY + ":local");
         }
 
         // We don't want to actually get the document, we just want to know if one exist
         solrQuery.setRows(0);
 
-        return client.query(solrQuery).getResults().getNumFound() > 0;
+        return this.client.query(solrQuery).getResults().getNumFound() > 0;
     }
 
     /**
@@ -250,18 +252,12 @@ public class ExtensionIndexStore implements Initializable
 
     /**
      * @param extension the extension to add to the index
-     * @param force true if the extension should always be saved even if it already exist
      * @param last true if it's the last version of this extension id
-     * @return true of the extension was saved
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public boolean add(Extension extension, boolean force, boolean last) throws SolrServerException, IOException
+    public void add(Extension extension, boolean last) throws SolrServerException, IOException
     {
-        if (!force && exists(extension.getId(), last ? Boolean.TRUE : null)) {
-            return false;
-        }
-
         SolrInputDocument document = new SolrInputDocument();
 
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extension.getId()), document);
@@ -307,8 +303,6 @@ public class ExtensionIndexStore implements Initializable
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, last, document);
 
         add(document);
-
-        return true;
     }
 
     private boolean add(SolrInputDocument document) throws SolrServerException, IOException
@@ -406,6 +400,9 @@ public class ExtensionIndexStore implements Initializable
         solrQuery.set("defType", "edismax");
         solrQuery.set("bf", BOOST);
 
+        // Only search for latest versions
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+
         // Pagination
         if (query.getOffset() > 0) {
             solrQuery.setStart(query.getOffset());
@@ -446,7 +443,12 @@ public class ExtensionIndexStore implements Initializable
         }
 
         // Execute the search
-        QueryResponse response = search(solrQuery);
+        QueryResponse response;
+        try {
+            response = search(solrQuery);
+        } catch (Exception e) {
+            throw new SearchException("Failed to search extension for query [" + query + "]", e);
+        }
 
         SolrDocumentList documents = response.getResults();
 
@@ -500,7 +502,7 @@ public class ExtensionIndexStore implements Initializable
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public List<ExtensionId> searchExtensionIds(SolrParams params) throws SearchException
+    public Set<ExtensionId> searchExtensionIds(SolrParams params) throws SolrServerException, IOException
     {
         if (params instanceof SolrQuery) {
             ((SolrQuery) params).setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
@@ -510,7 +512,7 @@ public class ExtensionIndexStore implements Initializable
 
         SolrDocumentList documents = response.getResults();
 
-        List<ExtensionId> extensionId = new ArrayList<>(documents.size());
+        Set<ExtensionId> extensionId = new LinkedHashSet<>(documents.size());
         for (SolrDocument document : documents) {
             extensionId.add(fromSolrId(this.utils.getId(document)));
         }
@@ -523,24 +525,22 @@ public class ExtensionIndexStore implements Initializable
      *
      * @param params an object holding all key/value parameters to send along the request
      * @return a {@link org.apache.solr.client.solrj.response.QueryResponse} containing the response from the server
+     * @throws SearchException when failing to execute the Solr query
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public QueryResponse search(SolrParams params) throws SearchException
+    public QueryResponse search(SolrParams params) throws SolrServerException, IOException
     {
-        try {
-            return this.client.query(params);
-        } catch (Exception e) {
-            throw new SearchException("Failed execute Solr query", e);
-        }
+        return this.client.query(params);
     }
 
     /**
      * @param id the identifier of the extension
      * @return the versions available for the provided id, null if no extension can be found with this id
-     * @throws SearchException when failing to search the versions
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
      */
-    public Collection<Version> getExtensionVersions(String id) throws SearchException
+    public Collection<Version> getExtensionVersions(String id) throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
 
@@ -548,6 +548,7 @@ public class ExtensionIndexStore implements Initializable
 
         solrQuery.addFilterQuery(
             ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + this.utils.toFilterQueryString(id));
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
 
         solrQuery.setRows(1);
 

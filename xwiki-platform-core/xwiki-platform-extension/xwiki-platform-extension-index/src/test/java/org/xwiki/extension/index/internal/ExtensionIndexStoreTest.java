@@ -64,7 +64,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -143,10 +142,8 @@ class ExtensionIndexStoreTest
     {
         TestExtension extension = new TestExtension(this.testRepository, new ExtensionId("id", "version"), "test");
 
-        assertTrue(this.indexStore.add(extension, false, true));
+        this.indexStore.add(extension, true);
         this.indexStore.commit();
-
-        assertFalse(this.indexStore.add(extension, false, true));
 
         SolrExtension storedExtension = this.indexStore.getSolrExtension(extension.getId());
 
@@ -172,7 +169,7 @@ class ExtensionIndexStoreTest
             new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
         extension.setDependencies(Arrays.asList(dependency1, dependency2));
 
-        assertTrue(this.indexStore.add(extension, false, true));
+        this.indexStore.add(extension, true);
         this.indexStore.commit();
 
         when(this.testRepository.resolve(extensionId)).thenReturn(extension);

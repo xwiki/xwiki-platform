@@ -58,7 +58,7 @@ import org.xwiki.job.event.status.JobStatus.State;
  * The default implementation of {@link ExtensionIndex}, based on Solr.
  * 
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.10RC1
  */
 @Component
 @Singleton
@@ -82,21 +82,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     @Override
     public void initialize() throws InitializationException
     {
-        // Start index job
-        try {
-            this.jobs.execute(ExtensionIndexJob.JOB_TYPE, new ExtensionIndexRequest(true));
-        } catch (JobException e) {
-            throw new InitializationException("Failed to start indexing the available extensions", e);
-        }
-
         setDescriptor(new DefaultExtensionRepositoryDescriptor(ID, ID, null));
-
-        // Trigger first indexing
-        try {
-            index();
-        } catch (JobException e) {
-            this.logger.error("Failed to run indexing job", e);
-        }
     }
 
     @Override
@@ -196,7 +182,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     private void cacheExtension(Extension extension)
     {
         try {
-            this.store.add(extension, false, false);
+            this.store.add(extension, false);
         } catch (Exception e) {
             this.logger.warn("Failed to add the extension [{}] to the index: {}", extension.getId(),
                 ExceptionUtils.getRootCauseMessage(e));
@@ -209,7 +195,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
         Collection<Version> versions;
         try {
             versions = this.store.getExtensionVersions(id);
-        } catch (SearchException e) {
+        } catch (Exception e) {
             throw new ResolveException("Failed to search for exetnsion versions", e);
         }
 

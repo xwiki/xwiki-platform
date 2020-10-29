@@ -22,6 +22,7 @@ package org.xwiki.mentions.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -29,12 +30,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mentions.MentionsFormatter;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
 
 /**
  * Default implementation of {@link MentionFormatterProvider}.
  * <p>
- * A lookup of the requested formatter type is performed.
- * An anonymous instance of {@link MentionsFormatter} is returned if the lookup fails.
+ * A lookup of the requested formatter type is performed. If the type is not defined, the default {@link
+ * org.xwiki.mentions.MentionsConfiguration#USER_MENTION_TYPE} type is used.
+ * If the lookup fails, the default @link MentionFormatterProvider} component is returned.
  *
  * @version $Id$
  * @since 12.10RC1
@@ -56,8 +59,8 @@ public class DefaultMentionsFormatterProvider implements MentionFormatterProvide
     public MentionsFormatter get(String type)
     {
         String hint = type;
-        if (type == null) {
-            hint = "user";
+        if (StringUtils.isEmpty(type)) {
+            hint = USER_MENTION_TYPE;
         }
 
         MentionsFormatter ret;

@@ -45,6 +45,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 
 import static java.util.Collections.singletonList;
+import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
 
 /**
  * Default implementation of {@link MentionXDOMService}.
@@ -90,8 +91,8 @@ public class DefaultMentionXDOMService implements MentionXDOMService
             String userReference = block.getParameter(REFERENCE_PARAM_NAME);
             // We are currently resolving to DocumentReference to allow us to support the mention of groups.
 
-            // If the type is not defined, we use the default "user" type.
-            String type = Optional.ofNullable(block.getParameter(TYPE_PARAM_NAME)).orElse("user");
+            // If the type is not defined, we use the default type.
+            String type = Optional.ofNullable(block.getParameter(TYPE_PARAM_NAME)).orElse(USER_MENTION_TYPE);
             ret.merge(new MentionedActorReference(userReference, type),
                 new ArrayList<>(singletonList(block.getParameter(ANCHORID_PARAM_NAME))), (l1, l2) -> {
                     l1.addAll(l2);

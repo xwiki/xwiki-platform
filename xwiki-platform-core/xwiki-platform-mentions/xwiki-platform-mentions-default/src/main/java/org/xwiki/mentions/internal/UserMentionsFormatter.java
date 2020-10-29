@@ -36,6 +36,7 @@ import org.xwiki.user.UserReferenceResolver;
 
 import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
 import static org.xwiki.mentions.DisplayStyle.LOGIN;
+import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
 
 /**
  * User implementation of {@link MentionsFormatter}.
@@ -44,7 +45,7 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * @since 12.10RC1
  */
 @Singleton
-@Named("user")
+@Named(USER_MENTION_TYPE)
 @Component
 public class UserMentionsFormatter implements MentionsFormatter
 {

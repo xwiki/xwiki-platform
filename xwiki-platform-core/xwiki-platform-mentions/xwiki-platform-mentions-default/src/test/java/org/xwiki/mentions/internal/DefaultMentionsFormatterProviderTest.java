@@ -33,7 +33,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.test.LogLevel.DEBUG;
@@ -53,39 +52,40 @@ class DefaultMentionsFormatterProviderTest
     @MockComponent
     private ComponentManager componentManager;
 
+    @MockComponent
+    private MentionsFormatter defaultFormatter;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @Test
     void get() throws Exception
     {
-        MentionsFormatter mock = mock(MentionsFormatter.class);
-        when(this.componentManager.getInstance(MentionsFormatter.class, "ap")).thenReturn(mock);
-        MentionsFormatter user = this.provider.get("ap");
-        assertEquals(mock, user);
+        MentionsFormatter expectedMentionsFormatter = mock(MentionsFormatter.class);
+        when(this.componentManager.getInstance(MentionsFormatter.class, "ap")).thenReturn(expectedMentionsFormatter);
+        MentionsFormatter userMentionFormatter = this.provider.get("ap");
+        assertEquals(expectedMentionsFormatter, userMentionFormatter);
     }
 
     @Test
     void getNull() throws Exception
     {
-        MentionsFormatter mock = mock(MentionsFormatter.class);
-        when(this.componentManager.getInstance(MentionsFormatter.class, "user")).thenReturn(mock);
-        MentionsFormatter user = this.provider.get(null);
-        assertEquals(mock, user);
+        MentionsFormatter expectedMentionsFormatter = mock(MentionsFormatter.class);
+        when(this.componentManager.getInstance(MentionsFormatter.class, "user")).thenReturn(expectedMentionsFormatter);
+        assertEquals(expectedMentionsFormatter, this.provider.get(null));
     }
 
     @Test
     void getNotFound() throws Exception
     {
-        MentionsFormatter mock = mock(MentionsFormatter.class);
-        when(this.componentManager.getInstance(MentionsFormatter.class, "user"))
+        when(this.componentManager.getInstance(MentionsFormatter.class, "testhint"))
             .thenThrow(ComponentLookupException.class);
-        MentionsFormatter user = this.provider.get(null);
-        assertNotEquals(mock, user);
+        MentionsFormatter user = this.provider.get("testhint");
+        assertEquals(this.defaultFormatter, user);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.DEBUG, this.logCapture.getLogEvent(0).getLevel());
         assertEquals(
-            "Unable to find a formatter with type [null]. Fallback to the default formatter. "
+            "Unable to find a formatter with type [testhint]. Fallback to the default formatter. "
                 + "Cause: [ComponentLookupException: ]",
             this.logCapture.getMessage(0));
     }

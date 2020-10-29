@@ -586,9 +586,10 @@ blockquote.mention-quote {
       <code>{{velocity}}
 #set ($reference = $wikimacro.parameters.reference)
 #set ($style = $wikimacro.parameters.style)
-#set ($content = $services.mentions.format($reference.reference, $style))
+#set ($type = "$!wikimacro.parameters.type")
+#set ($content = $services.mentions.format($reference.reference, $style, $type))
 #set ($anchor = $wikimacro.parameters.anchor)
-#set ($isCurrentUser = $xcontext.userReference == $reference.reference)
+#set ($isCurrentUser = $xcontext.userReference == $reference.reference &amp;&amp; ($type == '' || $type  == 'user'))
 #set ($cssClasses = ['xwiki-mention', 'user'])
 #if ($isCurrentUser)
   #set ($discard = $cssClasses.add('self'))

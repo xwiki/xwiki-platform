@@ -57,6 +57,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
 
 /**
  * Event listener for the mentions to local wiki users.
@@ -117,8 +118,9 @@ public class UserMentionEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         MentionNotificationParameters mentionNotificationParameters = (MentionNotificationParameters) data;
-        // We send notifications to the mentions typed as "user" (representing the local wiki users)
-        Set<MentionNotificationParameter> newMentions = mentionNotificationParameters.getNewMentions().get("user");
+        // We send notifications to the mentions typed as "user" (representing the local wiki users).
+        Set<MentionNotificationParameter> newMentions =
+            mentionNotificationParameters.getNewMentions().get(USER_MENTION_TYPE);
         if (newMentions != null) {
             Optional<XWikiDocument> optionalDoc;
             EntityReference entityReference = mentionNotificationParameters.getEntityReference();

@@ -2,6 +2,7 @@
 ## Merge default configuration
 ##
 {
+  "id":"defaultConfigResolverTest",
   "query":{
     "source":"test"
   },
@@ -37,6 +38,7 @@
 }
 ---
 {
+  "id":"defaultConfigResolverTest",
   "query":{
     "properties":[],
     "source":{"id":"test"},

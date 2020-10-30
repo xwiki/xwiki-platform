@@ -45,7 +45,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     /**
      * The highlighted result block.
      */
-    private List<Block> blocks = new ArrayList<Block>();
+    private List<Block> blocks = new ArrayList<>();
 
     /**
      * Used to convert Pygment token values into blocks.
@@ -84,7 +84,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
 
             String styleParameter = formatStyle(style);
 
-            FormatBlock formatBlock = null;
+            FormatBlock formatBlock;
             if (styleParameter.length() > 0) {
                 formatBlock = new FormatBlock(blockList, Format.NONE);
                 formatBlock.setParameter("style", styleParameter);

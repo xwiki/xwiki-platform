@@ -142,7 +142,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the limit threshold is working properly and the rights events are triggered.
      */
     @Test
-    public void authenticationFailureLimitReached()
+    void authenticationFailureLimitReached()
     {
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
@@ -154,6 +154,21 @@ public class DefaultAuthenticationFailureManagerTest
             this.failingLogin);
         verify(this.strategy1, times(2)).notify(failingLogin);
         verify(this.strategy2, times(2)).notify(failingLogin);
+    }
+
+    @Test
+    void authenticationFailureEmptyLogin()
+    {
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(""));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(""));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(null));
+
+        verify(this.observationManager, times(2)).notify(new AuthenticationFailureEvent(), "");
+        verify(this.observationManager, times(2)).notify(new AuthenticationFailureEvent(), null);
+        verify(this.observationManager, never()).notify(eq(new AuthenticationFailureLimitReachedEvent()), any());
+        verify(this.strategy1, never()).notify(any());
+        verify(this.strategy2, never()).notify(any());
     }
 
     /**

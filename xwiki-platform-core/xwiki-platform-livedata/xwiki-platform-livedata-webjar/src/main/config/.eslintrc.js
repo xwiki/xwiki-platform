@@ -42,6 +42,8 @@ module.exports = {
   },
   globals: {
     define: 'readonly',
+    // We need to be able to set the public path at runtime.
+    __webpack_public_path__: 'writable',
     XWiki: 'writable'
   }
 };

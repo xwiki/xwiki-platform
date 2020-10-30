@@ -17,14 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*
+#set ($liveDataEntry = 'xwiki-livedata.umd.min')
+#set ($liveDataPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', $liveDataEntry))
+#set ($liveDataBasePath = $stringtool.removeEnd($liveDataPath, $liveDataEntry))
+*/
 require.config({
   paths: {
-    Logic: "$services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'Logic.min.js')",
-    Vue: "$services.webjars.url('vue', 'vue.runtime.min.js')",
-    'xwiki-livedata': $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'xwiki-livedata.umd.min.js'))
+    Logic: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'Logic.min')),
+    Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
+    'xwiki-livedata': $jsontool.serialize($liveDataPath)
   }
 });
+
+window.liveDataBaseURL = $jsontool.serialize($liveDataBasePath);
 
 require(['jquery', 'Logic'], function($, LiveData) {
   "use strict";

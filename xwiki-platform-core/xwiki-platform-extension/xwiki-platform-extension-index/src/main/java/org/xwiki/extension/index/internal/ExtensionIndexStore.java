@@ -229,7 +229,7 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
-     * @param extensionId the id of the extension to add to the index
+     * @param extensionId the id of the extension to update
      * @param last true if it's the last version of this extension id
      * @param newVersions the versions available for the extension
      * @throws IOException If there is a low-level I/O error.
@@ -246,6 +246,27 @@ public class ExtensionIndexStore implements Initializable
             last, document);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
             ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS, newVersions, document);
+
+        add(document);
+    }
+
+    /**
+     * @param extensionId the id of the extension to update
+     * @param namespace the namespace for which to update the extension
+     * @param compatible true if the extension is compatible with the passed namespace
+     * @throws IOException if there is a communication error with the server
+     * @throws SolrServerException if there is an error on the server
+     */
+    public void updateCompatible(ExtensionId extensionId, String namespace, boolean compatible)
+        throws SolrServerException, IOException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+
+        this.utils.setAtomic(
+            compatible ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, namespace, document);
 
         add(document);
     }

@@ -20,10 +20,12 @@
 package org.xwiki.extension.index.internal.job;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -40,6 +42,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndexStatus;
@@ -57,6 +60,8 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
@@ -101,6 +106,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
 
     @Inject
     private WikiDescriptorManager wikis;
+
+    @Inject
+    protected ExtensionManagerConfiguration configuration;
 
     @Inject
     private InstalledExtensionRepository installedExtensions;
@@ -164,7 +172,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             this.progress.startStep(this);
             Map<String, SortedSet<Version>> extensions = updateVersions();
 
-            // 2: Validate extensions to figure out if they are compatible
+            // 3: Validate extensions to figure out if they are compatible
             this.progress.startStep(this);
             validateExtensions(extensions);
 
@@ -177,20 +185,32 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     private void validateExtensions(Map<String, SortedSet<Version>> extensions) throws WikiManagerException
     {
         // Validate extensions on root namespace
-        validateExtensionsOnRoot(extensions);
+        try {
+            validateExtensions(null, true, extensions);
+        } catch (Exception e) {
+            this.logger.error("Failed to validate extension on root namespace", e);
+        }
 
         // Validate extensions on main wiki namespace
-        validateExtensionsOnWiki(this.wikis.getMainWikiId(), true, extensions);
+        try {
+            validateExtensions(this.wikis.getMainWikiId(), true, extensions);
+        } catch (Exception e) {
+            this.logger.error("Failed to validate extension on main wiki namespace", e);
+        }
 
         // Validate extensions on other namespaces
         for (String wiki : this.wikis.getAllIds()) {
             if (!this.wikis.getMainWikiId().equals(wiki)) {
-                validateExtensionsOnWiki(wiki, false, extensions);
+                try {
+                    validateExtensions(wiki, false, extensions);
+                } catch (Exception e) {
+                    this.logger.error("Failed to validate extension on wiki [{}] namespace", wiki, e);
+                }
             }
         }
     }
 
-    private Extension getValid(String extensionId, String namespace, boolean allowRootMdofications)
+    private Extension getValid(String extensionId, String namespace, boolean allowRootModications)
         throws SolrServerException, IOException
     {
         Collection<Version> versions = this.indexStore.getExtensionVersions(extensionId);
@@ -204,14 +224,36 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             stopVersion = null;
         }
 
-        for (Version version : versions) {
+        // Try recommended versions
+        VersionConstraint recommendedVersionConstraint = this.configuration.getRecomendedVersionConstraint(extensionId);
+        Version recommendedVersion = VersionUtils.getUniqueVersion(recommendedVersionConstraint);
+        if (recommendedVersion != null) {
+            if (recommendedVersion.equals(stopVersion)) {
+                return null;
+            }
+            if (versions.contains(recommendedVersion)) {
+                return tryInstall(new ExtensionId(extensionId, recommendedVersion), namespace, allowRootModications);
+            }
+        }
+
+        // Try others
+        List<Version> versionList;
+        if (versions instanceof List) {
+            versionList = (List<Version>) versions;
+        } else {
+            versionList = new ArrayList<>(versions);
+        }
+        // Need to invert the list
+        for (ListIterator<Version> it = versionList.listIterator(versionList.size()); it.hasPrevious();) {
+            Version version = it.previous();
+
             // Don't try lower than the stop version
             if (stopVersion != null && stopVersion.compareTo(version) >= 0) {
                 break;
             }
 
             Extension validExtension =
-                tryInstall(new ExtensionId(extensionId, version), namespace, allowRootMdofications);
+                tryInstall(new ExtensionId(extensionId, version), namespace, allowRootModications);
             if (validExtension != null) {
                 return validExtension;
             }
@@ -242,14 +284,37 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             ? ((ExtensionPlan) job.getStatus()).getTree().iterator().next().getAction().getExtension() : null;
     }
 
-    private void validateExtensions(String wikiId, boolean allowRootMdofications, Collection<String> extensions)
-        throws SolrServerException, IOException
+    private void validateExtensions(String wikiId, boolean allowRootMdofications,
+        Map<String, SortedSet<Version>> extensions) throws SolrServerException, IOException
     {
-        for (String extensionId : extensions) {
-            Extension validExtension = getValid(extensionId,
-                wikiId != null ? new WikiNamespace(wikiId).serialize() : null, allowRootMdofications);
+        boolean updated = false;
 
-            
+        for (Map.Entry<String, SortedSet<Version>> entry : extensions.entrySet()) {
+            String extensionId = entry.getKey();
+            String namespace = wikiId != null ? new WikiNamespace(wikiId).serialize() : null;
+            Extension validExtension = getValid(extensionId, namespace, allowRootMdofications);
+
+            if (validExtension != null) {
+                Collection<Version> versions = entry.getValue();
+
+                if (!versions.contains(validExtension.getId().getVersion())) {
+                    this.indexStore.add(validExtension, false);
+
+                    // Remember this extension version was added to the index
+                    versions.add(validExtension.getId().getVersion());
+                }
+
+                for (Version version : versions) {
+                    this.indexStore.updateCompatible(new ExtensionId(extensionId, version), namespace,
+                        version.equals(validExtension.getId().getVersion()));
+                }
+
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            this.indexStore.commit();
         }
     }
 

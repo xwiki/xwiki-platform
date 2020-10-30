@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.StringUtils;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -128,6 +129,18 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             && !getFailureStrategyList().isEmpty();
     }
 
+    /**
+     * Determine which username we should skip.
+     * We don't handle empty usernames to avoid triggering the security mechanism for nothing and having unexpected
+     * behaviours.
+     * @param username the username to check.
+     * @return {@code true} if the username is empty.
+     */
+    private boolean skipUsername(String username)
+    {
+        return StringUtils.isEmpty(username);
+    }
+
     @Override
     public boolean recordAuthenticationFailure(String username)
     {
@@ -138,6 +151,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         // we can immediately return, and we clear the data.
         if (!isAuthenticationSecurityEnabled()) {
             this.authFailures.clear();
+            return false;
+        } else if (skipUsername(username)) {
             return false;
         }
 
@@ -190,7 +205,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         StringBuilder builder = new StringBuilder();
 
         // We only call the strategies if the threshold is reached.
-        if (isThresholdReached(username)) {
+        if (!skipUsername(username) && isThresholdReached(username)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
                 builder.append(authenticationFailureStrategy.getForm(username));
                 builder.append(STRING_AGGREGATION_SEPARATOR);
@@ -212,7 +227,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         }
 
         // We only call the strategies if the threshold is reached.
-        if (isThresholdReached(username)) {
+        if (!skipUsername(username) && isThresholdReached(username)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
 
                 // The form is validated if ALL strategies validated it.
@@ -234,7 +249,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         StringBuilder builder = new StringBuilder();
 
         // We only call the strategies if the threshold is reached.
-        if (isThresholdReached(username)) {
+        if (!skipUsername(username) && isThresholdReached(username)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
                 builder.append(authenticationFailureStrategy.getErrorMessage(username));
                 builder.append(STRING_AGGREGATION_SEPARATOR);

@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rightsmanager.like=Нравиться
-like.unlike.modal.title=Не нравиться?
+like.unlike.modal.title=Не нравиться
 like.unlike.modal.body=Вы действительно хотите удалить отметку "Нравится" для страницы {0}?
 like.unlike.modal.closeButton=Закрыть
 like.unlike.modal.unlikeButton=Не нравиться

@@ -133,7 +133,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
      */
     protected void appendItalic(StringBuffer styleOut, Map<String, Object> styles)
     {
-        appendBoolean(styleOut, "italic", "font-weight: italic; ", styles);
+        appendBoolean(styleOut, "italic", "font-style: italic; ", styles);
     }
 
     /**

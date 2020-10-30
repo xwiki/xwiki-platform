@@ -108,6 +108,8 @@ public class PdfExportImpl implements PdfExport
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
+    private static XMLReaderFactory xmlReaderFactory = Utils.getComponent(XMLReaderFactory.class);
+
     /**
      * Used to get the temporary directory.
      */
@@ -329,7 +331,7 @@ public class PdfExportImpl implements PdfExport
 
             // Dom4J 2.1.1 disables external DTDs by default, so we set our own XMLReader.
             // See https://github.com/dom4j/dom4j/issues/51
-            XMLReader xmlReader = Utils.getComponent(XMLReaderFactory.class).createXMLReader();
+            XMLReader xmlReader = xmlReaderFactory.createXMLReader();
             reader.setXMLReader(xmlReader);
 
             reader.setEntityResolver(new DefaultEntityResolver());
@@ -352,10 +354,7 @@ public class PdfExportImpl implements PdfExport
             XMLWriter writer = new XMLWriter(out, outputFormat);
             writer.write(document);
             String result = out.toString();
-            // Debug output
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("HTML with CSS applied [{}]", result);
-            }
+            LOGGER.debug("HTML with CSS applied [{}]", result);
             return result;
         } catch (Exception e) {
             LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);

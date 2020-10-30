@@ -16,3 +16,5 @@ org.xwiki.mentions.internal.rendering.PlainTextMentionsBlockRenderer
 org.xwiki.mentions.internal.rendering.PlainTextMentionsRenderer
 org.xwiki.mentions.internal.rendering.PlainTextMentionsRendererFactory
 org.xwiki.mentions.internal.DefaultMentionsFormatterProvider
+org.xwiki.mentions.internal.analyzer.CreatedDocumentMentionsAnalyzer
+org.xwiki.mentions.internal.analyzer.UpdatedDocumentMentionsAnalyzer

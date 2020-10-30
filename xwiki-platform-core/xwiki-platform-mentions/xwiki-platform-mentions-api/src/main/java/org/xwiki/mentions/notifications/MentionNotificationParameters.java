@@ -217,7 +217,7 @@ public class MentionNotificationParameters implements Serializable
     {
         return new XWikiToStringBuilder(this)
             .append("authorReference", this.getAuthorReference())
-            .append("documentReference", this.getEntityReference())
+            .append("entityReference", this.getEntityReference())
             .append("version", this.getVersion())
             .append("location", this.getLocation())
             .append("mentions", this.mentions)

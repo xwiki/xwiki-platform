@@ -258,4 +258,24 @@ public class ViewPage extends BasePage
         useShortcutForDocExtraPane("i", "information");
         return new InformationPane();
     }
+
+    public String getTitleColor()
+    {
+        return getElementCSSValue(By.id("document-title"), "color");
+    }
+
+    public String getPageBackgroundColor()
+    {
+        return getElementCSSValue(By.id("mainContentArea"), "background-color");
+    }
+
+    public String getTitleFontFamily()
+    {
+        return getElementCSSValue(By.id("document-title"), "font-family");
+    }
+
+    private String getElementCSSValue(By locator, String attribute)
+    {
+        return getDriver().findElement(locator).getCssValue(attribute);
+    }
 }

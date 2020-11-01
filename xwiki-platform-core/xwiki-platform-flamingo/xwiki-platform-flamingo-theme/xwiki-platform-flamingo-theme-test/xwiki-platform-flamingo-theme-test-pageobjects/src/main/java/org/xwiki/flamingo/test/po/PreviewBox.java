@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the preview iframe of when customizing a theme.
@@ -31,7 +32,7 @@ import org.openqa.selenium.WebElement;
  *
  * @version $Id$
  */
-public class PreviewBox extends CSSGetterPage
+public class PreviewBox extends ViewPage
 {
     /**
      * Default constructor: it switches automatically inside the iframe (see {@link #switchToPreviewBox()}).
@@ -57,12 +58,6 @@ public class PreviewBox extends CSSGetterPage
     public void switchToDefaultContent()
     {
         getDriver().switchTo().defaultContent();
-    }
-
-    @Override
-    protected String getElementCSSValue(final By locator, String attribute)
-    {
-        return getDriver().findElement(locator).getCssValue(attribute);
     }
 
     public boolean hasError()

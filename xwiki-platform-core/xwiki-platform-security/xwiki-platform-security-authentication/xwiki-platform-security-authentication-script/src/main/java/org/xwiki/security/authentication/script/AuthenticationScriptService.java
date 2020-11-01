@@ -76,7 +76,7 @@ public class AuthenticationScriptService implements ScriptService
     /**
      * @param username the login used in the request for authentication.
      * @return the aggregated form field to validate for the authentication
-     *          (see {@link AuthenticationFailureManager#getForm(String)}).
+     *         (see {@link AuthenticationFailureManager#getForm(String, javax.servlet.http.HttpServletRequest)}
      */
     public String getForm(String username)
     {

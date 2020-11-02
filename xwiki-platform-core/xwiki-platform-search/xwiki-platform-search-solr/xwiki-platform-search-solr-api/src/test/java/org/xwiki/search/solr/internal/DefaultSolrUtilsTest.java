@@ -17,27 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.po;
+package org.xwiki.search.solr.internal;
 
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.ViewPage;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-public abstract class CSSGetterPage extends ViewPage
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Validate {@link DefaultSolrUtils}.
+ * 
+ * @version $Id$
+ */
+@ComponentTest
+class DefaultSolrUtilsTest
 {
-    protected abstract String getElementCSSValue(final By locator, String attribute);
+    @InjectMockComponents
+    private DefaultSolrUtils utils;
 
-    public String getTextColor()
+    @Test
+    void toFilterQueryString()
     {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "color");
-    }
-
-    public String getPageBackgroundColor()
-    {
-        return getElementCSSValue(By.id("mainContentArea"), "background-color");
-    }
-
-    public String getFontFamily()
-    {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "font-family");
+        assertEquals("\\OR", this.utils.toFilterQueryString("OR"));
     }
 }

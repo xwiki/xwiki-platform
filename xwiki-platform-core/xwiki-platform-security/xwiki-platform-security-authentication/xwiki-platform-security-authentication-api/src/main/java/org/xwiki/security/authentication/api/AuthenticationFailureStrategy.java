@@ -19,13 +19,21 @@
  */
 package org.xwiki.security.authentication.api;
 
-import org.securityfilter.filter.SecurityRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
  * Describes a strategy to perform in case the limit of authentication failures is reached.
  * See {@link AuthenticationConfiguration} for a definition of this limit.
+ * Note that this strategy might be called even for users before reaching the authentication limit, this is done in
+ * order to prevent the following scenario:
+ * <ul>
+ *     <li>an attacker tries to login x times with a login</li>
+ *     <li>a CAPTCHA is displayed in form to mitigate the attack</li>
+ *     <li>the attacker tries to perform the attack on a different login</li>
+ * </ul>
+ * In this case if the CAPTCHA is displayed, we should use it also to prevent attacking the other user.
  *
  * @version $Id$
  * @since 11.6RC1
@@ -51,7 +59,7 @@ public interface AuthenticationFailureStrategy
      * @param request the authentication request.
      * @return true if the authentication request can be validated, i.e. if the user should be authorized to login.
      */
-    boolean validateForm(String username, SecurityRequestWrapper request);
+    boolean validateForm(String username, HttpServletRequest request);
 
     /**
      * Notify the strategy about an authentication failure limit reached.

@@ -126,6 +126,8 @@ public class EventStoreTest
 
     private static final DefaultEvent EVENT15 = event("id15");
 
+    private static final DefaultEvent EVENTOR = event("OR");
+
     private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
 
     private static final WikiReference WIKI1_REFERENCE = new WikiReference("wiki1");
@@ -462,6 +464,12 @@ public class EventStoreTest
 
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
         assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
+
+        this.eventStore.saveEvent(EVENTOR).get();
+
+        assertSearch(Arrays.asList(EVENTOR), new SimpleEventQuery().in(Event.FIELD_ID, EVENTOR.getId()));
+
+        this.eventStore.deleteEvent(EVENTOR).get();
     }
 
     @Test

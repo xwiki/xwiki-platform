@@ -47,6 +47,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -81,6 +82,13 @@ public class DownloadAction extends XWikiAction
 
     /** Key of the blacklist in xwiki.properties. */
     public static final String BLACKLIST_PROPERTY = "attachment.download.blacklist";
+
+    /**
+     * Key of the forceDownload list in xwiki.properties.
+     * @since 12.10RC1
+     */
+    @Unstable
+    public static final String FORCE_DOWNLOAD_PROPERTY = "attachment.download.forceDownload";
 
     /** The URL part separator. */
     private static final String SEPARATOR = "/";
@@ -452,7 +460,7 @@ public class DownloadAction extends XWikiAction
             hasPR = false;
         }
         // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if ((!hasPR && !isAuthorized(mimetype)) || "1".equals(request.getParameter("force-download"))) {
+        if (shouldBeDownloaded(hasPR, request, mimetype)) {
             dispType = ATTACHMENT;
         }
         // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
@@ -483,15 +491,48 @@ public class DownloadAction extends XWikiAction
         return start == null || end == null || end >= start;
     }
 
-    private boolean isAuthorized(String mimeType)
+    /**
+     * Check if an attachment should be downloaded or can be displayed inline.
+     * Attachments should be downloaded if:
+     * <ul>
+     *     <li>the request contains a force-download parameter with the value 1</li>
+     *     <li>or the mimetype is part of the forceDownload property list</li>
+     *     <li>or no custom whitelist exists and a custom blacklist exists and contains the mimetype and the attachment
+     *     has not been added by a user with programming rights</li>
+     *     <li>or the whitelist (default or custom) does not contains the mimetype and the attachment has not been added
+     *     by a user with programming rights</li>
+     * </ul>
+     *
+     * Note that in the case of the request does not contain a force-downloaded parameter with the value 1 and the
+     * mimetype is not part of the forceDownload property list, but the attachment has been added by a user with
+     * programming right, then the attachment is always displayed inline.
+     *
+     * @param hasPR a boolean indicating if the attachment has been added by someone with programming rights.
+     * @param request the current download request.
+     * @param mimeType the mimetype of the attachment.
+     * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
+     */
+    private boolean shouldBeDownloaded(boolean hasPR, XWikiRequest request, String mimeType)
     {
+        boolean result;
         ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-        if (configuration.containsKey(BLACKLIST_PROPERTY) && !configuration.containsKey(WHITELIST_PROPERTY)) {
-            List<String> blackList = (configuration.getProperty(BLACKLIST_PROPERTY, Collections.<String>emptyList()));
-            return !blackList.contains(mimeType);
+
+        boolean whiteListExists = configuration.containsKey(WHITELIST_PROPERTY);
+        boolean blackListExists = configuration.containsKey(BLACKLIST_PROPERTY);
+        List<String> blackList = configuration.getProperty(BLACKLIST_PROPERTY, Collections.emptyList());
+        List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
+        List<String> forceDownloadList = configuration.getProperty(FORCE_DOWNLOAD_PROPERTY, Collections.emptyList());
+
+        if ("1".equals(request.getParameter("force-download")) || forceDownloadList.contains(mimeType)) {
+            result = true;
+        } else if (hasPR) {
+            result = false;
+        } else if (blackListExists && !whiteListExists) {
+            result = blackList.contains(mimeType);
         } else {
-            List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
-            return whiteList.contains(mimeType);
+            result = !whiteList.contains(mimeType);
         }
+
+        return result;
     }
 }

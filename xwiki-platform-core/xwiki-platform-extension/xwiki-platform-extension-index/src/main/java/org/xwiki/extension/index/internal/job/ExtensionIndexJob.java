@@ -35,17 +35,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.collections4.IterableUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.index.ExtensionIndexStatus;
 import org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.extension.job.InstallRequest;
@@ -60,6 +59,7 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.Version.Type;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.AbstractJob;
@@ -67,7 +67,6 @@ import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Update the index from configured repositories.
@@ -77,7 +76,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
  */
 @Component
 @Named(ExtensionIndexJob.JOB_TYPE)
-public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, ExtensionIndexStatus>
+public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, DefaultExtensionIndexStatus>
 {
     /**
      * Type of the job.
@@ -108,7 +107,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     private WikiDescriptorManager wikis;
 
     @Inject
-    protected ExtensionManagerConfiguration configuration;
+    private ExtensionManagerConfiguration configuration;
 
     @Inject
     private InstalledExtensionRepository installedExtensions;
@@ -120,6 +119,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     @Override
     protected void jobStarting()
     {
+        // Reduce the priority of this thread since it's not a critical task and it might be expensive
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
+
         // Start an extension session so that things like the Maven cache are shared with the whole process
         this.extensionContext.pushSession();
 
@@ -134,6 +136,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         } finally {
             // We don't need the extension session anymore
             this.extensionContext.popSession();
+
+            // Restore normal priority
+            Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         }
     }
 
@@ -144,7 +149,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
     }
 
     @Override
-    protected ExtensionIndexStatus createNewStatus(ExtensionIndexRequest request)
+    protected DefaultExtensionIndexStatus createNewStatus(ExtensionIndexRequest request)
     {
         return new DefaultExtensionIndexStatus(request, this.observationManager, this.loggerManager);
     }
@@ -156,67 +161,76 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
 
         // 1: Add local extensions
         this.progress.startStep(this);
-        boolean updated = addLocalExtensions();
-
-        // 1: Gather all extension from searchable repositories
-        this.progress.startStep(this);
-        updated |= addRemoteExtensions();
-
-        if (updated) {
-            // Make sure to commit all new extensions
-            this.indexStore.commit();
+        if (getRequest().isLocalExtensionsEnabled()) {
+            addLocalExtensions();
         }
 
-        if (updated) {
-            // 2: Gather other versions
-            this.progress.startStep(this);
-            Map<String, SortedSet<Version>> extensions = updateVersions();
+        // 2: Gather all extension from searchable repositories
+        this.progress.startStep(this);
+        if (getRequest().isRemoteExtensionsEnabled()) {
+            addRemoteExtensions();
+        }
 
-            // 3: Validate extensions to figure out if they are compatible
-            this.progress.startStep(this);
-            validateExtensions(extensions);
+        // 3: Update versions
+        this.progress.startStep(this);
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+        Set<ExtensionId> extensoinIds = this.indexStore.searchExtensionIds(solrQuery);
+        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensoinIds.size());
+        for (ExtensionId extensionId : extensoinIds) {
+            extensions.computeIfAbsent(extensionId.getId(), key -> new TreeSet<>()).add(extensionId.getVersion());
+        }
+        if (getRequest().isRemoteExtensionsEnabled()) {
+            updateVersions(extensions);
+        }
 
-            // TODO: 3: Analyze extensions to find specific metadata depending on the type
+        // 4: Validate extensions
+        this.progress.startStep(this);
+        if (getStatus().isUpdated()) {
+            this.progress.pushLevelProgress(getRequest().getNamespaces().size(), getRequest().getNamespaces());
+            for (Namespace namespace : getRequest().getNamespaces()) {
+                this.progress.startStep(getRequest().getNamespaces());
+                validateExtensions(namespace, extensions);
+            }
+            this.progress.popLevelProgress(this);
         }
 
         this.progress.popLevelProgress(this);
     }
 
-    private void validateExtensions(Map<String, SortedSet<Version>> extensions) throws WikiManagerException
+    private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> extensions)
     {
-        // Validate extensions on root namespace
         try {
-            validateExtensions(null, true, extensions);
-        } catch (Exception e) {
-            this.logger.error("Failed to validate extension on root namespace", e);
-        }
-
-        // Validate extensions on main wiki namespace
-        try {
-            validateExtensions(this.wikis.getMainWikiId(), true, extensions);
-        } catch (Exception e) {
-            this.logger.error("Failed to validate extension on main wiki namespace", e);
-        }
-
-        // Validate extensions on other namespaces
-        for (String wiki : this.wikis.getAllIds()) {
-            if (!this.wikis.getMainWikiId().equals(wiki)) {
-                try {
-                    validateExtensions(wiki, false, extensions);
-                } catch (Exception e) {
-                    this.logger.error("Failed to validate extension on wiki [{}] namespace", wiki, e);
+            if (Namespace.ROOT.equals(namespace)) {
+                // Validate root namespace
+                validateExtensions(null, true, extensions);
+            } else if (WikiNamespace.TYPE.equals(namespace.getType())
+                && this.wikis.getMainWikiId().equals(namespace.getValue())) {
+                // Validate also root namespace
+                if (!getRequest().getNamespaces().contains(Namespace.ROOT)) {
+                    validateExtensions(null, true, extensions);
                 }
+                // Validate main wiki namespace
+                validateExtensions(namespace.serialize(), true, extensions);
+            } else {
+                // Validate namespace
+                validateExtensions(namespace.serialize(), false, extensions);
             }
+        } catch (Exception e) {
+            this.logger.error("Failed to validate extensions on namespace [{}]", namespace, e);
         }
     }
 
-    private Extension getValid(String extensionId, String namespace, boolean allowRootModications)
-        throws SolrServerException, IOException
+    private Extension getValid(String extensionId, String namespace, boolean allowRootModications,
+        SortedSet<Version> indexedVersions) throws SolrServerException, IOException
     {
-        Collection<Version> versions = this.indexStore.getExtensionVersions(extensionId);
+        // If a core extension already exist then installing it in whatever version is impossible
+        if (this.coreExtensions.exists(extensionId)) {
+            return null;
+        }
 
+        // Get the already installed version
         InstalledExtension installedExtension = this.installedExtensions.getInstalledExtension(extensionId, namespace);
-
         Version stopVersion;
         if (installedExtension != null) {
             stopVersion = installedExtension.getId().getVersion();
@@ -224,19 +238,34 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             stopVersion = null;
         }
 
-        // Try recommended versions
+        // Get recommended version
         VersionConstraint recommendedVersionConstraint = this.configuration.getRecomendedVersionConstraint(extensionId);
         Version recommendedVersion = VersionUtils.getUniqueVersion(recommendedVersionConstraint);
-        if (recommendedVersion != null) {
-            if (recommendedVersion.equals(stopVersion)) {
-                return null;
-            }
-            if (versions.contains(recommendedVersion)) {
-                return tryInstall(new ExtensionId(extensionId, recommendedVersion), namespace, allowRootModications);
-            }
+
+        // No reason for search something else if the installed version is already the recommended one
+        if (recommendedVersion != null && recommendedVersion.equals(stopVersion)) {
+            return null;
+        }
+
+        // Get available versions
+        Collection<Version> versions = this.indexStore.getExtensionVersions(extensionId);
+        if (versions == null) {
+            versions = indexedVersions;
+        }
+
+        // Try recommended version
+        if (recommendedVersion != null && versions.contains(recommendedVersion)) {
+            // Try only the recommended version if it exist
+            return tryInstall(new ExtensionId(extensionId, recommendedVersion), namespace, allowRootModications);
         }
 
         // Try others
+        return getValid(extensionId, namespace, allowRootModications, versions, stopVersion);
+    }
+
+    private Extension getValid(String extensionId, String namespace, boolean allowRootModications,
+        Collection<Version> versions, Version stopVersion)
+    {
         List<Version> versionList;
         if (versions instanceof List) {
             versionList = (List<Version>) versions;
@@ -267,6 +296,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         InstallRequest planRequest = new InstallRequest(getRequest());
         planRequest.setId((List<String>) null);
         planRequest.setVerbose(false);
+        planRequest.setStatusLogIsolated(true);
 
         planRequest.addExtension(extensionId);
         planRequest.setRootModificationsAllowed(allowRootMdofications);
@@ -284,15 +314,16 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             ? ((ExtensionPlan) job.getStatus()).getTree().iterator().next().getAction().getExtension() : null;
     }
 
-    private void validateExtensions(String wikiId, boolean allowRootMdofications,
+    private void validateExtensions(String namespace, boolean allowRootMdofications,
         Map<String, SortedSet<Version>> extensions) throws SolrServerException, IOException
     {
         boolean updated = false;
 
         for (Map.Entry<String, SortedSet<Version>> entry : extensions.entrySet()) {
             String extensionId = entry.getKey();
-            String namespace = wikiId != null ? new WikiNamespace(wikiId).serialize() : null;
-            Extension validExtension = getValid(extensionId, namespace, allowRootMdofications);
+            SortedSet<Version> indexedVersions = entry.getValue();
+
+            Extension validExtension = getValid(extensionId, namespace, allowRootMdofications, indexedVersions);
 
             if (validExtension != null) {
                 Collection<Version> versions = entry.getValue();
@@ -318,25 +349,17 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         }
     }
 
-    private Map<String, SortedSet<Version>> updateVersions() throws SearchException, SolrServerException, IOException
+    private Map<String, SortedSet<Version>> updateVersions(Map<String, SortedSet<Version>> extensions)
+        throws SolrServerException, IOException
     {
-        SolrQuery solrQuery = new SolrQuery();
-
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
-
-        Set<ExtensionId> extensoinIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensoinIds.size());
-        for (ExtensionId extensionId : extensoinIds) {
-            extensions.computeIfAbsent(extensionId.getId(), key -> new TreeSet<>()).add(extensionId.getVersion());
-        }
-
         boolean updated = false;
         for (Map.Entry<String, SortedSet<Version>> entry : extensions.entrySet()) {
             updated |= updateVersions(entry.getKey(), entry.getValue());
         }
 
         if (updated) {
-            // Make sure to commit all new extensions
+            getStatus().setUpdated(true);
+
             this.indexStore.commit();
         }
 
@@ -355,7 +378,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
 
         // TODO: remove indexed extensions not part of the resolved versions ?
 
-        List<Version> newVersions = IterableUtils.toList(versions);
+        List<String> newVersions = new ArrayList<>(versions.getSize());
+        for (Version version : versions) {
+            if (version.getType() == Type.STABLE) {
+                newVersions.add(version.getValue());
+            }
+        }
 
         boolean updated = false;
 
@@ -375,7 +403,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
         return updated;
     }
 
-    private boolean addLocalExtensions() throws SearchException, SolrServerException, IOException
+    private void addLocalExtensions() throws SearchException, SolrServerException, IOException
     {
         boolean updated = false;
 
@@ -390,10 +418,14 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             }
         }
 
-        return updated;
+        if (updated) {
+            getStatus().setUpdated(true);
+
+            this.indexStore.commit();
+        }
     }
 
-    private boolean addRemoteExtensions() throws SearchException, ResolveException, SolrServerException, IOException
+    private void addRemoteExtensions() throws SearchException, ResolveException, SolrServerException, IOException
     {
         boolean updated = false;
 
@@ -403,7 +435,11 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Extens
             }
         }
 
-        return updated;
+        if (updated) {
+            getStatus().setUpdated(true);
+
+            this.indexStore.commit();
+        }
     }
 
     private boolean addRemoteExtensions(Searchable searchableRepository)

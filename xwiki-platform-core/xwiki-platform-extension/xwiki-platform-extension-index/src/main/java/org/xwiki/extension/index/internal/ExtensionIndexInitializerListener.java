@@ -23,14 +23,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
-import org.xwiki.extension.index.internal.job.ExtensionIndexRequest;
+import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Start the indexer when XWiki starts.
@@ -48,7 +49,10 @@ public class ExtensionIndexInitializerListener extends AbstractEventListener
     public static final String NAME = "ExtensionIndexInitializerListener";
 
     @Inject
-    private JobExecutor jobs;
+    private ExtensionIndex index;
+
+    @Inject
+    private WikiDescriptorManager wikis;
 
     @Inject
     private Logger logger;
@@ -58,15 +62,18 @@ public class ExtensionIndexInitializerListener extends AbstractEventListener
      */
     public ExtensionIndexInitializerListener()
     {
-        super(NAME, new ApplicationStartedEvent());
+        super(NAME, new WikiReadyEvent(), new ApplicationReadyEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Trigger first indexing
         try {
-            this.jobs.execute(ExtensionIndexJob.JOB_TYPE, new ExtensionIndexRequest(true));
+            if (event instanceof ApplicationReadyEvent) {
+                this.index.index(new WikiNamespace(this.wikis.getMainWikiId()));
+            } else if (event instanceof WikiReadyEvent) {
+                this.index.index(new WikiNamespace(((WikiReadyEvent) event).getWikiId()));
+            }
         } catch (JobException e) {
             this.logger.error("Failed to start indexing the available extensions", e);
         }

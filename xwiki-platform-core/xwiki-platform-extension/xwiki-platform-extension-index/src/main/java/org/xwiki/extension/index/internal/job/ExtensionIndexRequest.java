@@ -19,9 +19,13 @@
  */
 package org.xwiki.extension.index.internal.job;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.job.AbstractRequest;
 
 /**
@@ -37,24 +41,115 @@ public class ExtensionIndexRequest extends AbstractRequest
      */
     public static final List<String> JOB_ID = Arrays.asList("extension", "index");
 
-    private final boolean withLocalExtension;
+    private static final long serialVersionUID = 1L;
+
+    private final boolean localExtensionsEnabled;
+
+    private final boolean remoteExtensionsEnabled;
+
+    private final boolean versionsEnabled;
+
+    private List<Namespace> namespaces;
 
     /**
-     * @param withLocalExtensions true if local extensions should be loaded (generally for the first run of the job)
+     * @param localExtensionsEnabled true if local extensions should be loaded
+     * @param remoteExtensionsEnabled true if remote extensions should be loaded
+     * @param versionsEnabled true if available version should be updated
+     * @param namespaces the namespaces on which to check the compatibility of indexed extensions
      */
-    public ExtensionIndexRequest(boolean withLocalExtensions)
+    public ExtensionIndexRequest(boolean localExtensionsEnabled, boolean remoteExtensionsEnabled,
+        boolean versionsEnabled, Collection<Namespace> namespaces)
     {
         setId(JOB_ID);
 
-        this.withLocalExtension = withLocalExtensions;
+        setVerbose(false);
+        setStatusLogIsolated(false);
+
+        this.localExtensionsEnabled = localExtensionsEnabled;
+        this.remoteExtensionsEnabled = remoteExtensionsEnabled;
+        this.versionsEnabled = versionsEnabled;
+        this.namespaces =
+            namespaces != null ? Collections.unmodifiableList(new ArrayList<>(namespaces)) : Collections.emptyList();
+
+        if (this.namespaces.size() == 1) {
+            setId(getId(this.namespaces.get(0)));
+        }
     }
 
     /**
-     * @return the localExtensionEnabled true if local extensions should be loaded (generally for the first run of the
-     *         job)
+     * @param request the request to copy
      */
-    public boolean isLocalExtensionEnabled()
+    public ExtensionIndexRequest(ExtensionIndexRequest request)
     {
-        return this.withLocalExtension;
+        this(request.isLocalExtensionsEnabled(), request.isRemoteExtensionsEnabled(), request.isVersionsEnabled(),
+            request.getNamespaces());
+    }
+
+    /**
+     * @param namespace the namespace for which to validate extensions
+     * @return the id of the job
+     */
+    public static List<String> getId(Namespace namespace)
+    {
+        List<String> id = new ArrayList<>(JOB_ID);
+        id.add(namespace.serialize());
+
+        return id;
+    }
+
+    /**
+     * @param namespace the namespace for which to validate extensions
+     */
+    public void addNamespace(Namespace namespace)
+    {
+        List<Namespace> list = new ArrayList<>();
+        list.addAll(this.namespaces);
+        list.add(namespace);
+
+        this.namespaces = Collections.unmodifiableList(list);
+    }
+
+    /**
+     * @param namespace the namespace for which to stop validate extensions
+     */
+    public void removeNamespace(Namespace namespace)
+    {
+        List<Namespace> list = new ArrayList<>();
+        list.addAll(this.namespaces);
+        list.remove(namespace);
+
+        this.namespaces = Collections.unmodifiableList(list);
+    }
+
+    /**
+     * @return true if local extensions should be loaded
+     */
+    public boolean isLocalExtensionsEnabled()
+    {
+        return this.localExtensionsEnabled;
+    }
+
+    /**
+     * @return true if remote extensions should be loaded
+     */
+    public boolean isRemoteExtensionsEnabled()
+    {
+        return this.remoteExtensionsEnabled;
+    }
+
+    /**
+     * @return true if available version should be updated
+     */
+    public boolean isVersionsEnabled()
+    {
+        return this.versionsEnabled;
+    }
+
+    /**
+     * @return the namespaces on which to check the compatibility of indexed extensions
+     */
+    public List<Namespace> getNamespaces()
+    {
+        return this.namespaces;
     }
 }

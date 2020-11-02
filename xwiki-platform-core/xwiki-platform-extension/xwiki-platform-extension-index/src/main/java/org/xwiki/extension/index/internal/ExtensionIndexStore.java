@@ -45,6 +45,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
@@ -78,6 +79,8 @@ import org.xwiki.search.solr.SolrUtils;
 @Singleton
 public class ExtensionIndexStore implements Initializable
 {
+    private static final String ROOT_NAMESPACE = "{root}";
+
     private static final int COMMIT_BATCH_SIZE = 100;
 
     private static final Map<String, SearchFieldMapping> SEARCH_FIELD_MAPPING = new HashMap<>();
@@ -235,7 +238,7 @@ public class ExtensionIndexStore implements Initializable
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public void update(ExtensionId extensionId, boolean last, List<Version> newVersions)
+    public void update(ExtensionId extensionId, boolean last, List<String> newVersions)
         throws SolrServerException, IOException
     {
         SolrInputDocument document = new SolrInputDocument();
@@ -266,9 +269,19 @@ public class ExtensionIndexStore implements Initializable
 
         this.utils.setAtomic(
             compatible ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, namespace, document);
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, toStoredNamespace(namespace), document);
 
         add(document);
+    }
+
+    private String toStoredNamespace(Namespace namespace)
+    {
+        return namespace != null && !namespace.equals(Namespace.ROOT) ? namespace.toString() : ROOT_NAMESPACE;
+    }
+
+    private String toStoredNamespace(String namespace)
+    {
+        return namespace != null ? namespace : ROOT_NAMESPACE;
     }
 
     /**
@@ -421,9 +434,6 @@ public class ExtensionIndexStore implements Initializable
         solrQuery.set("defType", "edismax");
         solrQuery.set("bf", BOOST);
 
-        // Only search for latest versions
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
-
         // Pagination
         if (query.getOffset() > 0) {
             solrQuery.setStart(query.getOffset());
@@ -457,10 +467,16 @@ public class ExtensionIndexStore implements Initializable
                 builder.append(':');
 
                 builder.append('(');
-                builder.append(StringUtils.join(indexedQuery.getNamespaces().stream()
-                    .map(n -> this.utils.toFilterQueryString(n.serialize())).iterator(), " OR "));
+                builder.append(StringUtils.join(indexedQuery.getCompatibleNamespaces().stream()
+                    .map(n -> this.utils.toFilterQueryString(toStoredNamespace(n))).iterator(), " OR "));
                 builder.append(')');
+            } else {
+                // Only search for latest versions
+                solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
             }
+        } else {
+            // Only search for latest versions
+            solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
         }
 
         // Execute the search

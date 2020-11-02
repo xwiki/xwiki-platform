@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
@@ -30,7 +31,7 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
  * 
  * @param <T> the extension type
  * @version $Id$
- * @since 12.9RC1
+ * @since 12.10RC1
  */
 public class SafeExtensionIndex<T extends ExtensionIndex> extends SafeAdvancedSearchableExtensionRepository<T>
     implements ExtensionIndex
@@ -50,14 +51,14 @@ public class SafeExtensionIndex<T extends ExtensionIndex> extends SafeAdvancedSe
     // ExtensionIndex
 
     @Override
-    public ExtensionIndexStatus getStatus()
+    public ExtensionIndexStatus getStatus(Namespace namespace)
     {
-        return getWrapped().getStatus();
+        return getWrapped().getStatus(namespace);
     }
 
     @Override
-    public ExtensionIndexStatus index() throws JobException
+    public ExtensionIndexStatus index(Namespace namespace) throws JobException
     {
-        return getWrapped().index();
+        return getWrapped().index(namespace);
     }
 }

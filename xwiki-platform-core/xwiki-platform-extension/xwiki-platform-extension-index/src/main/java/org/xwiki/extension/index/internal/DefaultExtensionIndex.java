@@ -19,8 +19,10 @@
  */
 package org.xwiki.extension.index.internal;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,6 +30,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
@@ -52,6 +55,7 @@ import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus.State;
 
 /**
@@ -71,6 +75,9 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     private JobExecutor jobs;
 
     @Inject
+    private JobStatusStore jobStore;
+
+    @Inject
     private ExtensionIndexStore store;
 
     @Inject
@@ -86,20 +93,34 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     }
 
     @Override
-    public ExtensionIndexStatus getStatus()
+    public ExtensionIndexStatus getStatus(Namespace namespace)
     {
-        Job job = this.jobs.getJob(ExtensionIndexRequest.JOB_ID);
+        List<String> id;
+        if (namespace != null) {
+            id = ExtensionIndexRequest.getId(namespace);
+        } else {
+            id = ExtensionIndexRequest.JOB_ID;
+        }
 
-        return job != null ? (ExtensionIndexStatus) job.getStatus() : null;
+        // Try running jobs
+        Job job = this.jobs.getJob(id);
+
+        if (job != null) {
+            return (ExtensionIndexStatus) job.getStatus();
+        }
+
+        // Try serialized jobs
+        return (ExtensionIndexStatus) this.jobStore.getJobStatus(id);
     }
 
     @Override
-    public ExtensionIndexStatus index() throws JobException
+    public ExtensionIndexStatus index(Namespace namespace) throws JobException
     {
-        Job job = this.jobs.getJob(ExtensionIndexRequest.JOB_ID);
+        Job job = this.jobs.getJob(ExtensionIndexRequest.getId(namespace));
 
         if (job == null || job.getStatus().getState() == State.FINISHED) {
-            job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE, new ExtensionIndexRequest(false));
+            job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE,
+                new ExtensionIndexRequest(false, true, true, Arrays.asList(namespace)));
         }
 
         return (ExtensionIndexStatus) job.getStatus();

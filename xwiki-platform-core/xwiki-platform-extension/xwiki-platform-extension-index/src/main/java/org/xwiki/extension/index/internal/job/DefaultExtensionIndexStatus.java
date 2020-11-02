@@ -32,6 +32,8 @@ import org.xwiki.observation.ObservationManager;
  */
 public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndexRequest> implements ExtensionIndexStatus
 {
+    private boolean updated;
+
     /**
      * @param request the request provided when started the job
      * @param observationManager the observation manager component
@@ -41,5 +43,19 @@ public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndex
         LoggerManager loggerManager)
     {
         super(ExtensionIndexJob.JOB_TYPE, request, null, observationManager, loggerManager);
+    }
+
+    @Override
+    public boolean isUpdated()
+    {
+        return this.updated;
+    }
+
+    /**
+     * @param updated true if the index was updated
+     */
+    public void setUpdated(boolean updated)
+    {
+        this.updated = updated;
     }
 }

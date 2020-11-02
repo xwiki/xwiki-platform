@@ -208,11 +208,6 @@ public class LiveDataQuery
         private Object value;
 
         /**
-         * Specifies whether the user should be able to change / remove this constraint or not.
-         */
-        private boolean readOnly;
-
-        /**
          * Default constructor.
          */
         public Constraint()
@@ -252,7 +247,6 @@ public class LiveDataQuery
         {
             this.value = value;
             this.operator = operator;
-            this.readOnly = readOnly;
         }
 
         /**
@@ -289,26 +283,6 @@ public class LiveDataQuery
         public void setValue(Object value)
         {
             this.value = value;
-        }
-
-        /**
-         * @return {@code true} if the user shouldn't be able to change or remove this constraint, {@code false}
-         *         otherwise
-         */
-        public boolean isReadOnly()
-        {
-            return readOnly;
-        }
-
-        /**
-         * Sets whether the user can change / remove this constraint or not.
-         * 
-         * @param readOnly {@code true} to prevent the user from changing or removing this constraint, {@code false}
-         *            otherwise
-         */
-        public void setReadOnly(boolean readOnly)
-        {
-            this.readOnly = readOnly;
         }
     }
 

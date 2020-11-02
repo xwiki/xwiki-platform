@@ -117,7 +117,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         LiveDataQuery queryConfig = new LiveDataQuery();
         queryConfig.setProperties(columns);
         queryConfig.setSource(getSourceConfig(options));
-        queryConfig.setFilters(getReadOnlyFiltersConfig(options));
+        processExtraParams(options, queryConfig);
         queryConfig.setSort(getSortConfig(columns, options));
 
         JsonNode rowCount = options.path("rowCount");
@@ -190,29 +190,39 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         return parameters;
     }
 
-    private List<Filter> getReadOnlyFiltersConfig(ObjectNode options)
+    private void processExtraParams(ObjectNode options, LiveDataQuery queryConfig)
     {
-        List<Filter> filters = null;
         JsonNode extraParamsNode = options.path("extraParams");
         if (extraParamsNode.isTextual()) {
-            filters = new ArrayList<>();
             String extraParams = extraParamsNode.asText();
             try {
+                List<Filter> filters = new ArrayList<>();
                 Map<String, List<String>> parameters = getURLParameters('?' + extraParams);
                 for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
-                    Filter filter = new Filter();
-                    filter.setProperty(entry.getKey());
-                    filter.getConstraints()
-                        .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
-                    filter.getConstraints().forEach(constraint -> constraint.setReadOnly(true));
-                    filters.add(filter);
+                    if (queryConfig.getProperties().contains(entry.getKey())) {
+                        // Convert to a live data property filter.
+                        Filter filter = new Filter();
+                        filter.setProperty(entry.getKey());
+                        filter.getConstraints()
+                            .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
+                        filters.add(filter);
+                    } else if (entry.getValue().size() == 1) {
+                        // Convert to a live data source parameter.
+                        queryConfig.getSource().setParameter(entry.getKey(), entry.getValue().get(0));
+                    } else {
+                        queryConfig.getSource().setParameter(entry.getKey(), entry.getValue());
+                    }
+                }
+                if (!filters.isEmpty()) {
+                    queryConfig.setFilters(filters);
                 }
             } catch (Exception e) {
-                this.logger.warn("Failed to extract live data hidden filters from live table extra parameters [{}]."
-                    + " Root cause is [{}].", extraParams, ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn(
+                    "Failed to extract live data source parameters and property filters"
+                        + " from live table extra parameters [{}]." + " Root cause is [{}].",
+                    extraParams, ExceptionUtils.getRootCauseMessage(e));
             }
         }
-        return filters;
     }
 
     private List<SortEntry> getSortConfig(List<String> columns, ObjectNode options)

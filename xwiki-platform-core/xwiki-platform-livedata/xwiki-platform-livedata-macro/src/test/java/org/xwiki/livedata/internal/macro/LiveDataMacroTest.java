@@ -102,8 +102,8 @@ class LiveDataMacroTest
         expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
         expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
         expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m','readOnly':false}]},".trim());
-        expectedConfig.append("      {'property':'position','constraints':[{'value':'lead','readOnly':true}]}".trim());
+        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]},".trim());
+        expectedConfig.append("      {'property':'position','constraints':[{'value':'lead'}]}".trim());
         expectedConfig.append("    ],".trim());
         expectedConfig.append("    'sort':[".trim());
         expectedConfig.append("      {'property':'firstName'},".trim());
@@ -133,8 +133,7 @@ class LiveDataMacroTest
         parameters.setSourceParameters("wiki=dev&group=apps");
         parameters.setProperties("avatar, firstName, lastName, position");
         parameters.setSort("firstName, lastName:desc, position:asc");
-        parameters.setHiddenFilters("position=lead");
-        parameters.setFilters("firstName=m");
+        parameters.setFilters("firstName=m&position=lead");
         parameters.setLimit(10);
         parameters.setOffset(20L);
         parameters.setLayouts("table, cards");

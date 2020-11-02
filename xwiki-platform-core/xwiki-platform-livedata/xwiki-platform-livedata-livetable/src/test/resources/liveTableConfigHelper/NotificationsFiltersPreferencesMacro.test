@@ -14,7 +14,7 @@
     "rowCount": 10,
     "description": "This table lists every filter registered for the current user.",
     "translationPrefix": "notifications.settings.filters.preferences.table.",
-    "extraParams": "eventType=&format=&user=xwiki%3AXWiki.mflorea",
+    "extraParams": "eventTypes=&format=&eventTypes=mention&user=xwiki%3AXWiki.mflorea&user=xwiki%3AXWiki.cdesableau",
     "outputOnlyHtml": true,
     "pageSize": false
   }
@@ -27,20 +27,14 @@
     "source":{
       "id":"liveTable",
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
-      "translationPrefix":"notifications.settings.filters.preferences.table."
+      "translationPrefix":"notifications.settings.filters.preferences.table.",
+      "format":"",
+      "user":["xwiki:XWiki.mflorea","xwiki:XWiki.cdesableau"]
     },
     "filters":[
       {
-        "property":"format",
-        "constraints":[{"value":"","readOnly":true}]
-      },
-      {
-        "property":"eventType",
-        "constraints":[{"value":"","readOnly":true}]
-      },
-      {
-        "property":"user",
-        "constraints":[{"value":"xwiki:XWiki.mflorea","readOnly":true}]
+        "property":"eventTypes",
+        "constraints":[{"value":""},{"value":"mention"}]
       }
     ],
     "sort":[

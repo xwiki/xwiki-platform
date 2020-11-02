@@ -89,7 +89,6 @@ public class NavigationPanelIT
     {
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         return appCreatePage.clickNextStep().clickNextStep().clickNextStep().clickFinish();
     }
 }

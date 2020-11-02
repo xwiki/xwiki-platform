@@ -224,15 +224,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <tr>
               ## Have the same number of TD than there are TH, in order to have valid HTML
               <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
+              #foreach ($i in [0..$maxlevel])
+                <td>&nbsp;</td>
+              #end
             </tr>
           </tbody>
         </table>

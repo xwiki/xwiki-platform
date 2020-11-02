@@ -106,10 +106,10 @@ class CreatedDocumentMentionsAnalyzerTest
 
         when(doc.getXObjects()).thenReturn(mapBaseObjects);
 
-        List<MentionNotificationParameters> analyze =
+        List<MentionNotificationParameters> actual =
             this.createdDocumentMentionsAnalyzer.analyze(doc, DOCUMENT_REFERENCE, "1.0", AUTHOR);
 
-        assertEquals(asList(), analyze);
+        assertEquals(asList(), actual);
     }
 
     @Test
@@ -129,14 +129,14 @@ class CreatedDocumentMentionsAnalyzerTest
         mapAnchors.put(new MentionedActorReference(USER_U1, "user"), asList("anchor0"));
         when(this.xdomService.groupAnchorsByUserReference(blocks)).thenReturn(mapAnchors);
 
-        List<MentionNotificationParameters> analyze =
+        List<MentionNotificationParameters> actual =
             this.createdDocumentMentionsAnalyzer.analyze(doc, DOCUMENT_REFERENCE, "1.0", AUTHOR);
 
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT, "1.0")
                 .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor0"))
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor0"))
-        ), analyze);
+        ), actual);
     }
 
     @Test
@@ -175,17 +175,16 @@ class CreatedDocumentMentionsAnalyzerTest
 
         when(doc.getXObjects()).thenReturn(mapBaseObjects);
 
-        List<MentionNotificationParameters> analyze =
+        List<MentionNotificationParameters> actual =
             this.createdDocumentMentionsAnalyzer.analyze(doc, DOCUMENT_REFERENCE, "1.0", AUTHOR);
 
-        assertEquals(
-            asList(
-                new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("comment", baseObjectReference),
-                    MentionLocation.AWM_FIELD, "1.0")
-                    .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                    .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                    .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                    .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-            ), analyze);
+        assertEquals(asList(
+            new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("comment", baseObjectReference),
+                MentionLocation.AWM_FIELD, "1.0")
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
+        ), actual);
     }
 }

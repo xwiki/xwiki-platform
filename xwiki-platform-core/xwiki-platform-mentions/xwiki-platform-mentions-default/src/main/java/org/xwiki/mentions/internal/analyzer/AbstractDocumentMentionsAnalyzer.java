@@ -46,8 +46,9 @@ public abstract class AbstractDocumentMentionsAnalyzer
         for (Map.Entry<MentionedActorReference, List<String>> e : count.entrySet()) {
             MentionedActorReference mentionReference = e.getKey();
             for (String anchorId : e.getValue()) {
-                ret.addMention(mentionReference.getType(), new MentionNotificationParameter(mentionReference.getReference(),
-                    anchorId));
+                ret.addMention(mentionReference.getType(),
+                    new MentionNotificationParameter(mentionReference.getReference(),
+                        anchorId));
             }
         }
     }

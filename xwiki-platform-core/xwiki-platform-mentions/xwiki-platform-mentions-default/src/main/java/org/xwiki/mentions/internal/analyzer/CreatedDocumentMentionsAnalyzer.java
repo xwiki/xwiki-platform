@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -53,6 +54,7 @@ import static org.xwiki.mentions.MentionLocation.DOCUMENT;
  * @since 12.10RC1
  */
 @Component(roles = { CreatedDocumentMentionsAnalyzer.class })
+@Singleton
 public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAnalyzer
 {
     @Inject

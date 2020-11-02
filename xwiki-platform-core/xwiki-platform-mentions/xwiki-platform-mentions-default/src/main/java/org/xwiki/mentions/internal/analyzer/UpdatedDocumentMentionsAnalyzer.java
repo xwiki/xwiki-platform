@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -63,6 +64,7 @@ import static org.xwiki.mentions.MentionLocation.DOCUMENT;
  * @since 12.10RC1
  */
 @Component(roles = { UpdatedDocumentMentionsAnalyzer.class })
+@Singleton
 public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAnalyzer
 {
     @Inject
@@ -195,13 +197,14 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         BaseObject baseObject, String version, String authorReference, Syntax syntax)
     {
         List<MentionNotificationParameters> ret = new ArrayList<>();
-        Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
-            optOldEntries -> optOldEntries
-                .stream()
-                .filter(Objects::nonNull)
-                .filter(it -> it.getId() == baseObject.getId())
-                .findAny());
         if (baseObject != null) {
+            Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
+                optOldEntries -> optOldEntries
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .filter(it -> it.getId() == baseObject.getId())
+                    .findAny());
+
             // special treatment on comment object to analyse only the comment field.
             if (Objects.equals(baseObject
                 .getXClassReference()

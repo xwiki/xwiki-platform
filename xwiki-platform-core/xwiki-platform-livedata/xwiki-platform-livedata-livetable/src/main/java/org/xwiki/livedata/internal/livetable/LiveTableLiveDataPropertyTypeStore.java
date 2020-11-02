@@ -53,6 +53,8 @@ public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataProperty
 
     private static final String TEXT = "text";
 
+    private static final String LIST = "list";
+
     @Override
     public Collection<LiveDataPropertyDescriptor> get()
     {
@@ -72,12 +74,14 @@ public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataProperty
         types.add(createTypeDescriptor("Date", isBetween, contains));
         types.add(createTypeDescriptor("Email", HTML, TEXT, stringOperators));
         types.add(createTypeDescriptor("Groups", HTML, SUGGEST, listOperators));
+        types.add(createTypeDescriptor("Levels", null, LIST, listOperators));
         types.add(createTypeDescriptor("Number", equals));
         types.add(createTypeDescriptor("Page", HTML, SUGGEST, listOperators));
         types.add(createTypeDescriptor("Password", null, (String) null));
-        types.add(createTypeDescriptor("StaticList", null, "list", listOperators));
+        types.add(createTypeDescriptor("StaticList", null, LIST, listOperators));
         types.add(createTypeDescriptor("String", null, TEXT, stringOperators));
         types.add(createTypeDescriptor("TextArea", HTML, TEXT, stringOperators));
+        types.add(createTypeDescriptor("Timezone", null, TEXT, stringOperators));
         types.add(createTypeDescriptor("Users", HTML, SUGGEST, listOperators));
         return types;
     }

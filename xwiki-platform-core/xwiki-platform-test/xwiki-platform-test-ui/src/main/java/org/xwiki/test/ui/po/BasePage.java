@@ -368,10 +368,12 @@ public class BasePage extends BaseElement
 
     /**
      * @since 7.3M2
+     * @deprecated use {@link #clickMoreActionsSubMenuEntry(String)} instead which has a better name
      */
+    @Deprecated
     public void clickAdminActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickMoreActionsSubMenuEntry(id);
     }
 
     /**
@@ -401,13 +403,13 @@ public class BasePage extends BaseElement
      */
     public CopyPage copy()
     {
-        clickAdminActionsSubMenuEntry("tmActionCopy");
+        clickMoreActionsSubMenuEntry("tmActionCopy");
         return new CopyPage();
     }
 
     public RenamePage rename()
     {
-        clickAdminActionsSubMenuEntry("tmActionRename");
+        clickMoreActionsSubMenuEntry("tmActionRename");
         return new RenamePage();
     }
 
@@ -416,7 +418,7 @@ public class BasePage extends BaseElement
      */
     public ConfirmationPage delete()
     {
-        clickAdminActionsSubMenuEntry("tmActionDelete");
+        clickMoreActionsSubMenuEntry("tmActionDelete");
         return new ConfirmationPage();
     }
 
@@ -429,7 +431,7 @@ public class BasePage extends BaseElement
      */
     public DeletePageConfirmationPage deletePage()
     {
-        clickAdminActionsSubMenuEntry("tmActionDelete");
+        clickMoreActionsSubMenuEntry("tmActionDelete");
         return new DeletePageConfirmationPage();
     }
 

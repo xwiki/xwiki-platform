@@ -57,7 +57,6 @@ public class DocumentFieldsTest extends AbstractTest
         String appName = RandomStringUtils.randomAlphabetic(6);
         ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
 
         // Add a standard field.

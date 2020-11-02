@@ -71,7 +71,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the application name.
         appCreatePage.setApplicationName("A");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertFalse(appCreatePage.getContent().contains(EMPTY_APP_NAME_ERROR_MESSAGE));
 
         // Clear the application name using the Backspace key.
@@ -86,7 +85,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Fix the application name and move to the next step.
         appCreatePage.setApplicationName(getTestMethodName());
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertEquals(getTestMethodName(), appCreatePage.clickNextStep().getDocumentTitle());
     }
 
@@ -110,7 +108,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the application name.
         appCreatePage.setApplicationName("B");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertFalse(appCreatePage.getContent().contains(EMPTY_APP_NAME_ERROR_MESSAGE));
 
         // Clear the application name using the Backspace key.
@@ -124,7 +121,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Fix the application name and move to the next step using the Enter key.
         appCreatePage.setApplicationName(getTestMethodName());
-        appCreatePage.waitForApplicationNamePreview();
         getDriver().addPageNotYetReloadedMarker();
         appCreatePage.getApplicationNameInput().sendKeys(Keys.RETURN);
         getDriver().waitUntilPageIsReloaded();
@@ -146,7 +142,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the name of an existing space.
         appCreatePage.setApplicationName("Help");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertTrue(appCreatePage.getContent().contains(APP_NAME_USED_WARNING_MESSAGE));
 
         // Proceed to the next step.

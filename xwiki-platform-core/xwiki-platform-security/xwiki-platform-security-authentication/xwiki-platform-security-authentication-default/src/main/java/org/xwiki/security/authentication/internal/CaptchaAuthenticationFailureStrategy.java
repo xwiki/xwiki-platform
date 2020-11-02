@@ -19,12 +19,15 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
@@ -90,10 +93,12 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
     }
 
     @Override
-    public boolean validateForm(String username, SecurityRequestWrapper request)
+    public boolean validateForm(String username, HttpServletRequest request)
     {
         try {
-            return getCaptcha().isValid(request.getParameterMap());
+            Map<String, Object> map = new HashMap<>(request.getParameterMap());
+            map.putAll(request.getParameterMap());
+            return getCaptcha().isValid(map);
         } catch (CaptchaException | ComponentLookupException e) {
             // We skip the error log if we did not manage to find the captcha: this might indeed happen in case
             // an user fails to authenticate without using the form.

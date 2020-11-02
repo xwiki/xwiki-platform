@@ -238,7 +238,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 LOGGER.info("User " + username + " login has failed");
             }
 
-            authenticationFailureManager.recordAuthenticationFailure(username);
+            authenticationFailureManager.recordAuthenticationFailure(username, request);
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
             int rCode = HttpServletResponse.SC_UNAUTHORIZED;

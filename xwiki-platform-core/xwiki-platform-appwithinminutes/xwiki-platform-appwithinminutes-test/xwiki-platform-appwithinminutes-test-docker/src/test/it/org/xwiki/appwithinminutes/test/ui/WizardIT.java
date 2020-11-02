@@ -75,7 +75,6 @@ public class WizardIT
         try {
             ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
             appCreatePage.setApplicationName(appName);
-            appCreatePage.waitForApplicationNamePreview();
             ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
             classEditPage.addField("Short Text");
 

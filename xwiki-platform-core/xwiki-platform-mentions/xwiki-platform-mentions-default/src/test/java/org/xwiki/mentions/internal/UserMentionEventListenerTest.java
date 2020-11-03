@@ -32,7 +32,9 @@ import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.mentions.events.NewMentionsEvent;
 import org.xwiki.mentions.notifications.MentionNotificationParameter;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -41,6 +43,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -104,6 +108,12 @@ class UserMentionEventListenerTest
     @MockComponent
     private MentionXDOMService xdomService;
 
+    @MockComponent
+    private AuthorizationManager authorizationManager;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
     @BeforeEach
     void setUp()
     {
@@ -115,6 +125,7 @@ class UserMentionEventListenerTest
         when(this.userReferenceSerializer.serialize(userReferenceUser)).thenReturn("xwiki:XWiki.User");
         when(this.userReferenceSerializer.serialize(userReferenceU2)).thenReturn(MENTIONED_IDENTITY_USER);
         when(this.entityReferenceSerializer.serialize(DOCUMENT_REFERENCE)).thenReturn("xwiki:XWiki.Doc");
+        when(this.authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);
     }
 
     @Test
@@ -234,7 +245,6 @@ class UserMentionEventListenerTest
     void sendNotificationQuoteDeactivated() throws Exception
     {
         String mentionedIdentity = "xwiki:XWiki.U2";
-        XDOM xdom = new XDOM(emptyList());
 
         Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
         when(this.configuration.isQuoteActivated()).thenReturn(false);
@@ -256,6 +266,59 @@ class UserMentionEventListenerTest
                 new ObjectPropertyReference("comment", objectReference),
                 MentionLocation.COMMENT, "7.5")
                 .addNewMention("user", mentionNotificationParameter));
+
+        MentionEvent event = new MentionEvent(eventTarget,
+            new MentionEventParams()
+                .setUserReference(AUTHOR_REFERENCE)
+                .setDocumentReference("xwiki:XWiki.Doc")
+                .setLocation(MentionLocation.COMMENT)
+                .setAnchor("anchor")
+        );
+        verify(this.observationManager)
+            .notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
+        verify(this.quote, never()).extract(any(), any());
+    }
+
+    /**
+     * Verify that no notification is sent to users that are not allowed to view the page.
+     */
+    @Test
+    void sendNotificationViewDenied() throws Exception
+    {
+        String mentionedIdentity = "xwiki:XWiki.U2";
+        String mentionedIdentity2 = "xwiki:XWiki.U3";
+
+        Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
+        when(this.configuration.isQuoteActivated()).thenReturn(false);
+        when(this.entityReferenceSerializer.serialize(DOCUMENT_REFERENCE)).thenReturn("xwiki:XWiki.Doc");
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
+        when(this.documentRevisionProvider.getRevision(DOCUMENT_REFERENCE, "7.5")).thenReturn(xWikiDocument);
+        ObjectReference objectReference = new ObjectReference("XWiki.XWikiComments", DOCUMENT_REFERENCE);
+        ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference("comment", objectReference);
+        BaseObject baseObject = new BaseObject();
+        LargeStringProperty largeStringProperty = new LargeStringProperty();
+        largeStringProperty.setValue("some content");
+        baseObject.addField("comment", largeStringProperty);
+        when(xWikiDocument.getXObject((EntityReference) objectReference)).thenReturn(baseObject);
+        when(xWikiDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        DocumentReference u3DocumentReference = new DocumentReference("xwiki", "XWiki", "U3");
+        when(this.documentReferenceResolver
+            .resolve(mentionedIdentity, objectPropertyReference.extractReference(EntityType.WIKI)))
+            .thenReturn(u3DocumentReference);
+
+        when(this.authorizationManager.hasAccess(Right.VIEW, u3DocumentReference, objectReference)).thenReturn(false);
+
+        MentionNotificationParameter mentionNotificationParameter =
+            new MentionNotificationParameter(mentionedIdentity, "anchor");
+        MentionNotificationParameter mentionNotificationParameter2 =
+            new MentionNotificationParameter(mentionedIdentity2, "anchor");
+        this.notificationService.onEvent(null, null,
+            new MentionNotificationParameters(AUTHOR_REFERENCE,
+                objectPropertyReference,
+                MentionLocation.COMMENT, "7.5")
+                .addNewMention("user", mentionNotificationParameter)
+                .addNewMention("user", mentionNotificationParameter2)
+        );
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()

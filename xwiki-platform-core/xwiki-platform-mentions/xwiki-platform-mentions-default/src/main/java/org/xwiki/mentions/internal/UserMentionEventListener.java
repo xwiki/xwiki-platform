@@ -38,12 +38,15 @@ import org.xwiki.mentions.notifications.MentionNotificationParameter;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -100,6 +103,12 @@ public class UserMentionEventListener implements EventListener
     private MentionXDOMService xdomService;
 
     @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -144,24 +153,32 @@ public class UserMentionEventListener implements EventListener
     private void handleNotification(MentionNotificationParameters mentionNotificationParameters,
         EntityReference entityReference, XWikiDocument doc, MentionNotificationParameter mentionNotificationParameter)
     {
-        String extractedQuote =
-            getQuoteFromXDOM(mentionNotificationParameters, entityReference, doc, mentionNotificationParameter);
+        if (canView(mentionNotificationParameter.getReference(), entityReference)) {
+            String extractedQuote =
+                getQuoteFromXDOM(mentionNotificationParameters, entityReference, doc, mentionNotificationParameter);
 
-        MentionEventParams params = new MentionEventParams()
-            .setUserReference(mentionNotificationParameters.getAuthorReference())
-            .setDocumentReference(
-                this.entityReferenceSerializer.serialize(entityReference.extractReference(EntityType.DOCUMENT)))
-            .setLocation(mentionNotificationParameters.getLocation())
-            .setAnchor(mentionNotificationParameter.getAnchorId())
-            .setQuote(extractedQuote);
-        String mentionedIdentity = mentionNotificationParameter.getReference();
+            MentionEventParams params = new MentionEventParams()
+                .setUserReference(mentionNotificationParameters.getAuthorReference())
+                .setDocumentReference(
+                    this.entityReferenceSerializer.serialize(entityReference.extractReference(EntityType.DOCUMENT)))
+                .setLocation(mentionNotificationParameters.getLocation())
+                .setAnchor(mentionNotificationParameter.getAnchorId())
+                .setQuote(extractedQuote);
+            String mentionedIdentity = mentionNotificationParameter.getReference();
 
-        UserReference userReference = this.userReferenceResolver.resolve(mentionedIdentity,
-            entityReference.extractReference(EntityType.WIKI));
-        String identity = this.userReferenceSerializer.serialize(userReference);
-        MentionEvent event =
-            new MentionEvent(singleton(identity), params);
-        this.observationManager.notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
+            UserReference userReference = this.userReferenceResolver.resolve(mentionedIdentity,
+                entityReference.extractReference(EntityType.WIKI));
+            String identity = this.userReferenceSerializer.serialize(userReference);
+            MentionEvent event =
+                new MentionEvent(singleton(identity), params);
+            this.observationManager.notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
+        }
+    }
+
+    private boolean canView(String userReference, EntityReference entityReference)
+    {
+        return this.authorizationManager.hasAccess(Right.VIEW, this.documentReferenceResolver
+            .resolve(userReference, entityReference.extractReference(EntityType.WIKI)), entityReference);
     }
 
     private String getQuoteFromXDOM(MentionNotificationParameters mentionNotificationParameters,

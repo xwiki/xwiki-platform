@@ -53,6 +53,20 @@ public class ScriptVelocityContext extends XWikiVelocityContext
     }
 
     /**
+     * @param parent the initial Velocity context
+     * @param logDeprecated true if use of deprecated binding should be logged
+     * @param reservedBindings the binding that should not be synchronized
+     * @since 12.10RC1
+     * @since 12.6.5
+     */
+    public ScriptVelocityContext(VelocityContext parent, boolean logDeprecated, Set<String> reservedBindings)
+    {
+        super(parent, logDeprecated);
+
+        this.reservedBindings = reservedBindings;
+    }
+
+    /**
      * @return the current script context
      */
     public ScriptContext getScriptContext()

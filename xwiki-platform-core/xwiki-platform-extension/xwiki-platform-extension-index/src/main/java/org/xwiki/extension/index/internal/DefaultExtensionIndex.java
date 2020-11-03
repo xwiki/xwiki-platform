@@ -19,10 +19,8 @@
  */
 package org.xwiki.extension.index.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,11 +38,9 @@ import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
-import org.xwiki.extension.index.internal.job.ExtensionIndexJob;
-import org.xwiki.extension.index.internal.job.ExtensionIndexRequest;
+import org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler;
 import org.xwiki.extension.repository.AbstractAdvancedSearchableExtensionRepository;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
-import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.internal.RepositoryUtils;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -52,11 +48,7 @@ import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.VersionUtils;
-import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
-import org.xwiki.job.JobStatusStore;
-import org.xwiki.job.event.status.JobStatus.State;
 
 /**
  * The default implementation of {@link ExtensionIndex}, based on Solr.
@@ -72,16 +64,10 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     private static final String ID = "index";
 
     @Inject
-    private JobExecutor jobs;
-
-    @Inject
-    private JobStatusStore jobStore;
-
-    @Inject
     private ExtensionIndexStore store;
 
     @Inject
-    private ExtensionRepositoryManager repositories;
+    private ExtensionIndexJobScheduler scheduler;
 
     @Inject
     private Logger logger;
@@ -95,35 +81,13 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     @Override
     public ExtensionIndexStatus getStatus(Namespace namespace)
     {
-        List<String> id;
-        if (namespace != null) {
-            id = ExtensionIndexRequest.getId(namespace);
-        } else {
-            id = ExtensionIndexRequest.JOB_ID;
-        }
-
-        // Try running jobs
-        Job job = this.jobs.getJob(id);
-
-        if (job != null) {
-            return (ExtensionIndexStatus) job.getStatus();
-        }
-
-        // Try serialized jobs
-        return (ExtensionIndexStatus) this.jobStore.getJobStatus(id);
+        return this.scheduler.getStatus(namespace);
     }
 
     @Override
     public ExtensionIndexStatus index(Namespace namespace) throws JobException
     {
-        Job job = this.jobs.getJob(ExtensionIndexRequest.getId(namespace));
-
-        if (job == null || job.getStatus().getState() == State.FINISHED) {
-            job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE,
-                new ExtensionIndexRequest(false, true, true, Arrays.asList(namespace)));
-        }
-
-        return (ExtensionIndexStatus) job.getStatus();
+        return this.scheduler.index(namespace);
     }
 
     // ExtensionRepository
@@ -155,13 +119,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
             return extension;
         }
 
-        // Fallback on the registered remote repositories
-        extension = this.repositories.resolve(extensionId);
-
-        // Remember the found extension
-        cacheExtension(extension);
-
-        return extension;
+        throw new ExtensionNotFoundException("No extension could be found in the index for id [" + extensionId + "]");
     }
 
     @Override
@@ -179,13 +137,8 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
             }
         }
 
-        // Fallback on the registered remote repositories
-        Extension extension = this.repositories.resolve(extensionDependency);
-
-        // Remember the found extension
-        cacheExtension(extension);
-
-        return extension;
+        throw new ExtensionNotFoundException(
+            "No dependency could be found in the index for id [" + extensionDependency + "]");
     }
 
     @Override
@@ -197,16 +150,6 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
             this.logger.error("Failed to check existance of extension [{}]", extensionId, e);
 
             return false;
-        }
-    }
-
-    private void cacheExtension(Extension extension)
-    {
-        try {
-            this.store.add(extension, false);
-        } catch (Exception e) {
-            this.logger.warn("Failed to add the extension [{}] to the index: {}", extension.getId(),
-                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

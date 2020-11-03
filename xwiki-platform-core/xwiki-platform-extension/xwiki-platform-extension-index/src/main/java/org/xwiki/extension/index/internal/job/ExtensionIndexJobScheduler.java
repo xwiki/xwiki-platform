@@ -20,15 +20,27 @@
 package org.xwiki.extension.index.internal.job;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
+import org.xwiki.extension.ExtensionManagerConfiguration;
+import org.xwiki.extension.index.ExtensionIndexStatus;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobStatusStore;
+import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Component in charge of scheduling and stopping indexing jobs.
@@ -37,38 +49,207 @@ import org.xwiki.job.JobExecutor;
  * @since 12.10RC1
  */
 @Component(roles = ExtensionIndexJobScheduler.class)
-public class ExtensionIndexJobScheduler implements Disposable, Initializable
+public class ExtensionIndexJobScheduler implements Disposable
 {
     @Inject
     private JobExecutor jobs;
 
-    private final ExtensionIndexRequest request =
+    @Inject
+    private JobStatusStore jobStore;
+
+    @Inject
+    private ExtensionManagerConfiguration configuration;
+
+    @Inject
+    private WikiDescriptorManager wikis;
+
+    @Inject
+    private Logger logger;
+
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExtensionIndexRequest scheduledRequest =
         new ExtensionIndexRequest(true, true, true, Arrays.asList(Namespace.ROOT));
 
+    private ExtensionIndexRequest currentRequest;
+
+    private boolean updated;
+
     /**
-     * @param namespace the namespace to add to the analysis
+     * Indicate that the instance is starting.
      */
-    public void start(Namespace namespace)
+    public void start()
     {
-        this.request.addNamespace(namespace);
+        // Add main wiki
+        this.scheduledRequest.addNamespace(new WikiNamespace(this.wikis.getMainWikiId()));
 
-        // Queue an analysis of the namespace
-
+        // Trigger a first indexing
+        executeFirstJob();
     }
 
     /**
-     * @param namespace the namespace to remove from the analysis
+     * Indicate that a namespace start to be ready for manipulation.
+     * 
+     * @param namespace the namespace to initialize
+     */
+    public void initialize(Namespace namespace)
+    {
+        this.scheduledRequest.addNamespace(namespace);
+
+        // Start an analysis of the namespace only if something changed
+        if (this.updated) {
+            executeJob(new ExtensionIndexRequest(false, false, false, Arrays.asList(namespace)));
+        }
+    }
+
+    /**
+     * Start a new indexing process or return the status of the currently running one.
+     * 
+     * @param namespace the namespace for which to validate the extensions
+     * @return the status of the running indexing process
+     * @throws JobException when failing to start indexing
+     */
+    public ExtensionIndexStatus index(Namespace namespace) throws JobException
+    {
+        // Check if the namespace's job is already running
+        Job job;
+        if (this.currentRequest != null && this.currentRequest.getNamespaces().contains(namespace)) {
+            job = this.jobs.getJob(ExtensionIndexRequest.getId(namespace));
+        } else {
+            job = null;
+        }
+
+        // If not start a new one
+        if (job == null || job.getStatus().getState() == State.FINISHED) {
+            ExtensionIndexRequest request = new ExtensionIndexRequest(false, true, true, Arrays.asList(namespace));
+
+            // Also analyze root namespace for main wiki
+            if (namespace.getType().equals(WikiNamespace.TYPE) && this.wikis.isMainWiki(namespace.getValue())) {
+                request.addNamespace(Namespace.ROOT);
+            }
+
+            job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE, request);
+        }
+
+        return (ExtensionIndexStatus) job.getStatus();
+    }
+
+    /**
+     * @param namespace the namespace for which the validation was executed
+     * @return the status of the currently running or last indexing process
+     */
+    public ExtensionIndexStatus getStatus(Namespace namespace)
+    {
+        List<String> id = ExtensionIndexRequest.getId(namespace);
+
+        // Try running jobs
+
+        Job job = this.jobs.getJob(id);
+
+        // If no specific job try scheduled job
+        if (job == null && this.scheduledRequest.getNamespaces().contains(namespace)) {
+            job = this.jobs.getJob(this.scheduledRequest.getId());
+        }
+
+        if (job != null) {
+            return (ExtensionIndexStatus) job.getStatus();
+        }
+
+        // Try serialized jobs
+
+        ExtensionIndexStatus namespaceStatus = (ExtensionIndexStatus) this.jobStore.getJobStatus(id);
+        ExtensionIndexStatus scheduledStatus = !id.equals(this.scheduledRequest.getId())
+            ? (ExtensionIndexStatus) this.jobStore.getJobStatus(this.scheduledRequest.getId()) : null;
+
+        if (namespaceStatus != null
+            && (scheduledStatus == null || namespaceStatus.getStartDate().after(scheduledStatus.getStartDate()))
+            || !((ExtensionIndexRequest) scheduledStatus.getRequest()).getNamespaces().contains(namespace)) {
+            return namespaceStatus;
+        }
+
+        return scheduledStatus;
+    }
+
+    /**
+     * @param namespace the new namespace to analyze
+     */
+    public void add(Namespace namespace)
+    {
+        // Update the scheduled request
+        this.scheduledRequest.addNamespace(namespace);
+
+        // Queue an analysis of the namespace
+        executeJob(new ExtensionIndexRequest(false, false, false, Arrays.asList(namespace)));
+    }
+
+    /**
+     * @param namespace the namespace to stop analysing
      */
     public void remove(Namespace namespace)
     {
-        this.request.removeNamespace(namespace);
+        // Update the scheduled request
+        this.scheduledRequest.removeNamespace(namespace);
 
         // TODO: remove the namespace from the index
+    }
+
+    private void executeFirstJob()
+    {
+        this.scheduler.execute(this::runFirstJob);
+    }
+
+    private void executeJob(ExtensionIndexRequest request)
+    {
+        this.scheduler.execute(() -> this.runJob(request));
+    }
+
+    private void runFirstJob()
+    {
+        // Run the first job
+        runScheduledJob();
+
+        // Disable local extension loading (it will be done dynamically)
+        this.scheduledRequest.setLocalExtensionsEnabled(false);
+
+        // Start scheduling following jobs
+        this.scheduler.scheduleWithFixedDelay(this::runScheduledJob, this.configuration.getIndexInterval(),
+            this.configuration.getIndexInterval(), TimeUnit.SECONDS);
+    }
+
+    private void runScheduledJob()
+    {
+        Job job = runJob(this.scheduledRequest);
+
+        if (job != null) {
+            ExtensionIndexStatus status = (ExtensionIndexStatus) job.getStatus();
+
+            // Remember updates
+            this.updated |= status.isUpdated();
+        }
+    }
+
+    private Job runJob(ExtensionIndexRequest request)
+    {
+        this.currentRequest = request;
+
+        try {
+            Job job = this.jobs.execute(ExtensionIndexJob.JOB_TYPE, request);
+            job.join();
+
+            return job;
+        } catch (Exception e) {
+            this.logger.error("Failed to execute job", e);
+        } finally {
+            this.currentRequest = null;
+        }
+
+        return null;
     }
 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-
+        // Stop the scheduling
+        this.scheduler.shutdownNow();
     }
 }

@@ -3,3 +3,4 @@ org.xwiki.extension.index.internal.ExtensionIndexInitializerListener
 org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer
 org.xwiki.extension.index.internal.ExtensionIndexStore
 org.xwiki.extension.index.internal.job.ExtensionIndexJob
+org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler

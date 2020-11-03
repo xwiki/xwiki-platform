@@ -22,16 +22,13 @@ package org.xwiki.extension.index.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.index.ExtensionIndex;
-import org.xwiki.job.JobException;
+import org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Start the indexer when XWiki starts.
@@ -49,13 +46,7 @@ public class ExtensionIndexInitializerListener extends AbstractEventListener
     public static final String NAME = "ExtensionIndexInitializerListener";
 
     @Inject
-    private ExtensionIndex index;
-
-    @Inject
-    private WikiDescriptorManager wikis;
-
-    @Inject
-    private Logger logger;
+    private ExtensionIndexJobScheduler scheduler;
 
     /**
      * The default constructor.
@@ -68,14 +59,10 @@ public class ExtensionIndexInitializerListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        try {
-            if (event instanceof ApplicationReadyEvent) {
-                this.index.index(new WikiNamespace(this.wikis.getMainWikiId()));
-            } else if (event instanceof WikiReadyEvent) {
-                this.index.index(new WikiNamespace(((WikiReadyEvent) event).getWikiId()));
-            }
-        } catch (JobException e) {
-            this.logger.error("Failed to start indexing the available extensions", e);
+        if (event instanceof ApplicationReadyEvent) {
+            this.scheduler.start();
+        } else if (event instanceof WikiReadyEvent) {
+            this.scheduler.initialize(new WikiNamespace(((WikiReadyEvent) event).getWikiId()));
         }
     }
 }

@@ -43,7 +43,7 @@ public class ExtensionIndexRequest extends AbstractRequest
 
     private static final long serialVersionUID = 1L;
 
-    private final boolean localExtensionsEnabled;
+    private boolean localExtensionsEnabled;
 
     private final boolean remoteExtensionsEnabled;
 
@@ -92,9 +92,23 @@ public class ExtensionIndexRequest extends AbstractRequest
     public static List<String> getId(Namespace namespace)
     {
         List<String> id = new ArrayList<>(JOB_ID);
-        id.add(namespace.serialize());
+
+        if (namespace != null) {
+            String namespaceString = namespace.serialize();
+            if (namespaceString != null) {
+                id.add(namespace.serialize());
+            }
+        }
 
         return id;
+    }
+
+    /**
+     * @param localExtensionsEnabled true if local extensions should be loaded
+     */
+    public void setLocalExtensionsEnabled(boolean localExtensionsEnabled)
+    {
+        this.localExtensionsEnabled = localExtensionsEnabled;
     }
 
     /**

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
@@ -108,6 +109,9 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         setTextGeneralField(Extension.FIELD_WEBSITE, false, false);
 
         setBooleanField(RemoteExtension.FIELD_RECOMMENDED, false, false);
+
+        setPIntField(RatingExtension.FIELD_TOTAL_VOTES, false, false);
+        setPFloatField(RatingExtension.FIELD_AVERAGE_VOTE, false, false);
 
         setStringField(Extension.FIELD_AUTHORS, true, false);
         setTextGeneralField(SOLR_FIELD_AUTHORS_INDEX, true, false, SOLR_FIELD_STORED, false);

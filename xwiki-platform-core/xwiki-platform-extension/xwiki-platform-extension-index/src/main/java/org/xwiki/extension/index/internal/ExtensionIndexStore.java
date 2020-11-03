@@ -56,6 +56,7 @@ import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -254,6 +255,34 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
+     * Update variable informations (recommended tag, ratings, etc.).
+     * 
+     * @param remoteExtension the remote extension from which to extract variable information
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public void update(RemoteExtension remoteExtension) throws SolrServerException, IOException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(remoteExtension.getId()), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
+            remoteExtension.isRecommended(), document);
+
+        if (remoteExtension instanceof RatingExtension) {
+            RatingExtension ratingExtension = (RatingExtension) remoteExtension;
+
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_TOTAL_VOTES,
+                ratingExtension.getRating().getTotalVotes(), document);
+            this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_AVERAGE_VOTE,
+                ratingExtension.getRating().getAverageVote(), document);
+        }
+
+        add(document);
+    }
+
+    /**
      * @param extensionId the id of the extension to update
      * @param namespace the namespace for which to update the extension
      * @param compatible true if the extension is compatible with the passed namespace
@@ -285,6 +314,7 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
+     * @param remoteExtension the {@link RemoteExtension} version of the extension
      * @param extension the extension to add to the index
      * @param last true if it's the last version of this extension id
      * @throws IOException If there is a low-level I/O error.
@@ -311,10 +341,6 @@ public class ExtensionIndexStore implements Initializable
         }
 
         this.utils.set(Extension.FIELD_CATEGORY, extension.getCategory(), document);
-
-        if (extension instanceof RemoteExtension) {
-            this.utils.set(RemoteExtension.FIELD_RECOMMENDED, ((RemoteExtension) extension).isRecommended(), document);
-        }
 
         this.utils.setString(Extension.FIELD_AUTHORS, extension.getAuthors(), ExtensionAuthor.class, document);
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
@@ -406,6 +432,9 @@ public class ExtensionIndexStore implements Initializable
 
         extension.setRecommended(this.utils.get(RemoteExtension.FIELD_RECOMMENDED, document, false));
 
+        extension.setTotalVotes(this.utils.get(RatingExtension.FIELD_TOTAL_VOTES, document, 0));
+        extension.setAverageVote(this.utils.get(RatingExtension.FIELD_AVERAGE_VOTE, document, 0f));
+
         extension.setAuthors(this.utils.getCollection(Extension.FIELD_AUTHORS, document, ExtensionAuthor.class));
         extension.setExtensionFeatures(
             this.utils.getCollection(Extension.FIELD_EXTENSIONFEATURES, document, ExtensionId.class));
@@ -427,12 +456,16 @@ public class ExtensionIndexStore implements Initializable
      */
     public IterableResult<Extension> search(ExtensionQuery query) throws SearchException
     {
-        SolrQuery solrQuery = new SolrQuery(query.getQuery());
+        SolrQuery solrQuery = new SolrQuery();
 
-        // Use the Extended DisMax Query Parser to set a boost configuration (which is not a feature supported by the
-        // Standard Query Parser)
-        solrQuery.set("defType", "edismax");
-        solrQuery.set("bf", BOOST);
+        if (StringUtils.isNotBlank(query.getQuery())) {
+            solrQuery.setQuery(query.getQuery());
+
+            // Use the Extended DisMax Query Parser to set a boost configuration (which is not a feature supported by
+            // the Standard Query Parser)
+            solrQuery.set("defType", "edismax");
+            solrQuery.set("bf", BOOST);
+        }
 
         // Pagination
         if (query.getOffset() > 0) {

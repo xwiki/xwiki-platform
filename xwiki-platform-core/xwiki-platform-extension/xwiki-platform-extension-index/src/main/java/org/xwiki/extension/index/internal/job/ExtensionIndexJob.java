@@ -44,6 +44,7 @@ import org.xwiki.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
@@ -63,10 +64,10 @@ import org.xwiki.extension.version.Version.Type;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.GroupedJob;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.model.namespace.WikiNamespace;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Update the index from configured repositories.
@@ -77,6 +78,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 @Component
 @Named(ExtensionIndexJob.JOB_TYPE)
 public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, DefaultExtensionIndexStatus>
+    implements GroupedJob
 {
     /**
      * Type of the job.
@@ -84,6 +86,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     public static final String JOB_TYPE = "extendion.index";
 
     private static final int SEARCH_BATCH_SIZE = 100;
+
+    private static final JobGroupPath GROUP_PATH = new JobGroupPath(JOB_TYPE, null);
 
     @Inject
     private ExtensionIndexStore indexStore;
@@ -104,9 +108,6 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     private ExtensionContext extensionContext;
 
     @Inject
-    private WikiDescriptorManager wikis;
-
-    @Inject
     private ExtensionManagerConfiguration configuration;
 
     @Inject
@@ -115,6 +116,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     @Inject
     @Named(InstallPlanJob.JOBTYPE)
     private Provider<Job> installPlanJobProvider;
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return GROUP_PATH;
+    }
 
     @Override
     protected void jobStarting()
@@ -184,15 +191,15 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             updateVersions(extensions);
         }
 
-        // 4: Validate extensions
+        // 4: Validate extensions (only if something was updated or if update was disabled)
         this.progress.startStep(this);
-        if (getStatus().isUpdated()) {
+        if (getStatus().isUpdated() || !getRequest().isRemoteExtensionsEnabled()) {
             this.progress.pushLevelProgress(getRequest().getNamespaces().size(), getRequest().getNamespaces());
             for (Namespace namespace : getRequest().getNamespaces()) {
                 this.progress.startStep(getRequest().getNamespaces());
                 validateExtensions(namespace, extensions);
             }
-            this.progress.popLevelProgress(this);
+            this.progress.popLevelProgress(getRequest().getNamespaces());
         }
 
         this.progress.popLevelProgress(this);
@@ -201,21 +208,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> extensions)
     {
         try {
-            if (Namespace.ROOT.equals(namespace)) {
-                // Validate root namespace
-                validateExtensions(null, true, extensions);
-            } else if (WikiNamespace.TYPE.equals(namespace.getType())
-                && this.wikis.getMainWikiId().equals(namespace.getValue())) {
-                // Validate also root namespace
-                if (!getRequest().getNamespaces().contains(Namespace.ROOT)) {
-                    validateExtensions(null, true, extensions);
-                }
-                // Validate main wiki namespace
-                validateExtensions(namespace.serialize(), true, extensions);
-            } else {
-                // Validate namespace
-                validateExtensions(namespace.serialize(), false, extensions);
-            }
+            // Validate namespace
+            validateExtensions(namespace.serialize(), false, extensions);
         } catch (Exception e) {
             this.logger.error("Failed to validate extensions on namespace [{}]", namespace, e);
         }
@@ -358,8 +352,6 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         if (updated) {
-            getStatus().setUpdated(true);
-
             this.indexStore.commit();
         }
 
@@ -392,6 +384,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
             ExtensionId extensionId = new ExtensionId(id, version);
             try {
+                // FIXME: update versions only if needed
                 this.indexStore.update(extensionId, !it.hasNext(), newVersions);
 
                 updated = true;
@@ -411,16 +404,17 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // Add the extensions
         for (Extension extension : extensions) {
-            if (!this.indexStore.exists(extension.getId(), true)) {
+            // TODO: support beta and snapshots versions too ?
+            if (extension.getId().getVersion().getType() == Type.STABLE
+                && !this.indexStore.exists(extension.getId(), true)) {
                 this.indexStore.add(extension, true);
 
                 updated = true;
+                getStatus().setUpdated(true);
             }
         }
 
         if (updated) {
-            getStatus().setUpdated(true);
-
             this.indexStore.commit();
         }
     }
@@ -436,8 +430,6 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         if (updated) {
-            getStatus().setUpdated(true);
-
             this.indexStore.commit();
         }
     }
@@ -459,6 +451,15 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
                     // Add the extension to the index
                     this.indexStore.add(completeExtension, true);
+
+                    updated = true;
+                    getStatus().setUpdated(true);
+                }
+
+                // Update recommended and rating
+                if (extension instanceof RemoteExtension) {
+                    this.indexStore.update((RemoteExtension) extension);
+
                     updated = true;
                 }
             }

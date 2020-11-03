@@ -29,7 +29,10 @@ import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.rating.ExtensionRating;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.wrap.AbstractWrappingExtension;
 
@@ -39,7 +42,7 @@ import org.xwiki.extension.wrap.AbstractWrappingExtension;
  * @version $Id$
  * @since 12.10RC1
  */
-public class SolrExtension extends AbstractWrappingExtension<Extension> implements RemoteExtension
+public class SolrExtension extends AbstractWrappingExtension<Extension> implements RatingExtension
 {
     private final ExtensionRepository repository;
 
@@ -50,6 +53,31 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     private Date indexDate;
 
     private boolean last;
+
+    private int totalVotes;
+
+    private float averageVote;
+
+    private final ExtensionRating rating = new ExtensionRating()
+    {
+        @Override
+        public int getTotalVotes()
+        {
+            return totalVotes;
+        }
+
+        @Override
+        public float getAverageVote()
+        {
+            return averageVote;
+        }
+
+        @Override
+        public RatableExtensionRepository getRepository()
+        {
+            return null;
+        }
+    };
 
     /**
      * @param repository the repository where this extension comes from
@@ -170,6 +198,30 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     public void setRecommended(boolean recommended)
     {
         this.overwrites.put(FIELD_RECOMMENDED, recommended);
+    }
+
+    // RatingExtension
+
+    @Override
+    public ExtensionRating getRating()
+    {
+        return this.rating;
+    }
+
+    /**
+     * @param totalVotes the total number of votes
+     */
+    public void setTotalVotes(int totalVotes)
+    {
+        this.totalVotes = totalVotes;
+    }
+
+    /**
+     * @param averageVote the average vote
+     */
+    public void setAverageVote(float averageVote)
+    {
+        this.averageVote = averageVote;
     }
 
     // SolrExtension

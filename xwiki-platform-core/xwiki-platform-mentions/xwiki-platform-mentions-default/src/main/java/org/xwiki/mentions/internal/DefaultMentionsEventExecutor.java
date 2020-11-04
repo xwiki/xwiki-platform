@@ -236,7 +236,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     }
 
     /**
-     *
+     * 
      * @return the list of consumers
      */
     public List<MentionsConsumer> getConsumers()

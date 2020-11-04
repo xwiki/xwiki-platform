@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.MentionedActorReference;
@@ -36,8 +36,6 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -52,6 +50,7 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
@@ -119,11 +118,7 @@ class CreatedDocumentMentionsAnalyzerTest
         when(doc.getSyntax()).thenReturn(XWIKI_2_1);
         XDOM xdom = new XDOM(asList());
         when(doc.getXDOM()).thenReturn(xdom);
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("reference", USER_U1);
-        parameters.put("anchor", "anchor0");
-        List<MacroBlock> blocks = asList(new MacroBlock("mention",
-            parameters, false));
+        List<MacroBlock> blocks = asList(buildMentionMacro(USER_U1, "anchor0", FIRST_NAME));
         when(this.xdomService.listMentionMacros(xdom)).thenReturn(blocks);
         Map<MentionedActorReference, List<String>> mapAnchors = new HashMap<>();
         mapAnchors.put(new MentionedActorReference(USER_U1, "user"), asList("anchor0"));
@@ -134,8 +129,8 @@ class CreatedDocumentMentionsAnalyzerTest
 
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT, "1.0")
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor0"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor0"))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor0", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor0", FIRST_NAME))
         ), actual);
     }
 
@@ -161,10 +156,9 @@ class CreatedDocumentMentionsAnalyzerTest
         largeStringProperty.setValue("SOME CONTENT");
         largeStringProperty.setName("comment");
         when(baseObject.getProperties()).thenReturn(new Object[] { largeStringProperty, new FloatProperty() });
-        MacroBlock mentionComment1 = new MacroBlock("mention", new HashMap<>(), false);
-        MacroBlock mentionComment2 = new MacroBlock("mention", new HashMap<>(), false);
+        MacroBlock mentionComment1 = buildMentionMacro(USER_U1, "anchor1", FIRST_NAME);
+        MacroBlock mentionComment2 = buildMentionMacro(USER_U1, "anchor2", FIRST_NAME);
         XDOM xdomComment = new XDOM(asList(mentionComment1, mentionComment2));
-        // TODO: make a test where parse fails (and check logs)
         when(this.xdomService.parse("SOME CONTENT", XWIKI_2_1)).thenReturn(Optional.of(xdomComment));
         List<MacroBlock> commentBLock = asList(mentionComment1, mentionComment2);
         when(this.xdomService.listMentionMacros(xdomComment)).thenReturn(commentBLock);
@@ -181,10 +175,19 @@ class CreatedDocumentMentionsAnalyzerTest
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("comment", baseObjectReference),
                 MentionLocation.AWM_FIELD, "1.0")
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
         ), actual);
+    }
+
+    private MacroBlock buildMentionMacro(String reference, String anchor, DisplayStyle displayStyle)
+    {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("reference", reference);
+        parameters.put("anchor", anchor);
+        parameters.put("style", displayStyle.toString());
+        return new MacroBlock("mention", parameters, false);
     }
 }

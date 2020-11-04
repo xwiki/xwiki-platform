@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.events.MentionEvent;
@@ -141,7 +142,7 @@ class UserMentionEventListenerTest
         Set<String> eventTarget = singleton(MENTIONED_IDENTITY_USER);
 
         MentionNotificationParameter mentionNotificationParameter =
-            new MentionNotificationParameter(MENTIONED_IDENTITY_USER, "anchor");
+            new MentionNotificationParameter(MENTIONED_IDENTITY_USER, "anchor", DisplayStyle.FIRST_NAME);
 
         this.notificationService.onEvent(null, null,
             new MentionNotificationParameters(AUTHOR_REFERENCE,
@@ -161,8 +162,9 @@ class UserMentionEventListenerTest
     @Test
     void sentNotificationsMultipleRecipients() throws Exception
     {
-        MentionNotificationParameter mention1 = new MentionNotificationParameter(MENTIONED_IDENTITY_USER, "anchor");
-        MentionNotificationParameter mention2 = new MentionNotificationParameter("User", "anchor2");
+        MentionNotificationParameter mention1 = new MentionNotificationParameter(MENTIONED_IDENTITY_USER, "anchor",
+            DisplayStyle.FIRST_NAME);
+        MentionNotificationParameter mention2 = new MentionNotificationParameter("User", "anchor2", DisplayStyle.FIRST_NAME);
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
         ObjectReference commentObjectReference = new ObjectReference("XWiki.Comments", DOCUMENT_REFERENCE);
         BaseObject baseObject = new BaseObject();
@@ -220,7 +222,7 @@ class UserMentionEventListenerTest
         when(this.xdomService.parse("some content", Syntax.XWIKI_2_1)).thenReturn(Optional.of(xdom));
 
         MentionNotificationParameter mentionNotificationParameter =
-            new MentionNotificationParameter(mentionedIdentity, "anchor");
+            new MentionNotificationParameter(mentionedIdentity, "anchor", DisplayStyle.FIRST_NAME);
         this.notificationService
             .onEvent(null, null,
                 new MentionNotificationParameters(AUTHOR_REFERENCE,
@@ -260,7 +262,7 @@ class UserMentionEventListenerTest
         when(xWikiDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         MentionNotificationParameter mentionNotificationParameter =
-            new MentionNotificationParameter(mentionedIdentity, "anchor");
+            new MentionNotificationParameter(mentionedIdentity, "anchor", DisplayStyle.FIRST_NAME);
         this.notificationService.onEvent(null, null,
             new MentionNotificationParameters(AUTHOR_REFERENCE,
                 new ObjectPropertyReference("comment", objectReference),
@@ -309,9 +311,9 @@ class UserMentionEventListenerTest
         when(this.authorizationManager.hasAccess(Right.VIEW, u3DocumentReference, objectReference)).thenReturn(false);
 
         MentionNotificationParameter mentionNotificationParameter =
-            new MentionNotificationParameter(mentionedIdentity, "anchor");
+            new MentionNotificationParameter(mentionedIdentity, "anchor", DisplayStyle.FIRST_NAME);
         MentionNotificationParameter mentionNotificationParameter2 =
-            new MentionNotificationParameter(mentionedIdentity2, "anchor");
+            new MentionNotificationParameter(mentionedIdentity2, "anchor", DisplayStyle.FIRST_NAME);
         this.notificationService.onEvent(null, null,
             new MentionNotificationParameters(AUTHOR_REFERENCE,
                 objectPropertyReference,

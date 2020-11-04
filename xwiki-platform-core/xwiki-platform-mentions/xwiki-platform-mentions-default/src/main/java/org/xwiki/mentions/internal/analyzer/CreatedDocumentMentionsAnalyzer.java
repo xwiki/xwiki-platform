@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.MentionedActorReference;
@@ -124,15 +125,16 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
         Map<MentionedActorReference, List<String>> counts = this.xdomService.groupAnchorsByUserReference(blocks);
 
-        addAllMentions(ret, counts);
+        addAllMentions(ret, counts, blocks);
 
         for (Map.Entry<MentionedActorReference, List<String>> entry : counts.entrySet()) {
             boolean emptyAnchorProcessed = false;
             String type = entry.getKey().getType();
             String reference = entry.getKey().getReference();
             for (String anchorId : entry.getValue()) {
+                DisplayStyle displayStyle = findDisplayStyle(blocks, reference, anchorId);
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    addNewMention(ret, type, new MentionNotificationParameter(reference, anchorId));
+                    addNewMention(ret, type, new MentionNotificationParameter(reference, anchorId, displayStyle));
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }

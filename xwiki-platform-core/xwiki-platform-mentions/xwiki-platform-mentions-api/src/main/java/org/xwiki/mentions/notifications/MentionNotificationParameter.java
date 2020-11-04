@@ -19,32 +19,40 @@
  */
 package org.xwiki.mentions.notifications;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Hold a mention notification parameter, composed of the reference of the mentioned actor and the unique anchor
  * identifier of the mention in a page.
  *
- * @since 12.10RC1
  * @version $Id$
+ * @since 12.10RC1
  */
 @Unstable
-public class MentionNotificationParameter
+public class MentionNotificationParameter implements Serializable
 {
     private final String reference;
 
     private final String anchorId;
 
+    private final DisplayStyle displayStyle;
+
     /**
      * @param reference the actor reference
      * @param anchorId the anchor identifier of the mention
+     * @param displayStyle mentions display style
      */
-    public MentionNotificationParameter(String reference, String anchorId)
+    public MentionNotificationParameter(String reference, String anchorId, DisplayStyle displayStyle)
     {
         this.reference = reference;
         this.anchorId = anchorId;
+        this.displayStyle = displayStyle;
     }
 
     /**
@@ -63,6 +71,14 @@ public class MentionNotificationParameter
         return this.anchorId;
     }
 
+    /**
+     * @return the display style of the mention
+     */
+    public DisplayStyle getDisplayStyle()
+    {
+        return this.displayStyle;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -79,6 +95,7 @@ public class MentionNotificationParameter
         return new EqualsBuilder()
             .append(this.reference, that.reference)
             .append(this.anchorId, that.anchorId)
+            .append(this.displayStyle, that.displayStyle)
             .isEquals();
     }
 
@@ -88,6 +105,17 @@ public class MentionNotificationParameter
         return new HashCodeBuilder(17, 37)
             .append(this.reference)
             .append(this.anchorId)
+            .append(this.displayStyle)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("reference", this.getReference())
+            .append("anchorId", this.getAnchorId())
+            .append("displayStyle", this.getDisplayStyle())
+            .build();
     }
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.MentionedActorReference;
@@ -51,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
+import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
@@ -151,12 +153,16 @@ class UpdatedDocumentMentionsAnalyzerTest
         XDOM newXDOM = new XDOM(asList(new WordBlock("v1.1")));
         when(newDoc.getXDOM()).thenReturn(newXDOM);
 
-        List<MacroBlock> oldMentions = asList(new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> oldMentions = asList(
+            buildMentionMacro(USER_U1, "anchor0", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor1", FIRST_NAME)
+        );
         when(this.xdomService.listMentionMacros(oldXDOM)).thenReturn(oldMentions);
-        List<MacroBlock> newMentions =
-            asList(new MacroBlock("mention", new HashMap<>(), false), new MacroBlock("mention", new HashMap<>(), false),
-                new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> newMentions = asList(
+            buildMentionMacro(USER_U1, "anchor0", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor1", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor2", FIRST_NAME)
+        );
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
         Map<MentionedActorReference, List<String>> oldCounts = new HashMap<>();
@@ -171,10 +177,10 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         assertEquals(
             asList(new MentionNotificationParameters(AUTHOR, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT, "1.1")
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor0"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor0", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
             ), analyze);
     }
 
@@ -217,8 +223,9 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         List<MacroBlock> oldMentions = asList(new MacroBlock("mention", new HashMap<>(), false));
         when(this.xdomService.listMentionMacros(oldXDOM)).thenReturn(oldMentions);
-        List<MacroBlock> newMentions = asList(new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> newMentions = asList(
+            buildMentionMacro(USER_U1, "anchor1", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor2", FIRST_NAME));
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
         // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
@@ -235,10 +242,10 @@ class UpdatedDocumentMentionsAnalyzerTest
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("lspfield", baseObjectReference),
                 MentionLocation.AWM_FIELD, "1.1")
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
         ), analyze);
     }
 
@@ -281,8 +288,10 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         List<MacroBlock> oldMentions = asList(new MacroBlock("mention", new HashMap<>(), false));
         when(this.xdomService.listMentionMacros(oldXDOM)).thenReturn(oldMentions);
-        List<MacroBlock> newMentions = asList(new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> newMentions = asList(
+            buildMentionMacro(USER_U1, "anchor1", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor2", FIRST_NAME)
+        );
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
         // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
@@ -299,10 +308,10 @@ class UpdatedDocumentMentionsAnalyzerTest
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("lspfield", baseObjectReference),
                 MentionLocation.AWM_FIELD, "1.1")
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
         ), analyze);
     }
 
@@ -346,8 +355,8 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         List<MacroBlock> oldMentions = asList(new MacroBlock("mention", new HashMap<>(), false));
         when(this.xdomService.listMentionMacros(oldXDOM)).thenReturn(oldMentions);
-        List<MacroBlock> newMentions = asList(new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> newMentions = asList(buildMentionMacro(USER_U1, "anchor1", FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor2", FIRST_NAME));
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
         // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
@@ -364,10 +373,10 @@ class UpdatedDocumentMentionsAnalyzerTest
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference(fieldName, baseObjectReference),
                 COMMENT, "1.1")
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
         ), analyze);
     }
 
@@ -415,8 +424,10 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         List<MacroBlock> oldMentions = asList(new MacroBlock("mention", new HashMap<>(), false));
         when(this.xdomService.listMentionMacros(oldXDOM)).thenReturn(oldMentions);
-        List<MacroBlock> newMentions = asList(new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false));
+        List<MacroBlock> newMentions = asList(
+            buildMentionMacro(USER_U1, null, FIRST_NAME),
+            buildMentionMacro(USER_U1, "anchor2", FIRST_NAME)
+        );
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
         // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
@@ -433,10 +444,19 @@ class UpdatedDocumentMentionsAnalyzerTest
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference(fieldName, baseObjectReference),
                 ANNOTATION, "1.1")
-                .addMention("user", new MentionNotificationParameter(USER_U1, null))
-                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, null))
-                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2"))
+                .addMention("user", new MentionNotificationParameter(USER_U1, null, FIRST_NAME))
+                .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, null, FIRST_NAME))
+                .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
         ), analyze);
+    }
+
+    private MacroBlock buildMentionMacro(String reference, String anchor, DisplayStyle displayStyle)
+    {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("reference", reference);
+        parameters.put("anchor", anchor);
+        parameters.put("style", displayStyle.toString());
+        return new MacroBlock("mention", parameters, false);
     }
 }

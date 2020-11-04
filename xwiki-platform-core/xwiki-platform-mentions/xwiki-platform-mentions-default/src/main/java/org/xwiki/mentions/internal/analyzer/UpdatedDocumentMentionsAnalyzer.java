@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.MentionedActorReference;
@@ -121,7 +122,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         Map<MentionedActorReference, List<String>> newCounts =
             this.xdomService.groupAnchorsByUserReference(newMentions);
 
-        addAllMentions(ret, newCounts);
+        addAllMentions(ret, newCounts, newMentions);
 
         for (Map.Entry<MentionedActorReference, List<String>> entry : newCounts.entrySet()) {
             MentionedActorReference key = entry.getKey();
@@ -141,14 +142,16 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
+                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, "");
                 addNewMention(ret, null,
-                    new MentionNotificationParameter(reference, ""));
+                    new MentionNotificationParameter(reference, "", displayStyle));
             }
 
             // Notify all new mentions with new anchors.
             for (String anchor : anchorsToNotify) {
+                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, anchor);
                 addNewMention(ret, type,
-                    new MentionNotificationParameter(reference, anchor));
+                    new MentionNotificationParameter(reference, anchor, displayStyle));
             }
         }
         return wrapResult(ret);
@@ -281,11 +284,14 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         // notification are send unconditionally to all mentioned users.
         Map<MentionedActorReference, List<String>> mentionedActorReferenceListMap =
             this.xdomService.groupAnchorsByUserReference(newMentions);
-        addAllMentions(ret, mentionedActorReferenceListMap);
+        addAllMentions(ret, mentionedActorReferenceListMap, newMentions);
         mentionedActorReferenceListMap
             .forEach((key, value) -> value.forEach(
-                anchorId -> addNewMention(ret, key.getType(),
-                    new MentionNotificationParameter(key.getReference(), anchorId))));
+                anchorId -> {
+                    DisplayStyle displayStyle = findDisplayStyle(newMentions, key.getReference(), anchorId);
+                    addNewMention(ret, key.getType(),
+                        new MentionNotificationParameter(key.getReference(), anchorId, displayStyle));
+                }));
 
         return wrapResult(ret);
     }

@@ -21,11 +21,14 @@ package org.xwiki.mentions.internal.analyzer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.internal.MentionedActorReference;
 import org.xwiki.mentions.notifications.MentionNotificationParameter;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
+import org.xwiki.rendering.block.MacroBlock;
 
 /**
  * Common class for the mention analyzers.
@@ -41,14 +44,16 @@ public abstract class AbstractDocumentMentionsAnalyzer
         mentionNotificationParameters.addNewMention(type, mentionedActorReference);
     }
 
-    protected void addAllMentions(MentionNotificationParameters ret, Map<MentionedActorReference, List<String>> count)
+    protected void addAllMentions(MentionNotificationParameters ret, Map<MentionedActorReference, List<String>> count,
+        List<MacroBlock> mentionsMacros)
     {
         for (Map.Entry<MentionedActorReference, List<String>> e : count.entrySet()) {
             MentionedActorReference mentionReference = e.getKey();
             for (String anchorId : e.getValue()) {
+                String reference = mentionReference.getReference();
+                DisplayStyle displayStyle = findDisplayStyle(mentionsMacros, reference, anchorId);
                 ret.addMention(mentionReference.getType(),
-                    new MentionNotificationParameter(mentionReference.getReference(),
-                        anchorId));
+                    new MentionNotificationParameter(reference, anchorId, displayStyle));
             }
         }
     }
@@ -63,5 +68,15 @@ public abstract class AbstractDocumentMentionsAnalyzer
             ret = Optional.of(mentionNotificationParameters);
         }
         return ret;
+    }
+
+    protected DisplayStyle findDisplayStyle(List<MacroBlock> mentionsMacros, String reference, String anchor)
+    {
+        return mentionsMacros.stream()
+            .filter(it -> Objects.equals(it.getParameter("reference"), reference)
+                && Objects.equals(it.getParameter("anchor"), anchor))
+            .findAny()
+            .map(it -> DisplayStyle.valueOf(it.getParameter("style")))
+            .orElse(DisplayStyle.FULL_NAME);
     }
 }

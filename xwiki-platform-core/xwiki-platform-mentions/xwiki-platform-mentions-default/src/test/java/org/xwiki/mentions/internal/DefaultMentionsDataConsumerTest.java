@@ -21,6 +21,7 @@ package org.xwiki.mentions.internal;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
+import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.events.NewMentionsEvent;
 import org.xwiki.mentions.internal.analyzer.CreatedDocumentMentionsAnalyzer;
@@ -144,7 +145,7 @@ class DefaultMentionsDataConsumerTest
         MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
                 "1.1")
-                .addNewMention("user", new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1"));
+                .addNewMention("user", new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1", DisplayStyle.FIRST_NAME));
         when(this.createdDocumentMentionsAnalyzer.analyze(doc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
             .thenReturn(singletonList(
                 mentionNotificationParameters));
@@ -207,7 +208,7 @@ class DefaultMentionsDataConsumerTest
         MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(AUTHOR_REFERENCE, DOCUMENT_REFERENCE, MentionLocation.DOCUMENT,
                 "1.1")
-                .addNewMention("user", new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1"));
+                .addNewMention("user", new MentionNotificationParameter("xwiki:XWiki.U1", "anchor1", DisplayStyle.FIRST_NAME));
         when(this.updatedDocumentMentionsAnalyzer.analyze(oldDoc, newDoc, DOCUMENT_REFERENCE, "1.1", AUTHOR_REFERENCE))
             .thenReturn(singletonList(
                 mentionNotificationParameters));

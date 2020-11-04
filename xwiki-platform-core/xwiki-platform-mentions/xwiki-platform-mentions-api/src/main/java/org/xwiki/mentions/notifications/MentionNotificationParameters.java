@@ -20,6 +20,7 @@
 package org.xwiki.mentions.notifications;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,9 +46,13 @@ import org.xwiki.text.XWikiToStringBuilder;
 @Unstable
 public class MentionNotificationParameters implements Serializable
 {
-    private final Map<String, Set<MentionNotificationParameter>> newMentions = new HashMap<>();
+    private final Map<String, Set<MentionNotificationParameter>> newMentions;
 
-    private final Map<String, Set<MentionNotificationParameter>> mentions = new HashMap<>();
+    private final Map<String, Set<MentionNotificationParameter>> unmodifiableNewMentions;
+
+    private final Map<String, Set<MentionNotificationParameter>> mentions;
+
+    private final Map<String, Set<MentionNotificationParameter>> unmodifiableMentions;
 
     private final String authorReference;
 
@@ -73,6 +78,10 @@ public class MentionNotificationParameters implements Serializable
         this.entityReference = entityReference;
         this.location = location;
         this.version = version;
+        this.newMentions = new HashMap<>();
+        this.mentions = new HashMap<>();
+        this.unmodifiableNewMentions = Collections.unmodifiableMap(this.newMentions);
+        this.unmodifiableMentions = Collections.unmodifiableMap(this.mentions);
     }
 
     /**
@@ -128,27 +137,27 @@ public class MentionNotificationParameters implements Serializable
     }
 
     /**
-     * Returns a map of the new mentions. The type of the mentioned actors are used as keys, and the values are
-     * {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor reference and its
+     * Returns an unmodifable map of the new mentions. The type of the mentioned actors are used as keys, and the values
+     * are {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor reference and its
      * anchor.
      *
      * @return the map of new mentions
      */
     public Map<String, Set<MentionNotificationParameter>> getNewMentions()
     {
-        return this.newMentions;
+        return this.unmodifiableNewMentions;
     }
 
     /**
-     * Returns a map of all the mentions, including the new ones. The type of the mentioned actors are used as keys, and
-     * the values are {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor
-     * reference and its anchor.
+     * Returns an unmodifiable map of all the mentions, including the new ones. The type of the mentioned actors are
+     * used as keys, and the values are {@link MentionNotificationParameter}, identifying a unique mention in a page by
+     * its actor reference and its anchor.
      *
      * @return the map of all the mentions
      */
     public Map<String, Set<MentionNotificationParameter>> getMentions()
     {
-        return this.mentions;
+        return this.unmodifiableMentions;
     }
 
     /**

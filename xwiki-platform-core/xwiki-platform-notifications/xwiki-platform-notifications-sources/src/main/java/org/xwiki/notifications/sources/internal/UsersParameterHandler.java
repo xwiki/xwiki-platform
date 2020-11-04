@@ -103,10 +103,12 @@ public class UsersParameterHandler
 
             addFilterPreference(parameters, userList);
         } else if (parameters.user != null) {
-            // if we have a user (but no "users") then we should also display personal messages from followed users.
-            // the other types of messages get included, but for personal messages the filter needs
+            // If we have a user (but no "users") then we should also display personal messages from users
+            // followed by that user.
+            // The other types of messages get included in other places, but for personal messages the filter needs
             // a matching filter preference so we loop though preferences to see if they have
-            // a preference for this (using a copy to guard against unwanted modifications)
+            // a preference for this (using a copy to guard against unwanted modifications).
+            // As result there should be a preference for every followed user in the parameters.filterPreferences list.
             try {
                 for (NotificationFilterPreference filterPref
                     : notificationFilterPreferenceManager.getFilterPreferences(parameters.user)) {

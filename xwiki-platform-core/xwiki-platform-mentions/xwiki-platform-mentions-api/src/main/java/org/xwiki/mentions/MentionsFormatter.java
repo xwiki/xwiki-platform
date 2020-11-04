@@ -26,8 +26,8 @@ import org.xwiki.stability.Unstable;
 /**
  * Provides services to format the user mentions.
  * <p>
- * Unless you know statically the type of user to format, {@link MentionFormatterProvider} should be used to resolve
- * the formatter to use according to the type of the user.
+ * Unless you know statically the type of actor to format, {@link MentionFormatterProvider} should be used to resolve
+ * the formatter to use according to the type of the actor.
  *
  * @since 12.10RC1
  * @see MentionFormatterProvider
@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
 public interface MentionsFormatter
 {
     /**
-     * Format a user mention.
+     * Format a actor mention.
      * <p>
      * The formatter takes the serialized reference of an actor and returns an user readable string.
      * The kind of actor handled is specific to a {@code MentionFormatter} implementation.

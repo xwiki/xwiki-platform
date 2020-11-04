@@ -28,8 +28,8 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Hold a mention notification parameter, composed of the reference of the mentioned actor and the unique anchor
- * identifier of the mention in a page.
+ * Holds a mention notification parameter, composed of the reference of the mentioned actor, the unique anchor
+ * identifier of the mention in a page, and the display style of the mention.
  *
  * @version $Id$
  * @since 12.10RC1
@@ -46,7 +46,7 @@ public class MentionNotificationParameter implements Serializable
     /**
      * @param reference the actor reference
      * @param anchorId the anchor identifier of the mention
-     * @param displayStyle mentions display style
+     * @param displayStyle the mention display style
      */
     public MentionNotificationParameter(String reference, String anchorId, DisplayStyle displayStyle)
     {
@@ -72,7 +72,7 @@ public class MentionNotificationParameter implements Serializable
     }
 
     /**
-     * @return the display style of the mention
+     * @return the mention display style
      */
     public DisplayStyle getDisplayStyle()
     {

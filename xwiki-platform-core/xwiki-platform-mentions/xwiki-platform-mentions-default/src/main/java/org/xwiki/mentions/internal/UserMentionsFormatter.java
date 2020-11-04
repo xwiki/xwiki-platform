@@ -68,8 +68,8 @@ public class UserMentionsFormatter implements MentionsFormatter
         String lastName = Objects.toString(userProperties.getLastName(), "");
         final String content;
         if (Objects.equals(style, LOGIN) || Objects.equals(firstName, "") && Objects.equals(lastName, "")) {
-            // if the login is asked explicitly we display it
-            // if the user has no first name and no last name, we display the login by default
+            // If the login is asked explicitly we display it.
+            // If the user has no first name and no last name, we display the login by default.
             // TODO: This works only with the document user store. Needs to be changed when the user API allows to
             // access the user login.
             content = this.documentReferenceResolver.resolve(actorReference).getName();

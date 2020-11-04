@@ -89,7 +89,7 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param version the version of the document holding the analyzed xobjects when it was created
      * @param authorReference the reference of the author of the document
      * @param syntax the syntax of the document
-     * @return the list of mentions for the objects of the document
+     * @return the list of mentions found in the objects of the document
      */
     private List<MentionNotificationParameters> traverseXObjectsOnCreate(
         Map<DocumentReference, List<BaseObject>> xObjects, String version, String authorReference, Syntax syntax)
@@ -106,14 +106,15 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     }
 
     /**
-     * Handles the analysis of a created content to search for mentions to notify.
+     * Handles the analysis of a created content and search for new mentions.
      *
      * @param xdom the xdom of the content
      * @param entityReference the reference to the analyzed entity
-     * @param version the version of the document holding the analyzed entity when it was created
+     * @param version the version of the document holding the analyzed entity
      * @param authorReference the reference of the author of the created document
      * @param location the location of the content
-     * @return the list of {@link MentionNotificationParameters}
+     * @return an empty {@link Optional} if no new mention is found, an {@link Optional} holding an {@link
+     *     MentionNotificationParameters} if a new mention is found
      */
     private Optional<MentionNotificationParameters> handleContentOnCreate(XDOM xdom, EntityReference entityReference,
         String version, String authorReference, MentionLocation location)
@@ -143,14 +144,13 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     }
 
     /**
-     * Handles an object of a created document and search for mentions to notify its content.
+     * Handles an object of a created document and search for new mentions.
      *
      * @param baseObject the object
      * @param version the version of the document holding the base object when it was created
      * @param authorReference the reference of the author of the document
      * @param syntax the syntax of the document
-     * @return the list of {@link MentionNotificationParameters} for the entities where new mentions have been
-     *     identified on the base object.
+     * @return the list of new mentions identified in the fields of the object
      */
     private List<MentionNotificationParameters> handleBaseObjectOnCreate(BaseObject baseObject, String version,
         String authorReference, Syntax syntax)

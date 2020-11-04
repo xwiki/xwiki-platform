@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * <p>
  * The following information is sent along the event:
  * <ul>
- *     <li>source: the reference of the user that made the change</li>
+ *     <li>source: the reference of the user who made the change</li>
  *     <li>data: the {@link org.xwiki.mentions.notifications.MentionNotificationParameters} holding the
  *     list of mentions introduced by the change on a given entity</li>
  * </ul>

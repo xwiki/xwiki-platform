@@ -73,15 +73,15 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
     /**
      * Identifies new mentions on an updated document by analyzing the content of the document body as well as the
-     * content of the objects attached to the document.
+     * content of the objects attached to the document and comparing them to the document and its objects before the
+     * update.
      *
      * @param oldDoc the document before the update
      * @param newDoc the document after the update
      * @param documentReference the reference of the document
      * @param version the version of the document after the update
      * @param authorReference the reference of the author of the update
-     * @return the list of {@link MentionNotificationParameters} for the entities where new mentions have been
-     *     identified.
+     * @return the list of the identified new mentions
      */
     public List<MentionNotificationParameters> analyze(XWikiDocument oldDoc, XWikiDocument newDoc,
         DocumentReference documentReference,
@@ -104,8 +104,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param version the version of the document holding the analyzed entity  when it was updated
      * @param authorReference the reference of the author of the update
      * @param location the location of the content
-     * @return the {@link MentionNotificationParameters} for the document if new mentions have been identified, wrapped
-     *     in an {@link Optional < MentionNotificationParameter >}.
+     * @return an empty {@link Optional} if no new mention is found, an {@link Optional} holding an {@link
+     *     MentionNotificationParameters} if a new mention is found
      */
     private Optional<MentionNotificationParameters> handleUpdatedContent(XDOM oldXDOM, XDOM newXDOM,
         EntityReference entityReference,
@@ -166,8 +166,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param version the version of the document holding the analyzed xobjects when it was updated
      * @param authorReference the reference of the author of the update
      * @param syntax the syntax of the document
-     * @return the list of {@link MentionNotificationParameters} for the based objects where new mentions have been
-     *     identified.
+     * @return the list of the identified new mentions
      */
     private List<MentionNotificationParameters> traverseXObjectsOnUpdate(
         Map<DocumentReference, List<BaseObject>> oldXObjects,
@@ -194,7 +193,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param version the version of the document holding the analyzed object when it was updated
      * @param authorReference the reference of the author of the change
      * @param syntax the syntax of the document
-     * @return the list of new mentions identified during the analysis of the base object.
+     * @return the list of the identified new mentions
      */
     private List<MentionNotificationParameters> handleBaseObjectOnUpdate(List<BaseObject> oldEntry,
         BaseObject baseObject, String version, String authorReference, Syntax syntax)
@@ -208,7 +207,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                     .filter(it -> it.getId() == baseObject.getId())
                     .findAny());
 
-            // special treatment on comment object to analyse only the comment field.
+            // Special treatment on comment objects to analyse only the comment field.
             if (Objects.equals(baseObject
                 .getXClassReference()
                 .getLocalDocumentReference(), COMMENTSCLASS_REFERENCE))
@@ -243,8 +242,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param location the location of the property
      * @param authorReference the reference of the author change
      * @param syntax the syntax of the document
-     * @return the identified new mentions in the large string property, wrapped in an {@link Optional}. {@link
-     *     Optional#empty()} is returned when no new mentions are found in the large string property.
+     * @return an empty {@link Optional} if no new mention is found, an {@link Optional} holding an {@link
+     *     MentionNotificationParameters} if a new mention is found
      */
     private Optional<MentionNotificationParameters> handleProperty(Optional<BaseObject> oldBaseObject,
         LargeStringProperty largeStringProperty,
@@ -269,8 +268,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
      * @param version the version of the document holding the analyzed entity when it was updated
      * @param authorReference the reference of the author of the change
      * @param location the location of the content
-     * @return the {@link MentionNotificationParameters} for the analyzed entity, wrapped in an {@link Optional}. {@link
-     *     Optional#empty()}  is returned if no new mentions are identified in the entity.
+     * @return an empty {@link Optional} if no new mention is found, an {@link Optional} holding an {@link
+     *     MentionNotificationParameters} if a new mention is found
      */
     private Optional<MentionNotificationParameters> handleCreatedContent(XDOM newXdom, EntityReference entityReference,
         String version, String authorReference, MentionLocation location)
@@ -280,8 +279,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXdom);
 
-        // the matching element has not be found in the previous version of the document
-        // notification are send unconditionally to all mentioned users.
+        // The matching element has not be found in the previous version of the document.
+        // Notification are send unconditionally to all mentioned users.
         Map<MentionedActorReference, List<String>> mentionedActorReferenceListMap =
             this.xdomService.groupAnchorsByUserReference(newMentions);
         addAllMentions(ret, mentionedActorReferenceListMap, newMentions);

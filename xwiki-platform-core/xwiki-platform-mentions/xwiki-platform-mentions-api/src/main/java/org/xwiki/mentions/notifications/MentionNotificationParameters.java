@@ -34,11 +34,12 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Holds the mentions for a given entity update. It holds two maps of mentions, grouped by the type of user mentioned.
- * <ul>
- *     <li>The list of new mentions in the analyzed entity</li>
- *     <li>The list of all the mentions of the entity</li>
- * </ul>
+ * Contains the mentions for a change (creation or modification) on a given entity. The object contains two maps of
+ * mentions, storing respectively the list of all mentions of the entity, and the list of new mentions introduced by the
+ * change. The keys of the maps are the types of the mentioned users stored in the values. The value of the maps
+ * contains the list of mentions of a given type. In addition, the object contains the reference of the author of the
+ * change, the location of the entity (e.g., in a document or a comment), the reference of the changed entity, and the
+ * version of the entity after the change.
  *
  * @version $Id$
  * @since 12.6
@@ -56,9 +57,6 @@ public class MentionNotificationParameters implements Serializable
 
     private final String authorReference;
 
-    /*
-     * entity reference where the mention occurs
-     */
     private final EntityReference entityReference;
 
     private final MentionLocation location;
@@ -66,10 +64,10 @@ public class MentionNotificationParameters implements Serializable
     private final String version;
 
     /**
-     * @param authorReference the reference of the autor of the change that led to the mentions
+     * @param authorReference the reference of the author of the change that produced the mentions
      * @param entityReference the entity holding the mentions (a page content, a comment...)
      * @param location the pre-calculated location of the entity
-     * @param version version of the document where the mention occured
+     * @param version version of the document where the mention occurred
      */
     public MentionNotificationParameters(String authorReference,
         EntityReference entityReference, MentionLocation location, String version)
@@ -109,9 +107,9 @@ public class MentionNotificationParameters implements Serializable
     }
 
     /**
-     * Add a to the map of mentions.
+     * Add a mention to the map of mentions.
      *
-     * @param type the type of the mentioned user
+     * @param type the type of the mentioned actor
      * @param mentionedActorReference the mention notification parameters
      * @return the current object
      */
@@ -125,7 +123,7 @@ public class MentionNotificationParameters implements Serializable
     /**
      * Add a mention to the map of new mentions.
      *
-     * @param type the type of the mentioned user
+     * @param type the type of the mentioned actor
      * @param mentionedActorReference the mention notification parameter
      * @return the current object
      */
@@ -171,9 +169,9 @@ public class MentionNotificationParameters implements Serializable
     /**
      * Add new mention to a map.
      *
-     * @param type the type of the mentioned user
+     * @param type the type of the mentioned actor
      * @param mentionedActorReference the mention notification parameter
-     * @param mentionsMap the map of mention to update
+     * @param mentionsMap the map of mentions to update
      */
     private void addToMap(String type, MentionNotificationParameter mentionedActorReference,
         Map<String, Set<MentionNotificationParameter>> mentionsMap)

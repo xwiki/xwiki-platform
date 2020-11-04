@@ -93,7 +93,6 @@ class CreatedDocumentMentionsAnalyzerTest
         LargeStringProperty largeStringProperty = new LargeStringProperty();
         largeStringProperty.setObject(baseObject);
         largeStringProperty.setValue("SOME CONTENT");
-        // TODO: make a test where parse fails (and check logs)
         XDOM xdomComment = new XDOM(asList());
         when(this.xdomService.parse("SOME CONTENT", XWIKI_2_1)).thenReturn(Optional.of(xdomComment));
         List<MacroBlock> commentBLock = asList();

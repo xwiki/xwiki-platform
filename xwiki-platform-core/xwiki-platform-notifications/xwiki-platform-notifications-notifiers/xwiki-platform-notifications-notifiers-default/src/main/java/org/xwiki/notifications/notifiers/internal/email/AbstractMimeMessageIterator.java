@@ -122,14 +122,18 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private final MailListener listener = new VoidMailListener()
     {
+        @Override
         public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
         {
-            onPrepare(message);
+            // Remove the mail notifications, it's in mail module's hands now
+            onPrepare(message, true);
         }
 
+        @Override
         public void onPrepareMessageError(ExtendedMimeMessage message, Exception e, Map<String, Object> parameters)
         {
-            onPrepare(message);
+            // Don't remove the mail notifications so that they can be retried later
+            onPrepare(message, false);
         }
     };
 
@@ -171,15 +175,16 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         computeNext();
     }
 
-    private void onPrepare(ExtendedMimeMessage message)
+    private void onPrepare(ExtendedMimeMessage message, boolean delete)
     {
         // Indicate that we don't need to send this user notification anymore
-        List<EntityEvent> events = this.eventsMappingPerMessage.remove(message);
-        if (events != null) {
-            events = this.eventsMappingPerId.remove(message.getUniqueMessageId());
+        List<EntityEvent> events = this.eventsMappingPerId.remove(message.getUniqueMessageId());
+        if (events == null) {
+            events = this.eventsMappingPerMessage.remove(message);
         }
 
-        if (events != null) {
+        // Forget about the mail notification so that it's not sent again
+        if (events != null && delete) {
             events.forEach(this.eventStore::deleteMailEntityEvent);
         }
     }

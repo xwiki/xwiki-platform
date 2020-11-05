@@ -89,7 +89,7 @@ public class PrefilteringLiveNotificationEmailListener extends AbstractEventList
             } else if (event instanceof WikiReadyEvent) {
                 // Load all the events for which live mail was processing was not finished and send them
                 // Don't block the event thread
-                this.manager.addEvents(this.wikis.getMainWikiId());
+                this.manager.addEvents(((WikiReadyEvent) event).getWikiId());
             }
         }
     }

@@ -157,6 +157,8 @@
     <property>
       <async_context>
         <value>doc.reference</value>
+        <value>user</value>
+        <value>wiki</value>
       </async_context>
     </property>
     <property>

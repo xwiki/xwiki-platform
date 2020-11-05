@@ -473,6 +473,8 @@ public class ExtensionIndexStore implements Initializable
         }
         if (query.getLimit() > 0) {
             solrQuery.setRows(query.getLimit());
+        } else {
+            solrQuery.setRows(Integer.MAX_VALUE);
         }
 
         // Sort
@@ -503,6 +505,8 @@ public class ExtensionIndexStore implements Initializable
                 builder.append(StringUtils.join(indexedQuery.getCompatibleNamespaces().stream()
                     .map(n -> this.utils.toFilterQueryString(toStoredNamespace(n))).iterator(), " OR "));
                 builder.append(')');
+
+                solrQuery.addFilterQuery(builder.toString());
             } else {
                 // Only search for latest versions
                 solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
@@ -522,8 +526,9 @@ public class ExtensionIndexStore implements Initializable
 
         SolrDocumentList documents = response.getResults();
 
-        return new CollectionIterableResult<>((int) documents.getNumFound(), (int) documents.getStart(),
-            documents.stream().map(this::toSolrExtension).collect(Collectors.toList()));
+        List<Extension> extensions = documents.stream().map(this::toSolrExtension).collect(Collectors.toList());
+
+        return new CollectionIterableResult<>((int) documents.getNumFound(), (int) documents.getStart(), extensions);
     }
 
     private String serializeFilter(Filter filter)

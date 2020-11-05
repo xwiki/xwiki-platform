@@ -172,7 +172,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             addLocalExtensions();
         }
 
-        // 2: Gather all extension from searchable repositories
+        // 2: Gather all extensions from searchable repositories
         this.progress.startStep(this);
         if (getRequest().isRemoteExtensionsEnabled()) {
             addRemoteExtensions();
@@ -182,6 +182,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         this.progress.startStep(this);
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+        solrQuery.setRows(Integer.MAX_VALUE);
         Set<ExtensionId> extensoinIds = this.indexStore.searchExtensionIds(solrQuery);
         Map<String, SortedSet<Version>> extensions = new HashMap<>(extensoinIds.size());
         for (ExtensionId extensionId : extensoinIds) {
@@ -370,10 +371,10 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // TODO: remove indexed extensions not part of the resolved versions ?
 
-        List<String> newVersions = new ArrayList<>(versions.getSize());
+        List<String> stableVersions = new ArrayList<>(versions.getSize());
         for (Version version : versions) {
             if (version.getType() == Type.STABLE) {
-                newVersions.add(version.getValue());
+                stableVersions.add(version.getValue());
             }
         }
 
@@ -383,9 +384,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             Version version = it.next();
 
             ExtensionId extensionId = new ExtensionId(id, version);
+            boolean last = !it.hasNext();
             try {
-                // FIXME: update versions only if needed
-                this.indexStore.update(extensionId, !it.hasNext(), newVersions);
+                this.indexStore.update(extensionId, last, stableVersions);
 
                 updated = true;
             } catch (Exception e) {

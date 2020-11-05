@@ -74,7 +74,7 @@ public class UsersParameterHandlerTest
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Test
-    public void handlerUsersParameter()
+    void handlerUsersParameter()
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         this.usersParameterHandler.handleUsersParameter(null, notificationParameters);
@@ -125,7 +125,7 @@ public class UsersParameterHandlerTest
     }
 
     @Test
-    public void handlerUsersParameterWhenOnlyTheUserParameterIsGiven() throws NotificationException
+    void handlerUsersParameterWhenOnlyTheUserParameterIsGiven() throws NotificationException
     {
         final DocumentReference testUser = new DocumentReference("currentwiki", "XWiki", "SomeUser");
 

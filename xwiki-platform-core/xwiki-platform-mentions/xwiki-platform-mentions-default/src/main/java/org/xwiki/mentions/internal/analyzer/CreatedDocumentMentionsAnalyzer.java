@@ -75,11 +75,12 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         DocumentReference documentReference, String version, String authorReference)
     {
         Syntax syntax = doc.getSyntax();
-        List<MentionNotificationParameters> ret = new ArrayList<>();
+        List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         handleContentOnCreate(doc.getXDOM(), documentReference, version, authorReference, DOCUMENT)
-            .ifPresent(ret::add);
-        ret.addAll(traverseXObjectsOnCreate(doc.getXObjects(), version, authorReference, syntax));
-        return ret;
+            .ifPresent(mentionNotificationParametersList::add);
+        mentionNotificationParametersList
+            .addAll(traverseXObjectsOnCreate(doc.getXObjects(), version, authorReference, syntax));
+        return mentionNotificationParametersList;
     }
 
     /**
@@ -94,15 +95,16 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     private List<MentionNotificationParameters> traverseXObjectsOnCreate(
         Map<DocumentReference, List<BaseObject>> xObjects, String version, String authorReference, Syntax syntax)
     {
-        List<MentionNotificationParameters> ret = new ArrayList<>();
+        List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         for (List<BaseObject> baseObjects : xObjects.values()) {
             for (BaseObject baseObject : baseObjects) {
                 if (baseObject != null) {
-                    ret.addAll(handleBaseObjectOnCreate(baseObject, version, authorReference, syntax));
+                    mentionNotificationParametersList
+                        .addAll(handleBaseObjectOnCreate(baseObject, version, authorReference, syntax));
                 }
             }
         }
-        return ret;
+        return mentionNotificationParametersList;
     }
 
     /**
@@ -119,14 +121,14 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     private Optional<MentionNotificationParameters> handleContentOnCreate(XDOM xdom, EntityReference entityReference,
         String version, String authorReference, MentionLocation location)
     {
-        MentionNotificationParameters ret =
+        MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(authorReference, entityReference, location, version);
 
         List<MacroBlock> blocks = this.xdomService.listMentionMacros(xdom);
 
         Map<MentionedActorReference, List<String>> counts = this.xdomService.groupAnchorsByUserReference(blocks);
 
-        addAllMentions(ret, counts, blocks);
+        addAllMentions(mentionNotificationParameters, counts, blocks);
 
         for (Map.Entry<MentionedActorReference, List<String>> entry : counts.entrySet()) {
             boolean emptyAnchorProcessed = false;
@@ -135,12 +137,13 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
             for (String anchorId : entry.getValue()) {
                 DisplayStyle displayStyle = findDisplayStyle(blocks, reference, anchorId);
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    addNewMention(ret, type, new MentionNotificationParameter(reference, anchorId, displayStyle));
+                    addNewMention(mentionNotificationParameters, type,
+                        new MentionNotificationParameter(reference, anchorId, displayStyle));
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }
         }
-        return wrapResult(ret);
+        return wrapResult(mentionNotificationParameters);
     }
 
     /**
@@ -155,7 +158,7 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     private List<MentionNotificationParameters> handleBaseObjectOnCreate(BaseObject baseObject, String version,
         String authorReference, Syntax syntax)
     {
-        List<MentionNotificationParameters> ret = new ArrayList<>();
+        List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         for (Object o : baseObject.getProperties()) {
             if (o instanceof LargeStringProperty) {
                 LargeStringProperty largeStringProperty = (LargeStringProperty) o;
@@ -164,9 +167,9 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                     .parse(content, syntax)
                     .flatMap(xdom -> handleContentOnCreate(xdom, largeStringProperty.getReference(), version,
                         authorReference, AWM_FIELD))
-                    .ifPresent(ret::add);
+                    .ifPresent(mentionNotificationParametersList::add);
             }
         }
-        return ret;
+        return mentionNotificationParametersList;
     }
 }

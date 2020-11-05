@@ -87,12 +87,13 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         DocumentReference documentReference,
         String version, String authorReference)
     {
-        List<MentionNotificationParameters> ret = new ArrayList<>();
+        List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         handleUpdatedContent(oldDoc.getXDOM(), newDoc.getXDOM(), documentReference, version, authorReference, DOCUMENT)
-            .ifPresent(ret::add);
-        ret.addAll(traverseXObjectsOnUpdate(oldDoc.getXObjects(), newDoc.getXObjects(), version, authorReference,
-            newDoc.getSyntax()));
-        return ret;
+            .ifPresent(mentionNotificationParametersList::add);
+        mentionNotificationParametersList
+            .addAll(traverseXObjectsOnUpdate(oldDoc.getXObjects(), newDoc.getXObjects(), version, authorReference,
+                newDoc.getSyntax()));
+        return mentionNotificationParametersList;
     }
 
     /**
@@ -198,7 +199,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     private List<MentionNotificationParameters> handleBaseObjectOnUpdate(List<BaseObject> oldEntry,
         BaseObject baseObject, String version, String authorReference, Syntax syntax)
     {
-        List<MentionNotificationParameters> ret = new ArrayList<>();
+        List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         if (baseObject != null) {
             Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
                 optOldEntries -> optOldEntries
@@ -219,18 +220,18 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                         boolean isComment = field == null || StringUtils.isEmpty(field.toFormString());
                         MentionLocation location = isComment ? COMMENT : ANNOTATION;
                         handleProperty(oldBaseObject, lsp, version, location, authorReference, syntax)
-                            .ifPresent(ret::add);
+                            .ifPresent(mentionNotificationParametersList::add);
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
                     if (o instanceof LargeStringProperty) {
                         handleProperty(oldBaseObject, (LargeStringProperty) o, version, AWM_FIELD, authorReference,
-                            syntax).ifPresent(ret::add);
+                            syntax).ifPresent(mentionNotificationParametersList::add);
                     }
                 }
             }
         }
-        return ret;
+        return mentionNotificationParametersList;
     }
 
     /**
@@ -274,7 +275,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     private Optional<MentionNotificationParameters> handleCreatedContent(XDOM newXdom, EntityReference entityReference,
         String version, String authorReference, MentionLocation location)
     {
-        MentionNotificationParameters ret =
+        MentionNotificationParameters mentionNotificationParameters =
             new MentionNotificationParameters(authorReference, entityReference, location, version);
 
         List<MacroBlock> newMentions = this.xdomService.listMentionMacros(newXdom);
@@ -283,15 +284,15 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         // Notification are send unconditionally to all mentioned users.
         Map<MentionedActorReference, List<String>> mentionedActorReferenceListMap =
             this.xdomService.groupAnchorsByUserReference(newMentions);
-        addAllMentions(ret, mentionedActorReferenceListMap, newMentions);
+        addAllMentions(mentionNotificationParameters, mentionedActorReferenceListMap, newMentions);
         mentionedActorReferenceListMap
             .forEach((key, value) -> value.forEach(
                 anchorId -> {
                     DisplayStyle displayStyle = findDisplayStyle(newMentions, key.getReference(), anchorId);
-                    addNewMention(ret, key.getType(),
+                    addNewMention(mentionNotificationParameters, key.getType(),
                         new MentionNotificationParameter(key.getReference(), anchorId, displayStyle));
                 }));
 
-        return wrapResult(ret);
+        return wrapResult(mentionNotificationParameters);
     }
 }

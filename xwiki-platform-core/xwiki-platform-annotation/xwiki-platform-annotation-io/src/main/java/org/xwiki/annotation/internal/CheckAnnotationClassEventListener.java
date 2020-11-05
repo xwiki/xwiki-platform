@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -48,7 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 4.0M2
  */
-@Role
+@Component
 @Named(CheckAnnotationClassEventListener.NAME)
 @Singleton
 public class CheckAnnotationClassEventListener implements EventListener

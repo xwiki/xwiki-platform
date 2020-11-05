@@ -55,7 +55,8 @@ public class HTML5Validator implements Validator
     {
         clear();
 
-        SimpleDocumentValidator validator = new SimpleDocumentValidator();
+        // Don't enable the language detection as it can lead to too any false positives. See XWIKI-17776 for more.
+        SimpleDocumentValidator validator = new SimpleDocumentValidator(true, true, false);
 
         String schemaUrl = "http://s.validator.nu/html5-all.rnc";
 

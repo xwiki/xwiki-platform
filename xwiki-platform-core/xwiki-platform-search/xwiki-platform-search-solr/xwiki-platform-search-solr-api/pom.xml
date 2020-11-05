@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -35,9 +35,11 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>74</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- The Solr framework is designed to be shared for the whole farm -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -102,8 +104,15 @@
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 
@@ -132,6 +141,24 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/**.class</include>
+                <include>META-INF/**</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
@@ -149,15 +176,13 @@
         </executions>
       </plugin>
       <!-- Attach default configuration package -->
-      <!-- We require the jar in both test and package but we don't want to get it if we don't need it (for example
-           with backward-compatibility check) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-default-configuration-test</id>
-            <phase>process-test-resources</phase>
+            <id>attach-search-core</id>
+            <phase>process-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -175,8 +200,8 @@
             </configuration>
           </execution>
           <execution>
-            <id>attach-default-configuration-package</id>
-            <phase>prepare-package</phase>
+            <id>attach-minimal-core</id>
+            <phase>process-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -184,10 +209,10 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
                   <version>${project.version}</version>
-                  <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                  <type>zip</type>
+                  <destFileName>xwiki-platform-search-solr-server-core-minimal.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>

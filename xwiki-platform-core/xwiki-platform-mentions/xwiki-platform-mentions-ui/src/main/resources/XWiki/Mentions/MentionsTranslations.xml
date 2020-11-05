@@ -1,0 +1,95 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=User Mention
+rendering.macro.mention.description=Insert a user mention.
+rendering.macro.mention.parameter.reference.name=Reference
+rendering.macro.mention.parameter.reference.description=The mentioned user or group reference.
+rendering.macro.mention.parameter.style.name=Display Style
+rendering.macro.mention.parameter.style.description=The style choice of the mention (this is only supported for user mentions).
+rendering.macro.mention.parameter.anchor.name=Anchor
+rendering.macro.mention.parameter.anchor.description=The anchor to be used for linking to that mention (this anchor should be unique to the document as much as possible).
+rendering.macro.mention.parameter.type.name=Type
+rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Full name of the user
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=First name of the user only
+org.xwiki.mentions.DisplayStyle.LOGIN=Username
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Mentions Color
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions to the current user (note: used as the value of a background-color css attribute).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Self Mentions Color
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activate the quotes
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.
+mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.</content>
+  <object>
+    <name>XWiki.Mentions.MentionsTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>a1c4a461-c4c0-4126-86ac-8310fca8a518</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -51,9 +52,13 @@ public class LiveTableElement extends BaseElement
      */
     public boolean isReady()
     {
-        Object result = getDriver().executeJavascript("return Element.hasClassName('"
-            + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
-        return result instanceof Boolean ? (Boolean) result : false;
+        try {
+            Object result = getDriver().executeJavascript("return (Element.hasClassName) && Element.hasClassName('"
+                + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
+            return result instanceof Boolean ? (Boolean) result : false;
+        } catch (JavascriptException e) {
+            return false;
+        }
     }
 
     /**
@@ -242,15 +247,10 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                // Refresh the current page since we need the livetable to fetch the JSON again
-                driver.navigate().refresh();
-                return driver.findElements(by).size() >= minimalExpectedRowCount;
-            }
+        getDriver().waitUntilCondition(driver -> {
+            // Refresh the current page since we need the livetable to fetch the JSON again
+            driver.navigate().refresh();
+            return driver.findElements(by).size() >= minimalExpectedRowCount;
         });
     }
 
@@ -260,7 +260,7 @@ public class LiveTableElement extends BaseElement
      *
      * @since 9.1RC1
      */
-    // We need to decide if it's bettter to introduce this method or to globally increase the default timeout.
+    // We need to decide if it's better to introduce this method or to globally increase the default timeout.
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount, int timeout)
     {
         int originalTimeout = getDriver().getTimeout();
@@ -289,5 +289,18 @@ public class LiveTableElement extends BaseElement
         getDriver().findElement(By.xpath(xpath)).click();
 
         waitUntilReady();
+    }
+
+    /**
+     * Clicks a form element (usually a button) with the passed name at the passed row number.
+     *
+     * @param actionName the HTML form element name attribute value
+     * @param rowNumber the LT row number (starts at 1)
+     * @since 12.10RC1
+     */
+    public void clickAction(String actionName, int rowNumber)
+    {
+        WebElement rowElement = getRow(rowNumber);
+        rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
     }
 }

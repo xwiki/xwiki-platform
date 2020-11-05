@@ -126,7 +126,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
         // Document dates.
         solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
-        solrDocument.setField(FieldUtils.DATE, translatedDocument.getContentUpdateDate());
+        solrDocument.setField(FieldUtils.DATE, translatedDocument.getDate());
 
         // Document translations have their own hidden fields
         solrDocument.setField(FieldUtils.HIDDEN, translatedDocument.isHidden());

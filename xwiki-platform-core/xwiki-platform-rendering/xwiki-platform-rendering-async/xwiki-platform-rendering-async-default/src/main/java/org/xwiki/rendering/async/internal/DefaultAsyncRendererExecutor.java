@@ -150,7 +150,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     public AsyncRendererExecutorResponse render(AsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException
     {
-        boolean asyncAllowed = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
+        // if placeholder is forced, then we always consider it as async.
+        boolean asyncAllowed = configuration.isPlaceHolderForced()
+                                || (renderer.isAsyncAllowed() && this.asyncContext.isEnabled());
         boolean cacheAllowed = renderer.isCacheAllowed();
 
         // Get context and job id
@@ -167,7 +169,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                 if (status != null
                     && (status.getEndDate() == null || this.cacheControl.isCacheReadAllowed(status.getEndDate()))) {
-                    if (status.getResult() != null) {
+                    if (status.getResult() != null && !configuration.isPlaceHolderForced()) {
                         // Available cached result, return it
 
                         injectUses(status);
@@ -190,6 +192,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
         AsyncRendererJobRequest request = new AsyncRendererJobRequest();
         request.setRenderer(renderer);
+        request.setJobGroupPath(renderer.getJobGroupPath());
 
         if (asyncAllowed) {
             this.cache.getLock().writeLock().lock();

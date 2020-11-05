@@ -37,69 +37,69 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
-### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
-### Missing: platform.appwithinminutes.createAppButtonLabel=Create Application
+platform.appwithinminutes.homePageTitle=数分钟之内的应用程序
+platform.appwithinminutes.description=基于XWiki强大的结构化数据管理系统，在几分钟之内创建协作式Web应用程序。
+platform.appwithinminutes.createAppButtonLabel=创建应用
 platform.appwithinminutes.appsLiveTableHeading=应用
 platform.appwithinminutes.appsLiveTable.doc.title=应用
-### Missing: platform.appwithinminutes.appsLiveTable.doc.author=Last author
-### Missing: platform.appwithinminutes.appsLiveTable.doc.date=Update date
-### Missing: platform.appwithinminutes.appsLiveTable._actions=Actions
-### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
+platform.appwithinminutes.appsLiveTable.doc.author=上一个作者
+platform.appwithinminutes.appsLiveTable.doc.date=更新日期
+platform.appwithinminutes.appsLiveTable._actions=操作
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=授予空间管理权限。
 
 ### AWM Applications panel entry
-### Missing: platform.appwithinminutes.appPanelCreateEntry=Create your own!
+platform.appwithinminutes.appPanelCreateEntry=创建你自己的！
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
-### Missing: appWithinMinutes.wizardStep.name.name=Name
-### Missing: appWithinMinutes.wizardStep.name.title=Name your application
-### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
-### Missing: appWithinMinutes.wizardStep.structure.name=Structure
-### Missing: appWithinMinutes.wizardStep.structure.title=Structure your data
-### Missing: appWithinMinutes.wizardStep.structure.description=Describe the application data
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
-### Missing: appWithinMinutes.wizardStep.presentation.name=Presentation
-### Missing: appWithinMinutes.wizardStep.presentation.title=Customize your application home page
-### Missing: appWithinMinutes.wizardStep.presentation.description=Customize the application home page
-### Missing: platform.appwithinminutes.wizardStepNextButtonLabel=Next Step
-### Missing: platform.appwithinminutes.wizardStepNextButtonTip=Go to next step
-### Missing: platform.appwithinminutes.wizardStepFinishButtonLabel=Finish
-### Missing: platform.appwithinminutes.wizardStepFinishButtonTip=Go to the application home page
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
-### Missing: platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
-### Missing: platform.appwithinminutes.wizardStepHelpTitle=Steps
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHeading=第{0}—{1}步
+appWithinMinutes.wizardStep.name.name=名称
+appWithinMinutes.wizardStep.name.title=命名你的应用
+appWithinMinutes.wizardStep.name.description=选择应用名称
+appWithinMinutes.wizardStep.structure.name=结构体
+appWithinMinutes.wizardStep.structure.title=整理数据
+appWithinMinutes.wizardStep.structure.description=描述应用数据
+appWithinMinutes.wizardStep.entries.name=条目
+appWithinMinutes.wizardStep.entries.title=找到您的数据
+appWithinMinutes.wizardStep.entries.description=选择存储数据的位置
+appWithinMinutes.wizardStep.presentation.name=介绍
+appWithinMinutes.wizardStep.presentation.title=自定义您的应用程序主页
+appWithinMinutes.wizardStep.presentation.description=自定义应用程序主页
+platform.appwithinminutes.wizardStepNextButtonLabel=下一步
+platform.appwithinminutes.wizardStepNextButtonTip=转到下一步
+platform.appwithinminutes.wizardStepFinishButtonLabel=完成
+platform.appwithinminutes.wizardStepFinishButtonTip=转到应用程序主页
+platform.appwithinminutes.wizardStepPreviousButtonLabel=上一步
+platform.appwithinminutes.wizardStepPreviousButtonTip=转到上一步
+platform.appwithinminutes.wizardStepHelpTitle=步骤
+platform.appwithinminutes.wizardStepHelpDescription=该向导将指导您完成创建应用程序的过程。这些是您将要执行的步骤：
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
-### Missing: platform.appwithinminutes.appNamePageTitle=Create Application
-### Missing: platform.appwithinminutes.appNameLabel=Application Name
-### Missing: platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
-### Missing: platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application homepage URL
-### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
-### Missing: platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
-### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
+appWithinMinutes.createApp.location.label=位置
+appWithinMinutes.createApp.location.hint=页面层次结构中将在其中创建应用程序的位置。
+appWithinMinutes.createApp.parent.label=父级
+appWithinMinutes.createApp.parent.hint=新应用程序的父级。如果要创建顶级应用程序，请将此字段留空。
+appWithinMinutes.createApp.parent.placeholder=父级路径
+appWithinMinutes.codeSpace.title=代码
+appWithinMinutes.codeSpace.description=这是应用程序代码所在的地方。
+appWithinMinutes.codeSpace.hiddenPagesInfo=即使您当前的用户配置文件设置阻止，也会列出隐藏的页面，否则，所有应用程序代码页都不可见，因为默认情况下它们都被隐藏。
+platform.appwithinminutes.appNamePageTitle=创建应用程序
+platform.appwithinminutes.appNameLabel=应用程序名称
+platform.appwithinminutes.appNameHint=应用程序名称确定主页URL和应用程序代码的存储位置。
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=应用程序主页URL
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=应用程序代码位置
+platform.appwithinminutes.appNameIsUsedWarning=该应用程序已经存在。如果转到下一步，则将编辑现有应用程序。
+platform.appwithinminutes.appNameEmptyError=请输入应用程序名称。
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
-### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
-### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
+platform.appwithinminutes.classEditorPaletteTitle=字段调色板
+platform.appwithinminutes.classEditorPaletteHint=从调色板中拖放字段以创建将用于输入数据的表单。
+platform.appwithinminutes.classEditorCanvasHint=将字段从调色板中拖放到该区域中。
 
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateLabel=Update the template
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
-### Missing: platform.appwithinminutes.classEditorUpdateSheetLabel=Update the sheet
-### Missing: platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
+platform.appwithinminutes.classEditorUpdateTemplateLabel=更新模板
+platform.appwithinminutes.classEditorUpdateTemplateHint=模板（{0}）存储默认字段值。
+platform.appwithinminutes.classEditorUpdateSheetLabel=更新工作表
+platform.appwithinminutes.classEditorUpdateSheetHint=工作表({0})用于显示和编辑结构化数据。
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=更新翻译
 ### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
 
 ### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.

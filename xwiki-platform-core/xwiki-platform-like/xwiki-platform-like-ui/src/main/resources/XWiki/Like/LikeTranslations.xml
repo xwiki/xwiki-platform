@@ -1,0 +1,100 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="">
+  <web>XWiki.Like</web>
+  <name>LikeTranslations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LikeTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rightsmanager.like=Like
+like.unlike.modal.title=Unlike confirmation
+like.unlike.modal.body=Are you sure you wish to remove your Like for page {0}?
+like.unlike.modal.closeButton=Close
+like.unlike.modal.unlikeButton=Unlike the page
+like.unlike.modal.viewLikersButton=Likes
+like.newlike.success=The page has been liked.
+like.newlike.error=Error when trying to like the page.
+like.unlike.success=The page has been unliked.
+like.unlike.error=Error when trying to unlike the page.
+like.userprofile.menu=Liked Pages
+like.button.title=Number of likes on this page: {0}
+like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
+like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+like.likers.empty=No one likes this page yet.
+like.likers.number={0} person(s) like this page:
+like.likers.title=People liking {0}
+like.livetable.column.title=Title
+like.livetable.column.location=Location
+like.livetable.column.likes=Likes
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
+  <object>
+    <name>XWiki.Like.LikeTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>a2b32a08-d4a4-4004-b7d7-cd16324914d8</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

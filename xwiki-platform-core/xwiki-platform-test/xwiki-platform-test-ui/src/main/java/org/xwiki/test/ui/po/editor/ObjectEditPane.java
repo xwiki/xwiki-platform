@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -118,5 +119,49 @@ public class ObjectEditPane extends FormContainerElement
     {
         this.setFieldValue(byPropertyName(propertyName), propertyValue);
         return this;
+    }
+
+    /**
+     * @return the div container of the current object edit. Note that this should only be used in the case of
+     * ObjectEditor.
+     */
+    private WebElement getXobjectContainer()
+    {
+        return getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
+    }
+
+    /**
+     * @return {@code true} if the delete link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isDeleteLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("delete")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return {@code true} if the edit link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isEditLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("edit")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return the current object number.
+     * @since 12.4RC1
+     */
+    public int getObjectNumber()
+    {
+        return objectNumber;
     }
 }

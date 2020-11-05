@@ -29,7 +29,8 @@ def builds = [
     build(
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshot',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      properties:
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs',
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
   },
@@ -140,7 +141,41 @@ if (!params.type || params.type == 'standard') {
     }
   }
 } else {
-  buildDocker(params.type)
+  // If the build is docker-latest, only build if the previous build was triggered by some source code changes, 
+  // to save agent build time and save the planet! (We don't need to re-run docker tests if there's been no
+  // source changes).	
+  // Also always build if triggered manually by a user.
+  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
+    // We trigger the build under two conditions:
+    // - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
+    //   seems we need that too since it happens when we push changes to master)
+    // - The previous build was triggered by an upstream job (like rendering triggering platform)
+    def shouldExecute = false
+    currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
+      echoXWiki "Build trigger cause: [${it.toString()}]"
+      if (it.toString().contains('SCMTriggerCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('BranchEventCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+      if (it.toString().contains('UpstreamCause')) {
+        echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
+        shouldExecute = true
+      }
+    }
+    if (shouldExecute) {
+      buildDocker(params.type)
+    } else {
+      echoXWiki "No SCM trigger nor upstream job trigger, thus not executing the docker latest tests (since there's been no source changes; this saves agent build time and help save humanity!). Aborting."
+      // Aborting so that the build isn't displayed as successful without doing anything.
+      currentBuild.result = 'ABORTED'
+    }
+  } else {
+    buildDocker(params.type)
+  }
 }
 
 private void buildStandardSingle(build)
@@ -152,62 +187,73 @@ private void buildStandardAll(builds)
 {
   parallel(
     'main': {
-      // Build, skipping quality checks so that the result of the build can be sent as fast as possible to the devs.
+      // Build, skipping quality checks and integration tests (but execute unit tests) so that the result of the build
+      // can be sent as fast as possible to the devs. Note that we skip integration tests by using the FailSafe plugin
+      // property "DskipITs".
       // In addition, we want the generated artifacts to be deployed to our remote Maven repository so that developers
-      // can benefit from them even though some quality checks have not yet passed. In // we start a build with the
-      // quality profile that executes various quality checks.
+      // can benefit from them even though some quality checks have not yet passed.
+      // In // we start a build with the quality profile that executes various quality checks, and we run all the
+      // integration tests just after this build.
       //
       // Note: We configure the snapshot extension repository in XWiki (-Psnapshots) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
 
-      // Note: We want the following behavior:
-      // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
-      //   happen since Jenkins will throw an exception and we don't catch it.
-      // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
-      //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to test
-      // xwiki manually.
+			parallel(
+			  'integration-tests' : {
+			  	// Run all integration tests, with each module in its own node to parallelize the work.
+					runIntegrationTests()
+			  },
+			  'distribution' : {
+          // Note: We want the following behavior:
+          // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
+          //   happen since Jenkins will throw an exception and we don't catch it.
+          // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
+          //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to
+          //   test xwiki manually.
 
-      // Build the distributions
-      builds['Distribution'].call()
+          // Build the distributions
+          builds['Distribution'].call()
 
-      // Building the various functional tests, after the distribution has been built successfully.
+					// Building the various functional tests, after the distribution has been built successfully.
 
-      // Build the Flavor Test POM, required for the pageobjects module below.
-      builds['Flavor Test - POM'].call()
+					// Build the Flavor Test POM, required for the pageobjects module below.
+					builds['Flavor Test - POM'].call()
 
-      // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-      builds['Flavor Test - PageObjects'].call()
+					// Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
+					builds['Flavor Test - PageObjects'].call()
 
-      // Now run all tests in parallel
-      parallel(
-        'flavor-test-ui': {
-          // Run the Flavor UI tests
-          builds['Flavor Test - UI'].call()
-        },
-        'flavor-test-misc': {
-          // Run the Flavor Misc tests
-          builds['Flavor Test - Misc'].call()
-        },
-        'flavor-test-storage': {
-          // Run the Flavor Storage tests
-          builds['Flavor Test - Storage'].call()
-        },
-        'flavor-test-escaping': {
-          // Run the Flavor Escaping tests
-          builds['Flavor Test - Escaping'].call()
-        },
-        'flavor-test-webstandards': {
-          // Run the Flavor Webstandards tests
-          // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
-          // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-          builds['Flavor Test - Webstandards'].call()
-        },
-        'flavor-test-upgrade': {
-          // Run the Flavor Upgrade tests
-          builds['Flavor Test - Upgrade'].call()
-        }
-      )
+					// Now run all tests in parallel
+					parallel(
+						'flavor-test-ui': {
+							// Run the Flavor UI tests
+							builds['Flavor Test - UI'].call()
+						},
+						'flavor-test-misc': {
+							// Run the Flavor Misc tests
+							builds['Flavor Test - Misc'].call()
+						},
+						'flavor-test-storage': {
+							// Run the Flavor Storage tests
+							builds['Flavor Test - Storage'].call()
+						},
+						'flavor-test-escaping': {
+							// Run the Flavor Escaping tests
+							builds['Flavor Test - Escaping'].call()
+						},
+						'flavor-test-webstandards': {
+							// Run the Flavor Webstandards tests
+							// Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
+							// Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
+							builds['Flavor Test - Webstandards'].call()
+						},
+						'flavor-test-upgrade': {
+							// Run the Flavor Upgrade tests
+							builds['Flavor Test - Upgrade'].call()
+						}
+					)
+			  }
+			)
     },
     'testrelease': {
       // Simulate a release and verify all is fine, in preparation for the release day.
@@ -216,12 +262,34 @@ private void buildStandardAll(builds)
     'quality': {
       // Run the quality checks
       builds['Quality'].call()
-    },
+    }
+    /* TODO: 27/4/2020: Disable sonar build to check the hypothesis that it's causing kills on agents by using too
+       much memory.
+    ,
     'sonar': {
       // Sonar analysis + push to Sonarcloud.io
       builds['Sonar'].call()
     }
+    */
   )
+}
+
+private void runIntegrationTests()
+{
+  def itModuleList
+  def customJobProperties
+  node() {
+    // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
+    checkout skipChangeLog: true, scm: scm
+		itModuleList = itModules()
+		customJobProperties = getCustomJobProperties()
+  }
+
+  xwikiITBuild {
+    modules = itModuleList
+    // Make sure that we don't reset the job properties!
+    jobProperties = customJobProperties
+  }
 }
 
 private void buildDocker(type)
@@ -335,11 +403,18 @@ private def getCustomJobProperties()
   // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
   // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
   // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+  //
+  // Notes:
+  // - docker-latest: We start them at 10PM to have more time available for them so that we're sure they're finished on
+  //   the next morning when committers start pushing code. That's why we don't use @midnight.
+  // - docker-all: We don't use @weekly for docker-all since we want them to execute on weekends only so that they
+  //   don't execute at the same time as docker-latest during standard week days, as it'll mean that all agents will
+  //   be used and be available for standard builds during the working days.
   return [
     parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
     pipelineTriggers([
-      parameterizedCron('''@midnight %type=docker-latest
-@weekly %type=docker-all
+      parameterizedCron('''H 22 * * * %type=docker-latest
+H 0 * * 6 %type=docker-all
 @monthly %type=docker-unsupported'''),
       cron("@monthly")
     ])

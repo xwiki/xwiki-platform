@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -65,8 +64,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.ratings.AverageRatingApi;
+import org.xwiki.ratings.AverageRating;
+import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.internal.XWikiRepositoryModel.SolrField;
@@ -91,8 +92,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
+    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
+        XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
     protected static final String DEFAULT_BOOST;
 
@@ -156,10 +157,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     @Inject
     protected ContextualAuthorizationManager authorization;
 
-    @Inject
-    @Named("separate")
-    protected RatingsManager ratingsManager;
-
     /**
      * Used to extract a document reference from a {@link SolrDocument}.
      */
@@ -168,6 +165,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     @Inject
     protected ExtensionFactory extensionFactory;
+
+    @Inject
+    private RatingsManagerFactory ratingsManagerFactory;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -305,7 +305,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         extension.setId((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
 
         License license = this.extensionObjectFactory.createLicense();
         license.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
@@ -548,7 +549,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setSummary(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
 
@@ -646,7 +648,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID, true));
-        extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
+        extension.setType(StringUtils.stripToNull(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true)));
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
 
@@ -769,11 +771,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionRating extensionRating = this.extensionObjectFactory.createExtensionRating();
 
         try {
-            AverageRatingApi averageRating =
-                new AverageRatingApi(ratingsManager.getAverageRating(extensionDocumentReference));
+            RatingsManager ratingsManager = this.ratingsManagerFactory
+                .getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT);
+            AverageRating averageRating = ratingsManager.getAverageRating(extensionDocumentReference);
             extensionRating.setTotalVotes(averageRating.getNbVotes());
             extensionRating.setAverageVote(averageRating.getAverageVote());
-        } catch (XWikiException e) {
+        } catch (RatingsException e) {
             extensionRating.setTotalVotes(0);
             extensionRating.setAverageVote(0);
         }
@@ -806,7 +809,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         extension.setId(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
 
         return extension;

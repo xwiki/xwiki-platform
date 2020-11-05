@@ -22,8 +22,10 @@ package com.xpn.xwiki.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +40,8 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
  * @version $Id$
  * @since 5.2M2
  */
+@Component
+@Singleton
 public class DefaultMandatoryDocumentInitializerManager implements MandatoryDocumentInitializerManager
 {
     @Inject

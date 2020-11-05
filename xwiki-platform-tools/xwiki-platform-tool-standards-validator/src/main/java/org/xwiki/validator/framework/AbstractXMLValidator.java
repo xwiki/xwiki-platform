@@ -22,6 +22,7 @@ package org.xwiki.validator.framework;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -74,6 +75,9 @@ public abstract class AbstractXMLValidator implements Validator
      */
     public AbstractXMLValidator(boolean validateXML)
     {
+        // Error messages are localized and we skipped some of the errors based on their messages
+        // See RSSErrorHandler for example.
+        Locale.setDefault(Locale.ENGLISH);
         setValidateXML(validateXML);
 
         this.errorHandler = createXMLErrorHandler();

@@ -53,10 +53,10 @@ public interface NotificationConfiguration
 
     /**
      * @return true if pre filtering should be used for ALERT user notifications
-     * @since 12.1RC1
+     * @since 12.6
      */
     @Unstable
-    default boolean isEventPreFilteringEnabled()
+    default boolean isEventPrefilteringEnabled()
     {
         return false;
     }
@@ -66,7 +66,28 @@ public interface NotificationConfiguration
      * @since 12.2
      */
     @Unstable
-    default boolean isRestCacheEnabled() {
+    default boolean isRestCacheEnabled()
+    {
         return true;
+    }
+
+    /**
+     * @return the number of threads to use for computing notifications in REST.
+     * @since 12.5RC1
+     */
+    @Unstable
+    default int getRESTPoolSize()
+    {
+        return 2;
+    }
+
+    /**
+     * @return the number of threads to use for computing notifications in Async renderer.
+     * @since 12.5RC1
+     */
+    @Unstable
+    default int getAsyncPoolSize()
+    {
+        return 2;
     }
 }

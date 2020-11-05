@@ -51,6 +51,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
     private WebElement updateClassSheetCheckbox;
 
     /**
+     * Default constructor which waits on xaction_save button.
+     */
+    public ApplicationClassEditPage()
+    {
+        super(true, true);
+    }
+
+    /**
      * Clicks on the Next Step button.
      *
      * @return the page that represents the next step of the App Within Minutes wizard
@@ -95,19 +103,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    return !addedField.getAttribute("class").contains("loading");
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return !addedField.getAttribute("class").contains("loading");
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
 
@@ -122,7 +125,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      */
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
-        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, 0);
+        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, -5);
     }
 
     /**

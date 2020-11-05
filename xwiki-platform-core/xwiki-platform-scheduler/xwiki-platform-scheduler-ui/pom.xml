@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-scheduler</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-scheduler-ui</artifactId>
   <name>XWiki Platform - Scheduler - UI</name>
@@ -66,6 +66,13 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-message</artifactId>
       <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Used to display the scheduler job code -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

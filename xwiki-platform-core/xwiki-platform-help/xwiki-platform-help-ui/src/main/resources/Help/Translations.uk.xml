@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Підказки
 help.tipsPanel.noTipMessage=Немає підказок!
-help.tipsPanel.gettingStartedTip=Якщо ви новий користувач XWiki, ознайомтеся з [[Керівництвом по початку роботи&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Перехід на будь-яку сторінку в вікі за допомогою Ctrl + G або Meta + G.\nДивіться [[ще про гарячі клавіші &gt;&gt; http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=Чи знаєте ви, що ви можете поліпшити XWiki? Витратьте 5 хвилин, щоб [[заповнити цей опитування &gt;&gt; http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] і допомогти цим проектом з відкритим вихідним кодом!
+help.tipsPanel.gettingStartedTip=Якщо ви новий користувач XWiki, ознайомтеся з [[Керівництвом по початку роботи&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Перехід на будь-яку сторінку в вікі за допомогою Ctrl + G або Meta + G.\nДивіться [[ще про гарячі клавіші &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Чи знаєте ви, що ви можете поліпшити XWiki? Витратьте 5 хвилин, щоб [[заповнити цей опитування &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] і допомогти цим проектом з відкритим вихідним кодом!
 help.tipsPanel.breadcrumbsTip=Ви можете використовувати стрілки на панелі навігації, щоб швидко перейти до споріднених і дочірнім сторінкам.
-help.tipsPanel.advancedHiddenShortcutTip=Натисніть клавіші x + x + x + a для перемикання в [[Розширений режим &gt;&gt; http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] і x + x + x + h для перемикання відображення [[прихованих сторінок &gt;&gt; http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.advancedHiddenShortcutTip=Натисніть клавіші x + x + x + a для перемикання в [[Розширений режим &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] і x + x + x + h для перемикання відображення [[прихованих сторінок &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=При редагуванні в WYSIWYG редакторі введіть ## [##, а потім почніть вводити літери, щоб отримати рекомендації по створенню посилання.
 help.macroList.title=Доступні макроси
 help.macroList.id=ID

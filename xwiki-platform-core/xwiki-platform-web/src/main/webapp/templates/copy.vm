@@ -81,7 +81,7 @@
       ##-----------------------------------------------------------
       #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
           && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
-        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        #warning($services.localization.render('core.copy.alreadyExists', [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <form action="$xwiki.relativeRequestURL" class="xform third">
           ## CSRF prevention
           <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -101,7 +101,7 @@
         </form>
       #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
         #warning($services.localization.render('core.copy.editRightsForbidden',
-        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <div class="buttons">
           <span class="buttonwrapper">
               <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">
@@ -173,8 +173,8 @@
       ##------------------
       ## Translation field
       ##------------------
-      #set ($docTranslations = $doc.getTranslationList())
-      #if ($xwiki.isMultiLingual() && $docTranslations.size() > 0)
+      #set ($translationLocales = $doc.translationLocales)
+      #if ($xwiki.isMultiLingual() && $translationLocales.size() > 0)
       <dt>
         <label for="language">$services.localization.render('language')</label>
         <span class="xHint">$services.localization.render('core.copy.language.hint')</span>
@@ -184,8 +184,8 @@
           ## Add a special "All Translations" combo box entry to copy all translations.
           <option value="ALL" selected="selected">$services.localization.render('core.copy.allTranslations')</option>
           ## Add all the existing translations
-          #foreach ($docTranslation in $docTranslations)
-            <option>$docTranslation</option>
+          #foreach ($translationLocale in $translationLocales)
+            <option>$escapetool.xml($translationLocale.toString())</option>
           #end
         </select>
       </dd>

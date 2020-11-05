@@ -31,6 +31,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
@@ -56,10 +57,10 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Validate the Distribution Wizard part of the upgrade process.
@@ -71,6 +72,11 @@ public class UpgradeTest extends AbstractTest
 {
     protected static final ExtensionId EXTENSIONID_WATCHLIST_UI =
         new ExtensionId("org.xwiki.platform:xwiki-platform-watchlist-ui");
+
+    protected static final ExtensionId EXTENSIONID_CODEMIRROR_58 = new ExtensionId("org.webjars:codemirror", "5.8");
+
+    protected static final ExtensionId EXTENSIONID_CODEMIRROR_5242 =
+        new ExtensionId("org.webjars:codemirror", "5.24.2");
 
     protected static ExtensionTestUtils extensionTestUtil;
 
@@ -110,6 +116,10 @@ public class UpgradeTest extends AbstractTest
     private static final String STEP_EXTENSIONS_NAME = "Extensions";
 
     private static final int STEP_EXTENSIONS_ID = 3;
+
+    private static final String STEP_EVENTSMIGRATION_NAME = "Events migration";
+
+    private static final int STEP_EVENTSMIGRATION_ID = 4;
 
     /**
      * Automatically register as Admin user.
@@ -163,6 +173,14 @@ public class UpgradeTest extends AbstractTest
         assertFalse(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
     }
 
+    /**
+     * @since 12.9RC1
+     */
+    protected void assertNotInstalled(ExtensionId extensionId) throws Exception
+    {
+        assertFalse(extensionTestUtil.isInstalled(extensionId));
+    }
+
     // Test
 
     protected void setupLogs()
@@ -211,6 +229,11 @@ public class UpgradeTest extends AbstractTest
         extensionsStep();
 
         ////////////////////
+        // Validate Events Migration step
+
+        eventsMigrationStep();
+
+        ////////////////////
         // Validate Report step
 
         reportStep();
@@ -225,6 +248,9 @@ public class UpgradeTest extends AbstractTest
 
         // Make sure the watchlist UI has been uninstalled
         assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
+        // Make sure the previous codemirror versions have been replaced
+        assertNotInstalled(EXTENSIONID_CODEMIRROR_58);
+        assertNotInstalled(EXTENSIONID_CODEMIRROR_5242);
 
         ////////////////////
         // Custom validation
@@ -239,11 +265,11 @@ public class UpgradeTest extends AbstractTest
 
     private void welcomeStep()
     {
-        WelcomeDistributionStep welcomeStep = new WelcomeDistributionStep();
+        WelcomeDistributionStep step = new WelcomeDistributionStep();
 
         // Steps
 
-        List<DistributionStepIcon> icons = welcomeStep.getIcons();
+        List<DistributionStepIcon> icons = step.getIcons();
 
         assertFalse(icons.get(STEP_ADMIN_ID).isDone());
         assertFalse(icons.get(STEP_ADMIN_ID).isActive());
@@ -264,17 +290,20 @@ public class UpgradeTest extends AbstractTest
         assertEquals(4, icons.get(STEP_EXTENSIONS_ID).getNumber());
         assertEquals(STEP_EXTENSIONS_ID + 1, icons.get(STEP_EXTENSIONS_ID).getNumber());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertEquals(5, icons.get(STEP_EVENTSMIGRATION_ID).getNumber());
+        assertEquals(STEP_EVENTSMIGRATION_ID + 1, icons.get(STEP_EVENTSMIGRATION_ID).getNumber());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Go to next step
-        welcomeStep.clickCompleteStep();
+        step.clickCompleteStep();
     }
 
     private void flavorStep() throws Exception
     {
-        FlavorDistributionStep flavorStep = new FlavorDistributionStep();
+        FlavorDistributionStep step = new FlavorDistributionStep();
 
         // Steps
-        List<DistributionStepIcon> icons = flavorStep.getIcons();
+        List<DistributionStepIcon> icons = step.getIcons();
 
         assertTrue(icons.get(STEP_ADMIN_ID).isDone());
         assertFalse(icons.get(STEP_ADMIN_ID).isActive());
@@ -288,21 +317,24 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Make sure complete step is disabled
-        assertFalse(flavorStep.isCompleteStepDisabled());
+        assertFalse(step.isCompleteStepDisabled());
 
         // Check current flavor
-        ExtensionPane currentFlavor = flavorStep.getCurrentFlavorExtensionPane();
+        ExtensionPane currentFlavor = step.getCurrentFlavorExtensionPane();
         assertEquals(PREVIOUSFLAVOR_NAME, currentFlavor.getName());
         assertEquals(PREVIOUSFLAVOR_ID.getVersion().getValue(), currentFlavor.getVersion());
         assertEquals("installed-invalid", currentFlavor.getStatus());
 
         // Flavor upgrade
         if (KNOW_VALID_FLAVORS.contains(PREVIOUSFLAVOR_ID.getId())) {
-            flavorStepKnownValidUpgrade(flavorStep);
+            flavorStepKnownValidUpgrade(step);
         } else if (KNOW_INVALID_FLAVORS.contains(PREVIOUSFLAVOR_ID.getId())) {
-            flavorStepKnownInvalidUpgrade(flavorStep);
+            flavorStepKnownInvalidUpgrade(step);
         } else {
             // TODO
             fail("Unsupported Flavor step use case");
@@ -406,11 +438,11 @@ public class UpgradeTest extends AbstractTest
 
     private void orphanedDependenciesStep()
     {
-        CleanDistributionStep extensionsStep = new CleanDistributionStep();
+        CleanDistributionStep step = new CleanDistributionStep();
 
         // Steps
 
-        List<DistributionStepIcon> icons = extensionsStep.getIcons();
+        List<DistributionStepIcon> icons = step.getIcons();
 
         // Make sure the extensions step is active
         if (!icons.get(STEP_ORPHANED_ID).isActive()) {
@@ -429,9 +461,12 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Confirm the extension to uninstall/make top level
-        CleanApplyDistributionStep cleanApply = extensionsStep.clickContinue();
+        CleanApplyDistributionStep cleanApply = step.clickContinue();
 
         // Validate the plan
         CleanApplyFinalizeDistributionStep cleanApplyFinalize = cleanApply.clickContinue();
@@ -448,11 +483,11 @@ public class UpgradeTest extends AbstractTest
 
     private void extensionsStep()
     {
-        ExtensionsDistributionStep extensionsStep = new ExtensionsDistributionStep();
+        ExtensionsDistributionStep step = new ExtensionsDistributionStep();
 
         // Steps
 
-        List<DistributionStepIcon> icons = extensionsStep.getIcons();
+        List<DistributionStepIcon> icons = step.getIcons();
 
         // Make sure the extensions step is active
         if (!icons.get(STEP_EXTENSIONS_ID).isActive()) {
@@ -471,22 +506,31 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertTrue(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Search for extension update
-        extensionsStep.checkForUpdates();
+        step.checkForUpdates();
 
         // TODO: check some stuff
 
         // Go to next step
-        extensionsStep.clickCompleteStep();
+        step.clickCompleteStep();
     }
 
-    private void reportStep()
+    private void eventsMigrationStep()
     {
-        ReportDistributionStep reportStep = new ReportDistributionStep();
+        CleanDistributionStep step = new CleanDistributionStep();
 
         // Steps
-        List<DistributionStepIcon> icons = reportStep.getIcons();
+
+        List<DistributionStepIcon> icons = step.getIcons();
+
+        // Make sure the events migration step is active
+        if (!icons.get(STEP_EVENTSMIGRATION_ID).isActive()) {
+            return;
+        }
 
         assertTrue(icons.get(STEP_ADMIN_ID).isDone());
         assertFalse(icons.get(STEP_ADMIN_ID).isActive());
@@ -500,8 +544,40 @@ public class UpgradeTest extends AbstractTest
         assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
+        assertTrue(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
+
+        // TODO: check some stuff
+
+        // Go to next step
+        step.clickCompleteStep();
+    }
+
+    private void reportStep()
+    {
+        ReportDistributionStep step = new ReportDistributionStep();
+
+        // Steps
+        List<DistributionStepIcon> icons = step.getIcons();
+
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+        assertTrue(icons.get(STEP_EVENTSMIGRATION_ID).isDone());
+        assertFalse(icons.get(STEP_EVENTSMIGRATION_ID).isActive());
+        assertEquals(STEP_EVENTSMIGRATION_NAME, icons.get(STEP_EVENTSMIGRATION_ID).getName());
 
         // Finish
-        reportStep.clickCompleteStep();
+        step.clickCompleteStep();
     }
 }

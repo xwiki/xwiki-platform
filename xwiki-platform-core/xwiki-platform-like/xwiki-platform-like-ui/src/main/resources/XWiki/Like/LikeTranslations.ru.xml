@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="ru">
+  <web>XWiki.Like</web>
+  <name>LikeTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LikeTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rightsmanager.like=Нравиться
+like.unlike.modal.title=Не нравиться
+like.unlike.modal.body=Вы действительно хотите удалить отметку "Нравится" для страницы {0}?
+like.unlike.modal.closeButton=Закрыть
+like.unlike.modal.unlikeButton=Не нравиться
+like.unlike.modal.viewLikersButton=Просмотреть отметки "Нравится"
+like.newlike.success=Страница "Нравится".
+like.newlike.error=Ошибка при попытке поставить "Нравится" странице.
+like.unlike.success=Страница "Не нравится".
+like.unlike.error=Ошибка при попытке поставить "Не нравится" странице.
+like.userprofile.menu=Понравившиеся страницы
+like.button.title=У этой страницы {0} отметок "Нравится"
+like.button.title.like=Нажмите, чтобы оценить текущую страницу. У этой страницы {0} отметок "Нравится".
+like.button.title.unlike=Нажмите, чтобы оценить текущую страницу. У этой страницы {0} отметок "Нравится".
+like.likers.empty=У этой страницы пока нет отметок "Нравится".
+like.likers.number={0} чел. поставили "Нравится" этой странице:
+like.likers.title="Нравится" {0} чел.
+like.livetable.column.title=Название
+like.livetable.column.location=Расположение
+like.livetable.column.likes=Понравившиеся страницы
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Всегда отображать кнопку "Нравится"
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Отображать кнопку, даже если у пользователя нет прав на взаимодействие с ней. Используйте его, если хотите, чтобы счетчик отметок "Нравится" всегда отображался.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Емкость кеш-памяти
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравиться" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.</content>
+</xwikidoc>

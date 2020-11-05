@@ -67,7 +67,6 @@ platform.flamingo.themes.category.breadcrumb=Mrvica
 platform.flamingo.themes.category.advanced=Napredno
 platform.flamingo.themes.defaultvalue=Pretpostavljeno
 platform.flamingo.themes.lessCode.description=U ovo polje možete izravno unijeti LESS kod koji će biti dodan koži.
-platform.flamingo.themes.incompatiblebrowser=Isprike, pretpregled ne radi na ovoj verziji Internet Explorera. Trebate koristiti ažurniji preglednik.
 platform.flamingo.themes.local=Lokalno
 platform.flamingo.themes.global=Globalno
 
@@ -83,6 +82,11 @@ platform.flamingo.themes.global=Globalno
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=Nažalost, ovo polje se ne uzima u obzir kod pretpregleda.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Isprike, pretpregled ne radi na ovoj verziji Internet Explorera. Trebate koristiti ažurniji preglednik.
 
 #@deprecatedend</content>
 </xwikidoc>

@@ -25,8 +25,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.async.AsyncContext;
@@ -39,6 +41,8 @@ import org.xwiki.uiextension.UIExtensionManager;
  * @version $Id$
  * @since 4.3.1
  */
+@Component
+@Singleton
 public class DefaultUIExtensionManager implements UIExtensionManager
 {
     /**

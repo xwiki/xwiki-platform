@@ -22,14 +22,17 @@ package org.xwiki.notifications.sources.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.internal.EventStreamConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -44,11 +47,14 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.group.GroupManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -56,6 +62,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -65,38 +72,57 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList(SimilarityCalculator.class)
+@ComponentTest
+@ComponentList({SimilarityCalculator.class, EventSearcher.class})
 public class DefaultParametrizedNotificationManagerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultParametrizedNotificationManager> mocker =
-        new MockitoComponentMockingRule<>(DefaultParametrizedNotificationManager.class);
+    @InjectMockComponents
+    private DefaultParametrizedNotificationManager defaultParametrizedNotificationManager;
 
+    @MockComponent
     private EventStream eventStream;
+
+    @MockComponent
+    private EventStore eventStore;
+
+    @MockComponent
     private QueryGenerator queryGenerator;
+
+    @MockComponent
+    private EventQueryGenerator eventQueryGenerator;
+
+    @MockComponent
+    private EventStreamConfiguration configuration;
+
+    @MockComponent
     private AuthorizationManager authorizationManager;
+
+    @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @MockComponent
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
+    private GroupManager groupManager;
+
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
+
     private Query query;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
-        eventStream = mocker.getInstance(EventStream.class);
-        queryGenerator = mocker.getInstance(QueryGenerator.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        contextualAuthorizationManager = mocker.getInstance(ContextualAuthorizationManager.class);
-        recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
-
         query = mock(Query.class);
         when(query.setLimit(anyInt())).thenReturn(query);
         when(queryGenerator.generateQuery(any(NotificationParameters.class))).thenReturn(query);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
-        when(pref1.getProperties()).thenReturn(
-            Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
+        when(pref1.getProperties())
+            .thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
         when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
@@ -132,13 +158,13 @@ public class DefaultParametrizedNotificationManagerTest
         when(event6.getType()).thenReturn("type6");
 
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4),
-                Arrays.asList(event5, event6));
+            Arrays.asList(event5, event6));
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 2;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(2, results.size());
@@ -157,7 +183,8 @@ public class DefaultParametrizedNotificationManagerTest
     public void getEventsWhenNoPreferences() throws Exception
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
-        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
+        when(pref1.getProperties())
+            .thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(false);
 
         // Test
@@ -165,7 +192,7 @@ public class DefaultParametrizedNotificationManagerTest
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 2;
         parameters.preferences = Arrays.asList(pref1);
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(0, results.size());
@@ -184,7 +211,7 @@ public class DefaultParametrizedNotificationManagerTest
             NotificationParameters parameters = new NotificationParameters();
             parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
             parameters.expectedCount = 2;
-            mocker.getComponentUnderTest().getEvents(parameters);
+            this.defaultParametrizedNotificationManager.getEvents(parameters);
         } catch (NotificationException e) {
             caughtException = e;
         }
@@ -204,8 +231,8 @@ public class DefaultParametrizedNotificationManagerTest
         Event event3 = createMockedEvent();
 
         when(eventStream.searchEvents(query)).thenReturn(
-                Arrays.asList(event1, event2, event1, event2, event2, event2, event1, event2, event2, event2),
-                Arrays.asList(event1, event2, event2, event1, event3));
+            Arrays.asList(event1, event2, event1, event2, event2, event2, event1, event2, event2, event2),
+            Arrays.asList(event1, event2, event2, event1, event3));
 
         when(recordableEventDescriptorHelper.hasDescriptor(isNull(), any(DocumentReference.class))).thenReturn(true);
 
@@ -213,7 +240,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 5;
-        long result = mocker.getComponentUnderTest().getEvents(parameters).size();
+        long result = this.defaultParametrizedNotificationManager.getEvents(parameters).size();
 
         // Verify
         assertEquals(5, result);
@@ -253,7 +280,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 2;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(1, results.size());
@@ -296,7 +323,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 2;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(1, results.size());
@@ -347,7 +374,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 5;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(2, results.size());
@@ -391,7 +418,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 5;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(1, results.size());
@@ -412,7 +439,6 @@ public class DefaultParametrizedNotificationManagerTest
         // * Alice adds an annotation on page "Bike" (E11 & E12)
         // * Alice adds an other annotation on page "Bike" (E12 & E13)
 
-
         // Expected:
         // * Bob and Alice have updated the page "Bike"
         // * Bob and Carol have commented the page "Bike"
@@ -430,23 +456,27 @@ public class DefaultParametrizedNotificationManagerTest
         when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc2)).thenReturn(true);
 
         // * Bob updates the page "Bike" (E1)
-        Event event1 = createMockedEvent(); when(event1.toString()).thenReturn("event1");
+        Event event1 = createMockedEvent();
+        when(event1.toString()).thenReturn("event1");
         when(event1.getDocument()).thenReturn(doc1);
         when(event1.getType()).thenReturn("update");
         when(event1.getGroupId()).thenReturn("g1");
 
         // * Alice updates the page "Bike" (E2)
-        Event event2 = createMockedEvent(); when(event2.toString()).thenReturn("event2");
+        Event event2 = createMockedEvent();
+        when(event2.toString()).thenReturn("event2");
         when(event2.getDocument()).thenReturn(doc1);
         when(event2.getType()).thenReturn("update");
         when(event2.getGroupId()).thenReturn("g2");
 
         // * Bob comments the page "Bike" (E3 & E4)
-        Event event3 = createMockedEvent(); when(event3.toString()).thenReturn("event3");
+        Event event3 = createMockedEvent();
+        when(event3.toString()).thenReturn("event3");
         when(event3.getDocument()).thenReturn(doc1);
         when(event3.getType()).thenReturn("addComment");
         when(event3.getGroupId()).thenReturn("g3");
-        Event event4 = createMockedEvent(); when(event4.toString()).thenReturn("event4");
+        Event event4 = createMockedEvent();
+        when(event4.toString()).thenReturn("event4");
         when(event4.getDocument()).thenReturn(doc1);
         when(event4.getType()).thenReturn("update");
         when(event4.getGroupId()).thenReturn("g3");
@@ -454,63 +484,73 @@ public class DefaultParametrizedNotificationManagerTest
         // * Carol comments the page "Bike" (E5 & E6)
         // (note: we put the "update" event before the "addComment", because we can not guarantee the order so
         // it's good to test both)
-        Event event5 = createMockedEvent(); when(event5.toString()).thenReturn("event5");
+        Event event5 = createMockedEvent();
+        when(event5.toString()).thenReturn("event5");
         when(event5.getDocument()).thenReturn(doc1);
         when(event5.getType()).thenReturn("update");
         when(event5.getGroupId()).thenReturn("g5");
-        Event event6 = createMockedEvent(); when(event6.toString()).thenReturn("event6");
+        Event event6 = createMockedEvent();
+        when(event6.toString()).thenReturn("event6");
         when(event6.getDocument()).thenReturn(doc1);
         when(event6.getType()).thenReturn("addComment");
         when(event6.getGroupId()).thenReturn("g5");
 
         // * Dave comments the page "Guitar" (E7 & E8)
-        Event event7 = createMockedEvent(); when(event7.toString()).thenReturn("event7");
+        Event event7 = createMockedEvent();
+        when(event7.toString()).thenReturn("event7");
         when(event7.getDocument()).thenReturn(doc2);
         when(event7.getType()).thenReturn("update");
         when(event7.getGroupId()).thenReturn("g7");
-        Event event8 = createMockedEvent(); when(event8.toString()).thenReturn("event8");
+        Event event8 = createMockedEvent();
+        when(event8.toString()).thenReturn("event8");
         when(event8.getDocument()).thenReturn(doc2);
         when(event8.getType()).thenReturn("addComment");
         when(event8.getGroupId()).thenReturn("g7");
 
         // * Bob adds an annotation on page "Bike" (E9 & E10)
-        Event event9 = createMockedEvent(); when(event8.toString()).thenReturn("event9");
+        Event event9 = createMockedEvent();
+        when(event8.toString()).thenReturn("event9");
         when(event9.getDocument()).thenReturn(doc1);
         when(event9.getType()).thenReturn("update");
         when(event9.getGroupId()).thenReturn("g9");
-        Event event10 = createMockedEvent(); when(event8.toString()).thenReturn("event10");
+        Event event10 = createMockedEvent();
+        when(event8.toString()).thenReturn("event10");
         when(event10.getDocument()).thenReturn(doc1);
         when(event10.getType()).thenReturn("addAnnotation");
         when(event10.getGroupId()).thenReturn("g9");
 
         // * Alice adds an annotation on page "Bike" (E11 & E12)
-        Event event11 = createMockedEvent(); when(event8.toString()).thenReturn("event11");
+        Event event11 = createMockedEvent();
+        when(event8.toString()).thenReturn("event11");
         when(event11.getDocument()).thenReturn(doc1);
         when(event11.getType()).thenReturn("update");
         when(event11.getGroupId()).thenReturn("g11");
-        Event event12 = createMockedEvent(); when(event8.toString()).thenReturn("event12");
+        Event event12 = createMockedEvent();
+        when(event8.toString()).thenReturn("event12");
         when(event12.getDocument()).thenReturn(doc1);
         when(event12.getType()).thenReturn("addAnnotation");
         when(event12.getGroupId()).thenReturn("g11");
 
         // * Alice adds an other annotation on page "Bike" (E12 & E13)
-        Event event13 = createMockedEvent(); when(event8.toString()).thenReturn("event11");
+        Event event13 = createMockedEvent();
+        when(event8.toString()).thenReturn("event11");
         when(event13.getDocument()).thenReturn(doc1);
         when(event13.getType()).thenReturn("addAnnotation");
         when(event13.getGroupId()).thenReturn("g13");
-        Event event14 = createMockedEvent(); when(event8.toString()).thenReturn("event12");
+        Event event14 = createMockedEvent();
+        when(event8.toString()).thenReturn("event12");
         when(event14.getDocument()).thenReturn(doc1);
         when(event14.getType()).thenReturn("update");
         when(event14.getGroupId()).thenReturn("g13");
 
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4, event5, event6,
-                event7, event8, event9, event10, event11, event12, event13, event14));
+            event7, event8, event9, event10, event11, event12, event13, event14));
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 50;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(4, results.size());
@@ -549,9 +589,12 @@ public class DefaultParametrizedNotificationManagerTest
         // * Bob has annotated the page "Bike"
 
         // Mocks
-        Event event1 = createMockedEvent(); when(event1.toString()).thenReturn("event1");
-        Event event2 = createMockedEvent(); when(event1.toString()).thenReturn("event2");
-        Event event3 = createMockedEvent(); when(event1.toString()).thenReturn("event3");
+        Event event1 = createMockedEvent();
+        when(event1.toString()).thenReturn("event1");
+        Event event2 = createMockedEvent();
+        when(event1.toString()).thenReturn("event2");
+        Event event3 = createMockedEvent();
+        when(event1.toString()).thenReturn("event3");
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(event1.getDocument()).thenReturn(doc);
@@ -575,7 +618,7 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 50;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(1, results.size());
@@ -597,16 +640,20 @@ public class DefaultParametrizedNotificationManagerTest
         // * Bob has updated the page "Bike"
 
         // Mocks
-        Event eventUpdate1          = createMockedEvent();
-        Event eventUpdate2          = createMockedEvent();
-        Event eventAddComment       = createMockedEvent();
+        Event eventUpdate1 = createMockedEvent();
+        Event eventUpdate2 = createMockedEvent();
+        Event eventAddComment = createMockedEvent();
         Event eventAddCommentUpdate = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        when(eventUpdate1.getDocument()).thenReturn(doc); when(eventUpdate1.toString()).thenReturn("update1");
-        when(eventUpdate2.getDocument()).thenReturn(doc); when(eventUpdate2.toString()).thenReturn("update2");
-        when(eventAddComment.getDocument()).thenReturn(doc); when(eventAddComment.toString()).thenReturn("addComment");
-        when(eventAddCommentUpdate.getDocument()).thenReturn(doc); when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
+        when(eventUpdate1.getDocument()).thenReturn(doc);
+        when(eventUpdate1.toString()).thenReturn("update1");
+        when(eventUpdate2.getDocument()).thenReturn(doc);
+        when(eventUpdate2.toString()).thenReturn("update2");
+        when(eventAddComment.getDocument()).thenReturn(doc);
+        when(eventAddComment.toString()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getDocument()).thenReturn(doc);
+        when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
         when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
@@ -622,21 +669,21 @@ public class DefaultParametrizedNotificationManagerTest
         when(eventAddCommentUpdate.getGroupId()).thenReturn("g3");
 
         // They comes with inverse chronological order because of the query
-        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate,
-                eventUpdate2, eventUpdate1));
+        when(eventStream.searchEvents(query))
+            .thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate, eventUpdate2, eventUpdate1));
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 5;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(2, results.size());
     }
 
     private Event createMockedEvent(String type, DocumentReference user, DocumentReference doc, Date date,
-            String groupId)
+        String groupId)
     {
         Event event = mock(Event.class);
         when(event.getDate()).thenReturn(date);
@@ -645,8 +692,8 @@ public class DefaultParametrizedNotificationManagerTest
         when(event.getType()).thenReturn(type);
         when(event.getGroupId()).thenReturn(groupId);
 
-        when(event.toString()).thenReturn(String.format("[%s] Event [%s] on document [%s] by [%s] on [%s]",
-                groupId, type, doc, user, date.toString()));
+        when(event.toString()).thenReturn(String.format("[%s] Event [%s] on document [%s] by [%s] on [%s]", groupId,
+            type, doc, user, date.toString()));
 
         return event;
     }
@@ -657,39 +704,39 @@ public class DefaultParametrizedNotificationManagerTest
         DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
 
         // Example taken from a real case
-        Event event0 = createMockedEvent("update", userA, userA, new Date(1510567729000L),
-                "1997830249-1510567729000-Puhs4MSa");
-        Event event1 = createMockedEvent("update", userA, userA, new Date(1510567724000L),
-                "1997830249-1510567724000-aCjmsmSh");
-        Event event2 = createMockedEvent("update", userA, userA, new Date(1510567718000L),
-                "1997830249-1510567718000-hEErMBp9");
-        Event event3 = createMockedEvent("update", userA, userA, new Date(1510567717000L),
-                "1997830249-1510567718000-hEErMBp9");
-        Event event4 = createMockedEvent("update", userA, userA, new Date(1510567715000L),
-                "1997830249-1510567715000-B723WWBC");
-        Event event5 = createMockedEvent("update", userA, userA, new Date(1510567715000L),
-                "1997830249-1510567715000-B723WWBC");
-        Event event6 = createMockedEvent("update", userA, userA, new Date(1510567714000L),
-                "1997830249-1510567714000-SHPmruCG");
-        Event event7 = createMockedEvent("update", userA, userA, new Date(1510567712000L),
-                "1997830249-1510567712000-Fy19J0v1");
-        Event event8 = createMockedEvent("update", userA, userA, new Date(1510567711000L),
-                "1997830249-1510567711000-zDfFnZbD");
-        Event event9 = createMockedEvent("update", userA, userA, new Date(1510567711000L),
-                "1997830249-1510567711000-zDfFnZbD");
+        Event event0 =
+            createMockedEvent("update", userA, userA, new Date(1510567729000L), "1997830249-1510567729000-Puhs4MSa");
+        Event event1 =
+            createMockedEvent("update", userA, userA, new Date(1510567724000L), "1997830249-1510567724000-aCjmsmSh");
+        Event event2 =
+            createMockedEvent("update", userA, userA, new Date(1510567718000L), "1997830249-1510567718000-hEErMBp9");
+        Event event3 =
+            createMockedEvent("update", userA, userA, new Date(1510567717000L), "1997830249-1510567718000-hEErMBp9");
+        Event event4 =
+            createMockedEvent("update", userA, userA, new Date(1510567715000L), "1997830249-1510567715000-B723WWBC");
+        Event event5 =
+            createMockedEvent("update", userA, userA, new Date(1510567715000L), "1997830249-1510567715000-B723WWBC");
+        Event event6 =
+            createMockedEvent("update", userA, userA, new Date(1510567714000L), "1997830249-1510567714000-SHPmruCG");
+        Event event7 =
+            createMockedEvent("update", userA, userA, new Date(1510567712000L), "1997830249-1510567712000-Fy19J0v1");
+        Event event8 =
+            createMockedEvent("update", userA, userA, new Date(1510567711000L), "1997830249-1510567711000-zDfFnZbD");
+        Event event9 =
+            createMockedEvent("update", userA, userA, new Date(1510567711000L), "1997830249-1510567711000-zDfFnZbD");
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
-                .thenReturn(true);
-        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
             .thenReturn(true);
-        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event0, event1, event2, event3,
-                event4, event5, event6, event7, event8, event9), Collections.emptyList());
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
+        when(eventStream.searchEvents(query)).thenReturn(
+            Arrays.asList(event0, event1, event2, event3, event4, event5, event6, event7, event8, event9),
+            Collections.emptyList());
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
         parameters.expectedCount = 5;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         assertEquals(1, results.size());
 
@@ -706,8 +753,7 @@ public class DefaultParametrizedNotificationManagerTest
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
             .thenReturn(true);
-        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
-            .thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Collections.emptyList());
 
         // Test
@@ -720,20 +766,20 @@ public class DefaultParametrizedNotificationManagerTest
         NotificationFilter filter1 = mock(NotificationFilter.class);
         when(filter1.getPriority()).thenReturn(1);
         when(filter1.filterEvent(eq(event1), any(DocumentReference.class), anyCollection(),
-                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
+            any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
         when(filter1.filterEvent(eq(event2), any(DocumentReference.class), anyCollection(),
-                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
+            any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
         NotificationFilter filter2 = mock(NotificationFilter.class);
         when(filter2.getPriority()).thenReturn(2);
         when(filter2.filterEvent(eq(event1), any(DocumentReference.class), anyCollection(),
-                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
+            any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
         when(filter2.filterEvent(eq(event2), any(DocumentReference.class), anyCollection(),
-                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
+            any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
         parameters.filters = Arrays.asList(filter1, filter2);
         when(filter1.compareTo(filter2)).thenReturn(1);
         when(filter2.compareTo(filter1)).thenReturn(-1);
 
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         assertEquals(1, results.size());
         assertEquals(event1, results.get(0).getEvents().get(0));
@@ -750,8 +796,7 @@ public class DefaultParametrizedNotificationManagerTest
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
             .thenReturn(true);
-        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
-            .thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class))).thenReturn(true);
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Collections.emptyList());
 
         when(recordableEventDescriptorHelper.hasDescriptor(eq("customThing"), eq(userA))).thenReturn(false);
@@ -762,7 +807,7 @@ public class DefaultParametrizedNotificationManagerTest
         parameters.expectedCount = 5;
         parameters.format = NotificationFormat.ALERT;
 
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         assertEquals(1, results.size());
         assertEquals(event2, results.get(0).getEvents().get(0));
@@ -785,12 +830,60 @@ public class DefaultParametrizedNotificationManagerTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = this.userReference;
         parameters.expectedCount = 1;
-        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
 
         // Verify
         assertEquals(0, results.size());
         verify(contextualAuthorizationManager).hasAccess(Right.VIEW, doc);
+    }
+
+    @Test
+    public void getEventsFilterOnTarget() throws Exception
+    {
+        Event event = createMockedEvent();
+        when(event.getType()).thenReturn("update");
+        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar")));
+
+        when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any())).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any())).thenReturn(true);
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event));
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = this.userReference;
+        parameters.expectedCount = 1;
+        when(serializer.serialize(this.userReference)).thenReturn("XWiki.UserA");
+
+        // the current user is not targeted by the event: we don't get any result.
+        // We also check that we tried to look in the groups.
+        List<CompositeEvent> results = this.defaultParametrizedNotificationManager.getEvents(parameters);
+        assertTrue(results.isEmpty());
+        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+
+        // the current user is targeted explicitely by the event: we get a result.
+        // We also check that we don't perform any check in groups in that case
+        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar", "XWiki.UserA")));
+        results = this.defaultParametrizedNotificationManager.getEvents(parameters);
+        assertEquals(1, results.size());
+        verify(this.groupManager, times(1)).getGroups(this.userReference, null, true);
+
+        DocumentReference groupReference = mock(DocumentReference.class);
+        when(this.groupManager.getGroups(this.userReference, null, true)).thenReturn(Arrays.asList(groupReference));
+        when(this.serializer.serialize(groupReference)).thenReturn("Foo.bar");
+
+        // the current user is targeted by the event, but this time through a group: we get a result.
+        // We also check that we did perform a new check in groups
+        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar")));
+        results = this.defaultParametrizedNotificationManager.getEvents(parameters);
+        assertEquals(1, results.size());
+        verify(this.groupManager, times(2)).getGroups(this.userReference, null, true);
+
+        // the current user is targeted explicitely by the event, but also through a group: we should still get a single
+        // result
+        // We also check that we don't perform any supplementary check in groups in that case
+        when(event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("Foo.bar", "XWiki.UserA")));
+        results = this.defaultParametrizedNotificationManager.getEvents(parameters);
+        assertEquals(1, results.size());
+        verify(this.groupManager, times(2)).getGroups(this.userReference, null, true);
     }
 }

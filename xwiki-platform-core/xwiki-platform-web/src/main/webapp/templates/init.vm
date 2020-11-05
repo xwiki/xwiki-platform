@@ -100,9 +100,9 @@
       </style>
 
       ## The URL factory is not available until XWiki is fully initialized. The WebJar script service uses the URL factory.
-      <script type="text/javascript" src="${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
-      <script type='text/javascript' src='${request.getContextPath()}/resources/uicomponents/logging/logging.js'></script>
-      <script type="text/javascript">
+      <script src="${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
+      <script src='${request.getContextPath()}/resources/uicomponents/logging/logging.js'></script>
+      <script>
       // <![CDATA[
         require.config({
           baseUrl: '/',

@@ -52,7 +52,8 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
      * @version $Id$
      * @since 11.8RC1
      */
-    public enum DocumentPart {
+    public enum DocumentPart
+    {
         /**
          * Merge of the title.
          */
@@ -70,8 +71,12 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
 
         /**
          * Merge of the locale.
+         * 
+         * @since 11.10.11
+         * @since 12.6.3
+         * @since 12.8
          */
-        LOCALE,
+        DEFAULT_LOCALE,
 
         /**
          * Merge of the parent reference.

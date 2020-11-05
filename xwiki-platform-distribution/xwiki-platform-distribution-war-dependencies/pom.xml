@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
@@ -178,6 +178,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-handler-jar</artifactId>
       <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-jar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -401,18 +407,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacrocontent</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacroparameter</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-async-macro</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -476,10 +470,10 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Mailsender -->
+    <!-- Mail Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-storage</artifactId>
+      <artifactId>xwiki-platform-mail-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -514,7 +508,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -599,6 +599,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need it in the WAR so that the migration is properly applied. This could be moved once we have an
+        appropriate way to run DB migrations from extension -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ratings-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

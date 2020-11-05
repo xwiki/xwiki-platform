@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Implementation-Title: XWiki Plarform - Search - SOLR - Server - Core
+Bundle-Description: A package containing a SOLR core for XWiki
+Bundle-License: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+Bundle-SymbolicName: org.xwiki.platform.xwiki-platform-search-solr-ser
+ ver-core
+Implementation-Version: 12.2-SNAPSHOT
+Built-By: tmortagne
+Specification-Vendor: XWiki
+Bnd-LastModified: 1585243756081
+Bundle-ManifestVersion: 2
+Specification-Title: XWiki Plarform - Search - SOLR - Server - Core
+Implementation-Vendor-Id: org.xwiki.platform
+Bundle-DocURL: http://xwiki.org/
+Bundle-Vendor: XWiki
+Tool: Bnd-4.2.0.201903051501
+Implementation-Vendor: XWiki
+XWiki-Extension-Id: org.xwiki.platform:xwiki-platform-search-solr-serv
+ er-core
+Bundle-Name: XWiki Plarform - Search - SOLR - Server - Core
+Bundle-Version: 12.2.0.SNAPSHOT
+Build-Jdk-Spec: 1.8
+Created-By: Apache Maven Bundle Plugin
+Specification-Version: 12.2-SNAPSHOT
+Build-Jdk: 1.8.0_242
+Implementation-URL: http://extensions.xwiki.org?id=org.xwiki.platform:
+ xwiki-platform-search-solr-server-core:12.2-SNAPSHOT:::/xwiki-commons
+ -pom/xwiki-platform/xwiki-platform-core/xwiki-platform-search/xwiki-p
+ latform-search-solr/xwiki-platform-search-solr-server/xwiki-platform-
+ search-solr-server-core
+

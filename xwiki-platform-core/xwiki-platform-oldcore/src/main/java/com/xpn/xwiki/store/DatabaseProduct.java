@@ -32,22 +32,22 @@ package com.xpn.xwiki.store;
 public final class DatabaseProduct
 {
     /**
-     * The product name for Oracle databases.
+     * The Product name and the JDBC scheme to recognize an Oracle DB.
      */
-    public static final DatabaseProduct ORACLE = new DatabaseProduct("Oracle");
+    public static final DatabaseProduct ORACLE = new DatabaseProduct("Oracle", "oracle");
 
     /**
-     * The product name for Derby databases.
+     * The Product name and the JDBC scheme to recognize a Derby DB.
      */
-    public static final DatabaseProduct DERBY = new DatabaseProduct("Apache Derby");
+    public static final DatabaseProduct DERBY = new DatabaseProduct("Apache Derby", "derby");
 
     /**
-     * The product name for HSQLDB databases.
+     * The Product name and the JDBC scheme to recognize a HSQLDB DB.
      */
-    public static final DatabaseProduct HSQLDB = new DatabaseProduct("HSQL Database Engine");
+    public static final DatabaseProduct HSQLDB = new DatabaseProduct("HSQL Database Engine", "hsqldb");
 
     /**
-     * The product name for DB2 databases.
+     * The Product name and the JDBC scheme to recognize a DB2 DB.
      * <p>
      * Per DB2 documentation at
      * http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/topic/com.ibm.db2.luw.apdv.java.doc/doc/c0053013.html, the
@@ -55,49 +55,59 @@ public final class DatabaseProduct
      * JDBC drivers varies by the OS and environment the product is running on. Hence the DB string here uses only the
      * first 3 unique characters of the database product name. The {@link #toProduct(String)} method also hence checks
      * for {@link java.lang.String#startsWith(String)} rather than an exact match.
-     * </p>
      */
-    public static final DatabaseProduct DB2 = new DatabaseProduct("DB2/");
+    public static final DatabaseProduct DB2 = new DatabaseProduct("DB2/", "db2");
 
     /**
-     * The product name for MySQL databases.
+     * The Product name and the JDBC scheme to recognize a MySQL DB.
      */
-    public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL");
+    public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL", "mysql");
 
     /**
-     * The product name for PostgreSQL databases.
+     * The Product name and the JDBC scheme to recognize a PostgreSQL DB.
      */
-    public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL");
+    public static final DatabaseProduct POSTGRESQL = new DatabaseProduct("PostgreSQL", "postgresql");
 
     /**
-     * The product name for Microsoft SQL Server databases.
+     * The Product name and the JDBC scheme to recognize a Microsoft SQL Server DB.
      */
-    public static final DatabaseProduct MSSQL = new DatabaseProduct("Microsoft SQL Server");
+    public static final DatabaseProduct MSSQL = new DatabaseProduct("Microsoft SQL Server", "sqlserver");
+
+    /**
+     * The Product name and the JDBC scheme to recognize a H2 DB.
+     */
+    public static final DatabaseProduct H2 = new DatabaseProduct("H2", "h2");
 
     /**
      * Represents an unknown database for which we were not able to find the product name.
      */
-    public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
+    public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown", "unknown");
 
     /**
-     * The product name for H2 databases.
+     * The Product name and the JDBC scheme to recognize a MariaDB DB.
+     * <p>
+     * Keeping it private until we think it's different enough from MySQL behavior to justify it's own branches.
      */
-    public static final DatabaseProduct H2 = new DatabaseProduct("H2");
+    private static final DatabaseProduct MARIADB = new DatabaseProduct("MariaDB", "mariadb");
 
     /**
      * @see #getProductName()
      */
     private String productName;
 
+    private String jdbcScheme;
+
     /**
      * Private constructor to prevent instantiations.
      *
      * @param productName the database product name as returned by
-     *            {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
+     *        {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
+     * @param jdbcScheme the JDBC scheme as defined in the URL connection string for this product
      */
-    private DatabaseProduct(String productName)
+    private DatabaseProduct(String productName, String jdbcScheme)
     {
         this.productName = productName;
+        this.jdbcScheme = jdbcScheme;
     }
 
     /**
@@ -126,34 +136,48 @@ public final class DatabaseProduct
     /**
      * Transform a product name represented as a string into a {@link DatabaseProduct} object.
      *
-     * @param productNameAsString the string to transform
+     * @param productNameOrJDBCScheme the string to parse (can either represent a product name or a URL connection DB
+     *        scheme
      * @return the {@link DatabaseProduct} object
      */
-    public static DatabaseProduct toProduct(String productNameAsString)
+    public static DatabaseProduct toProduct(String productNameOrJDBCScheme)
     {
         DatabaseProduct product;
-        if (productNameAsString.equalsIgnoreCase(ORACLE.getProductName())) {
+        if (matches(productNameOrJDBCScheme, ORACLE)) {
             product = ORACLE;
-        } else if (productNameAsString.equalsIgnoreCase(DERBY.getProductName())) {
+        } else if (matches(productNameOrJDBCScheme, DERBY)) {
             product = DERBY;
-        } else if (productNameAsString.equalsIgnoreCase(HSQLDB.getProductName())) {
+        } else if (matches(productNameOrJDBCScheme, HSQLDB)) {
             product = HSQLDB;
-        } else if (productNameAsString.equalsIgnoreCase(H2.getProductName())) {
+        } else if (matches(productNameOrJDBCScheme, H2)) {
             product = H2;
-        } else if (productNameAsString.startsWith(DB2.getProductName())) {
+        } else if (productNameOrJDBCScheme.startsWith(DB2.getProductName())
+            || DB2.jdbcScheme.equalsIgnoreCase(productNameOrJDBCScheme))
+        {
             // See documentation above on why we check starts with for DB2
             product = DB2;
-        } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
+        } else if (isMySQL(productNameOrJDBCScheme)) {
             product = MYSQL;
-        } else if (productNameAsString.equalsIgnoreCase(POSTGRESQL.getProductName())) {
+        } else if (matches(productNameOrJDBCScheme, POSTGRESQL)) {
             product = POSTGRESQL;
-        } else if (productNameAsString.equalsIgnoreCase(MSSQL.getProductName())) {
+        } else if (matches(productNameOrJDBCScheme, MSSQL)) {
             product = MSSQL;
         } else {
             product = UNKNOWN;
         }
 
         return product;
+    }
+
+    private static boolean isMySQL(String productNameOrJDBCScheme)
+    {
+        return matches(productNameOrJDBCScheme, MYSQL) || matches(productNameOrJDBCScheme, MARIADB);
+    }
+
+    private static boolean matches(String productNameOrJDBCScheme, DatabaseProduct product)
+    {
+        return product.getProductName().equalsIgnoreCase(productNameOrJDBCScheme)
+            || product.jdbcScheme.equalsIgnoreCase(productNameOrJDBCScheme);
     }
 
     @Override

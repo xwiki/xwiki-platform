@@ -24,11 +24,16 @@ require([
     $requireConfigParams))
 ], function() {
   require(['tree'], function($) {
-    $('.xtree').xtree().one('ready.jstree', function(event, data) {
-      var tree = data.instance;
-      var openToNodeId = tree.element.attr('data-openTo');
-      // Open the tree to the specified node and select it.
-      openToNodeId && data.instance.openTo(openToNodeId);
-    });
+    var init = function(event, data) {
+      var container = $((data && data.elements) || document);
+      container.find('.xtree').xtree().one('ready.jstree', function(event, data) {
+        var tree = data.instance;
+        var openToNodeId = tree.element.attr('data-openTo');
+        // Open the tree to the specified node and select it.
+        openToNodeId && data.instance.openTo(openToNodeId);
+      });
+    };
+
+    $(document).ready(init).on('xwiki:dom:updated', init);
   });
 });

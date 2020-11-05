@@ -44,6 +44,37 @@
   }
 }
 
+@media (max-width: @screen-sm) {
+  // FIX Bootstrap: Reset custom display for dropdowns inside navbars
+  #xwikimainmenu {
+    & .open .dropdown-menu {
+      /* Replace the custom embedded display by having the dropdown outside the nav. */
+      position: absolute;
+
+      /* Reset overwritten properties with Bootstrap variables. */
+      border: 1px solid @dropdown-border;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+
+      & > li > a {
+        color: inherit;
+
+        &:hover, &:focus {
+          background-color: @dropdown-link-hover-bg;
+        }
+      }
+
+      & .divider {
+        background-color: @dropdown-divider-bg;
+      }
+    }
+
+    & .navbar-nav {
+      /* Fix the alignment of the dropdown with the end of the topmenu. */
+      margin-bottom: 0;
+    }
+  }
+}
+
 #globalsearch {
 
   margin: 0;
@@ -258,7 +289,7 @@
     text-shadow: none;
   }
 
- .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
+ .btn-default:hover, .btn-default:active, .btn-default:focus, .open .dropdown-toggle {
     border-color: darken(@dropdown-divider-bg, 10%);
   }
 }

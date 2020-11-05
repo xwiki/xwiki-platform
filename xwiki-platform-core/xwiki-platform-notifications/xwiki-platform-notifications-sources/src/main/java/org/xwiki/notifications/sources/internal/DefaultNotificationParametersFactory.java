@@ -30,8 +30,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
@@ -39,11 +41,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -61,10 +67,9 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * This component aims at producing {@link org.xwiki.notifications.sources.NotificationParameters} instances
- * based on some given criteria.
- * It has been introduced to help dealing with an huge amount of parameters available in old API such as the
- * notification REST API.
+ * This component aims at producing {@link org.xwiki.notifications.sources.NotificationParameters} instances based on
+ * some given criteria. It has been introduced to help dealing with an huge amount of parameters available in old API
+ * such as the notification REST API.
  *
  * @version $Id$
  * @since 12.2
@@ -80,6 +85,13 @@ public class DefaultNotificationParametersFactory
 
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private NotificationConfiguration configuration;
@@ -109,7 +121,8 @@ public class DefaultNotificationParametersFactory
      * Define the parameters that will be taken into account when creating a {@link NotificationParameters} in
      * {@link #createNotificationParameters(Map)}.
      */
-    public enum ParametersKey {
+    public enum ParametersKey
+    {
         /**
          * See {@link NotificationParameters#format}: accepted values are the {@link NotificationFormat} names.
          */
@@ -121,13 +134,11 @@ public class DefaultNotificationParametersFactory
         USER_ID(true),
 
         /**
-         * This parameter only accept boolean values.
-         * If {@code true} then the filters and preferences of the {@link NotificationParameters} will be only
-         * retrieved from the given user preferences (a {@link #USER_ID} must be set in that case).
-         * If {@code false} the following parameters are taken into account for the filters of
-         * {@link NotificationParameters}:
-         * PAGES, SPACES, WIKIS, USERS, TAGS, DISPLAY_OWN_EVENTS, DISPLAY_MINOR_EVENTS, DISPLAY_SYSTEM_EVENTS,
-         * DISPLAY_READ_EVENTS, CURRENT_WIKI.
+         * This parameter only accept boolean values. If {@code true} then the filters and preferences of the
+         * {@link NotificationParameters} will be only retrieved from the given user preferences (a {@link #USER_ID}
+         * must be set in that case). If {@code false} the following parameters are taken into account for the filters
+         * of {@link NotificationParameters}: PAGES, SPACES, WIKIS, USERS, TAGS, DISPLAY_OWN_EVENTS,
+         * DISPLAY_MINOR_EVENTS, DISPLAY_SYSTEM_EVENTS, DISPLAY_READ_EVENTS, CURRENT_WIKI.
          */
         USE_USER_PREFERENCES(false),
 
@@ -135,6 +146,14 @@ public class DefaultNotificationParametersFactory
          * See {@link NotificationParameters#endDate}: accepted values are date serialized as a long.
          */
         UNTIL_DATE(true),
+
+        /**
+         * See {@link NotificationParameters#endDateIncluded}: accepted values are boolean.
+         * 
+         * @since 12.7RC1
+         * @since 12.6.1
+         */
+        UNTIL_DATE_INCLUDED(false),
 
         /**
          * See {@link NotificationParameters#blackList}: accepted values are list represented as a String with commas
@@ -154,29 +173,29 @@ public class DefaultNotificationParametersFactory
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are list of serialized document references joined with commas.
-         * It will be used to create filter to include those pages.
+         * Accepted values are list of serialized document references joined with commas. It will be used to create
+         * filter to include those pages.
          */
         PAGES(false),
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are list of serialized space references joined with commas.
-         * It will be used to create filter to include those spaces.
+         * Accepted values are list of serialized space references joined with commas. It will be used to create filter
+         * to include those spaces.
          */
         SPACES(false),
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are list of serialized wiki references joined with commas.
-         * It will be used to create filter to include those wikis.
+         * Accepted values are list of serialized wiki references joined with commas. It will be used to create filter
+         * to include those wikis.
          */
         WIKIS(false),
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are list of usernames joined with commas.
-         * It will be used to create filter to include the events from those users.
+         * Accepted values are list of usernames joined with commas. It will be used to create filter to include the
+         * events from those users.
          */
         USERS(false),
 
@@ -206,15 +225,14 @@ public class DefaultNotificationParametersFactory
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are list of string corresponding to document tags.
-         * This will be used to include events concerning documents with those tags.
+         * Accepted values are list of string corresponding to document tags. This will be used to include events
+         * concerning documents with those tags.
          */
         TAGS(false),
 
         /**
          * This parameter will be only taken into account if {@link #USE_USER_PREFERENCES} parameter value is false.
-         * Accepted values are identifier of the current wiki.
-         * This is used in case of multiple wikis.
+         * Accepted values are identifier of the current wiki. This is used in case of multiple wikis.
          */
         // TODO: not sure we should keep it, I put it since it was already in the REST API.
         CURRENT_WIKI(false);
@@ -223,8 +241,9 @@ public class DefaultNotificationParametersFactory
 
         /**
          * Default constructor.
+         * 
          * @param isDirectlyUsed {@code true} if we have a method which handle directly the parameter with its value.
-         *                       {@code false} if the parameters is evaluated in conjunction with others.
+         *            {@code false} if the parameters is evaluated in conjunction with others.
          */
         ParametersKey(boolean isDirectlyUsed)
         {
@@ -232,8 +251,8 @@ public class DefaultNotificationParametersFactory
         }
 
         /**
-         * @return {@code true} if we have a method which handle directly the parameter with its value.
-         *         {@code false} if the parameters is evaluated in conjunction with others.
+         * @return {@code true} if we have a method which handle directly the parameter with its value. {@code false} if
+         *         the parameters is evaluated in conjunction with others.
          */
         protected boolean isDirectlyUsed()
         {
@@ -241,8 +260,8 @@ public class DefaultNotificationParametersFactory
         }
 
         /**
-         * Retrieve the {@link ParametersKey} based on a name, but accept camel cases version of the name.
-         * (e.g. calling this method with userId should return {@link #USER_ID}).
+         * Retrieve the {@link ParametersKey} based on a name, but accept camel cases version of the name. (e.g. calling
+         * this method with userId should return {@link #USER_ID}).
          *
          * @param name a string name of a {@link ParametersKey} in any case.
          * @return an instance corresponding to the name.
@@ -264,11 +283,10 @@ public class DefaultNotificationParametersFactory
     }
 
     /**
-     * Create a notification parameters with a map of parameters indexed by strings.
-     * The keys of the map should be any variant of {@link ParametersKey} names: camel case is accepted.
-     * The {@link NotificationParameters} is created then using {@link #createNotificationParameters(Map)} i
-     * mplementation. This method is mainly provided as a helper in order to be allowed to use this factory with
-     * velocity scripts easily.
+     * Create a notification parameters with a map of parameters indexed by strings. The keys of the map should be any
+     * variant of {@link ParametersKey} names: camel case is accepted. The {@link NotificationParameters} is created
+     * then using {@link #createNotificationParameters(Map)} implementation. This method is mainly provided as a helper
+     * in order to be allowed to use this factory with velocity scripts easily.
      *
      * @param parameters the map of parameters with String as indexes.
      * @return a {@link NotificationParameters} that comply with the given parameters.
@@ -321,7 +339,8 @@ public class DefaultNotificationParametersFactory
                         break;
 
                     case UNTIL_DATE:
-                        this.handleUntilDate(notificationParameters, parameterValue);
+                        this.handleUntilDate(notificationParameters, parameterValue, BooleanUtils
+                            .toBooleanObject(parameters.get(ParametersKey.UNTIL_DATE_INCLUDED)) != Boolean.FALSE);
                         break;
 
                     case BLACKLIST:
@@ -360,19 +379,31 @@ public class DefaultNotificationParametersFactory
         return notificationParameters;
     }
 
-    private void useUserPreferences(NotificationParameters parameters)
-        throws EventStreamException, NotificationException
+    /**
+     * Modify the passed parameters to take into account user preferences.
+     * 
+     * @param parameters the parameters
+     * @throws NotificationException if error happens
+     * @since 12.6
+     */
+    public void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {
         if (parameters.user != null) {
+            // We only request the filters that performs post-filtering.
+            parameters.filters = new HashSet<>(notificationFilterManager.getAllFilters(parameters.user, true,
+                NotificationFilter.FilteringPhase.POST_FILTERING));
+
             // Check if we should pre or post filter events
-            if (parameters.format == NotificationFormat.ALERT && this.configuration.isEventPreFilteringEnabled()) {
+            if (this.configuration.isEventPrefilteringEnabled()) {
                 enableAllEventTypes(parameters);
 
-                parameters.filters.add(new ForUserEventFilter(NotificationFormat.ALERT, null));
+                // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
+                // in it if prefiltering is enabled. Now we are missing the format in this method for now.
+                parameters.filters.add(new ForUserEventFilter(parameters.format, null));
             } else {
                 parameters.preferences =
                     notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
+
                 parameters.filterPreferences =
                     notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
             }
@@ -380,8 +411,7 @@ public class DefaultNotificationParametersFactory
     }
 
     private void dontUseUserPreferences(NotificationParameters notificationParameters,
-        Map<ParametersKey, String> parameters)
-        throws NotificationException, EventStreamException
+        Map<ParametersKey, String> parameters) throws NotificationException, EventStreamException
     {
         List<String> excludedFilters = new ArrayList<>();
         if (Boolean.parseBoolean(parameters.get(ParametersKey.DISPLAY_OWN_EVENTS))) {
@@ -399,27 +429,24 @@ public class DefaultNotificationParametersFactory
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
         notificationParameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
+            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toSet());
 
         enableAllEventTypes(notificationParameters);
-        handleLocationParameter(parameters.get(ParametersKey.PAGES),
-            notificationParameters, NotificationFilterProperty.PAGE);
-        handleLocationParameter(parameters.get(ParametersKey.SPACES),
-            notificationParameters, NotificationFilterProperty.SPACE);
 
         String wikis = parameters.get(ParametersKey.WIKIS);
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
-        handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI);
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI);
+
+        if (StringUtils.isEmpty(currentWiki)) {
+            currentWiki = wikiDescriptorManager.getCurrentWikiId();
         }
+
+        handleLocationParameter(parameters.get(ParametersKey.PAGES), notificationParameters,
+            NotificationFilterProperty.PAGE, currentWiki);
+        handleLocationParameter(parameters.get(ParametersKey.SPACES), notificationParameters,
+            NotificationFilterProperty.SPACE, currentWiki);
+        handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
+
+        handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
 
         usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
 
@@ -436,8 +463,42 @@ public class DefaultNotificationParametersFactory
         }
     }
 
+    /**
+     * When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from other
+     * wikis (except if the "wikis" parameter is set). The concept of the subwiki is to restrict a given domain of
+     * interest into a given wiki, this is why it does not make sense to show events from other wikis in a "timeline"
+     * such as the notifications macro. Note that on the main wiki, which is often a "portal" for all the others wikis,
+     * we assure it's OK to display events from other wikis. This restriction needs only to be applied if the following
+     * two conditions hold:
+     * <ol>
+     * <li>there are no other restrictions about pages, their subpages or wikis defined</li>
+     * <li>we are actually in a subwiki, and not the main wiki</li>
+     * </ol>
+     * The first condition is necessary because if there is already a restriction on e.g. pages in the subwiki then
+     * adding another restriction to show only events from the subwiki has the effect that all events from the subwiki
+     * are shown, making the restriction to the pages of the subwiki void. This is because all filters added here to the
+     * notificationParameters are are considered in conjunction, so only one filter needs to evaluate to true to display
+     * an event. Also if one has already the wikis parameter defined, then only the specified wikis should be
+     * considered, not the current wiki, too (unless it is explicitly mentioned in the list of wikis) TODO: add a
+     * "handleAllWikis" parameter to disable this behaviour.
+     *
+     * @param notificationParameters the parameters which are passed to the notification API.
+     * @param parameters the parameters of the notification macro
+     * @param currentWiki the identifier of the current wiki
+     */
+    private void handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
+        Map<ParametersKey, String> parameters, String currentWiki)
+    {
+        if (StringUtils.isBlank(parameters.get(ParametersKey.WIKIS))
+            && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
+            && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
+            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+            handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
+        }
+    }
+
     private void handleLocationParameter(String locations, NotificationParameters parameters,
-        NotificationFilterProperty property)
+        NotificationFilterProperty property, String currentWiki)
     {
         if (StringUtils.isNotBlank(locations)) {
             Set<NotificationFormat> formats = new HashSet<>();
@@ -457,10 +518,10 @@ public class DefaultNotificationParametersFactory
                         pref.setWiki(locationArray[i]);
                         break;
                     case SPACE:
-                        pref.setPage(locationArray[i]);
+                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
                         break;
                     case PAGE:
-                        pref.setPageOnly(locationArray[i]);
+                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
                         break;
                     default:
                         break;
@@ -470,12 +531,35 @@ public class DefaultNotificationParametersFactory
         }
     }
 
-    private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException
+    /**
+     * add the current wiki to the reference if it is missing an explicit wiki reference.
+     * 
+     * @param entityRefStr the reference to check
+     * @param entityType the (expected) type of the reference
+     * @param currentWiki the wiki to add to the reference, if missing
+     * @return a string representation if a reference with an explicit wiki
+     */
+    private String makeReferenceAbsolute(String entityRefStr, EntityType entityType, String currentWiki)
+    {
+        EntityReference entityRef = relativeEntityReferenceResolver.resolve(entityRefStr, entityType);
+        if (entityRef.extractReference(EntityType.WIKI) == null) {
+            entityRef = entityReferenceResolver.resolve(entityRefStr, entityType,
+                new EntityReference(currentWiki, EntityType.WIKI));
+        }
+        return entityReferenceSerializer.serialize(entityRef);
+    }
+
+    private void enableAllEventTypes(NotificationParameters parameters) throws NotificationException
     {
         parameters.preferences.clear();
-        for (RecordableEventDescriptor descriptor : recordableEventDescriptorManager
-            .getRecordableEventDescriptors(true)) {
-            parameters.preferences.add(new InternalNotificationPreference(descriptor));
+
+        try {
+            for (RecordableEventDescriptor descriptor : recordableEventDescriptorManager
+                .getRecordableEventDescriptors(true)) {
+                parameters.preferences.add(new InternalNotificationPreference(descriptor));
+            }
+        } catch (EventStreamException e) {
+            throw new NotificationException("Failed to get recorabled event descriptors", e);
         }
     }
 
@@ -517,10 +601,12 @@ public class DefaultNotificationParametersFactory
         }
     }
 
-    private void handleUntilDate(NotificationParameters notificationParameters, String untilDate)
+    private void handleUntilDate(NotificationParameters notificationParameters, String untilDate,
+        boolean untilDateIncluded)
     {
         if (StringUtils.isNotBlank(untilDate)) {
             notificationParameters.endDate = new Date(Long.parseLong(untilDate));
+            notificationParameters.endDateIncluded = untilDateIncluded;
         }
     }
 }

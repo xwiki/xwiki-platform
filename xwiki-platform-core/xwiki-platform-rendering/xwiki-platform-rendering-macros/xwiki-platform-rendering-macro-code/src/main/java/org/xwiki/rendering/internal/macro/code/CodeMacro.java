@@ -122,11 +122,11 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             throw new MacroExecutionException("Failed to highlight content", e);
         }
 
-        Map<String, String> formatParameters = new LinkedHashMap<String, String>();
+        Map<String, String> formatParameters = new LinkedHashMap<>();
         formatParameters.put("class", "code");
 
         if (context.isInline()) {
-            result = Arrays.<Block>asList(new FormatBlock(result, Format.NONE, formatParameters));
+            result = Arrays.asList(new FormatBlock(result, Format.NONE, formatParameters));
         } else {
             try {
                 CodeLayoutHandler layoutHandler =
@@ -136,7 +136,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
                 this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied",
                     parameters.getLayout().name(), e);
             }
-            result = Arrays.<Block>asList(new GroupBlock(result, formatParameters));
+            result = Arrays.asList(new GroupBlock(result, formatParameters));
         }
 
         return result;

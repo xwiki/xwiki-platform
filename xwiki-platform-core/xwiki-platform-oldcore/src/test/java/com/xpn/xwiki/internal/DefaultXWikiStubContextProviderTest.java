@@ -21,20 +21,28 @@ package com.xpn.xwiki.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.xwiki.context.Execution;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,6 +55,9 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 public class DefaultXWikiStubContextProviderTest
 {
+    @MockComponent
+    private Execution execution;
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
@@ -78,5 +89,36 @@ public class DefaultXWikiStubContextProviderTest
         assertNotSame(xcontext1.getRequest(), xcontext2.getRequest());
         assertNotSame(xcontext1.getResponse(), xcontext2.getResponse());
         assertNotSame(xcontext1.getURLFactory(), xcontext2.getURLFactory());
+    }
+
+    @Test
+    public void createStubContextWithLoopProtection()
+    {
+        XWikiContext[] subContext = new XWikiContext[1];
+
+        when(this.urlFactoryService.createURLFactory(anyInt(), any())).then(new Answer<XWikiURLFactory>()
+        {
+            @Override
+            public XWikiURLFactory answer(InvocationOnMock invocation) throws Throwable
+            {
+                // Check if the protection is set
+                subContext[0] = provider.createStubContext();
+
+                return null;
+            }
+        });
+
+        XWikiContext xcontext = this.provider.createStubContext();
+        assertNotNull(xcontext);
+        assertSame(subContext[0], xcontext);
+        assertNotSame(this.oldcore.getXWikiContext(), xcontext);
+    }
+
+    @Test
+    public void createStubContextWithNoExecutionContext()
+    {
+        when(this.execution.getContext()).thenReturn(null);
+
+        assertNotNull(this.provider.createStubContext());
     }
 }

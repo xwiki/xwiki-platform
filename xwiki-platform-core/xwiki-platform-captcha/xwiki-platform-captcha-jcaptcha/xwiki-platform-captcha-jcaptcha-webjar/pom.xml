@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-captcha-jcaptcha-webjar</artifactId>
@@ -45,26 +45,4 @@
       <artifactId>jquery</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <!-- Cancel custom MANIFEST file (since it's not generated for "webjar" packaging) -->
-              <manifestFile combine.self="override" />
-            </archive>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

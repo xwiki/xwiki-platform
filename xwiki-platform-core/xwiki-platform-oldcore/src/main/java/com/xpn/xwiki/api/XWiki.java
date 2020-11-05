@@ -33,6 +33,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
@@ -163,15 +164,6 @@ public class XWiki extends Api
         }
 
         return this.documentRevisionProvider;
-    }
-
-    private ContextualAuthorizationManager getContextualAuthorizationManager()
-    {
-        if (this.contextualAuthorizationManager == null) {
-            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.contextualAuthorizationManager;
     }
 
     /**
@@ -1396,6 +1388,18 @@ public class XWiki extends Api
     }
 
     /**
+     * Get the available locales according to the preferences.
+     *
+     * @return the list of available locales
+     * @since 12.4RC1
+     */
+    @Unstable
+    public List<Locale> getAvailableLocales()
+    {
+        return this.xwiki.getAvailableLocales(getXWikiContext());
+    }
+
+    /**
      * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
      *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
      *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
@@ -1588,6 +1592,44 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             this.xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, getXWikiContext());
         }
+    }
+
+    /**
+     * API to rename a document to another document.
+     * Note that the list of backlinks can be retrieved with {@link Document#getBackLinkedReferences()}
+     * and the list of children with {@link Document#getChildrenReferences()}.
+     *
+     * <strong>Warning:</strong> Be aware that this method never triggers any event related to the rename
+     * of the document. If you want the right events to be sent for the event, please use the dedicated Refactoring
+     * Module API (see
+     * {@link org.xwiki.refactoring.script.RequestFactory#createRenameRequest(EntityReference, EntityReference)}
+     * and {@link org.xwiki.refactoring.job.MoveRequest}).
+     *
+     * @param sourceDocumentReference the source document to rename.
+     * @param targetDocumentReference the target reference to rename the document to.
+     * @param overwrite if {@code true} the target document reference will be overwritten if it exists
+     *                  (deleted to the recycle bin before the rename). If {@code false} and the target document exist
+     *                  the rename won't be performed.
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *                                  modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *                                 document reference
+     * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
+     * @throws XWikiException if the document cannot be renamed properly.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences) throws XWikiException
+    {
+        if (hasAccess(Right.DELETE, sourceDocumentReference)
+            && ((overwrite && hasAccess(Right.DELETE, targetDocumentReference))
+            || (!overwrite && hasAccess(Right.EDIT, targetDocumentReference)))) {
+            return this.xwiki.renameDocument(sourceDocumentReference, targetDocumentReference, overwrite,
+                backlinkDocumentReferences, childDocumentReferences, getXWikiContext());
+        }
+        return false;
     }
 
     /**

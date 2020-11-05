@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xclass</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xclass-test</artifactId>
   <name>XWiki Platform - XClass - Tests - Parent POM</name>
@@ -39,6 +39,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-xclass-test-pageobjects</module>
-    <module>xwiki-platform-xclass-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-xclass-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

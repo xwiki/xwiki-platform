@@ -27,8 +27,8 @@ import javax.script.ScriptContext;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-
 import org.xwiki.script.ScriptContextInitializer;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,6 +52,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     @Inject
     private Logger logger;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -70,7 +72,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             // for internal use only. In this manner we control what the user can access.
             scriptContext.setAttribute("xwiki", new XWiki(xcontext.getWiki(), xcontext), ScriptContext.ENGINE_SCOPE);
 
-            scriptContext.setAttribute("request", xcontext.getRequest(), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("request",
+                new ScriptXWikiServletRequest(xcontext.getRequest(), this.authorization), ScriptContext.ENGINE_SCOPE);
             scriptContext.setAttribute("response", xcontext.getResponse(), ScriptContext.ENGINE_SCOPE);
 
             // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one

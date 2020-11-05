@@ -25,20 +25,24 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1011</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
-    <upgradetest.previousflavor.version>10.11.1</upgradetest.previousflavor.version>
+    <upgradetest.previousflavor.version>10.11.11</upgradetest.previousflavor.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <version>10.11.1</version>
+      <!-- Using a fixed version instead of ${upgradetest.previousflavor.version} because of
+           https://issues.apache.org/jira/browse/MRELEASE-799, causing "The artifact (...) requires a different
+           version (...) than what is found (...) for the expression (upgradetest.previousflavor.version) in the
+           project (...)" otherwise, when using the release plugin -->
+      <version>10.11.11</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

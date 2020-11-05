@@ -57,6 +57,9 @@ user.profile.network.follow=Zacznij obserwować
 user.profile.network.unfollow=Przestań obserwować
 user.profile.network.done=Gotowe
 user.profile.network.saving=zapisywanie...
-user.profile.network.error=Błąd podczas zapisywania ustawienia powiadomienia</content>
+user.profile.network.error=Błąd podczas zapisywania ustawienia powiadomienia
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
   
 </xwikidoc>

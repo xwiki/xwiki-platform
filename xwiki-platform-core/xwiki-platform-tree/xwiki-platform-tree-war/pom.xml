@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree-war</artifactId>
   <name>XWiki Platform - Tree - WAR</name>
@@ -33,17 +33,29 @@
   <description>Velocity macros and JavaScript files that can't be packaged in the WebJar</description>
   <build>
     <plugins>
-      <!-- Javascript and CSS files compression -->
+      <!-- Javascript compression -->
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <groupId>com.github.blutorange</groupId>
+        <artifactId>closure-compiler-maven-plugin</artifactId>
         <executions>
           <execution>
             <goals>
-              <goal>compress</goal>
+              <goal>minify</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <!-- Fix the path to the source file from the generated source map. This works ATM because all the JavaScript
+            source files are located in the same folder. Note that the source mapping is not going to be perfect if the
+            JavaScript code contains Velocity code. -->
+          <closureSourceMapLocationMappings>
+            <closureSourceMapLocationMapping>
+              <name>uicomponents/widgets/</name>
+              <!-- We can't leave the value empty because it generates "null" in the path. -->
+              <value>./</value>
+            </closureSourceMapLocationMapping>
+          </closureSourceMapLocationMappings>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

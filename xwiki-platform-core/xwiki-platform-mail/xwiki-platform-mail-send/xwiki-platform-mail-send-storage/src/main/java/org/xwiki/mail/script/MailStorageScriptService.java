@@ -44,6 +44,7 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -54,14 +55,14 @@ import com.xpn.xwiki.XWikiContext;
  * @since 6.4M3
  */
 @Component
-@Named("mailstorage")
+@Named("mail.storage")
 @Singleton
 public class MailStorageScriptService extends AbstractMailScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    private static final String ERROR_KEY = "scriptservice.mailstorage.error";
+    private static final String ERROR_KEY = "scriptservice.mail.storage.error";
 
     @Inject
     @Named("filesystem")
@@ -125,7 +126,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
     }
 
     /**
-     * Resends all mails matching the passed filter map.
+     * Resends all mails matching the passed filter map, asynchronously.
      *
      * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
      * @param offset the number of rows to skip (0 means don't skip any row)
@@ -136,21 +137,25 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     public List<ScriptMailResult> resendAsynchronously(Map<String, Object> filterMap, int offset, int count)
     {
-        List<Pair<MailStatus, MailStatusResult>> results;
-        try {
-            results = this.mailResender.resendAsynchronously(filterMap, offset, count);
-        } catch (MailStoreException e) {
-            // Save the exception for reporting through the script services's getLastError() API
-            setError(e);
-            return null;
-        }
+        return resendGeneric(filterMap, offset, count,
+            (filterMap1, offset1, count1) -> mailResender.resendAsynchronously(filterMap1, offset1, count1));
+    }
 
-        List<ScriptMailResult> scriptResults = new ArrayList<>();
-        for (Pair<MailStatus, MailStatusResult> result : results) {
-            scriptResults.add(new ScriptMailResult(
-                new DefaultMailResult(result.getLeft().getBatchId()), result.getRight()));
-        }
-        return scriptResults;
+    /**
+     * Resends all mails matching the passed filter map, synchronously (one mail after another).
+     *
+     * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
+     * @return the mail results for the resent mails and null if an error occurred while loading the mail statuses
+     *         from the store
+     * @since 12.10RC1
+     */
+    @Unstable
+    public List<ScriptMailResult> resend(Map<String, Object> filterMap, int offset, int count)
+    {
+        return resendGeneric(filterMap, offset, count,
+            (filterMap1, offset1, count1) -> mailResender.resend(filterMap1, offset1, count1));
     }
 
     /**
@@ -313,9 +318,36 @@ public class MailStorageScriptService extends AbstractMailScriptService
         return message;
     }
 
+    private List<ScriptMailResult> resendGeneric(Map<String, Object> filterMap, int offset, int count,
+        MultipleMailResender multipleMailResender)
+    {
+        List<Pair<MailStatus, MailStatusResult>> results;
+        try {
+            results = multipleMailResender.resendMessages(filterMap, offset, count);
+        } catch (MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+            return null;
+        }
+
+        List<ScriptMailResult> scriptResults = new ArrayList<>();
+        for (Pair<MailStatus, MailStatusResult> result : results) {
+            scriptResults.add(new ScriptMailResult(
+                new DefaultMailResult(result.getLeft().getBatchId()), result.getRight()));
+        }
+        return scriptResults;
+    }
+
     @Override
     protected String getErrorKey()
     {
         return ERROR_KEY;
+    }
+
+    @FunctionalInterface
+    private interface MultipleMailResender
+    {
+        List<Pair<MailStatus, MailStatusResult>> resendMessages(Map<String, Object> filterMap, int offset, int count)
+            throws MailStoreException;
     }
 }

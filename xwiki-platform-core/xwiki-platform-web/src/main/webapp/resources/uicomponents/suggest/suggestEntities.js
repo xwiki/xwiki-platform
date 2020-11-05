@@ -87,5 +87,5 @@ require(['jquery', 'xwiki-entityTypeSwitch', 'xwiki-events-bridge'], function($)
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

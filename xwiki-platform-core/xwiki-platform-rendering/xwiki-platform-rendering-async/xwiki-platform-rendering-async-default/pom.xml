@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-async</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-async-default</artifactId>
   <name>XWiki Platform - Rendering - Async - Default</name>
@@ -33,8 +33,7 @@
   <description>XWiki Platform - Rendering - Async - Default</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.46</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

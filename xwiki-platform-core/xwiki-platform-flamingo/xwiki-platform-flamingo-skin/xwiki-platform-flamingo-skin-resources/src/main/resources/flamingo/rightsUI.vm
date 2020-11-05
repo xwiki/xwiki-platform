@@ -20,8 +20,6 @@
 #if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'admin')
   $response.sendRedirect($doc.getURL('edit', 'editor=rights'))
 #end
-#set ($formname = 'update')
-#set ($saveaction = 'save')
 ##
 ## Set on which document the rights should be saved
 ##
@@ -45,6 +43,10 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #if("$!request.section"=='wikis.rights')
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
+## This should be changed in the future to include dynamically registered rights.
+#elseif ($services.security.authorization.isRightRegistered('like')).
+  #set ($rightsLevels = {'view': 0, 'like': 1, 'comment': 2, 'edit': 3, 'script': 4, 'delete': 5, 'admin': 6, 'register': 7, 'programming': 8})
+  #set ($allowWins = [5, 6, 7])
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
   #set ($allowWins = [5, 6, 7])
@@ -218,7 +220,15 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             </tr>
           </thead>
           ## Livetable placeholder, will be filled in from Javascript
-          <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body">
+            <tr>
+              ## Have the same number of TD than there are TH, in order to have valid HTML
+              <td>&nbsp;</td>
+              #foreach ($i in [0..$maxlevel])
+                <td>&nbsp;</td>
+              #end
+            </tr>
+          </tbody>
         </table>
       </td>
     </tr>
@@ -285,7 +295,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </dl>
   #end
 
-    <script type="text/javascript">
+    <script>
     //<![CDATA[
 (function() {
   function hideScopeForUsers() {

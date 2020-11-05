@@ -25,13 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-default</artifactId>
   <name>XWiki Platform - Refactoring - Default Implementation</name>
   <description>XWiki Platform - Refactoring - Default Implementation</description>
   <properties>
-    <xwiki.pitest.mutationThreshold>83</xwiki.pitest.mutationThreshold>
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -42,12 +41,17 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
 

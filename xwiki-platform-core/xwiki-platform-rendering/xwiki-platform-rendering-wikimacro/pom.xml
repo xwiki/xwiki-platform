@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
   <packaging>pom</packaging>
@@ -34,6 +34,5 @@
   <modules>
     <module>xwiki-platform-rendering-wikimacro-api</module>
     <module>xwiki-platform-rendering-wikimacro-store</module>
-    <module>xwiki-platform-rendering-wikimacro-macros</module>
   </modules>
 </project>

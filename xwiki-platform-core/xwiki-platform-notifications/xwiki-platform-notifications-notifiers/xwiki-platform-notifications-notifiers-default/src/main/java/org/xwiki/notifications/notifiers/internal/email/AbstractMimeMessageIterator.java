@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,14 +38,21 @@ import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.eventstream.EntityEvent;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.internal.DefaultEntityEvent;
+import org.xwiki.mail.ExtendedMimeMessage;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.VoidMailListener;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -95,9 +103,6 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private NotificationEmailRenderer defaultNotificationEmailRenderer;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
     private MailSenderConfiguration mailSenderConfiguration;
 
     @Inject
@@ -109,40 +114,78 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     @Inject
     private MailTemplateImageAttachmentsExtractor mailTemplateImageAttachmentsExtractor;
 
-    private NotificationUserIterator userIterator;
+    @Inject
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
+
+    @Inject
+    private EventStore eventStore;
+
+    private final MailListener listener = new VoidMailListener()
+    {
+        public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
+        {
+            onPrepare(message);
+        }
+
+        public void onPrepareMessageError(ExtendedMimeMessage message, Exception e, Map<String, Object> parameters)
+        {
+            onPrepare(message);
+        }
+    };
+
+    private Iterator<DocumentReference> userIterator;
 
     private Map<String, Object> factoryParameters = new HashMap<>();
 
-    private DocumentReference templateReference;
+    private Map<String, List<EntityEvent>> eventsMappingPerId = new ConcurrentHashMap<>();
+
+    private Map<MimeMessage, List<EntityEvent>> eventsMappingPerMessage = new ConcurrentHashMap<>();
+
+    private EntityReference templateReference;
 
     private List<CompositeEvent> currentEvents = Collections.emptyList();
 
     private DocumentReference currentUser;
+
+    private String currentUsedId;
 
     private InternetAddress currentUserEmail;
 
     private boolean hasNext;
 
     /**
-     * Initialize the iterator.
-     * A class extending {@link AbstractMimeMessageIterator} should implement a same initialize method that calls
-     * this one at the end of its execution.
+     * Initialize the iterator. A class extending {@link AbstractMimeMessageIterator} should implement a same initialize
+     * method that calls this one at the end of its execution.
      *
      * @param userIterator iterator that returns all users
      * @param factoryParameters parameters for the email factory
      * @param templateReference reference to the mail template
      */
-    protected void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
-            DocumentReference templateReference)
+    protected void initialize(Iterator<DocumentReference> userIterator, Map<String, Object> factoryParameters,
+        EntityReference templateReference)
     {
         this.userIterator = userIterator;
         this.factoryParameters = factoryParameters;
         this.templateReference = templateReference;
-        this.computeNext();
+
+        computeNext();
+    }
+
+    private void onPrepare(ExtendedMimeMessage message)
+    {
+        // Indicate that we don't need to send this user notification anymore
+        List<EntityEvent> events = this.eventsMappingPerMessage.remove(message);
+        if (events != null) {
+            events = this.eventsMappingPerId.remove(message.getUniqueMessageId());
+        }
+
+        if (events != null) {
+            events.forEach(this.eventStore::deleteMailEntityEvent);
+        }
     }
 
     protected abstract List<CompositeEvent> retrieveCompositeEventList(DocumentReference user)
-            throws NotificationException;
+        throws NotificationException;
 
     /**
      * Compute the message that will be sent to the next user in the iterator.
@@ -151,7 +194,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     {
         this.currentEvents = Collections.emptyList();
         this.currentUserEmail = null;
-        while ((this.currentEvents.isEmpty() || currentUserEmail == null) && this.userIterator.hasNext()) {
+        while ((this.currentEvents.isEmpty() || this.currentUserEmail == null) && this.userIterator.hasNext()) {
             this.currentUser = this.userIterator.next();
             try {
                 this.currentUserEmail = new InternetAddress(getUserEmail(this.currentUser));
@@ -163,16 +206,18 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             try {
                 // TODO: in a next version, it will be important to paginate these results and to send several emails
                 // if there is too much content
-                this.currentEvents = retrieveCompositeEventList(currentUser);
+                this.currentEvents = retrieveCompositeEventList(this.currentUser);
             } catch (NotificationException e) {
                 logger.error(ERROR_MESSAGE, this.currentUser, e);
             }
         }
+        this.currentUsedId = this.serializer.serialize(this.currentUser);
 
-        this.hasNext = currentUserEmail != null && !this.currentEvents.isEmpty();
+        this.hasNext = this.currentUserEmail != null && !this.currentEvents.isEmpty();
     }
 
-    private void updateFactoryParameters() throws NotificationException, AddressException
+    private void updateFactoryParameters(DocumentReference templateDocumentReference)
+        throws NotificationException, AddressException
     {
         // We need to clear all the attachments that have been put in the previous iteration, otherwise, we end up
         // duplicating the wiki logo, the user avatars, and every attachments that are common to several emails...
@@ -180,39 +225,39 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
         handleEvents();
         handleWikiLogo();
-        handleImageAttachmentsFromTemplate();
+        handleImageAttachmentsFromTemplate(templateDocumentReference);
 
         try {
-            factoryParameters.put(FROM, new InternetAddress(mailSenderConfiguration.getFromAddress()));
+            this.factoryParameters.put(FROM, new InternetAddress(this.mailSenderConfiguration.getFromAddress()));
         } catch (AddressException | NullPointerException e) {
-            logger.warn("No default email address is configured in the administration.");
+            this.logger.warn("No default email address is configured in the administration.");
         }
 
-        factoryParameters.put(TO, this.currentUserEmail);
+        this.factoryParameters.put(TO, this.currentUserEmail);
     }
 
-    private void handleImageAttachmentsFromTemplate() throws NotificationException
+    private void handleImageAttachmentsFromTemplate(DocumentReference templateDocumentReference)
+        throws NotificationException
     {
         Collection<Attachment> attachments = getAttachments();
 
         try {
-            attachments.addAll(mailTemplateImageAttachmentsExtractor.getImages(templateReference));
+            attachments.addAll(this.mailTemplateImageAttachmentsExtractor.getImages(templateDocumentReference));
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to get the attachments of the template [%s].", templateReference), e);
+                String.format("Failed to get the attachments of the template [%s].", templateDocumentReference), e);
         }
     }
 
     private void handleEvents() throws NotificationException
     {
-        String usedId = serializer.serialize(this.currentUser);
         // Render all the events both in HTML and Plain Text
         List<String> htmlEvents = new ArrayList<>();
         List<String> plainTextEvents = new ArrayList<>();
         EventsSorter eventsSorter = new EventsSorter();
-        for (CompositeEvent event : currentEvents) {
-            String html = defaultNotificationEmailRenderer.renderHTML(event, usedId);
-            String plainText = defaultNotificationEmailRenderer.renderPlainText(event, usedId);
+        for (CompositeEvent event : this.currentEvents) {
+            String html = this.defaultNotificationEmailRenderer.renderHTML(event, this.currentUsedId);
+            String plainText = this.defaultNotificationEmailRenderer.renderPlainText(event, this.currentUsedId);
             htmlEvents.add(html);
             plainTextEvents.add(plainText);
             eventsSorter.add(event, html, plainText);
@@ -221,8 +266,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         // Put in the velocity parameters all the events and their rendered version
         Map<String, Object> velocityVariables = getVelocityVariables();
 
-        velocityVariables.put(EMAIL_USER, usedId);
-        velocityVariables.put(EVENTS, currentEvents);
+        velocityVariables.put(EMAIL_USER, this.currentUsedId);
+        velocityVariables.put(EVENTS, this.currentEvents);
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);
         velocityVariables.put(SORTED_EVENTS, eventsSorter.sort());
@@ -233,28 +278,29 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private void handleWikiLogo()
     {
         try {
-            getAttachments().add(logoAttachmentExtractor.getLogo());
+            getAttachments().add(this.logoAttachmentExtractor.getLogo());
         } catch (Exception e) {
-            logger.warn("Failed to get the logo.", e);
+            this.logger.warn("Failed to get the logo.", e);
         }
     }
 
     private Collection<Attachment> getAttachments()
     {
-        Object attachments = factoryParameters.get(ATTACHMENTS);
+        Object attachments = this.factoryParameters.get(ATTACHMENTS);
         if (attachments != null) {
             return (Collection<Attachment>) attachments;
         }
 
         Collection<Attachment> newList = new ArrayList<>();
-        factoryParameters.put(ATTACHMENTS, newList);
+        this.factoryParameters.put(ATTACHMENTS, newList);
+
         return newList;
     }
 
     private void handleAvatars()
     {
         Set<DocumentReference> userAvatars = new HashSet<>();
-        for (CompositeEvent event : currentEvents) {
+        for (CompositeEvent event : this.currentEvents) {
             userAvatars.addAll(event.getUsers());
         }
         Collection<Attachment> attachments = getAttachments();
@@ -262,17 +308,17 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             try {
                 attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32));
             } catch (Exception e) {
-                logger.warn("Failed to add the avatar of [{}] in the email.", userAvatar, e);
+                this.logger.warn("Failed to add the avatar of [{}] in the email.", userAvatar, e);
             }
         }
     }
 
     private Map<String, Object> getVelocityVariables()
     {
-        Object velocityVariables = factoryParameters.get(VELOCITY_VARIABLES);
+        Object velocityVariables = this.factoryParameters.get(VELOCITY_VARIABLES);
         if (velocityVariables == null) {
             velocityVariables = new HashMap<String, Object>();
-            factoryParameters.put(VELOCITY_VARIABLES, velocityVariables);
+            this.factoryParameters.put(VELOCITY_VARIABLES, velocityVariables);
         }
 
         return (Map<String, Object>) velocityVariables;
@@ -280,16 +326,15 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private String getUserEmail(DocumentReference user)
     {
-        return (String) documentAccessBridge.getProperty(user,
-                new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), "XWiki", "XWikiUsers"),
-                0,
-                EMAIL_PROPERTY);
+        return (String) this.documentAccessBridge.getProperty(user,
+            new DocumentReference(user.getWikiReference().getName(), "XWiki", "XWikiUsers"), 0,
+            EMAIL_PROPERTY);
     }
 
     @Override
     public boolean hasNext()
     {
-        return hasNext;
+        return this.hasNext;
     }
 
     @Override
@@ -297,14 +342,27 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     {
         MimeMessage message = null;
         try {
-            updateFactoryParameters();
-            message = this.factory.createMessage(templateReference, factoryParameters);
+            DocumentReference templateDocumentReference =
+                this.documentReferenceResolver.resolve(this.templateReference, this.currentUser);
+
+            updateFactoryParameters(templateDocumentReference);
+            message = this.factory.createMessage(templateDocumentReference, this.factoryParameters);
+
+            List<EntityEvent> events = new ArrayList<>();
+            this.currentEvents.forEach(
+                ce -> ce.getEvents().forEach(event -> events.add(new DefaultEntityEvent(event, this.currentUsedId))));
+
+            if (message instanceof ExtendedMimeMessage) {
+                this.eventsMappingPerId.put(((ExtendedMimeMessage) message).getUniqueMessageId(), events);
+            } else {
+                this.eventsMappingPerMessage.put(message, events);
+            }
         } catch (Exception e) {
-            logger.error(ERROR_MESSAGE, this.currentUser, e);
+            this.logger.error(ERROR_MESSAGE, this.currentUser, e);
         }
 
         // Look for the next email to send
-        this.computeNext();
+        computeNext();
 
         // But return the current email
         return message;
@@ -314,5 +372,13 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     public Iterator<MimeMessage> iterator()
     {
         return this;
+    }
+
+    /**
+     * @return the {@link MailListener} used to trigger the update of the event store
+     */
+    public MailListener getMailListener()
+    {
+        return this.listener;
     }
 }

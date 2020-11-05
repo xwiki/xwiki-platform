@@ -25,17 +25,19 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ratings</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ratings-api</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Ratings - API</name>
   <description>API to rate wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>3</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
+    <!-- Needs to be installed on root to be able to use Solr Store -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       org.xwiki.contrib.ratings:application-ratings-api
@@ -48,18 +50,13 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-logging-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
@@ -69,37 +66,11 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required in order to mock XWikiContext -->
     <dependency>
-      <!-- Required in order to mock XWikiContext -->
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <excludes>
-                org/xwiki/ratings/ConfiguredReputationAlgorithmProvider.java,
-                org/xwiki/ratings/RatingsException.java,
-                org/xwiki/ratings/RatingsManager.java,
-                org/xwiki/ratings/ReputationException.java,
-                org/xwiki/ratings/internal/DefaultReputationAlgorithm.java,
-                org/xwiki/ratings/internal/SeparatePageRatingsManager.java,
-                org/xwiki/ratings/internal/SimpleReputationAlgorithm.java
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

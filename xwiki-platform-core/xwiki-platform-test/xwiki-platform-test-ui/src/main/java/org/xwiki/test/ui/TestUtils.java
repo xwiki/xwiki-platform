@@ -37,6 +37,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -99,8 +100,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
@@ -719,7 +720,19 @@ public class TestUtils
      */
     public String getURLToDeletePage(EntityReference reference)
     {
-        return getURL(reference, "delete", "confirm=1");
+        return getURLToDeletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public String getURLToDeletePage(EntityReference reference, boolean affectChildren)
+    {
+        String queryString = "confirm=1&async=false";
+        if (affectChildren) {
+            queryString += "&affectChildren=true";
+        }
+        return getURL(reference, "delete", queryString);
     }
 
     /**
@@ -918,7 +931,15 @@ public class TestUtils
      */
     public void deletePage(EntityReference reference)
     {
-        getDriver().get(getURLToDeletePage(reference));
+        deletePage(reference, false);
+    }
+
+    /**
+     * @since 12.9RC1
+     */
+    public void deletePage(EntityReference reference, boolean affectChildren)
+    {
+        getDriver().get(getURLToDeletePage(reference, affectChildren));
     }
 
     /**
@@ -1896,9 +1917,10 @@ public class TestUtils
      *
      * @param propertyName name of the property to set
      * @param value value to set to the property
+     * @return the previous value, if the property was set, {@code null} otherwise
      * @since 9.7RC1
      */
-    public void setWikiPreference(String propertyName, String value) throws Exception
+    public String setWikiPreference(String propertyName, String value) throws Exception
     {
         DocumentReference documentReference = new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences");
         ObjectReference objectReference = new ObjectReference("XWiki.XWikiPreferences[0]", documentReference);
@@ -1906,6 +1928,7 @@ public class TestUtils
         Property property = RestTestUtils.property(propertyName, value);
 
         org.xwiki.rest.model.jaxb.Object preferenceObject = rest().get(objectReference, false);
+        String previousValue = null;
 
         if (preferenceObject == null) {
             // The object does not exist, create it
@@ -1923,7 +1946,14 @@ public class TestUtils
             TestUtils.assertStatusCodes(
                 rest().executePut(ObjectPropertyResource.class, property, rest().toElements(propertyReference)), true,
                 STATUS_ACCEPTED);
+
+            Property unsetProperty = RestTestUtils.property(propertyName, null);
+            previousValue =
+                preferenceObject.getProperties().stream().filter(prop -> Objects.equals(propertyName, prop.getName()))
+                    .findFirst().orElse(unsetProperty).getValue();
         }
+
+        return previousValue;
     }
 
     /**

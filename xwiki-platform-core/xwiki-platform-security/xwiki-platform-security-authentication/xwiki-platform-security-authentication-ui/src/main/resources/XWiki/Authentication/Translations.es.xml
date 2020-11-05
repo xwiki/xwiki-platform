@@ -37,15 +37,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>authentication.admin.failureStrategy.label=Estrategias de fallo
-authentication.admin.failureStrategy.hint=Estrategias a utilizar en caso de fallo de autenticación múltiple. Se pueden seleccionar varias estrategias.
-authentication.admin.failureStrategy.disableAccount.name=Desactivar cuenta
+authentication.admin.failureStrategy.hint=Estrategias a utilizar en el caso de un error de autenticación múltiple. Se puede seleccionar varias estrategias.
+authentication.admin.failureStrategy.disableAccount.name=Desactivar la cuenta
 authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Número máximo de intentos autorizados
-authentication.admin.maxAttempts.hint=Esto representa el número máximo de fallos de inicio de sesión autorizados antes de que se active la estrategia. Este número sólo se tiene en cuenta en el contexto de la siguiente ventana de tiempo. Tenga en cuenta que un valor 0 significa que la función está desactivada.
-authentication.admin.timeWindow.label=Ventana de tiempo para los fallos de inicio de sesión
-authentication.admin.timeWindow.hint=La ventana de tiempo en segundos durante la cual la estrategia considerará el inicio de sesión como fallido.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
+authentication.admin.maxAttempts.hint=Representa el número máximo de errores de inicio de sesión autorizados antes de que se active la estrategia. Este número solo se tiene en cuenta en el contexto de la siguiente ventana temporal. Ten en cuenta que un valor 0 significa que la funcionalidad está desactivada.
+authentication.admin.timeWindow.label=Ventana temporal para los errores de inicio de sesión
+authentication.admin.timeWindow.hint=La ventana temporal en segundos durante la cual considerar los errores de intento de inicio de sesión para activar la estrategia.
+authentication.admin.isAuthenticationSecurityEnabled.label=Activa o desactiva el mecanismo de seguridad de la autenticación
+authentication.admin.isAuthenticationSecurityEnabled.hint=Desactivar el mecanismo de seguridad de la autenticación también reinicializará los registros de errores de autenticación.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=Desactivado
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Activado</content>
 </xwikidoc>

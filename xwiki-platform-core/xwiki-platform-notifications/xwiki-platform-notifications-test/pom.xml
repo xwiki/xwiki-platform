@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test</artifactId>
   <name>XWiki Platform - Notifications - Test - Parent POM</name>
@@ -36,6 +36,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-notifications-test-pageobjects</module>
-    <module>xwiki-platform-notifications-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-notifications-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

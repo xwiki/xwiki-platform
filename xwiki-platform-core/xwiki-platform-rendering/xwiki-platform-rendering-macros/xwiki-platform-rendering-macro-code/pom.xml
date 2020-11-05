@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-code</artifactId>
   <name>XWiki Platform - Rendering - Macro - Code</name>
   <description>Highlights code</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Code Macro</xwiki.extension.name>
   </properties>

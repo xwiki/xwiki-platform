@@ -166,7 +166,7 @@
       #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
           && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
         #warning($services.localization.render('core.copy.alreadyExists',
-          [$services.model.serialize($targetDocReference, 'compactwiki')]))
+          [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <form action="$xwiki.relativeRequestURL" id="copy" class="xform third" method="post">
           ## The field values are specified in the URL. We use POST to append the "overwrite" value.
           <input type="hidden" name="overwrite" value="true" />
@@ -186,7 +186,7 @@
         </form>
       #elseif (!$services.security.authorization.hasAccess('edit', $targetDocReference))
         #warning($services.localization.render('core.copy.editRightsForbidden',
-        [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        [$escapetool.xml($services.model.serialize($targetDocReference, 'compactwiki'))]))
         <div class="buttons">
           <span class="buttonwrapper">
               <a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">

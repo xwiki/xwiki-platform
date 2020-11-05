@@ -55,6 +55,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
      */
     public static final String DEFAULT_REMOTE_URL = "http://localhost:8983/solr/";
 
+    /**
+     * The name of the core containing the XWiki search index.
+     */
+    public static final String DEFAULT_CORE_PREFIX = "xwiki";
+
     @Inject
     private SolrConfiguration configuration;
 
@@ -63,15 +68,31 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
+        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
 
-        this.rootClient = new HttpSolrClient.Builder(remoteURL).build();
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+
+        // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
+        String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
+        if (searchCoreURL != null) {
+            this.clients.put(SolrClientInstance.CORE_NAME, new HttpSolrClient.Builder(searchCoreURL).build());
+        }
     }
 
     @Override
     protected SolrClient getInternalSolrClient(String coreName)
     {
-        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + coreName).build();
+        // Prefix Solr cores to avoid collision with other non-xwiki cores
+
+        StringBuilder corePath =
+            new StringBuilder(this.configuration.getInstanceConfiguration(TYPE, "corePrefix", DEFAULT_CORE_PREFIX));
+
+        if (!coreName.equals(SolrClientInstance.CORE_NAME)) {
+            corePath.append('_');
+            corePath.append(coreName);
+        }
+
+        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + corePath).build();
     }
 
     @Override

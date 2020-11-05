@@ -57,6 +57,7 @@ import com.google.common.primitives.Ints;
 import ch.qos.logback.classic.Level;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
@@ -84,7 +85,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  *     &#064;Test
  *     public void test(XWikiWebDriver driver, TestUtils setup)
  *     {
- *         driver.get("http://xwiki.org");
+ *         driver.get("https://xwiki.org");
  *         assertThat(driver.getTitle(),
  *             containsString("XWiki - The Advanced Open Source Enterprise and Application Wiki"));
  *         driver.findElement(By.linkText("XWiki's concept")).click();
@@ -104,11 +105,24 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private boolean isVncStarted;
 
+    private TestConfigurationResolver testConfigurationMerger = new TestConfigurationResolver();
+
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws Exception
+    public void beforeAll(ExtensionContext extensionContext)
     {
-        // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
-        // already started and we should not do anything.
+        try {
+            beforeAllInternal(extensionContext);
+        } catch (Exception e) {
+            raiseException(e);
+        }
+    }
+
+    private void beforeAllInternal(ExtensionContext extensionContext) throws Exception
+    {
+        // This method is going to be called for the top level test class but also for nested test classes. So if
+        // the currently executing test class has parents and one of them has the @UITest annotation, it means the
+        // test has already been setup (all Docker containers are already started, etc), and thus we should not do
+        // anything.
         if (hasParentTestContainingUITestAnnotation(extensionContext)) {
             return;
         }
@@ -120,6 +134,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // of debugging information.
         if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
+            setLogbackLoggerLevel("org.rnorth", Level.TRACE);
+            setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
             // Don't display the stack trace that TC displays when it cannot find a config file override
             // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
@@ -189,13 +205,22 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception
+    public void beforeEach(ExtensionContext extensionContext)
+    {
+        try {
+            beforeEachInternal(extensionContext);
+        } catch (Exception e) {
+            raiseException(e);
+        }
+    }
+
+    private void beforeEachInternal(ExtensionContext extensionContext)
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
             LOGGER.info("(*) Start VNC container...");
 
-            BrowserWebDriverContainer webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
+            BrowserWebDriverContainer<?> webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
             // Use the maximum resolution available so that we have the maximum number of UI elements visible and
             // reduce the risks of false positives due to not visible elements.
@@ -253,10 +278,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
-        String agentName = System.getProperty("jenkinsAgentName");
-        if (agentName != null) {
-            LOGGER.info("Jenkins Agent: [{}]", agentName);
-        }
+        displayAgentName();
 
         throw throwable;
     }
@@ -313,14 +335,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
     {
-        // If the tests has parent tests and one of them has the @UITest annotation then it means all containers
-        // have already been started and thus the servlet engine is supported.
+        // This method is the first one called in the test lifecycle. It's called for the top level test class but
+        // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
+        // annotation then it means all containers have already been started and the servlet engine is supported.
         if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
-            UITest uiTest = extensionContext.getRequiredTestClass().getAnnotation(UITest.class);
-            TestConfiguration testConfiguration = new TestConfiguration(uiTest);
-            // Save the test configuration so that we can access it in afterAll()
+            // Create & save the test configuration so that we can access it in afterAll()
+            TestConfiguration testConfiguration = testConfigurationMerger.resolve(extensionContext);
             saveTestConfiguration(extensionContext, testConfiguration);
-
             // Skip the test if the Servlet Engine selected is in the forbidden list
             if (isServletEngineForbidden(testConfiguration)) {
                 return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
@@ -351,7 +372,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ExtensionContext extensionContext) throws Exception
     {
         BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
-        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
+        BrowserWebDriverContainer<?> webDriverContainer = browserContainerExecutor.start();
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers
@@ -418,7 +439,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         saveXWikiURL(extensionContext, xwikiURL);
 
         if (testConfiguration.isVerbose()) {
-            LOGGER.info("XWiki ping URL = " + xwikiURL);
+            LOGGER.info("XWiki ping URL = {}", xwikiURL);
         }
     }
 
@@ -469,5 +490,20 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             vnc.saveRecordingToFile(recordingFile);
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
+    }
+
+    private void displayAgentName()
+    {
+        String agentName = getAgentName();
+        if (agentName != null) {
+            LOGGER.info("Jenkins Agent: [{}]", agentName);
+        }
+    }
+
+    private void raiseException(Exception e)
+    {
+        String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
+        throw new RuntimeException(
+            String.format("Error setting up the XWiki testing environment%s", extraMessage), e);
     }
 }

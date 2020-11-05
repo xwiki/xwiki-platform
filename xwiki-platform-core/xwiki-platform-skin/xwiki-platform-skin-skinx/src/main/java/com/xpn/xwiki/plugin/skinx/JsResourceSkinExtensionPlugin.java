@@ -66,7 +66,7 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
     @Override
     protected String generateLink(String url, String resourceName, XWikiContext context)
     {
-        StringBuilder result = new StringBuilder("<script type='text/javascript' src='").append(url).append("'");
+        StringBuilder result = new StringBuilder("<script src='").append(url).append("'");
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;

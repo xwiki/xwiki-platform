@@ -23,9 +23,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 
-import com.xpn.xwiki.XWikiContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -74,9 +72,6 @@ public class DefaultMailSenderConfigurationTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
-
     @BeforeEach
     public void setUp()
     {
@@ -111,7 +106,6 @@ public class DefaultMailSenderConfigurationTest
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
-        when(this.xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
 
         when(this.mailConfigDocumentSource.getProperty("from", String.class)).thenReturn(null);
         when(this.mainWikiMailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
@@ -135,7 +129,6 @@ public class DefaultMailSenderConfigurationTest
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
-        when(this.xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
 
         when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(null);
         when(this.mainWikiMailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(

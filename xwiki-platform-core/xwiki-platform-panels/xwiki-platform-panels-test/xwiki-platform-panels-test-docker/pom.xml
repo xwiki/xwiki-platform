@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-panels-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-panels-test-docker</artifactId>
@@ -107,14 +107,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

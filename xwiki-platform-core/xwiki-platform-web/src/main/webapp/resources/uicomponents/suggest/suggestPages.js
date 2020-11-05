@@ -28,7 +28,7 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   'use strict';
 
   var pageIcon = $jsontool.serialize($services.icon.getMetaData('page_white'));
-  var webHome = "$!services.model.getEntityReference('DOCUMENT', 'default').name" || 'WebHome';
+  var webHome = $jsontool.serialize($services.model.getEntityReference('DOCUMENT', 'default').name) || 'WebHome';
 
   var getSelectizeOptions = function(select) {
     return {
@@ -163,5 +163,5 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

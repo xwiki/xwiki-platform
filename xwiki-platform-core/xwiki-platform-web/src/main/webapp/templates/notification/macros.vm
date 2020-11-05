@@ -58,7 +58,9 @@
       ##
       ## * It's consistent with the way the title is displayed in the page itself (using html, see: `titlevars.vm`).
       <a href="$!escapetool.xml($document.getURL())">$document.displayTitle</a>
-      #if ("$!request.currentWiki" != '' && $request.currentWiki != $compositeEvent.document.wikiReference.name)
+      ## Notifications are rendered in the context of their wiki, so we need to use the XWikiContext#originalWikiId
+      ## to actually know where the request comes from.
+      #if ($xcontext.getContext().getOriginalWikiId() != $compositeEvent.document.wikiReference.name)
         <span class="text-muted">($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)</span>
       #end
     </div>
@@ -191,15 +193,45 @@ $xwiki.getPlainUserName($user)##
 #**
  * Display a notification for a message sent through the Message Stream.
  * TODO: find a way to move it to the "message stream" module
+ *
+ * @param compositeEvent displays the message of the event
+ * @param translationKey the translation key of the title of the message
+ * @param icon the icon of the message
  * @since 10.5RC1
  * @since 9.11.6
  *#
 #macro(displayMessageNotification $compositeEvent $translationKey $icon)
   #define($content)
     #set ($messageEvent = $event.events[0])
-    <p>$services.localization.render($translationKey, ["#displayNotificationEventUser($messageEvent.user, false)"])</p>
+  <p>$services.localization.render($translationKey, ["#displayNotificationEventUser($messageEvent.user, false)"])</p>
+  <blockquote>
+    $messageEvent.body
+  </blockquote>
+  <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
+  #end
+  #displayNotificationEventSkeleton($icon, 'comment', $content, '')
+#end
+##
+#*
+ * Display a notification from a message to a group sent through the Message Stream.
+ * TODO: find a way to move it to the "message stream" module
+ *
+ * @param compositeEvent displays the message of the event
+ * @param translationKey the translation key of the title of the message, takes two parameters, the first one for the
+ *                       user the second one for the group
+ * @param icon the icon of the message
+ * @since 12.10RC1
+ *#
+#macro(displayGroupMessageNotification $compositeEvent $translationKey $icon)
+  #define($content)
+    #set ($messageEvent = $event.events[0])
+    #set ($translationParameters = [
+      "#displayNotificationEventUser($messageEvent.user, false)",
+      "#displayNotificationEventUser($messageEvent.stream, false)"
+    ])
+    <p>$services.localization.render($translationKey, $translationParameters)</p>
     <blockquote>
-     $messageEvent.body
+    $messageEvent.body
     </blockquote>
     <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
   #end

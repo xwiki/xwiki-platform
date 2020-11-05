@@ -20,10 +20,13 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -36,6 +39,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
+
     private static PersistentTestContext context;
 
     /** Used so that AllTests can set the persistent test context. */
@@ -110,10 +115,10 @@ public class BaseElement
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
         try {
-            // The notification message may disappear before we get to click on it.
             getDriver().findElementWithoutWaiting(notificationMessageLocator).click();
         } catch (WebDriverException e) {
-            // Ignore.
+            // The notification message may disappear before we get to click on it and thus we ignore in case there's
+            // an error.
         }
     }
 
@@ -124,5 +129,41 @@ public class BaseElement
     protected boolean isElementVisible(By by)
     {
         return getDriver().findElementWithoutWaiting(by).isDisplayed();
+    }
+
+    /**
+     * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
+     * safely.
+     * <p>
+     * Subclassed should override this method and add additional checks needed by their logic.
+     *
+     * @since 12.5RC1
+     */
+    public void waitUntilPageJSIsLoaded()
+    {
+        // Prototype
+        getDriver().waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
+
+        // JQuery and dependencies
+        // JQuery dropdown plugin needed for the edit button's dropdown menu.
+        // TODO: We seem to have a flicker possibly caused by this check taking more than the default 10s timeout from
+        // time to time, see https://jira.xwiki.org/browse/XCOMMONS-1865. Testing this hypothesis by waiting a first
+        // time and if it fails waiting again and logging some message. Remove if the increased timeout doesn't help.
+        // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
+        // machine, etc).
+        try {
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        } catch (TimeoutException e) {
+            LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        }
+
+        // Make sure all asynchronous elements have been executed
+        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
+
+        // Make sure the shortcuts are loaded
+        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 }

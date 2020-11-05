@@ -22,8 +22,6 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -50,40 +48,17 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     private class TargetablePreference extends AbstractNotificationPreference
             implements TargetableNotificationPreference
     {
+        /*
+         * Note that we specifically don't want to check the equality with the target since this is used as part of
+         * NotificationPreferencesManager#getAllPreferences to ensure that only the top priority preference is kept.
+         * Check DefaultNotificationPreferenceManager#getAllPreferences for more information.
+         */
         private EntityReference target;
 
         @Override
         public EntityReference getTarget()
         {
             return target;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            TargetablePreference that = (TargetablePreference) o;
-
-            return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(target, that.target)
-                .isEquals();
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(target)
-                .toHashCode();
         }
     }
 
@@ -94,51 +69,59 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     }
 
     @Override
-    public void prepare()
+    public TargetableNotificationPreferenceBuilder prepare()
     {
         preference = new TargetablePreference();
         preference.category = NotificationPreferenceCategory.DEFAULT;
+        return this;
     }
 
     @Override
-    public void setEnabled(boolean isEnabled)
+    public TargetableNotificationPreferenceBuilder setEnabled(boolean isEnabled)
     {
         preference.isNotificationEnabled = isEnabled;
+        return this;
     }
 
     @Override
-    public void setFormat(NotificationFormat format)
+    public TargetableNotificationPreferenceBuilder setFormat(NotificationFormat format)
     {
         preference.format = format;
+        return this;
     }
 
     @Override
-    public void setProperties(Map<NotificationPreferenceProperty, Object> properties)
+    public TargetableNotificationPreferenceBuilder setProperties(Map<NotificationPreferenceProperty, Object> properties)
     {
         preference.properties = properties;
+        return this;
     }
 
     @Override
-    public void setProviderHint(String providerHint)
+    public TargetableNotificationPreferenceBuilder setProviderHint(String providerHint)
     {
         preference.providerHint = providerHint;
+        return this;
     }
 
     @Override
-    public void setStartDate(Date startDate)
+    public TargetableNotificationPreferenceBuilder setStartDate(Date startDate)
     {
         preference.startDate = startDate;
+        return this;
     }
 
     @Override
-    public void setTarget(EntityReference target)
+    public TargetableNotificationPreferenceBuilder setTarget(EntityReference target)
     {
         preference.target = target;
+        return this;
     }
 
     @Override
-    public void setCategory(NotificationPreferenceCategory category)
+    public TargetableNotificationPreferenceBuilder setCategory(NotificationPreferenceCategory category)
     {
         preference.category = category;
+        return this;
     }
 }

@@ -95,8 +95,6 @@ notifications.filters.description.systemUserNotificationFilter=Sakrij obavijesti
 
 ## Notifications toggles
 ### Missing: notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
-### Missing: notifications.toggle.label.off=OFF
-### Missing: notifications.toggle.label.on=ON
 
 ## Notifications formats
 ### Missing: notifications.format.alert=Alert
@@ -166,6 +164,8 @@ notifications.rss.feedLink=RSS tijek
 notifications.rss.feedTitle=Obavijesti RSS tijeka
 notifications.rss.feedDescription=Ovaj RSS tijek možete prilagoditi na vašoj profilnoj stranici.
 notifications.rss.seeChanges=Izmjene\: ({0})
+### Missing: notifications.rss.defaultTitleWithPage=New event on {0}
+### Missing: notifications.rss.defaultTitle=New event
 ### Missing: notifications.globalsettings.email=Notifications Email
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dnevno
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Svaki sat

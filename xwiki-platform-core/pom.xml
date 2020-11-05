@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,13 +18,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -83,35 +81,6 @@
             </systemProperties>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-            <jswarn>false</jswarn>
-            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-              currently more widely used in the JavaScript world. -->
-            <suffix>.min</suffix>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.cj.jshintmojo</groupId>
-          <artifactId>jshint-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>lint</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <globals>require,define</globals>
-            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
-            <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -133,30 +102,99 @@
         <groupId>org.revapi</groupId>
         <artifactId>revapi-maven-plugin</artifactId>
         <configuration>
-          <analysisConfiguration><![CDATA[
-            {
-              "revapi": {
-                "filter": {
-                  // We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
-                  // since they're already covered by their own builds and we release all of them together.
-                  "archives": {
-                    "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
-                  }
-                },
-                "ignore" : [
-                  // Add more ignores below...
-                ]
-              }
-            }
-          ]]></analysisConfiguration>
+          <analysisConfiguration>
+            <revapi.filter>
+              <archives>
+                <!-- We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
+                     since they're already covered by their own builds and we release all of them together. -->
+                <exclude>
+                  <item>org\.xwiki\.commons:.*:.*</item>
+                  <item>org\.xwiki\.rendering:.*:.*</item>
+                </exclude>
+              </archives>
+            </revapi.filter>
+            <!-- Add ignores here using the following syntax. You can use a single <revapi.ignore> entry but it
+                 cannot be empty.
+
+                 Note: you can use regexes by using the syntax: <regex>true</regex>
+                 Don't forget to '\'-escape dots and other special characters in this case ;) -->
+            <revapi.ignore>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method java.lang.String org.xwiki.security.authentication.api.AuthenticationFailureManager::getForm(java.lang.String)</old>
+                <new>method java.lang.String org.xwiki.security.authentication.api.AuthenticationFailureManager::getForm(java.lang.String, javax.servlet.http.HttpServletRequest)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::recordAuthenticationFailure(java.lang.String)</old>
+                <new>method boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::recordAuthenticationFailure(java.lang.String, javax.servlet.http.HttpServletRequest)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::validateForm(java.lang.String, ===org.securityfilter.filter.SecurityRequestWrapper===)</old>
+                <new>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureManager::validateForm(java.lang.String, ===javax.servlet.http.HttpServletRequest===)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureStrategy::validateForm(java.lang.String, ===org.securityfilter.filter.SecurityRequestWrapper===)</old>
+                <new>parameter boolean org.xwiki.security.authentication.api.AuthenticationFailureStrategy::validateForm(java.lang.String, ===javax.servlet.http.HttpServletRequest===)</new>
+                <justification>Unstable API.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>interface org.xwiki.mentions.MentionNotificationService</old>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method void org.xwiki.mentions.notifications.MentionNotificationParameters::&lt;init&gt;(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String, org.xwiki.rendering.block.XDOM)</old>
+                <new>method void org.xwiki.mentions.notifications.MentionNotificationParameters::&lt;init&gt;(java.lang.String, org.xwiki.model.reference.EntityReference, org.xwiki.mentions.MentionLocation, java.lang.String)</new>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.lang.String org.xwiki.mentions.notifications.MentionNotificationParameters::getAnchorId()</old>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.returnTypeChanged</code>
+                <old>method org.xwiki.model.reference.DocumentReference org.xwiki.mentions.notifications.MentionNotificationParameters::getAuthorReference()</old>
+                <new>method java.lang.String org.xwiki.mentions.notifications.MentionNotificationParameters::getAuthorReference()</new>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method org.xwiki.model.reference.DocumentReference org.xwiki.mentions.notifications.MentionNotificationParameters::getDocumentReference()</old>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method org.xwiki.model.reference.DocumentReference org.xwiki.mentions.notifications.MentionNotificationParameters::getMentionedIdentity()</old>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method org.xwiki.rendering.block.XDOM org.xwiki.mentions.notifications.MentionNotificationParameters::getXdom()</old>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+              <item>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method java.lang.String org.xwiki.mentions.script.MentionsScriptService::format(java.lang.String, org.xwiki.mentions.DisplayStyle)</old>
+                <new>method java.lang.String org.xwiki.mentions.script.MentionsScriptService::format(java.lang.String, org.xwiki.mentions.DisplayStyle, java.lang.String)</new>
+                <justification>Young API. Redesign of the mention notifications mechanism.</justification>
+              </item>
+            </revapi.ignore>
+          </analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <modules>
-    <!-- Sorted Alphabetically -->
+      <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
-    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -197,12 +235,14 @@
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
+    <module>xwiki-platform-like</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
@@ -240,7 +280,6 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-vfs</module>
-    <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>

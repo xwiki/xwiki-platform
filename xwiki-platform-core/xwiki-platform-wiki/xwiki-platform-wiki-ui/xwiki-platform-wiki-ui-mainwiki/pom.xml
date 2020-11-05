@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-wiki-ui</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
   <packaging>xar</packaging>
@@ -129,6 +129,7 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed to display wiki activity in the user profile "Wiki" tab -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-ui</artifactId>

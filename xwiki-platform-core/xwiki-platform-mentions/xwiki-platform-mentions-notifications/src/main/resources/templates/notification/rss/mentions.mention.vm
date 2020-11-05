@@ -1,0 +1,68 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+### Default plain text template for RSS feeds
+#template('notification/macros.vm')
+###
+### Get the doc
+###
+#set ($document = $xwiki.getDocument($event.document))
+###
+### Display
+###
+<p>
+  <strong>$services.localization.render('mentions.event.mention.type')</strong>
+    #if ($document)
+      <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>
+    #end
+  .<br/>
+    $services.localization.render('notifications.events.mentions.mention.description.by.1user',
+      ["#displayNotificationEventUsers($event.users, false)"])
+</p>
+###
+### Display dates
+###
+<p>
+    #set ($dates = $event.dates)
+    #if ($dates.size() > 1)
+        $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])
+    #else
+        $xwiki.formatDate($event.dates.get(0))
+    #end
+  <br/>
+    ###
+    ### Display a link to the diff
+    ###
+    #if ($document)
+        #set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
+        #if ($event.events.size() == 1)
+            #set ($origdoc = $newdoc.previousDocument)
+        #else
+            #set ($lastIndex = $event.events.size() - 1)
+            #set ($origdoc =
+              $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
+        #end
+        #if ($newdoc.version)
+          #set ($externalURL = $newdoc.getExternalURL('view',
+            "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
+          #set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
+          $services.localization.render('notifications.rss.seeChanges', 'xwiki/2.1', [$diffLink])
+        #end
+    #end
+</p>

@@ -113,7 +113,7 @@ public @interface UITest
 
     /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
-     * depending on the database)
+     *         depending on the database)
      * @since 10.10RC1
      */
     String jdbcDriverVersion() default "";
@@ -125,8 +125,9 @@ public @interface UITest
     boolean vnc() default true;
 
     /**
-     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
-     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as
+     *         {@code xwiki.properties} with Velocity (check {@code xwiki.properties.vm} to find the list of supported
+     *         properties)
      * @since 10.10RC1
      */
     String[] properties() default {};
@@ -144,6 +145,18 @@ public @interface UITest
      * @since 10.11RC1
      */
     String[] extraJARs() default {};
+
+    /**
+     * @return true if the specified extra JAR versions must be resolved (when they're not specified), by checking the
+     *         transitive list of dependencies in the current POM. Note that there are 2 limitations: resolving takes
+     *         time and SNAPSHOT versions will be resolved to the latest published SNAPSHOT. This is why it's off by
+     *         default. When false the current POM version will be used for the missing exyta JAR versions. The main
+     *         use case for using true is in contrib extensions where the current POM version usually don't match
+     *         extra JARs versions and you may not want to hardcode the version and thus you can let the docker test
+     *         framework find it for you.
+     * @since 12.5RC1
+     */
+    boolean resolveExtraJARs() default false;
 
     /**
      * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the

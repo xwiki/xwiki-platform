@@ -20,8 +20,10 @@
 package org.xwiki.container.servlet.internal;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheControl;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
 import org.xwiki.container.RequestInitializerException;
@@ -34,6 +36,8 @@ import org.xwiki.container.servlet.ServletRequest;
  * @version $Id$
  * @since 11.8RC1
  */
+@Component
+@Singleton
 public class CacheControlRequestInitializer implements RequestInitializer
 {
     @Inject

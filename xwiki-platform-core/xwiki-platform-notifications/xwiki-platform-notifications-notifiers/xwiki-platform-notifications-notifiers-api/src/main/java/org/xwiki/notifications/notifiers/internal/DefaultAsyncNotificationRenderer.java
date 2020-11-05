@@ -23,10 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.job.GroupedJobInitializer;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
@@ -65,6 +68,10 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
 
+    @Inject
+    @Named("AsyncNotificationRenderer")
+    private GroupedJobInitializer jobInitializer;
+
     private String cacheKey;
 
     /**
@@ -89,7 +96,9 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         } else {
             queryType = "display";
         }
-        return Arrays.asList("notifications", queryType, this.cacheKey);
+        // We need to replace the / from the cachekey so it won't appear encoded in the URL
+        // since it not necessarily supported, in particular for Tomcat standard configuration.
+        return Arrays.asList("notifications", queryType, this.cacheKey.replaceAll("/", "_"));
     }
 
     @Override
@@ -122,9 +131,13 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         } else {
             try {
                 boolean loadMore = events.size() == notificationParameters.expectedCount;
-                List<CompositeEventStatus> compositeEventStatuses =
-                    this.compositeEventStatusManager.getCompositeEventStatuses(events,
-                        documentReferenceSerializer.serialize(notificationParameters.user));
+                List<CompositeEventStatus> compositeEventStatuses = null;
+                // We cannot compute the read status if the user is not available.
+                if (notificationParameters.user != null) {
+                    compositeEventStatuses =
+                        this.compositeEventStatusManager.getCompositeEventStatuses(events,
+                            documentReferenceSerializer.serialize(notificationParameters.user));
+                }
                 stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
             } catch (Exception e) {
                 throw new RenderingException("Error while retrieving the event status", e);
@@ -150,5 +163,11 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     public boolean isCacheAllowed()
     {
         return false;
+    }
+
+    @Override
+    public JobGroupPath getJobGroupPath()
+    {
+        return this.jobInitializer.getId();
     }
 }

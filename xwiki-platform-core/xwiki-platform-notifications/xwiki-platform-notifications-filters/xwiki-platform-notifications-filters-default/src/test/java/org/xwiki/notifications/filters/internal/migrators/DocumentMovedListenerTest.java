@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
-import org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -36,6 +35,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.internal.CachedModelBridge;
 import org.xwiki.notifications.filters.internal.DocumentMovedListener;
 import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -72,7 +72,7 @@ public class DocumentMovedListenerTest
 
     private EntityReferenceSerializer<String> serializer;
 
-    private LegacyEventStreamStoreConfiguration legacyEventStreamStoreConfiguration;
+    private NotificationFilterPreferenceConfiguration filterPreferencesConfiguration;
 
     private NamespaceContextExecutor namespaceContextExecutor;
 
@@ -89,7 +89,7 @@ public class DocumentMovedListenerTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
 
-        legacyEventStreamStoreConfiguration = mocker.getInstance(LegacyEventStreamStoreConfiguration.class);
+        filterPreferencesConfiguration = mocker.getInstance(NotificationFilterPreferenceConfiguration.class);
         namespaceContextExecutor = mocker.getInstance(NamespaceContextExecutor.class);
         cachedModelBridge = mock(CachedModelBridge.class);
         mocker.registerComponent(ModelBridge.class, "cached", cachedModelBridge);
@@ -106,8 +106,8 @@ public class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
-        when(legacyEventStreamStoreConfiguration.useLocalStore()).thenReturn(true);
-        when(legacyEventStreamStoreConfiguration.useMainStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
 
@@ -121,8 +121,9 @@ public class DocumentMovedListenerTest
                 .thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
         Query query2 = mock(Query.class);
-        when(session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " +
-                "where p.pageOnly = :oldPage")).thenReturn(query2);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
+                .thenReturn(query2);
         when(query2.setString(anyString(), anyString())).thenReturn(query2);
 
         // Test
@@ -151,8 +152,8 @@ public class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
-        when(legacyEventStreamStoreConfiguration.useLocalStore()).thenReturn(true);
-        when(legacyEventStreamStoreConfiguration.useMainStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -167,8 +168,9 @@ public class DocumentMovedListenerTest
                 .thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
         Query query2 = mock(Query.class);
-        when(session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " +
-                "where p.pageOnly = :oldPage")).thenReturn(query2);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
+                .thenReturn(query2);
         when(query2.setString(anyString(), anyString())).thenReturn(query2);
 
         // Test
@@ -195,8 +197,8 @@ public class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.Terminal");
 
         // Mock
-        when(legacyEventStreamStoreConfiguration.useLocalStore()).thenReturn(true);
-        when(legacyEventStreamStoreConfiguration.useMainStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
         when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
 

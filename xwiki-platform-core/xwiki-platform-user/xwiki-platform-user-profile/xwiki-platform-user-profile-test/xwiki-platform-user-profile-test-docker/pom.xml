@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile-test</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test-docker</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Functional Docker Tests</name>
@@ -43,12 +43,6 @@
       <artifactId>xwiki-platform-user-profile-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- The dashboard might change the behaviour of the profile, so we want to test with it -->
     <dependency>
@@ -83,14 +77,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

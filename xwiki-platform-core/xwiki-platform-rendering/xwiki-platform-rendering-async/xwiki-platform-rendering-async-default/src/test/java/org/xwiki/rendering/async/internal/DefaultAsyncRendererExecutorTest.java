@@ -38,6 +38,7 @@ import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -90,6 +91,8 @@ public class DefaultAsyncRendererExecutorTest
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private JobGroupPath jobGroupPath;
+
     @BeforeEach
     private void beforeEach() throws RenderingException, ComponentLookupException, JobException
     {
@@ -99,6 +102,8 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.render(false, false)).thenReturn(new AsyncRendererResult("false false"));
         when(this.renderer.render(true, false)).thenReturn(new AsyncRendererResult("true false"));
         when(this.renderer.render(false, true)).thenReturn(new AsyncRendererResult("false true"));
+        this.jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
+        when(this.renderer.getJobGroupPath()).thenReturn(this.jobGroupPath);
 
         when(cache.getLock()).thenReturn(this.lock);
 
@@ -165,6 +170,7 @@ public class DefaultAsyncRendererExecutorTest
             response.getStatus().getRequest().getId());
         assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
         assertEquals("true true", response.getStatus().getResult().getResult());
+        assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
 
     @Test
@@ -184,6 +190,7 @@ public class DefaultAsyncRendererExecutorTest
             response.getStatus().getRequest().getId());
         assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
         assertEquals("false true", response.getStatus().getResult().getResult());
+        assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
 
     @Test
@@ -204,6 +211,7 @@ public class DefaultAsyncRendererExecutorTest
         assertEquals("1/2/celement1/value1%255c/celement2/value2%252f/" + response.getAsyncClientId(),
             response.getJobIdHTTPPath());
         assertEquals("true false", response.getStatus().getResult().getResult());
+        assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
 
     @Test
@@ -222,6 +230,7 @@ public class DefaultAsyncRendererExecutorTest
         assertNull(response.getStatus().getRequest().getId());
         assertNull(response.getJobIdHTTPPath());
         assertEquals("false false", response.getStatus().getResult().getResult());
+        assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
 
     @Test

@@ -1,0 +1,4 @@
+Pages:
+  [create] [Title 1](https://externaldomain:4242/xwiki/bin/view/NotificationsEmailTest/Page1).
+  edited by NotificationsEmailsITuser1.
+  Changes: https://externaldomain:4242/xwiki/bin/view/NotificationsEmailTest/Page1?viewer=changes&rev1=1.1&rev2=1.1

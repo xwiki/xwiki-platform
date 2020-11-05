@@ -25,23 +25,24 @@ import java.util.HashSet;
 
 import javax.script.ScriptContext;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,36 +52,46 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.6RC1
  */
+@ComponentTest
 public class DefaultNotificationRSSRendererTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultNotificationRSSRenderer> mocker =
-            new MockitoComponentMockingRule<>(DefaultNotificationRSSRenderer.class);
+    @InjectMockComponents
+    private DefaultNotificationRSSRenderer defaultNotificationRSSRenderer;
 
+    @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
 
+    @MockComponent
     private TemplateManager templateManager;
 
+    @MockComponent
     private ScriptContextManager scriptContextManager;
 
-    @Before
-    public void setUp() throws Exception
+    private void mockEvent(CompositeEvent testCompositeEvent, boolean noTitle, boolean noDocument, boolean unknownTitle)
+        throws Exception
     {
-        this.contextualLocalizationManager = this.mocker.registerMockComponent(ContextualLocalizationManager.class);
+        when(this.contextualLocalizationManager.getTranslationPlain("EventTitle", "EventDocumentTitle"))
+            .thenReturn("TranslatedEventTitle");
+        when(this.contextualLocalizationManager.getTranslationPlain("EventTitle"))
+            .thenReturn("TranslatedEventTitleNoDocument");
+        when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.defaultTitleWithPage",
+            "EventDocumentTitle")).thenReturn("DefaultTitle");
+        when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.defaultTitle"))
+            .thenReturn("DefaultTitleNoDocument");
 
-        this.templateManager = this.mocker.registerMockComponent(TemplateManager.class);
-
-        this.scriptContextManager = this.mocker.registerMockComponent(ScriptContextManager.class);
-    }
-
-    private void mockEvent(CompositeEvent testCompositeEvent) throws Exception
-    {
         Event testEvent1 = mock(Event.class);
         Date testEventDate = mock(Date.class);
-        when(testEvent1.getTitle()).thenReturn("EventTitle");
-        when(testEvent1.getDocumentTitle()).thenReturn("EventDocumentTitle");
-        when(this.contextualLocalizationManager.getTranslationPlain("EventTitle", "EventDocumentTitle"))
-                .thenReturn("TranslatedEventTitle");
+        if (!noTitle) {
+            when(testEvent1.getTitle()).thenReturn("EventTitle");
+        }
+        if (!noDocument) {
+            when(testEvent1.getDocumentTitle()).thenReturn("EventDocumentTitle");
+        }
+        if (!unknownTitle) {
+            when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(mock(Translation.class));
+        } else {
+            when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(null);
+        }
 
         DocumentReference testEventAuthor1 = new DocumentReference("xwiki", "XWiki", "AuthorName");
 
@@ -95,17 +106,71 @@ public class DefaultNotificationRSSRendererTest
     }
 
     @Test
-    public void testCompositeEventRendering() throws Exception
+    void renderNotification() throws Exception
     {
-        CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
-
-        this.mockEvent(testCompositeEvent);
-
         when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
 
-        SyndEntry resultEntry = this.mocker.getComponentUnderTest().renderNotification(testCompositeEvent);
+        CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, false, false, false);
+        SyndEntry resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
 
         assertEquals("TranslatedEventTitle", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, false, true, false);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("TranslatedEventTitleNoDocument", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, true, true, false);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitleNoDocument", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, true, false, false);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitle", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, false, true, true);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitleNoDocument", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, false, false, true);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitle", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, true, true, true);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitleNoDocument", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
+
+        testCompositeEvent = mock(CompositeEvent.class);
+        this.mockEvent(testCompositeEvent, true, false, true);
+        resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
+
+        assertEquals("DefaultTitle", resultEntry.getTitle());
         assertEquals(1, resultEntry.getAuthors().size());
         assertEquals("id1", resultEntry.getUri());
     }

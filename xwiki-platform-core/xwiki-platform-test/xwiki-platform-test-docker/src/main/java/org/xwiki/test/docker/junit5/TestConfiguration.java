@@ -25,12 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
-import org.xwiki.text.StringUtils;
 import org.xwiki.tool.extension.ExtensionOverride;
 
 /**
@@ -87,7 +89,7 @@ public class TestConfiguration
 
     private boolean saveDatabaseData;
 
-    private boolean isOffline;
+    private boolean offline;
 
     private String servletEngineTag;
 
@@ -103,6 +105,8 @@ public class TestConfiguration
 
     private List<ArtifactCoordinate> extraJARs;
 
+    private boolean resolveExtraJARs;
+
     private List<Integer> sshPorts;
 
     private List<String> profiles;
@@ -112,6 +116,8 @@ public class TestConfiguration
     private List<ServletEngine> forbiddenServletEngines;
 
     private Properties databaseCommands;
+
+    private PropertiesMerger propertiesMerger = new PropertiesMerger();
 
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
@@ -132,12 +138,40 @@ public class TestConfiguration
         resolveVNC();
         resolveProperties();
         resolveExtraJARs();
+        resolveResolveExtraJARs();
         resolveExtensionOverrides();
         resolveSSHPorts();
         resolveProfiles();
         resolveOffice();
         resolveForbiddenServletEngines();
         resolveDatabaseCommands();
+    }
+
+    /**
+     * @param testConfiguration the configuration to merge with the current one
+     */
+    public void merge(TestConfiguration testConfiguration) throws DockerTestException
+    {
+        mergeBrowser(testConfiguration.getBrowser());
+        mergeDatabase(testConfiguration.getDatabase());
+        mergeServletEngine(testConfiguration.getServletEngine());
+        mergeVerbose(testConfiguration.isVerbose());
+        mergeDebug(testConfiguration.isDebug());
+        mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeOffline(testConfiguration.isOffline());
+        mergeDatabaseTag(testConfiguration.getDatabaseTag());
+        mergeServletEngineTag(testConfiguration.getServletEngineTag());
+        mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
+        mergeVNC(testConfiguration.vnc());
+        mergeProperties(testConfiguration.getProperties());
+        mergeExtraJARs(testConfiguration.getExtraJARs());
+        mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
+        mergeExtensionOverrides(testConfiguration.getExtensionOverrides());
+        mergeSSHPorts(testConfiguration.getSSHPorts());
+        mergeProfiles(testConfiguration.getProfiles());
+        mergeOffice(testConfiguration.isOffice());
+        mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
+        mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
     }
 
     /**
@@ -201,9 +235,39 @@ public class TestConfiguration
         this.browser = resolve(Browser.class, this.uiTestAnnotation.browser(), BROWSER_PROPERTY);
     }
 
+    private void mergeBrowser(Browser browser) throws DockerTestException
+    {
+        if (getBrowser() != null) {
+            if (browser != null && !getBrowser().equals(browser)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge browser [%s] since it was already specified as [%s]", browser,
+                        getBrowser()));
+            } else {
+                this.browser = getBrowser();
+            }
+        } else {
+            this.browser = browser;
+        }
+    }
+
     private void resolveDatabase()
     {
         this.database = resolve(Database.class, this.uiTestAnnotation.database(), DATABASE_PROPERTY);
+    }
+
+    private void mergeDatabase(Database database) throws DockerTestException
+    {
+        if (getDatabase() != null) {
+            if (database != null && !getDatabase().equals(database)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge database [%s] since it was already specified as [%s]", database,
+                        getDatabase()));
+            } else {
+                this.database = getDatabase();
+            }
+        } else {
+            this.database = database;
+        }
     }
 
     private void resolveServletEngine()
@@ -212,9 +276,38 @@ public class TestConfiguration
             SERVLETENGINE_PROPERTY);
     }
 
+    private void mergeServletEngine(ServletEngine servletEngine) throws DockerTestException
+    {
+        if (getServletEngine() != null) {
+            if (servletEngine != null && !getServletEngine().equals(servletEngine)) {
+                throw new DockerTestException(
+                     String.format("Cannot merge Servlet engine [%s] since it was already specified as [%s]",
+                     servletEngine, getServletEngine()));
+            } else {
+                this.servletEngine = getServletEngine();
+            }
+        } else {
+            this.servletEngine = servletEngine;
+        }
+    }
+
     private void resolveVerbose()
     {
-        this.verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
+        boolean isVerbose;
+        // Always display verbose logs for debugging when inside a container.
+        if (DockerTestUtils.isInAContainer()) {
+            isVerbose = true;
+        } else {
+            isVerbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
+        }
+        this.verbose = isVerbose;
+    }
+
+    private void mergeVerbose(boolean verbose)
+    {
+        if (!isVerbose() && verbose) {
+            this.verbose = true;
+        }
     }
 
     private void resolveDebug()
@@ -222,14 +315,35 @@ public class TestConfiguration
         this.debug = resolve(this.uiTestAnnotation.debug(), DEBUG_PROPERTY);
     }
 
+    private void mergeDebug(boolean debug)
+    {
+        if (!isDebug() && debug) {
+            this.debug = true;
+        }
+    }
+
     private void resolveSaveDatabaseData()
     {
         this.saveDatabaseData = resolve(this.uiTestAnnotation.saveDatabaseData(), SAVEDBDATA_PROPERTY);
     }
 
+    private void mergeSaveDatabaseData(boolean saveDatabaseData)
+    {
+        if (!isDatabaseDataSaved() && saveDatabaseData) {
+            this.saveDatabaseData = true;
+        }
+    }
+
     private void resolveOffline()
     {
-        this.isOffline = resolve(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY);
+        this.offline = resolve(this.uiTestAnnotation.offline(), OFFLINE_PROPERTY);
+    }
+
+    private void mergeOffline(boolean offline)
+    {
+        if (!isOffline() && offline) {
+            this.offline = true;
+        }
     }
 
     private void resolveDatabaseTag()
@@ -237,9 +351,39 @@ public class TestConfiguration
         this.databaseTag = resolve(this.uiTestAnnotation.databaseTag(), DATABASETAG_PROPERTY);
     }
 
+    private void mergeDatabaseTag(String databaseTag) throws DockerTestException
+    {
+        if (getDatabaseTag() != null) {
+            if (databaseTag != null && !getDatabaseTag().equals(databaseTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge database tag [%s] since it was already specified as [%s]",
+                        databaseTag, getDatabaseTag()));
+            } else {
+                this.databaseTag = getDatabaseTag();
+            }
+        } else {
+            this.databaseTag = databaseTag;
+        }
+    }
+
     private void resolveServletEngineTag()
     {
         this.servletEngineTag = resolve(this.uiTestAnnotation.servletEngineTag(), SERVLETENGINETAG_PROPERTY);
+    }
+
+    private void mergeServletEngineTag(String servletEngineTag) throws DockerTestException
+    {
+        if (getServletEngineTag() != null) {
+            if (servletEngineTag != null && !getServletEngineTag().equals(servletEngineTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge Servlet engine tag [%s] since it was already specified as [%s]",
+                        servletEngineTag, getServletEngineTag()));
+            } else {
+                this.servletEngineTag = getServletEngineTag();
+            }
+        } else {
+            this.servletEngineTag = servletEngineTag;
+        }
     }
 
     private void resolveJDBCDriverVersion()
@@ -247,9 +391,31 @@ public class TestConfiguration
         this.jdbcDriverVersion = resolve(this.uiTestAnnotation.jdbcDriverVersion(), JDBCDRIVERVERSION_PROPERTY);
     }
 
+    private void mergeJDBCDriverVersion(String jdbcDriverVersion) throws DockerTestException
+    {
+        if (getJDBCDriverVersion() != null) {
+            if (jdbcDriverVersion != null && !getJDBCDriverVersion().equals(jdbcDriverVersion)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge JDBC driver version [%s] since it was already specified as [%s]",
+                        jdbcDriverVersion, getJDBCDriverVersion()));
+            } else {
+                this.jdbcDriverVersion = getJDBCDriverVersion();
+            }
+        } else {
+            this.jdbcDriverVersion = jdbcDriverVersion;
+        }
+    }
+
     private void resolveVNC()
     {
         this.vnc = resolve(this.uiTestAnnotation.vnc(), VNC_PROPERTY);
+    }
+
+    private void mergeVNC(boolean vnc)
+    {
+        if (!vnc() && vnc) {
+            this.vnc = true;
+        }
     }
 
     private void resolveOffice()
@@ -257,15 +423,32 @@ public class TestConfiguration
         this.office = resolve(this.uiTestAnnotation.office(), OFFICE_PROPERTY);
     }
 
+    private void mergeOffice(boolean office)
+    {
+        if (!isOffice() && office) {
+            this.office = true;
+        }
+    }
+
     private void resolveProperties()
     {
         this.properties = resolveGenericProperties(this.uiTestAnnotation.properties(), PROPERTIES_PREFIX_PROPERTY);
+    }
+
+    private void mergeProperties(Properties properties) throws DockerTestException
+    {
+        this.properties = this.propertiesMerger.merge(getProperties(), properties, false);
     }
 
     private void resolveDatabaseCommands()
     {
         this.databaseCommands = resolveGenericProperties(this.uiTestAnnotation.databaseCommands(),
             DATABASE_PREFIX_COMMAND);
+    }
+
+    private void mergeDatabaseCommands(Properties databaseCommands) throws DockerTestException
+    {
+        this.databaseCommands = this.propertiesMerger.merge(getDatabaseCommands(), databaseCommands, false);
     }
 
     private Properties resolveGenericProperties(String[] propertiesAsArray)
@@ -304,6 +487,25 @@ public class TestConfiguration
         this.extraJARs = artifactCoordinates;
     }
 
+    private void mergeExtraJARs(List<ArtifactCoordinate> extraJARs)
+    {
+        List<ArtifactCoordinate> mergedExtraJARs = getExtraJARs();
+        mergedExtraJARs.addAll(extraJARs);
+        this.extraJARs = mergedExtraJARs;
+    }
+
+    private void resolveResolveExtraJARs()
+    {
+        this.resolveExtraJARs = this.uiTestAnnotation.resolveExtraJARs();
+    }
+
+    private void mergeResolveExtraJARs(boolean resolveExtraJARs)
+    {
+        if (!isResolveExtraJARs() && resolveExtraJARs) {
+            this.resolveExtraJARs = true;
+        }
+    }
+
     private void resolveExtensionOverrides()
     {
         List<ExtensionOverride> overrides = new ArrayList<>();
@@ -317,6 +519,13 @@ public class TestConfiguration
         this.extensionOverrides = overrides;
     }
 
+    private void mergeExtensionOverrides(List<ExtensionOverride> extensionOverrides)
+    {
+        List<ExtensionOverride> mergedExtensionOverrides = getExtensionOverrides();
+        mergedExtensionOverrides.addAll(extensionOverrides);
+        this.extensionOverrides = mergedExtensionOverrides;
+    }
+
     private void resolveSSHPorts()
     {
         List<Integer> newSSHPorts = new ArrayList<>();
@@ -325,6 +534,13 @@ public class TestConfiguration
             newSSHPorts.add(sshPort);
         }
         this.sshPorts = newSSHPorts;
+    }
+
+    private void mergeSSHPorts(List<Integer> sshPorts)
+    {
+        List<Integer> mergedSSHPorts = getSSHPorts();
+        mergedSSHPorts.addAll(sshPorts);
+        this.sshPorts = mergedSSHPorts;
     }
 
     private void resolveProfiles()
@@ -338,6 +554,13 @@ public class TestConfiguration
         this.profiles = newProfiles;
     }
 
+    private void mergeProfiles(List<String> profiles)
+    {
+        List<String> mergedProfiles = getProfiles();
+        mergedProfiles.addAll(profiles);
+        this.profiles = mergedProfiles;
+    }
+
     private void resolveForbiddenServletEngines()
     {
         List<ServletEngine> newForbiddenServletEngines = new ArrayList<>();
@@ -345,6 +568,13 @@ public class TestConfiguration
             newForbiddenServletEngines.addAll(Arrays.asList(this.uiTestAnnotation.forbiddenEngines()));
         }
         this.forbiddenServletEngines = newForbiddenServletEngines;
+    }
+
+    private void mergeForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
+    {
+        List<ServletEngine> mergedForbiddenServletEngines = getForbiddenServletEngines();
+        mergedForbiddenServletEngines.addAll(forbiddenServletEngines);
+        this.forbiddenServletEngines = mergedForbiddenServletEngines;
     }
 
     /**
@@ -406,7 +636,7 @@ public class TestConfiguration
      */
     public boolean isOffline()
     {
-        return this.isOffline;
+        return this.offline;
     }
 
     /**
@@ -473,6 +703,15 @@ public class TestConfiguration
     public List<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
+    }
+
+    /**
+     * @return true if extra JARs version should be resolved when missing, see {@link UITest#resolveExtraJARs()}
+     * @since 12.5RC1
+     */
+    public boolean isResolveExtraJARs()
+    {
+        return this.resolveExtraJARs;
     }
 
     /**

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -90,6 +90,26 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!--
+    Needed for the delete page tests.
+    This dependency is needed because the delete page tests need to activate the configuration that allows advanced
+    users to choose whether pages are permanently deleted or moved to the recycled bin.
+    The access to this configuration is currently only available through the refactoring UI.
+    Note that the definitive place of this configuration is still in discussion and this dependency needs to be removed
+    if it moves out of the refactoring UI.
+     -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Needed for ObjectEditorIT to test user displayer. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -116,14 +136,10 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -34,6 +35,7 @@ import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Abstract super class for right resolvers.
@@ -95,6 +97,17 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         {
             return this.reference;
         }
+
+        @Override
+        public String toString()
+        {
+            ToStringBuilder builder = new XWikiToStringBuilder(this);
+            builder.append("user", this.userReference);
+            builder.append("entity", this.reference);
+            builder.append("access", this.access);
+
+            return builder.toString();
+        }
     }
 
     /**
@@ -111,7 +124,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         /**
          * Create Policies based on default initial policies.
          */
-        Policies() {
+        Policies()
+        {
             try {
                 if (initialAllowTie == null || Right.size() != initialPolicySize) {
                     initialPolicySize = Right.size();
@@ -140,7 +154,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param impliedRight the implied right to set
          * @param originalRight the original right to get
          */
-        public void set(Right impliedRight, Right originalRight) {
+        public void set(Right impliedRight, Right originalRight)
+        {
             if (originalRight.getTieResolutionPolicy() == RuleState.ALLOW) {
                 allowTie.add(impliedRight);
             }
@@ -153,7 +168,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param right the right to check.
          * @return the current tie resolution policy of this right.
          */
-        public RuleState getTieResolutionPolicy(Right right) {
+        public RuleState getTieResolutionPolicy(Right right)
+        {
             return (allowTie.contains(right)) ? RuleState.ALLOW : RuleState.DENY;
         }
 
@@ -161,7 +177,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param right the right to check.
          * @return the current tie resolution policy of this right.
          */
-        public boolean getInheritanceOverridePolicy(Right right) {
+        public boolean getInheritanceOverridePolicy(Right right)
+        {
             return !noOverride.contains(right);
         }
     }

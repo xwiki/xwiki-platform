@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>
   <description>XWiki Platform - Tools - Web Standard Validator</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>89</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -46,17 +45,13 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <dependency>
-      <groupId>rome</groupId>
+      <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>18.11.5</version>
+      <version>20.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
@@ -73,14 +68,6 @@
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity-tools</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

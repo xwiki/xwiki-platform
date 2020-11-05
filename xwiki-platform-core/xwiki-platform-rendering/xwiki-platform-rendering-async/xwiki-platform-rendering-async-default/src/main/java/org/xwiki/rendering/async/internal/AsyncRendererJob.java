@@ -22,12 +22,17 @@ package org.xwiki.rendering.async.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.template.TemplateManager;
+
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
  * Default implementation of {@link AsyncRendererJob}.
@@ -37,7 +42,7 @@ import org.xwiki.template.TemplateManager;
  */
 @Component
 @Named(AsyncRendererJobStatus.JOBTYPE)
-public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus>
+public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, AsyncRendererJobStatus> implements GroupedJob
 {
     @Inject
     private AsyncRendererCache cache;
@@ -47,6 +52,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private TemplateManager templateManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     protected AsyncRendererJobRequest castRequest(Request request)
@@ -90,6 +98,11 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         // (other than executing it at the beginning of every single element which might be executed asynchronously...)
         this.templateManager.execute("xwikivars.vm");
 
+        // Mark the context document as used if it was explicitly set in the context
+        if (this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
+            this.asyncContext.useEntity(documentAccessBridge.getCurrentDocumentReference());
+        }
+
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
@@ -108,5 +121,11 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
         // Cache the result
         this.cache.put(getStatus());
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return getRequest().getJobGroupPath();
     }
 }

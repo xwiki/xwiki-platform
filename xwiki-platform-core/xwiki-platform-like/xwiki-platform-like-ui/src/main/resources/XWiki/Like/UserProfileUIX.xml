@@ -1,0 +1,299 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Like.UserProfileUIX" locale="">
+  <web>XWiki.Like</web>
+  <name>UserProfileUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Like.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ($request.livetable == "true")
+  #template('hierarchy_macros.vm')
+  #if("$!{request.xpage}" == 'plain')
+    $response.setContentType('application/json')
+  #end
+  #set ($documentReference = $services.model.resolveDocument($request.user))
+  ##==============================
+  ## Offset = item # at which to start displaying data
+  ##==============================
+  #set($offset = $numbertool.toNumber($request.get('offset')))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if($offset &lt; 0)
+    #set($offset = 0)
+  #end
+  ##==================
+  ## Limit = # of items to display
+  ##==================
+  #set($limit = $numbertool.toNumber($request.get('limit')))
+  #set ($likedPages = $services.like.getUserLikes($documentReference, $offset, $limit))
+  #set ($optUserLikes = $services.like.countUserLikes($documentReference))
+  #if ($optUserLikes.isPresent())
+    #set ($totalRows = $optUserLikes.get())
+  #else
+    #set ($totalRows = $likedPages.size())
+  #end
+  ##==========
+  ## Sort direction
+  ##==========
+  #set($order = "$!request.sort")
+  #if($order != '')
+    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+      #set($orderDirection = 'desc')
+    #end
+  #end
+  #set ($pagesRows = [])
+  #foreach($likedPage in $likedPages)
+    #set ($likedDoc = $xwiki.getDocument($likedPage))
+    #set ($optDocumentLikes = $services.like.getLikes($likedPage))
+    #if ($optDocumentLikes.isPresent())
+      #set ($documentLikes = $optDocumentLikes.get())
+    #else
+      #set ($documentLikes = "N/A")
+    #end
+    ## code inspired from getdocuments.vm
+    #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, $services.model.serialize($likedPage, "default")))
+    #set ($row = {'doc_viewable' : $viewable})
+    #if (!$viewable)
+      #set ($discard = $row.put('doc_fullName', $likedDoc.fullName))
+    #else
+      #set ($translatedDoc = $likedDoc.translatedDocument)
+      #set ($fullname = $services.model.serialize($likedDoc.documentReference, 'default'))
+      #set ($discard = $row.put('doc_name', $likedDoc.documentReference.name))
+      #set ($discard = $row.put('doc_fullName', $fullname))
+      #set ($location = "#hierarchy($likedDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
+      #set ($discard = $row.put('doc_location', $location))
+      #set ($discard = $row.put('doc_space', $likedDoc.space))
+      #set ($discard = $row.put('doc_url', $xwiki.getURL($likedDoc)))
+      #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!likedDoc.wiki, $!likedDoc.space, 'WebHome'))))
+      #set ($discard = $row.put('doc_wiki', $likedDoc.wiki))
+      #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $likedDoc.documentReference.extractReference('WIKI')))))
+      #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+      #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+      #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+      #set ($rawTitle = $translatedDoc.title)
+      #if ($rawTitle != $row['doc_title'])
+        #set ($discard = $row.put('doc_title_raw', $rawTitle))
+      #end
+      #set ($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
+      #set ($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+      #set ($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
+    #end
+    #set ($discard = $row.put('like', $documentLikes))
+    #set ($discard = $pagesRows.add($row))
+  #end
+  #set ($newOffset = $offset + 1)
+  ## ===
+  ## JSON
+  ## ===
+  {
+    "totalrows": $totalRows,
+    "returnedrows":  $pagesRows.size(),
+    "offset": $newOffset,
+    "reqNo": $numbertool.toNumber($request.reqNo),
+    "rows": $jsontool.serialize($pagesRows)
+  }
+#end
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.Like.UserProfileUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>b79d80e9-7a28-4d56-b5d9-1de5cfa820ff</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>doc.reference</value>
+        <value>user</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+=$escapetool.xml($services.localization.render("like.userprofile.menu"))=
+#set($columns = ["doc.title", "doc.location", "like"])
+#set ($docTitleDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.title')))
+#set ($docLocationDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.location')))
+#set ($likesDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.likes')))
+#set($columnsProperties = {
+  "doc.title" : { "displayName": $docTitleDisplayName, "type": "text", "size": 30, "link": "view", "sortable": false, "filterable": false },
+  "doc.location" : { "displayName": $docLocationDisplayName, "type": "text", "size": 30, "html": true, "sortable": false, "filterable": false },
+  "like" : { "displayName": $likesDisplayName, "type" : "number", "sortable": false, "filterable": false }
+})
+
+#set ($currentUser = $services.model.serialize($doc.documentReference, "default"))
+#set ($pageToCallReference = $services.model.resolveDocument("XWiki.Like.UserProfileUIX"))
+#set ($pageToCall = $xwiki.getDocument($pageToCallReference))
+#set ($queryParams = {
+  "user": $currentUser,
+  "livetable": "true",
+  "xpage": "plain",
+  "outputSyntax": "plain"
+})
+#set($options = {
+  'url': $pageToCall.getURL('get', $escapetool.url($queryParams))
+})
+#livetable("likedPages" $columns $columnsProperties $options)
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.like.userProfileMenu</name>
+    </property>
+    <property>
+      <parameters>icon=heart
+name=$services.localization.render('like.userprofile.menu')
+isActive=#if($services.like.isAuthorized($services.wiki.currentWikiReference))true#{else}false#end
+priority=1000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

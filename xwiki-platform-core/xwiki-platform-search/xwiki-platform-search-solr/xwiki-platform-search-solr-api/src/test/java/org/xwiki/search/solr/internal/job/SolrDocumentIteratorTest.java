@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Provider;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +31,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,7 +43,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -60,13 +57,13 @@ import static org.mockito.Mockito.when;
  * @since 5.4.5
  */
 @ComponentTest
-public class SolrDocumentIteratorTest
+class SolrDocumentIteratorTest
 {
     @MockComponent
     private SolrReferenceResolver resolver;
 
     @MockComponent
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstance;
 
     @MockComponent
     private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
@@ -74,18 +71,8 @@ public class SolrDocumentIteratorTest
     @InjectMockComponents
     private SolrDocumentIterator solrIterator;
 
-    private SolrInstance solr;
-
-    @BeforeEach
-    public void configure() throws Exception
-    {
-        this.solr = mock(SolrInstance.class);
-
-        when(this.solrInstanceProvider.get()).thenReturn(this.solr);
-    }
-
     @Test
-    public void size() throws Exception
+    void size() throws Exception
     {
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(12L);
@@ -93,7 +80,7 @@ public class SolrDocumentIteratorTest
         QueryResponse response = mock(QueryResponse.class);
         when(response.getResults()).thenReturn(results);
 
-        when(solr.query(any(SolrQuery.class))).thenReturn(response);
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
 
         DocumentIterator<String> iterator = this.solrIterator;
 
@@ -106,13 +93,13 @@ public class SolrDocumentIteratorTest
     }
 
     @Test
-    public void sizeWithException() throws Exception
+    void sizeWithException()
     {
         assertThrows(IllegalStateException.class, () -> this.solrIterator.size(), "Failed to query the Solr index.");
     }
 
     @Test
-    public void iterate() throws Exception
+    void iterate() throws Exception
     {
         SolrDocumentList firstResults = new SolrDocumentList();
         firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", "1.3"));
@@ -129,27 +116,27 @@ public class SolrDocumentIteratorTest
         when(secondResponse.getNextCursorMark()).thenReturn("bar");
         when(secondResponse.getResults()).thenReturn(secondResults);
 
-        when(solr.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
 
         DocumentIterator<String> iterator = this.solrIterator;
 
         WikiReference rootReference = new WikiReference("wiki");
         iterator.setRootReference(rootReference);
 
-        List<Pair<DocumentReference, String>> actualResult = new ArrayList<Pair<DocumentReference, String>>();
+        List<Pair<DocumentReference, String>> actualResult = new ArrayList<>();
         while (iterator.hasNext()) {
             actualResult.add(iterator.next());
         }
 
         verify(this.resolver).getQuery(rootReference);
 
-        List<Pair<DocumentReference, String>> expectedResult = new ArrayList<Pair<DocumentReference, String>>();
+        List<Pair<DocumentReference, String>> expectedResult = new ArrayList<>();
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
-        expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "1.3"));
+        expectedResult.add(new ImmutablePair<>(documentReference, "1.3"));
         documentReference = new DocumentReference("chess", Arrays.asList("M"), "N", Locale.ENGLISH);
-        expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "2.4"));
+        expectedResult.add(new ImmutablePair<>(documentReference, "2.4"));
         documentReference = new DocumentReference("tennis", Arrays.asList("X", "Y", "Z"), "V", Locale.FRENCH);
-        expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "1.1"));
+        expectedResult.add(new ImmutablePair<>(documentReference, "1.1"));
 
         assertEquals(expectedResult, actualResult);
     }

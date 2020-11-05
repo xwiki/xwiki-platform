@@ -36,7 +36,7 @@
   https://tcollignon.github.io/2016/02/09/Accelerate-tomcat-78-start-up.html
   (see: "Disable scanning the web application", 
         "Disable scanning web-fragment jar",
-        "Disable both WebSocket and JSP support (only tomcat 8)", 
+        "Disable both WebSocket and JSP support", 
         "Excludes jars for scanning")
 -->
 <Context path="/xwiki" docBase="/usr/lib/xwiki"
@@ -47,8 +47,7 @@
        expired cache entries", which is solved by increasing the cache
        size. 
   -->
-  <Resources allowLinking="true" cachingAllowed="true"
-             cacheMaxSize="12800" cacheObjectMaxSize="640" />
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="32768"/>
 
   <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">

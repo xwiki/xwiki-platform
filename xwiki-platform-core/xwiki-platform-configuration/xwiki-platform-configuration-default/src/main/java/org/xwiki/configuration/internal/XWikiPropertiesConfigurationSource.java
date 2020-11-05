@@ -77,7 +77,8 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         File file = new File("/etc/xwiki/" + XWIKI_PROPERTIES_FILE);
         if (file.exists()) {
             try {
-                this.logger.info("loading {} from default location {}", XWIKI_PROPERTIES_FILE, file.getCanonicalPath());
+                this.logger.info("Loading [{}] from default location [{}]", XWIKI_PROPERTIES_FILE,
+                    file.getCanonicalPath());
                 return new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
                     .configure(new Parameters().properties()
                         .setListDelimiterHandler(new DefaultListDelimiterHandler(',')).setFile(file))
@@ -95,7 +96,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         try {
             xwikiPropertiesUrl = this.environment.getResource(XWIKI_PROPERTIES_WARPATH);
             if (xwikiPropertiesUrl != null) {
-                this.logger.info("loading {} from {}", XWIKI_PROPERTIES_FILE, xwikiPropertiesUrl.toExternalForm());
+                this.logger.info("Loading [{}] from [{}]", XWIKI_PROPERTIES_FILE, xwikiPropertiesUrl.toExternalForm());
                 FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                     new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
                         .configure(new Parameters().properties()

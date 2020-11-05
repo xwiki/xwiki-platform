@@ -19,7 +19,8 @@
  */
 package org.xwiki.security.authentication.api;
 
-import org.securityfilter.filter.SecurityRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
@@ -38,9 +39,10 @@ public interface AuthenticationFailureManager
      * Record that the given username fails to authenticate.
      * @param username the username that fails the authentication. Should be the username typed by the user and not a
      *          computed login.
+     * @param request a wrapping of the request used for the authentication.
      * @return true if the authentication failure limits defined by the configuration has been reached.
      */
-    boolean recordAuthenticationFailure(String username);
+    boolean recordAuthenticationFailure(String username, HttpServletRequest request);
 
     /**
      * Remove all records of authentication failure for the given user.
@@ -54,20 +56,21 @@ public interface AuthenticationFailureManager
      * strategies (see {@link AuthenticationFailureStrategy#getForm(String)}). Else return an empty string.
      * @param username the username that is used for the authentication. Should be the username typed by the user and
      *                   not a computed login.
+     * @param request a wrapping of the request used for the authentication.
      * @return the aggregated form information to add to the standard login form, or an empty string.
      */
-    String getForm(String username);
+    String getForm(String username, HttpServletRequest request);
 
     /**
      * If the user reached the authentication failure limit, validate the form information against the different
      * strategies used and return the result
-     * (see {@link AuthenticationFailureStrategy#validateForm(String, SecurityRequestWrapper)}). Else returns true.
+     * (see {@link AuthenticationFailureStrategy#validateForm(String, HttpServletRequest)}). Else returns true.
      * @param username the username that is used for the authentication. Should be the username typed by the user and
      *      not a computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return true if all strategies validate the request or if the user didn't reach the limit.
      */
-    boolean validateForm(String username, SecurityRequestWrapper request);
+    boolean validateForm(String username, HttpServletRequest request);
 
     /**
      * If the user reached the authentication failure limit, aggregate the error message of the different strategies

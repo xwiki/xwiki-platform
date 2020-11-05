@@ -44,26 +44,56 @@ public class NotificationsRSS
 {
     private SyndFeed feed;
 
+    private String url;
+    private String user;
+    private String password;
+
     /**
      * @param url URL of the RSS feed
      * @param user username to use to connect
      * @param password password of the user
-     * @throws Exception if an error happens while fetching and parsing RSS
      */
-    public NotificationsRSS(String url, String user, String password) throws Exception
+    public NotificationsRSS(String url, String user, String password)
     {
+        this.url = url;
+        this.user = user;
+        this.password = password;
+    }
+
+    /**
+     * Allow to load the entries but transform first the URL to load them from the real host domain:
+     * it might be different than the one from the retrieved URL since this class is not executed inside a docker
+     * container, and the servletEngine might not be inside a container either.
+     *
+     * @param containerDomain the domain used inside the browser
+     * @param realDomain the real domain to use to access the servletEngine from the test.
+     * @since 12.3RC1
+     */
+    public void loadEntries(String containerDomain, String realDomain)
+    {
+        String originalURL = this.url;
+        this.url = this.url.replace(containerDomain, realDomain);
         HttpClient client = HttpClientBuilder.create().build();
 
-        HttpGet request = new HttpGet(url);
-        request.addHeader("Authorization", "Basic " + Base64.encode(user + ":" + password));
+        try {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("Authorization", "Basic " + Base64.encode(user + ":" + password));
 
-        HttpResponse response = client.execute(request);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new Exception(String.format("Bad status code: [%d].", response.getStatusLine().getStatusCode()));
+            HttpResponse response = client.execute(request);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new AssertionError(String.format("Bad status code: [%d].",
+                    response.getStatusLine().getStatusCode()));
+            }
+
+            SyndFeedInput input = new SyndFeedInput();
+            feed = input.build(new XmlReader(response.getEntity().getContent()));
+        } catch (Exception e) {
+            throw new AssertionError(
+                String.format("Error while loading and parsing the RSS feed from URL [%s]. "
+                    + "Original URL was [%s] internal domain [%s] replaced by external one [%s].",
+                    url, originalURL, containerDomain, realDomain),
+                e);
         }
-
-        SyndFeedInput input = new SyndFeedInput();
-        feed = input.build(new XmlReader(response.getEntity().getContent()));
     }
 
     /**

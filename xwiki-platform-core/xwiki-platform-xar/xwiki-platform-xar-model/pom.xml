@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xar</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xar-model</artifactId>
   <name>XWiki Platform - XAR - Model API</name>
@@ -33,7 +33,6 @@
   <description>Model API to represent the XAR format</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>56</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>API to represent the XAR format</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -62,7 +61,6 @@
       <groupId>net.java.dev.stax-utils</groupId>
       <artifactId>stax-utils</artifactId>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

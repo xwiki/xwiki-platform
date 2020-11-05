@@ -101,8 +101,15 @@
   #if("$!{filterError}" != '')
     #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
   #end
-  #set ($totalrows = $services.mailstorage.count($filterMap))
-  #set ($results = $services.mailstorage.load($filterMap, $offset, $limit, $order, $orderDirection))
+  #set ($totalrows = $services.mail.storage.count($filterMap))
+  #set ($results = $services.mail.storage.load($filterMap, $offset, $limit, $order, $orderDirection))
+  ## If there's an error then log it since we cannot return an error to the Livetable
+  #if ($services.mail.sender.lastError)
+    $services.logging.getLogger('Mail Status Livetable').error('Failed to load mails from store',
+    $services.mail.sender.lastError)
+    ## Return an empty result in case of error
+    #set ($result = $collectiontool.getArrayList())
+  #end
   ## ===============
   ## JSON Generation
   ## ===============
@@ -130,7 +137,7 @@
       #set($discard  = $row.put('wiki', $!item.wiki))
     #end
     #if("$!item.state" != 'sent')
-      #set($discard  = $row.put('actions', "&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+      #set($discard  = $row.put('actions', "&lt;form action='' method='post'&gt;
               &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
               &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
               &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;

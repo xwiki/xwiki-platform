@@ -25,9 +25,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -44,6 +46,8 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 4.0M2
  */
+@Component
+@Singleton
 public class DefaultAnnotationConfiguration implements AnnotationConfiguration
 {
     /**

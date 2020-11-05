@@ -19,74 +19,37 @@
  */
 package org.xwiki.ratings;
 
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.stability.Unstable;
 
 /**
- * RatingsException definition.
- * 
+ * Generic exception for Rating API.
+ *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.9RC1
  */
-public class RatingsException extends XWikiException
+@Unstable
+public class RatingsException extends Exception
 {
-    private static final long serialVersionUID = 1L;
-
-    // Module
-    public static final int MODULE_PLUGIN_RATINGS = 1120;
-    
-    // Error list
-    public static final int ERROR_RATINGS_CREATECONTAINER_NULLSPACE = 1120001;
-
-    public static final int ERROR_RATINGS_ADDRATING_NULLCONTAINER = 1120002;
-
-    public static final int ERROR_RATINGS_ADDRATING_NULLCONTENT = 1120003;
-
-    public static final int ERROR_RATINGS_INVALID_RATING_ID = 1120004;
-
-    public static final int ERROR_RATINGS_SAVERATING_NULLDOCUMENT = 1120005;
+    private static final long serialVersionUID = -2229233170941158972L;
 
     /**
-     * RatingsException default constructor
+     * Default constructor with message.
+     *
+     * @param message Cause of the exception.
      */
-    public RatingsException()
+    public RatingsException(String message)
     {
+        super(message);
     }
 
     /**
-     * RatingsException constructor.
-     * 
-     * @param module the module in which the exception occurred
-     * @param code the code for the generated exception
-     * @param message the message for the generated exception
+     * Default constructor with message and parent exception.
+     *
+     * @param message Cause of the exception.
+     * @param throwable Parent of the exception.
      */
-    public RatingsException(int module, int code, String message)
+    public RatingsException(String message, Throwable throwable)
     {
-        super(module, code, message);
-    }
-
-    /**
-     * RatingsException constructor.
-     * 
-     * @param module the module in which the exception occurred
-     * @param code the code for the generated exception
-     * @param message the message for the generated exception
-     * @param e the XWikiException that occurred
-     */
-    public RatingsException(int module, int code, String message, Exception e)
-    {
-        super(module, code, message, e);
-    }
-
-    /**
-     * RatingsException constructor.
-     * 
-     * @param e the XWikiException that occurred
-     */
-    public RatingsException(XWikiException e)
-    {
-        super(e.getModule(), e.getCode(), e.getMessage());
-
-        initCause(e.getCause());
-        setArgs(e.getArgs());
+        super(message, throwable);
     }
 }

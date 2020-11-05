@@ -189,7 +189,7 @@ public class WikiEventListener extends AbstractEventListener
         ExtensionHandler xarHandler = this.xarHandlerProvider.get();
 
         for (InstalledExtension installedExtension : installedExtensions) {
-            if (installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equals(installedExtension.getType())) {
                 installRequest.addExtension(installedExtension.getId());
 
                 try {

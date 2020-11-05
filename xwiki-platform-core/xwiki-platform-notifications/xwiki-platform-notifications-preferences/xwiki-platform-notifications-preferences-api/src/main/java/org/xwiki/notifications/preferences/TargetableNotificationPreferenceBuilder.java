@@ -42,45 +42,53 @@ public interface TargetableNotificationPreferenceBuilder
 
     /**
      * Prepare the builder for a new instance.
+     * @return the current instance.
      */
-    void prepare();
+    TargetableNotificationPreferenceBuilder prepare();
 
     /**
      * Define if the notification preference is enabled or not.
      *
      * @param isEnabled true if the preference should be enabled
+     * @return the current instance.
      */
-    void setEnabled(boolean isEnabled);
+    TargetableNotificationPreferenceBuilder setEnabled(boolean isEnabled);
 
     /**
      * @param format the format of the preference
+     * @return the current instance.
      */
-    void setFormat(NotificationFormat format);
+    TargetableNotificationPreferenceBuilder setFormat(NotificationFormat format);
 
     /**
      * @param properties a map of the preference properties
+     * @return the current instance.
      */
-    void setProperties(Map<NotificationPreferenceProperty, Object> properties);
+    TargetableNotificationPreferenceBuilder setProperties(Map<NotificationPreferenceProperty, Object> properties);
 
     /**
      * @param providerHint the hint of the provider of the preference
+     * @return the current instance.
      */
-    void setProviderHint(String providerHint);
+    TargetableNotificationPreferenceBuilder setProviderHint(String providerHint);
 
     /**
      * @param startDate the start date of the preference
+     * @return the current instance.
      */
-    void setStartDate(Date startDate);
+    TargetableNotificationPreferenceBuilder setStartDate(Date startDate);
 
     /**
      * @param target the target of the preference
      * @since 9.11.4
      * @since 10.2RC2
+     * @return the current instance.
      */
-    void setTarget(EntityReference target);
+    TargetableNotificationPreferenceBuilder setTarget(EntityReference target);
 
     /**
      * @param category the category of the preference
+     * @return the current instance.
      */
-    void setCategory(NotificationPreferenceCategory category);
+    TargetableNotificationPreferenceBuilder setCategory(NotificationPreferenceCategory category);
 }

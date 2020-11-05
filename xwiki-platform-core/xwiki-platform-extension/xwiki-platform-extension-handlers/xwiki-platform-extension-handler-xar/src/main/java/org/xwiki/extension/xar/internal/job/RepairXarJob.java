@@ -174,7 +174,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
                 this.progressManager.startStep(this);
 
-                if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+                if (XarExtensionHandler.TYPE.equals(extension.getType())) {
                     localExtension = this.localExtensionRepository.storeExtension(extension);
                 }
 

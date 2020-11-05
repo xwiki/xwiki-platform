@@ -19,113 +19,98 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.ratings.RatingsConfiguration;
-import org.xwiki.ratings.RatingsManager;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseProperty;
 
 /**
- * Provides Ratings configuration.
+ * Default configuration for Ratings.
+ * By default the configuration considers a scale of 5, doesn't use a dedicated core, stores the zero values and the
+ * average. And it uses the solr manager.
+ * FIXME: Change this to be based on a RatingConfiguration document.
  *
- * @see RatingsConfiguration
  * @version $Id$
- * @since 8.2.1
+ * @since 12.9RC1
  */
 @Component
 @Singleton
 public class DefaultRatingsConfiguration implements RatingsConfiguration
 {
     @Inject
-    private Logger logger;
-    
+    @Named("ratings")
+    private ConfigurationSource configurationSource;
+
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * Get document.
-     *
-     * @param reference the reference for which to return the document
-     * @return the document
-     */
-    public XWikiDocument getDocument(EntityReference reference)
+    @Override
+    public boolean isZeroStored()
     {
-        XWikiContext context = xcontextProvider.get();
-        try
-        {
-            return context.getWiki().getDocument(reference, context);
-        } catch (XWikiException e) {
-            logger.error("Failed to retrieve the document for the reference [{}].", reference, e);
-            return null;
-        }
+        return this.configurationSource.getProperty("zeroStored", true);
     }
 
-    /**
-     * Get configuration document.
-     *
-     * @param documentReference the documentReference for which to return the configuration document
-     * @return the configuration document
-     */
-    public XWikiDocument getConfigurationDocument(DocumentReference documentReference)
+    @Override
+    public int getScaleUpperBound()
     {
-        SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
-        while (lastSpaceReference.getType() == EntityType.SPACE) {
-            DocumentReference configurationDocumentReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, lastSpaceReference);
-            XWikiDocument spaceConfigurationDocument = getDocument((EntityReference) configurationDocumentReference);
-            if (spaceConfigurationDocument != null
-                && spaceConfigurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
-                return spaceConfigurationDocument;
-            }
-            if (lastSpaceReference.getParent().getType() == EntityType.SPACE) {
-                lastSpaceReference = new SpaceReference(lastSpaceReference.getParent());
-            } else {
-                break;
-            }
-        }
-        XWikiDocument globalConfigurationDocument = getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE);
-        return globalConfigurationDocument;
+        return this.configurationSource.getProperty("scaleUpperBound", 5);
     }
-    
-    /**
-     * Retrieves configuration parameter from the current space's WebPreferences and fallback to XWiki.RatingsConfig if
-     * it does not exist.
-     * 
-     * @param documentReference the document being rated or for which the existing ratings are fetched
-     * @param parameterName the parameter for which to retrieve the value
-     * @param defaultValue the default value for the parameter
-     * @return the value of the given parameter name from the current configuration context
-     */
-    public String getConfigurationParameter(DocumentReference documentReference, String parameterName, 
-        String defaultValue)
+
+    @Override
+    public boolean hasDedicatedCore()
     {
-        XWikiDocument configurationDocument = getConfigurationDocument(documentReference);
-        if (configurationDocument != null && !configurationDocument.isNew() 
-            && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
-            try
-            {
-                BaseProperty prop = (BaseProperty) configurationDocument.
-                    getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(parameterName);
-                String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
-                return (propValue.equals("") ? defaultValue : propValue);  
-            } catch (XWikiException e) {
-                logger.error("Failed to retrieve the property for the configurationDocument [{}].", 
-                    configurationDocument, e);
-                return null;
-            } 
+        return this.configurationSource.getProperty("dedicatedCore", false);
+    }
+
+    @Override
+    public boolean isAverageStored()
+    {
+        return this.configurationSource.getProperty("averageStored", true);
+    }
+
+    @Override
+    public String getRatingsStorageHint()
+    {
+        return this.configurationSource.getProperty("ratingsStorageHint", "solr");
+    }
+
+    @Override
+    public String getAverageRatingStorageHint()
+    {
+        return this.configurationSource.getProperty("averageRatingStorageHint", "xobject");
+    }
+
+    @Override
+    public Set<EntityReference> getExcludedReferencesFromRatings()
+    {
+        Set<String> serializedExcludedReferences =
+            this.configurationSource.getProperty("excludedReferences", new HashSet<>());
+        Set<EntityReference> result;
+        if (serializedExcludedReferences.isEmpty()) {
+            result = Collections.emptySet();
+        } else {
+            result = new HashSet<>();
+            for (String serializedExcludedReference : serializedExcludedReferences) {
+                // FIXME: for now we are only considering page references, but it should be improved later.
+                result.add(this.entityReferenceResolver.resolve(serializedExcludedReference, EntityType.PAGE));
+            }
         }
-        return defaultValue;
+        return result;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return this.configurationSource.getProperty("enabled", true);
     }
 }

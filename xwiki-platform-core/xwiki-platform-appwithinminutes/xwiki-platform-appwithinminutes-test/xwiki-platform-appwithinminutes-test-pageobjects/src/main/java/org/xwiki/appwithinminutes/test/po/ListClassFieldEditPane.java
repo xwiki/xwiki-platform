@@ -108,7 +108,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
      */
     public List<String> getDefaultSelectedValues()
     {
-        List<String> selectedValues = new ArrayList<String>();
+        List<String> selectedValues = new ArrayList<>();
         for (WebElement selectedItem : getSelectedItems()) {
             selectedValues.add(selectedItem.getAttribute("value"));
         }
@@ -121,7 +121,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
     protected List<WebElement> getSelectedItems()
     {
         By xpath = By.xpath(".//*[local-name() = 'option' or @type = 'radio' or @type = 'checkbox']");
-        List<WebElement> selectedItems = new ArrayList<WebElement>();
+        List<WebElement> selectedItems = new ArrayList<>();
         for (WebElement item : getDriver().findElementsWithoutWaiting(defaultValueContainer, xpath)) {
             if (item.isSelected()) {
                 selectedItems.add(item);

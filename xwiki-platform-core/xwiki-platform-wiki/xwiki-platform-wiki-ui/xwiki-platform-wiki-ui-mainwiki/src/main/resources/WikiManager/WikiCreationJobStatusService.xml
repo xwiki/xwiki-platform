@@ -38,7 +38,6 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
-  #set($discard = $response.setContentType('application/json'))
   #set($wikiId = $request.wikiId)
   #set($status = $services.wiki.creationjob.getJobStatus($wikiId))
   #set($lastError = $status.logTail.getLastLogEvent('ERROR'))
@@ -61,7 +60,7 @@
   #set($logs = "#printLogs($status.logTail, $loading)")
   #set($doc = $olddoc)
   #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage, 'hasErrorLog':$hasErrorLog, 'logs':$logs})
-  $jsontool.serialize($map)
+  #jsonResponse($map)
 #end
 {{/velocity}}</content>
 </xwikidoc>

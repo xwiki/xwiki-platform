@@ -24,9 +24,12 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.job.GroupedJobInitializer;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
@@ -41,6 +44,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -73,6 +77,10 @@ public class DefaultAsyncNotificationRendererTest
 
     @MockComponent
     private EntityReferenceSerializer<String> documentReferenceSerializer;
+
+    @MockComponent
+    @Named("AsyncNotificationRenderer")
+    private GroupedJobInitializer jobInitializer;
 
     private NotificationParameters notificationParameters;
 
@@ -167,5 +175,33 @@ public class DefaultAsyncNotificationRendererTest
         assertEquals(new AsyncRendererResult("Expected count cache result!"),
             this.asyncNotificationRenderer.render(false, true));
         verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY, compositeEventList, false);
+    }
+
+    @Test
+    public void renderUserNull() throws Exception
+    {
+        notificationParameters.user = null;
+        List<CompositeEvent> compositeEventList = Arrays.asList(
+            mock(CompositeEvent.class),
+            mock(CompositeEvent.class)
+        );
+        when(this.notificationManager.getEvents(notificationParameters)).thenReturn(compositeEventList);
+        notificationParameters.expectedCount = 2;
+        when(this.htmlNotificationRenderer.render(compositeEventList, null, true))
+            .thenReturn("Expected result!");
+        this.asyncNotificationRenderer.initialize(
+            new NotificationAsyncRendererConfiguration(notificationParameters, false));
+        assertEquals(new AsyncRendererResult("Expected result!"), this.asyncNotificationRenderer.render(false, false));
+        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
+        verify(this.notificationCacheManager).setInCache(CACHE_KEY, compositeEventList, false);
+        verify(this.compositeEventStatusManager, never()).getCompositeEventStatuses(any(), any());
+    }
+
+    @Test
+    public void getJobGroupPath()
+    {
+        JobGroupPath jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
+        when(this.jobInitializer.getId()).thenReturn(jobGroupPath);
+        assertEquals(jobGroupPath, this.asyncNotificationRenderer.getJobGroupPath());
     }
 }

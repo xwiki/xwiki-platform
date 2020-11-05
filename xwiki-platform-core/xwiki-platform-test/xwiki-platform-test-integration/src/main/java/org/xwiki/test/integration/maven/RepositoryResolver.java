@@ -140,17 +140,17 @@ public class RepositoryResolver
     private List<RemoteRepository> newRemoteRepositories()
     {
         RemoteRepository mavenCentral = new RemoteRepository.Builder(
-            "central", DEFAULT_REPO_TYPE, "http://repo1.maven.org/maven2/")
+            "central", DEFAULT_REPO_TYPE, "https://repo1.maven.org/maven2/")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWiki = new RemoteRepository.Builder(
-            "xwiki", DEFAULT_REPO_TYPE, "http://nexus.xwiki.org/nexus/content/groups/public")
+            "xwiki", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWikiSnapshot = new RemoteRepository.Builder(
             // Note: we make sure to use the same id as the one used my Maven in the hope to have more up to date
             // metadata (in maven-metadata-xwiki-snapshots.xml).
-            "xwiki-snapshots", DEFAULT_REPO_TYPE, "http://nexus.xwiki.org/nexus/content/groups/public-snapshots/")
+            "xwiki-snapshots", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public-snapshots/")
             .setPolicy(REPOSITORY_POLICY)
             .build();
 

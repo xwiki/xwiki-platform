@@ -22,8 +22,10 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
  * Page Object for Comments Tab (or pane)
@@ -60,6 +62,23 @@ public class CommentsTab extends BaseElement
         return commentForm.isDisplayed();
     }
 
+    /**
+     * Opens the comment form by clicking on the comment button.
+     * If the comment button has already been clicked, does nothing.
+     */
+    public void openCommentForm()
+    {
+        String commentFormId = "AddComment";
+        String openFormId = "openCommentForm";
+        XWikiWebDriver driver = getDriver();
+        // if the comments has not already been toggled (ie, the comment button is not displayed).
+        // we click on the button and wait until the form is visible
+        if (!driver.findElementWithoutWaiting(By.id(commentFormId)).isDisplayed()) {
+            driver.findElementWithoutWaiting(By.id(openFormId)).click();
+            driver.waitUntilElementIsVisible(By.id(commentFormId));
+        }
+    }
+
     public void setAnonymousCommentAuthor(String author)
     {
         this.anonymousCommentAuthor.clear();
@@ -70,13 +89,12 @@ public class CommentsTab extends BaseElement
     {
         this.commentsList = getDriver().findElementsWithoutWaiting(By.className("xwikicomment"));
 
-        for (int i = 0; i < this.commentsList.size(); i++) {
-            if (this.commentsList.get(i).findElement(By.className("commentcontent")).getText().equals(content)) {
-                return Integer
-                    .parseInt(this.commentsList.get(i).getAttribute("id").substring("xwikicomment_".length()));
+        for (WebElement comment : this.commentsList) {
+            if (comment.findElement(By.className("commentcontent")).getText().equals(content)) {
+                return Integer.parseInt(comment.getAttribute("id").substring("xwikicomment_".length()));
             }
         }
-        return -1;
+        throw new NotFoundException(String.format("Comment with content [%s] cannot be found.", content));
     }
 
     /**
@@ -84,13 +102,14 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm getAddCommentForm()
     {
+        openCommentForm();
         return new CommentForm(By.id("AddComment"));
     }
 
     public int postComment(String content, boolean wait)
     {
         CommentForm addCommentForm = getAddCommentForm();
-        addCommentForm.getContentField().sendKeys(content);
+        addCommentForm.addToContentField(content);
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
@@ -127,7 +146,9 @@ public class CommentsTab extends BaseElement
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getDriver().findElementWithoutWaiting(
+        // Comments are handled async so it makes sense to wait for the reply button to be ready if another comment
+        // has just been posted for example. That's why we don't use findElementWithoutWaiting here.
+        getDriver().findElement(
             By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
@@ -141,7 +162,7 @@ public class CommentsTab extends BaseElement
     public void replyToCommentByID(int id, String replyContent)
     {
         CommentForm replyCommentForm = replyToCommentByID(id);
-        replyCommentForm.getContentField().sendKeys(replyContent);
+        replyCommentForm.addToContentField(replyContent);
         replyCommentForm.clickSubmit();
     }
 
@@ -156,7 +177,7 @@ public class CommentsTab extends BaseElement
         getDriver()
             .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
             .click();
-        getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
+        getDriver().waitUntilElementIsVisible(By.className("commenteditor-" + id));
         return new CommentForm(By.className("edit-xcomment"));
     }
 
@@ -169,8 +190,7 @@ public class CommentsTab extends BaseElement
     public void editCommentByID(int id, String content)
     {
         CommentForm editCommentForm = editCommentByID(id);
-        editCommentForm.getContentField().clear();
-        editCommentForm.getContentField().sendKeys(content);
+        editCommentForm.clearAndSetContentField(content);
         editCommentForm.clickSubmit();
     }
 

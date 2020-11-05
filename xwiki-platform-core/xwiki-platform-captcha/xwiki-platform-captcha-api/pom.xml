@@ -23,14 +23,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - API</name>
   <description>API to generate and validate CAPTCHAs.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>7</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CAPTCHA API</xwiki.extension.name>
   </properties>

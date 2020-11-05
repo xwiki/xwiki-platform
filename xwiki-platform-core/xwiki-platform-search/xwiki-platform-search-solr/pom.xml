@@ -25,14 +25,14 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Search - Solr - Parent POM</name>
   <description>Parent project for the Solr search engine.</description>
   <properties>
-    <solr.version>8.5.0</solr.version>
+    <solr.version>8.5.1</solr.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -81,6 +81,10 @@
           </exclusion>
           <exclusion>
             <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>*</artifactId>
           </exclusion>
           <!-- We use slf4j in XWiki -->

@@ -910,7 +910,8 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("Version 2.1.4 is installed", downgradePlan.get(0).getStatusMessage());
 
         // Finish the downgrade and check the downgrade log.
-        extensionPane = extensionPane.confirm();
+        // Using 20s for the timeout since 10s seems to not always be enough
+        extensionPane = extensionPane.confirm(20);
         assertEquals("installed", extensionPane.getStatus());
         assertEquals("Installed", extensionPane.getStatusMessage());
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();

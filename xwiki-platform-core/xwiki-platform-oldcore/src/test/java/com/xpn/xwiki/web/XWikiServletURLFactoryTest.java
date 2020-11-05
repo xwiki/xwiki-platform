@@ -177,7 +177,8 @@ public class XWikiServletURLFactoryTest
     {
         this.mockXWikiRequest = mock(XWikiServletRequestStub.class);
         when(((XWikiServletRequestStub) this.mockXWikiRequest).isDaemon()).thenReturn(true);
-        when(((XWikiServletRequestStub) this.mockXWikiRequest).getHttpServletRequest()).thenReturn(this.mockXWikiRequest);
+        when(((XWikiServletRequestStub) this.mockXWikiRequest).getHttpServletRequest())
+            .thenReturn(this.mockXWikiRequest);
 
         initRequest(host, port);
     }
@@ -220,7 +221,8 @@ public class XWikiServletURLFactoryTest
         assertEquals("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
 
         verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
-        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(), this.oldcore.getXWikiContext());
+        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
+            this.oldcore.getXWikiContext());
     }
 
     @Test
@@ -440,22 +442,31 @@ public class XWikiServletURLFactoryTest
     }
 
     /**
-     * Tests how URLs are serialized when the default URL is not set.
+     * Make sure the right reference URL used in daemon mode.
      */
     @Test
     public void getURLWhenDeamonRequest() throws MalformedURLException
     {
-        initDaemonRequest("wiki1server", -1);
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
+
+        // Set a deamon request
+        initDaemonRequest("request", 42);
+
+        this.oldcore.getXWikiContext().setWikiId("wiki1");
+
+        assertEquals("/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
+
+        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
 
         this.oldcore.getXWikiContext().setWikiId("wiki2");
 
-        String url =
-            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
-        assertEquals("/xwiki/bin/view/Space/Page", url);
+        assertEquals("http://wiki1server/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
 
-        url =
-            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
-        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
+        assertEquals("/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
     }
 
     /**
@@ -738,7 +749,7 @@ public class XWikiServletURLFactoryTest
 
         Map<String, Object> queryParametersMap = new LinkedHashMap<>();
         queryParametersMap.put("cache-version", "11.1-SNAPSHOT#");
-        queryParametersMap.put("anArrayOfInt", new int[] { 42, 56 });
+        queryParametersMap.put("anArrayOfInt", new int[] {42, 56});
         queryParametersMap.put("aListWithStringToEncode", Arrays.asList("épervier", "androïde"));
         queryParametersMap.put("aCustomObject", new Object()
         {
@@ -748,14 +759,13 @@ public class XWikiServletURLFactoryTest
                 return "foo";
             }
         });
-        queryParametersMap.put("paramètre", new String[] { "foo", "bâr" });
+        queryParametersMap.put("paramètre", new String[] {"foo", "bâr"});
 
         url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext(),
             queryParametersMap);
         assertEquals("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e?cache-version=11.1-SNAPSHOT%23"
             + "&anArrayOfInt=42&anArrayOfInt=56"
-            + "&aListWithStringToEncode=%C3%A9pervier&aListWithStringToEncode=andro%C3%AFde"
-            + "&aCustomObject=foo"
+            + "&aListWithStringToEncode=%C3%A9pervier&aListWithStringToEncode=andro%C3%AFde" + "&aCustomObject=foo"
             + "&param%C3%A8tre=foo&param%C3%A8tre=b%C3%A2r", url.toString());
     }
 

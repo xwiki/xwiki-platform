@@ -33,6 +33,7 @@
   <!-- =========================================================== -->
   <Set name="RequestLog">
     <New id="RequestLog" class="org.eclipse.jetty.server.AsyncNCSARequestLog">
+      <!-- Set the request logs inside the xwiki permanent directory -->
       <Set name="filename"><Property name="xwiki.data.dir" default="." />/<Property>
         <Name>jetty.requestlog.filePath</Name>
         <Deprecated>requestlog.filename</Deprecated>

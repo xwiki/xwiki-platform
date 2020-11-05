@@ -77,8 +77,8 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     private Thread notificationGraceTimeThread;
 
     /**
-     * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event
-     * grace time has ended).
+     * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event grace time
+     * has ended).
      */
     private class NotificationGraceTimeRunnable implements Runnable
     {
@@ -121,20 +121,20 @@ public class LiveNotificationEmailListener extends AbstractEventListener
         // Check if the notifications are enabled in the wiki and if the mail option for the
         // notifications is enabled.
         if (!this.remoteState.isRemoteState() && this.notificationConfiguration.isEnabled()
-            && this.notificationConfiguration.areEmailsEnabled()) {
+            && this.notificationConfiguration.areEmailsEnabled()
+            && !this.notificationConfiguration.isEventPrefilteringEnabled()) {
             try {
                 org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
 
                 // We can’t directly store a list of RecordableEventDescriptors as some of them can be
                 // dynamically defined at runtime.
                 List<RecordableEventDescriptor> descriptorList =
-                        this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
+                    this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
 
                 // Try to match one of the given descriptors with the current event.
                 for (RecordableEventDescriptor descriptor : descriptorList) {
                     // Find a descriptor that corresponds to the given event
-                    if (descriptor.getEventType().equals(eventStreamEvent.getType()))
-                    {
+                    if (descriptor.getEventType().equals(eventStreamEvent.getType())) {
                         // Add the event to the live notification email queue
                         this.liveNotificationEmailManager.addEvent(eventStreamEvent);
 
@@ -151,14 +151,14 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     /**
      * If the notification grace time thread is not running, start it.
      */
-    private synchronized void startNotificationThread() {
+    private synchronized void startNotificationThread()
+    {
         // If the notification thread is not defined or is dead ...
-        if (this.notificationGraceTimeThread == null
-                || (!this.notificationGraceTimeThread.isAlive()
-                        && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
+        if (this.notificationGraceTimeThread == null || (!this.notificationGraceTimeThread.isAlive()
+            && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
             // ... initialize it
-            this.notificationGraceTimeThread = new Thread(
-                    new ExecutionContextRunnable(new NotificationGraceTimeRunnable(), this.componentManager));
+            this.notificationGraceTimeThread =
+                new Thread(new ExecutionContextRunnable(new NotificationGraceTimeRunnable(), this.componentManager));
             this.notificationGraceTimeThread.setName("Live E-Mail notifications thread");
             this.notificationGraceTimeThread.setDaemon(true);
             this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY - 1);

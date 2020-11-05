@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-oldcore</artifactId>
   <name>XWiki Platform - Legacy - Old Core</name>
@@ -184,6 +184,42 @@
             <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
           </classpathDependencyExcludes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Skip foreign declaration checks since we merge the components.txt -->
+                      <name>skipForeignDeclarations</name>
+                      <value>true</value>
+                    </property>
+                    <!-- TODO: Ideally inherit this from the top level pom but I couldn't find how to do it, or remove
+                         it when spoon is fixed, see https://github.com/INRIA/spoon/issues/3339 -->
+                    <property>
+                      <name>componentsTxtPath</name>
+                      <value>target/classes/META-INF/components.txt</value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+          <execution>
+            <id>spoon-test</id>
+            <configuration>
+              <!-- TODO: Remove once https://github.com/INRIA/spoon/issues/3583 is fixed -->
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

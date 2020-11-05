@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-macro</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <name>XWiki Platform - Notifications - Macro - UI</name>
   <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
@@ -77,15 +77,17 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Add the dependency to the oldcore bridges that we need for sure -->
+    <!-- Add the dependency to the oldcore bridges that we need for sure.
+     Note that notifications-preferences-default should always be declared before notifiers-default.
+     -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

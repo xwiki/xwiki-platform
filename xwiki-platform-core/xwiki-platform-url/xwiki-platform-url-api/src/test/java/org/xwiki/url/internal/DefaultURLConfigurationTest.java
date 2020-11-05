@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DefaultURLConfigurationTest
+class DefaultURLConfigurationTest
 {
     @InjectMockComponents
     private DefaultURLConfiguration defaultURLConfiguration;
@@ -48,21 +48,15 @@ public class DefaultURLConfigurationTest
     private ConfigurationSource configurationSource;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(configuration.get()).thenReturn(configurationSource);
     }
 
     @Test
-    public void useResourceLastModificationDate()
+    void useResourceLastModificationDate()
     {
-        URLConfiguration urlConfiguration = new URLConfiguration()
-        {
-            @Override public String getURLFormatId()
-            {
-                return null;
-            }
-        };
+        URLConfiguration urlConfiguration = () -> null;
 
         assertTrue(urlConfiguration.useResourceLastModificationDate());
         String property = "url.useResourceLastModificationDate";

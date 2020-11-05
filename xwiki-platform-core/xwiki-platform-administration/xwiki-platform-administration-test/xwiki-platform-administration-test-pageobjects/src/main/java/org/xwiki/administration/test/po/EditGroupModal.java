@@ -68,6 +68,24 @@ public class EditGroupModal extends BaseModal
         return this;
     }
 
+    public EditGroupModal addUsers(String... users)
+    {
+        this.groupEditPage.addUsers(users);
+        return this;
+    }
+
+    public EditGroupModal addGroups(String... groups)
+    {
+        this.groupEditPage.addGroups(groups);
+        return this;
+    }
+
+    public EditGroupModal removeMembers(String... members)
+    {
+        this.groupEditPage.removeMembers(members);
+        return this;
+    }
+
     public LiveTableElement filterMembers(String member)
     {
         this.groupEditPage.filterMembers(member);

@@ -136,7 +136,6 @@
       <code>#template('colorThemeInit.vm')
 #spWorkspaceCreateItem {
   background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation_add.png')");
-  background-repeat:no-repeat;
 }
 
 #spWorkspaceCreateLabel a {
@@ -152,7 +151,13 @@
 
 .spWorkspaceItem {
   background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+}
+
+ul.xlist li.workspace {
+  background-position: 2px 3px;
   background-repeat:no-repeat;
+  /* Leave space for the icon. */
+  padding-left: 1.5em;
 }
 
 ul.xlist li.workspace div.spWorkspaceName {

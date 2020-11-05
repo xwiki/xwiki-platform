@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -165,7 +165,35 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-flavor-tour</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-like-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>
@@ -173,7 +201,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.templates</groupId>
       <artifactId>application-templates-ui</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.6</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>
@@ -185,7 +213,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.4</version>
+      <version>4.5.2</version>
       <type>xar</type>
       <optional>true</optional>
       <exclusions>
@@ -219,13 +247,15 @@
       </dependencies>
     </profile>
   </profiles>
-
   <build>
     <plugins>
       <plugin>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
+          <contentPages>
+            <contentPage>.*/Main/WebHome.*\.xml</contentPage>
+          </contentPages>
           <entries>
             <entry>
               <document>PanelsCode.ApplicationsPanelConfiguration</document>

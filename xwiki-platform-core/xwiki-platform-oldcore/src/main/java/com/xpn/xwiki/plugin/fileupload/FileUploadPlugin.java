@@ -37,6 +37,8 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
@@ -95,6 +98,10 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * <tt>upload_sizethreshold</tt> XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
+
+    private Environment environment;
+
+    private String temporaryDirectory;
 
     /**
      * @param name the plugin name
@@ -181,20 +188,20 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         loadFileList(
             xwiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
             (int) xwiki.getSpacePreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
-            xwiki.Param("xwiki.upload.tempdir"), context);
+            getTemporaryDirectory(xwiki), context);
     }
 
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
      *
      * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and not in memory.
+     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @param context Context of the request.
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
-    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir, XWikiContext context)
+    public void loadFileList(long uploadMaxSize, int uploadSizeThreshold, String tempdir, XWikiContext context)
         throws XWikiException
     {
         LOGGER.debug("Loading uploaded files");
@@ -209,42 +216,29 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
         // Get the FileUpload Data
         // Make sure the factory only ever creates file items which will be deleted when the jvm is stopped.
-        DiskFileItemFactory factory = new DiskFileItemFactory()
+        DiskFileItemFactory factory = new DiskFileItemFactory(uploadSizeThreshold, new File(tempdir))
         {
             @Override
             public FileItem createItem(String fieldName, String contentType, boolean isFormField, String fileName)
             {
                 try {
-                    final DiskFileItem item =
+                    DiskFileItem item =
                         (DiskFileItem) super.createItem(fieldName, contentType, isFormField, fileName);
                     // Needed to make sure the File object is created.
                     item.getOutputStream();
                     return item;
                 } catch (IOException e) {
-                    String path = System.getProperty("java.io.tmpdir");
-                    if (super.getRepository() != null) {
-                        path = super.getRepository().getPath();
-                    }
-                    throw new RuntimeException("Unable to create a temporary file for saving the attachment. "
-                        + "Do you have write access on " + path + "?");
+                    throw new RuntimeException(
+                        String.format("Unable to create a temporary file for saving the attachment. "
+                        + "Do you have write access on [%s]?", getRepository()), e);
                 }
             }
         };
-
-        factory.setSizeThreshold(uploadSizeThreashold);
-
-        if (tempdir != null) {
-            File tempdirFile = new File(tempdir);
-            if (tempdirFile.mkdirs() && tempdirFile.canWrite()) {
-                factory.setRepository(tempdirFile);
-            }
-        }
 
         // TODO: Does this work in portlet mode, or we must use PortletFileUpload?
         FileUpload fileupload = new ServletFileUpload(factory);
         RequestContext reqContext = new ServletRequestContext(context.getRequest().getHttpServletRequest());
         fileupload.setSizeMax(uploadMaxSize);
-        // context.put("fileupload", fileupload);
 
         try {
             @SuppressWarnings("unchecked")
@@ -453,5 +447,30 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         }
 
         return fileitem;
+    }
+
+    private Environment getEnvironment()
+    {
+        if (this.environment == null) {
+            this.environment = Utils.getComponent(Environment.class);
+        }
+        return this.environment;
+    }
+
+    private String getTemporaryDirectory(XWiki xwiki)
+    {
+        if (this.temporaryDirectory == null) {
+            String tmpDirectory = xwiki.Param("xwiki.upload.tempdir");
+            File tmpDirectoryFile;
+            if (StringUtils.isEmpty(tmpDirectory)) {
+                tmpDirectoryFile = new File(getEnvironment().getTemporaryDirectory(), "fileuploads");
+            } else {
+                tmpDirectoryFile = new File(tmpDirectory);
+            }
+            tmpDirectoryFile.mkdirs();
+            this.temporaryDirectory = tmpDirectoryFile.getAbsolutePath();
+
+        }
+        return this.temporaryDirectory;
     }
 }

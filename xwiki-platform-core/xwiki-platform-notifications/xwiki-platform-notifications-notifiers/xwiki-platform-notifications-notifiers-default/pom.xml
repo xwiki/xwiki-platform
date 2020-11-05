@@ -25,17 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-notifiers</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
   <name>XWiki Platform - Notifications - Notifiers - Default bridge</name>
   <description>Default bridge to oldcore for the notifications notifiers API module.</description>
   <properties>
-    <!-- TODO: Put back to 19% once https://jira.xwiki.org/browse/XWIKI-17074 is fixed -->
-    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Put back to 13% once https://jira.xwiki.org/browse/XWIKI-17074 is fixed -->
-    <xwiki.pitest.mutationThreshold>10</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.26</xwiki.jacoco.instructionRatio>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -82,4 +80,26 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/notifications/notifiers/internal/UserEventDispatcher.java,
+                org/xwiki/notifications/notifiers/internal/email/AbstractMimeMessageIterator.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

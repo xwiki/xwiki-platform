@@ -97,6 +97,7 @@ com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentWikiReferenceProvider
+com.xpn.xwiki.internal.model.reference.SpaceReferenceConverter
 com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver

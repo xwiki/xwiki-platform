@@ -31,7 +31,19 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
- * Represents a reference to a page. Note that nested pages are supported.
+ * Represents a reference to a page. Note that nested pages are supported. A page is essentially the same thing as a
+ * document. A document represents the data displayed in a wiki page, stored in a {@code Document} object. Both a
+ * {@link PageReference} and a {@link DocumentReference} point to a {@code Document}.
+ * <p>
+ * In XWiki 7.2, we introduced the ability to have pages inside pages (we called it
+ * <a href="https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/ContentOrganization/">Nested
+ * Pages</a>). We did that by creating a space to represent a Nested Page. Indeed, a space always has {@code WebHome}
+ * document and this document contains the content of the Nested Page. In other words all Nested Page are located in
+ * {@code WebHome} documents.
+ * <p>
+ * This means that a reference to a Nested Page always ends with {@code WebHome}, which is an implementation detail, and
+ * hard to remember and use (e.g. {@code A.B.C.WebHome}). Thus we introduced the concept of a Page Reference to
+ * reference a Nested Page and this allows us to drop the {@code Webhome} part in the reference (e.g. {@code A.B.C}).
  *
  * @version $Id$
  * @since 10.6RC1

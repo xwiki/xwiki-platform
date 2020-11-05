@@ -26,25 +26,24 @@ var XWiki = (function(XWiki) {
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
   // we need to handle the creation of document
-  var currentDocument, currentVersion, isNew, versionRefreshed;
-  var editingVersionDate = new Date();
+  var currentDocument;
+  var editingVersionDateField = $('editingVersionDate');
+  var previousVersionField = $('previousVersion');
+  var isNewField = $('isNew');
 
-  var getCurrentVersion = function (event) {
+  var refreshVersion = function (event) {
     if (currentDocument.equals(event.memo.documentReference)) {
-      // We are certainly coming from a back button navigation: the content of the editor might not reflect the real
-      // content, let's reload the editor.
-      if (!versionRefreshed && currentVersion != event.memo.version) {
-        window.location.reload();
+      if (previousVersionField) {
+        previousVersionField.setValue(event.memo.version);
       }
-      currentVersion = event.memo.version;
-      editingVersionDate = new Date();
-      isNew = "false";
-      versionRefreshed = true;
+      if (isNewField) {
+        isNewField.setValue(false);
+      }
     }
   };
 
-  // in object editor the version is updated when an object is added.
-  document.observe('xwiki:document:changeVersion', getCurrentVersion);
+  // Listen for versions change to update properly the version fields.
+  document.observe('xwiki:document:changeVersion', refreshVersion);
 
   actionButtons.EditActions = Class.create({
     initialize : function() {
@@ -106,7 +105,7 @@ var XWiki = (function(XWiki) {
           return false;
         }
       }
-      var commentField = form.comment;
+      var commentField = (form && form.comment) || $('commentinput');
       if (commentField && (($xwiki.isEditCommentSuggested()) || $xwiki.isEditCommentMandatory())) {
         while (commentField.value == '') {
           var response = prompt("$services.localization.render('core.comment.prompt')", '');
@@ -120,17 +119,20 @@ var XWiki = (function(XWiki) {
       return true;
     },
     onCancel : function(event) {
-      event.stop();
+      event.preventDefault();
 
-      // Notify others we are going to cancel
+      // Notify the others that we are going to cancel.
       this.notify(event, "cancel");
 
-      // Optimisation: Do not send the entire form's data when all we want is to cancel editing.
-
+      // Optimisation: Do not submit the entire form's data when all we want is to cancel editing.
+      var form = event.element().form;
+      form && this.cancelForm(form);
+    },
+    cancelForm: function(form) {
       // Determine the form's action and clean it by removing any anchors.
-      var location = event.element().form.action;
+      var location = form.action;
       if (typeof location != "string") {
-        location = event.element().form.attributes.getNamedItem("action");
+        location = form.attributes.getNamedItem("action");
         if (location) {
           location = location.nodeValue;
         } else {
@@ -144,19 +146,20 @@ var XWiki = (function(XWiki) {
         location += '?';
       }
 
-      // Make sure that we call the CancelAction using XWiki's ActionFilter, no matter what XWiki action was set in the form's action.
+      // Make sure that we call the CancelAction using XWiki's ActionFilter, no matter what XWiki action was set in the
+      // form's action.
       var cancelActionParameter = '&action_cancel=true';
 
       // Include the xredirect element, if it exists.
-      var xredirectElement = event.element().form.select('input[name="xredirect"]')[0];
+      var xredirectElement = form.select('input[name="xredirect"]')[0];
       var xredirectParameter = xredirectElement ? '&xredirect=' + escape(xredirectElement.value) : '';
 
       // Include the language parameter if it exists
-      var language = event.element().form.select('input[name="language"]')[0];
+      var language = form.select('input[name="language"]')[0];
       var languageParameter = language ? '&language=' + escape(language.value) : '';
 
-      // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both the cancel action
-      // and the page unload event would unlock the document, so no point in doing both.
+      // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both
+      // the cancel action and the page unload event would unlock the document, so no point in doing both.
       XWiki.EditLock && XWiki.EditLock.setLocked(false);
 
       // Call the cancel URL directly instead of submitting the form. (optimisation)
@@ -168,26 +171,28 @@ var XWiki = (function(XWiki) {
         if (this.validateForm(event.element().form)) {
           this.notify(event, action, {'continue' : continueEditing});
         } else {
-          event.stop();
+          event.preventDefault();
         }
       }
     },
     notify : function(originalEvent, action, params) {
-      var event = document.fire('xwiki:actions:' + action, Object.extend({
+      // We fire the action event on the button that triggered the action. This is useful when there are multiple forms
+      // on the same page and you want to catch the events that were triggered by a specific form.
+      var event = originalEvent.element().fire('xwiki:actions:' + action, Object.extend({
         originalEvent: originalEvent,
         form: originalEvent.element().form
       }, params || {}));
       // We check both the current event and the original event in order to preserve backwards compatibility with older
-      // code that may stop only the original event. We recommend stopping only the current event becase most of the
-      // listeners shouldn't be aware of the original event.
-      var stopped = event.stopped || originalEvent.stopped;
+      // code that may prevent default behavior only for the original event. We recommend calling preventDefault() only
+      // on the current event because most of the listeners shouldn't be aware of the original event.
+      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented;
       // Stop the original event if the current event has been stopped. Also, in Internet Explorer the original event
-      // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original event
-      // we must call stop() again here.
-      if (stopped) {
-        originalEvent.stop();
+      // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original
+      // event we must stop it again here.
+      if (defaultPrevented) {
+        originalEvent.preventDefault();
       }
-      return !stopped;
+      return !defaultPrevented;
     }
   });
 
@@ -222,54 +227,24 @@ var XWiki = (function(XWiki) {
       }
     },
     onSave : function(event) {
-      // Don't continue if the event has been stopped already
-      if (event.stopped) {
+      // Don't continue if the event has been stopped already.
+      if (event.defaultPrevented) {
         return;
       }
 
-      var isContinue = event.memo["continue"];
-
-      this.form = $(event.memo.form);
       this.savedBox.hide();
       this.failedBox.hide();
-
-      var isCreateFromTemplate = (this.form.template && this.form.template.value);
+      
+      var isContinue = event.memo["continue"];
+      this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      var isCustomForm = (this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1);
+      var isCustomForm = this.form.action.indexOf("/preview/") == -1 && this.form.action.indexOf("/save/") == -1;
       if (isCustomForm && !isContinue) {
         return;
       }
 
-      // We only send the version info if we are on a standard edit.
-      var isFromStandardEditor = window.location.href.indexOf("/edit/") != -1;
-
-      if (isFromStandardEditor) {
-        if ($('previousVersion')) {
-          $('previousVersion').setValue(currentVersion);
-          $('editingVersionDate').setValue(editingVersionDate.toISOString());
-          $('isNew').setValue(isNew);
-        } else {
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "previousVersion",
-            id: "previousVersion",
-            value: currentVersion
-          }));
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "editingVersionDate",
-            id: "editingVersionDate",
-            value: editingVersionDate.toISOString()
-          }));
-          this.form.insert(new Element("input", {
-            type: "hidden",
-            name: "isNew",
-            id: "isNew",
-            value: isNew.toString()
-          }));
-        }
-      }
+      var isCreateFromTemplate = (this.form.template && this.form.template.value);
 
       // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
       var isAsync = (this.form.async && this.form.async.value === 'true');
@@ -287,8 +262,8 @@ var XWiki = (function(XWiki) {
       // - S&V from template async.
       // - S&V no template sync
 
-      // Stop the submit event.
-      event.stop();
+      // Prevent the default form submit behavior.
+      event.preventDefault();
 
       // Show the right notification message.
       if (isCreateFromTemplate) {
@@ -313,16 +288,21 @@ var XWiki = (function(XWiki) {
       if (!isContinue) {
         this.disableEditors();
       }
+      var state = {
+        isContinue: isContinue,
+        isCreateFromTemplate: isCreateFromTemplate,
+        saveButton: event.element()
+      };
       new Ajax.Request(this.form.action, {
         method : 'post',
         parameters : formData.toQueryString(),
-        onSuccess : this.onSuccess.bindAsEventListener(this, isContinue, isCreateFromTemplate),
-        on1223 : this.on1223.bindAsEventListener(this),
-        on0 : this.on0.bindAsEventListener(this),
-        on409 : this.on409.bindAsEventListener(this, isContinue),
-        on401 : this.on401.bindAsEventListener(this),
-        on403 : this.on403.bindAsEventListener(this, isContinue, isCreateFromTemplate),
-        onFailure : this.onFailure.bind(this)
+        onSuccess : this.onSuccess.bind(this, state),
+        on1223 : this.on1223.bind(this),
+        on0 : this.on0.bind(this),
+        on409 : this.on409.bind(this, state),
+        on401 : this.on401.bind(this, state),
+        on403 : this.on403.bind(this, state),
+        onFailure : this.onFailure.bind(this, state)
       });
     },
     // IE converts 204 status code into 1223...
@@ -333,7 +313,7 @@ var XWiki = (function(XWiki) {
     on0 : function(response) {
       response.request.options.onFailure(response);
     },
-    onSuccess : function(response, isContinue, isCreateFromTemplate) {
+    onSuccess : function(state, response) {
       // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
       if (this.form && this.form.template) {
         this.form.template.disabled = true;
@@ -353,18 +333,13 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
-      if (isCreateFromTemplate) {
+      if (state.isCreateFromTemplate) {
         if (response.responseJSON) {
           // Start the progress display.
-          this.getStatus(response.responseJSON.links[0].href, isContinue);
+          this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
-        }
-      } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
-        document.fire("xwiki:document:saved");
-        if (this.maybeRedirect(isContinue)) {
-          return;
         }
       } else {
         this.progressBox.hide();
@@ -373,6 +348,12 @@ var XWiki = (function(XWiki) {
         } else {
           this.savingBox.replace(this.savedBox);
         }
+        if (!state.isContinue || $('body').hasClassName('previewbody')) {
+          state.saveButton.fire("xwiki:document:saved");
+          if (this.maybeRedirect(state.isContinue)) {
+            return;
+          }
+        }
       }
 
       if (response.responseJSON && response.responseJSON.newVersion) {
@@ -380,11 +361,16 @@ var XWiki = (function(XWiki) {
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
+
+        // We only update this field since the other ones are updated by the callback of setVersion.
+        if (editingVersionDateField) {
+          editingVersionDateField.setValue(new Date().getTime())
+        }
       }
 
       // Announce that the document has been saved
       // TODO: We should send the new version as a memo field
-      document.fire("xwiki:document:saved");
+      state.saveButton.fire("xwiki:document:saved");
 
       // If documents have been merged we need to reload to get latest saved version.
       if (response.responseJSON && response.responseJSON.mergedDocument) {
@@ -397,7 +383,8 @@ var XWiki = (function(XWiki) {
         defaultInteractionParameters : {},
         /** Constructor. Registers the key listener that pops up the dialog. */
         initialize : function($super, interactionParameters) {
-          this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+          this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters),
+            interactionParameters || {});
           // call constructor from ModalPopup with params content, shortcuts, options
           $super(
             createContent(this.interactionParameters, this),
@@ -419,10 +406,18 @@ var XWiki = (function(XWiki) {
     },
     // Reload the editors in case the user want to loose his change.
     reloadEditor : function () {
-      window.location.reload();
+      // We don't rely on window.location.reload() since it might keep cached data from the form.
+      // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
+      // all browsers. Instead we rely on a query parameter with the current date.
+      // URLSearchParams is not supported by IE11 but we rely on a polyfill.
+      require(["$services.webjars.url('org.webjars.npm:url-search-params-polyfill', 'index.js')"], function() {
+        var params = new URLSearchParams(window.location.search);
+        params.set("timestamp", new Date().getTime());
+        window.location.search = "?" + params.toString();
+      });
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
-    on401 : function (response) {
+    on401 : function (state, response) {
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
@@ -456,68 +451,69 @@ var XWiki = (function(XWiki) {
       this.displayErrorModal(createContent);
       this.enableEditors();
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 403 happens in case of CSRF issue
-    on403 : function (response, isContinue, isCreateFromTemplate) {
+    on403 : function (state, response) {
+      if (!response.responseJSON || !response.responseJSON.errorType === "CSRF") {
+        return this.on401(state, response);
+      }
+
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
       this.failedBox.hide();
 
-      if (response.responseJSON && response.responseJSON.errorType === "CSRF") {
-        var answerJson = response.responseJSON;
-        var self = this;
-        var createContent = function (data, modal) {
-          var resubmit = function () {
-            $$('input[name=form_token]').each(function (item) {
-              item.value = answerJson.newToken;
-            });
-            new Ajax.Request(answerJson.resubmissionURI, {
-              method : 'post',
-              parameters : "form_token=" + answerJson.newToken,
-              onSuccess : self.onSuccess.bindAsEventListener(self, isContinue, isCreateFromTemplate),
-              on1223 : self.on1223.bindAsEventListener(self),
-              on0 : self.on0.bindAsEventListener(self),
-              on409 : self.on409.bindAsEventListener(self, isContinue),
-              on401 : self.on401.bindAsEventListener(self),
-              on403 : self.on403.bindAsEventListener(self, isContinue, isCreateFromTemplate),
-              onFailure : self.onFailure.bind(self)
-            });
-            modal.closeDialog();
-          };
-
-          var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
-          var buttonsDiv =  new Element('div');
-
-          // the confirmation message contains some double quotes that should be escaped.
-          content.insert("$escapetool.json($services.localization.render('csrf.confirmation'))");
-          content.insert(new Element('br'));
-          var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
-          buttonCreate.insert("$services.localization.render('yes')");
-          buttonsDiv.insert(buttonCreate);
-          buttonCreate.on("click", resubmit);
-
-          buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
-          buttonCreate.insert("$services.localization.render('no')");
-          buttonsDiv.insert(buttonCreate);
-          buttonCreate.on("click", function () {
-            modal.closeDialog();
+      var answerJson = response.responseJSON;
+      var self = this;
+      var createContent = function (data, modal) {
+        var resubmit = function () {
+          $$('input[name=form_token]').each(function (item) {
+            item.value = answerJson.newToken;
           });
-          content.insert(buttonsDiv);
-          return content;
+          new Ajax.Request(answerJson.resubmissionURI, {
+            method : 'post',
+            parameters : "form_token=" + answerJson.newToken,
+            onSuccess : self.onSuccess.bind(self, state),
+            on1223 : self.on1223.bind(self),
+            on0 : self.on0.bind(self),
+            on409 : self.on409.bind(self, state),
+            on401 : self.on401.bind(self, state),
+            on403 : self.on403.bind(self, state),
+            onFailure : self.onFailure.bind(self, state)
+          });
+          modal.closeDialog();
         };
-        this.enableEditors();
-        this.displayErrorModal(createContent);
-      } else {
-        this.on401(response);
-      }
+
+        var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
+        var buttonsDiv =  new Element('div');
+
+        // the confirmation message contains some double quotes that should be escaped.
+        content.insert("$escapetool.json($services.localization.render('csrf.confirmation'))");
+        content.insert(new Element('br'));
+        var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
+        buttonCreate.insert("$services.localization.render('yes')");
+        buttonsDiv.insert(buttonCreate);
+        buttonCreate.on("click", resubmit);
+
+        buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
+        buttonCreate.insert("$services.localization.render('no')");
+        buttonsDiv.insert(buttonCreate);
+        buttonCreate.on("click", function () {
+          modal.closeDialog();
+        });
+        content.insert(buttonsDiv);
+        return content;
+      };
+
+      this.enableEditors();
+      this.displayErrorModal(createContent);
 
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
-    on409 : function(response, isContinue) {
+    on409 : function(state, response) {
       var self = this;
       this.progressBox.hide();
       this.savingBox.hide();
@@ -559,7 +555,7 @@ var XWiki = (function(XWiki) {
           method : 'post',
           parameters : formData.toQueryString(),
           onSuccess : displayModal,
-          onFailure : self.onFailure.bind(self)
+          onFailure : self.onFailure.bind(self, state)
         });
       };
 
@@ -587,7 +583,7 @@ var XWiki = (function(XWiki) {
               id: "forceSave",
               value: action
             }));
-            if (isContinue) {
+            if (state.isContinue) {
               $('input[name=action_saveandcontinue]').click();
             } else {
               $('input[name=action_save]').click();
@@ -678,9 +674,9 @@ var XWiki = (function(XWiki) {
 
       previewDiff();
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
-    onFailure : function(response) {
+    onFailure : function(state, response) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
@@ -693,12 +689,12 @@ var XWiki = (function(XWiki) {
         $('ajaxRequestFailureReason').update(response.statusText);
       }
       // Announce that a document save attempt has failed
-      document.fire("xwiki:document:saveFailed", {'response' : response});
+      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     startStatusReport : function(statusUrl) {
       updateStatus(0);
     },
-    getStatus : function(statusUrl, isContinue, redirectUrl) {
+    getStatus : function(statusUrl, state) {
       new Ajax.Request(statusUrl, {
         method : 'get',
         parameters : { 'media' : 'json' },
@@ -707,16 +703,16 @@ var XWiki = (function(XWiki) {
           this.updateStatus(progressOffset);
           if (progressOffset < 1) {
             // Start polling for status updates, every second.
-            setTimeout(this.getStatus.bind(this, statusUrl, isContinue), 1000);
+            setTimeout(this.getStatus.bind(this, statusUrl, state), 1000);
           } else {
             // Job complete.
             this.progressBox.replace(this.savedBox);
-            this.maybeRedirect(isContinue);
+            this.maybeRedirect(state.isContinue);
           }
-        }.bindAsEventListener(this),
-        on1223 : this.on1223.bindAsEventListener(this),
-        on0 : this.on0.bindAsEventListener(this),
-        onFailure : this.onFailure.bindAsEventListener(this)
+        }.bind(this),
+        on1223 : this.on1223.bind(this),
+        on0 : this.on0.bind(this),
+        onFailure : this.onFailure.bind(this, state)
       });
     },
     updateStatus : function(progressOffset) {
@@ -725,7 +721,8 @@ var XWiki = (function(XWiki) {
       if (dotIndex > -1) {
         var stringProgress = stringProgress.substring(0, dotIndex + 2);
       }
-      var newProgressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', stringProgress), "inprogress");
+      var newProgressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__',
+        stringProgress), "inprogress");
       this.progressBox.replace(newProgressBox);
       this.progressBox = newProgressBox;
     },
@@ -762,19 +759,7 @@ var XWiki = (function(XWiki) {
   function init() {
     require(['xwiki-meta'], function (xm) {
       currentDocument = xm.documentReference;
-      isNew = xm.isNew;
-      currentVersion = xm.version;
-
-      // in case of 404 the document is new
-      xm.refreshVersion(function () {
-        isNew = true;
-        versionRefreshed = true;
-      });
     });
-    if ($('content')) {
-      // ensure that the shown value is the true value in case of reload.
-      $('content').value = $('content').defaultValue;
-    }
 
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();

@@ -54,12 +54,17 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       // Take the root node data from the tree container element.
       node.data = this.get_container().data('root') || {};
       // If the root node doesn't specify the valid child nodes then infer this information from its children.
-      if (!node.data.validChildren) {
+      // If the valid child nodes are inferred then refresh the list whenever the root node is refreshed.
+      if (!node.data.validChildren || node.data.validChildrenInferred) {
+        node.data.validChildrenInferred = true;
         var nestedCallback = callback;
         callback = function(children) {
           var validChildren = getNodeTypes(children);
           if (validChildren.length > 0) {
             node.data.validChildren = validChildren;
+          } else {
+            // Reset, in case the root node has been refreshed.
+            delete node.data.validChildren;
           }
           nestedCallback(children);
         };
@@ -127,7 +132,13 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   var addMoreChildren = function(tree, paginationNode) {
     // Mark the pagination node as loading to prevent multiple pagination requests for the same offset.
     var paginationElement = tree.get_node(paginationNode.id, true);
-    if (paginationElement.hasClass('jstree-loading')) return;
+    if (!paginationElement.length || paginationElement.hasClass('jstree-loading')) {
+      // The pagination element could be missing, even if the pagination node is present in the tree model, if the
+      // pagination node was not yet drawn, i.e. if we call this function too early (e.g. the pagination node was just
+      // added to the tree model but the tree was not re-rendered). This function needs to be called after the
+      // pagination node is drawn.
+      return;
+    }
     paginationElement.addClass('jstree-loading');
     // Replace the pagination node with the nodes from the next page.
     var parent = tree.get_node(paginationNode.parent);
@@ -382,62 +393,57 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   };
 
   var extendQueryString = function(url, parameters) {
+    url = url || '';
     url += url.indexOf('?') < 0 ? '?': '&';
     return url + $.param(parameters);
   };
 
   var getDefaultParams = function(element) {
-    var baseParams = {
+    var defaultParams = {
       core: {
-        // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
-        force_text: true,
         // Turn off animations by default.
         animation: false,
+        check_callback: validateOperation,
+        // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
+        force_text: true,
         themes: {
           name: 'xwiki',
           responsive: element.attr('data-responsive') !== 'false',
           icons: element.attr('data-icons') !== 'false',
           dots: element.attr('data-edges') !== 'false'
         }
+      },
+      plugins: [],
+      contextmenu: {
+        items: getContextMenuItems
+      },
+      dnd: {
+        is_draggable: areDraggable
+      },
+      finder: {
+        url: extendQueryString(element.attr('data-url'), {
+          data: 'suggestions'
+        })
       }
     };
-    var plugins = [];
     if (element.attr('data-checkboxes') === 'true') {
-      plugins.push('checkbox');
+      defaultParams.plugins.push('checkbox');
+    }
+    if (element.attr('data-dragAndDrop') === 'true') {
+      defaultParams.plugins.push('dnd');
+    }
+    if (element.attr('data-contextMenu') === 'true') {
+      defaultParams.plugins.push('contextmenu');
+    }
+    if (element.attr('data-finder') === 'true') {
+      defaultParams.plugins.push('finder');
     }
     if (element.attr('data-url')) {
-      if (element.attr('data-dragAndDrop') === 'true') {
-        plugins.push('dnd');
-      }
-      if (element.attr('data-contextMenu') === 'true') {
-        plugins.push('contextmenu');
-      }
-      if (element.attr('data-finder') === 'true') {
-        plugins.push('finder');
-      }
-      return $.extend(true, baseParams, {
-        core: {
-          data: getChildren,
-          check_callback: validateOperation
-        },
-        plugins: plugins,
-        dnd: {
-          is_draggable: areDraggable
-        },
-        contextmenu: {
-          items: getContextMenuItems
-        },
-        finder: {
-          url: extendQueryString(element.attr('data-url'), {
-            data: 'suggestions'
-          })
-        }
-      });
-    } else {
-      // The tree structure is in-line.
-      baseParams.plugins = plugins;
-      return baseParams;
+      defaultParams.core.data = getChildren;
+    } else if (element.attr('data-json')) {
+      defaultParams.core.data = element.data('json');
     }
+    return $.extend(true, defaultParams, element.data('config'));
   };
 
   var customTreeAPI = {
@@ -479,7 +485,10 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     return this.on('select_node.jstree', function(event, data) {
       var tree = data.instance;
       var selectedNode = data.node;
-      if (selectedNode.data && selectedNode.data.type === 'pagination') {
+      // Load more child nodes when the pagination node is selected, if the selection is a result of an action performed
+      // by the user (e.g click on the pagination node). We need to make this distinction because sometimes we want to
+      // select the pagination node without activating it (i.e. without replacing it with the next child nodes).
+      if (selectedNode.data && selectedNode.data.type === 'pagination' && data.event) {
         addMoreChildren(tree, selectedNode);
       } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
           $(data.event.target).closest('.jstree-no-links').length === 0) {

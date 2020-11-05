@@ -35,12 +35,26 @@ public class AdministrablePage extends ViewPage
     private WebElement administerWikiLink;
 
     /**
-     * Click on the "Administer Wiki" menu item.
+     * Clicks on the "Administer Wiki" menu item.
+     *
+     * @return the wiki administration PO
      */
     public AdministrationPage clickAdministerWiki()
     {
         toggleDrawer();
         this.administerWikiLink.click();
+        return new AdministrationPage();
+    }
+
+    /**
+     * Clicks on the "Administer Page" menu item.
+     *
+     * @return the page administration PO
+     * @since 12.10RC1
+     */
+    public AdministrationPage clickAdministerPage()
+    {
+        clickMoreActionsSubMenuEntry("tmAdminSpace");
         return new AdministrationPage();
     }
 }

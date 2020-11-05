@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation-test</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-test-tests</artifactId>
   <name>XWiki Platform - Observation - Tests - Functional Tests</name>
@@ -34,7 +34,6 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <xwiki.database.directory>${project.build.directory}/data/database</xwiki.database.directory>
     <xwiki.instance.directory>${project.build.directory}/xwiki</xwiki.instance.directory>
@@ -77,7 +76,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -115,138 +113,139 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Generate hibernate configuration for hsqldb in server mode -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
-        <version>${commons.version}</version>
-        <executions>
-          <execution>
-            <id>xwiki-platform-tool-configuration-resources</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>process</goal>
-            </goals>
-            <configuration>
-              <resourceBundles>
-                <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${project.version}</resourceBundle>
-              </resourceBundles>
-              <properties>
-                <xwikiDbConnectionUrl>jdbc:hsqldb:hsql://localhost/xwiki_db</xwikiDbConnectionUrl>
-                <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
-                <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
-                <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
-                <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
-                <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
-
-                <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>
-              </properties>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Start Hsqldb -->
-      <plugin>
-        <groupId>org.onebusaway.plugins</groupId>
-        <artifactId>maven-hsqldb-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>start-hsqldb</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <dbName>${xwiki.database.directory}/xwiki_db</dbName>
-          <isTransient>false</isTransient>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <!-- Generate XWiki instances -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
-        </configuration>
-        <executions>
-          <execution>
-            <id>xwiki-0</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-            <configuration>
-              <outputPackageDirectory>${xwiki.instance.directory}</outputPackageDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>xwiki-1</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-            <configuration>
-              <outputPackageDirectory>${xwiki.instance.directory}-1</outputPackageDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Customize instances -->
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <configuration>
-              <tasks>
-                <!-- Override hibernate configuration -->
-                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
-                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
-                <!-- Override xwiki.properties configuration -->
-                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
-                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>package</id>
+      <activation>
+        <property>
+          <name>!skipITs</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Generate hibernate configuration for hsqldb in server mode -->
+          <plugin>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+            <version>${commons.version}</version>
+            <executions>
+              <execution>
+                <id>xwiki-platform-tool-configuration-resources</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>process</goal>
+                </goals>
+                <configuration>
+                  <resourceBundles>
+                    <resourceBundle>org.xwiki.platform:xwiki-platform-tool-configuration-resources:${project.version}</resourceBundle>
+                  </resourceBundles>
+                  <properties>
+                    <xwikiDbConnectionUrl>jdbc:hsqldb:hsql://localhost/xwiki_db</xwikiDbConnectionUrl>
+                    <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
+                    <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
+                    <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
+                    <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
+                    <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
+                    <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Start Hsqldb -->
+          <plugin>
+            <groupId>org.onebusaway.plugins</groupId>
+            <artifactId>maven-hsqldb-plugin</artifactId>
+            <version>1.0</version>
+            <executions>
+              <execution>
+                <id>start-hsqldb</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <dbName>${xwiki.database.directory}/xwiki_db</dbName>
+              <isTransient>false</isTransient>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>${hsqldb.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <!-- Generate XWiki instances -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+              <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
+            </configuration>
+            <executions>
+              <execution>
+                <id>xwiki-0</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <outputPackageDirectory>${xwiki.instance.directory}</outputPackageDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>xwiki-1</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <outputPackageDirectory>${xwiki.instance.directory}-1</outputPackageDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Customize instances by overwriting config files generated by the packager plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <target>
+                    <!-- Override hibernate configuration -->
+                    <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
+                    <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
+                    <!-- Override xwiki.properties configuration -->
+                    <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
+                    <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.

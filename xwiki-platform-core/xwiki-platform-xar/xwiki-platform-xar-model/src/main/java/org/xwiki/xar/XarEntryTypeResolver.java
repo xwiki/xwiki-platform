@@ -19,7 +19,6 @@
  */
 package org.xwiki.xar;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -28,7 +27,6 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 10.3
  */
-@Component
 @Role
 public interface XarEntryTypeResolver
 {

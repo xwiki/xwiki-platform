@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Resends mails.
@@ -35,7 +36,7 @@ import org.xwiki.component.annotation.Role;
 public interface MailResender
 {
     /**
-     * Resends all mails matching the passed filter map.
+     * Resends all mails matching the passed filter map, asynchronously.
      *
      * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
      * @param offset the number of rows to skip (0 means don't skip any row)
@@ -48,7 +49,26 @@ public interface MailResender
         throws MailStoreException;
 
     /**
-     * Resends the mail message matching the passed batch id and message id.
+     * Resends all mails matching the passed filter map, synchronously (one mail after another).
+     *
+     * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
+     * @return the mail statuses and results for the resent mails
+     * @throws MailStoreException if a mail status failed to be loaded. Note that no exception is raised if a mail
+     *         message failed to be loaded from the store, in which case no entry will be returned in the returned list
+     * @since 12.10RC1
+     */
+    @Unstable
+    default List<Pair<MailStatus, MailStatusResult>> resend(Map<String, Object> filterMap, int offset, int count)
+        throws MailStoreException
+    {
+        // Not supported by default
+        throw new MailStoreException("Synchronous mail resending is not supported");
+    }
+
+    /**
+     * Resends the mail message matching the passed batch id and message id, asynchronously.
      *
      * @param batchId the id of the batch to which the message to resend belongs to
      * @param uniqueMessageId the unique id of the message to resend

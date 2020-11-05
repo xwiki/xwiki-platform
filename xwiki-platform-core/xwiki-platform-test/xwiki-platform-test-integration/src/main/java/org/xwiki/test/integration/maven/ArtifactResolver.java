@@ -239,7 +239,7 @@ public class ArtifactResolver
     private void sendError(Artifact artifact, Collection<Exception> exceptions) throws Exception
     {
         for (Exception exception : exceptions) {
-            LOGGER.error("Problem [{}]", exception);
+            LOGGER.error("Artifact resolving error for [{}]", artifact, exception);
         }
         throw new Exception(String.format("Failed to resolve artifact [%s]", artifact));
     }

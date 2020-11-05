@@ -42,6 +42,7 @@ public interface SolrCoreInitializer
      * Initialize the client after its creation.
      * 
      * @param client to manipulate the core
+     * @throws SolrException when failing to initialize the core
      */
     void initialize(SolrClient client) throws SolrException;
 }

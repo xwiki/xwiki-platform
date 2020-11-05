@@ -34,8 +34,8 @@ public class EntitySelection implements Comparable<EntitySelection>
     /**
      * Define the inner state of the EntitySelection.
      */
-    public enum State {
-
+    public enum State
+    {
         /**
          * If a user selected it.
          */

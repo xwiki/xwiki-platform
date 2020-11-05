@@ -19,37 +19,50 @@
  */
 package org.xwiki.configuration.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 /**
  * Unit tests for {@link SpacePreferencesConfigurationSource}.
  *
  * @version $Id$
  */
+@OldcoreTest
 public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
     private static final DocumentReference SPACE_DOCUMENT =
         new DocumentReference(CURRENT_WIKI, "currentspace", SpacePreferencesConfigurationSource.DOCUMENT_NAME);
 
-    public SpacePreferencesConfigurationSourceTest()
-    {
-        super(SpacePreferencesConfigurationSource.class);
-    }
+    @InjectMockComponents
+    private SpacePreferencesConfigurationSource source;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
 
     @Override
+    @BeforeEach
     public void before() throws Exception
     {
         super.before();
+        when(this.dab.getCurrentDocumentReference()).thenReturn(SPACE_DOCUMENT);
+    }
 
-        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
-        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(SPACE_DOCUMENT);
+    @Override
+    protected ConfigurationSource getConfigurationSource()
+    {
+        return this.source;
     }
 
     @Override
@@ -59,10 +72,10 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumen
     }
 
     @Test
-    public void getPropertyForStringWhenExists() throws Exception
+    void getPropertyForStringWhenExists() throws Exception
     {
         setStringProperty(SPACE_DOCUMENT, "key", "value");
 
-        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
+        assertEquals("value", this.source.getProperty("key", String.class));
     }
 }

@@ -70,7 +70,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     /**
      * @see OfficeServerConfiguration#getTaskExecutionTimeout()
      */
-    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
+    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 60000L;
 
     /**
      * @see OfficeServerConfiguration#getHomePath()

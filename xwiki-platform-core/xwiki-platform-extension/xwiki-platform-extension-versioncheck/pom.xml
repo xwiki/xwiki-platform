@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension</artifactId>
-        <version>12.3-SNAPSHOT</version>
+        <version>12.10-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-extension-versioncheck</artifactId>
     <name>XWiki Platform - Extension - Version Check</name>
@@ -33,8 +33,7 @@
     <description>XWiki Platform - Extension - Version Check</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
-        <xwiki.pitest.mutationThreshold>21</xwiki.pitest.mutationThreshold>
-    </properties>
+        </properties>
     <dependencies>
         <dependency>
             <groupId>org.xwiki.platform</groupId>

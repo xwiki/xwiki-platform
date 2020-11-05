@@ -809,7 +809,8 @@ public class RepositoryManager implements Initializable, Disposable
         // Update properties
 
         // Type
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE, extension.getType());
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
+            StringUtils.defaultString(extension.getType()));
 
         // Name
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName());

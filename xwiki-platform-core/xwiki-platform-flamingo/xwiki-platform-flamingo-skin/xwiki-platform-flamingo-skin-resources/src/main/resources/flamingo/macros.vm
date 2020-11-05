@@ -31,16 +31,18 @@
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered panel panel-default xwikimessage">
-     <div class="panel-heading">
+  <div class="centered panel panel-default xwikimessage">
+    <div class="panel-heading">
       <div class="panel-title">$title</div>
-     </div>
-     <div class="panel-body">
-      <p class="xwikimessage">$message</p>
+    </div>
+    <div class="panel-body">
+      #if ("$!message" != '')
+        <p class="xwikimessage">$message</p>
+      #end
 #end
 #macro(xwikimessageboxend)
-      </div>
-    </div>
+    </div>##panel-body
+  </div>##panel
 #end
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
@@ -73,6 +75,7 @@
  *#
 #macro(editActionButton $action $resourceIdentifier $class)
 #submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier), $class)
+<input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 
 #**
@@ -288,7 +291,12 @@
               </td>
             </tr>
           </thead>
-          <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          ## Use hyphenation in order to prevent the live table from overflowing the available width (e.g. when the
+          ## table cells contain long words that cannot be wrapped otherwise).
+          ## See https://justmarkup.com/articles/2015-07-31-dealing-with-long-words-in-css/
+          <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body hyphenate">
+            <tr><td colspan="${columnCount}">&nbsp;</td></tr>
+          </tbody>
         </table>
       </td>
     </tr>

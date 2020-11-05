@@ -50,6 +50,8 @@ public class PreferenceDateNotificationFilter
         for (NotificationPreference preference : preferences) {
             Object preferenceEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
             if (preferenceEventType != null && event.getType().equals(preferenceEventType)
+                    // We filter (i.e. don't record) only if the preference starting strictly after the event
+                    // event starting on same date are not filtered.
                     && preference.getStartDate().after(event.getDate())) {
                 return true;
             }

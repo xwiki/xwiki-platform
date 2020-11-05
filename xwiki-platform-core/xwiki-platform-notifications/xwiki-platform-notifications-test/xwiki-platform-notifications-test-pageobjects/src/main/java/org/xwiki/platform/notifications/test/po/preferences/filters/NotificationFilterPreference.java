@@ -170,4 +170,14 @@ public class NotificationFilterPreference
         return String.format("NotificationFilterPreference{filterName='%s', filterType='%', evenTypes=%s, formats=%s,"
                 + " enabled=%s", filterName, filterName, eventTypes, formats, isEnabled());
     }
+
+    /**
+     * @return the ID of the filter.
+     * @since 12.4
+     */
+    public String getID()
+    {
+        return this.livetableRow.findElement(By.className("notificationFilterPreferenceCheckbox"))
+            .getAttribute("data-preferenceid");
+    }
 }

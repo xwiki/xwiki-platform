@@ -86,8 +86,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
 
     private void saveNotificationPreferences(String json, String providerHint, EntityReference target,
-            NotificationPreferenceCategory category)
-            throws NotificationException
+        NotificationPreferenceCategory category) throws NotificationException
     {
         /*
             The JSON we get is a "snapshot" of the states of the buttons the user has in front of her eyes when she is
@@ -136,16 +135,14 @@ public class NotificationPreferenceScriptService implements ScriptService
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
 
-                targetableNotificationPreferenceBuilder.prepare();
-                targetableNotificationPreferenceBuilder.setEnabled(enabled);
-                targetableNotificationPreferenceBuilder.setFormat(format);
-                targetableNotificationPreferenceBuilder.setProviderHint(providerHint);
-                targetableNotificationPreferenceBuilder.setProperties(
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
-                targetableNotificationPreferenceBuilder.setTarget(target);
-                targetableNotificationPreferenceBuilder.setCategory(category);
-
-                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.build();
+                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.prepare()
+                    .setEnabled(enabled)
+                    .setFormat(format)
+                    .setProviderHint(providerHint)
+                    .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType))
+                    .setTarget(target)
+                    .setCategory(category)
+                    .build();
 
                 // This part is explained by the long comment below
                 NotificationPreference correspondingPreference = getCorrespondingPreference(existingPreferences,
@@ -164,7 +161,8 @@ public class NotificationPreferenceScriptService implements ScriptService
     }
 
     private NotificationPreference getCorrespondingPreference(List<NotificationPreference> existingPreferences,
-            TargetableNotificationPreference newPreference) {
+        TargetableNotificationPreference newPreference)
+    {
         for (NotificationPreference pref: existingPreferences) {
             // This code heavily
             // depends on org.xwiki.notifications.preferences.internal.AbstractNotificationPreference.equals()
@@ -216,7 +214,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @throws AccessDeniedException if the current user has not the right to administrate the current wiki
      */
     public void saveNotificationPreferencesForCurrentWiki(String json)
-            throws NotificationException, AccessDeniedException
+        throws NotificationException, AccessDeniedException
     {
         WikiReference currentWiki = documentAccessBridge.getCurrentDocumentReference().getWikiReference();
         authorizationManager.checkAccess(Right.ADMIN, currentWiki);
@@ -296,7 +294,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @throws AccessDeniedException if the current user has not the admin right on the wiki
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format, String wiki)
-            throws NotificationException, AccessDeniedException
+        throws NotificationException, AccessDeniedException
     {
         WikiReference wikiReference = new WikiReference(wiki);
         authorizationManager.checkAccess(Right.ADMIN, wikiReference);

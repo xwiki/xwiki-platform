@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring</artifactId>
   <name>XWiki Platform - Refactoring - Parent POM</name>
@@ -34,5 +34,6 @@
   <modules>
     <module>xwiki-platform-refactoring-api</module>
     <module>xwiki-platform-refactoring-default</module>
+    <module>xwiki-platform-refactoring-ui</module>
   </modules>
 </project>

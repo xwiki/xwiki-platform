@@ -30,6 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Parameters to fill to retrieve notifications using {@link ParametrizedNotificationManager}.
@@ -58,6 +59,14 @@ public class NotificationParameters
      * Don't get notifications that have been triggered after the following date.
      */
     public Date endDate;
+
+    /**
+     * True if the end date should be included.
+     * 
+     * @since 12.6.1
+     * @since 12.7RC1
+     */
+    public boolean endDateIncluded = true;
 
     /**
      * Don't get notification that have been triggered before the following date.
@@ -107,6 +116,7 @@ public class NotificationParameters
             .append(user, that.user)
             .append(format, that.format)
             .append(endDate, that.endDate)
+            .append(endDateIncluded, that.endDateIncluded)
             .append(fromDate, that.fromDate)
             .append(onlyUnread, that.onlyUnread)
             .append(blackList, that.blackList)
@@ -124,6 +134,7 @@ public class NotificationParameters
             .append(format)
             .append(expectedCount)
             .append(endDate)
+            .append(endDateIncluded)
             .append(fromDate)
             .append(onlyUnread)
             .append(blackList)
@@ -131,5 +142,23 @@ public class NotificationParameters
             .append(filterPreferences)
             .append(filters)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("user", user)
+            .append("format", format)
+            .append("expectedCount", expectedCount)
+            .append("endDate", endDate)
+            .append("endDateIncluded", endDateIncluded)
+            .append("fromDate", fromDate)
+            .append("onlyUnread", onlyUnread)
+            .append("blackList", blackList)
+            .append("preferences", preferences)
+            .append("filterPreferences", filterPreferences)
+            .append("filters", filters)
+            .toString();
     }
 }

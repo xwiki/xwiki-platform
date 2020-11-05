@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-reference</artifactId>
   <name>XWiki Platform - Annotations - References Manipulation</name>
@@ -34,8 +34,7 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.43</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>44</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

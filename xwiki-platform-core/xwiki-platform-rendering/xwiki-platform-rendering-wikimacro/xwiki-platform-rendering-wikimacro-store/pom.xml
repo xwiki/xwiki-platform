@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
   <description>Defines the ability to store macros into wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>71</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Name to display by the Extension Manager -->
@@ -42,11 +41,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-wikimacro-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacrocontent</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -99,6 +93,12 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xdomxmlcurrent</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

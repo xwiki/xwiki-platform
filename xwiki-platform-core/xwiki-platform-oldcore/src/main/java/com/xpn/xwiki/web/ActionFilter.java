@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -88,12 +90,20 @@ public class ActionFilter implements Filter
     {
         // Only HTTP requests can be dispatched.
         if (request instanceof HttpServletRequest
-            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
+            && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
+        {
             HttpServletRequest hrequest = (HttpServletRequest) request;
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String parameter = parameterNames.nextElement();
-                if (parameter.startsWith(ACTION_PREFIX)) {
+                
+                // If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken into
+                // account if they are part of the xaction list. Otherwise, all the parameters prefixed with 'action_'
+                // are accepted.
+                String[] xactions = request.getParameterValues("xaction");
+                if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
+                    .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
+                {
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
@@ -154,7 +164,8 @@ public class ActionFilter implements Filter
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
             if (servletPath.equals(PATH_SEPARATOR
-                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")))
+            {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

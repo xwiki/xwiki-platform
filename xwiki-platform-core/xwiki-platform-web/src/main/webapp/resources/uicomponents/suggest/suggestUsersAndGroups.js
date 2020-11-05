@@ -118,6 +118,10 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
       $(this).xwikiSelectize($.extend(getSelectizeOptions($(this)), options));
     });
   };
+
+  return {
+    'loadUsers': loadUsers
+  }
 });
 
 /**
@@ -185,5 +189,5 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });

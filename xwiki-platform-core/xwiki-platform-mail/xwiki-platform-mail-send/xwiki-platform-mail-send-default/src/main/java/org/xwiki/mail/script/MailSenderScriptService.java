@@ -45,24 +45,24 @@ import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
  * Example for sending an HTML message with attachments and a text
  * alternative:
  * <pre><code>
- *   #set ($message = $services.mailSender.createMessage(to, subject))
+ *   #set ($message = $services.mail.sender.createMessage(to, subject))
  *   #set ($discard = $message.addPart("html", "html message", {"alternate" : "text message",
  *     "attachments" : $attachments}))
- *   #set ($mailResult = $services.mailsender.send($message))
+ *   #set ($mailResult = $services.mail.sender.send($message))
  * </code></pre>
  *
  * @version $Id$
  * @since 6.1M2
  */
 @Component
-@Named("mailsender")
+@Named("mail.sender")
 @Singleton
 public class MailSenderScriptService extends AbstractMailScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    static final String ERROR_KEY = "scriptservice.mailsender.error";
+    static final String ERROR_KEY = "scriptservice.mail.sender.error";
 
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
@@ -102,7 +102,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public Iterator<MimeMessage> createMessages(String hint, Object source)
     {
-        return createMessages(hint, source, Collections.<String, Object>emptyMap());
+        return createMessages(hint, source, Collections.emptyMap());
     }
 
     /**

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-common</artifactId>
   <name>XWiki Platform - Active Installs - Common API</name>
@@ -33,8 +33,7 @@
   <description>API common to both client and server modules</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>22</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

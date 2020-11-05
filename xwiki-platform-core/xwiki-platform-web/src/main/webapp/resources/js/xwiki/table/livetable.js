@@ -375,12 +375,28 @@ XWiki.widgets.LiveTable = Class.create({
             if (action.async) {
               link.observe('click', function(event) {
                 event.stop();
-                new Ajax.Request(this.href, {
+                var notification = new XWiki.widgets.Notification(
+                  $jsontool.serialize($services.localization.render('platform.livetable.asyncActionInProgress')),
+                  'inprogress'
+                );
+                new Ajax.Request(link.href, {
                   onSuccess: function() {
-                    eval(action.callback);
+                    if (typeof action.callback === 'string') {
+                      new Function('row', 'i', 'table', action.callback)(row, i, table);
+                    }
+                    notification.replace(new XWiki.widgets.Notification(
+                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionDone')),
+                      'done'
+                    ));
+                  },
+                  onFailure: function() {
+                    notification.replace(new XWiki.widgets.Notification(
+                      $jsontool.serialize($services.localization.render('platform.livetable.asyncActionFailed')),
+                      'error'
+                    ));
                   }
                 });
-              }.bindAsEventListener(link));
+              });
             }
             td.insert(link);
           }
@@ -1381,7 +1397,9 @@ var init = function(event) {
   elements.forEach(function(element) {
     var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :
       element.querySelectorAll('.xwiki-livetable');
-    liveTableElements.forEach(maybeCreateLiveTable);
+    // Iterate the NodeList of live table elements in a way that is compatible with IE11.
+    // See XWIKI-17170: LiveTables not working on IE11
+    Array.prototype.forEach.call(liveTableElements, maybeCreateLiveTable);
   });
 };
 

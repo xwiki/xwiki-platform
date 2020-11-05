@@ -23,13 +23,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-jcaptcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - JCaptcha - API</name>
   <properties>
     <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>54</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JCaptcha API</xwiki.extension.name>
   </properties>

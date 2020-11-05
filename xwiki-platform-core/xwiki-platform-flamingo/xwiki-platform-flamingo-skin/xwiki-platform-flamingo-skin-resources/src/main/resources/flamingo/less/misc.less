@@ -415,10 +415,34 @@ dl.export-tree-legend dt + dd {
   right: 30px;
 }
 
-.changes-body > .nav {
+.changes-body > .changes-body-header {
   border-bottom: @border-width solid @xwiki-border-color;
   margin-bottom: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 4);
+}
+
+.changes-body .changes-actions {
+  color: @text-muted;
+  display: none;
+  font-size: smaller;
+  text-align: right;
+}
+.changes-body .changes-actions.active {
+  display: block;
+}
+
+.html-diff-context-toggle {
+  color: inherit;
+}
+a.html-diff-context-toggle {
+  display: inline-block;
+  padding: @nav-link-padding;
+  text-decoration: none;
+}
+
+.html-diff-context-toggle-show .html-diff-context-hide,
+.html-diff-context-toggle-hide .html-diff-context-show {
+  display: none;
 }
 
 // Panels Layout --------------------------------------------------------------
@@ -472,4 +496,9 @@ dl.export-tree-legend dt + dd {
   .label {
     color: @text-color;
   }
+}
+
+// Locale Picker
+.bootstrap-select.btn-group .dropdown-menu li.active small.text-muted {
+  color: inherit;
 }

@@ -23,11 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionsConfiguration;
+import org.xwiki.mentions.MentionsFormatter;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
-import org.xwiki.mentions.internal.MentionsFormatter;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -47,7 +49,7 @@ public class MentionsScriptService implements ScriptService
     private MentionsConfiguration configuration;
 
     @Inject
-    private MentionsFormatter formatter;
+    private MentionFormatterProvider mentionFormatterProvider;
 
     @Inject
     private MentionsEventExecutor eventExecutor;
@@ -83,7 +85,6 @@ public class MentionsScriptService implements ScriptService
         return this.eventExecutor.getQueueSize();
     }
 
-
     /**
      *
      * @see MentionsConfiguration#isQuoteActivated()
@@ -96,15 +97,25 @@ public class MentionsScriptService implements ScriptService
     }
 
     /**
-     * Format a user mention.
+     * Format an actor mention according to its type.
      *
-     * @see MentionsFormatter#formatMention(String, DisplayStyle)
-     * @param userReference the user reference
+     * @param actorReference the reference of the mentioned actor
      * @param style the display style
-     * @return the formatted mention
+     * @param type the type of the actor to format
+     * @return the formatted actor mention
+     * @see MentionsFormatter#formatMention(String, DisplayStyle)
+     * @since 12.10RC1
      */
-    public String format(String userReference, DisplayStyle style)
+    @Unstable
+    public String format(String actorReference, DisplayStyle style, String type)
     {
-        return this.formatter.formatMention(userReference, style);
+        // Uses the "user" type when the mention has an undefined type.
+        String hint;
+        if (StringUtils.isEmpty(type)) {
+            hint = MentionsConfiguration.USER_MENTION_TYPE;
+        } else {
+            hint = type;
+        }
+        return this.mentionFormatterProvider.get(hint).formatMention(actorReference, style);
     }
 }

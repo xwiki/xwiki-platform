@@ -17,25 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.mentions.events;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.DisplayStyle;
+import org.xwiki.observation.event.Event;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provides services to format the user mentions.
+ * An event sent at the end of the analysis of a document change (i.e., a created or updated document).
+ * <p>
+ * The following information is sent along the event:
+ * <ul>
+ *     <li>source: the reference of the user who made the change</li>
+ *     <li>data: the {@link org.xwiki.mentions.notifications.MentionNotificationParameters} holding the
+ *     list of mentions introduced by the change on a given entity</li>
+ * </ul>
  *
  * @version $Id$
- * @since 12.6
+ * @since 12.10RC1
  */
-@Role
-public interface MentionsFormatter
+@Unstable
+public class NewMentionsEvent implements Event
 {
-    /**
-     * Format a user mention.
-     * @param userReference The user reference
-     * @param style The display style of the mention
-     * @return the formatted mention
-     */
-    String formatMention(String userReference, DisplayStyle style);
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof NewMentionsEvent;
+    }
 }

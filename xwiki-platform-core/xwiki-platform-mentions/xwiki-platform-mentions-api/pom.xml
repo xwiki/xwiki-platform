@@ -31,7 +31,7 @@
   <name>XWiki Platform - Mentions - API</name>
   <description>API to support the mention of users</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -56,7 +56,7 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }, resolveExtraJARs = true)
-public class MentionsIT
+class MentionsIT
 {
     private static final String U1_USERNAME = "U1";
 
@@ -166,8 +166,8 @@ public class MentionsIT
             properties
                 .put("comment",
                     "AAAAA\n\n"
-                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" /}} XYZ\n\n"
-                        + "BBBBB");
+                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
+                        + "type=\"user\" /}} XYZ\n\nBBBBB");
             setup.addObject(reference, "XWiki.XWikiComments", properties);
         });
 

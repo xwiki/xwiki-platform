@@ -17,45 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.mentions.MentionsFormatter;
 
 /**
- * Gives access to the configuration settings of the mentions.
+ * Provides a {@link MentionsFormatter} component according to the type of actor to format.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.10RC1
+ * @see MentionsFormatter
  */
-@Unstable
 @Role
-public interface MentionsConfiguration
+public interface MentionFormatterProvider
 {
     /**
-     * The type of the mentions to local users.
-     * <p>
-     * This is also the default type when it is not defined.
+     * Returns a {@link MentionsFormatter} from the requested actor type.
      *
-     * @since 12.10RC1
+     * @param type the requested actor type
+     * @return the resolved {@link MentionsFormatter}
      */
-    @Unstable
-    String USER_MENTION_TYPE = "user";
-
-    /**
-     * 
-     * @return the color for the mentions.
-     */
-    String getMentionsColor();
-
-    /**
-     * @return the color for the mentions to the current user.
-     */
-    String getSelfMentionsColor();
-
-    /**
-     * 
-     * @return {@code true} if the mentions quote feature is activated.
-     */
-    boolean isQuoteActivated();
+    MentionsFormatter get(String type);
 }

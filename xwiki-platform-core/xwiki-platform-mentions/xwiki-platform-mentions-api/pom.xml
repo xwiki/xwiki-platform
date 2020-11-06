@@ -31,6 +31,8 @@
   <name>XWiki Platform - Mentions - API</name>
   <description>API to support the mention of users</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>User Mentions API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

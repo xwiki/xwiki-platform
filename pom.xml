@@ -86,7 +86,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.22.Final</hibernate.version>
+    <hibernate.version>5.4.23.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -167,6 +167,13 @@
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
         <version>2.7.2</version>
+        <exclusions>
+          <!-- Not need in the context of XWiki and cause conflict with other dependencies -->
+          <exclusion>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>

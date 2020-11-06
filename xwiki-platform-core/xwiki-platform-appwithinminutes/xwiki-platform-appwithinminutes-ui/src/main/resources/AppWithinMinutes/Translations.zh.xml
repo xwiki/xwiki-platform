@@ -91,7 +91,7 @@ platform.appwithinminutes.appNameIsUsedWarning=该应用程序已经存在。如
 platform.appwithinminutes.appNameEmptyError=请输入应用程序名称。
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
+platform.appwithinminutes.classEditorPaletteTitle=字段调色板
 platform.appwithinminutes.classEditorPaletteHint=从调色板中拖放字段以创建将用于输入数据的表单。
 platform.appwithinminutes.classEditorCanvasHint=将字段从调色板中拖放到该区域中。
 

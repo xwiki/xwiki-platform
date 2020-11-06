@@ -19,6 +19,8 @@
  */
 package org.xwiki.mentions.internal;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,16 +40,16 @@ import static org.xwiki.mentions.DisplayStyle.FULL_NAME;
 import static org.xwiki.mentions.DisplayStyle.LOGIN;
 
 /**
- * Test of {@link DefaultMentionsFormatter}.
+ * Test of {@link UserMentionsFormatter}.
  *
  * @version $Id$
- * @since 12.6
+ * @since 12.10RC1
  */
 @ComponentTest
-class DefaultMentionsFormatterTest
+class UserMentionsFormatterTest
 {
     @InjectMockComponents
-    private DefaultMentionsFormatter formatter;
+    private UserMentionsFormatter formatter;
 
     @MockComponent
     private UserPropertiesResolver userPropertiesResolver;

@@ -19,82 +19,86 @@
  */
 package org.xwiki.mentions.notifications;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.mentions.MentionLocation;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Object holding the parameters of the users mentions.
+ * Contains the mentions for a change (creation or modification) on a given entity. The object contains two maps of
+ * mentions, storing respectively the list of all mentions of the entity, and the list of new mentions introduced by the
+ * change. The keys of the maps are the types of the mentioned users stored in the values. The value of the maps
+ * contains the list of mentions of a given type. In addition, the object contains the reference of the author of the
+ * change, the location of the entity (e.g., in a document or a comment), the reference of the changed entity, and the
+ * version of the entity after the change.
+ *
  * @version $Id$
  * @since 12.6
  */
 @Unstable
-public class MentionNotificationParameters
+public class MentionNotificationParameters implements Serializable
 {
-    private final DocumentReference authorReference;
+    private final Map<String, Set<MentionNotificationParameter>> newMentions;
 
-    private final DocumentReference documentReference;
+    private final Map<String, Set<MentionNotificationParameter>> unmodifiableNewMentions;
 
-    private final DocumentReference mentionedIdentity;
+    private final Map<String, Set<MentionNotificationParameter>> mentions;
+
+    private final Map<String, Set<MentionNotificationParameter>> unmodifiableMentions;
+
+    private final String authorReference;
+
+    private final EntityReference entityReference;
 
     private final MentionLocation location;
 
-    private final String anchorId;
-
-    private final XDOM xdom;
+    private final String version;
 
     /**
-     * @param authorReference the reference of the author of the mention
-     * @param documentReference the document in which the mention has been done
-     * @param mentionedIdentity the identity of the mentioned user
-     * @param location the location of the mention
-     * @param anchorId the anchor link to use
-     * @param xdom the content xdom
+     * @param authorReference the reference of the author of the change that produced the mentions
+     * @param entityReference the entity holding the mentions (a page content, a comment...)
+     * @param location the pre-calculated location of the entity
+     * @param version version of the document where the mention occurred
      */
-    public MentionNotificationParameters(DocumentReference authorReference, DocumentReference documentReference,
-        DocumentReference mentionedIdentity, MentionLocation location, String anchorId, XDOM xdom)
+    public MentionNotificationParameters(String authorReference,
+        EntityReference entityReference, MentionLocation location, String version)
     {
         this.authorReference = authorReference;
-        this.documentReference = documentReference;
-        this.mentionedIdentity = mentionedIdentity;
+        this.entityReference = entityReference;
         this.location = location;
-        this.anchorId = anchorId;
-        this.xdom = xdom;
+        this.version = version;
+        this.newMentions = new HashMap<>();
+        this.mentions = new HashMap<>();
+        this.unmodifiableNewMentions = Collections.unmodifiableMap(this.newMentions);
+        this.unmodifiableMentions = Collections.unmodifiableMap(this.mentions);
     }
 
     /**
-     *
      * @return the reference of the author of the mention
      */
-    public DocumentReference getAuthorReference()
+    public String getAuthorReference()
     {
         return this.authorReference;
     }
 
     /**
-     *
      * @return the document in which the mention has been done
      */
-    public DocumentReference getDocumentReference()
+    public EntityReference getEntityReference()
     {
-        return this.documentReference;
+        return this.entityReference;
     }
 
     /**
-     *
-     * @return the identity of the mentioned user
-     */
-    public DocumentReference getMentionedIdentity()
-    {
-        return this.mentionedIdentity;
-    }
-
-    /**
-     *
      * @return the location of the mention
      */
     public MentionLocation getLocation()
@@ -103,21 +107,80 @@ public class MentionNotificationParameters
     }
 
     /**
+     * Add a mention to the map of mentions.
      *
-     * @return the anchor link to use
+     * @param type the type of the mentioned actor
+     * @param mentionedActorReference the mention notification parameters
+     * @return the current object
      */
-    public String getAnchorId()
+    public MentionNotificationParameters addMention(String type,
+        MentionNotificationParameter mentionedActorReference)
     {
-        return this.anchorId;
+        addToMap(type, mentionedActorReference, this.mentions);
+        return this;
     }
 
     /**
+     * Add a mention to the map of new mentions.
      *
-     * @return the content xdom
+     * @param type the type of the mentioned actor
+     * @param mentionedActorReference the mention notification parameter
+     * @return the current object
      */
-    public XDOM getXdom()
+    public MentionNotificationParameters addNewMention(String type,
+        MentionNotificationParameter mentionedActorReference)
     {
-        return this.xdom;
+        addToMap(type, mentionedActorReference, this.newMentions);
+        return this;
+    }
+
+    /**
+     * Returns an unmodifable map of the new mentions. The type of the mentioned actors are used as keys, and the values
+     * are {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor reference and its
+     * anchor.
+     *
+     * @return the map of new mentions
+     */
+    public Map<String, Set<MentionNotificationParameter>> getNewMentions()
+    {
+        return this.unmodifiableNewMentions;
+    }
+
+    /**
+     * Returns an unmodifiable map of all the mentions, including the new ones. The type of the mentioned actors are
+     * used as keys, and the values are {@link MentionNotificationParameter}, identifying a unique mention in a page by
+     * its actor reference and its anchor.
+     *
+     * @return the map of all the mentions
+     */
+    public Map<String, Set<MentionNotificationParameter>> getMentions()
+    {
+        return this.unmodifiableMentions;
+    }
+
+    /**
+     * @return the version of the document where the mentions occurred
+     */
+    public String getVersion()
+    {
+        return this.version;
+    }
+
+    /**
+     * Add new mention to a map.
+     *
+     * @param type the type of the mentioned actor
+     * @param mentionedActorReference the mention notification parameter
+     * @param mentionsMap the map of mentions to update
+     */
+    private void addToMap(String type, MentionNotificationParameter mentionedActorReference,
+        Map<String, Set<MentionNotificationParameter>> mentionsMap)
+    {
+        if (!mentionsMap.containsKey(type)) {
+            mentionsMap.put(type, new HashSet<>());
+        }
+
+        mentionsMap.get(type).add(mentionedActorReference);
     }
 
     @Override
@@ -134,38 +197,38 @@ public class MentionNotificationParameters
         MentionNotificationParameters that = (MentionNotificationParameters) o;
 
         return new EqualsBuilder()
-                   .append(this.authorReference, that.authorReference)
-                   .append(this.documentReference, that.documentReference)
-                   .append(this.mentionedIdentity, that.mentionedIdentity)
-                   .append(this.location, that.location)
-                   .append(this.anchorId, that.anchorId)
-                   .append(this.xdom, that.xdom)
-                   .isEquals();
+            .append(this.newMentions, that.newMentions)
+            .append(this.mentions, that.mentions)
+            .append(this.authorReference, that.authorReference)
+            .append(this.entityReference, that.entityReference)
+            .append(this.location, that.location)
+            .append(this.version, that.version)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
         return new HashCodeBuilder(17, 37)
-                   .append(this.authorReference)
-                   .append(this.documentReference)
-                   .append(this.mentionedIdentity)
-                   .append(this.location)
-                   .append(this.anchorId)
-                   .append(this.xdom)
-                   .toHashCode();
+            .append(this.newMentions)
+            .append(this.mentions)
+            .append(this.authorReference)
+            .append(this.entityReference)
+            .append(this.location)
+            .append(this.version)
+            .toHashCode();
     }
 
     @Override
     public String toString()
     {
         return new XWikiToStringBuilder(this)
-                   .append("authorReference", this.getAuthorReference())
-                   .append("documentReference", this.getDocumentReference())
-                   .append("mentionedIdentity", this.getMentionedIdentity())
-                   .append("location", this.getLocation())
-                   .append("anchorId", this.getAnchorId())
-                   .append("xdom", this.getXdom())
-                   .build();
+            .append("authorReference", this.getAuthorReference())
+            .append("entityReference", this.getEntityReference())
+            .append("version", this.getVersion())
+            .append("location", this.getLocation())
+            .append("mentions", this.mentions)
+            .append("newMentions", this.newMentions)
+            .build();
     }
 }

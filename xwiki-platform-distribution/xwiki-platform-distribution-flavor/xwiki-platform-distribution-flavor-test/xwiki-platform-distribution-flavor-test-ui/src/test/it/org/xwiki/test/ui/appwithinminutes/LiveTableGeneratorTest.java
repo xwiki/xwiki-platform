@@ -61,7 +61,6 @@ public class LiveTableGeneratorTest extends AbstractTest
         appName = RandomStringUtils.randomAlphabetic(6);
         ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         classEditPage = appCreatePage.clickNextStep();
     }
 

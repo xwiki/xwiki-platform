@@ -57,13 +57,14 @@ public class ApplicationCreatePage extends ViewPage
     }
 
     /**
-     * Types the given string into the application name input.
+     * Types the given string into the application name input and wait for the preview to be available.
      *
      * @param appName the application name
      */
     public void setApplicationName(String appName)
     {
         this.locationPicker.setTitle(appName);
+        waitForApplicationNamePreview();
     }
 
     /**
@@ -75,7 +76,7 @@ public class ApplicationCreatePage extends ViewPage
     }
 
     /**
-     * Waits until the preview for the currently inputed application name is displayed.
+     * Waits until the preview for the currently entered application name is displayed.
      */
     public void waitForApplicationNamePreview()
     {

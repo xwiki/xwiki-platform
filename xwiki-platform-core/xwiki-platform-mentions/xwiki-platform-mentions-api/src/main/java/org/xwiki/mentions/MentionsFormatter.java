@@ -20,22 +20,32 @@
 package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.mentions.notifications.MentionNotificationParameters;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.stability.Unstable;
 
 /**
- * A service to send mentions notification.
+ * Provides services to format the user mentions.
+ * <p>
+ * Unless you know statically the type of actor to format, {@link MentionFormatterProvider} should be used to resolve
+ * the formatter to use according to the type of the actor.
  *
+ * @since 12.10RC1
+ * @see MentionFormatterProvider
  * @version $Id$
- * @since 12.5RC1
  */
 @Role
 @Unstable
-public interface MentionNotificationService
+public interface MentionsFormatter
 {
     /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
-     * @param mentionNotificationParameters Parameters of the mentions notifications.
+     * Format a actor mention.
+     * <p>
+     * The formatter takes the serialized reference of an actor and returns an user readable string.
+     * The kind of actor handled is specific to a {@code MentionFormatter} implementation.
+     *
+     * @param actorReference the actor reference
+     * @param style the display style of the mention
+     * @return the formatted mention
      */
-    void sendNotification(MentionNotificationParameters mentionNotificationParameters);
+    String formatMention(String actorReference, DisplayStyle style);
 }

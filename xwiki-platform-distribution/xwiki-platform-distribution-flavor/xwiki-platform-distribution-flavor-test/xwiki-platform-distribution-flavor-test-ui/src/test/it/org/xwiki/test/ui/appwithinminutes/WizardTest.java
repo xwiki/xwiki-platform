@@ -94,9 +94,6 @@ public class WizardTest extends AbstractTest
         String[] appPath = new String[] {getClass().getSimpleName(), this.testName.getMethodName(), appName};
         appCreatePage.setApplicationName(appName);
 
-        // Wait for the preview.
-        appCreatePage.waitForApplicationNamePreview();
-
         // Move to the next step.
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
 
@@ -270,7 +267,6 @@ public class WizardTest extends AbstractTest
         // Step 1
         String appName = "Empty App âé";
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
 
         // Step 2
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
@@ -279,7 +275,6 @@ public class WizardTest extends AbstractTest
         // Back to Step 1
         appCreatePage = classEditPage.clickPreviousStep();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         // Test that the application wasn't created.
         Assert.assertFalse(appCreatePage.getContent().contains(ApplicationNameTest.APP_NAME_USED_WARNING_MESSAGE));
 

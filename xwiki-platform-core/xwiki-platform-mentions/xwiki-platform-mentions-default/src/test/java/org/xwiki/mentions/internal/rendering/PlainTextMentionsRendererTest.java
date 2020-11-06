@@ -22,15 +22,19 @@ package org.xwiki.mentions.internal.rendering;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.mentions.internal.MentionsFormatter;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
+import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.xwiki.mentions.DisplayStyle.FULL_NAME;
 
 /**
@@ -46,7 +50,16 @@ class PlainTextMentionsRendererTest
     private PlainTextMentionsRenderer renderer;
 
     @MockComponent
+    private MentionFormatterProvider mentionFormatterProvider;
+
     private MentionsFormatter formatter;
+
+    @BeforeEach
+    void setUp()
+    {
+        this.formatter = mock(MentionsFormatter.class);
+        when(this.mentionFormatterProvider.get("user")).thenReturn(this.formatter);
+    }
 
     @Test
     void onMacroMention()

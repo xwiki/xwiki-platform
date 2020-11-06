@@ -89,6 +89,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_LOCALE = "locale";
 
     /**
+     * Name of the entry containing the action.
+     * 
+     * @since 12.10RC1
+     */
+    public static final String PROP_ACTION = "action";
+
+    /**
      * The prefix of the entries containing request related informations.
      */
     public static final String PREFIX_PROP_REQUEST = "request.";
@@ -202,8 +209,8 @@ public class XWikiContextContextStore extends AbstractContextStore
      */
     public XWikiContextContextStore()
     {
-        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL, PROP_REQUEST_PARAMETERS,
-            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
+            PROP_REQUEST_PARAMETERS, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -217,6 +224,7 @@ public class XWikiContextContextStore extends AbstractContextStore
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
             save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
+            save(contextStore, PROP_ACTION, xcontext.getAction(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
@@ -339,6 +347,11 @@ public class XWikiContextContextStore extends AbstractContextStore
         // Locale
         if (contextStore.containsKey(PROP_LOCALE)) {
             xcontext.setLocale((Locale) contextStore.get(PROP_LOCALE));
+        }
+
+        // Action
+        if (contextStore.containsKey(PROP_ACTION)) {
+            xcontext.setAction((String) contextStore.get(PROP_ACTION));
         }
 
         // Document

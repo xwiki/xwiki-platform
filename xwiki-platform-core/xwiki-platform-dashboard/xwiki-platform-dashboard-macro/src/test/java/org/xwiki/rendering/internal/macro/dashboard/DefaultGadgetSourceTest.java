@@ -28,9 +28,7 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,11 +47,9 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -61,11 +57,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DefaultGadgetSourceTest
+class DefaultGadgetSourceTest
 {
     @InjectMockComponents
     private DefaultGadgetSource defaultGadgetSource;
@@ -105,8 +100,7 @@ public class DefaultGadgetSourceTest
     private MacroTransformationContext macroTransformationContext;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager)
-        throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReferenceResolver<String> currentReferenceResolver =
             componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -131,46 +125,33 @@ public class DefaultGadgetSourceTest
         VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-        when(velocityEngine.evaluate(any(), any(), any(), any(String.class))).then(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                StringWriter stringWriter = (StringWriter) args[1];
-                String title = (String) args[3];
-                stringWriter.append(title);
-                return null;
-            }
+        when(velocityEngine.evaluate(any(), any(), any(), any(String.class))).then((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            StringWriter stringWriter = (StringWriter) args[1];
+            String title = (String) args[3];
+            stringWriter.append(title);
+            return null;
         });
 
         AuthorExecutor authorExecutor = componentManager.getInstance(AuthorExecutor.class);
-        when(authorExecutor.call(any(), eq(ownerAuthorReference), eq(ownerSourceReference))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Callable callable = (Callable) invocationOnMock.getArguments()[0];
-                return callable.call();
-            }
+        when(authorExecutor.call(any(), eq(ownerAuthorReference), eq(ownerSourceReference))).then(invocationOnMock -> {
+            Callable callable = (Callable) invocationOnMock.getArguments()[0];
+            return callable.call();
         });
 
         ContentExecutor<MacroTransformationContext> contentExecutor =
             componentManager.getInstance(ContentExecutor.TYPE_MACRO_TRANSFORMATION);
-        when(contentExecutor.execute(any(), any(), any(), any())).then(new Answer<XDOM>() {
-            @Override
-            public XDOM answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                String content = invocationOnMock.getArgument(0);
-                XDOM xdom = new XDOM(Collections.singletonList(new WordBlock(content)));
-                return xdom;
-            }
+        when(contentExecutor.execute(any(), any(), any(), any())).then((Answer<XDOM>) invocationOnMock -> {
+            String content = invocationOnMock.getArgument(0);
+            XDOM xdom = new XDOM(Collections.singletonList(new WordBlock(content)));
+            return xdom;
         });
         when(ownerDocument.getAuthorReference()).thenReturn(ownerAuthorReference);
         when(ownerDocument.getDocumentReference()).thenReturn(ownerSourceReference);
     }
 
     @Test
-    public void getGadgets() throws Exception
+    void getGadgets() throws Exception
     {
         assertEquals(new ArrayList<>(), this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext));
 

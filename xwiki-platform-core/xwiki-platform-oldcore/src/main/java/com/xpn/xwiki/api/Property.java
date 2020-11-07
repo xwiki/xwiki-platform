@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.mail.MailGeneralConfiguration;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Property is a single attribute of an XWiki {@link com.xpn.xwiki.api.Object}.
@@ -82,18 +85,31 @@ public class Property extends Element
      */
     public java.lang.Object getValue()
     {
-        BaseProperty baseProperty = getBaseProperty();
+        final BaseProperty<?> baseProperty = getBaseProperty();
+        final XWikiContext context = getXWikiContext();
 
-        com.xpn.xwiki.objects.classes.PropertyClass propertyClass = baseProperty.getPropertyClass(getXWikiContext());
+        com.xpn.xwiki.objects.classes.PropertyClass propertyClass = baseProperty.getPropertyClass(context);
 
         // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
         // API level, so that java code using core classes will still have access, regardless or rights.
         if (propertyClass != null && "Password".equals(propertyClass.getClassType())) {
-            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+            if (!context.getWiki().getRightService().hasProgrammingRights(context)) {
+                return null;
+            }
+        }
+
+        if (propertyClass != null && "Email".equals(propertyClass.getClassType())) {
+            if (isObfuscateEmails() && !context.getWiki().getRightService().hasWikiAdminRights(context)) {
                 return null;
             }
         }
 
         return getBaseProperty().getValue();
+    }
+
+    private static boolean isObfuscateEmails()
+    {
+        MailGeneralConfiguration cf = Utils.getComponent(MailGeneralConfiguration.class);
+        return cf.isObfuscateEmails();
     }
 }

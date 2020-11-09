@@ -176,7 +176,6 @@
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
@@ -206,7 +205,6 @@
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
@@ -269,7 +267,6 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="hibernate.jdbc.use_streams_for_binary">false</property>
     <property name="xwiki.virtual_mode">schema</property>
 

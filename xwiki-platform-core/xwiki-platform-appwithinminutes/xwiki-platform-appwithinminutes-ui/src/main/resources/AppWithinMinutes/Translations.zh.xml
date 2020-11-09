@@ -100,13 +100,13 @@ platform.appwithinminutes.classEditorUpdateTemplateHint=模板（{0}）存储默
 platform.appwithinminutes.classEditorUpdateSheetLabel=更新工作表
 platform.appwithinminutes.classEditorUpdateSheetHint=工作表({0})用于显示和编辑结构化数据。
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=更新翻译
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsHint=更新转译命名字段列表{{0}}.
 
-### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
-### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
-### Missing: platform.appwithinminutes.classEditorTemplateSaveComment=Update default values
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
-### Missing: platform.appwithinminutes.classEditorSheetSaveComment=Update class sheet
+platform.appwithinminutes.classEditorMultipleSheetsWarning=这个样式有多个工作表。
+platform.appwithinminutes.classEditorDuplicateFieldNameError=这个样式有两个字段是相同名字{0}
+platform.appwithinminutes.classEditorTemplateSaveComment=更新默认值。
+platform.appwithinminutes.classEditorBindSheetSaveComment=样式绑定工作表
+platform.appwithinminutes.classEditorSheetSaveComment=更新工作表样式
 ### Missing: platform.appwithinminutes.classEditorTranslationsSaveComment=Update translations
 
 ### Missing: platform.appwithinminutes.classEditorStandardCategoryName=Standard

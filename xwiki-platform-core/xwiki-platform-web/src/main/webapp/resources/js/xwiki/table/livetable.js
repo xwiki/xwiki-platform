@@ -441,7 +441,13 @@ XWiki.widgets.LiveTable = Class.create({
         }
         // The value can be passed as a string..
         if (descriptor.html + '' === 'true') {
-          container.innerHTML = row[fieldName] || '';
+          // The value of the column must be unescaped to allow it to be used as html.
+          // For the values coming from XObjects fields, the unescaped value is found in a field suffixed with '_value'.
+          if (!table.options.columnDescriptors[column + '_value']) {
+            container.innerHTML = row[fieldName + '_value'] || row[fieldName] || '';
+          } else {
+            container.innerHTML = row[fieldName] || '';
+          }
         } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
           var text = row[fieldName] + '';
           if (fieldName === 'doc_name' && !row['doc_viewable']) {

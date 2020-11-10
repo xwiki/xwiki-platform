@@ -91,7 +91,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         this.asyncContext.setEnabled(!renderer.isCacheAllowed());
 
         // Prepare to catch stuff to invalidate the cache
-        ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        }
 
         // Many UI elements expect xwikivars.vm result to be in the context so we execute it
         // FIXME: not very happy with that but can't find a better place yet
@@ -99,19 +101,23 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         this.templateManager.execute("xwikivars.vm");
 
         // Mark the context document as used if it was explicitly set in the context
-        if (this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
-            this.asyncContext.useEntity(documentAccessBridge.getCurrentDocumentReference());
+        if (this.request.getContext() != null
+            && this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
+            this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
         }
 
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
-        // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
-        ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
-        getStatus().setReferences(contextUse.getReferences());
-        getStatus().setRoles(contextUse.getRoles());
-        getStatus().setRoleTypes(contextUse.getRoleTypes());
-        getStatus().setUses(contextUse.getUses());
+
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
+            ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+            getStatus().setReferences(contextUse.getReferences());
+            getStatus().setRoles(contextUse.getRoles());
+            getStatus().setRoleTypes(contextUse.getRoleTypes());
+            getStatus().setUses(contextUse.getUses());
+        }
     }
 
     @Override

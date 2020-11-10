@@ -17,6 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+require.config({
+  paths: {
+    'xwiki-suggestPages': "$xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)" +
+      "?v=$escapetool.url($xwiki.version)"
+  }
+});
+
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
 var widgets = XWiki.widgets = XWiki.widgets || {};
@@ -42,9 +49,21 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       "id" : "jmp_target",
       "title" : "$services.localization.render('core.viewers.jump.dialog.input.tooltip')"
     });
+    this.input.placeholder = this.input.title;
     content.appendChild(this.input);
-    this.viewButton = this.createButton("button", "$services.localization.render('core.viewers.jump.dialog.actions.view')", "$services.localization.render('core.viewers.jump.dialog.actions.view.tooltip')", "jmp_view");
-    this.editButton = this.createButton("button", "$services.localization.render('core.viewers.jump.dialog.actions.edit')", "$services.localization.render('core.viewers.jump.dialog.actions.edit.tooltip')", "jmp_edit");
+    this.viewButton = this.createButton(
+      "button",
+      "$services.localization.render('core.viewers.jump.dialog.actions.view')",
+      "$services.localization.render('core.viewers.jump.dialog.actions.view.tooltip')",
+      "jmp_view"
+    );
+    this.editButton = this.createButton(
+      "button",
+      "$services.localization.render('core.viewers.jump.dialog.actions.edit')",
+      "$services.localization.render('core.viewers.jump.dialog.actions.edit.tooltip')",
+      "jmp_edit",
+      "secondary"
+    );
     var buttonContainer = new Element("div", {"class" : "buttons"});
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
@@ -55,18 +74,18 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       content,
       {
         "show" : {
-	  method : this.showDialog,
-	  keys : [$services.localization.render('core.viewers.jump.shortcuts')]
-	},
+	        method : this.showDialog,
+	        keys : [$services.localization.render('core.viewers.jump.shortcuts')]
+	      },
         "view" : {
-	  method : this.openDocument,
-	  keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
-	  options : { 'propagate' : true }
-	},
+	        method : this.openDocument,
+	        keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
+	        options : { 'propagate' : true }
+	      },
         "edit" : {
-	  method : this.openDocument,
-	  keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
-	}
+	        method : this.openDocument,
+	        keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
+	      }
       },
       {
         title : "$services.localization.render('core.viewers.jump.dialog.content')",
@@ -75,7 +94,8 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       }
     );
 
-    // Allow the default close event ('Escape' key) to propagate so that the ajaxsuggest can catch it and clear the suggestions list.
+    // Allow the default close event ('Escape' key) to propagate so that the page picker can catch it and clear the list
+    // of suggestions.
     this.shortcuts['close'].options = { 'propagate' : true };
   },
   /**
@@ -83,76 +103,73 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
    * and forwards the call to the {@link #showDialog} method.
    */
   createDialog : function($super, event) {
-    // Register the listeners executed when clicking on the buttons.
+    // Register the event listeners executed when clicking on the action buttons.
     Event.observe(this.viewButton, 'click', this.openDocument.bindAsEventListener(this, "view"));
     Event.observe(this.editButton, 'click', this.openDocument.bindAsEventListener(this, "edit"));
     $super(event);
-    if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      // Create the Suggest.
-      new XWiki.widgets.Suggest(this.input, {
-        // This document also provides the suggestions.
-        // Trick so that Velocity will get executed but Javascript lint will not choke on it... Note that we cannot
-        // use a standard javascript comment ("//") since the minification process removes comments ;)
-        // We use the special construct ("/*!") which tells yuicompressor to not compress this part...
-        // We use localeAware=true to avoid returning several times the same entity reference
-        // (when there are translations).
-        /*!#set ($restURL = "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&localeAware=true&number=10&")*/
-        script: "$response.encodeURL($restURL)",
-        // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
-        varname: "q",
-        noresults: "$services.localization.render('core.viewers.jump.suggest.noResults')",
-        icon: "${xwiki.getSkinFile('icons/silk/page_white_text.png')}",
-        json: true,
-        resultsParameter : "searchResults",
-        resultId : "id",
-        resultValue : "pageFullName",
-        resultInfo : "pageFullName",
-        timeout : 30000,
-        parentContainer : this.dialogBox,
-        // Make sure the suggest widget does not hogg the Enter key press event.
-        propagateEventKeyCodes : [ Event.KEY_RETURN ]
-      });
-    }
+    // Initialize the page picker.
+    var self = this;
+    require(['jquery', 'xwiki-suggestPages'], function($) {
+      var enableActionButtons = function(enable) {
+        var actionButtons = $(self.viewButton).add(self.editButton).find('input');
+        if (enable === false) {
+          // Disable the action buttons right away.
+          actionButtons.prop('disabled', true);
+        } else {
+          setTimeout(function() {
+            // Enable the action buttons with a short delay in order to prevent the Enter key from closing the modal
+            // after a page is selected.
+            actionButtons.prop('disabled', false);
+          }, 0);
+        }
+      };
+      var updateActionButtons = function(event) {
+        enableActionButtons($(self.input).val() !== '');
+      };
+      $(self.input).on('change', updateActionButtons).suggestPages({maxItems: 1});
+      // Disable the action buttons while the dropdown list of suggestions is open in order to prevent the form from
+      // being submitted when a page is selected using the Enter key. We have to do this hack because the page picker
+      // doesn't stop the propagation of the Enter key event when the dropdown is opened, as it does with the Esc key.
+      self.input.selectize.on('dropdown_open', $.proxy(enableActionButtons, null, false));
+      // Update the state of the action buttons after the dropdown is closed (either because a page was selected or
+      // because the user pressed the Esc key). The state depends on whether the picker has a selected value.
+      self.input.selectize.on('dropdown_close', updateActionButtons);
+      // We have to focus the page picker here because #showDialog() is not called when the dialog is displayed for the
+      // first time as you would expect...
+      self.input.selectize.focus();
+      // Synchronize the action buttons state with the text input state.
+      updateActionButtons();
+    });
   },
   /** Called when the dialog is displayed. Enables the key listeners and gives focus to the (cleared) input. */
   showDialog : function($super) {
     // Display the dialog
     $super();
-    // Clear the input field
-    this.input.value = '';
-    // Focus the input field
-    this.input.focus();
-  },
-  /** Called when the dialog is closed. Overriding default behavior to check if the user actually wanted to close the suggestions list instead. */
-  closeDialog : function($super, event) {
-    if (!event.type.startsWith('key') || !this.dialogBox.down('.ajaxsuggest')) {
-      // Close the dialog either from the close/x button (mouse event) or when the keyboard shortcut (Escape key) is used and there is no ajax suggestion list displayed.
-      $super();
-      // Clear the suggestion list so that it does not flicker next time we open the dialog.
-      this.input.__x_suggest.clearSuggestions();
+    // Check if the page picker is available.
+    if (this.input.selectize) {
+      // Clear the previously selected page and focus the page picker.
+      this.input.selectize.clear();
+      this.input.selectize.focus();
+    } else {
+      // Clear the input field
+      this.input.value = '';
+      // Focus the input field
+      this.input.focus();
     }
   },
   /**
    * Open the selected document in the specified mode.
    *
    * @param {Event} event The event that triggered this action. Either a keyboard shortcut or a button click.
-   * @param {String} mode The mode that the document should be opened in. One of "view" or "edit". Note that on the
-   *     server side, "edit" could be replaced with "inline" if the document is sheet-based.
+   * @param {String} mode The mode that the document should be opened in. One of "view" or "edit".
    */
   openDocument : function(event, mode) {
-    // Don`t do anything if the user is still selecting from the suggestions list or if nothing was entered yet.
-    var highlightedSuggestion = this.dialogBox.down('.ajaxsuggest .xhighlight');
-    if ((!highlightedSuggestion || highlightedSuggestion.hasClassName('noSuggestion')) && this.input.value != "") {
+    // Don't do anything if the corresponding action button is disabled (usually when no value is selected).
+    if (!this[(mode || 'view') + 'Button'].down('input').disabled) {
       Event.stop(event);
-      var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT);
-      if (reference && reference.type == XWiki.EntityType.DOCUMENT) {
-        var documentToGo = new XWiki.Document(reference);
-        window.self.location = documentToGo.getURL(mode, '', '');
-      } else {
-        if (typeof(XWiki.widgets.Suggest) != "undefined") {
-          new XWiki.widgets.Notification("$services.localization.render('core.viewers.jump.dialog.invalidNameError')", 'error');
-        }
-      }
+      var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT,
+        XWiki.currentDocument.documentReference);
+      window.location = new XWiki.Document(reference).getURL(mode);
     }
   }
 });

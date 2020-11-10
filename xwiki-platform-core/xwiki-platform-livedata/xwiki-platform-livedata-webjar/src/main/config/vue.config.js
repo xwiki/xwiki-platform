@@ -24,6 +24,10 @@ module.exports = {
   filenameHashing: false,
   chainWebpack: config => {
     config.optimization.delete("splitChunks");
+    config.externals({
+      "jquery": "jquery",
+      "bootstrap-datetimepicker": "bootstrap-datetimepicker",
+    })
   },
   css: {
     extract: false,

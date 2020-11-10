@@ -24,6 +24,12 @@ module.exports = {
   // __webpack_public_path__ variable (see https://webpack.js.org/configuration/output/#outputpublicpath).
   publicPath: '',
   filenameHashing: false,
+  chainWebpack: config => {
+    config.externals({
+      "jquery": "jquery",
+      "bootstrap-datetimepicker": "bootstrap-datetimepicker",
+    })
+  },
   css: {
     extract: false,
   },

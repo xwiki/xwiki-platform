@@ -27,7 +27,7 @@ define({
   id: "LD0",
 
   query: {
-    properties: ["doc_title", "age", "country", "tags", "other"],
+    properties: ["doc_date", "doc_title", "age", "country", "tags", "other"],
 
     source: {
       id: "...",
@@ -74,6 +74,15 @@ define({
     ],
 
     propertyDescriptors: [
+      {
+        id: "doc_date",
+        name: "Date",
+        type: "date",
+        visible: true,
+        displayer: {
+          id: 'date',
+        },
+      },
       {
         id: "doc_title",
         name: "Name",
@@ -155,6 +164,18 @@ define({
           id: 'list'
         },
       },
+      {
+        id: 'date',
+        name: 'Date',
+        displayer: {
+          id: 'date',
+        },
+        sortable: true,
+        filterable: true,
+        filter: {
+          id: 'date'
+        },
+      },
     ],
 
     defaultFilter: 'text',
@@ -187,6 +208,16 @@ define({
           { id: "greater", name: ">", },
         ],
       },
+      {
+        id: "date",
+        defaultOperator: "equals",
+        operators: [
+          { id: "equals", name: "Equals", },
+          { id: "nequals", name: "Not Equals", },
+          { id: "before", name: "Before", },
+          { id: "after", name: "After", },
+        ],
+      },
     ],
 
     defaultDisplayer: 'text',
@@ -200,6 +231,9 @@ define({
       },
       {
         id: "html",
+      },
+      {
+        id: "date",
       },
     ],
 

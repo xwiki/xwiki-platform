@@ -100,62 +100,62 @@ platform.appwithinminutes.classEditorUpdateTemplateHint=模板（{0}）存储默
 platform.appwithinminutes.classEditorUpdateSheetLabel=更新工作表
 platform.appwithinminutes.classEditorUpdateSheetHint=工作表({0})用于显示和编辑结构化数据。
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=更新翻译
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsHint=更新转译命名字段列表{{0}}.
 
-### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
-### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
-### Missing: platform.appwithinminutes.classEditorTemplateSaveComment=Update default values
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
-### Missing: platform.appwithinminutes.classEditorSheetSaveComment=Update class sheet
-### Missing: platform.appwithinminutes.classEditorTranslationsSaveComment=Update translations
+platform.appwithinminutes.classEditorMultipleSheetsWarning=这个样式有多个工作表。
+platform.appwithinminutes.classEditorDuplicateFieldNameError=这个样式有两个字段是相同名字{0}
+platform.appwithinminutes.classEditorTemplateSaveComment=更新默认值。
+platform.appwithinminutes.classEditorBindSheetSaveComment=样式绑定工作表
+platform.appwithinminutes.classEditorSheetSaveComment=更新工作表样式
+platform.appwithinminutes.classEditorTranslationsSaveComment=更新转译
 
-### Missing: platform.appwithinminutes.classEditorStandardCategoryName=Standard
-### Missing: platform.appwithinminutes.classEditorPickersCategoryName=Pickers
-### Missing: platform.appwithinminutes.classEditorDocumentCategoryName=Page
-### Missing: platform.appwithinminutes.classEditorAdvancedCategoryName=Advanced
+platform.appwithinminutes.classEditorStandardCategoryName=标准样式
+platform.appwithinminutes.classEditorPickersCategoryName=样式采集
+platform.appwithinminutes.classEditorDocumentCategoryName=页面
+platform.appwithinminutes.classEditorAdvancedCategoryName=高级
 
-### Missing: platform.appwithinminutes.classEditorDBListFieldName=Database List
-### Missing: platform.appwithinminutes.classEditorGroupsFieldName=Group
-### Missing: platform.appwithinminutes.classEditorUsersFieldName=User
-### Missing: platform.appwithinminutes.classEditorDateFieldName=Date
-### Missing: platform.appwithinminutes.classEditorStaticListFieldName=Static List
-### Missing: platform.appwithinminutes.classEditorBooleanFieldName=Boolean
-### Missing: platform.appwithinminutes.classEditorNumberFieldName=Number
-### Missing: platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
-### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
-### Missing: platform.appwithinminutes.classEditorContentFieldName=Content
-### Missing: platform.appwithinminutes.classEditorTitleFieldName=Title
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
+platform.appwithinminutes.classEditorDBListFieldName=数据库列表
+platform.appwithinminutes.classEditorGroupsFieldName=用户组
+platform.appwithinminutes.classEditorUsersFieldName=用户
+platform.appwithinminutes.classEditorDateFieldName=日期
+platform.appwithinminutes.classEditorStaticListFieldName=静态文件列表
+platform.appwithinminutes.classEditorBooleanFieldName=逻辑值
+platform.appwithinminutes.classEditorNumberFieldName=数字
+platform.appwithinminutes.classEditorTextAreaFieldName=长文本
+platform.appwithinminutes.classEditorStringFieldName=短文本
+platform.appwithinminutes.classEditorContentFieldName=内容
+platform.appwithinminutes.classEditorTitleFieldName=标题
+platform.appwithinminutes.classEditorPageFieldName=页面
 
-### Missing: platform.appwithinminutes.classEditorDeleteFieldLabel=Delete
-### Missing: platform.appwithinminutes.classEditorConfigureFieldLabel=Configure
-### Missing: platform.appwithinminutes.classEditorPreviewFieldLabel=Preview
-### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
-### Missing: platform.appwithinminutes.classEditorMoveFieldLabel=Move
-### Missing: platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop to change the order
+platform.appwithinminutes.classEditorDeleteFieldLabel=删除
+platform.appwithinminutes.classEditorConfigureFieldLabel=配置
+platform.appwithinminutes.classEditorPreviewFieldLabel=预览
+platform.appwithinminutes.classEditorPreviewFieldHint=隐藏配置面板并保存修改内容
+platform.appwithinminutes.classEditorMoveFieldLabel=移动页面
+platform.appwithinminutes.classEditorMoveFieldHint=拖拽并改变排序
 
-### Missing: platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Default value
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=默认值
 
 ### Date Picker
-### Missing: platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
-### Missing: platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Clear
-### Missing: platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Now
-### Missing: platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Today
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=确定
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=清除内容
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=现在的时间
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=今天
 
 ### Static List Editor
-### Missing: platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Value
-### Missing: platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
-### Missing: platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
-### Missing: platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=数值
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=增加
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=删除
 
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+appWithinMinutes.templateProviderEditor.hint=应用实体是wiki页面里面的结构化数据。
+appWithinMinutes.templateProviderEditor.icon.hint=应用实体指定图标。
+appWithinMinutes.templateProviderEditor.description.hint=应用内实体的简短介绍输入。
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=这里是建立实体的表单
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=实体当没有被选择的时候，可以应用所有页面。
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=这里建立实体结构的地方
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=这些实体可以在任何wiki页面建立，当没有被指定范围的时候。
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=不能强制实体应用范围
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
 

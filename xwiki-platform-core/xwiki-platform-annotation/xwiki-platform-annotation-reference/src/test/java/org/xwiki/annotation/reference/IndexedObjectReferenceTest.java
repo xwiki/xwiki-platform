@@ -19,12 +19,12 @@
  */
 package org.xwiki.annotation.reference;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests the {@link IndexedObjectReference} implementation of object names.
@@ -32,13 +32,13 @@ import static org.junit.Assert.assertNull;
  * @version $Id$
  * @since 2.3M1
  */
-public class IndexedObjectReferenceTest
+class IndexedObjectReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void constructors()
     {
         IndexedObjectReference reference1 =
             new IndexedObjectReference(new EntityReference("XWiki.Class[2]", EntityType.OBJECT, new EntityReference(
@@ -55,7 +55,8 @@ public class IndexedObjectReferenceTest
     /**
      * Ensures the equivalence of constructors building a reference to the default object.
      */
-    public void testConstructorsWhenNonIndexedReference()
+    @Test
+    void constructorsWhenNonIndexedReference()
     {
         IndexedObjectReference reference1 =
             new IndexedObjectReference(new EntityReference("XWiki.Class", EntityType.OBJECT, new EntityReference(
@@ -81,7 +82,7 @@ public class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testObjectNumberWhenDefaultObject()
+    void objectNumberWhenDefaultObject()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("XWiki.Class", EntityType.OBJECT, new EntityReference(
@@ -92,7 +93,7 @@ public class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testClassNameWhenRelativeClass()
+    void classNameWhenRelativeClass()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("Class", EntityType.OBJECT, new EntityReference("Page",
@@ -103,7 +104,7 @@ public class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testObjectNumberWhenNonPairedSeparators()
+    void objectNumberWhenNonPairedSeparators()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("XWiki.Class0]", EntityType.OBJECT, new EntityReference(
@@ -114,7 +115,7 @@ public class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testObjectNumberWhenNameContainsSeparators()
+    void objectNumberWhenNameContainsSeparators()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("XW[iki.C]lass[0]", EntityType.OBJECT, new EntityReference(
@@ -125,7 +126,7 @@ public class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testObjectNumberWhenIndexNotNumber()
+    void objectNumberWhenIndexNotNumber()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("XWiki.Class[number]", EntityType.OBJECT,

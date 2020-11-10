@@ -32,7 +32,7 @@ import org.xwiki.observation.ObservationManager;
  */
 public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndexRequest> implements ExtensionIndexStatus
 {
-    private boolean updated;
+    private boolean extensionAdded;
 
     /**
      * @param request the request provided when started the job
@@ -46,16 +46,16 @@ public class DefaultExtensionIndexStatus extends DefaultJobStatus<ExtensionIndex
     }
 
     @Override
-    public boolean isUpdated()
+    public boolean isExtensionAdded()
     {
-        return this.updated;
+        return this.extensionAdded;
     }
 
     /**
-     * @param updated true if the index was updated
+     * @param extensionAdded true if the index was updated
      */
-    public void setUpdated(boolean updated)
+    public void setExtensionAdded(boolean extensionAdded)
     {
-        this.updated = updated;
+        this.extensionAdded = extensionAdded;
     }
 }

@@ -47,18 +47,15 @@ public class ExtensionIndexRequest extends AbstractRequest
 
     private final boolean remoteExtensionsEnabled;
 
-    private final boolean versionsEnabled;
-
     private List<Namespace> namespaces;
 
     /**
      * @param localExtensionsEnabled true if local extensions should be loaded
      * @param remoteExtensionsEnabled true if remote extensions should be loaded
-     * @param versionsEnabled true if available version should be updated
      * @param namespaces the namespaces on which to check the compatibility of indexed extensions
      */
     public ExtensionIndexRequest(boolean localExtensionsEnabled, boolean remoteExtensionsEnabled,
-        boolean versionsEnabled, Collection<Namespace> namespaces)
+        Collection<Namespace> namespaces)
     {
         setId(JOB_ID);
 
@@ -67,7 +64,6 @@ public class ExtensionIndexRequest extends AbstractRequest
 
         this.localExtensionsEnabled = localExtensionsEnabled;
         this.remoteExtensionsEnabled = remoteExtensionsEnabled;
-        this.versionsEnabled = versionsEnabled;
         this.namespaces =
             namespaces != null ? Collections.unmodifiableList(new ArrayList<>(namespaces)) : Collections.emptyList();
 
@@ -81,8 +77,7 @@ public class ExtensionIndexRequest extends AbstractRequest
      */
     public ExtensionIndexRequest(ExtensionIndexRequest request)
     {
-        this(request.isLocalExtensionsEnabled(), request.isRemoteExtensionsEnabled(), request.isVersionsEnabled(),
-            request.getNamespaces());
+        this(request.isLocalExtensionsEnabled(), request.isRemoteExtensionsEnabled(), request.getNamespaces());
     }
 
     /**
@@ -149,14 +144,6 @@ public class ExtensionIndexRequest extends AbstractRequest
     public boolean isRemoteExtensionsEnabled()
     {
         return this.remoteExtensionsEnabled;
-    }
-
-    /**
-     * @return true if available version should be updated
-     */
-    public boolean isVersionsEnabled()
-    {
-        return this.versionsEnabled;
     }
 
     /**

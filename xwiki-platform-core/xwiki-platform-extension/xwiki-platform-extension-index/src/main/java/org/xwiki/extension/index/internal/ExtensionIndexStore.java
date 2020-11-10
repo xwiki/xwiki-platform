@@ -235,12 +235,10 @@ public class ExtensionIndexStore implements Initializable
     /**
      * @param extensionId the id of the extension to update
      * @param last true if it's the last version of this extension id
-     * @param newVersions the versions available for the extension
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public void update(ExtensionId extensionId, boolean last, List<String> newVersions)
-        throws SolrServerException, IOException
+    public void updateLast(ExtensionId extensionId, boolean last) throws SolrServerException, IOException
     {
         SolrInputDocument document = new SolrInputDocument();
 
@@ -248,8 +246,6 @@ public class ExtensionIndexStore implements Initializable
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST,
             last, document);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS, newVersions, document);
 
         add(document);
     }
@@ -289,7 +285,7 @@ public class ExtensionIndexStore implements Initializable
      * @throws IOException if there is a communication error with the server
      * @throws SolrServerException if there is an error on the server
      */
-    public void updateCompatible(ExtensionId extensionId, String namespace, boolean compatible)
+    public void updateCompatible(ExtensionId extensionId, Namespace namespace, boolean compatible)
         throws SolrServerException, IOException
     {
         SolrInputDocument document = new SolrInputDocument();
@@ -299,18 +295,51 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(
             compatible ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
             ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, toStoredNamespace(namespace), document);
+        this.utils.setAtomic(
+            compatible ? SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE : SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT,
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, toStoredNamespace(namespace),
+            document);
 
         add(document);
+    }
+
+    public Boolean isCompatible(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
+            + this.utils.toFilterQueryString(toSolrId(extensionId)));
+
+        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES,
+            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES);
+
+        solrQuery.setRows(1);
+
+        QueryResponse response = search(solrQuery);
+
+        SolrDocumentList documents = response.getResults();
+        if (!documents.isEmpty()) {
+            SolrDocument document = documents.get(0);
+
+            if (this.utils
+                .<List<String>>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, document)
+                .contains(namespace)) {
+                return true;
+            }
+
+            if (this.utils
+                .<List<String>>get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document)
+                .contains(namespace.serialize())) {
+                return false;
+            }
+        }
+
+        return null;
     }
 
     private String toStoredNamespace(Namespace namespace)
     {
         return namespace != null && !namespace.equals(Namespace.ROOT) ? namespace.toString() : ROOT_NAMESPACE;
-    }
-
-    private String toStoredNamespace(String namespace)
-    {
-        return namespace != null ? namespace : ROOT_NAMESPACE;
     }
 
     /**
@@ -371,7 +400,7 @@ public class ExtensionIndexStore implements Initializable
         this.client.add(document);
 
         // Check if it should be auto committed
-        this.documentsToStore++;
+        ++this.documentsToStore;
         if (this.documentsToStore == COMMIT_BATCH_SIZE) {
             commit();
 
@@ -572,18 +601,19 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
-     * @param params an object holding all key/value parameters to send along the request
+     * @param solrQuery an object holding all key/value parameters to send along the request
      * @return a {@link org.apache.solr.client.solrj.response.QueryResponse} containing the response from the server
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public Set<ExtensionId> searchExtensionIds(SolrParams params) throws SolrServerException, IOException
+    public Set<ExtensionId> searchExtensionIds(SolrQuery solrQuery) throws SolrServerException, IOException
     {
-        if (params instanceof SolrQuery) {
-            ((SolrQuery) params).setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
+        if (solrQuery.getRows() == null) {
+            solrQuery.setRows(Integer.MAX_VALUE);
         }
+        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
 
-        QueryResponse response = search(params);
+        QueryResponse response = search(solrQuery);
 
         SolrDocumentList documents = response.getResults();
 
@@ -610,20 +640,46 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
-     * @param id the identifier of the extension
+     * @param extensionId the identifier of the extension
      * @return the versions available for the provided id, null if no extension can be found with this id
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public Collection<Version> getExtensionVersions(String id) throws SolrServerException, IOException
+    public Collection<Version> getIndexedVersions(String extensionId) throws SolrServerException, IOException
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS);
+        solrQuery.setFields(Extension.FIELD_VERSION);
 
-        solrQuery.addFilterQuery(
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + this.utils.toFilterQueryString(id));
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
+            + this.utils.toFilterQueryString(extensionId));
+
+        QueryResponse response = search(solrQuery);
+
+        SolrDocumentList documents = response.getResults();
+        if (documents.isEmpty()) {
+            return null;
+        }
+
+        return documents.stream().map(d -> this.utils.<Version>get(Extension.FIELD_VERSION, d, Version.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * @param extensionId the identifier of the extension
+     * @return the {@link Version} for which the extension is compatible (in any namespace)
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public Version getCompatibleVersion(String extensionId) throws SolrServerException, IOException
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        solrQuery.setFields(Extension.FIELD_VERSION);
+
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
+            + this.utils.toFilterQueryString(extensionId));
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES + ":[* TO *]");
 
         solrQuery.setRows(1);
 
@@ -634,7 +690,6 @@ public class ExtensionIndexStore implements Initializable
             return null;
         }
 
-        return this.utils.getCollection(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_VERSIONS, documents.get(0),
-            Version.class);
+        return this.utils.get(Extension.FIELD_VERSION, documents.get(0), Version.class);
     }
 }

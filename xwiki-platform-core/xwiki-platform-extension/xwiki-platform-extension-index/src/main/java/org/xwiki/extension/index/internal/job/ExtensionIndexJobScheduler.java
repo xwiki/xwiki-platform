@@ -69,11 +69,11 @@ public class ExtensionIndexJobScheduler implements Disposable
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private final ExtensionIndexRequest scheduledRequest =
-        new ExtensionIndexRequest(true, true, true, Arrays.asList(Namespace.ROOT));
+        new ExtensionIndexRequest(true, true, Arrays.asList(Namespace.ROOT));
 
     private ExtensionIndexRequest currentRequest;
 
-    private boolean updated;
+    private boolean extensionAdded;
 
     /**
      * Indicate that the instance is starting.
@@ -97,8 +97,8 @@ public class ExtensionIndexJobScheduler implements Disposable
         this.scheduledRequest.addNamespace(namespace);
 
         // Start an analysis of the namespace only if something changed
-        if (this.updated) {
-            executeJob(new ExtensionIndexRequest(false, false, false, Arrays.asList(namespace)));
+        if (this.extensionAdded) {
+            executeJob(new ExtensionIndexRequest(false, false, Arrays.asList(namespace)));
         }
     }
 
@@ -121,7 +121,7 @@ public class ExtensionIndexJobScheduler implements Disposable
 
         // If not start a new one
         if (job == null || job.getStatus().getState() == State.FINISHED) {
-            ExtensionIndexRequest request = new ExtensionIndexRequest(false, true, true, Arrays.asList(namespace));
+            ExtensionIndexRequest request = new ExtensionIndexRequest(false, true, Arrays.asList(namespace));
 
             // Also analyze root namespace for main wiki
             if (namespace.getType().equals(WikiNamespace.TYPE) && this.wikis.isMainWiki(namespace.getValue())) {
@@ -162,8 +162,8 @@ public class ExtensionIndexJobScheduler implements Disposable
             ? (ExtensionIndexStatus) this.jobStore.getJobStatus(this.scheduledRequest.getId()) : null;
 
         if (namespaceStatus != null
-            && (scheduledStatus == null || namespaceStatus.getStartDate().after(scheduledStatus.getStartDate()))
-            || !((ExtensionIndexRequest) scheduledStatus.getRequest()).getNamespaces().contains(namespace)) {
+            && (scheduledStatus == null || namespaceStatus.getStartDate().after(scheduledStatus.getStartDate())
+                || !((ExtensionIndexRequest) scheduledStatus.getRequest()).getNamespaces().contains(namespace))) {
             return namespaceStatus;
         }
 
@@ -179,7 +179,7 @@ public class ExtensionIndexJobScheduler implements Disposable
         this.scheduledRequest.addNamespace(namespace);
 
         // Queue an analysis of the namespace
-        executeJob(new ExtensionIndexRequest(false, false, false, Arrays.asList(namespace)));
+        executeJob(new ExtensionIndexRequest(false, false, Arrays.asList(namespace)));
     }
 
     /**
@@ -224,7 +224,7 @@ public class ExtensionIndexJobScheduler implements Disposable
             ExtensionIndexStatus status = (ExtensionIndexStatus) job.getStatus();
 
             // Remember updates
-            this.updated |= status.isUpdated();
+            this.extensionAdded |= status.isExtensionAdded();
         }
     }
 

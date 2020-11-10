@@ -158,9 +158,9 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     {
         Collection<Version> versions;
         try {
-            versions = this.store.getExtensionVersions(id);
+            versions = this.store.getIndexedVersions(id);
         } catch (Exception e) {
-            throw new ResolveException("Failed to search for exetnsion versions", e);
+            throw new ResolveException("Failed to search for extension versions", e);
         }
 
         if (versions == null) {

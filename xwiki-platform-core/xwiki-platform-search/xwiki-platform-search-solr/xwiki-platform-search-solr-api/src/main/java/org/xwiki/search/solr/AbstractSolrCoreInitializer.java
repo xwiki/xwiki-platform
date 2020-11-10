@@ -205,7 +205,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
             // Save scheme version
             setCurrentXWikiVersion(true);
-        } else {
+        } else if (xversion.longValue() < SCHEMA_BASE_VERSION) {
             migrateBaseSchema(xversion);
 
             // Update version
@@ -321,7 +321,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
             // Update version
             setCurrentCoreVersion(true);
-        } else if (cversion.longValue() != getVersion()) {
+        } else if (cversion.longValue() < getVersion()) {
             // Migrate the existing core schema
             migrateSchema(cversion);
 

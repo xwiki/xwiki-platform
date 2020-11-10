@@ -66,14 +66,14 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String SOLR_FIELD_EXTENSIONID = "s_extensionId";
 
     /**
-     * Indicate on the available versions for this extension (to avoid indexing all versions).
-     */
-    public static final String SOLR_FIELD_VERSIONS = "s_versions";
-
-    /**
      * The name of the field indicating in which namespaces an extension is compatible.
      */
     public static final String SOLR_FIELD_COMPATIBLE_NAMESPACES = "s_compatibleNamespaces";
+
+    /**
+     * The name of the field indicating in which namespaces an extension is incompatible.
+     */
+    public static final String SOLR_FIELD_INCOMPATIBLE_NAMESPACES = "s_incompatibleNamespaces";
 
     /**
      * The name of the field indicating if an entry is the last version of an extension.
@@ -126,9 +126,8 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
         setBooleanField(SOLR_FIELD_LAST, false, false);
 
-        setStringField(SOLR_FIELD_VERSIONS, true, false);
-
         setStringField(SOLR_FIELD_COMPATIBLE_NAMESPACES, true, false);
+        setStringField(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, true, false);
     }
 
     @Override

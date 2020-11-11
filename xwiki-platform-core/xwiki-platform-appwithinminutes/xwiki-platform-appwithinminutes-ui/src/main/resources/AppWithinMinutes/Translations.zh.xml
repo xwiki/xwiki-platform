@@ -156,13 +156,13 @@ appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=实体当没
 appWithinMinutes.templateProviderEditor.creationRestrictions.name=这里建立实体结构的地方
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=这些实体可以在任何wiki页面建立，当没有被指定范围的时候。
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=不能强制实体应用范围
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=关于建立应用实体范围的建议，最好的方式是应用实体不限定使用范围。
+appWithinMinutes.templateProviderEditor.terminal.hint=应用实体是否在这个页面终止。
 
 ### Wizard Step 3: Application Presentation
-### Missing: platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
-### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
-### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=Tip
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=应用字段清单
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=通用字段清单
+platform.appwithinminutes.liveTableEditorHelpTitle=提示信息
 ### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
 ### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnName=Page Title
 ### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data

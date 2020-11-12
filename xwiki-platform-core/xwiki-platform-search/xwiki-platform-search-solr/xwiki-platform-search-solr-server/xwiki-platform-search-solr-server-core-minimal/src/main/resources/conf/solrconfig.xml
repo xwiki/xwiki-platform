@@ -45,9 +45,28 @@
       -->
       <str name="echoParams">explicit</str>
 
+      <str name="defType">edismax</str>
+
+      <str name="fl">*,score,popularity</str>
+
       <!-- Select everything by default -->
       <str name="q">*</str>
+
+       <str name="qf">
+          type^5.0
+       </str>
+
+      <str name="hl">false</str>
     </lst>
+  </requestHandler>
+
+  <requestHandler name="/query" class="solr.SearchHandler">
+     <lst name="defaults">
+       <str name="echoParams">explicit</str>
+       <str name="wt">json</str>
+       <str name="indent">true</str>
+       <str name="df">text</str>
+     </lst>
   </requestHandler>
 
   <!-- Query configuration that should be beneficial to most cores -->

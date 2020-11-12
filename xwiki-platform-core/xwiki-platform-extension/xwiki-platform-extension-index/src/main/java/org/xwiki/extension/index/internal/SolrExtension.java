@@ -22,15 +22,18 @@ package org.xwiki.extension.index.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.rating.ExtensionRating;
-import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.version.Version;
@@ -42,13 +45,17 @@ import org.xwiki.extension.wrap.AbstractWrappingExtension;
  * @version $Id$
  * @since 12.10RC1
  */
-public class SolrExtension extends AbstractWrappingExtension<Extension> implements RatingExtension
+public class SolrExtension extends AbstractWrappingExtension<Extension> implements IndexedExtension
 {
     private final ExtensionRepository repository;
 
     private final ExtensionId extensionId;
 
     private List<Version> versions;
+
+    private Set<Namespace> compatibleNamespaces = Collections.emptySet();
+
+    private Set<Namespace> incompatibleNamespaces = Collections.emptySet();
 
     private Date indexDate;
 
@@ -96,6 +103,46 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
             return this.repository.resolve(this.extensionId);
         } catch (ResolveException e) {
             throw new UnsupportedOperationException(e);
+        }
+    }
+
+    // IndexedExtension
+
+    @Override
+    public Boolean isCompatible(Namespace namespace)
+    {
+        if (this.compatibleNamespaces != null && this.compatibleNamespaces.contains(namespace)) {
+            return true;
+        }
+
+        if (this.incompatibleNamespaces != null && this.incompatibleNamespaces.contains(namespace)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param compatibleNamespaces the namespaces in which the extension can be installed
+     */
+    public void setCompatibleNamespaces(Collection<Namespace> compatibleNamespaces)
+    {
+        if (compatibleNamespaces != null) {
+            this.compatibleNamespaces = new HashSet<>(compatibleNamespaces);
+        } else {
+            this.compatibleNamespaces = Collections.emptySet();
+        }
+    }
+
+    /**
+     * @param incompatibleNamespaces the namespaces in which the extension cannot be installed
+     */
+    public void setIncompatibleNamespaces(Collection<Namespace> incompatibleNamespaces)
+    {
+        if (incompatibleNamespaces != null) {
+            this.incompatibleNamespaces = new HashSet<>(incompatibleNamespaces);
+        } else {
+            this.incompatibleNamespaces = Collections.emptySet();
         }
     }
 
@@ -176,7 +223,8 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
      */
     public void setAuthors(Collection<? extends ExtensionAuthor> authors)
     {
-        this.overwrites.put(FIELD_AUTHORS, authors);
+        this.overwrites.put(FIELD_AUTHORS,
+            authors != null ? Collections.unmodifiableCollection(authors) : Collections.emptyList());
     }
 
     // RemoteExtension

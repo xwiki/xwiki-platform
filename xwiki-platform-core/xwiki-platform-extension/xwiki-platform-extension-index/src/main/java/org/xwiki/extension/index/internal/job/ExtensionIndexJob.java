@@ -74,8 +74,10 @@ import org.xwiki.job.GroupedJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Update the index from configured repositories.
@@ -129,6 +131,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
     @Inject
     private SolrUtils solrUtils;
+
+    @Inject
+    private WikiDescriptorManager wikis;
 
     @Inject
     @Named(InstallPlanJob.JOBTYPE)
@@ -205,12 +210,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // 3: Validate latest and recommended extensions versions (only if something was updated or if update was
         // disabled)
-        Set<String> missingExtension = new HashSet<>();
+        Map<String, Set<Namespace>> missingExtension = new HashMap<>();
         this.progress.startStep(this);
-        // if (getStatus().isUpdated() || (!getRequest().isLocalExtensionsEnabled() &&
-        // !getRequest().isRemoteExtensionsEnabled())) {
-        validateRecommendedExtensions(indexedExtensions, missingExtension);
-        // }
+        validateLastExtensions(indexedExtensions, missingExtension);
 
         // 4: Validate older extensions
         this.progress.startStep(this);
@@ -219,26 +221,30 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
     }
 
-    private void validateRecommendedExtensions(Map<String, SortedSet<Version>> indexedExtensions,
-        Set<String> missingExtension)
+    private void validateLastExtensions(Map<String, SortedSet<Version>> indexedExtensions,
+        Map<String, Set<Namespace>> missingExtension) throws SolrServerException, IOException
     {
         this.progress.pushLevelProgress(getRequest().getNamespaces().size(), getRequest().getNamespaces());
+
         for (Namespace namespace : getRequest().getNamespaces()) {
             this.progress.startStep(getRequest().getNamespaces());
+
             validateExtensions(namespace, indexedExtensions, missingExtension);
         }
+
         this.progress.popLevelProgress(getRequest().getNamespaces());
     }
 
-    private void validateOldExtensions(Set<String> missingExtension, Map<String, SortedSet<Version>> indexedExtensions)
+    private void validateOldExtensions(Map<String, Set<Namespace>> missingExtension,
+        Map<String, SortedSet<Version>> indexedExtensions) throws SolrServerException, IOException
     {
         // Test older versions
-        this.progress.pushLevelProgress(getRequest().getNamespaces().size(), getRequest().getNamespaces());
-        for (Namespace namespace : getRequest().getNamespaces()) {
+        this.progress.pushLevelProgress(missingExtension.size(), missingExtension);
+        for (Map.Entry<String, Set<Namespace>> entry : missingExtension.entrySet()) {
             this.progress.startStep(getRequest().getNamespaces());
-            validateOlderExtensions(namespace, missingExtension, indexedExtensions);
+            validateOlderExtensions(entry.getKey(), entry.getValue(), indexedExtensions);
         }
-        this.progress.popLevelProgress(getRequest().getNamespaces());
+        this.progress.popLevelProgress(missingExtension);
     }
 
     private void add(ExtensionId extension, Map<String, SortedSet<Version>> extensions)
@@ -258,25 +264,37 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         return extensions;
     }
 
-    private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> indexedExtensions,
-        Set<String> missingExtensions)
+    private void validateOlderExtensions(String extensionId, Set<Namespace> namespaces,
+        Map<String, SortedSet<Version>> indexedExtensions) throws SolrServerException, IOException
     {
-        try {
-            // Validate namespace
-            validateExtensions(namespace, false, indexedExtensions, missingExtensions);
-        } catch (Exception e) {
-            this.logger.error("Failed to validate extensions on namespace [{}]", namespace, e);
-        }
-    }
+        boolean updated = false;
 
-    private void validateOlderExtensions(Namespace namespace, Set<String> missingExtensions,
-        Map<String, SortedSet<Version>> indexedExtensions)
-    {
-        try {
-            // Validate namespace
-            validateOlderExtensions(namespace, false, missingExtensions, indexedExtensions);
-        } catch (Exception e) {
-            this.logger.error("Failed to validate extensions on namespace [{}]", namespace, e);
+        SortedSet<Version> indexedVersions = indexedExtensions.get(extensionId);
+
+        // If the extension is already compatible on any namespace check this specific version
+        Version compatibleVersion = this.indexStore.getCompatibleVersion(extensionId, null);
+
+        // Try other versions
+        for (Namespace namespace : namespaces) {
+            try {
+                if (compatibleVersion == null || this.indexStore
+                    .isCompatible(new ExtensionId(extensionId, compatibleVersion), namespace.serialize()) == null) {
+
+                    if (compatibleVersion != null) {
+                        // Try only the compatible version
+
+                    } else {
+                        // Search for a compatible version among the available versions
+                        updated |= validateOldExtension(extensionId, namespace, indexedVersions);
+                    }
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to validate extensions [{}] on namespace [{}]", extensionId, namespace, e);
+            }
+        }
+
+        if (updated) {
+            this.indexStore.commit();
         }
     }
 
@@ -294,12 +312,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         return stopVersion;
     }
 
-    private Extension getValid(String extensionId, Namespace namespace, boolean allowRootModications,
-        SortedSet<Version> indexedVersions, Set<String> missingExtensions)
+    private boolean validateExtension(String extensionId, Namespace namespace, SortedSet<Version> indexedVersions,
+        Map<String, Set<Namespace>> missingExtensions) throws SolrServerException, IOException
     {
         // If a core extension already exist then installing it in whatever version is impossible
         if (this.coreExtensions.exists(extensionId) || this.invalidFlavors.contains(extensionId)) {
-            return null;
+            return false;
         }
 
         String namespaceString = namespace.serialize();
@@ -313,38 +331,76 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // No reason for search something else if the installed version is already the recommended one
         if (recommendedVersion != null && recommendedVersion.equals(stopVersion)) {
-            return null;
+            return false;
         }
 
-        // Try recommended version
         if (recommendedVersion != null) {
-            ExtensionId recommendedExtensionId = new ExtensionId(extensionId, recommendedVersion);
+            return validateRecommendedVersion(extensionId, recommendedVersion, namespace, indexedVersions);
+        } else {
+            // Try latest version
+            ExtensionId tryId = new ExtensionId(extensionId, indexedVersions.last());
 
-            if (this.extensionManager.exists(recommendedExtensionId)) {
-                // Try only the recommended version if it exist
-                return tryInstall(recommendedExtensionId, namespaceString, allowRootModications);
-            } else {
-                // If the recommended version does not exist, test only the last version
-                return tryInstall(new ExtensionId(extensionId, indexedVersions.last()), namespaceString,
-                    allowRootModications);
+            // Check if the version already been validated
+            if (isValidated(tryId, namespaceString)) {
+                return false;
             }
+
+            // Try installing it
+            Extension validExtension = tryInstall(tryId, namespace);
+            if (validExtension != null) {
+                addSearchableCompatibleExtension(validExtension, namespace, indexedVersions);
+
+                return true;
+            }
+
+            // Try older versions (but push it to a future step)
+            missingExtensions.computeIfAbsent(extensionId, key -> new HashSet<>()).add(namespace);
+
+            // Explicitly mark the extension as invalid (if this extension exist in the index)
+            this.indexStore.updateCompatible(tryId, namespace.serialize(), null, true);
+
+            return true;
         }
-
-        // Try latest version
-        Extension validExtension =
-            tryInstall(new ExtensionId(extensionId, indexedVersions.last()), namespaceString, allowRootModications);
-        if (validExtension != null) {
-            return validExtension;
-        }
-
-        // Try older versions
-        missingExtensions.add(extensionId);
-
-        return null;
     }
 
-    private Extension getValid(String extensionId, String namespace, boolean allowRootModications,
-        Collection<Version> versions, Version stopVersion)
+    private boolean validateRecommendedVersion(String extensionId, Version recommendedVersion, Namespace namespace,
+        SortedSet<Version> indexedVersions) throws SolrServerException, IOException
+    {
+        ExtensionId recommendedExtensionId = new ExtensionId(extensionId, recommendedVersion);
+        ExtensionId lastExtensionId = new ExtensionId(extensionId, indexedVersions.last());
+
+        // Check if the recommended or last version already been validated
+        if (isValidated(recommendedExtensionId, namespace.serialize())
+            || isValidated(lastExtensionId, namespace.serialize())) {
+            return false;
+        }
+
+        ExtensionId tryId;
+        if (this.extensionManager.exists(recommendedExtensionId)) {
+            // Try only the recommended version if it exist
+            tryId = recommendedExtensionId;
+        } else {
+            // If the recommended version does not exist, test only the last version
+            tryId = lastExtensionId;
+        }
+
+        // Try only the recommended version if it exist
+        return validate(tryId, namespace, indexedVersions);
+    }
+
+    private boolean isAllowRootModications(Namespace namespace)
+    {
+        return namespace == null || namespace.equals(Namespace.ROOT)
+            || (namespace.getType().endsWith(WikiNamespace.TYPE) && this.wikis.isMainWiki(namespace.getValue()));
+    }
+
+    private boolean isValidated(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
+    {
+        return this.indexStore.isCompatible(extensionId, namespace) != null;
+    }
+
+    private boolean validateOldExtension(String extensionId, Namespace namespace, Collection<Version> versions,
+        Version stopVersion, SortedSet<Version> indexedVersions) throws SolrServerException, IOException
     {
         List<Version> versionList;
         if (versions instanceof List) {
@@ -352,6 +408,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         } else {
             versionList = new ArrayList<>(versions);
         }
+
         // Need to invert the list
         for (ListIterator<Version> it = versionList.listIterator(versionList.size()); it.hasPrevious();) {
             Version version = it.previous();
@@ -361,40 +418,68 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 break;
             }
 
-            Extension validExtension =
-                tryInstall(new ExtensionId(extensionId, version), namespace, allowRootModications);
-            if (validExtension != null) {
-                return validExtension;
+            ExtensionId tryId = new ExtensionId(extensionId, version);
+
+            // Check if the extension already been validated
+            Boolean compatible = this.indexStore.isCompatible(tryId, namespace.serialize());
+            if (compatible != null) {
+                return false;
             }
+
+            // Try installing it
+            return validate(tryId, namespace, indexedVersions);
         }
 
-        return null;
+        return false;
     }
 
-    private Extension tryInstall(ExtensionId extensionId, String namespace, boolean allowRootMdofications)
+    private boolean validate(ExtensionId extensionId, Namespace namespace, SortedSet<Version> indexedVersions)
+        throws SolrServerException, IOException
     {
-        // Check if it already been validated
-        Boolean compatible = this.indexStore.isCompatible(extensionId, namespace);
-        if (compatible != null) {
-            return ;
+        // Try installing it
+        Extension validExtension = tryInstall(extensionId, namespace);
+        if (validExtension != null) {
+            addSearchableCompatibleExtension(validExtension, namespace, indexedVersions);
+
+            return true;
         }
 
+        if (this.indexStore.exists(extensionId)) {
+            // Explicitly mark the extension as invalid (if this extension exist in the index)
+            // TODO: index it if it does not exist ?
+            this.indexStore.updateCompatible(extensionId, namespace.serialize(), null, true);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private Extension tryInstall(ExtensionId extensionId, Namespace namespace)
+    {
         InstallRequest planRequest = new InstallRequest(getRequest());
         planRequest.setId((List<String>) null);
         planRequest.setVerbose(false);
         planRequest.setStatusLogIsolated(true);
 
         planRequest.addExtension(extensionId);
-        planRequest.setRootModificationsAllowed(allowRootMdofications);
+        planRequest.setRootModificationsAllowed(isAllowRootModications(namespace));
 
         if (namespace != null) {
-            planRequest.addNamespace(namespace);
+            planRequest.addNamespace(namespace.serialize());
         }
 
         // Run the install plan in the current thread to benefit from the shared extension session
         Job job = this.installPlanJobProvider.get();
         job.initialize(planRequest);
-        job.run();
+
+        // Ignore any log produced by the install plan job
+        getStatus().ignoreLog(true);
+        try {
+            job.run();
+        } finally {
+            getStatus().ignoreLog(false);
+        }
 
         if (job.getStatus().getError() == null) {
             // Get last element of the root tree node
@@ -407,8 +492,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         return null;
     }
 
-    private void addValidExtension(Extension validExtension, Namespace namespace, SortedSet<Version> indexedVersions)
-        throws SolrServerException, IOException
+    private void addSearchableCompatibleExtension(Extension validExtension, Namespace namespace,
+        SortedSet<Version> indexedVersions) throws SolrServerException, IOException
     {
         if (!indexedVersions.contains(validExtension.getId().getVersion())) {
             this.indexStore.add(validExtension, false);
@@ -418,48 +503,18 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         for (Version version : indexedVersions) {
-            this.indexStore.updateCompatible(new ExtensionId(validExtension.getId().getId(), version), namespace,
-                version.equals(validExtension.getId().getVersion()));
+            this.indexStore.updateCompatible(new ExtensionId(validExtension.getId().getId(), version),
+                namespace.serialize(), version.equals(validExtension.getId().getVersion()), null);
         }
     }
 
-    private void validateOlderExtensions(Namespace namespace, boolean allowRootMdofications,
-        Set<String> missingExtension, Map<String, SortedSet<Version>> indexedExtensions)
+    private boolean validateOldExtension(String extensionId, Namespace namespace, SortedSet<Version> indexedVersions)
         throws SolrServerException, IOException
-    {
-        boolean updated = false;
-
-        for (String extensionId : missingExtension) {
-            SortedSet<Version> indexedVersions = indexedExtensions.get(extensionId);
-
-            Extension validExtension = getOldValid(extensionId, namespace, allowRootMdofications, indexedVersions);
-
-            if (validExtension != null) {
-                addValidExtension(validExtension, namespace, indexedVersions);
-
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            this.indexStore.commit();
-        }
-    }
-
-    private Extension getOldValid(String extensionId, Namespace namespace, boolean allowRootModications,
-        SortedSet<Version> indexedVersions) throws SolrServerException, IOException
     {
         String namespaceString = namespace.serialize();
 
         // Get the stop version
         Version stopVersion = getStopVersion(extensionId, namespaceString);
-
-        // Get version valid in other namespaces
-        Version compatibleVersion = this.indexStore.getCompatibleVersion(extensionId);
-        if (compatibleVersion != null) {
-            // Assume if this one is not compatible, none is
-            return tryInstall(new ExtensionId(extensionId, compatibleVersion), namespaceString, allowRootModications);
-        }
 
         // Get available versions
         Collection<Version> versions = new TreeSet<>();
@@ -475,34 +530,29 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         versions.remove(indexedVersions.last());
 
         // Search for a compatible version among the available versions
-        return getValid(extensionId, namespaceString, allowRootModications, versions, stopVersion);
+        return validateOldExtension(extensionId, namespace, versions, stopVersion, indexedVersions);
     }
 
-    private void validateExtensions(Namespace namespace, boolean allowRootMdofications,
-        Map<String, SortedSet<Version>> indexedExtensions, Set<String> missingExtensions)
-        throws SolrServerException, IOException
+    private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> indexedExtensions,
+        Map<String, Set<Namespace>> missingExtensions) throws SolrServerException, IOException
     {
         boolean updated = false;
 
         this.progress.pushLevelProgress(indexedExtensions.size(), indexedExtensions);
 
-        //for (Map.Entry<String, SortedSet<Version>> entry : indexedExtensions.entrySet()) {
+        for (Map.Entry<String, SortedSet<Version>> entry : indexedExtensions.entrySet()) {
             this.progress.startStep(indexedExtensions);
 
-            //String extensionId = entry.getKey();
-            String extensionId = "org.xwiki.contrib.oidc:oidc-authenticator";
-            //SortedSet<Version> indexedVersions = entry.getValue();
-            SortedSet<Version> indexedVersions = indexedExtensions.get("org.xwiki.contrib.oidc:oidc-authenticator");
+            String extensionId = entry.getKey();
+            SortedSet<Version> indexedVersions = entry.getValue();
 
-            Extension validExtension =
-                getValid(extensionId, namespace, allowRootMdofications, indexedVersions, missingExtensions);
-
-            if (validExtension != null) {
-                addValidExtension(validExtension, namespace, indexedVersions);
-
-                updated = true;
+            try {
+                updated |= validateExtension(extensionId, namespace, indexedVersions, missingExtensions);
+            } catch (Exception e) {
+                this.logger.error("Failed to validate extension with if [{}] on namespace [{}]", extensionId, namespace,
+                    e);
             }
-        //}
+        }
 
         if (updated) {
             this.indexStore.commit();

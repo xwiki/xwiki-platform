@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -40,6 +41,7 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionAuthorConverter;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
@@ -64,7 +66,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -133,6 +134,22 @@ class ExtensionIndexStoreTest
         when(this.testRepository.getDescriptor()).thenReturn(this.testRepositoryDescriptor);
         when(this.extensionManager.getRepository(this.testRepositoryDescriptor.getId()))
             .thenReturn(this.testRepository);
+    }
+
+    private void assertSimpleSearch(String query, ExtensionId... expected) throws SearchException
+    {
+        IndexedExtensionQuery extensionQuery = new IndexedExtensionQuery(query);
+
+        IterableResult<Extension> result = this.indexStore.search(extensionQuery);
+
+        List<ExtensionId> resultIds = new ArrayList<>(result.getSize());
+        for (Extension extension : result) {
+            resultIds.add(extension.getId());
+        }
+
+        List<ExtensionId> expectIds = Arrays.asList(expected);
+
+        assertEquals(expectIds, resultIds);
     }
 
     // Tests
@@ -208,5 +225,27 @@ class ExtensionIndexStoreTest
         assertEquals(0, result.getOffset());
         assertEquals(1, result.getSize());
         assertEquals(1, result.getTotalHits());
+    }
+
+    @Test
+    void search() throws SolrServerException, IOException, ResolveException, SearchException
+    {
+        ExtensionId extensionId = new ExtensionId("id", "version");
+
+        TestExtension extension = new TestExtension(this.testRepository, extensionId, "type");
+        extension.setCategory("category");
+        extension.setName("Some Name");
+
+        this.indexStore.add(extension, true);
+        this.indexStore.commit();
+
+        // assertSimpleSearch("", extensionId);
+
+        /*
+         * assertSimpleSearch(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + extensionId.getId(),
+         * extensionId);
+         */
+
+        assertSimpleSearch("Name", extensionId);
     }
 }

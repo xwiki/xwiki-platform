@@ -263,7 +263,7 @@ public class RepositoryManager implements Initializable, Disposable
 
             if (!documentNames.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] { this.currentStringResolver.resolve(documentNames.get(0)) };
+                    new DocumentReference[] {this.currentStringResolver.resolve(documentNames.get(0))};
             } else {
                 cachedDocumentReference = new DocumentReference[1];
             }
@@ -417,7 +417,7 @@ public class RepositoryManager implements Initializable, Disposable
                 if (extensionVersions != null) {
                     for (BaseObject extensionVersionObject : extensionVersions) {
                         if (extensionVersionObject != null) {
-                            valid = isVersionValid(document, extensionVersionObject, context);
+                            valid = isVersionValid(document, type, extensionVersionObject, context);
 
                             if (!valid) {
                                 return false;
@@ -431,7 +431,8 @@ public class RepositoryManager implements Initializable, Disposable
         return valid;
     }
 
-    private boolean isVersionValid(XWikiDocument document, BaseObject extensionVersionObject, XWikiContext context)
+    private boolean isVersionValid(XWikiDocument document, String type, BaseObject extensionVersionObject,
+        XWikiContext context)
     {
         // Has a version
         String extensionVersion = getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
@@ -444,52 +445,57 @@ public class RepositoryManager implements Initializable, Disposable
 
         boolean valid;
 
-        ResourceReference resourceReference = null;
-        try {
-            resourceReference = getDownloadReference(document, extensionVersion);
-        } catch (ResolveException e) {
-            logger.debug("Cannot obtain download source reference for object [{}({})]",
-                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
-            return false;
-        }
+        if (StringUtils.isEmpty(type)) {
+            // We don't care about the file when type is "no file"
+            valid = true;
+        } else {
+            ResourceReference resourceReference = null;
+            try {
+                resourceReference = getDownloadReference(document, extensionVersion);
+            } catch (ResolveException e) {
+                logger.debug("Cannot obtain download source reference for object [{}({})]",
+                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
+                return false;
+            }
 
-        if (resourceReference != null) {
-            if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
-                AttachmentReference attachmentReference =
-                    this.attachmentResolver.resolve(resourceReference.getReference(), document.getDocumentReference());
+            if (resourceReference != null) {
+                if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
+                    AttachmentReference attachmentReference = this.attachmentResolver
+                        .resolve(resourceReference.getReference(), document.getDocumentReference());
 
-                XWikiDocument attachmentDocument;
-                try {
-                    if (attachmentReference.getDocumentReference().equals(document.getDocumentReference())) {
-                        attachmentDocument = document;
-                    } else {
-                        attachmentDocument =
-                            context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                    XWikiDocument attachmentDocument;
+                    try {
+                        if (attachmentReference.getDocumentReference().equals(document.getDocumentReference())) {
+                            attachmentDocument = document;
+                        } else {
+                            attachmentDocument =
+                                context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                        }
+
+                        valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
+                    } catch (XWikiException e) {
+                        this.logger.error("Failed to get document [{}]", attachmentReference.getDocumentReference(), e);
+
+                        valid = false;
                     }
 
-                    valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
-                } catch (XWikiException e) {
-                    this.logger.error("Failed to get document [{}]", attachmentReference.getDocumentReference(), e);
-
+                    if (!valid) {
+                        this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                    }
+                } else if (ResourceType.URL.equals(resourceReference.getType())
+                    || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
+                    valid = true;
+                } else {
                     valid = false;
-                }
 
-                if (!valid) {
-                    this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                    this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
                 }
-            } else if (ResourceType.URL.equals(resourceReference.getType())
-                || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
-                valid = true;
             } else {
                 valid = false;
 
-                this.logger.debug("Unknown resource type [{}]", resourceReference.getType());
+                this.logger.debug("No actual download provided for object [{}({})]",
+                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
             }
-        } else {
-            valid = false;
-
-            this.logger.debug("No actual download provided for object [{}({})]",
-                XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, extensionVersionObject.getNumber());
         }
 
         return valid;
@@ -695,7 +701,7 @@ public class RepositoryManager implements Initializable, Disposable
                         if (!extensionVersions.containsKey(new DefaultVersion(version))
                             && featureVersions.containsKey(new DefaultVersion(version))) {
                             // The version does not exist on remote repository
-                            if (!isVersionValid(document, versionObject, xcontext)) {
+                            if (!isVersionValid(document, extension.getType(), versionObject, xcontext)) {
                                 // The version is invalid, removing it to not make the whole extension invalid
                                 document.removeXObject(versionObject);
                                 needSave = true;
@@ -1204,8 +1210,10 @@ public class RepositoryManager implements Initializable, Disposable
         needSave |= updateExtensionVersionDependencies(document, extension);
 
         // Download
-        String download = getDownloadURL(extension);
-        needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
+        if (!StringUtils.isEmpty(extension.getType())) {
+            String download = getDownloadURL(extension);
+            needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
+        }
 
         return needSave;
     }

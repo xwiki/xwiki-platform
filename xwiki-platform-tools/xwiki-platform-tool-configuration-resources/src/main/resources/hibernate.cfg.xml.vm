@@ -48,7 +48,8 @@
          at https://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
     <property name="hibernate.dbcp.defaultAutoCommit">false</property>
-    <property name="hibernate.dbcp.maxTotal">#if ("$!xwikiDbDbcpMaxTotal" != '')${xwikiDbDbcpMaxTotal}#{else}50#end</property>
+    <property name="hibernate.dbcp.maxTotal">##
+#if ("$!xwikiDbDbcpMaxTotal" != '')${xwikiDbDbcpMaxTotal}#{else}50#end</property>
     <property name="hibernate.dbcp.maxIdle">5</property>
     <property name="hibernate.dbcp.maxWaitMillis">30000</property>
 
@@ -72,10 +73,10 @@
     -->
     <property name="hibernate.schema_update.unique_constraint_strategy">skip</property>
 
-    <!-- Setting "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" will tell DBCP to cache
-         Prepared Statements (it's off by default). Note that for backward compatibility the "hibernate.dbcp.ps.maxActive" is also
-         supported and when set it'll set "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" to
-         value of "hibernate.dbcp.ps.maxActive".
+    <!-- Setting "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" will
+         tell DBCP to cache Prepared Statements (it's off by default). Note that for backward compatibility the
+         "hibernate.dbcp.ps.maxActive" is also supported and when set it'll set "hibernate.dbcp.poolPreparedStatements"
+         to true and "hibernate.dbcp.maxOpenPreparedStatements" to value of "hibernate.dbcp.ps.maxActive".
 
          Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
@@ -99,16 +100,19 @@
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
-    $!xwikiDbAdditionalProperties
-## DO NOT USE XML COMMENT IN BETWEEN DB SPECIFIC CONFIGURATION, IT RENDER COMMENTING/UNCOMMENTING THE RIGHT
-## CONFIGURATION A PAIN
+#if ("$!xwikiDbAdditionalProperties" != '')
+    $xwikiDbAdditionalProperties
 
+#end
+## DO NOT USE XML COMMENTS IN BETWEEN DB SPECIFIC CONFIGURATION, IT RENDER COMMENTING/UNCOMMENTING THE RIGHT
+## CONFIGURATION A PAIN
+##
     <!-- Configuration for the default database.
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
 
-         If you want the main wiki database to be different than "xwiki" (or the default schema for schema based engines)
-         you will also have to set the property xwiki.db in xwiki.cfg file
+         If you want the main wiki database to be different than "xwiki" (or the default schema for schema based
+         engines) you will also have to set the property xwiki.db in xwiki.cfg file
     -->
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
 ## have preferred to use an empty value but I couldn't make that work with Maven.
@@ -127,7 +131,8 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDb == 'mysql' || $xwikiDb == 'mariadb'|| $xwikiDb == 'oracle')
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
-    <property name="hibernate.dbcp.maxOpenPreparedStatements">#if ("$!xwikiDbDbcpMaxOpenPreparedStatements" != '')${xwikiDbDbcpMaxOpenPreparedStatements}#{else}20#end</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">##
+#if ("$!xwikiDbDbcpMaxOpenPreparedStatements" != '')${xwikiDbDbcpMaxOpenPreparedStatements}#{else}20#end</property>
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)
@@ -171,7 +176,6 @@
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
@@ -201,7 +205,6 @@
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
@@ -227,7 +230,8 @@
            - if you want the main wiki schema to be different than "PUBLIC" (the default HSQLDB schema)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="hibernate.connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
+    <property name="hibernate.connection.url">##
+jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
     <property name="hibernate.connection.username">sa</property>
     <property name="hibernate.connection.password"></property>
     <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
@@ -263,7 +267,6 @@
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="hibernate.jdbc.use_streams_for_binary">false</property>
     <property name="xwiki.virtual_mode">schema</property>
 

@@ -27,7 +27,7 @@ module.exports = {
   chainWebpack: config => {
     config.externals({
       "jquery": "jquery",
-      "bootstrap-datetimepicker": "bootstrap-datetimepicker",
+      "daterangepicker": "daterangepicker",
     })
   },
   css: {

@@ -149,14 +149,15 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
-import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -3537,7 +3538,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && XMLUtils.containsElementSyntax(result)) {
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && HTMLUtils.containsElementSyntax(result)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }

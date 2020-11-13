@@ -11,13 +11,7 @@
   padding: 1px 2px;
 }
 
-/* The "Jump to any page..." text inserted in the QuickLinks panel */
-.jmp-activator {
-  cursor: pointer;
-  font-size: 80%;
-  font-weight: 900;
-}
-
-.jmp-activator:hover {
-  text-decoration: underline;
+.jump-dialog-container {
+  /* Reduce the z-index a bit in order to not have the page picker drop down behind the modal backdrop. */
+  z-index: 999;
 }

@@ -474,11 +474,11 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         job.initialize(planRequest);
 
         // Ignore any log produced by the install plan job
-        getStatus().ignoreLog(true);
+        getStatus().ignoreLogs(true);
         try {
             job.run();
         } finally {
-            getStatus().ignoreLog(false);
+            getStatus().ignoreLogs(false);
         }
 
         if (job.getStatus().getError() == null) {

@@ -3534,12 +3534,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // If we're in new rendering engine we want to wrap the HTML returned by displayView() in
             // a {{html/}} macro so that the user doesn't have to do it.
             // We test if we're inside the rendering engine since it's also possible that this display() method is
-            // called
-            // directly from a template and in this case we only want HTML as a result and not wiki syntax.
+            // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
-                && (result.indexOf("<") != -1 || result.indexOf(">") != -1)) {
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && XMLUtils.containsElementSyntax(result)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }

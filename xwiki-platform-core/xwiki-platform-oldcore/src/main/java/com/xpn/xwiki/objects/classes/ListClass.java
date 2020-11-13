@@ -738,11 +738,11 @@ public abstract class ListClass extends PropertyClass
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
-                newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));
+                newlist.add(getDisplayValue(value, name, map, context));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(XMLUtils.escapeElementText(getDisplayValue(prop.getValue(), name, map, context)));
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 

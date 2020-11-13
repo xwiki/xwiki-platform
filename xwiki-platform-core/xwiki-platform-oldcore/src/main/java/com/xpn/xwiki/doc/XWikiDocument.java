@@ -3538,7 +3538,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && HTMLUtils.containsElementSyntax(result)) {
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && HTMLUtils.containsElementText(result)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }

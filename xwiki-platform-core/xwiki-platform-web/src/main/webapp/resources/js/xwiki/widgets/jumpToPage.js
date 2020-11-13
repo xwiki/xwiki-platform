@@ -107,9 +107,22 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     Event.observe(this.viewButton, 'click', this.openDocument.bindAsEventListener(this, "view"));
     Event.observe(this.editButton, 'click', this.openDocument.bindAsEventListener(this, "edit"));
     $super(event);
+    // Add a CSS class to the container in order to better control the styles for the Jump to Page modal.
+    this.input.up('.xdialog-modal-container').addClassName('jump-dialog-container');
     // Initialize the page picker.
     var self = this;
     require(['jquery', 'xwiki-suggestPages'], function($) {
+      // Load the required CSS.
+      [
+        $jsontool.serialize($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css')),
+        $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true))
+      ].forEach(function(url) {
+        var link = $('<link/>').attr({
+          type: 'text/css',
+          rel: 'stylesheet',
+          href: url
+        }).appendTo('head');
+      });
       var enableActionButtons = function(enable) {
         var actionButtons = $(self.viewButton).add(self.editButton).find('input');
         if (enable === false) {

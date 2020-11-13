@@ -185,7 +185,10 @@ public class WARBuilder
 
     private void copyClasses(File webInfClassesDirectory) throws Exception
     {
-        copyDirectory(new File("target/classes"), webInfClassesDirectory);
+        File sourceDirectory = new File("target/classes");
+        if (sourceDirectory.exists()) {
+            copyDirectory(new File("target/classes"), webInfClassesDirectory);
+        }
     }
 
     private void copyJDBCDriver(File libDirectory) throws Exception

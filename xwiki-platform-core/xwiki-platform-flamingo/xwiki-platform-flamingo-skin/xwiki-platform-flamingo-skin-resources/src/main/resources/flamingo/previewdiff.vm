@@ -1,7 +1,11 @@
 #set ($discard = $services.template.execute('diff_macros.vm'))
 
-#set ($origdoc = $xwiki.getDocument($tdoc.getDocumentReference()))
+#set ($origdoc = $xwiki.getDocument($tdoc.getDocumentReferenceWithLocale()))
 #set ($previousDoc = $origdoc.getDocumentRevision($request.get("previousVersion")))
+#if (!$previousDoc)
+  ## The previous version specified on the request doesn't exist (anymore).
+  #set ($previousDoc = $origdoc)
+#end
 #set ($mergedDocResult = $services.merge.mergeDocument($previousDoc, $tdoc, $origdoc))
 
 #set ($versions = {

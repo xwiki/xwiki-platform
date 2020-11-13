@@ -442,11 +442,7 @@ XWiki.widgets.LiveTable = Class.create({
         // The value can be passed as a string..
         if (descriptor.html + '' === 'true') {
           // The value of the column must be unescaped to allow it to be used as html.
-          // The values coming from XProperties are escaped by default.
-          // The corresponding unescaped value is found in a field suffixed with '_value'.
-          // When a custom data source is used, the escaped value can be either directly provided, or defined in a
-          // corresponding field suffixed with '_value'.
-          // TODO: this mechanism should be changed once XWIKI-18049 is implemented. 
+          // For the values coming from XObjects fields, the unescaped value is found in a field suffixed with '_value'.
           if (!table.options.columnDescriptors[column + '_value']) {
             container.innerHTML = row[fieldName + '_value'] || row[fieldName] || '';
           } else {

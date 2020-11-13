@@ -17,18 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.store.internal.observation;
+package org.xwiki.eventstream.internal.observation;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.EventStatus;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
-import org.xwiki.eventstream.store.internal.LegacyEvent;
-import org.xwiki.eventstream.store.internal.LegacyEventLoader;
-import org.xwiki.eventstream.store.internal.LegacyEventStatus;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.LocalEventConverter;
-import org.xwiki.query.QueryException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -41,28 +44,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link LegacyEventStatusEventConverter}.
+ * Validate {@link EventStatusEventConverter}.
  * 
  * @version $Id$
  */
 @ComponentTest
-public class LegacyEventStatusEventConverterTest
+class EventStatusEventConverterTest
 {
     @MockComponent
-    LegacyEventLoader loader;
+    EventStore eventStore;
 
     @InjectMockComponents(role = LocalEventConverter.class)
-    LegacyEventStatusEventConverter converter;
+    EventStatusEventConverter converter;
 
     @Test
-    public void convertNoThing()
+    void convertNoThing()
     {
         assertFalse(this.converter.toRemote(new LocalEventData(new LogEvent(), null, null), new RemoteEventData()));
         assertFalse(this.converter.fromRemote(new RemoteEventData(new LogEvent(), null, null), new LocalEventData()));
     }
 
     @Test
-    public void convertEmpty()
+    void convertEmpty()
     {
         RemoteEventData remoteEvent = new RemoteEventData();
 
@@ -77,14 +80,11 @@ public class LegacyEventStatusEventConverterTest
     }
 
     @Test
-    public void convertWithEvent() throws QueryException
+    void convertWithEvent() throws EventStreamException
     {
-        LegacyEvent initialEvent = new LegacyEvent();
-        initialEvent.setEventId("id");
-        LegacyEventStatus status = new LegacyEventStatus();
-        status.setActivityEvent(initialEvent);
-        status.setEntityId("entity");
-        status.setRead(true);
+        DefaultEvent initialEvent = new DefaultEvent();
+        initialEvent.setId("id");
+        DefaultEventStatus status = new DefaultEventStatus(initialEvent, "entity", true);
 
         RemoteEventData remoteEvent = new RemoteEventData();
 
@@ -93,15 +93,15 @@ public class LegacyEventStatusEventConverterTest
 
         LocalEventData localEvent = new LocalEventData();
 
-        LegacyEvent loadedEvent = new LegacyEvent();
-        when(this.loader.getLegacyEvent("id")).thenReturn(loadedEvent);
+        DefaultEvent loadedEvent = new DefaultEvent();
+        when(this.eventStore.getEvent("id")).thenReturn(Optional.of(loadedEvent));
 
         assertTrue(this.converter.fromRemote(remoteEvent, localEvent));
 
         assertSame(EventStatusAddOrUpdatedEvent.class, localEvent.getEvent().getClass());
         assertNotNull(localEvent.getSource());
-        assertSame(loadedEvent, ((LegacyEventStatus) localEvent.getSource()).getActivityEvent());
-        assertEquals("entity", ((LegacyEventStatus) localEvent.getSource()).getEntityId());
-        assertTrue(((LegacyEventStatus) localEvent.getSource()).isRead());
+        assertSame(loadedEvent, ((EventStatus) localEvent.getSource()).getEvent());
+        assertEquals("entity", ((EventStatus) localEvent.getSource()).getEntityId());
+        assertTrue(((EventStatus) localEvent.getSource()).isRead());
     }
 }

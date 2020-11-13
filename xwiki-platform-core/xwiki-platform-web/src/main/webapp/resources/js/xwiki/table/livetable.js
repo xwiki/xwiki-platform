@@ -423,14 +423,10 @@ XWiki.widgets.LiveTable = Class.create({
           td.appendChild(link);
           container = link;
         }
-        // The value can be passed as a string.
+        // The value can be passed as a string..
         if (descriptor.html + '' === 'true') {
-          // When a column contains HTML, we need to make sure to return the unescaped HTML (otherwise
-          // it would not be interpreted as HTML and the HTML would be displayed in the LT cells).
-          // Indeed, in order to prevent injection of malicious HTML it's been HTML-escaped by the Class
-          // Displayers (e.g StringClass, etc). This is why we return the '_value' field content since 
-          // it's supposed to always contains the unescaped data.
-          // TODO: In the future, protect this even more by implementing XWIKI-18049.
+          // The value of the column must be unescaped to allow it to be used as html.
+          // For the values coming from XObjects fields, the unescaped value is found in a field suffixed with '_value'.
           if (!table.options.columnDescriptors[column + '_value']) {
             container.innerHTML = row[fieldName + '_value'] || row[fieldName] || '';
           } else {

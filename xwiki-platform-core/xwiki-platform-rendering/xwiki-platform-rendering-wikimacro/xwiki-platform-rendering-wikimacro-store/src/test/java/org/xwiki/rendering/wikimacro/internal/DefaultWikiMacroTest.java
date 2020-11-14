@@ -739,4 +739,16 @@ class DefaultWikiMacroTest
 
         assertEquals(expect, printer.toString());
     }
+
+    @Test
+    void testContentUpdateDuringMacroExecution() throws Exception
+    {
+        registerWikiMacro("contentWikiMacro",
+            "{{groovy}}wikimacro.setContent('This is some test content');println \"{{wikimacrocontent/}}\";{{/groovy}}",
+            Syntax.XWIKI_2_1);
+
+        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        assertXHTML("<p>This is some test content</p>",
+            "{{contentWikiMacro param1=\"value1\" param2=\"value2\"/}}");
+    }
 }

@@ -135,13 +135,10 @@ public class ExtensionIndexStore implements Initializable
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_FEATURES, SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
     }
 
-    /*
-     * private static final String BOOST = ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 " +
-     * Extension.FIELD_NAME + "^9.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX + "^8.0 " +
-     * Extension.FIELD_SUMMARY + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
-     */
-
-    private static final String BOOST = Extension.FIELD_NAME + "^10.0 ";
+    private static final String BOOST =
+        ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 " + Extension.FIELD_NAME + "^9.0 "
+            + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX + "^8.0 " + Extension.FIELD_SUMMARY
+            + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
 
     @Inject
     private Solr solr;
@@ -523,10 +520,7 @@ public class ExtensionIndexStore implements Initializable
             // Use the Extended DisMax Query Parser to set a boost configuration (which is not a feature supported by
             // the Standard Query Parser)
             solrQuery.set("defType", "edismax");
-            solrQuery.set("bf", BOOST);
-
-            solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, Extension.FIELD_VERSION,
-                Extension.FIELD_NAME);
+            solrQuery.set("qf", BOOST);
         }
 
         // Pagination

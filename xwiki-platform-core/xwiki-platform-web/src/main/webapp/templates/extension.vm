@@ -84,6 +84,37 @@
           <button class="primary" type="submit">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
       </div>
+
+      <div>
+        #if ($request.recommended == 'false')
+          #set($recommended = false)
+        #else
+          #set($recommended = true)
+        #end
+        #if ($request.indexed == 'false')
+          #set($indexed = false)
+        #else
+          #set($indexed = true)
+        #end
+        #if ($request.compatible == 'false')
+          #set($compatible = false)
+        #else
+          #set($compatible = true)
+        #end
+        <input type="checkbox" id="switch_recommended" name="recommended"#if($recommended)checked#end>
+        <input type="hidden" name="recommended" value="false" />
+        <label for="switch_recommended">$escapetool.xml($services.localization.render('extensions.search.recommended.label'))</label>
+
+        <input type="checkbox" id="switch_indexed" name="indexed"#if($indexed)checked#end>
+        <input type="hidden" name="indexed" value="false" />
+        <label for="switch_indexed">$escapetool.xml($services.localization.render('extensions.search.indexed.label'))</label>
+
+        #if ($indexed)
+          <input type="checkbox" id="switch_compatible" name="compatible"#if($compatible)checked#end>
+          <input type="hidden" name="compatible" value="false" />
+          <label for="switch_compatible">$escapetool.xml($services.localization.render('extensions.search.compatible.label'))</label>
+        #end
+      </div>
     </form>
     ## Advanced search form.
     <form action="$xwiki.relativeRequestURL" class="xform">

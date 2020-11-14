@@ -176,14 +176,14 @@ class ExtensionIndexStoreTest
         extension.setAllowedNamespaces(Arrays.asList("namespace1", "namespace2"));
         extension.setRecommended(true);
         extension.setAuthors(Arrays.asList(new DefaultExtensionAuthor("first1 last1", "url1"),
-            new DefaultExtensionAuthor("first1 last1", "url2")));
+            new DefaultExtensionAuthor("first2 last2", "url2")));
         extension
             .setExtensionFeatures(Arrays.asList(new ExtensionId("feature1"), new ExtensionId("feature2", "version2")));
 
         ExtensionDependency dependency1 =
             new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
         ExtensionDependency dependency2 =
-            new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
+            new DefaultExtensionDependency("dependency2", new DefaultVersionConstraint("version2"));
         extension.setDependencies(Arrays.asList(dependency1, dependency2));
 
         this.indexStore.add(extension, true);
@@ -199,8 +199,7 @@ class ExtensionIndexStoreTest
         assertEquals(extension.getCategory(), storedExtension.getCategory());
         assertEquals(new ArrayList<>(extension.getAllowedNamespaces()),
             new ArrayList<>(storedExtension.getAllowedNamespaces()));
-        assertEquals(extension.isRecommended(), storedExtension.isRecommended());
-        assertEquals(extension.getAuthors(), storedExtension.getAuthors());
+        assertEquals(new ArrayList<>(extension.getAuthors()), new ArrayList<>(storedExtension.getAuthors()));
         assertEquals(new ArrayList<>(extension.getExtensionFeatures()),
             new ArrayList<>(storedExtension.getExtensionFeatures()));
         assertEquals(new ArrayList<>(extension.getDependencies()), new ArrayList<>(storedExtension.getDependencies()));
@@ -234,7 +233,8 @@ class ExtensionIndexStoreTest
 
         TestExtension extension = new TestExtension(this.testRepository, extensionId, "type");
         extension.setCategory("category");
-        extension.setName("Some Name");
+        extension.setName("Name1 Name2");
+        extension.setSummary("Summary1 Summary2");
 
         this.indexStore.add(extension, true);
         this.indexStore.commit();
@@ -246,6 +246,6 @@ class ExtensionIndexStoreTest
          * extensionId);
          */
 
-        assertSimpleSearch("Name", extensionId);
+        assertSimpleSearch("Name1", extensionId);
     }
 }

@@ -290,6 +290,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
         AnalyzerDefinition indexAnalyzer = new AnalyzerDefinition();
         indexAnalyzer.setTokenizer(tokenizer);
+        indexAnalyzer.setFilters(Arrays.asList(lowerCaseFilter));
 
         AnalyzerDefinition queryAnalyzer = new AnalyzerDefinition();
         queryAnalyzer.setTokenizer(tokenizer);

@@ -168,7 +168,7 @@ class DefaultSolrTest
 
         solrUtils.setString("testlocales", Arrays.asList(Locale.ENGLISH, Locale.FRENCH), Locale.class, inputDocument);
 
-        solrUtils.set("text", "two words", inputDocument);
+        solrUtils.set("text", "two words UPPERCASE", inputDocument);
 
         client.add(inputDocument);
         client.commit();
@@ -182,7 +182,7 @@ class DefaultSolrTest
         assertEquals(Locale.FRANCE, solrUtils.get("testlocale", storedDocument, Locale.class));
         assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH),
             solrUtils.getCollection("testlocales", storedDocument, Locale.class));
-        assertEquals("two words", solrUtils.get("text", storedDocument));
+        assertEquals("two words UPPERCASE", solrUtils.get("text", storedDocument));
 
         Map<String, Object> storedMap = solrUtils.getMap("testmap", storedDocument);
 
@@ -210,6 +210,30 @@ class DefaultSolrTest
 
         query = new SolrQuery("two");
         query.set(CommonParams.DF, "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("words");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("uppercase");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("UPPERCASE");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
         documents = client.query(query).getResults();
         assertEquals(1, documents.size());
         storedDocument = documents.get(0);

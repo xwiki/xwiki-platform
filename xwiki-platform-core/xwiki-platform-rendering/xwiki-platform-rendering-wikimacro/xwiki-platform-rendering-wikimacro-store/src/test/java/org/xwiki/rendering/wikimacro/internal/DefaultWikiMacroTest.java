@@ -744,7 +744,7 @@ class DefaultWikiMacroTest
     void testContentUpdateDuringMacroExecution() throws Exception
     {
         registerWikiMacro("contentWikiMacro",
-            "{{groovy}}wikimacro.setContent('This is some test content');println \"{{wikimacrocontent/}}\";{{/groovy}}",
+            "{{velocity}}$wikimacro.setContent('This is some test content'){{wikimacrocontent/}}{{/velocity}}",
             Syntax.XWIKI_2_1);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.

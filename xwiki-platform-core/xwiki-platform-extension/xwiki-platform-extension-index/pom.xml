@@ -32,7 +32,10 @@
   <packaging>jar</packaging>
   <description>Local index of extension coming from various repositories</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
+
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     </properties>
   <dependencies>
     <dependency>
@@ -73,6 +76,13 @@
       <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

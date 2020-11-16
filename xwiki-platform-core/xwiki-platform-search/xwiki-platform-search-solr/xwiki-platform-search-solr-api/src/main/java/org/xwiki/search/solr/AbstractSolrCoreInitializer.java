@@ -671,6 +671,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to set the field
      * @since 12.10RC1
      */
+    @Unstable
     protected void setTextGeneralField(String name, boolean multiValued, boolean dynamic, Object... attributes)
         throws SolrException
     {
@@ -980,6 +981,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to add the field
      * @since 12.10RC1
      */
+    @Unstable
     protected void setFieldType(FieldTypeDefinition definition, boolean add) throws SolrException
     {
         try {

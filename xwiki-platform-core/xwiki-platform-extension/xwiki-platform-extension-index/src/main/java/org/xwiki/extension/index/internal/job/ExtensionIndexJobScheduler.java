@@ -26,6 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -49,6 +50,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * @since 12.10RC1
  */
 @Component(roles = ExtensionIndexJobScheduler.class)
+@Singleton
 public class ExtensionIndexJobScheduler implements Disposable
 {
     @Inject

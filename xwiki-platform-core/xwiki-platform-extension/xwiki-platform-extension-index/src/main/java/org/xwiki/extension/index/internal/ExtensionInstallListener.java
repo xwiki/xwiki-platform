@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Named(ExtensionInstallListener.NAME)
+@Singleton
 public class ExtensionInstallListener extends AbstractEventListener
 {
     /**

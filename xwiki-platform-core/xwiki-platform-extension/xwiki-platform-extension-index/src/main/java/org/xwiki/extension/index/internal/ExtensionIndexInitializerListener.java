@@ -21,6 +21,7 @@ package org.xwiki.extension.index.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
@@ -38,6 +39,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Named(ExtensionIndexInitializerListener.NAME)
+@Singleton
 public class ExtensionIndexInitializerListener extends AbstractEventListener
 {
     /**

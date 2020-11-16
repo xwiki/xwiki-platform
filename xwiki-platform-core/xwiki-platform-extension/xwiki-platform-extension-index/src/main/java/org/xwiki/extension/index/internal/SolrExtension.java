@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionId;
@@ -53,9 +52,9 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
 
     private List<Version> versions;
 
-    private Set<Namespace> compatibleNamespaces = Collections.emptySet();
+    private Set<String> compatibleNamespaces = Collections.emptySet();
 
-    private Set<Namespace> incompatibleNamespaces = Collections.emptySet();
+    private Set<String> incompatibleNamespaces = Collections.emptySet();
 
     private Date indexDate;
 
@@ -109,7 +108,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     // IndexedExtension
 
     @Override
-    public Boolean isCompatible(Namespace namespace)
+    public Boolean isCompatible(String namespace)
     {
         if (this.compatibleNamespaces != null && this.compatibleNamespaces.contains(namespace)) {
             return true;
@@ -125,7 +124,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     /**
      * @param compatibleNamespaces the namespaces in which the extension can be installed
      */
-    public void setCompatibleNamespaces(Collection<Namespace> compatibleNamespaces)
+    public void setCompatibleNamespaces(Collection<String> compatibleNamespaces)
     {
         if (compatibleNamespaces != null) {
             this.compatibleNamespaces = new HashSet<>(compatibleNamespaces);
@@ -137,7 +136,7 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     /**
      * @param incompatibleNamespaces the namespaces in which the extension cannot be installed
      */
-    public void setIncompatibleNamespaces(Collection<Namespace> incompatibleNamespaces)
+    public void setIncompatibleNamespaces(Collection<String> incompatibleNamespaces)
     {
         if (incompatibleNamespaces != null) {
             this.incompatibleNamespaces = new HashSet<>(incompatibleNamespaces);

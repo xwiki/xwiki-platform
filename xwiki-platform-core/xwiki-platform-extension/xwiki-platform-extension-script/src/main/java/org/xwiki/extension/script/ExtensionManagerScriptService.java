@@ -38,6 +38,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
@@ -1008,6 +1009,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public boolean isAllowed(Extension extension, String namespace)
     {
+        if (extension instanceof IndexedExtension) {
+            if (Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
+                // If the extension has explicitly been marked as incompatible, return false
+                return false;
+            }
+        }
+
         return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);
     }
 

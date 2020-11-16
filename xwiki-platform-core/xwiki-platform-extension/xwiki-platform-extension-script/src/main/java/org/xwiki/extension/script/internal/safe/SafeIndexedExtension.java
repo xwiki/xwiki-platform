@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
@@ -61,7 +60,7 @@ public class SafeIndexedExtension<T extends IndexedExtension> extends SafeRating
     // IndexedExtension
 
     @Override
-    public Boolean isCompatible(Namespace namespace)
+    public Boolean isCompatible(String namespace)
     {
         return getWrapped().isCompatible(namespace);
     }

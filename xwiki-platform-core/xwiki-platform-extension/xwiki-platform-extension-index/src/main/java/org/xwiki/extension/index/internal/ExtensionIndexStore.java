@@ -364,6 +364,15 @@ public class ExtensionIndexStore implements Initializable
         return namespace;
     }
 
+    private String fromStoredNamespace(String storedNamespace)
+    {
+        if (storedNamespace == null || storedNamespace.equals(ROOT_NAMESPACE)) {
+            return null;
+        }
+
+        return storedNamespace;
+    }
+
     /**
      * @param remoteExtension the {@link RemoteExtension} version of the extension
      * @param extension the extension to add to the index
@@ -492,15 +501,26 @@ public class ExtensionIndexStore implements Initializable
 
         extension.setLast(this.utils.get(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST, document, false));
 
-        extension.setCompatibleNamespaces(this.utils.<Namespace>getCollection(
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, document, Namespace.class));
-        extension.setIncompatibleNamespaces(this.utils.<Namespace>getCollection(
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document, Namespace.class));
+        extension.setCompatibleNamespaces(
+            getNamespaces(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, document));
+        extension.setIncompatibleNamespaces(
+            getNamespaces(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_INCOMPATIBLE_NAMESPACES, document));
 
         // TODO: add dependencies
         // TODO: add managed dependencies
 
         return extension;
+    }
+
+    private Collection<String> getNamespaces(String fieldName, SolrDocument document)
+    {
+        Collection<String> storedNamespaces = this.utils.getCollection(fieldName, document);
+
+        if (storedNamespaces == null) {
+            return null;
+        }
+
+        return storedNamespaces.stream().map(this::fromStoredNamespace).collect(Collectors.toList());
     }
 
     /**

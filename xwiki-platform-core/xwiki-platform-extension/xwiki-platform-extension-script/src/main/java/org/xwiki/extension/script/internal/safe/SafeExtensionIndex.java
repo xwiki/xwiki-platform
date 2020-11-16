@@ -21,8 +21,11 @@ package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.job.JobException;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
@@ -60,5 +63,19 @@ public class SafeExtensionIndex<T extends ExtensionIndex> extends SafeAdvancedSe
     public ExtensionIndexStatus index(Namespace namespace) throws JobException
     {
         return getWrapped().index(namespace);
+    }
+
+    // ExtensionRepository
+
+    @Override
+    public IndexedExtension resolve(ExtensionDependency extensionDependency)
+    {
+        return (IndexedExtension) super.resolve(extensionDependency);
+    }
+
+    @Override
+    public IndexedExtension resolve(ExtensionId extensionId)
+    {
+        return (IndexedExtension) super.resolve(extensionId);
     }
 }

@@ -38,6 +38,7 @@ import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler;
 import org.xwiki.extension.repository.AbstractAdvancedSearchableExtensionRepository;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
@@ -111,9 +112,9 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     }
 
     @Override
-    public Extension resolve(ExtensionId extensionId) throws ResolveException
+    public IndexedExtension resolve(ExtensionId extensionId) throws ResolveException
     {
-        Extension extension = getSolrExtension(extensionId);
+        IndexedExtension extension = getSolrExtension(extensionId);
 
         if (extension != null) {
             return extension;
@@ -123,14 +124,14 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
     }
 
     @Override
-    public Extension resolve(ExtensionDependency extensionDependency) throws ResolveException
+    public IndexedExtension resolve(ExtensionDependency extensionDependency) throws ResolveException
     {
         // Search in the index if the constraint is a unique version
         Version uniqueVersion = VersionUtils.getUniqueVersion(extensionDependency.getVersionConstraint());
         if (uniqueVersion != null) {
             ExtensionId extensionId = new ExtensionId(extensionDependency.getId(), uniqueVersion);
 
-            Extension extension = getSolrExtension(extensionId);
+            IndexedExtension extension = getSolrExtension(extensionId);
 
             if (extension != null) {
                 return extension;

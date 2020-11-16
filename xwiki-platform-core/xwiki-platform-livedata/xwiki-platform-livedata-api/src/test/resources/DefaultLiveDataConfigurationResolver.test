@@ -154,6 +154,8 @@
       "pageSizes":[15,25,50,100],
       "showNextPrevious":true
     },
-    "entryDescriptor":{}
+    "entryDescriptor":{
+      "idProperty":"entryId"
+    }
   }
 }

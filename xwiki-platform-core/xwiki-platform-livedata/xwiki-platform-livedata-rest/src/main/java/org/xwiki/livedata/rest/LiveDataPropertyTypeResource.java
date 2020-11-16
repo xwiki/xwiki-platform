@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -44,18 +43,16 @@ public interface LiveDataPropertyTypeResource
      * Provides information about the specified live data property type.
      *
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
-     * @param typeId identifies the property type
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param typeId identifies the property type
      * @return the descriptor of the specified property type
      * @throws Exception if retrieving the property type fails
      */
     @GET
     PropertyDescriptor getType(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
-        @PathParam("typeId") String typeId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @QueryParam("namespace") @DefaultValue("") String namespace,
+        @PathParam("typeId") String typeId
     ) throws Exception;
 }

@@ -31,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
@@ -90,6 +91,9 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         if (actualSourceConfig != null) {
             Optional<LiveDataSource> source = this.sourceManager.get(actualSourceConfig);
             if (source.isPresent()) {
+                LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
+                entryDescriptor.setIdProperty(source.get().getEntries().getIdProperty());
+                config.getMeta().setEntryDescriptor(entryDescriptor);
                 config.getMeta().setPropertyDescriptors(source.get().getProperties().get());
                 config.getMeta().setPropertyTypes(source.get().getPropertyTypes().get());
             }

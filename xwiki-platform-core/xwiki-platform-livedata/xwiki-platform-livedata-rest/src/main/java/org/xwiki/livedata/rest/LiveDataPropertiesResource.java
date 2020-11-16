@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Properties;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -47,7 +46,6 @@ public interface LiveDataPropertiesResource
      * Provides the list of properties known by a specific {@link LiveDataSource} implementation.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
      * @return the list of properties known / supported by specified {@link LiveDataSource} component implementation
@@ -56,7 +54,6 @@ public interface LiveDataPropertiesResource
     @GET
     Properties getProperties(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
         @QueryParam("namespace") @DefaultValue("") String namespace
     ) throws Exception;
 
@@ -64,7 +61,6 @@ public interface LiveDataPropertiesResource
      * Adds a new property to the data set.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
      * @param propertyDescriptor describes the property to add
@@ -74,7 +70,6 @@ public interface LiveDataPropertiesResource
     @POST
     Response addProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
         @QueryParam("namespace") @DefaultValue("") String namespace,
         PropertyDescriptor propertyDescriptor
     ) throws Exception;

@@ -28,9 +28,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataEntryPropertyResource;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 
 /**
  * Default implementation of {@link LiveDataEntryPropertyResource}.
@@ -45,10 +45,10 @@ public class DefaultLiveDataEntryPropertyResource extends AbstractLiveDataResour
     implements LiveDataEntryPropertyResource
 {
     @Override
-    public Object getProperty(String sourceId, StringMap sourceParams, String entryId, String propertyId,
-        String namespace) throws Exception
+    public Object getProperty(String sourceId, String namespace, String entryId, String propertyId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(sourceId, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
             Optional<Object> value = source.get().getEntries().get(entryId, propertyId);
             if (value.isPresent()) {
@@ -60,10 +60,11 @@ public class DefaultLiveDataEntryPropertyResource extends AbstractLiveDataResour
     }
 
     @Override
-    public Response setProperty(String sourceId, StringMap sourceParams, String entryId, String propertyId,
-        Object value, String namespace) throws Exception
+    public Response setProperty(String sourceId, String namespace, String entryId, String propertyId, Object value)
+        throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(sourceId, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
             source.get().getEntries().update(entryId, propertyId, value);
             Optional<Object> newValue = source.get().getEntries().get(entryId, propertyId);

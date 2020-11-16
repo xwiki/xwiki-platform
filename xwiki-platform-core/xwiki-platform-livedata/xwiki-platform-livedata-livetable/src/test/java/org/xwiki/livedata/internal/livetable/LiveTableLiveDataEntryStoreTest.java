@@ -19,24 +19,20 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
-import org.xwiki.livedata.LiveDataQuery.Filter;
-import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -53,17 +49,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,46 +83,36 @@ class LiveTableLiveDataEntryStoreTest
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
+    @MockComponent
+    private LiveTableRequestHandler liveTableRequestHandler;
+
     @Mock
     private XWikiContext xcontext;
 
     @Mock
     private XWiki xwiki;
 
-    @Mock
-    private XWikiRequest originalRequest;
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void before()
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getRequest()).thenReturn(this.originalRequest);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
         this.entryStore.getParameters().clear();
+
+        when(this.liveTableRequestHandler.getLiveTableResults(any(), any()))
+            .thenAnswer(invocation -> ((Supplier<String>) invocation.getArgument(1)).get());
     }
 
     @Test
     void getFromTemplate() throws Exception
     {
-        //
-        // Setup
-        //
-
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(new Source("liveTable"));
         query.getSource().setParameter("template", "getdocuments");
-        query.getSource().setParameter("childrenOf", "Test");
-        query.getSource().setParameter("queryFilters", "unique");
-        query.getSource().setParameter("translationPrefix", "core.restore.batch.");
-        query.setProperties(Arrays.asList("doc.title", "status", "hidden", "doc.author"));
-        query.setSort(Collections.singletonList(new SortEntry("doc.date", true)));
-        query
-            .setFilters(Collections.singletonList(new Filter("doc.author", "contains", false, "mflorea", "tmortagne")));
-        query.setLimit(5);
-        query.setOffset(13L);
 
         Map<String, Object> row = new HashMap<>();
         row.put("doc_title", "Some title");
@@ -157,34 +139,7 @@ class LiveTableLiveDataEntryStoreTest
         expectedLiveData.setCount(23);
         expectedLiveData.getEntries().add(entry);
 
-        Map<String, String[]> expectedRequestParams = new HashMap<>();
-        expectedRequestParams.put("offset", new String[] {"14"});
-        expectedRequestParams.put("limit", new String[] {"5"});
-        expectedRequestParams.put("collist", new String[] {"doc.title,status,hidden,doc.author"});
-        expectedRequestParams.put("sort", new String[] {"doc.date"});
-        expectedRequestParams.put("dir", new String[] {"desc"});
-        expectedRequestParams.put("queryFilters", new String[] {"unique"});
-        expectedRequestParams.put("childrenOf", new String[] {"Test"});
-        expectedRequestParams.put("transprefix", new String[] {"core.restore.batch."});
-        expectedRequestParams.put("doc.author", new String[] {"mflorea", "tmortagne"});
-        expectedRequestParams.put("doc.author_match", new String[] {"partial"});
-        expectedRequestParams.put("doc.author/join_mode", new String[] {"OR"});
-
-        //
-        // Execution
-        //
-
         assertEquals(expectedLiveData, this.entryStore.get(query));
-
-        //
-        // Checks
-        //
-
-        ArgumentCaptor<XWikiRequest> requestCaptor = ArgumentCaptor.forClass(XWikiRequest.class);
-        verify(this.xcontext, times(2)).setRequest(requestCaptor.capture());
-        List<XWikiRequest> requests = requestCaptor.getAllValues();
-        assertRequestParameters(expectedRequestParams, requests.get(0).getParameterMap());
-        assertSame(this.originalRequest, requests.get(1));
     }
 
     @Test
@@ -212,15 +167,9 @@ class LiveTableLiveDataEntryStoreTest
     @Test
     void getFromResultPage() throws Exception
     {
-        //
-        // Setup
-        //
-
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(new Source("liveTable"));
         query.getSource().setParameter("resultPage", "Panels.LiveTableResults");
-        query.getSource().setParameter("className", "Panels.PanelClass");
-        query.setProperties(Arrays.asList("doc.title", "_actions"));
 
         DocumentReference documentReference = new DocumentReference("foo", "Panels", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("Panels.LiveTableResults")).thenReturn(documentReference);
@@ -232,28 +181,7 @@ class LiveTableLiveDataEntryStoreTest
         LiveData expectedLiveData = new LiveData();
         expectedLiveData.setCount(3);
 
-        Map<String, String[]> expectedRequestParams = new HashMap<>();
-        expectedRequestParams.put("outputSyntax", new String[] {"plain"});
-        expectedRequestParams.put("collist", new String[] {"doc.title,_actions"});
-        expectedRequestParams.put("classname", new String[] {"Panels.PanelClass"});
-
-        //
-        // Execution
-        //
-
         assertEquals(expectedLiveData, this.entryStore.get(query));
-
-        //
-        // Checks
-        //
-
-        ArgumentCaptor<XWikiRequest> requestCaptor = ArgumentCaptor.forClass(XWikiRequest.class);
-        verify(this.xcontext, times(2)).setRequest(requestCaptor.capture());
-        List<XWikiRequest> requests = requestCaptor.getAllValues();
-        assertRequestParameters(expectedRequestParams, requests.get(0).getParameterMap());
-        assertSame(this.originalRequest, requests.get(1));
-
-        verify(this.xcontext).setAction("get");
     }
 
     @Test
@@ -275,12 +203,33 @@ class LiveTableLiveDataEntryStoreTest
         assertEquals(expectedLiveData, this.entryStore.get(query));
     }
 
-    private void assertRequestParameters(Map<String, String[]> expectedParams, Map<String, String[]> actualParams)
+    @Test
+    void getFromDefaultResultPageWithInvalidJSON() throws Exception
     {
-        assertEquals(expectedParams.size(), actualParams.size());
-        for (Map.Entry<String, String[]> expectedEntry : expectedParams.entrySet()) {
-            assertArrayEquals(expectedEntry.getValue(), actualParams.get(expectedEntry.getKey()),
-                expectedEntry.getKey() + " does't match!");
+        LiveDataQuery query = new LiveDataQuery();
+        query.setSource(new Source("liveTable"));
+
+        DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
+        when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("no JSON");
+
+        try {
+            this.entryStore.get(query);
+            fail();
+        } catch (LiveDataException e) {
+            assertEquals("Failed to execute the live data query.", e.getMessage());
         }
+    }
+
+    @Test
+    void getIdProperty()
+    {
+        assertEquals("doc.fullName", this.entryStore.getIdProperty());
+
+        this.entryStore.getParameters().put("idProperty", "entryId");
+        assertEquals("entryId", this.entryStore.getIdProperty());
     }
 }

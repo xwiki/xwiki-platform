@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Source;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -44,7 +43,6 @@ public interface LiveDataSourceResource
      * Provides information about the specified live data source component.
      * 
      * @param sourceId indicates the live data source component implementation
-     * @param sourceParams the source parameters
      * @param namespace the component manager name-space where to look for the specified live data source; if not
      *            specified then the context / current names-pace is used
      * @return information about the specified live data source
@@ -53,7 +51,6 @@ public interface LiveDataSourceResource
     @GET
     Source getSource(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
         @QueryParam("namespace") @DefaultValue("") String namespace
     ) throws Exception;
 }

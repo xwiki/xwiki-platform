@@ -118,4 +118,9 @@ public interface LiveDataEntryStore
      * @throws LiveDataException if removing the specified entry fails
      */
     Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException;
+
+    /**
+     * @return the property that identifies the live data entries for this store
+     */
+    String getIdProperty();
 }

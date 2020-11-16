@@ -51,7 +51,13 @@ class LiveTableRequest extends WrappingXWikiRequest
     @Override
     public String getParameter(String name)
     {
-        return this.parameters.get(name)[0];
+        return this.parameters.getOrDefault(name, new String[] {null})[0];
+    }
+
+    @Override
+    public String get(String name)
+    {
+        return this.getParameter(name);
     }
 
     @Override

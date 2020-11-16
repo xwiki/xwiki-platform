@@ -33,6 +33,9 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data REST Services</xwiki.extension.name>
+    <checkstyle.suppressions.location>
+      ${basedir}/src/checkstyle/checkstyle-suppressions.xml
+    </checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>

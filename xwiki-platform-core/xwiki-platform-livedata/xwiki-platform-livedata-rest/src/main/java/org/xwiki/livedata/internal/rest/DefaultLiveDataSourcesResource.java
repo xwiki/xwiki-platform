@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.rest.LiveDataSourcesResource;
 import org.xwiki.livedata.rest.model.jaxb.Source;
 import org.xwiki.livedata.rest.model.jaxb.Sources;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
 
@@ -51,13 +50,12 @@ public class DefaultLiveDataSourcesResource extends AbstractLiveDataResource imp
     @Override
     public Sources getSources(String namespace) throws Exception
     {
-        Optional<Collection<String>> hints = this.liveDataSourceManager.getAvailableSources(namespace);
-        if (hints.isPresent()) {
+        Optional<Collection<String>> sourceIds = this.liveDataSourceManager.getAvailableSources(namespace);
+        if (sourceIds.isPresent()) {
             Link self = new Link().withRel(Relations.SELF).withHref(this.uriInfo.getAbsolutePath().toString());
 
-            StringMap emptyParams = new StringMap();
-            List<Source> sources = hints.get().stream().map(hint -> createSource(hint, emptyParams, namespace))
-                .collect(Collectors.toList());
+            List<Source> sources = sourceIds.get().stream().map(this::getLiveDataQuerySource)
+                .map(querySource -> createSource(querySource, namespace)).collect(Collectors.toList());
             return (Sources) new Sources().withSources(sources).withLinks(self);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);

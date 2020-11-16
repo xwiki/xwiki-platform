@@ -237,19 +237,6 @@ public class LiveDataQuery
         }
 
         /**
-         * Creates a new constraint that uses the given value and operator.
-         * 
-         * @param value the value to match
-         * @param operator the operator to use
-         * @param readOnly whether the user can change the constraint or not
-         */
-        public Constraint(Object value, String operator, boolean readOnly)
-        {
-            this.value = value;
-            this.operator = operator;
-        }
-
-        /**
          * @return the operator to use between the property value and the value from this constraint
          */
         public String getOperator()

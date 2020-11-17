@@ -40,6 +40,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   
-  <content>application.index.title=Índice de la aplicación
-application.index.drawer=Índice de la aplicación</content>
+  <content>application.index.title=Índice de aplicaciones
+application.index.drawer=Índice de aplicaciones</content>
 </xwikidoc>

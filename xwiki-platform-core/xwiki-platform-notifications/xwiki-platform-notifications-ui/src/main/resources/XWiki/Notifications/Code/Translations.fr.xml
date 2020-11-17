@@ -95,8 +95,6 @@ notifications.filters.preferences.setEnabled.error=L'activation/désactivation d
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Vous devez activer les notifications dans vos préférences si vous désirez surveiller ces emplacements.
-notifications.toggle.label.off=INACTIF
-notifications.toggle.label.on=ACTIF
 
 ## Notifications formats
 notifications.format.alert=Alerte
@@ -166,6 +164,8 @@ notifications.rss.feedLinkDescription=Flux d'événements
 notifications.rss.feedTitle=Flux RSS des notifications
 notifications.rss.feedDescription=Ce flux RSS peut être personnalisé dans votre page de profil.
 notifications.rss.seeChanges=Modifications : {0}
+notifications.rss.defaultTitleWithPage=Nouvel événement le {0}
+notifications.rss.defaultTitle=Nouvel événement
 notifications.globalsettings.email=Courriels de notification
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Journalier
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Horaire

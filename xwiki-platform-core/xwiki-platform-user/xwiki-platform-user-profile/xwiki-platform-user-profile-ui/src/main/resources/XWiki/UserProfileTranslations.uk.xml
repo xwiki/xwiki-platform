@@ -57,6 +57,9 @@ user.profile.network.follow=Підписатися
 user.profile.network.unfollow=Відписатися
 user.profile.network.done=Готово
 user.profile.network.saving=Збереження...
-user.profile.network.error=Помилка збереження налаштувань повідомлення</content>
+user.profile.network.error=Помилка збереження налаштувань повідомлення
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
   
 </xwikidoc>

@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=टिपा
 help.tipsPanel.noTipMessage=कोणतीही टीप उपलब्ध नाही!
-help.tipsPanel.gettingStartedTip=आपण नवीन XWiki वापरकर्ते असल्यास, [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]] पहा.
-help.tipsPanel.jumpToPageTip=विकीमधील कोणत्याही पृष्ठावर Ctrl+G किंवा  Meta+G सह जा.\n[[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]] पहा.
-help.tipsPanel.improveXWikiTip=आपणास माहित आहे की आपण XWiki सुधारू शकता? [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] ला 5 मिनिटे द्या आणि या मुक्त स्रोत प्रकल्पात मदत करा!
+help.tipsPanel.gettingStartedTip=आपण नवीन XWiki वापरकर्ते असल्यास, [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]] पहा.
+help.tipsPanel.jumpToPageTip=विकीमधील कोणत्याही पृष्ठावर Ctrl+G किंवा  Meta+G सह जा.\n[[more shortcuts&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]] पहा.
+help.tipsPanel.improveXWikiTip=आपणास माहित आहे की आपण XWiki सुधारू शकता? [[fill this survey&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] ला 5 मिनिटे द्या आणि या मुक्त स्रोत प्रकल्पात मदत करा!
 help.tipsPanel.breadcrumbsTip=सोबतच्या आणि आतील पृष्ठांवर द्रुत नेव्हिगेट करण्यासाठी आपण ब्रेडक्रंब घटकांच्या पुढील बाणांवर क्लिक करू शकता.
-help.tipsPanel.advancedHiddenShortcutTip=[[Advanced mode&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] आणि x + टॉगल करण्यासाठी x + x + x + की की कॉम्बो दाबा. [[hidden pages&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] चे प्रदर्शन टॉगल करण्यासाठी x + x + एच.
+help.tipsPanel.advancedHiddenShortcutTip=[[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] आणि x + टॉगल करण्यासाठी x + x + x + की की कॉम्बो दाबा. [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] चे प्रदर्शन टॉगल करण्यासाठी x + x + एच.
 help.tipsPanel.linkAutocompleteWYSIWYGTip=WYSIWYG मध्ये संपादन करताना, ## [## टाइप करा आणि नंतर दुवा तयार करण्यासाठी सूचना मिळविण्यासाठी अक्षरे टाइप करण्यास प्रारंभ करा.
 help.macroList.title=उपलब्ध मॅक्रो
 help.macroList.id=आयडी

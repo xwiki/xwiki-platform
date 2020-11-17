@@ -48,13 +48,13 @@ administration.menu.search.hint=Buscar...
 administration.menu.search.noResults=No hay resultados.
 
 # Registration Section
-XWiki.XWikiPreferences_use_email_verification.hint=Si la respuesta es "Sí", se enviará un correo electrónico a la dirección de correo electrónico indicada al rellenar el formulario de registro.
-XWiki.XWikiPreferences_validation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios para validar su dirección de correo electrónico.
-XWiki.XWikiPreferences_confirmation_email_content.hint=La plantilla de correo electrónico que corresponde al correo que se envía después de que el usuario valide su cuenta haciendo clic en el enlace de validación en el primer correo electrónico que recibe.
-XWiki.XWikiPreferences_invitation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios que quieran registrarse.
+XWiki.XWikiPreferences_use_email_verification.hint=Si la respuesta es "Sí", se enviará un mensaje a la dirección de correo electrónico indicada al rellenar el formulario de registro.
+XWiki.XWikiPreferences_validation_email_content.hint=La plantilla del mensaje que se enviará a los usuarios para validar su dirección de correo electrónico.
+XWiki.XWikiPreferences_confirmation_email_content.hint=La plantilla de correo electrónico que corresponde al correo que se envía tras validar el usuario su cuenta clicando en el enlace de validación en el primer mensaje que recibe.
+XWiki.XWikiPreferences_invitation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios invitados a registrarse.
 
-XWiki.Registration_heading.hint=Esta es la línea en la parte superior de la página que se muestra a las personas que se están registrando y cuando se acaban de registrar. Se puede usar sintaxis velocity y wiki.
-XWiki.Registration_welcomeMessage.hint=Esto sólo se muestra cuando la gente está rellenando el formulario. Se puede usar sintaxis velocity ywiki.
+XWiki.Registration_heading.hint=Esta es la línea en la parte superior de la página que se muestra a las personas que se están registrando y cuando se acaban de registrar. Se puede usar sintaxis Velocity y wiki.
+XWiki.Registration_welcomeMessage.hint=Solo se muestra cuando alguna persona está rellenando el formulario. Se puede usar sintaxis Velocity y wiki.
 XWiki.Registration_liveValidation_enabled.hint=Defina esta opción como false para desactivar el código JavaScript de validación en tiempo real (los campos seguirán siendo validados en el lado del servidor).
 XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validación en tiempo real muestra un mensaje para indicar a los usuarios que han rellenado el campo satisfactoriamente. Este es el mensaje que recibirán si no se anula para un campo en particular. Se puede utilizar la sintaxis velocity.
 XWiki.Registration_loginButton_enabled.hint=Cuando el usuario se ha registrado, le proporcionamos un botón para que haga clic en el que publicará su nombre de usuario y contraseña en la acción de inicio de sesión y los hará iniciar sesión de inmediato. Sin embargo, esto hace que el nombre de usuario y la contraseña se devuelvan en el HTML, lo que puede ser inaceptable en función de sus necesidades de seguridad.
@@ -87,8 +87,8 @@ XWiki.XWikiPreferences_iconTheme.hint=Especifique el tema del icono que se utili
 XWiki.XWikiPreferences_colorTheme.hint=Especifique el tema de color que se utilizará de forma predeterminada.
 
 # Editing Sections
-admin.edit=Editando
-admin.edit.description=Configure el modo de edición, el editor WYSIWYG y las sintaxis disponibles.
+admin.edit=Edición
+admin.edit.description=Configura el modo de edición, el editor WYSIWYG y las sintaxis disponibles.
 admin.title=Título
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Evitar que los usuarios creen páginas wiki con títulos vacíos.
 XWiki.XWikiPreferences_editor.hint=Seleccione el tipo de editor que se utilizará de forma predeterminada para editar el contenido de la página.
@@ -109,21 +109,21 @@ XWiki.XWikiPreferences_timezone.hint=Establecer globalmente la zona horaria
 administration.section.import.hint=Comience subiendo un nuevo paquete o seleccionando uno de la lista de paquetes disponibles. El contenido del paquete seleccionado se mostrará a la derecha junto con las opciones de importación.
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
+administration.section.export.pages=Páginas
+administration.section.export.pages.all=Todas las páginas
 administration.section.export.withHistory.hint=Incluya el historial de páginas en la exportación. De lo contrario, sólo se exporta la última versión de una página.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-administration.section.export.packageName.hint=El nombre de archivo utilizado al generar el archivo comprimido con el contenido exportado.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.targetXWikiVersion=Versión de XWiki destino
+administration.section.export.targetXWikiVersion.hint=La versión de XWiki de la que quieres importar las páginas. Tu versión actual es {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 y superior
+administration.section.export.targetXWikiVersion.below12=Anteriores a la 12.0
+administration.section.export.packageName.hint=El nombre de fichero utilizado al generar el archivo comprimido con las páginas wiki exportadas.
+administration.section.export.moreOptions=Más opciones
+administration.section.export.lessOptions=Menos opciones
 administration.section.export.description.hint=La descripción del paquete, que se muestra al importar el paquete.
-administration.section.export.author.hint=El autor del paquete.
+administration.section.export.author.hint=El autor del paquete, mostrado al importar el paquete.
 administration.section.export.licence.hint=La licencia del contenido. Por ejemplo: LGPL, GPLV2, etc.
-administration.section.export.version.hint=La versión del paquete.
-administration.section.export.backupPack.hint=Especifique si el paquete se utilizará como copia de seguridad. Esta opción no afecta al contenido exportado. El único efecto es que la opción "Importar como paquete de copia de seguridad" estará preseleccionada cuando importe el paquete. La diferencia entre un paquete de copia de seguridad y un paquete normal es que en el primer caso el último autor de la página se conserva durante la importación, mientras que en el segundo caso el usuario que realiza la importación se convierte en el último autor de cada página importada.
+administration.section.export.version.hint=La versión del paquete, almacenada en el descriptor del paquete.
+administration.section.export.backupPack.hint=Preservar el autor de la página al importar las páginas. Esta opción no tiene efecto sobre el contenido exportado y se puede cambiar antes de la importación.
 
 # Users Section
 administration.section.users.enableUser.inProgress=Habilitando cuenta de usuario...
@@ -146,6 +146,10 @@ admin.other=Otro
 admin.other.description=Diversas configuraciones de extensiones.
 administration.section.analytics.status=Estado
 administration.section.analytics.status.hint=Determinar si el seguimiento en Google Analytics™ está activo o no
+
+# Social category
+admin.social=Social
+admin.social.description=Configuración de funciones sociales.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart

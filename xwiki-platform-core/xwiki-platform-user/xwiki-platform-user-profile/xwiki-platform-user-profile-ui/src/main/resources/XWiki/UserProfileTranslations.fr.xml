@@ -57,5 +57,8 @@ user.profile.network.follow=Commencer à suivre
 user.profile.network.unfollow=Arrêter de suivre
 user.profile.network.done=Terminé
 user.profile.network.saving=Enregistrement en cours…
-user.profile.network.error=Erreur à l'enregistrement des paramètres de notification</content>
+user.profile.network.error=Erreur à l'enregistrement des paramètres de notification
+user.profile.status.done=Terminé
+user.profile.status.saving=Enregistrement en cours…
+user.profile.status.error=Erreur lors de l'enregistrement du statut utilisateur</content>
 </xwikidoc>

@@ -157,9 +157,9 @@ public class LegacyEventMigrationJob
         List<Event> eventsToSave = getEventsToSave(events);
 
         // Save events
-        CompletableFuture<Event> future = null;
+        CompletableFuture<?> future = null;
         for (Iterator<Event> it = eventsToSave.iterator(); it.hasNext();) {
-            future = this.eventStore.saveEvent(it.next());
+            future = migrate(it.next());
         }
 
         // Wait until the last event of the batch is saved
@@ -173,15 +173,47 @@ public class LegacyEventMigrationJob
         }
     }
 
+    private CompletableFuture<?> migrate(Event event)
+    {
+        CompletableFuture<?> future = this.eventStore.saveEvent(event);
+
+        List<String> entities;
+        try {
+            entities = getReadEntities(event.getId());
+
+            for (String entity : entities) {
+                future = this.eventStore.saveEventStatus(new DefaultEventStatus(event, entity, true));
+            }
+        } catch (QueryException e) {
+            this.logger.error("Failed to get read entities associated with event [{}]", event.getId(), e);
+        }
+
+        return future;
+    }
+
+    private List<String> getReadEntities(String eventId) throws QueryException
+    {
+        Query query = this.queryManager.createQuery("select eventStatus.entityId from LegacyEventStatus eventStatus "
+            + "where eventStatus.activityEvent.id = :eventId", Query.HQL);
+        query.bindValue("eventId", eventId);
+
+        return query.execute();
+    }
+
     private Query prepareQuery() throws QueryException
     {
-        String queryString;
+        StringBuilder queryString = new StringBuilder();
+
+        // Take into account the provided minimum date
         if (getRequest().getSince() != null) {
-            queryString = "WHERE event.date >= :since";
-        } else {
-            queryString = "";
+            queryString.append("WHERE event.date >= :since ");
         }
-        Query query = this.queryManager.createQuery(queryString, Query.HQL);
+
+        // Speed up the feeling of completeness by handling most recent events first
+        queryString.append("ORDER BY event.date desc");
+
+        // Create the query
+        Query query = this.queryManager.createQuery(queryString.toString(), Query.HQL);
         query.setLimit(100);
         if (getRequest().getSince() != null) {
             query.bindValue("since", getRequest().getSince());
@@ -205,14 +237,14 @@ public class LegacyEventMigrationJob
             try {
                 if (!this.eventStore.getEvent(event.getId()).isPresent()
                     // Ensure that the event concerns a wiki that still exist.
-                    && (event.getWiki() == null || this.wikiDescriptorManager.exists(event.getWiki().getName())))
-                {
+                    && (event.getWiki() == null || this.wikiDescriptorManager.exists(event.getWiki().getName()))) {
                     eventsToSave.add(event);
                 }
             } catch (WikiManagerException e) {
-                logger.warn("Error while checking if the wiki [{}] exists. The event (id: [{}]) referencing this wiki "
-                    + "won't be migrated. Root cause: [{}].", event.getWiki().getName(), event.getId(),
-                    ExceptionUtils.getRootCauseMessage(e));
+                logger.warn(
+                    "Error while checking if the wiki [{}] exists. The event (id: [{}]) referencing this wiki "
+                        + "won't be migrated. Root cause: [{}].",
+                    event.getWiki().getName(), event.getId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

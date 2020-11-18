@@ -40,7 +40,7 @@ define({
       {
         property: "country",
         matchAll: true,
-        constrains: [
+        constraints: [
           {operator: "equals", value: "france"},
         ],
       },

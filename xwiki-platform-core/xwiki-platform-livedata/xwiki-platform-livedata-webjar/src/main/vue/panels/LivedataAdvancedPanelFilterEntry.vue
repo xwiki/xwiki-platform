@@ -89,7 +89,7 @@ export default {
   computed: {
     // The filter entry corresponding to the props
     filterEntry () {
-      return this.logic.getQueryFilterGroup(this.propertyId).constrains[this.filterIndex];
+      return this.logic.getQueryFilterGroup(this.propertyId).constraints[this.filterIndex];
     },
   },
 

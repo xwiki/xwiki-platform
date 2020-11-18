@@ -914,12 +914,12 @@ define([
     /**
      * Get the filters in the query data object associated to a property id
      * @param {String} propertyId
-     * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
+     * @returns {Array} The constraints array of the filter group, or empty array if it does not exist
      */
     getQueryFilters (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       const queryFilterGroup = this.getQueryFilterGroup(propertyId);
-      return queryFilterGroup && queryFilterGroup.constrains || [];
+      return queryFilterGroup && queryFilterGroup.constraints || [];
     },
 
 
@@ -1043,11 +1043,11 @@ define([
             this.data.query.filters.push({
               property: newEntry.property,
               matchAll: true,
-              constrains: [],
+              constraints: [],
             });
           }
           // add entry
-          this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+          this.getQueryFilterGroup(newEntry.property).constraints.splice(newEntry.index, 0, {
             operator: newEntry.operator,
             value: newEntry.value,
           });
@@ -1078,7 +1078,7 @@ define([
      */
     addFilter (property, operator, value, index) {
       if (index === undefined) {
-        index = ((this.getQueryFilterGroup(property) || {}).constrains || []).length;
+        index = ((this.getQueryFilterGroup(property) || {}).constraints || []).length;
       }
       return this.filter(property, -1, {
         property: property,
@@ -1116,7 +1116,7 @@ define([
         this.triggerEvent("filter", {
           type: "removeAll",
           property: property,
-          removedFilters: removedFilterGroups[0].constrains,
+          removedFilters: removedFilterGroups[0].constraints,
         });
         this.updateEntries().then(resolve, reject);
       });

@@ -152,6 +152,10 @@ public class LiveTableRequestHandler
             requestParams.put("limit", new String[] {String.valueOf(query.getLimit())});
         }
 
+        // The live table widget is sending this parameter (in order to avoid handling a response for an obsolete
+        // request) and some live table sources are expecting it.
+        requestParams.put("reqNo", new String[] {"1"});
+
         return requestParams;
     }
 

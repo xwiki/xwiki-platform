@@ -107,6 +107,7 @@ public class LiveTableRequestHandlerTest
         query.setOffset(13L);
 
         Map<String, String[]> expectedRequestParams = new HashMap<>();
+        expectedRequestParams.put("reqNo", new String[] {"1"});
         expectedRequestParams.put("outputSyntax", new String[] {"plain"});
         expectedRequestParams.put("classname", new String[] {"Panels.PanelClass"});
         expectedRequestParams.put("offset", new String[] {"14"});

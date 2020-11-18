@@ -46,8 +46,10 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiContext;
@@ -95,7 +97,10 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     public LiveData get(LiveDataQuery query) throws LiveDataException
     {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+            // We need to allow backslash escaping because some live table sources are generating the JSON by hand
+            // instead of serializing a map.
+            ObjectMapper objectMapper =
+                JsonMapper.builder().enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER).build();
             ObjectNode liveTableResults = getLiveTableResultsJSON(query, objectMapper);
             LiveData liveData = new LiveData();
             liveData.setCount(liveTableResults.path("totalrows").asLong());

@@ -52,6 +52,7 @@ import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,6 +81,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String HIDDEN = "hidden";
 
+    private static final String TRANSLATION_PREFIX = "translationPrefix";
+
     @SuppressWarnings("serial")
     private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
     {
@@ -92,6 +95,9 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private ContextualLocalizationManager localization;
 
     @Override
     public LiveDataConfiguration resolve(LiveTableConfiguration liveTableConfig) throws LiveDataException
@@ -132,7 +138,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         Source source = new Source();
         source.setId("liveTable");
-        for (String parameter : Arrays.asList("className", "resultPage", "queryFilters", "translationPrefix")) {
+        for (String parameter : Arrays.asList("className", "resultPage", "queryFilters", TRANSLATION_PREFIX)) {
             if (options.path(parameter).isTextual()) {
                 source.setParameter(parameter, options.path(parameter).asText());
             }
@@ -267,11 +273,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         LiveDataPropertyDescriptor propertyDescriptor = new LiveDataPropertyDescriptor();
         propertyDescriptor.setId(column);
-
-        JsonNode displayName = columnProperties.path("displayName");
-        if (displayName.isTextual()) {
-            propertyDescriptor.setName(displayName.asText());
-        }
+        propertyDescriptor.setName(getPropertyName(column, columnProperties, options));
 
         // The live table macro considers all columns, except for "actions", as sortable by default.
         propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
@@ -294,6 +296,18 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         }
 
         return propertyDescriptor;
+    }
+
+    private String getPropertyName(String column, ObjectNode columnProperties, ObjectNode options)
+    {
+        JsonNode displayName = columnProperties.path("displayName");
+        JsonNode translationPrefix = options.path(TRANSLATION_PREFIX);
+        if (displayName.isTextual()) {
+            return displayName.asText();
+        } else if (translationPrefix.isTextual()) {
+            return this.localization.getTranslationPlain(translationPrefix.asText() + column);
+        }
+        return column;
     }
 
     private DisplayerDescriptor getDisplayerConfig(String column, ObjectNode columnProperties)

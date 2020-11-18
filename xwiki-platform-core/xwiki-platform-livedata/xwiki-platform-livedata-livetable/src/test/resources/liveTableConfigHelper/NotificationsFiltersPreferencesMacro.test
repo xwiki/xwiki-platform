@@ -3,7 +3,7 @@
   "columns": ["name", "filterType", "eventTypes", "notificationFormats", "isEnabled", "_actions"],
   "columnProperties": {
     "name": {"sortable": false, "html": true, "filterable": "false"},
-    "filterType": {"sortable": false, "filterable": false},
+    "filterType": {"sortable": false, "filterable": false, "displayName": "Filter Type"},
     "eventTypes": {"sortable": "false", "html": true, "filterable": false},
     "notificationFormats": {"type": "hidden"},
     "isEnabled": {"sortable": false, "html" : true, "filterable": false},
@@ -46,6 +46,7 @@
     "propertyDescriptors":[
       {
         "id":"name",
+        "name":"Name",
         "sortable":false,
         "visible":true,
         "filterable":false,
@@ -53,6 +54,7 @@
       },
       {
         "id":"filterType",
+        "name":"Filter Type",
         "sortable":false,
         "visible":true,
         "filterable":false

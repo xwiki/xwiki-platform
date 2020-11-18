@@ -26,16 +26,20 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LiveTableLiveDataConfigurationResolver}.
@@ -48,6 +52,16 @@ class LiveTableLiveDataConfigurationResolverTest
 {
     @InjectMockComponents
     private LiveTableLiveDataConfigurationResolver liveTableLiveDataConfigResolver;
+
+    @MockComponent
+    private ContextualLocalizationManager localization;
+
+    @BeforeEach
+    void configure()
+    {
+        when(this.localization.getTranslationPlain("notifications.settings.filters.preferences.table.name"))
+            .thenReturn("Name");
+    }
 
     @ParameterizedTest
     @MethodSource("getTestData")

@@ -44,14 +44,43 @@
   },
   "meta":{
     "propertyDescriptors":[
-      {"id":"name","sortable":false,"filterable":false,"displayer":{"id":"html"}},
-      {"id":"filterType","sortable":false,"filterable":false},
-      {"id":"eventTypes","sortable":false,"filterable":false,"displayer":{"id":"html"}},
-      {"id":"notificationFormats","sortable":true,"visible":false,"filterable":true},
-      {"id":"isEnabled","sortable":false,"filterable":false,"displayer":{"id":"html"}},
+      {
+        "id":"name",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"filterType",
+        "sortable":false,
+        "visible":true,
+        "filterable":false
+      },
+      {
+        "id":"eventTypes",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"notificationFormats",
+        "sortable":true,
+        "visible":false,
+        "filterable":true
+      },
+      {
+        "id":"isEnabled",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
       {
         "id":"_actions",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{
           "id":"actions",

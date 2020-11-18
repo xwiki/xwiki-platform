@@ -276,9 +276,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         // The live table macro considers all columns, except for "actions", as sortable by default.
         propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
 
-        if (HIDDEN.equals(columnProperties.path(TYPE).asText())) {
-            propertyDescriptor.setVisible(false);
-        }
+        // We have to explicitly set the visibility because we don't set a property type to inherit from.
+        propertyDescriptor.setVisible(!HIDDEN.equals(columnProperties.path(TYPE).asText()));
 
         propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
 

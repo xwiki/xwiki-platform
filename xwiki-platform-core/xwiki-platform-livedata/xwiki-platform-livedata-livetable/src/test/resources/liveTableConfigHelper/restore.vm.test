@@ -35,6 +35,7 @@
       {
         "id":"doc.name",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{
           "id":"link",
@@ -44,6 +45,7 @@
       {
         "id":"doc.location",
         "sortable":true,
+        "visible":true,
         "filterable":true,
         "displayer":{
           "id":"html"
@@ -55,6 +57,7 @@
       {
         "id":"_actions",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{
           "id":"actions",

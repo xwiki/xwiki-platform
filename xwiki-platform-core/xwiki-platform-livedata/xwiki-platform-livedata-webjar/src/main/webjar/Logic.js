@@ -22,10 +22,11 @@
 define([
   "Vue",
   "xwiki-livedata",
-  //"polyfills"
+  "liveDataSource"
 ], function (
   Vue,
-  XWikiLivedata
+  XWikiLivedata,
+  liveDataSource
 ) {
 
   /**
@@ -84,6 +85,11 @@ define([
         logic: this,
       },
     });
+
+    // Fetch the data if we don't have any.
+    if (!this.data.data.entries.length) {
+      this.updateEntries();
+    }
   };
 
 
@@ -390,17 +396,13 @@ define([
 
 
     fetchEntries () {
-      return new Promise(function (resolve, reject) {
-        const err = new Error("Error while fetching entries");
-        // TODO: FETCH ENTRIES FROM HERE
-        reject(err);
-      });
+      return liveDataSource.getEntries(this.data.query);
     },
 
 
     updateEntries () {
       return this.fetchEntries()
-        .then(entries => this.data.data.entries = entries)
+        .then(data => this.data.data = data)
         .catch(err => console.error(err));
     },
 
@@ -502,8 +504,7 @@ define([
           pageIndex: pageIndex,
           previousPageIndex: previousPageIndex,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -557,8 +558,7 @@ define([
           pageSize: pageSize,
           previousPageSize: previousPageSize,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -812,8 +812,7 @@ define([
           descending: descending,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -864,8 +863,7 @@ define([
           level: toIndex,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -1065,8 +1063,7 @@ define([
           newEntry: newEntry,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -1121,8 +1118,7 @@ define([
           property: property,
           removedFilters: removedFilterGroups[0].constrains,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 

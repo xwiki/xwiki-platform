@@ -26,6 +26,8 @@ require.config({
   paths: {
     Logic: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'Logic.min')),
+    liveDataSource: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'liveDataSource.min.js', {'evaluate': true})),
     Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
     'xwiki-livedata': $jsontool.serialize($liveDataPath)
   }

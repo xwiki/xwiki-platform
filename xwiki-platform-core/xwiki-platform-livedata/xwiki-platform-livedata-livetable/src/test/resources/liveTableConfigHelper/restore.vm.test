@@ -22,7 +22,7 @@
     "properties":["doc.name","doc.location","_actions"],
     "source":{
       "id":"liveTable",
-      "template":"getdeleteddocuments",
+      "template":"getdeleteddocuments.vm",
       "translationPrefix":"core.restore.batch.",
       "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
     },

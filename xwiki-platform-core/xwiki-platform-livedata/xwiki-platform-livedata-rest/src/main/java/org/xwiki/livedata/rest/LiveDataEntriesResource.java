@@ -45,7 +45,31 @@ import org.xwiki.stability.Unstable;
 public interface LiveDataEntriesResource
 {
     /**
-     * Provides the list of live data entries.
+     * Provides the list of live data entries. Here's an example URL:
+     * 
+     * <pre>
+     * /liveData/sources/liveTable/entries?
+     * 
+     *   namespace=wiki%3Axwiki&
+     * 
+     *   sourceParams.className=Help.Applications.Movies.Code.MoviesClass&
+     *   sourceParams.translationPrefix=movies.livetable.&
+     * 
+     *   properties=doc.title&
+     *   properties=genre&
+     *   properties=releaseDate&
+     *   properties=director&
+     *   properties=_actions&
+     * 
+     *   filters.doc.title=contains%3Amee&
+     *   matchAll=doc.title&
+     * 
+     *   sort=releaseDate&
+     *   descending=false&
+     * 
+     *   offset=0&
+     *   limit=10
+     * </pre>
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if

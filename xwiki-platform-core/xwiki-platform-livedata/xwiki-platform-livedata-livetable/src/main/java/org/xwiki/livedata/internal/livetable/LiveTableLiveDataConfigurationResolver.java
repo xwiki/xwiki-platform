@@ -157,7 +157,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         Map<String, List<String>> parameters = getURLParameters(url);
         List<String> xpage = parameters.remove("xpage");
         if (xpage != null && !xpage.isEmpty() && !StringUtils.isEmpty(xpage.get(0)) && !"plain".equals(xpage.get(0))) {
-            source.setParameter("template", xpage.get(0));
+            source.setParameter("template", xpage.get(0) + ".vm");
             for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                 if (entry.getValue().size() > 1) {
                     source.setParameter(entry.getKey(), entry.getValue());

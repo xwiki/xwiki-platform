@@ -71,12 +71,13 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         return source;
     }
 
-    protected Map<String, List<String>> getLiveDataSourceParameters()
+    protected Map<String, Object> getLiveDataSourceParameters()
     {
-        Map<String, List<String>> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         this.uriInfo.getQueryParameters().forEach((key, values) -> {
             if (key.startsWith(SOURCE_PARAMS_PREFIX)) {
-                params.put(key.substring(SOURCE_PARAMS_PREFIX.length()), values);
+                Object value = values.size() == 1 ? values.get(0) : values;
+                params.put(key.substring(SOURCE_PARAMS_PREFIX.length()), value);
             }
         });
         return params;

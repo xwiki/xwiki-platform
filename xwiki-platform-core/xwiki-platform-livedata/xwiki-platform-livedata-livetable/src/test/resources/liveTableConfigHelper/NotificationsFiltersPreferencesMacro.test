@@ -29,6 +29,7 @@
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
       "translationPrefix":"notifications.settings.filters.preferences.table.",
       "format":"",
+      "queryFilters":"currentlanguage,hidden",
       "user":["xwiki:XWiki.mflorea","xwiki:XWiki.cdesableau"]
     },
     "filters":[

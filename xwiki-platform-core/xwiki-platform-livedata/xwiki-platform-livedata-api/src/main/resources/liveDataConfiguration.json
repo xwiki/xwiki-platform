@@ -53,6 +53,7 @@
     "pagination": {
       "maxShownPages": 10,
       "pageSizes": [15, 25, 50, 100],
+      "showEntryRange": true,
       "showNextPrevious": true
     }
   }

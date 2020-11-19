@@ -208,6 +208,20 @@ class XWikiContextContextStoreTest
     }
 
     @Test
+    void restoreDocument()
+    {
+        DocumentReference document = new DocumentReference("docwiki", "space", "doc");
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+        contextStore.put(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE, document);
+
+        this.store.restore(contextStore);
+
+        assertEquals(document, this.oldcore.getXWikiContext().getDoc().getDocumentReference());
+        assertEquals("docwiki", this.oldcore.getXWikiContext().getWikiId());
+    }
+
+    @Test
     void restoreAuthor() throws XWikiException
     {
         assertNull(this.oldcore.getXWikiContext().getAuthorReference());

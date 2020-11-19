@@ -437,7 +437,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         if (contextStore.containsKey(PROP_DOCUMENT_REFERENCE)) {
-            restoreDocument((DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE), xcontext);
+            DocumentReference document = (DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE);
+            restoreDocument(document, xcontext);
+
+            // Set the document's wiki when it's not explicitly set
+            if (storedWikiId == null) {
+                xcontext.setWikiReference(document.getWikiReference());
+            }
         } else if (storedWikiId != null) {
             // If no document reference is provided get the wiki home page
             try {

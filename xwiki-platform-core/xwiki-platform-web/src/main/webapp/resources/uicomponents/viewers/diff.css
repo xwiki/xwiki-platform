@@ -51,6 +51,8 @@ td.diff-line {
   /* Take all the available space. */
   width: 100%;
   vertical-align: middle;
+  /* Preserve code formatting and also wrap long lines that exceed the available width. */
+  white-space: pre-wrap;
 }
 
 .diff-line-added {

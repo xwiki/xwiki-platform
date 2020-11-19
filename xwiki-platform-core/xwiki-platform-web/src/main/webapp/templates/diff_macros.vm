@@ -26,8 +26,9 @@
       <tr #if ($block.isConflicting())class="diff-conflict"#end>
         <td class="diff-line-number">...</td>
         <td class="diff-line-number">...</td>
-        <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
-          +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+        #set ($previousMeta = "-$mathtool.add($block.previousStart, 1),$block.previousSize")
+        #set ($nextMeta = "+$mathtool.add($block.nextStart, 1),$block.nextSize")
+        <td class="diff-line diff-line-meta">@@ $previousMeta $nextMeta @@</td>
       </tr>
       #foreach ($line in $block)
         <tr #if ($block.isConflicting())class="diff-conflict"#end>
@@ -928,8 +929,9 @@ data-documentversion="$!version"##
       <tr>
         <td class="diff-line-number">...</td>
         <td class="diff-line-number">...</td>
-        <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
-          +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+        #set ($previousMeta = "-$mathtool.add($block.previousStart, 1),$block.previousSize")
+        #set ($nextMeta = "+$mathtool.add($block.nextStart, 1),$block.nextSize")
+        <td class="diff-line diff-line-meta">@@ $previousMeta $nextMeta @@</td>
       </tr>
       #foreach ($line in $block)
       <tr>

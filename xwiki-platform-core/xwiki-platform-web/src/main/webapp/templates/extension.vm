@@ -60,7 +60,6 @@
           #if ("$!request.search" != '') value="$escapetool.xml($request.search)"#{end}
           placeholder="$services.localization.render('extensions.search.tip')"/>
         <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
-        #set ($selectedRepositoryId = 'recommended')
         #if ($request.repo)
           #set ($selectedRepositoryId = $request.repo)
         #end
@@ -69,10 +68,6 @@
             ## Remote extensions repository
             <option value=""#if ($selectedRepositoryId == '') selected="selected"#end>
               $services.localization.render('extensions.search.repository.remote.label')
-            </option>
-            ## Recommended extensions repository (default)
-            <option value="recommended"#if ($selectedRepositoryId == 'recommended') selected="selected"#end>
-              $services.localization.render("extensions.search.repository.recommended.label")
             </option>
           </optgroup>
           <optgroup label="$services.localization.render('extension.search.repositoryGroup.local.label')">
@@ -88,6 +83,40 @@
         <span class="buttonwrapper">
           <button class="primary" type="submit">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
+      </div>
+
+      <div>
+        #if ($request.recommended == 'false')
+          #set($recommended = false)
+        #else
+          #set($recommended = true)
+        #end
+        #if ($request.indexed == 'false')
+          #set($indexed = false)
+        #else
+          #set($indexed = true)
+        #end
+        #if ($request.compatible == 'false')
+          #set($compatible = false)
+        #else
+          #set($compatible = true)
+        #end
+        #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
+        <input type="checkbox" title="$recommendedTooltip" id="switch_recommended" name="recommended"#if($recommended)checked#end>
+        <input type="hidden" name="recommended" value="false" />
+        <label for="switch_recommended" title="$recommendedTooltip">$escapetool.xml($services.localization.render('extensions.search.recommended.label'))</label>
+
+        #set($indexedTooltip = $escapetool.xml($services.localization.render('extensions.search.indexed.tooltip')))
+        <input type="checkbox" title="$indexedTooltip" id="switch_indexed" name="indexed"#if($indexed)checked#end>
+        <input type="hidden" name="indexed" value="false" />
+        <label for="switch_indexed" title="$indexedTooltip">$escapetool.xml($services.localization.render('extensions.search.indexed.label'))</label>
+
+        #if ($indexed)
+          #set($compatibleTooltip = $escapetool.xml($services.localization.render('extensions.search.compatible.tooltip')))
+          <input type="checkbox" title="$compatibleTooltip" id="switch_compatible" name="compatible"#if($compatible)checked#end>
+          <input type="hidden" name="compatible" value="false" />
+          <label for="switch_compatible" title="$compatibleTooltip">$escapetool.xml($services.localization.render('extensions.search.compatible.label'))</label>
+        #end
       </div>
     </form>
     ## Advanced search form.
@@ -209,7 +238,7 @@ ${name}##
     ## An extension that can be either upgraded or downgraded.
     ## Compare this version with the version that is currently installed to determine which button to display.
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
-    #if ($extension.compareTo($installedExtension) > 0)
+    #if ($extension.id.version.compareTo($installedExtension.id.version) > 0)
       #extensionUpgradeButtons($installedExtension 'upgrade')
     #else
       #extensionUpgradeButtons($installedExtension 'downgrade' true)

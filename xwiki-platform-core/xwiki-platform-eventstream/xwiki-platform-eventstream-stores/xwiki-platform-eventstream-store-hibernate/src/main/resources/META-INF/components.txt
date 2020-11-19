@@ -13,4 +13,3 @@ org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration
 org.xwiki.eventstream.store.internal.RecordableEventMigrator
 org.xwiki.eventstream.store.internal.VerboseLegacyEventStore
 org.xwiki.eventstream.store.internal.WikiDeletedListener
-org.xwiki.eventstream.store.internal.observation.LegacyEventStatusEventConverter

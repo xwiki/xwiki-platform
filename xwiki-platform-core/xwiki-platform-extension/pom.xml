@@ -36,6 +36,7 @@
     <module>xwiki-platform-extension-cluster</module>
     <module>xwiki-platform-extension-distribution</module>
     <module>xwiki-platform-extension-handlers</module>
+    <module>xwiki-platform-extension-index</module>
     <module>xwiki-platform-extension-script</module>
     <module>xwiki-platform-extension-ui</module>
     <module>xwiki-platform-extension-versioncheck</module>

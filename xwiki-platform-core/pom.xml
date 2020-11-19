@@ -186,6 +186,12 @@
                 <new>method java.lang.String org.xwiki.mentions.script.MentionsScriptService::format(java.lang.String, org.xwiki.mentions.DisplayStyle, java.lang.String)</new>
                 <justification>Young API. Redesign of the mention notifications mechanism.</justification>
               </item>
+              <item>
+                <code>java.field.constantValueChanged</code>
+                <old>field org.xwiki.search.solr.AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION</old>
+                <new>field org.xwiki.search.solr.AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION</new>
+                <justification>Not a breackage</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

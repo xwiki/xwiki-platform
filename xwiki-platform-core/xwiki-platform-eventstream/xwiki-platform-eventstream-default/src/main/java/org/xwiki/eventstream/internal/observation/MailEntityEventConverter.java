@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.store.internal.observation;
+package org.xwiki.eventstream.internal.observation;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -32,40 +33,38 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
-import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
-import org.xwiki.eventstream.store.internal.LegacyEvent;
-import org.xwiki.eventstream.store.internal.LegacyEventLoader;
-import org.xwiki.eventstream.store.internal.LegacyEventStatus;
+import org.xwiki.eventstream.EntityEvent;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.events.MailEntityAddedEvent;
+import org.xwiki.eventstream.events.MailEntityDeleteEvent;
+import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
-import org.xwiki.query.QueryException;
 
 /**
- * Convert all event status events to remote events and back to local events.
+ * Convert all mail entity events to remote events and back to local events.
  *
  * @version $Id$
- * @since 12.2
- * @since 11.10.4
+ * @since 12.10RC1
+ * @since 12.6.5
  */
 @Component
 @Singleton
-@Named("eventstatus")
-public class LegacyEventStatusEventConverter extends AbstractEventConverter
+@Named("mailentity")
+public class MailEntityEventConverter extends AbstractEventConverter
 {
     private static final Set<Class<? extends Event>> EVENTS =
-        new HashSet<>(Arrays.asList(EventStatusAddOrUpdatedEvent.class, EventStatusDeletedEvent.class));
+        new HashSet<>(Arrays.asList(MailEntityAddedEvent.class, MailEntityDeleteEvent.class));
 
     private static final String PROP_EVENTID = "eventId";
 
     private static final String PROP_ENTITYID = "entityId";
 
-    private static final String PROP_ISREAD = "isRead";
-
     @Inject
-    private LegacyEventLoader loader;
+    private EventStore store;
 
     @Inject
     private Logger logger;
@@ -75,7 +74,7 @@ public class LegacyEventStatusEventConverter extends AbstractEventConverter
     {
         if (EVENTS.contains(localEvent.getEvent().getClass())) {
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
-            remoteEvent.setSource(serializeLegacyEventStatus((LegacyEventStatus) localEvent.getSource()));
+            remoteEvent.setSource(serializeEntityEvent((EntityEvent) localEvent.getSource()));
 
             return true;
         }
@@ -83,16 +82,15 @@ public class LegacyEventStatusEventConverter extends AbstractEventConverter
         return false;
     }
 
-    private Serializable serializeLegacyEventStatus(LegacyEventStatus local)
+    private Serializable serializeEntityEvent(EntityEvent local)
     {
         Serializable remote = null;
 
         if (local != null) {
             Map<String, Object> map = new HashMap<>();
 
-            map.put(PROP_EVENTID, local.getActivityEvent().getEventId());
+            map.put(PROP_EVENTID, local.getEvent().getId());
             map.put(PROP_ENTITYID, local.getEntityId());
-            map.put(PROP_ISREAD, local.isRead());
 
             remote = (Serializable) map;
         }
@@ -106,7 +104,7 @@ public class LegacyEventStatusEventConverter extends AbstractEventConverter
         if (EVENTS.contains(remoteEvent.getEvent().getClass())) {
             try {
                 localEvent.setEvent((Event) remoteEvent.getEvent());
-                localEvent.setSource(unserializeLegacyEventStatus(remoteEvent.getSource()));
+                localEvent.setSource(unserializeEntityEvent(remoteEvent.getSource()));
 
                 return true;
             } catch (Exception e) {
@@ -117,22 +115,20 @@ public class LegacyEventStatusEventConverter extends AbstractEventConverter
         return false;
     }
 
-    private Object unserializeLegacyEventStatus(Serializable remote) throws QueryException
+    private Object unserializeEntityEvent(Serializable remote) throws EventStreamException
     {
         if (remote instanceof Map) {
             Map<String, ?> map = (Map<String, ?>) remote;
 
             String eventId = (String) map.get(PROP_EVENTID);
 
-            LegacyEvent event = this.loader.getLegacyEvent(eventId);
+            Optional<org.xwiki.eventstream.Event> event = this.store.getEvent(eventId);
 
-            LegacyEventStatus eventStatus = new LegacyEventStatus();
-
-            eventStatus.setActivityEvent(event);
-            eventStatus.setEntityId((String) map.get(PROP_ENTITYID));
-            eventStatus.setRead((Boolean) map.get(PROP_ISREAD));
-
-            return eventStatus;
+            if (event.isPresent()) {
+                return new DefaultEntityEvent(event.get(), (String) map.get(PROP_ENTITYID));
+            } else {
+                this.logger.warn("Could not find any event corresponding to the remote event with id [{}]", eventId);
+            }
         }
 
         return null;

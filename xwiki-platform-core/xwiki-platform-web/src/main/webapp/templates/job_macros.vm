@@ -21,7 +21,7 @@
 
 $services.template.execute('logging_macros.vm')
 
-#macro (displayJobProgressBar $jobStatus)
+#macro (displayJobProgressBar $jobStatus $hideLog)
   <div class="ui-progress">
     <div class="box info hidden" id="state-none-hint">
       $services.localization.render("job.state.NONE.hint")
@@ -35,7 +35,7 @@ $services.template.execute('logging_macros.vm')
       #set ($percent = $numbertool.toNumber($mathtool.mul($percent, 100)).intValue())
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
-    #if ($jobStatus && $jobStatus.logTail.size() > 0)
+    #if (!$hideLog && $jobStatus && $jobStatus.logTail.size() > 0)
       <p class="ui-progress-message">
         #printLogMessage($jobStatus.logTail.lastLogEvent)
       </p>

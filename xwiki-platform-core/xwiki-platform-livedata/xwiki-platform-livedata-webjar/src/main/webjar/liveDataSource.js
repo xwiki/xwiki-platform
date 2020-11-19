@@ -38,6 +38,7 @@ define(['jquery'], function($) {
         parameters.matchAll.push(filter.property);
       }
       parameters['filters.' + filter.property] = filter.constraints
+        .filter(constraint => constraint.value !== undefined)
         .map(constraint => constraint.operator + ':' + constraint.value);
     });
     // Add sort.

@@ -554,6 +554,8 @@ define([
         const previousPageSize = this.data.query.limit;
         if (pageSize === previousPageSize) { return void resolve(); }
         this.data.query.limit = pageSize;
+        // Reset the offset whenever the page size changes.
+        this.data.query.offset = 0;
         this.triggerEvent("pageSizeChange", {
           pageSize: pageSize,
           previousPageSize: previousPageSize,
@@ -1056,6 +1058,8 @@ define([
         if (this.getQueryFilters(oldEntry.property).length === 0) {
           this.removeAllFilters(oldEntry.property);
         }
+        // Reset the offset whenever the filters are updated.
+        this.data.query.offset = 0;
         // dispatch events
         this.triggerEvent("filter", {
           type: filteringType,
@@ -1112,6 +1116,8 @@ define([
           .findIndex(filterGroup => filterGroup.property === property);
         if (filterIndex === -1) { return void reject(); }
         const removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
+        // Reset the offset whenever the filters are updated.
+        this.data.query.offset = 0;
         // dispatch events
         this.triggerEvent("filter", {
           type: "removeAll",

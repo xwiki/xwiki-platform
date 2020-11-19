@@ -32,6 +32,19 @@
   <nav class="livedata-pagination">
 
     <!--
+      Display the pagination current entry range
+      Can be shown / hiden by the `pagination.showEntryRange` property
+      in the Livedata meta config
+    -->
+    <span
+      class="pagination-current-entries"
+      v-if="data.meta.pagination.showEntryRange"
+    >
+      Entries {{ logic.getFirstIndexOfPage() + 1 }} - {{ logic.getLastIndexOfPage() + 1 }}
+      out of {{ data.data.count }}
+    </span>
+
+    <!--
       Select the pagination size (number of entries per page)
       Can be shown / hiden by the `pagination.showPageSizeDropdown` property
       in the Livedata meta config
@@ -40,7 +53,7 @@
       class="pagination-page-size"
       v-if="data.meta.pagination.showPageSizeDropdown"
     >
-      Entries per page
+      per page of
       <select
         @change="logic.setPageSize(+$event.target.value)"
       >
@@ -55,19 +68,6 @@
     </span>
 
     <!--
-      Display the pagination current entry range
-      Can be shown / hiden by the `pagination.showEntryRange` property
-      in the Livedata meta config
-    -->
-    <span
-      class="pagination-current-entries"
-      v-if="data.meta.pagination.showEntryRange"
-    >
-      {{ logic.getFirstIndexOfPage() + 1 }} - {{ logic.getLastIndexOfPage() + 1 }}
-      of {{ data.data.count }}
-    </span>
-
-    <!--
       The actual pagination widget
       It dislays the the available pages numbers, and change to them on click.
       Not all page numbers are show depending of the `pagination.maxShownPages`
@@ -75,6 +75,7 @@
       Arrows can be shown to go to first, last, previous, next page.
     -->
     <nav class="pagination-indexes">
+      Page
       <!--
         Go to First Page button
         Can be shown / hiden by the `pagination.showFirstLast` property
@@ -133,10 +134,8 @@
           }"
           href="#"
           @click.prevent="logic.setPageIndex(pageIndex)"
-        >
-          <!-- pageIndex + 1 because pageIndex are 0-based -->
-          {{ pageIndex + 1 }}
-        </a>
+        >{{ pageIndex + 1 }}</a>
+        <!-- pageIndex + 1 because pageIndex are 0-based -->
       </template>
 
       <!--
@@ -252,17 +251,14 @@ export default {
 <style>
 
 .livedata-pagination {
+  color: #777777;
   margin-left: 1rem;
   font-size: 0.9em;
 }
 
-.livedata-pagination .pagination-current-entries {
-  color: #777777;
-  margin-right: 1rem;
-}
-
 .livedata-pagination .pagination-indexes {
   display: inline-block;
+  margin-left: 2rem;
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
@@ -270,6 +266,7 @@ export default {
 
 .livedata-pagination .page-nav {
   padding: 0px 3px;
+  color: inherit;
   cursor: pointer;
 }
 .livedata-pagination .page-nav.current {
@@ -282,9 +279,6 @@ export default {
   text-decoration: none;
 }
 
-.livedata-pagination .pagination-page-size {
-  margin-right: 1rem;
-}
 .livedata-pagination .pagination-page-size select {
   height: unset;
   padding: 2px 4px;

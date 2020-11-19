@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.context;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @ComponentList(RequestInitializer.class)
-public class XWikiContextContextStoreTest
+class XWikiContextContextStoreTest
 {
     private static final String WIKI = "wiki";
 
@@ -97,17 +98,17 @@ public class XWikiContextContextStoreTest
 
         doReturn("webapppath").when(this.oldcore.getSpyXWiki()).getWebAppPath(this.oldcore.getXWikiContext());
 
-        this.wikiURL = new URL("http", "host", 42, "file");
+        this.wikiURL = new URL("http", "host", 42, "/file");
         doReturn(this.wikiURL).when(this.oldcore.getSpyXWiki()).getServerURL(this.descriptor.getId(),
             this.oldcore.getXWikiContext());
 
-        this.requestwikiURL = new URL("https", "host2", 84, "file2");
+        this.requestwikiURL = new URL("https", "host2", 84, "/file2");
         doReturn(this.requestwikiURL).when(this.oldcore.getSpyXWiki()).getServerURL(REQUESTWIKI,
             this.oldcore.getXWikiContext());
     }
 
     @Test
-    public void saveEmpty()
+    void saveEmpty()
     {
         Map<String, Serializable> contextStore = new HashMap<>();
 
@@ -117,7 +118,7 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void save()
+    void save()
     {
         this.oldcore.getXWikiContext().setWikiId(WIKI);
 
@@ -129,7 +130,31 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void saveRequestwiki()
+    void saveRequest()
+    {
+        Map<String, String[]> parameters = new HashMap<>();
+        parameters.put("param1", new String[] {"value1", "value2"});
+        XWikiServletRequestStub request = new XWikiServletRequestStub(this.wikiURL, parameters);
+        this.oldcore.getXWikiContext().setRequest(request);
+
+        Map<String, Serializable> contextStore = new HashMap<>();
+
+        this.store.save(contextStore, Arrays.asList(XWikiContextContextStore.PREFIX_PROP_REQUEST));
+
+        assertEquals(3, contextStore.size());
+        assertEquals(this.wikiURL.toString(), contextStore.get(XWikiContextContextStore.PROP_REQUEST_URL).toString());
+        assertEquals(null, contextStore.get(XWikiContextContextStore.PROP_REQUEST_CONTEXTPATH));
+
+        Map<String, String[]> storedParameters =
+            (Map<String, String[]>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_PARAMETERS);
+        assertEquals(1, storedParameters.size());
+        Map.Entry<String, String[]> entry = storedParameters.entrySet().iterator().next();
+        assertEquals("param1", entry.getKey());
+        assertEquals(Arrays.asList(parameters.get("param1")), Arrays.asList(entry.getValue()));
+    }
+
+    @Test
+    void saveRequestwiki()
     {
         this.oldcore.getXWikiContext().setWikiId(WIKI);
         this.oldcore.getXWikiContext().setOriginalWikiId(this.oldcore.getXWikiContext().getWikiId());
@@ -154,13 +179,13 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void restoreEmpty()
+    void restoreEmpty()
     {
         this.store.restore(new HashMap<>());
     }
 
     @Test
-    public void restoreWiki()
+    void restoreWiki()
     {
         assertNotEquals(WIKI, this.oldcore.getXWikiContext().getWikiId());
         assertNull(this.oldcore.getXWikiContext().getRequest());
@@ -183,7 +208,7 @@ public class XWikiContextContextStoreTest
     }
 
     @Test
-    public void restoreAuthor() throws XWikiException
+    void restoreAuthor() throws XWikiException
     {
         assertNull(this.oldcore.getXWikiContext().getAuthorReference());
         assertNull(this.oldcore.getXWikiContext().get(XWikiDocument.CKEY_SDOC));

@@ -258,15 +258,15 @@ public class XWikiContextContextStore extends AbstractContextStore
             save((key, subkey) -> {
                 switch (subkey) {
                     case SUFFIX_PROP_REQUEST_BASE:
-                        saveRequestBase(contextStore, key, request);
+                        saveRequestBase(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_URL:
-                        saveRequestURL(contextStore, key, request);
+                        saveRequestURL(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_PARAMETERS:
-                        saveRequestParameters(contextStore, key, request);
+                        saveRequestParameters(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
@@ -282,12 +282,12 @@ public class XWikiContextContextStore extends AbstractContextStore
         }
     }
 
-    private void saveRequestBase(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestBase(Map<String, Serializable> contextStore, XWikiRequest request)
     {
         URL url = HttpServletUtils.getSourceURL(request);
 
         try {
-            contextStore.put(key, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
+            contextStore.put(PROP_REQUEST_BASE, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
         } catch (MalformedURLException e) {
             // Cannot happen
         }
@@ -295,9 +295,9 @@ public class XWikiContextContextStore extends AbstractContextStore
         saveRequestContextPath(contextStore, request);
     }
 
-    private void saveRequestURL(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestURL(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, HttpServletUtils.getSourceURL(request));
+        contextStore.put(PROP_REQUEST_URL, HttpServletUtils.getSourceURL(request));
 
         saveRequestContextPath(contextStore, request);
     }
@@ -307,15 +307,15 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_CONTEXTPATH, request.getContextPath());
     }
 
-    private void saveRequestParameters(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestParameters(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, new LinkedHashMap<>(request.getParameterMap()));
+        contextStore.put(PROP_REQUEST_PARAMETERS, new LinkedHashMap<>(request.getParameterMap()));
     }
 
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
-        saveRequestURL(contextStore, key, request);
-        saveRequestParameters(contextStore, key, request);
+        saveRequestURL(contextStore, request);
+        saveRequestParameters(contextStore, request);
     }
 
     @Override

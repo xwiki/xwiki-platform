@@ -45,4 +45,17 @@ public interface SolrCoreInitializer
      * @throws SolrException when failing to initialize the core
      */
     void initialize(SolrClient client) throws SolrException;
+
+    /**
+     * Indicate if the the core content is considered to be caching (it's possible to recreate it if the core is lost).
+     * In practice it's mostly used to decide where to store the core data to make clear what it is when looking at the
+     * permanent directory in case of embedded Solr.
+     * 
+     * @return true if the content of the core is considered to be cache
+     * @since 12.10RC1
+     */
+    default boolean isCache()
+    {
+        return false;
+    }
 }

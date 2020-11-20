@@ -631,13 +631,6 @@
         </exclusions>
       </dependency>
 
-      <!-- Used by solr-core, tika and less4j -->
-      <dependency>
-        <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>3.14.0</version>
-      </dependency>
-
       <!-- Used by solr-core and closure-compiler -->
       <dependency>
         <groupId>com.google.re2j</groupId>

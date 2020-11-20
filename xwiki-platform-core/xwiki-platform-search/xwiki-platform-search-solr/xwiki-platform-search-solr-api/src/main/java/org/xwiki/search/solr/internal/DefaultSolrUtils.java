@@ -133,14 +133,14 @@ public class DefaultSolrUtils implements SolrUtils
     /**
      * The name of the type text_general.
      * 
-     * @since 12.10RC1
+     * @since 12.10
      */
     public static final String SOLR_TYPE_TEXT_GENERAL = "text_general";
 
     /**
      * The name of the type text_generals.
      * 
-     * @since 12.10RC1
+     * @since 12.10
      */
     public static final String SOLR_TYPE_TEXT_GENERALS = "text_generals";
 

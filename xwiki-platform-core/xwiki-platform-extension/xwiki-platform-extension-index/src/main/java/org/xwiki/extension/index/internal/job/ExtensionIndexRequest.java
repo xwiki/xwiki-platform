@@ -32,7 +32,7 @@ import org.xwiki.job.AbstractRequest;
  * The request to use to configure the {@link ExtensionIndexJob} job.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class ExtensionIndexRequest extends AbstractRequest
 {

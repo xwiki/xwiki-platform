@@ -36,7 +36,7 @@ import static org.xwiki.mentions.MentionLocation.DOCUMENT;
  * Test of {@link MentionNotificationParameters}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 class MentionNotificationParametersTest
 {

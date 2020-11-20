@@ -57,7 +57,7 @@ public interface MailResender
      * @return the mail statuses and results for the resent mails
      * @throws MailStoreException if a mail status failed to be loaded. Note that no exception is raised if a mail
      *         message failed to be loaded from the store, in which case no entry will be returned in the returned list
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     default List<Pair<MailStatus, MailStatusResult>> resend(Map<String, Object> filterMap, int offset, int count)

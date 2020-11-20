@@ -34,7 +34,7 @@ import org.xwiki.rendering.block.MacroBlock;
  * Common class for the mention analyzers.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public abstract class AbstractDocumentMentionsAnalyzer
 {

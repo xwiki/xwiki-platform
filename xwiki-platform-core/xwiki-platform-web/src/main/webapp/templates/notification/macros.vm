@@ -220,7 +220,7 @@ $xwiki.getPlainUserName($user)##
  * @param translationKey the translation key of the title of the message, takes two parameters, the first one for the
  *                       user the second one for the group
  * @param icon the icon of the message
- * @since 12.10RC1
+ * @since 12.10
  *#
 #macro(displayGroupMessageNotification $compositeEvent $translationKey $icon)
   #define($content)

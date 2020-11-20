@@ -66,7 +66,7 @@ import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
  * Event listener for the mentions to local wiki users.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(UserMentionEventListener.TYPE)

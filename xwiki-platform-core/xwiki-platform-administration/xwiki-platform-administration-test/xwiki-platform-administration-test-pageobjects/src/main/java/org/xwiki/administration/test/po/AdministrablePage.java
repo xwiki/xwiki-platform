@@ -50,7 +50,7 @@ public class AdministrablePage extends ViewPage
      * Clicks on the "Administer Page" menu item.
      *
      * @return the page administration PO
-     * @since 12.10RC1
+     * @since 12.10
      */
     public AdministrationPage clickAdministerPage()
     {

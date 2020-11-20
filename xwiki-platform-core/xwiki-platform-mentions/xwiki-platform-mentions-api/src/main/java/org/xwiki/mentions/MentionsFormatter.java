@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * Unless you know statically the type of actor to format, {@link MentionFormatterProvider} should be used to resolve
  * the formatter to use according to the type of the actor.
  *
- * @since 12.10RC1
+ * @since 12.10
  * @see MentionFormatterProvider
  * @version $Id$
  */

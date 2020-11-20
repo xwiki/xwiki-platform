@@ -48,7 +48,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
  * Convert all mail entity events to remote events and back to local events.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  * @since 12.6.5
  */
 @Component

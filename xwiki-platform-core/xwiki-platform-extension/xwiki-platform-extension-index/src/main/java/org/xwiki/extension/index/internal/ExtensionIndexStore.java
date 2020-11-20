@@ -74,7 +74,7 @@ import org.xwiki.search.solr.SolrUtils;
  * An helper to manipulate the store of indexed extensions.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = ExtensionIndexStore.class)
 @Singleton

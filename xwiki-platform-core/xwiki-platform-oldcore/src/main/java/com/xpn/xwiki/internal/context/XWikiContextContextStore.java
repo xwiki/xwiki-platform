@@ -91,7 +91,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     /**
      * Name of the entry containing the action.
      * 
-     * @since 12.10RC1
+     * @since 12.10
      */
     public static final String PROP_ACTION = "action";
 

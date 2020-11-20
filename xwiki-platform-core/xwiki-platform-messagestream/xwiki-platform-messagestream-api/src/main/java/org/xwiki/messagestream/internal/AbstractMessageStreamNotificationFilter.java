@@ -35,7 +35,7 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
  * Base class for the message notification filters.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public abstract class AbstractMessageStreamNotificationFilter implements NotificationFilter
 {

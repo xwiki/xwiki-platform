@@ -33,7 +33,7 @@ import org.xwiki.search.solr.SolrException;
  * Initialize the Solr core dedicated to events storage.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionIndexSolrCoreInitializer.NAME)

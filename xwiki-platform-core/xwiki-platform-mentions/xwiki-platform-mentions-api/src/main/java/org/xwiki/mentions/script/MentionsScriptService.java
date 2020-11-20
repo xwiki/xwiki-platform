@@ -104,7 +104,7 @@ public class MentionsScriptService implements ScriptService
      * @param type the type of the actor to format
      * @return the formatted actor mention
      * @see MentionsFormatter#formatMention(String, DisplayStyle)
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     public String format(String actorReference, DisplayStyle style, String type)

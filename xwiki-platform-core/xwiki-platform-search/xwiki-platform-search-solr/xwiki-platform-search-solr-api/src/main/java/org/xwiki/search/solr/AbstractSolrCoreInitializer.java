@@ -669,7 +669,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to set the field
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     protected void setTextGeneralField(String name, boolean multiValued, boolean dynamic, Object... attributes)
@@ -979,7 +979,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @param attributes the attributes of the field to add
      * @param add true if the field type should be added, false for replace
      * @throws SolrException when failing to add the field
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     protected void setFieldType(FieldTypeDefinition definition, boolean add) throws SolrException

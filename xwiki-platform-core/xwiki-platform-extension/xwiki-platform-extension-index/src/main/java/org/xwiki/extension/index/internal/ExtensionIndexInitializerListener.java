@@ -35,7 +35,7 @@ import org.xwiki.observation.event.Event;
  * Start the indexer when XWiki starts.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionIndexInitializerListener.NAME)

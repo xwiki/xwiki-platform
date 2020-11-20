@@ -149,7 +149,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * @param count the number of rows to return. If 0 then all rows are returned
      * @return the mail results for the resent mails and null if an error occurred while loading the mail statuses
      *         from the store
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     public List<ScriptMailResult> resend(Map<String, Object> filterMap, int offset, int count)

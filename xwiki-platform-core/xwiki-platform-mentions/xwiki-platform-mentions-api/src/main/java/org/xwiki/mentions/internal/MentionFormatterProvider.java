@@ -26,7 +26,7 @@ import org.xwiki.mentions.MentionsFormatter;
  * Provides a {@link MentionsFormatter} component according to the type of actor to format.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  * @see MentionsFormatter
  */
 @Role

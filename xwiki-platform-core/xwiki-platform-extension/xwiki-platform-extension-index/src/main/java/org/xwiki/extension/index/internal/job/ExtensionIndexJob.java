@@ -83,7 +83,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Update the index from configured repositories.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionIndexJob.JOB_TYPE)

@@ -296,7 +296,7 @@ public class LiveTableElement extends BaseElement
      *
      * @param actionName the HTML form element name attribute value
      * @param rowNumber the LT row number (starts at 1)
-     * @since 12.10RC1
+     * @since 12.10
      */
     public void clickAction(String actionName, int rowNumber)
     {

@@ -755,7 +755,7 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# values. We advise you to forbid at least the following mimetypes : text/html, text/javascript
 # attachment.download.blacklist=text/html,text/javascript
 
-#-# [Since 12.10RC1]
+#-# [Since 12.10]
 #-# Define the kind of attachment that you always want to be downloaded and never displayed inline.
 #-# By default this list is empty, but you can specify a list of mime-types (coma separated list of values) which
 #-# should be always downloaded no matter who attached them or what is the whitelist/blacklist configuration.

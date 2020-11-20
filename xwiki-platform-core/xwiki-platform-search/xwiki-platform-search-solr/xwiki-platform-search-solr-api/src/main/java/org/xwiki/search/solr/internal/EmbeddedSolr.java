@@ -97,7 +97,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     @Override
     public void initialize() throws InitializationException
     {
-        this.solrHomePath = Paths.get(this.solrConfiguration.getHomeDirectory());
+        this.solrHomePath = Paths.get(this.solrConfiguration.getHomeDirectory()).toAbsolutePath();
         this.solrSearchCorePath = this.solrHomePath.resolve(SolrClientInstance.CORE_NAME);
 
         try {
@@ -335,6 +335,6 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private Path resolveCacheCoreDataPath(String core)
     {
-        return this.environment.getPermanentDirectory().toPath().resolve("cache/solr/" + core);
+        return this.environment.getPermanentDirectory().toPath().resolve("cache/solr/" + core).toAbsolutePath();
     }
 }

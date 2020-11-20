@@ -110,5 +110,8 @@ public abstract class AbstractSolr implements Solr, Disposable
      */
     protected abstract SolrClient getInternalSolrClient(String coreName) throws SolrException;
 
+    /**
+     * @since 12.10
+     */
     protected abstract SolrClient createCore(SolrCoreInitializer initializer) throws SolrException;
 }

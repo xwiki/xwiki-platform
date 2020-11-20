@@ -52,7 +52,7 @@ public interface SolrCoreInitializer
      * permanent directory in case of embedded Solr.
      * 
      * @return true if the content of the core is considered to be cache
-     * @since 12.10RC1
+     * @since 12.10
      */
     default boolean isCache()
     {

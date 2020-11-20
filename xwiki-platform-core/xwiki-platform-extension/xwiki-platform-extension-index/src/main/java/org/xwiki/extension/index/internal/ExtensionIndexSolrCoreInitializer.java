@@ -94,6 +94,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     }
 
     @Override
+    public boolean isCache()
+    {
+        return true;
+    }
+
+    @Override
     protected void createSchema() throws SolrException
     {
         setStringField(SOLR_FIELD_EXTENSIONID, false, false);

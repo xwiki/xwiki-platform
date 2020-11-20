@@ -13,3 +13,4 @@ org.xwiki.ratings.internal.migration.R120901000XWIKI17761DataMigration
 org.xwiki.ratings.internal.migration.SolrDocumentMigration120900000
 org.xwiki.ratings.internal.RatingsConfigurationSource
 org.xwiki.ratings.internal.RatingDeletedEntityListener
+org.xwiki.ratings.internal.RatingMovedEntityListener

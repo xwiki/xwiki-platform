@@ -27,8 +27,10 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -37,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +57,9 @@ public class RatingDeletedEntityListenerTest
     @MockComponent
     private RatingsManagerFactory ratingsManagerFactory;
 
+    @MockComponent
+    private ObservationContext observationContext;
+
     @Test
     void onDocumentDeletedEvent() throws Exception
     {
@@ -68,6 +74,23 @@ public class RatingDeletedEntityListenerTest
         this.listener.onEvent(new DocumentDeletedEvent(reference), sourceDoc, null);
         verify(manager1).removeRatings(reference);
         verify(manager2).removeRatings(reference);
+    }
+
+    @Test
+    void onDocumentDeletedEventBecauseOfRenaming() throws Exception
+    {
+        RatingsManager manager1 = mock(RatingsManager.class);
+        RatingsManager manager2 = mock(RatingsManager.class);
+        when(ratingsManagerFactory.getInstantiatedManagers()).thenReturn(Arrays.asList(manager1, manager2));
+        when(observationContext.isIn(new DocumentRenamingEvent())).thenReturn(true);
+
+        XWikiDocument sourceDoc = mock(XWikiDocument.class);
+        DocumentReference reference = mock(DocumentReference.class);
+        when(sourceDoc.getDocumentReference()).thenReturn(reference);
+
+        this.listener.onEvent(new DocumentDeletedEvent(reference), sourceDoc, null);
+        verify(manager1, never()).removeRatings(reference);
+        verify(manager2, never()).removeRatings(reference);
     }
 
     @Test

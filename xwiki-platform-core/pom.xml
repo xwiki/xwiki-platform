@@ -192,6 +192,21 @@
                 <new>field org.xwiki.search.solr.AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION</new>
                 <justification>Not a breackage</justification>
               </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method long org.xwiki.ratings.RatingsManager::moveRatings(org.xwiki.model.reference.EntityReference, org.xwiki.model.reference.EntityReference) throws org.xwiki.ratings.RatingsException</new>
+                <justification>Young API.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.ratings.RatingsManager::setIdentifer(java.lang.String)</old>
+                <justification>Young API: fix typo.</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.ratings.RatingsManager::setIdentifier(java.lang.String)</new>
+                <justification>Young API: fix typo.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

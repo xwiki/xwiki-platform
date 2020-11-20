@@ -368,6 +368,13 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
+        SolrInputDocument document)
+    {
+        document.setField(fieldName, Collections.singletonMap(modifier, toString(fieldValue, valueType)));
+    }
+
+    @Override
     public void setString(String fieldName, Object fieldValue, SolrInputDocument document)
     {
         document.setField(fieldName, toString(fieldValue));

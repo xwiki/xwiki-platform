@@ -111,6 +111,14 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         return result;
     }
 
+    @Override
+    public long moveAverageRatings(EntityReference oldReference, EntityReference newReference)
+        throws RatingsException
+    {
+        // We don't need to do anything here: if a document reference has been moved then the xobject move with it.
+        return 0;
+    }
+
     private BaseObject retrieveAverageRatingXObject(EntityReference entityReference) throws Exception
     {
         DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);

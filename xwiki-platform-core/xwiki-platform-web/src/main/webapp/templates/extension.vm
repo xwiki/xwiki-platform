@@ -102,18 +102,18 @@
           #set($compatible = true)
         #end
         #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
-        <input type="checkbox" title="$recommendedTooltip" id="switch_recommended" name="recommended"#if($recommended)checked#end>
+        <input type="checkbox" title="$recommendedTooltip" id="switch_recommended" name="recommended"#if($recommended) checked#end>
         <input type="hidden" name="recommended" value="false" />
         <label for="switch_recommended" title="$recommendedTooltip">$escapetool.xml($services.localization.render('extensions.search.recommended.label'))</label>
 
         #set($indexedTooltip = $escapetool.xml($services.localization.render('extensions.search.indexed.tooltip')))
-        <input type="checkbox" title="$indexedTooltip" id="switch_indexed" name="indexed"#if($indexed)checked#end>
+        <input type="checkbox" title="$indexedTooltip" id="switch_indexed" name="indexed"#if($indexed) checked#end>
         <input type="hidden" name="indexed" value="false" />
         <label for="switch_indexed" title="$indexedTooltip">$escapetool.xml($services.localization.render('extensions.search.indexed.label'))</label>
 
         #if ($indexed)
           #set($compatibleTooltip = $escapetool.xml($services.localization.render('extensions.search.compatible.tooltip')))
-          <input type="checkbox" title="$compatibleTooltip" id="switch_compatible" name="compatible"#if($compatible)checked#end>
+          <input type="checkbox" title="$compatibleTooltip" id="switch_compatible" name="compatible"#if($compatible) checked#end>
           <input type="hidden" name="compatible" value="false" />
           <label for="switch_compatible" title="$compatibleTooltip">$escapetool.xml($services.localization.render('extensions.search.compatible.label'))</label>
         #end

@@ -91,7 +91,7 @@
         #else
           #set($recommended = true)
         #end
-        #if ($request.indexed == 'false' || $extensionManager.index.repository)
+        #if ($request.indexed == 'false' || !$extensionManager.index.repository)
           #set($indexed = false)
         #else
           #set($indexed = true)

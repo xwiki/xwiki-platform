@@ -2,6 +2,7 @@
   {
     "id":"Boolean",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"boolean"},
     "filter":{
@@ -14,12 +15,14 @@
   {
     "id":"ComputedField",
     "sortable":false,
+    "visible":true,
     "filterable":false,
     "displayer":{"id":"html"}
   },
   {
     "id":"DBList",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"suggest",
@@ -33,6 +36,7 @@
   {
     "id":"DBTreeList",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"suggest",
@@ -46,6 +50,7 @@
   {
     "id":"Date",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"date"},
     "filter":{
@@ -59,6 +64,7 @@
   {
     "id":"Email",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
@@ -73,6 +79,7 @@
   {
     "id":"Groups",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
@@ -87,6 +94,7 @@
   {
     "id":"Levels",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"list",
@@ -100,6 +108,7 @@
   {
     "id":"Number",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"number"},
     "filter":{
@@ -112,6 +121,7 @@
   {
     "id":"Page",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
@@ -126,11 +136,13 @@
   {
     "id":"Password",
     "sortable":false,
+    "visible":true,
     "filterable":false
   },
   {
     "id":"StaticList",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"list",
@@ -144,6 +156,7 @@
   {
     "id":"String",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"text",
@@ -157,6 +170,7 @@
   {
     "id":"TextArea",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{
@@ -171,6 +185,7 @@
   {
     "id":"Timezone",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "filter":{
       "id":"text",
@@ -184,6 +199,7 @@
   {
     "id":"Users",
     "sortable":true,
+    "visible":true,
     "filterable":true,
     "displayer":{"id":"html"},
     "filter":{

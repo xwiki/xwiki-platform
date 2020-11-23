@@ -81,7 +81,7 @@
         ## We don't use #em_submitButton because we want to use <button> instead of <input type="submit">, in order to 
         ## be able to use HTML content inside the text of the button (the search icon and the hidden span for screen readers).
         <span class="buttonwrapper">
-          <button class="primary" type="submit">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
+          <button class="primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
       </div>
 

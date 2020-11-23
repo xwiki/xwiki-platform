@@ -6,7 +6,12 @@
     "filterType": {"sortable": false, "filterable": false, "displayName": "Filter Type"},
     "eventTypes": {"sortable": "false", "html": true, "filterable": false},
     "notificationFormats": {"type": "hidden"},
-    "isEnabled": {"sortable": false, "html" : true, "filterable": false},
+    "isEnabled": {
+      "sortable": false,
+      "html" : true,
+      "filterable": false,
+      "class": "XWiki.Notifications.Code.ToggleableFilterPreferenceClass"
+    },
     "_actions": {"sortable": false, "actions": ["delete"], "filterable": false}
   },
   "options": {
@@ -75,8 +80,8 @@
       },
       {
         "id":"isEnabled",
+        "type":"Boolean",
         "sortable":false,
-        "visible":true,
         "filterable":false,
         "displayer":{"id":"html"}
       },

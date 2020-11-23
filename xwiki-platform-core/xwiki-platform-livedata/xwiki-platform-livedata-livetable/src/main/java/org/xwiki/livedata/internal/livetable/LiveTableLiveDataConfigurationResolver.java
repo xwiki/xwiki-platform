@@ -19,8 +19,6 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,8 +67,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Singleton
 public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigurationResolver<LiveTableConfiguration>
 {
-    private static final String UTF8 = "UTF-8";
-
     private static final String HTML = "html";
 
     private static final String LINK = "link";
@@ -84,6 +80,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     private static final String TRANSLATION_PREFIX = "translationPrefix";
 
     private static final String QUERY_FILTERS = "queryFilters";
+
+    private static final String CLASS_NAME = "className";
 
     @SuppressWarnings("serial")
     private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
@@ -100,6 +98,11 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     @Inject
     private ContextualLocalizationManager localization;
+
+    @Inject
+    private PropertyTypeSupplier propertyTypeSupplier;
+
+    private URLQueryStringParser urlQueryStringParser = new URLQueryStringParser();
 
     @Override
     public LiveDataConfiguration resolve(LiveTableConfiguration liveTableConfig) throws LiveDataException
@@ -140,7 +143,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         Source source = new Source();
         source.setId("liveTable");
-        for (String parameter : Arrays.asList("className", "resultPage", QUERY_FILTERS, TRANSLATION_PREFIX)) {
+        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", QUERY_FILTERS, TRANSLATION_PREFIX)) {
             if (options.path(parameter).isTextual()) {
                 source.setParameter(parameter, options.path(parameter).asText());
             }
@@ -165,7 +168,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private void addSourceParametersFromURL(Source source, String url) throws Exception
     {
-        Map<String, List<String>> parameters = getURLParameters(url);
+        Map<String, List<String>> parameters = this.urlQueryStringParser.parse(url);
         List<String> xpage = parameters.remove("xpage");
         if (xpage != null && !xpage.isEmpty() && !StringUtils.isEmpty(xpage.get(0)) && !"plain".equals(xpage.get(0))) {
             source.setParameter("template", xpage.get(0) + ".vm");
@@ -179,28 +182,6 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         }
     }
 
-    private Map<String, List<String>> getURLParameters(String url) throws Exception
-    {
-        URL baseURL = new URL("http://www.xwiki.org");
-        String queryString = new URL(baseURL, url).getQuery();
-        Map<String, List<String>> parameters = new HashMap<>();
-        for (String entry : queryString.split("&")) {
-            String[] parts = entry.split("=", 2);
-            String key = URLDecoder.decode(parts[0], UTF8);
-            if (key.isEmpty()) {
-                continue;
-            }
-            String value = parts.length == 2 ? URLDecoder.decode(parts[1], UTF8) : "";
-            List<String> values = parameters.get(key);
-            if (values == null) {
-                values = new ArrayList<>();
-                parameters.put(key, values);
-            }
-            values.add(value);
-        }
-        return parameters;
-    }
-
     private void processExtraParams(ObjectNode options, LiveDataQuery queryConfig)
     {
         JsonNode extraParamsNode = options.path("extraParams");
@@ -208,7 +189,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
             String extraParams = extraParamsNode.asText();
             try {
                 List<Filter> filters = new ArrayList<>();
-                Map<String, List<String>> parameters = getURLParameters('?' + extraParams);
+                Map<String, List<String>> parameters = this.urlQueryStringParser.parse('?' + extraParams);
                 for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                     if (queryConfig.getProperties().contains(entry.getKey())) {
                         // Convert to a live data property filter.
@@ -279,26 +260,24 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         LiveDataPropertyDescriptor propertyDescriptor = new LiveDataPropertyDescriptor();
         propertyDescriptor.setId(column);
         propertyDescriptor.setName(getPropertyName(column, columnProperties, options));
+        propertyDescriptor.setType(getPropertyType(column, columnProperties, options));
 
         // The live table macro considers all columns, except for "actions", as sortable by default.
         propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
 
-        // We have to explicitly set the visibility because we don't set a property type to inherit from.
-        propertyDescriptor.setVisible(!HIDDEN.equals(columnProperties.path(TYPE).asText()));
-
+        // We have to explicitly set the visibility if there is no property type to inherit from (or if the column has
+        // been marked as hidden).
+        boolean hidden = HIDDEN.equals(columnProperties.path(TYPE).asText());
+        if (propertyDescriptor.getType() == null || hidden) {
+            propertyDescriptor.setVisible(!hidden);
+        }
         propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
 
         // The live table macro considers all columns, except for "actions", as filterable by default.
         propertyDescriptor.setFilterable(columnProperties.path("filterable").asBoolean(!columnProperties.has(ACTIONS)));
-
         propertyDescriptor.setFilter(getFilterConfig(columnProperties));
 
         propertyDescriptor.setStyleName(columnProperties.path("headerClass").asText(null));
-
-        JsonNode className = columnProperties.path("class");
-        if (className.isTextual()) {
-            // TODO: Extract more information from the specified XWiki class (the property type).
-        }
 
         return propertyDescriptor;
     }
@@ -313,6 +292,22 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
             return this.localization.getTranslationPlain(translationPrefix.asText() + column);
         }
         return column;
+    }
+
+    private String getPropertyType(String column, ObjectNode columnProperties, ObjectNode options)
+    {
+        // The property type is specified by the class that owns the property, and the class name can be specified
+        // either in the column configuration, for each column, or in the live table configuration, for all live table
+        // columns.
+        JsonNode className = columnProperties.path("class");
+        if (!className.isTextual()) {
+            className = options.path(CLASS_NAME);
+            if (!className.isTextual()) {
+                // We cannot determine the property type without the class name.
+                return null;
+            }
+        }
+        return this.propertyTypeSupplier.getPropertyType(column, className.asText());
     }
 
     private DisplayerDescriptor getDisplayerConfig(String column, ObjectNode columnProperties)

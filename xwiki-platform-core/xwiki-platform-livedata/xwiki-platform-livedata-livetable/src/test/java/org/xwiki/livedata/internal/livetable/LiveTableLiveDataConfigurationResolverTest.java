@@ -56,11 +56,19 @@ class LiveTableLiveDataConfigurationResolverTest
     @MockComponent
     private ContextualLocalizationManager localization;
 
+    @MockComponent
+    private PropertyTypeSupplier propertyTypeSupplier;
+
     @BeforeEach
     void configure()
     {
         when(this.localization.getTranslationPlain("notifications.settings.filters.preferences.table.name"))
             .thenReturn("Name");
+
+        when(this.propertyTypeSupplier.getPropertyType("isEnabled",
+            "XWiki.Notifications.Code.ToggleableFilterPreferenceClass")).thenReturn("Boolean");
+        when(this.propertyTypeSupplier.getPropertyType("name", "Panels.PanelClass")).thenReturn("String");
+        when(this.propertyTypeSupplier.getPropertyType("type", "Panels.PanelClass")).thenReturn("StaticList");
     }
 
     @ParameterizedTest

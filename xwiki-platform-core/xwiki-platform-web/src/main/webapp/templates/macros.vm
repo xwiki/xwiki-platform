@@ -1296,7 +1296,7 @@ $Msz MB##
 {{html clean="false"}}
 #else {pre} #end
 #end
-#if ($request.useLiveData == 'true')
+#if ($services.liveData.liveTable && $request.useLiveData == 'true')
 #livetable_liveData($divid $collist $colprops $options)
 #else
 #livetable_html($divid $collist $colprops $options)

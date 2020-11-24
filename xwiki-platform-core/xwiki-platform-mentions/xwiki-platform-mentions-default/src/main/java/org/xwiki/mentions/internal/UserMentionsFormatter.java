@@ -42,7 +42,7 @@ import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
  * User implementation of {@link MentionsFormatter}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Singleton
 @Named(USER_MENTION_TYPE)

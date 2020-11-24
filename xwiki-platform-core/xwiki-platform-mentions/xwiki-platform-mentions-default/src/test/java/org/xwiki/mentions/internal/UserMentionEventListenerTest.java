@@ -71,7 +71,7 @@ import static org.xwiki.mentions.events.MentionEvent.EVENT_TYPE;
  * Test of {@link UserMentionEventListener}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 class UserMentionEventListenerTest

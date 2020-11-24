@@ -32,7 +32,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * identifier of the mention in a page, and the display style of the mention.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Unstable
 public class MentionNotificationParameter implements Serializable

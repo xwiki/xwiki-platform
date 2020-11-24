@@ -163,6 +163,23 @@ public interface SolrUtils
     void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document);
 
     /**
+     * Store in the document the value associated with the passed field name.
+     *
+     * @param modifier the atomic update modifier to apply (set, add, add-distinct, remove, removeregex, inc)
+     * @param fieldName the name of the field in the document
+     * @param fieldValue the value to store in the {@link SolrDocument}
+     * @param valueType the type to use as reference to serialize the value
+     * @param document the Solr document
+     * @since 12.10
+     */
+    @Unstable
+    default void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
+        SolrInputDocument document)
+    {
+        setAtomic(modifier, fieldName, fieldValue, document);
+    }
+
+    /**
      * Store in the document the values associated with the passed field name.
      * <p>
      * The field is expected to be multivalued.
@@ -172,6 +189,8 @@ public interface SolrUtils
      * @param document the Solr document
      */
     void set(String fieldName, Collection<?> fieldValue, SolrInputDocument document);
+
+
 
     /**
      * Store in the document the value associated with the passed field name.

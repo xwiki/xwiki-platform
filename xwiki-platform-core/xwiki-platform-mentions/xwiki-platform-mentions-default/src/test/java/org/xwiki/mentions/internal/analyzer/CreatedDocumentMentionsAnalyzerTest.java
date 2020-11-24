@@ -57,7 +57,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
  * Test of {@link CreatedDocumentMentionsAnalyzer}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 class CreatedDocumentMentionsAnalyzerTest

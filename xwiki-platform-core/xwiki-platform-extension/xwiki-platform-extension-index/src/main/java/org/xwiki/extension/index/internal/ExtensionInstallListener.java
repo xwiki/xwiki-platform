@@ -41,7 +41,7 @@ import org.xwiki.observation.event.Event;
  * Update the index when an extension is installed/uninstalled.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionInstallListener.NAME)

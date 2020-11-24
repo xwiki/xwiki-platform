@@ -43,7 +43,7 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * Test of {@link UserMentionsFormatter}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 class UserMentionsFormatterTest

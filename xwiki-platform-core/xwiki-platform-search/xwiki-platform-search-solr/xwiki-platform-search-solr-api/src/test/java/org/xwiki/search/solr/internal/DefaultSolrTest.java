@@ -55,6 +55,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -131,6 +132,8 @@ class DefaultSolrTest
 
         assertNotNull(client);
 
+        assertTrue(client.query(new SolrQuery()).getResults().isEmpty());
+
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put("name", "content");
         fieldAttributes.put("type", "string");
@@ -172,6 +175,8 @@ class DefaultSolrTest
 
         client.add(inputDocument);
         client.commit();
+
+        assertEquals(1, client.query(new SolrQuery()).getResults().size());
 
         SolrDocument storedDocument = client.getById("42");
 

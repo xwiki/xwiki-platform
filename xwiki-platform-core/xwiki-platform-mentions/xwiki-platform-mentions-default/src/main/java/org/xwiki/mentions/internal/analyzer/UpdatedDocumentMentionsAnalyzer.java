@@ -62,7 +62,7 @@ import static org.xwiki.mentions.MentionLocation.DOCUMENT;
  * Analyzes the new mentions on updated documents.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = { UpdatedDocumentMentionsAnalyzer.class })
 @Singleton

@@ -34,7 +34,7 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
  * 
  * @param <T> the extension type
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class SafeExtensionIndex<T extends ExtensionIndex> extends SafeAdvancedSearchableExtensionRepository<T>
     implements ExtensionIndex

@@ -133,14 +133,14 @@ public class DefaultSolrUtils implements SolrUtils
     /**
      * The name of the type text_general.
      * 
-     * @since 12.10RC1
+     * @since 12.10
      */
     public static final String SOLR_TYPE_TEXT_GENERAL = "text_general";
 
     /**
      * The name of the type text_generals.
      * 
-     * @since 12.10RC1
+     * @since 12.10
      */
     public static final String SOLR_TYPE_TEXT_GENERALS = "text_generals";
 
@@ -365,6 +365,13 @@ public class DefaultSolrUtils implements SolrUtils
     public void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document)
     {
         document.setField(fieldName, Collections.singletonMap(modifier, fieldValue));
+    }
+
+    @Override
+    public void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
+        SolrInputDocument document)
+    {
+        document.setField(fieldName, Collections.singletonMap(modifier, toString(fieldValue, valueType)));
     }
 
     @Override

@@ -476,6 +476,33 @@
                       <resource>properties.dtd</resource>
                     </resources>
                   </exception>
+                  <!-- Remove when https://issues.redhat.com/browse/IPROTO-177 is fixed -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>com.google.protobuf</groupId>
+                        <artifactId>protobuf-java</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.infinispan.protostream</groupId>
+                        <artifactId>protostream</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <resources>
+                      <resource>google/protobuf/any.proto</resource>
+                      <resource>google/protobuf/api.proto</resource>
+                      <resource>google/protobuf/compiler/plugin.proto</resource>
+                      <resource>google/protobuf/descriptor.proto</resource>
+                      <resource>google/protobuf/duration.proto</resource>
+                      <resource>google/protobuf/empty.proto</resource>
+                      <resource>google/protobuf/field_mask.proto</resource>
+                      <resource>google/protobuf/source_context.proto</resource>
+                      <resource>google/protobuf/struct.proto</resource>
+                      <resource>google/protobuf/timestamp.proto</resource>
+                      <resource>google/protobuf/type.proto</resource>
+                      <resource>google/protobuf/wrappers.proto</resource>
+                    </resources>
+                  </exception>
                 </exceptions>
                 <ignoredResourcePatterns>
                   <!-- Exclude XWiki's Component registration file -->

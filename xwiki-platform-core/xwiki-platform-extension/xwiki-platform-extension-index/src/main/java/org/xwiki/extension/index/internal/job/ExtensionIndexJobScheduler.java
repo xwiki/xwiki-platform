@@ -47,7 +47,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Component in charge of scheduling and stopping indexing jobs.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = ExtensionIndexJobScheduler.class)
 @Singleton

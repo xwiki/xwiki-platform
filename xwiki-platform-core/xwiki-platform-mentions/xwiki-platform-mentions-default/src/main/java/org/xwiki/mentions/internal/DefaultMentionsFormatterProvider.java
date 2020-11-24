@@ -40,7 +40,7 @@ import static org.xwiki.mentions.MentionsConfiguration.USER_MENTION_TYPE;
  * If the lookup fails, the default @link MentionFormatterProvider} component is returned.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Singleton

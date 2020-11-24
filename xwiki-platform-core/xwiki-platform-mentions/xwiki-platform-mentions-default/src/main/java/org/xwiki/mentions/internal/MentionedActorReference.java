@@ -27,7 +27,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * Represent the unique reference of a mentioned actor, composed of its serialized reference and its type.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class MentionedActorReference
 {

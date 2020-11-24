@@ -37,7 +37,7 @@ public interface MentionsConfiguration
      * <p>
      * This is also the default type when it is not defined.
      *
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     String USER_MENTION_TYPE = "user";

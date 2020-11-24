@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,6 +29,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -96,11 +95,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
-    protected SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException
+    protected SolrClient createCore(SolrCoreInitializer initializer) throws SolrException
     {
         CoreAdminRequest coreAdminRequest = new CoreAdminRequest.Create();
 
-        coreAdminRequest.setCoreName(coreName);
+        coreAdminRequest.setCoreName(initializer.getCoreName());
 
         try {
             coreAdminRequest.process(this.rootClient);
@@ -108,6 +107,6 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             throw new SolrException("Failed to create a new core", e);
         }
 
-        return getInternalSolrClient(coreName);
+        return getInternalSolrClient(initializer.getCoreName());
     }
 }

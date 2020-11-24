@@ -85,7 +85,7 @@ public class DownloadAction extends XWikiAction
 
     /**
      * Key of the forceDownload list in xwiki.properties.
-     * @since 12.10RC1
+     * @since 12.10
      */
     @Unstable
     public static final String FORCE_DOWNLOAD_PROPERTY = "attachment.download.forceDownload";

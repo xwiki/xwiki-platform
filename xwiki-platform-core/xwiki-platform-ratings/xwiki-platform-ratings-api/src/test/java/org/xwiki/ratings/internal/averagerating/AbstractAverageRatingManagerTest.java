@@ -86,6 +86,13 @@ public class AbstractAverageRatingManagerTest
         }
 
         @Override
+        public long moveAverageRatings(EntityReference oldReference, EntityReference newReference)
+            throws RatingsException
+        {
+            return 0;
+        }
+
+        @Override
         protected ObservationManager getObservationManager()
         {
             return AbstractAverageRatingManagerTest.this.observationManager;

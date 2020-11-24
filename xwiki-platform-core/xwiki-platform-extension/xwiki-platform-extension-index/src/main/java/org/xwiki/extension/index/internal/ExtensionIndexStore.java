@@ -74,7 +74,7 @@ import org.xwiki.search.solr.SolrUtils;
  * An helper to manipulate the store of indexed extensions.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = ExtensionIndexStore.class)
 @Singleton
@@ -253,15 +253,16 @@ public class ExtensionIndexStore implements Initializable
     /**
      * Update variable informations (recommended tag, ratings, etc.).
      * 
+     * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */
-    public void update(RemoteExtension remoteExtension) throws SolrServerException, IOException
+    public void update(ExtensionId extensionId, RemoteExtension remoteExtension) throws SolrServerException, IOException
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(remoteExtension.getId()), document);
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
             remoteExtension.isRecommended(), document);
@@ -276,6 +277,50 @@ public class ExtensionIndexStore implements Initializable
         }
 
         add(document);
+    }
+
+    /**
+     * Update variable informations (recommended tag, ratings, etc.) by copying it from another version.
+     * 
+     * @param extensionId the identifier of the extension to update
+     * @param copyVersion the version of the extension to copy
+     * @throws IOException If there is a low-level I/O error.
+     * @throws SolrServerException if there is an error on the server
+     */
+    public boolean update(ExtensionId extensionId, Version copyVersion) throws SolrServerException, IOException
+    {
+        // Get the version to copy
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
+            + this.utils.toFilterQueryString(toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
+        solrQuery.setFields(RemoteExtension.FIELD_RECOMMENDED, RatingExtension.FIELD_TOTAL_VOTES,
+            RatingExtension.FIELD_AVERAGE_VOTE);
+        solrQuery.setRows(1);
+        QueryResponse response = search(solrQuery);
+        SolrDocumentList documents = response.getResults();
+        if (documents.isEmpty()) {
+            return false;
+        }
+
+        SolrDocument copyDocument = documents.get(0);
+
+        // Update
+
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID, toSolrId(extensionId), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
+            copyDocument.get(RemoteExtension.FIELD_RECOMMENDED), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_TOTAL_VOTES,
+            copyDocument.get(RatingExtension.FIELD_TOTAL_VOTES), document);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_AVERAGE_VOTE,
+            copyDocument.get(RatingExtension.FIELD_AVERAGE_VOTE), document);
+
+        add(document);
+
+        return true;
     }
 
     /**

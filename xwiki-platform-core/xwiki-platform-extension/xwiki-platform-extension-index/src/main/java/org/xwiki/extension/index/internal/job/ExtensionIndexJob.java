@@ -83,7 +83,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Update the index from configured repositories.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionIndexJob.JOB_TYPE)
@@ -498,6 +498,11 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         if (!indexedVersions.contains(validExtension.getId().getVersion())) {
             this.indexStore.add(validExtension, false);
 
+            // Copy variable stuff (recommended, ratings, etc.) from current latest version
+            if (!indexedVersions.isEmpty()) {
+                this.indexStore.update(validExtension.getId(), indexedVersions.last());
+            }
+
             // Remember this extension version was added to the index
             indexedVersions.add(validExtension.getId().getVersion());
         }
@@ -536,8 +541,6 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     private void validateExtensions(Namespace namespace, Map<String, SortedSet<Version>> indexedExtensions,
         Map<String, Set<Namespace>> missingExtensions) throws SolrServerException, IOException
     {
-        boolean updated = false;
-
         this.progress.pushLevelProgress(indexedExtensions.size(), indexedExtensions);
 
         for (Map.Entry<String, SortedSet<Version>> entry : indexedExtensions.entrySet()) {
@@ -547,15 +550,15 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             SortedSet<Version> indexedVersions = entry.getValue();
 
             try {
-                updated |= validateExtension(extensionId, namespace, indexedVersions, missingExtensions);
+                if (validateExtension(extensionId, namespace, indexedVersions, missingExtensions)) {
+                    // Commit right way since validating an extension can be very slow and we want to get as many
+                    // extensions as possible as fast as possible in the search result
+                    this.indexStore.commit();
+                }
             } catch (Exception e) {
                 this.logger.error("Failed to validate extension with if [{}] on namespace [{}]", extensionId, namespace,
                     e);
             }
-        }
-
-        if (updated) {
-            this.indexStore.commit();
         }
 
         this.progress.popLevelProgress(indexedExtensions);
@@ -653,10 +656,16 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 }
 
                 // Update recommended and rating
-                if (extension instanceof RemoteExtension && this.indexStore.exists(extension.getId())) {
-                    this.indexStore.update((RemoteExtension) extension);
+                if (extension instanceof RemoteExtension) {
+                    SortedSet<Version> versions = indexedExtensions.get(extension.getId().getId());
+                    if (versions != null) {
+                        for (Version version : versions) {
+                            this.indexStore.update(new ExtensionId(extension.getId().getId(), version),
+                                (RemoteExtension) extension);
 
-                    updated = true;
+                            updated = true;
+                        }
+                    }
                 }
             }
 

@@ -40,7 +40,7 @@
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
       <!-- Select everything by default -->
-      <str name="q">*</str>
+      <str name="q">*:*</str>
     </lst>
   </requestHandler>
 

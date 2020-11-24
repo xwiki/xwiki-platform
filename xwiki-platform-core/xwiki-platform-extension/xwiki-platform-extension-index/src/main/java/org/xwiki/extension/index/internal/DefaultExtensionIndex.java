@@ -55,7 +55,7 @@ import org.xwiki.job.JobException;
  * The default implementation of {@link ExtensionIndex}, based on Solr.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Singleton

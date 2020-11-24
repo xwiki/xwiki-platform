@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiContext;
  * Filter that make sure a group message (to a group) from the message stream is visible only to members of this group.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Singleton

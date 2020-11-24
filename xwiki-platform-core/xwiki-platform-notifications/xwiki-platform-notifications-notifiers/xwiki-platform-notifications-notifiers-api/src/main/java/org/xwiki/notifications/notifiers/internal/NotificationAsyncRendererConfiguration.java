@@ -49,7 +49,8 @@ public class NotificationAsyncRendererConfiguration extends AsyncRendererConfigu
         this.notificationParameters = parameters;
         this.setContextEntries(new HashSet<>(Arrays.asList(
             XWikiContextContextStore.PROP_USER,
-            XWikiContextContextStore.PROP_REQUEST_WIKI
+            XWikiContextContextStore.PROP_REQUEST_WIKI,
+            XWikiContextContextStore.PROP_LOCALE
         )));
     }
 

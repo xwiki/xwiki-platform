@@ -34,10 +34,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -62,11 +64,16 @@ public class RatingDeletedEntityListener extends AbstractEventListener
         new DocumentDeletedEvent(),
         new WikiDeletedEvent());
 
+    private static final DocumentRenamingEvent RENAMING_EVENT = new DocumentRenamingEvent();
+
     @Inject
     private Logger logger;
 
     @Inject
     private RatingsManagerFactory ratingsManagerFactory;
+
+    @Inject
+    private ObservationContext observationContext;
 
     /**
      * Default constructor.
@@ -79,7 +86,9 @@ public class RatingDeletedEntityListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentDeletedEvent) {
+        // if the event is sent because of a rename, we ignore it: in that case RatingMovedEntityListener will be called
+        // and will handle properly the changes to be done.
+        if (event instanceof DocumentDeletedEvent && !this.observationContext.isIn(RENAMING_EVENT)) {
             XWikiDocument sourceDoc = (XWikiDocument) source;
             this.handleDeletedReference(sourceDoc.getDocumentReference());
         } else if (event instanceof XObjectDeletedEvent) {

@@ -47,6 +47,30 @@ public class SimpleSearchPane extends BaseElement
     private WebElement repositorySelect;
 
     /**
+     * The checkbox used to enable/disable recommended extensions filtering.
+     */
+    @FindBy(id = "switch_recommended")
+    private WebElement recommendedSwitch;
+
+    /**
+     * The checkbox used to enable/disable the use of the extensions index.
+     */
+    @FindBy(id = "switch_indexed")
+    private WebElement indexedSwitch;
+
+    /**
+     * The checkbox used to enable/disable compatible extensions filtering.
+     */
+    @FindBy(id = "switch_compatible")
+    private WebElement compatibleSwitch;
+
+    /**
+     * The button to reload the search.
+     */
+    @FindBy(id = "extensionSearchButton")
+    private WebElement button;
+
+    /**
      * The link to open the advanced search pane.
      */
     @FindBy(linkText = "Advanced search")
@@ -109,5 +133,55 @@ public class SimpleSearchPane extends BaseElement
         getDriver().waitUntilPageIsReloaded();
 
         return new SearchResultsPane();
+    }
+
+    private void setChecked(WebElement checkBox, boolean enabled)
+    {
+        if (enabled) {
+            if (checkBox.getAttribute("checked") == null) {
+                checkBox.click();
+            }
+        } else {
+            if (checkBox.getAttribute("checked") != null) {
+                checkBox.click();
+            }
+        }
+    }
+
+    /**
+     * @param enabled true if recommended extensions filter should be enabled
+     * @since 12.10
+     */
+    public void setRecommended(boolean enabled)
+    {
+        setChecked(this.recommendedSwitch, enabled);
+    }
+
+    /**
+     * @param enabled true if search should be based on the extensions index
+     * @since 12.10
+     */
+    public void setIndexed(boolean enabled)
+    {
+        setChecked(this.indexedSwitch, enabled);
+    }
+
+    /**
+     * @param enabled true if compatible extensions filter should be enabled
+     * @since 12.10
+     */
+    public void setCompatible(boolean enabled)
+    {
+        setChecked(this.compatibleSwitch, enabled);
+    }
+
+    /**
+     * Click the simple search button.
+     * 
+     * @since 12.10
+     */
+    public void clickButton()
+    {
+        this.button.click();
     }
 }

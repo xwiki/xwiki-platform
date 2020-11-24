@@ -51,7 +51,7 @@ import static org.xwiki.notifications.filters.NotificationFilter.FilterPolicy.NO
  * Test of {@link GroupMessageStreamNotificationFilter}.
  *
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 class GroupMessageStreamNotificationFilterTest

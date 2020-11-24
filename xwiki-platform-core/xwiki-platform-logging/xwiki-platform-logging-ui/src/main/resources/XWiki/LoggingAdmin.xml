@@ -73,7 +73,7 @@
 ##
 #if ($xwiki.hasAccessLevel('programming'))
   #set($void = $columns.add('actions'))
-  #set($void = $columnsProperties.put('actions', { 'html' : true, 'sortable' : false }))
+  #set($void = $columnsProperties.put('actions', { 'html' : true, 'sortable' : false, 'filterable' : false }))
 #end
 ##
 #livetable("logging" $columns $columnsProperties $options)

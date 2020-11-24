@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.XWikiServletResponse;
  * Wraps an XWiki response in order to allow capturing the live table results JSON.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class LiveTableResponse extends XWikiServletResponse
 {

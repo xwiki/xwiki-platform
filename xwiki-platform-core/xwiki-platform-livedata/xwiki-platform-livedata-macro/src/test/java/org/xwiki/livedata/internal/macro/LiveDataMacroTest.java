@@ -51,7 +51,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * Unit tests for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 @ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,

@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * 
  * @param <T> the input type
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Role
 @Unstable

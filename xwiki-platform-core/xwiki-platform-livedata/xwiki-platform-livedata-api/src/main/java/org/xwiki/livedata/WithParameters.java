@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
  * {@link ComponentInstantiationStrategy#PER_LOOKUP}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Unstable
 public class WithParameters

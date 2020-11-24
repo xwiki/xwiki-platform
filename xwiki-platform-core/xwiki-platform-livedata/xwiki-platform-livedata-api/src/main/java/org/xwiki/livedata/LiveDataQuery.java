@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * The query used to get the live data.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

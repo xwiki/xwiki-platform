@@ -60,7 +60,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Converts the Live Table configuration into Live Data configuration.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named("liveTable")

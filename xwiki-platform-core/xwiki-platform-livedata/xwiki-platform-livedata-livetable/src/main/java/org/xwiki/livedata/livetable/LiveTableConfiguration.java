@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Represents the configuration passed when creating a live table instance.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Unstable
 public class LiveTableConfiguration

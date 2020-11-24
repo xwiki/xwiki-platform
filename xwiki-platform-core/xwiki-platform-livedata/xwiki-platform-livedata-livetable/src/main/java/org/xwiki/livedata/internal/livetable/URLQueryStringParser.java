@@ -30,7 +30,7 @@ import java.util.Map;
  * Utility class to parse the query string from a given URL.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class URLQueryStringParser
 {

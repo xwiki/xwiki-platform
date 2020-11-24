@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
  * Unit tests for {@link LiveTableRequest}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 class LiveTableRequestTest
 {

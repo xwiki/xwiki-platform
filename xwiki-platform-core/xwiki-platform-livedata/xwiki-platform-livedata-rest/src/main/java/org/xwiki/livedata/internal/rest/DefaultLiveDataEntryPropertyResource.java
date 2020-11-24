@@ -36,7 +36,7 @@ import org.xwiki.livedata.rest.LiveDataEntryPropertyResource;
  * Default implementation of {@link LiveDataEntryPropertyResource}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryPropertyResource")

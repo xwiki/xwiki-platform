@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * The live data to display.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Unstable
 public class LiveData

@@ -36,7 +36,7 @@ import org.xwiki.livedata.rest.model.jaxb.Source;
  * Default implementation of {@link LiveDataSourceResource}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataSourceResource")

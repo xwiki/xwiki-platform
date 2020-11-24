@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests for {@link LiveDataConfiguration}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 class LiveDataConfigurationTest
 {

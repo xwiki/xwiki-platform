@@ -38,7 +38,7 @@ import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
  * Default implementation of {@link LiveDataPropertyResource}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyResource")

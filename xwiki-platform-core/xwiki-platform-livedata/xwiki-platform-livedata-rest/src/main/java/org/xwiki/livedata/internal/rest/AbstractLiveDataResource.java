@@ -55,7 +55,7 @@ import org.xwiki.rest.model.jaxb.Link;
  * Base class for live data REST resources.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public abstract class AbstractLiveDataResource extends XWikiResource
 {

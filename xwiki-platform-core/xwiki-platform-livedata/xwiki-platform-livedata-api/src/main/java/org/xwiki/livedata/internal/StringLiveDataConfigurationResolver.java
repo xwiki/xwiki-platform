@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Resolves the live data configuration from a JSON string input.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Singleton

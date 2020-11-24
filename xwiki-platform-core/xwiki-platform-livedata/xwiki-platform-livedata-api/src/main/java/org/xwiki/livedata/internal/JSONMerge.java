@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Merge JSON nodes.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 public class JSONMerge
 {

@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * The interface used to access the available live data sources.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Role
 @Unstable

@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * Scripting APIs for the Live Data implementation based on Live Table.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named(LiveDataScriptService.ROLEHINT + ".liveTable")

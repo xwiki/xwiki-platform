@@ -47,7 +47,7 @@ import com.xpn.xwiki.web.XWikiResponse;
  * Used to simulate a live table request and access the live table results.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = LiveTableRequestHandler.class)
 @Singleton

@@ -39,7 +39,7 @@ import org.xwiki.livedata.rest.model.jaxb.Entry;
  * Default implementation of {@link LiveDataEntryResource}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource")

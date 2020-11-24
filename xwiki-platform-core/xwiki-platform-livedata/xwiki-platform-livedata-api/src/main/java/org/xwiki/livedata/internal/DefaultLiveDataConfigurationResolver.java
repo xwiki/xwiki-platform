@@ -45,7 +45,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Adds default values to a live data configuration.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component
 @Singleton

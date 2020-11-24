@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link PropertyTypeSupplier}.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @ComponentTest
 public class PropertyTypeSupplierTest

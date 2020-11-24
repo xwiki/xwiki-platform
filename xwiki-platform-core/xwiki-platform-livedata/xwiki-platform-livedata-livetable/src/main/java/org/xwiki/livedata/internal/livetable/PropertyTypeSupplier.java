@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * Utility component to read the property type from an XWiki class.
  * 
  * @version $Id$
- * @since 12.10RC1
+ * @since 12.10
  */
 @Component(roles = PropertyTypeSupplier.class)
 @Singleton

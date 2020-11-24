@@ -36,9 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * A Java equivalent of a JSON map.
  * <p>
- * We don't generate this class from the schema because we need the {@link XmlJavaTypeAdapter} annotation on the
- * {@link #metaData} field. We tried various ways to add the {@link XmlJavaTypeAdapter} annotation to the
- * schema-generated class from the separate bindings file but none succeeded.
+ * We don't generate this class from the schema because we need the {@link XmlJavaTypeAdapter} annotation. We tried
+ * various ways to add the {@link XmlJavaTypeAdapter} annotation to the schema-generated class from the separate
+ * bindings file but none succeeded.
  * 
  * @version $Id$
  * @since 12.10
@@ -59,7 +59,8 @@ public class StringMap extends HashMap<String, Object>
      * 
      * @param json a serialized JSON object (the equivalent of a Java {@link Map}).
      * @return the corresponding {@link StringMap} instance
-     * @see https://blog.dejavu.sk/inject-custom-java-types-via-jax-rs-parameter-annotations/
+     * @see <a href="https://blog.dejavu.sk/inject-custom-java-types-via-jax-rs-parameter-annotations/">Inject custom
+     *      Java types via JSX-RS parameter annotations</a>
      */
     public static StringMap fromString(String json)
     {

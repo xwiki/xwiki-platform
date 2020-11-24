@@ -47,7 +47,7 @@ public interface LiveDataEntriesResource
     /**
      * Provides the list of live data entries. Here's an example URL:
      * 
-     * <pre>
+     * <pre>{@code
      * /liveData/sources/liveTable/entries?
      * 
      *   namespace=wiki%3Axwiki&
@@ -69,7 +69,7 @@ public interface LiveDataEntriesResource
      * 
      *   offset=0&
      *   limit=10
-     * </pre>
+     * }</pre>
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if

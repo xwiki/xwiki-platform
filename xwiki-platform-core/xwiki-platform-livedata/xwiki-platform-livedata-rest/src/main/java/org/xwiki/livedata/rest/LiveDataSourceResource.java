@@ -46,7 +46,7 @@ public interface LiveDataSourceResource
      * @param namespace the component manager name-space where to look for the specified live data source; if not
      *            specified then the context / current names-pace is used
      * @return information about the specified live data source
-     * @throws Exception
+     * @throws Exception if retrieving the specified live data source fails
      */
     @GET
     Source getSource(

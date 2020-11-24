@@ -296,12 +296,12 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         Select repositorySelect = adminPage.getSearchBar().getRepositorySelect();
         assertEquals("Recommended Extensions", repositorySelect.getFirstSelectedOption().getText());
 
-        // Check that a remote extension appears only in the list of "All Extensions".
+        // Check that a remote extension appears only in the list of "Available Extensions".
         adminPage.getSearchBar().selectRepository("installed");
         SearchResultsPane searchResults = adminPage.getSearchBar().search("alice");
         assertNull(searchResults.getExtension(extensionId));
 
-        adminPage.getSearchBar().getRepositorySelect().selectByVisibleText("All Extensions");
+        adminPage.getSearchBar().getRepositorySelect().selectByVisibleText("Available Extensions");
         adminPage = new ExtensionAdministrationPage();
         adminPage.waitUntilPageIsLoaded();
         // The value of the search input must be preserved when we switch the repository.

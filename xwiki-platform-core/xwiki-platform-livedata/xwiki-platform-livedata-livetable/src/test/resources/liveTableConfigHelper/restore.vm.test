@@ -24,7 +24,6 @@
       "id":"liveTable",
       "template":"getdeleteddocuments.vm",
       "translationPrefix":"core.restore.batch.",
-      "queryFilters":"currentlanguage,hidden",
       "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
     },
     "sort":[

@@ -38,6 +38,7 @@ import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
+import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -61,10 +62,15 @@ import com.xpn.xwiki.XWikiContext;
  * @since 12.10
  */
 @Component
-@Named("liveTable")
+@Named(LiveTableLiveDataEntryStore.ROLE_HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class LiveTableLiveDataEntryStore extends WithParameters implements LiveDataEntryStore
 {
+    /**
+     * The hint of this component implementation.
+     */
+    public static final String ROLE_HINT = "liveTable";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -128,17 +134,30 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
     private ObjectNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
     {
-        Object template = query.getSource().getParameters().get(LiveTableRequestHandler.TEMPLATE);
-        Object resultPage = query.getSource().getParameters().get(LiveTableRequestHandler.RESULT_PAGE);
-        String liveTableResultsJSON;
-        if (template instanceof String) {
-            liveTableResultsJSON = getLiveTableResultsFromTemplate((String) template, query);
-        } else if (resultPage instanceof String) {
-            liveTableResultsJSON = getLiveTableResultsFromPage((String) resultPage, query);
-        } else {
-            liveTableResultsJSON = getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
+        // Merge the parameters of this live data source with the parameters from the given query.
+        Source originalSource = query.getSource();
+        query.setSource(new Source(ROLE_HINT));
+        query.getSource().getParameters().putAll(getParameters());
+        if (originalSource != null) {
+            query.getSource().getParameters().putAll(originalSource.getParameters());
         }
-        return (ObjectNode) objectMapper.readTree(liveTableResultsJSON);
+
+        try {
+            Object template = query.getSource().getParameters().get(LiveTableRequestHandler.TEMPLATE);
+            Object resultPage = query.getSource().getParameters().get(LiveTableRequestHandler.RESULT_PAGE);
+            String liveTableResultsJSON;
+            if (template instanceof String) {
+                liveTableResultsJSON = getLiveTableResultsFromTemplate((String) template, query);
+            } else if (resultPage instanceof String) {
+                liveTableResultsJSON = getLiveTableResultsFromPage((String) resultPage, query);
+            } else {
+                liveTableResultsJSON = getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
+            }
+            return (ObjectNode) objectMapper.readTree(liveTableResultsJSON);
+        } finally {
+            // Restore the original query source.
+            query.setSource(originalSource);
+        }
     }
 
     private String getLiveTableResultsFromTemplate(String template, LiveDataQuery query) throws Exception

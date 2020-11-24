@@ -101,8 +101,6 @@ class LiveTableLiveDataEntryStoreTest
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        this.entryStore.getParameters().clear();
-
         when(this.liveTableRequestHandler.getLiveTableResults(any(), any()))
             .thenAnswer(invocation -> ((Supplier<String>) invocation.getArgument(1)).get());
     }
@@ -110,9 +108,7 @@ class LiveTableLiveDataEntryStoreTest
     @Test
     void getFromTemplate() throws Exception
     {
-        LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("liveTable"));
-        query.getSource().setParameter("template", "getdocuments");
+        this.entryStore.getParameters().put("template", "getdocuments");
 
         Map<String, Object> row = new HashMap<>();
         row.put("doc_title", "Some title");
@@ -139,15 +135,13 @@ class LiveTableLiveDataEntryStoreTest
         expectedLiveData.setCount(23);
         expectedLiveData.getEntries().add(entry);
 
-        assertEquals(expectedLiveData, this.entryStore.get(query));
+        assertEquals(expectedLiveData, this.entryStore.get(new LiveDataQuery()));
     }
 
     @Test
     void getFromResultPageWhenAccessDenied() throws Exception
     {
-        LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("liveTable"));
-        query.getSource().setParameter("resultPage", "Some.Page");
+        this.entryStore.getParameters().put("resultPage", "Some.Page");
 
         DocumentReference documentReference = new DocumentReference("foo", "Some", "Page");
         when(this.currentDocumentReferenceResolver.resolve("Some.Page")).thenReturn(documentReference);
@@ -157,7 +151,7 @@ class LiveTableLiveDataEntryStoreTest
             .checkAccess(Right.VIEW, documentReference);
 
         try {
-            this.entryStore.get(query);
+            this.entryStore.get(new LiveDataQuery());
             fail();
         } catch (LiveDataException e) {
             assertTrue(e.getCause() instanceof AccessDeniedException, "Expecting AccessDeniedException");
@@ -167,8 +161,11 @@ class LiveTableLiveDataEntryStoreTest
     @Test
     void getFromResultPage() throws Exception
     {
+        this.entryStore.getParameters().put("resultPage", "test");
+
+        // Verify that the query source parameters take precedence.
         LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("liveTable"));
+        query.setSource(new Source());
         query.getSource().setParameter("resultPage", "Panels.LiveTableResults");
 
         DocumentReference documentReference = new DocumentReference("foo", "Panels", "LiveTableResults");
@@ -187,9 +184,6 @@ class LiveTableLiveDataEntryStoreTest
     @Test
     void getFromDefaultResultPage() throws Exception
     {
-        LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("liveTable"));
-
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
 
@@ -200,15 +194,12 @@ class LiveTableLiveDataEntryStoreTest
         LiveData expectedLiveData = new LiveData();
         expectedLiveData.setCount(7);
 
-        assertEquals(expectedLiveData, this.entryStore.get(query));
+        assertEquals(expectedLiveData, this.entryStore.get(new LiveDataQuery()));
     }
 
     @Test
     void getFromDefaultResultPageWithInvalidJSON() throws Exception
     {
-        LiveDataQuery query = new LiveDataQuery();
-        query.setSource(new Source("liveTable"));
-
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
 
@@ -217,7 +208,7 @@ class LiveTableLiveDataEntryStoreTest
         when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("no JSON");
 
         try {
-            this.entryStore.get(query);
+            this.entryStore.get(new LiveDataQuery());
             fail();
         } catch (LiveDataException e) {
             assertEquals("Failed to execute the live data query.", e.getMessage());

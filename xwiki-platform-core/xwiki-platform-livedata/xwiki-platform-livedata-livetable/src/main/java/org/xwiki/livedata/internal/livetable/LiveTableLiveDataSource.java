@@ -25,6 +25,8 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
@@ -39,7 +41,7 @@ import org.xwiki.livedata.WithParameters;
 @Component
 @Named("liveTable")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataSource extends WithParameters implements LiveDataSource
+public class LiveTableLiveDataSource extends WithParameters implements LiveDataSource, Initializable
 {
     @Inject
     @Named("liveTable")
@@ -78,5 +80,12 @@ public class LiveTableLiveDataSource extends WithParameters implements LiveDataS
             ((WithParameters) this.propertyTypeStore).getParameters().putAll(this.getParameters());
         }
         return this.propertyTypeStore;
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Set default source parameters.
+        getParameters().put("queryFilters", "currentlanguage,hidden");
     }
 }

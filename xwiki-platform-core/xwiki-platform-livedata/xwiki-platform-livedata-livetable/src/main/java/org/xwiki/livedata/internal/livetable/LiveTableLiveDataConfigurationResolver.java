@@ -79,8 +79,6 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String TRANSLATION_PREFIX = "translationPrefix";
 
-    private static final String QUERY_FILTERS = "queryFilters";
-
     private static final String CLASS_NAME = "className";
 
     @SuppressWarnings("serial")
@@ -143,7 +141,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         Source source = new Source();
         source.setId("liveTable");
-        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", QUERY_FILTERS, TRANSLATION_PREFIX)) {
+        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", "queryFilters", TRANSLATION_PREFIX)) {
             if (options.path(parameter).isTextual()) {
                 source.setParameter(parameter, options.path(parameter).asText());
             }
@@ -159,9 +157,6 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
                     + "Root cause is [{}].", url, ExceptionUtils.getRootCauseMessage(e));
             }
         }
-
-        // Set the default query filters.
-        source.getParameters().putIfAbsent(QUERY_FILTERS, "currentlanguage,hidden");
 
         return source;
     }

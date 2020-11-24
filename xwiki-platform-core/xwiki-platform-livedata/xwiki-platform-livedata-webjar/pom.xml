@@ -166,7 +166,11 @@
   </build>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <!-- We don't use 'integration-tests' because:
+        * We cannot run the tests on CI yet (Chrome is not installed) and we're waiting for this issue
+          https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker.
+        * We don't have any JavaScript tests ATM anyway -->
+      <id>integration-tests-chrome</id>
       <build>
         <plugins>
           <plugin>

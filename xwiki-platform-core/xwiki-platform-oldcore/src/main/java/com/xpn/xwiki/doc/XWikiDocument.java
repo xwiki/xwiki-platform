@@ -1251,7 +1251,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(XWikiContext context) throws XWikiException
     {
         return displayDocument(getOutputSyntax(), context);
@@ -1267,7 +1266,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(boolean restricted, XWikiContext context) throws XWikiException
     {
         return displayDocument(getOutputSyntax(), restricted, context);
@@ -1283,7 +1281,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(targetSyntax, true, false, context, false);
@@ -1300,7 +1297,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, boolean restricted, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(targetSyntax, true, restricted, context, false);
@@ -5909,7 +5905,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the retrieved value or the default value.
      * @since 11.9RC1
      */
-    @Unstable
     public int getIntValue(DocumentReference classReference, String fieldName, int defaultValue)
     {
         BaseObject obj = getXObject(classReference, 0);
@@ -9015,7 +9010,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the maximum authorized length for a document full name.
      * @since 11.4RC1
      */
-    @Unstable
     public int getLocalReferenceMaxLength()
     {
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");

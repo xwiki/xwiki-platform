@@ -747,7 +747,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax) throws XWikiException
     {
         return this.doc.displayDocument(targetSyntax, getXWikiContext());
@@ -759,7 +758,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, boolean restricted) throws XWikiException
     {
         return this.doc.displayDocument(targetSyntax, restricted, getXWikiContext());
@@ -769,7 +767,6 @@ public class Document extends Api
      * @return the content of the current document rendered.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument() throws XWikiException
     {
         return this.doc.displayDocument(getXWikiContext());
@@ -780,7 +777,6 @@ public class Document extends Api
      * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(boolean restricted) throws XWikiException
     {
         return this.doc.displayDocument(restricted, getXWikiContext());
@@ -3233,7 +3229,6 @@ public class Document extends Api
      * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
      * @since 11.4RC1
      */
-    @Unstable
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();

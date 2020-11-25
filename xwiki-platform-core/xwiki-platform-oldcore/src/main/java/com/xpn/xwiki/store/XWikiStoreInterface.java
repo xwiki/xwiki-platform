@@ -575,6 +575,5 @@ public interface XWikiStoreInterface
      * @return an integer representing the limit size.
      * @since 11.4RC1
      */
-    @Unstable
     int getLimitSize(XWikiContext context, Class<?> entityType, String property);
 }

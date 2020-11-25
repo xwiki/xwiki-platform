@@ -30,7 +30,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Used as a placeholder for a the content passed to the wiki macro. It's resolved after the execution of the wiki
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(WikiMacroContentMacro.ID)
 @Singleton
-@Unstable
 public class WikiMacroContentMacro extends AbstractNoParameterMacro
 {
     /**

@@ -36,7 +36,6 @@ import org.xwiki.job.script.JobScriptService;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -213,7 +212,6 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @return the computed result
      * @since 11.10
      */
-    @Unstable
     protected <R> R wrapError(Callable<R> callable)
     {
         setError(null);
@@ -236,7 +234,6 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @return the safe version of the computed result
      * @since 11.10
      */
-    @Unstable
     protected <R> R safeWrapError(Callable<R> callable)
     {
         return wrapError(() -> safe(callable.call()));

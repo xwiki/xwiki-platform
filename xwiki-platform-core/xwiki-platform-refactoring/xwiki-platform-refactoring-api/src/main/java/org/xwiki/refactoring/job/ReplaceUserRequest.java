@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.job;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A job request that can be used to replace user references.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.8RC1
  */
-@Unstable
 public class ReplaceUserRequest extends EntityRequest
 {
     /**

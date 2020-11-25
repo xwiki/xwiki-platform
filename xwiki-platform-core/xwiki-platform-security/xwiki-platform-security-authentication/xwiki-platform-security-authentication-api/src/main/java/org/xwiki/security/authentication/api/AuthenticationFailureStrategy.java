@@ -21,7 +21,6 @@ package org.xwiki.security.authentication.api;
 
 import javax.servlet.http.HttpServletRequest;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Describes a strategy to perform in case the limit of authentication failures is reached.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.6RC1
  */
 @Role
-@Unstable
 public interface AuthenticationFailureStrategy
 {
     /**

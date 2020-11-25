@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Initialize the binding provided to the script macros. Called before executing each wiki macro is executed.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.11.9
  */
 @Role
-@Unstable
 public interface WikiMacroBindingInitializer
 {
     /**

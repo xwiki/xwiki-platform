@@ -68,7 +68,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -640,7 +639,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @return the {@link UninstallRequest}
      * @since 11.10
      */
-    @Unstable
     public UninstallRequest createUninstallRequest()
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
@@ -694,7 +692,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      *         {@code null} in case of failure
      * @since 11.10
      */
-    @Unstable
     public Job createUninstallPlan(UninstallRequest uninstallRequest)
     {
         setError(null);

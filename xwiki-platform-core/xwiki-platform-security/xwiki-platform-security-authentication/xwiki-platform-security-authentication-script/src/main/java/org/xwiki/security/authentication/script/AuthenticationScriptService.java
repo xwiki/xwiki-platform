@@ -36,7 +36,6 @@ import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.Programming;
@@ -47,7 +46,6 @@ import com.xpn.xwiki.util.Programming;
  * @version $Id$
  * @since 11.6RC1
  */
-@Unstable
 @Component
 @Named(SecurityScriptService.ROLEHINT + '.' + AuthenticationScriptService.ID)
 @Singleton

@@ -1823,7 +1823,6 @@ public class XWiki implements EventListener
      * @since 10.11.10
      * @since 11.6
      */
-    @Unstable
     public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
         XWikiContext context) throws XWikiException
     {
@@ -1839,7 +1838,6 @@ public class XWiki implements EventListener
      * @since 10.11.10
      * @since 11.6
      */
-    @Unstable
     public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
@@ -1857,7 +1855,6 @@ public class XWiki implements EventListener
      * @since 10.11.10
      * @since 11.6
      */
-    @Unstable
     public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
         boolean isMinorEdit, XWikiContext context) throws XWikiException
     {
@@ -4306,7 +4303,6 @@ public class XWiki implements EventListener
      * @return the user corresponding to that document reference.
      * @since 11.8RC1
      */
-    @Unstable
     public User getUser(DocumentReference userReference, XWikiContext context)
     {
         XWikiUser xwikiUser = new XWikiUser(userReference);

@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.preferences.email;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represent possible values for the "include diff" option of the user. We use an enum instead of Boolean so we can add
  * other values in the future (like having a simplified or a more complete diff, etc...).
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.11RC1
  */
-@Unstable
 public enum NotificationEmailDiffType
 {
     /**

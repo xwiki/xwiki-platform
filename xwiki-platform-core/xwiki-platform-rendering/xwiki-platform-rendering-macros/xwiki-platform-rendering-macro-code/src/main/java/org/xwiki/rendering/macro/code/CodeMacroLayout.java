@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro.code;
 
 import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
-import org.xwiki.stability.Unstable;
 
 /**
  * Values allowed in the <code>layout</code> parameter of the code macro.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.5RC1
  */
-@Unstable
 public enum CodeMacroLayout
 {
     /**

@@ -996,7 +996,6 @@ public abstract class XWikiAction extends Action
      * @throws XWikiException if the check fails
      * @since 11.3RC1
      */
-    @Unstable
     protected boolean csrfTokenCheck(XWikiContext context, boolean jsonAnswer) throws XWikiException
     {
         final boolean isAjaxRequest = Utils.isAjaxRequest(context);

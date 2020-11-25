@@ -21,7 +21,6 @@ package org.xwiki.resource;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents the type of Resource (eg Entity, Temporary, etc).
@@ -52,7 +51,6 @@ public class ResourceType
      *
      * @since 11.0
      */
-    @Unstable
     public ResourceType(String id, boolean isStatic)
     {
         this.id = id;
@@ -106,7 +104,6 @@ public class ResourceType
      *
      * @since 11.0
      */
-    @Unstable
     public boolean isStatic()
     {
         return this.isStatic;

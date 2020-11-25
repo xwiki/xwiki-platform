@@ -523,7 +523,6 @@ public class RefactoringScriptService implements ScriptService
      *         {@code null} in case of failure
      * @since 11.8RC1
      */
-    @Unstable
     public Job changeDocumentAuthor(DocumentReference oldAuthorReference, DocumentReference newAuthorReference)
     {
         ReplaceUserRequest request =
@@ -541,7 +540,6 @@ public class RefactoringScriptService implements ScriptService
      *         {@code null} in case of failure
      * @since 11.8RC1
      */
-    @Unstable
     public Job replaceUser(ReplaceUserRequest request)
     {
         return this.execute(RefactoringJobs.REPLACE_USER, request);

@@ -42,7 +42,7 @@ export default {
     },
     // The filter entry (the filter at `this.index`) of `this.propertyId`
     filterEntry () {
-        return (this.filterGroup.constraints || [])[this.index] || {};
+      return (this.filterGroup.constraints || [])[this.index] || {};
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {

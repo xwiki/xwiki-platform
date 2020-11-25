@@ -21,21 +21,24 @@
 ## Compute the content to display
 ## -------------------------------
 ## Honor the syntax if it's passed in the request.
-#try("contentvmexception")
+#try ("contentvmexception")
   #set ($restrictedContent = ($request.restricted == "true"))
-  #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
   #if ($outputSyntax)
+    #if ($request.contentTransformed == 'false')
+      #set ($renderedContent = $services.rendering.render($tdoc.getXDOM(), $outputSyntax.toIdString()))
+    #else
+      #set ($renderedContent = $tdoc.displayDocument($outputSyntax, $restrictedContent))
+    #end
     ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be
     ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
     ## panels on the side, header, etc).
     ## That's unless the caller has explicitly asked to not escape the content (this is done for example when calling
     ## get.vm in order to get proper XML).
-    #set($syntaxType = $outputSyntax.type.toIdString())
-    #if ($syntaxType == "xhtml" || $syntaxType == "html" || $noEscapeContent)
-      #set ($renderedContent = $tdoc.displayDocument($outputSyntax, $restrictedContent))
-    #else
-      ## Make sure to print correctly the result when it's not HTML,
-      #set ($renderedContent = "<pre>$escapetool.html($tdoc.displayDocument($outputSyntax, $restrictedContent))</pre>")
+    #set ($syntaxType = $outputSyntax.type.toIdString())
+    #if ($syntaxType != "xhtml" && $syntaxType != "html" && !$noEscapeContent)
+      ## Make sure to print correctly the result when it's not HTML.
+      #set ($renderedContent = "<pre>$escapetool.html($renderedContent)</pre>")
     #end
   #else
     #set ($renderedContent = $tdoc.displayDocument($restrictedContent))

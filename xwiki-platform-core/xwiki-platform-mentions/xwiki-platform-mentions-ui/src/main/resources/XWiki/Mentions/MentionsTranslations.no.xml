@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="no">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=Brukeromtale
+rendering.macro.mention.description=Sett inn en brukeromtale.
+rendering.macro.mention.parameter.reference.name=Referanse
+rendering.macro.mention.parameter.reference.description=Omtalte bruker- eller gruppereferanse.
+rendering.macro.mention.parameter.style.name=Visningsstil
+rendering.macro.mention.parameter.style.description=Stilvalget av omtalen (dette støttes bare for brukeromtaler).
+rendering.macro.mention.parameter.anchor.name=Anker
+rendering.macro.mention.parameter.anchor.description=Ankeret som skal brukes til å koble til omtalen (dette ankeret skal være unikt for dokumentet så mye som mulig).
+rendering.macro.mention.parameter.type.name=Type
+### Missing: rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Fullt navn på brukeren
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=Bare brukerens fornavn
+org.xwiki.mentions.DisplayStyle.LOGIN=Brukernavn
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Omtalefarge
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Fargen på omtalen til den nåværende brukeren (merk: brukes som verdi i et bakgrunnsfarge css-attributt).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farge på din egen omtale
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Aktiver sitater
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Definerer om et sitat av teksten rundt en omtale er inkludert i varsler om brukeromtale.
+mentions.tip=Når du redigerer i WYSIWYG, skriver du @ og begynn å skrive bokstaver for å få forslag om å omtale en bruker.</content>
+  
+</xwikidoc>

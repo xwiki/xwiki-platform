@@ -1,0 +1,60 @@
+{
+  "query": {
+    "offset": 0,
+    "limit": 15
+  },
+  "meta": {
+    "layouts": [
+      {"id": "table", "icon": "table"},
+      {"id": "cards", "icon": "th"}
+    ],
+
+    "defaultLayout": "table",
+
+    "filters": [
+      {
+        "id": "text",
+        "operators": ["contains", "startsWith", "equals", "notEquals"]
+      },
+      {
+        "id": "number",
+        "operators": [
+          {"id": "equals", "name": "="},
+          {"id": "notEquals", "name": "≠"},
+          {"id": "isLower", "name": "<"},
+          {"id": "isGreater", "name": ">"}
+        ]
+      },
+      {
+        "id": "date",
+        "operators": ["isBetween", "contains"]
+      },
+      {
+        "id": "list",
+        "operators": ["equals", "startsWith", "contains"]
+      },
+      {
+        "id": "suggest",
+        "operators": ["equals", "startsWith", "contains"]
+      }
+    ],
+
+    "defaultFilter": "text",
+
+    "displayers": [
+      {"id": "text"},
+      {"id": "link"},
+      {"id": "html"},
+      {"id": "actions"}
+    ],
+
+    "defaultDisplayer": "text",
+
+    "pagination": {
+      "maxShownPages": 10,
+      "pageSizes": [15, 25, 50, 100],
+      "showEntryRange": true,
+      "showNextPrevious": true
+    }
+  }
+}

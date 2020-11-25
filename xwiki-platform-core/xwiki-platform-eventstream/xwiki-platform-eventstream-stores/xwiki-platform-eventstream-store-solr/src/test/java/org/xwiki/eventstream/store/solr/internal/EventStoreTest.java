@@ -58,6 +58,7 @@ import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -96,21 +97,36 @@ import static org.mockito.Mockito.when;
 public class EventStoreTest
 {
     private static final DefaultEvent EVENT1 = event("id1");
+
     private static final DefaultEvent EVENT2 = event("id2");
+
     private static final DefaultEvent EVENT3 = event("id3");
+
     private static final DefaultEvent EVENT4 = event("id4");
+
     private static final DefaultEvent EVENT5 = event("id5");
+
     private static final DefaultEvent EVENT6 = event("id6");
+
     private static final DefaultEvent EVENT7 = event("id7");
+
     private static final DefaultEvent EVENT8 = event("id8");
+
     private static final DefaultEvent EVENT9 = event("id9");
+
     private static final DefaultEvent EVENT10 = event("id10");
+
     private static final DefaultEvent EVENT11 = event("id11");
+
     private static final DefaultEvent EVENT12 = event("id12");
+
     private static final DefaultEvent EVENT13 = event("id13");
+
     private static final DefaultEvent EVENT14 = event("id14");
+
     private static final DefaultEvent EVENT15 = event("id15");
 
+    private static final DefaultEvent EVENTOR = event("OR");
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
 
@@ -356,21 +372,18 @@ public class EventStoreTest
 
         assertSearch(Arrays.asList(), new SimpleEventQuery().withStatus("entity2"));
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4,
-            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4, EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
             EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
 
         this.eventStore.deleteEventStatuses("entity1", date0).get();
 
-        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4,
-            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4, EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
             EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
 
         this.eventStore.deleteEventStatuses("entity1", date20).get();
 
-        assertSearch(Arrays.asList(EVENT3, EVENT4,
-            EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10,
-            EVENT11, EVENT12, EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
+        assertSearch(Arrays.asList(EVENT3, EVENT4, EVENT5, EVENT6, EVENT7, EVENT8, EVENT9, EVENT10, EVENT11, EVENT12,
+            EVENT13, EVENT14, EVENT15), new SimpleEventQuery().withStatus("entity1"));
     }
 
     @Test
@@ -451,6 +464,12 @@ public class EventStoreTest
 
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
         assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
+
+        this.eventStore.saveEvent(EVENTOR).get();
+
+        assertSearch(Arrays.asList(EVENTOR), new SimpleEventQuery().in(Event.FIELD_ID, EVENTOR.getId()));
+
+        this.eventStore.deleteEvent(EVENTOR).get();
     }
 
     @Test
@@ -551,9 +570,11 @@ public class EventStoreTest
         EVENT1.setWiki(WIKI_REFERENCE);
         EVENT1.setSpace(SPACE_REFERENCE);
         EVENT1.setDocument(document1);
+        EVENT1.setRelatedEntity(SPACE1_REFERENCE);
         EVENT2.setWiki(WIKI_REFERENCE);
         EVENT2.setSpace(SPACE_REFERENCE);
         EVENT2.setDocument(document2);
+        EVENT2.setRelatedEntity(SPACE2_REFERENCE);
 
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2).get();
@@ -569,6 +590,12 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
+        assertSearch(Arrays.asList(EVENT1),
+            new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE1_REFERENCE)));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE1_REFERENCE));
+        assertSearch(Arrays.asList(EVENT2),
+            new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE2_REFERENCE)));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
     }
 
     public void searchStatus()

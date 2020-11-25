@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
- * General manager to handle {@link LikedEntity}.
+ * General manager to handle likes.
  *
  * @version $Id$
  * @since 12.7RC1
@@ -42,25 +42,41 @@ public interface LikeManager
      *
      * @param source the user who performs the like.
      * @param target the page or object to like.
-     * @return a dedicated LikeEntity containing all updated like information about the target.
+     * @return the new number of likes.
+     * @throws LikeException in case of problem when saving the like.
      */
-    LikedEntity saveLike(UserReference source, EntityReference target) throws LikeException;
+    long saveLike(UserReference source, EntityReference target) throws LikeException;
 
     /**
      * Retrieve the likes performed by the given user.
      *
      * @param source the user for whom to retrieve the entity likes.
-     * @return a list of like information about entities liked by this user.
+     * @param offset the offset used for pagination.
+     * @param limit the limit number of results to retrieve for pagination.
+     * @return a list of references liked by this user.
+     * @throws LikeException in case of problem when getting the like.
      */
-    List<LikedEntity> getUserLikes(UserReference source) throws LikeException;
+    List<EntityReference> getUserLikes(UserReference source, int offset, int limit) throws LikeException;
+
+    /**
+     * Retrieve the total number of likes performed by a user.
+     *
+     * @param source the user who performs the likes to count.
+     * @return the total number of likes performed.
+     * @throws LikeException in case of problem when getting the information.
+     * @since 12.9RC1
+     */
+    @Unstable
+    long countUserLikes(UserReference source) throws LikeException;
 
     /**
      * Retrieve like information a specific entity.
      *
      * @param target the page or object for which to retrieve the like information.
-     * @return a like information about that entity.
+     * @return the number of likes for that entity.
+     * @throws LikeException in case of problem when getting the like.
      */
-    LikedEntity getEntityLikes(EntityReference target) throws LikeException;
+    long getEntityLikes(EntityReference target) throws LikeException;
 
     /**
      * Allow a user to unlike an entity.
@@ -68,6 +84,7 @@ public interface LikeManager
      * @param source the user who performs the unlike.
      * @param target the entity to unlike.
      * @return {@code true} if the entity has been properly unliked.
+     * @throws LikeException in case of problem when removing the like.
      */
     boolean removeLike(UserReference source, EntityReference target) throws LikeException;
 
@@ -82,7 +99,35 @@ public interface LikeManager
     boolean isLiked(UserReference source, EntityReference target) throws LikeException;
 
     /**
+     * Retrieve the users who liked the given reference.
+     *
+     * @param target the page that has been liked.
+     * @param offset the offset used for pagination.
+     * @param limit the limit used for pagination.
+     * @return a list of user references of users who liked this page.
+     * @throws LikeException in case of problem for performing the query.
+     * @since 12.9RC1
+     */
+    @Unstable
+    List<UserReference> getLikers(EntityReference target, int offset, int limit) throws LikeException;
+
+    /**
      * @return a dedicated programmatic right for Like feature.
      */
     Right getLikeRight();
+
+    /**
+     * Clear like data related to the given reference from cache.
+     * @param target the reference for which data should be cleared.
+     * @since 12.9RC1
+     */
+    @Unstable
+    void clearCache(EntityReference target);
+
+    /**
+     * Clear all data from caches.
+     * @since 12.9RC1
+     */
+    @Unstable
+    void clearCache();
 }

@@ -72,6 +72,11 @@ public class UpgradeTest extends AbstractTest
     protected static final ExtensionId EXTENSIONID_WATCHLIST_UI =
         new ExtensionId("org.xwiki.platform:xwiki-platform-watchlist-ui");
 
+    protected static final ExtensionId EXTENSIONID_CODEMIRROR_58 = new ExtensionId("org.webjars:codemirror", "5.8");
+
+    protected static final ExtensionId EXTENSIONID_CODEMIRROR_5242 =
+        new ExtensionId("org.webjars:codemirror", "5.24.2");
+
     protected static ExtensionTestUtils extensionTestUtil;
 
     private static final String PREVIOUSFLAVOR_NAME = System.getProperty("previousFlavorName");
@@ -167,6 +172,14 @@ public class UpgradeTest extends AbstractTest
         assertFalse(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
     }
 
+    /**
+     * @since 12.9RC1
+     */
+    protected void assertNotInstalled(ExtensionId extensionId) throws Exception
+    {
+        assertFalse(extensionTestUtil.isInstalled(extensionId));
+    }
+
     // Test
 
     protected void setupLogs()
@@ -234,6 +247,9 @@ public class UpgradeTest extends AbstractTest
 
         // Make sure the watchlist UI has been uninstalled
         assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
+        // Make sure the previous codemirror versions have been replaced
+        assertNotInstalled(EXTENSIONID_CODEMIRROR_58);
+        assertNotInstalled(EXTENSIONID_CODEMIRROR_5242);
 
         ////////////////////
         // Custom validation

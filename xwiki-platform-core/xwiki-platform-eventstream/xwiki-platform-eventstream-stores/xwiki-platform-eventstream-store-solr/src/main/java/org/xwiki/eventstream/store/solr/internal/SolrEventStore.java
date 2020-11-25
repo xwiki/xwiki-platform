@@ -20,6 +20,7 @@
 package org.xwiki.eventstream.store.solr.internal;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,11 +91,39 @@ import org.xwiki.search.solr.SolrUtils;
 @Named("solr")
 public class SolrEventStore extends AbstractAsynchronousEventStore
 {
-    private static final Map<String, String> SEARCH_FIELD_MAPPING = new HashMap<>();
+    private static final Map<String, SearchFieldMapping> SEARCH_FIELD_MAPPING = new HashMap<>();
+
+    private static class SearchFieldMapping
+    {
+        String solrFieldName;
+
+        Type type;
+
+        SearchFieldMapping(String solrFieldName)
+        {
+            this.solrFieldName = solrFieldName;
+        }
+
+        SearchFieldMapping(Type type)
+        {
+            this.type = type;
+        }
+
+        SearchFieldMapping(String solrFieldName, Type type)
+        {
+            this.solrFieldName = solrFieldName;
+            this.type = type;
+        }
+    }
 
     static {
-        SEARCH_FIELD_MAPPING.put(Event.FIELD_DOCUMENT, EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX);
-        SEARCH_FIELD_MAPPING.put(Event.FIELD_SPACE, EventsSolrCoreInitializer.FIELD_SPACE_INDEX);
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_DOCUMENT,
+            new SearchFieldMapping(EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX));
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_SPACE,
+            new SearchFieldMapping(EventsSolrCoreInitializer.FIELD_SPACE_INDEX));
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_RELATEDENTITY, new SearchFieldMapping(EntityReference.class));
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_IMPORTANCE, new SearchFieldMapping(Importance.class));
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_USER, new SearchFieldMapping(DocumentReference.class));
     }
 
     @Inject
@@ -538,10 +567,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return null;
     }
 
-    /**
-     * @param condition
-     * @return
-     */
     private String serializeInCondition(InQueryCondition condition)
     {
         StringBuilder builder = new StringBuilder();
@@ -551,7 +576,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         builder.append(':');
 
         builder.append('(');
-        builder.append(StringUtils.join(condition.getValues(), " OR "));
+        builder.append(
+            StringUtils.join(condition.getValues().stream().map(this.utils::toFilterQueryString).iterator(), " OR "));
         builder.append(')');
 
         return builder.toString();
@@ -598,7 +624,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         switch (condition.getType()) {
             case EQUALS:
-                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                builder.append(toFilterQueryString(condition.getProperty(), condition.getValue()));
                 break;
 
             case LESS:
@@ -615,9 +641,26 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return builder.toString();
     }
 
+    private String toFilterQueryString(String propertyName, Object propertyValue)
+    {
+        SearchFieldMapping mapping = SEARCH_FIELD_MAPPING.get(propertyName);
+
+        if (mapping != null && mapping.type != null) {
+            return this.utils.toFilterQueryString(propertyValue, mapping.type);
+        } else {
+            return this.utils.toFilterQueryString(propertyValue);
+        }
+    }
+
     private String toSearchFieldName(String property)
     {
-        return SEARCH_FIELD_MAPPING.getOrDefault(property, property);
+        SearchFieldMapping mapping = SEARCH_FIELD_MAPPING.get(property);
+
+        if (mapping != null && mapping.solrFieldName != null) {
+            return mapping.solrFieldName;
+        }
+
+        return property;
     }
 
     public String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)

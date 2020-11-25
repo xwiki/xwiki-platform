@@ -294,16 +294,18 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check that the Recommended Extensions are displayed by default.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
         Select repositorySelect = adminPage.getSearchBar().getRepositorySelect();
-        assertEquals("Recommended Extensions", repositorySelect.getFirstSelectedOption().getText());
+        assertEquals("Available Extensions", repositorySelect.getFirstSelectedOption().getText());
 
         // Check that a remote extension appears only in the list of "All Extensions".
         adminPage.getSearchBar().selectRepository("installed");
         SearchResultsPane searchResults = adminPage.getSearchBar().search("alice");
         assertNull(searchResults.getExtension(extensionId));
 
-        adminPage.getSearchBar().getRepositorySelect().selectByVisibleText("All Extensions");
+        adminPage.getSearchBar().selectRepository("");
         adminPage = new ExtensionAdministrationPage();
         adminPage.waitUntilPageIsLoaded();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
         // The value of the search input must be preserved when we switch the repository.
         assertEquals("alice", adminPage.getSearchBar().getSearchInput().getAttribute("value"));
         assertNotNull(adminPage.getSearchResults().getExtension(extensionId));
@@ -316,7 +318,13 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = adminPage.getSearchBar().search("alice");
         assertNotNull(searchResults.getExtension(extensionId));
         assertNotNull(new SimpleSearchPane().selectRepository("local").getExtension(extensionId));
-        assertNotNull(new SimpleSearchPane().selectRepository("").getExtension(extensionId));
+
+        adminPage.getSearchBar().selectRepository("");
+        adminPage = new ExtensionAdministrationPage();
+        adminPage.waitUntilPageIsLoaded();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
+        assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
 
         // Check local extension.
         getExtensionTestUtils().uninstall(extensionId.getId(), true);
@@ -325,7 +333,13 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = adminPage.getSearchBar().search("alice");
         assertNull(searchResults.getExtension(extensionId));
         assertNotNull(new SimpleSearchPane().selectRepository("local").getExtension(extensionId));
-        assertNotNull(new SimpleSearchPane().selectRepository("").getExtension(extensionId));
+
+        adminPage.getSearchBar().selectRepository("");
+        adminPage = new ExtensionAdministrationPage();
+        adminPage.waitUntilPageIsLoaded();
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
+        assertNotNull(adminPage.getSearchBar().selectRepository("").getExtension(extensionId));
     }
 
     /**
@@ -980,6 +994,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         getRepositoryTestUtils().waitUntilReady();
 
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
+
+        // Test direct search
+        adminPage = adminPage.setIndexed(false);
 
         // Empty search
         SearchResultsPane searchResults = adminPage.getSearchResults();

@@ -44,8 +44,8 @@ public class XWikiBrowserWebDriverContainer<T extends BrowserWebDriverContainer<
     @Override
     protected void containerIsStarted(InspectContainerResponse containerInfo)
     {
-        Unreliables.retryUntilSuccess(60, TimeUnit.SECONDS,
-            Timeouts.getWithTimeout(20, TimeUnit.SECONDS,
+        Unreliables.retryUntilSuccess(240, TimeUnit.SECONDS,
+            Timeouts.getWithTimeout(60, TimeUnit.SECONDS,
                 () -> () -> new RemoteWebDriver(this.getSeleniumAddress(), this.capabilities)));
         super.containerIsStarted(containerInfo);
     }

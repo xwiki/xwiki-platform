@@ -19,16 +19,11 @@
  */
 package org.xwiki.refactoring.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Provides configuration from the {@code Refactoring.Code.RefactoringConfigurationClass} document in the current wiki.
@@ -42,26 +37,12 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Component
 @Singleton
 @Named("refactoring")
-public class RefactoringConfigurationSource extends AbstractDocumentConfigurationSource
+public class RefactoringConfigurationSource extends AbstractRefactoringConfigurationSource
 {
-    private static final List<String> SPACE_NAMES = Arrays.asList("Refactoring", "Code");
-
-    private static final LocalDocumentReference DOCUMENT_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "RefactoringConfiguration");
-
-    private static final LocalDocumentReference CLASS_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "RefactoringConfigurationClass");
-
     @Override
     protected DocumentReference getDocumentReference()
     {
         return new DocumentReference(DOCUMENT_REFERENCE, this.getCurrentWikiReference());
-    }
-
-    @Override
-    protected LocalDocumentReference getClassReference()
-    {
-        return CLASS_REFERENCE;
     }
 
     @Override

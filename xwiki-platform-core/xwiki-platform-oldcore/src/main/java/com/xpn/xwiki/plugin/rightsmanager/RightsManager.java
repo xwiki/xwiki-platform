@@ -33,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -1166,7 +1165,6 @@ public final class RightsManager
      * @throws XWikiException in case of errors
      * @since 11.9RC1
      */
-    @Unstable
     public void replaceUserOrGroupFromAllRights(DocumentReference userOrGroupSourceReference,
         DocumentReference userOrGroupTargetReference, boolean user, XWikiContext context) throws XWikiException
     {

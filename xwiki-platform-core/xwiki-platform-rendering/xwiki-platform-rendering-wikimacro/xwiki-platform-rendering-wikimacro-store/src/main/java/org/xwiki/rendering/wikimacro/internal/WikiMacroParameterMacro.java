@@ -34,7 +34,6 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterMacroParameters;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Used as a placeholder for a the value of a parameter passed to the wiki macro. It's resolved after the execution of
@@ -46,7 +45,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(WikiMacroParameterMacro.ID)
 @Singleton
-@Unstable
 public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMacroParameters>
 {
     /**

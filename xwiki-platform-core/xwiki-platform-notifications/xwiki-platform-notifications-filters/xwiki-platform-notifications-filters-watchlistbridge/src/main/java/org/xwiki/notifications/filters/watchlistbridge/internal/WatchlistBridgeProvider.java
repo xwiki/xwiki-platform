@@ -50,6 +50,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 
@@ -62,6 +66,7 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 @Component
 @Singleton
 @Named(WatchlistBridgeProvider.PROVIDER_HINT)
+// TODO: migrate watchlist objects to filters instead of dynamically converting them every time
 public class WatchlistBridgeProvider implements NotificationFilterPreferenceProvider
 {
     /**
@@ -125,7 +130,17 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     private void getValues(BaseObject obj, String fieldName, NotificationFilterProperty property,
         Set<NotificationFilterPreference> results)
     {
-        List<String> values = obj.getListValue(fieldName);
+        List<String> values;
+        PropertyInterface objProperty = obj.safeget(fieldName);
+        // Support both pre and post 7.0 type of watchlist objects
+        if (objProperty instanceof ListProperty) {
+            values = ((ListProperty) objProperty).getList();
+        } else if (objProperty instanceof LargeStringProperty) {
+            values = ListClass.getListFromString(((LargeStringProperty) objProperty).getValue(), ",", false);
+        } else {
+            values = Collections.emptyList();
+        }
+
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
                 DefaultNotificationFilterPreference pref = createNotificationFilterPreference(

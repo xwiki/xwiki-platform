@@ -44,6 +44,8 @@ rendering.macro.mention.parameter.style.name=Estilo de visualización
 rendering.macro.mention.parameter.style.description=La elección de estilo de la mención (solo es compatible con las menciones de usuario).
 rendering.macro.mention.parameter.anchor.name=Ancla
 rendering.macro.mention.parameter.anchor.description=El ancla a utilizar para vincular con esa mención (este anclaje debería ser único en el documento tanto como sea posible).
+rendering.macro.mention.parameter.type.name=Tipo
+rendering.macro.mention.parameter.type.description=El tipo del actor mencionado.
 org.xwiki.mentions.DisplayStyle.FULL_NAME=Nombre completo del usuario
 org.xwiki.mentions.DisplayStyle.FIRST_NAME=Solo nombre del usuario
 org.xwiki.mentions.DisplayStyle.LOGIN=Nombre de usuario
@@ -52,6 +54,6 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=El color de las men
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Color de las automenciones
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Activar las citas
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Establece si se incluye una cita del texto que rodea a una mención en las notificaciones de mención de usuario.
-### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.</content>
+mentions.tip=Al editar en modo WYSIWYG, teclea @ y a continuación comienza a teclear letras para obtener sugerencias para mencionar un usuario.</content>
   
 </xwikidoc>

@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.diff.Conflict;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.diff.internal.DefaultConflictDecision;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -192,7 +191,6 @@ public class ConflictQuestion
     /**
      * @since 11.8RC1
      */
-    @Unstable
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument, ConflictType type, List<Conflict<?>> documentConflicts)
     {
@@ -249,7 +247,6 @@ public class ConflictQuestion
      * @since 11.8RC1
      * @return the conflicts occured during the merge of documents.
      */
-    @Unstable
     public List<Conflict<?>> getDocumentConflicts()
     {
         return documentConflicts;

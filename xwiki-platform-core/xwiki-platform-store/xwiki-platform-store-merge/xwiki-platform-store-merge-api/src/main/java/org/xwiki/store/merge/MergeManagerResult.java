@@ -25,7 +25,6 @@ import java.util.List;
 import org.xwiki.diff.Conflict;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
-import org.xwiki.stability.Unstable;
 
 /**
  * This represents the result of a merge operation: it contains both the result of the merge, the possible conflicts
@@ -40,7 +39,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.8RC1
  */
-@Unstable
 public class MergeManagerResult<R, C>
 {
     private final List<Conflict<C>> conflicts;

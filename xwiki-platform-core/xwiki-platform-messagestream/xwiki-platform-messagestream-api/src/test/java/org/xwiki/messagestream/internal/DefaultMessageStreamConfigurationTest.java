@@ -19,52 +19,47 @@
  */
 package org.xwiki.messagestream.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Default implementation of {@link org.xwiki.messagestream.MessageStreamConfiguration}.
+ * Test of the default implementation of {@link org.xwiki.messagestream.MessageStreamConfiguration}.
  *
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6
  */
-public class DefaultMessageStreamConfigurationTest
+@ComponentTest
+class DefaultMessageStreamConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultMessageStreamConfiguration> mocker =
-            new MockitoComponentMockingRule<>(DefaultMessageStreamConfiguration.class);
+    @InjectMockComponents
+    private DefaultMessageStreamConfiguration defaultMessageStream;
 
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-    }
-
     @Test
-    public void isActive() throws Exception
+    void isActive()
     {
         DocumentReference configClass1 = new DocumentReference("wiki1", "XWiki", "MessageStreamConfig");
-        Mockito.when(documentAccessBridge.getProperty(configClass1, configClass1, "active")).thenReturn(1);
+        Mockito.when(this.documentAccessBridge.getProperty(configClass1, configClass1, "active")).thenReturn(1);
 
         DocumentReference configClass2 = new DocumentReference("wiki2", "XWiki", "MessageStreamConfig");
-        Mockito.when(documentAccessBridge.getProperty(configClass2, configClass2, "active")).thenReturn(0);
+        Mockito.when(this.documentAccessBridge.getProperty(configClass2, configClass2, "active")).thenReturn(0);
 
         DocumentReference configClass3 = new DocumentReference("wiki3", "XWiki", "MessageStreamConfig");
-        Mockito.when(documentAccessBridge.getProperty(configClass3, configClass3, "active")).thenReturn(null);
+        Mockito.when(this.documentAccessBridge.getProperty(configClass3, configClass3, "active")).thenReturn(null);
 
-        assertTrue(mocker.getComponentUnderTest().isActive("wiki1"));
-        assertFalse(mocker.getComponentUnderTest().isActive("wiki2"));
-        assertFalse(mocker.getComponentUnderTest().isActive("wiki3"));
+        assertTrue(this.defaultMessageStream.isActive("wiki1"));
+        assertFalse(this.defaultMessageStream.isActive("wiki2"));
+        assertFalse(this.defaultMessageStream.isActive("wiki3"));
     }
 }

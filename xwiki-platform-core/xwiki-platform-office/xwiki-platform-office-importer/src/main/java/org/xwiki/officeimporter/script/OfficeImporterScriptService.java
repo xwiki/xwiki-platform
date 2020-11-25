@@ -48,7 +48,6 @@ import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office importer APIs to server-side scripts.
@@ -318,7 +317,6 @@ public class OfficeImporterScriptService implements ScriptService
      * @since 11.0
      * @since 10.11.9
      */
-    @Unstable
     public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, DocumentReference parentReference,
         String title, boolean append)
     {

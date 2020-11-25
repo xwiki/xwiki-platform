@@ -36,7 +36,45 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{velocity}}
+#if ($xwiki.hasRecycleBin())
+
+#set ($configurationObject = 'Refactoring.Code.RefactoringConfiguration')
+
+{{html clean='false' wiki='true'}}
+&lt;form id='delete_Refactoring.Code.RefactoringConfiguration' method='post' action="${xwiki.getURL($configurationObject, 'save')}" class='xform'&gt;
+  &lt;fieldset&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for='Refactoring.Code.RefactoringConfigurationClass_0_isRecycleBinSkippingActivated'&gt;
+          $services.localization.render('Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated')
+        &lt;/label&gt;
+        &lt;span class='xHint'&gt;
+          $services.localization.render('Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint')
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        $doc.display('isRecycleBinSkippingActivated', 'edit')
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;input type='hidden' id='Refactoring.Code.RefactoringConfiguration_redirect' name='xredirect' value="$escapetool.url($xwiki.getRequestURL())"&gt;
+    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}"&gt;
+  &lt;/fieldset&gt;
+  &lt;div class='bottombuttons'&gt;
+    &lt;p class='admin-buttons'&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input type='submit' class='button' value="$services.localization.render('admin.save')" name='formactionsac'&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+#else
+{{warning}}
+$services.localization.render('refactoring.configuration.delete.emptySection')
+{{/warning}}
+#end
+{{/velocity}}</content>
   <object>
     <name>Refactoring.Code.RefactoringConfiguration</name>
     <number>0</number>
@@ -269,10 +307,10 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute/>
+      <codeToExecute>{{display reference='Refactoring.Code.RefactoringConfiguration' /}}</codeToExecute>
     </property>
     <property>
-      <configurationClass>Refactoring.Code.RefactoringConfigurationClass</configurationClass>
+      <configurationClass/>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
@@ -300,6 +338,135 @@
     </property>
     <property>
       <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>Refactoring.Code.RefactoringConfiguration</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8d16ebae-4865-41e4-98cc-a89d9d88ba5f</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#if (!$xwiki.hasRecycleBin())
+## Hides the section of the menu in which the refactoring is displayed.
+## This should be removed if new configuration values must be displayed regardless of the recycle bin status.
+#set ($refactoringConfigurationDoc = $xwiki.getDocument('Refactoring.Code.RefactoringConfiguration'))
+#set ($refactoringConfigurationSection =
+        $refactoringConfigurationDoc.getObject('XWiki.ConfigurableClass').displayInSection)
+#panel-body-content a[data-id="$refactoringConfigurationSection"] {
+  display: none;
+}
+#end</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
     </property>
   </object>
 </xwikidoc>

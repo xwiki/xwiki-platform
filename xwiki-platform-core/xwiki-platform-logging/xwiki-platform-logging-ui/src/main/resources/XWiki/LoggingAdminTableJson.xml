@@ -43,21 +43,18 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $numbertool.toNumber($request.offset).intValue())
-## If no offset is specified, start at 0
+#set ($offset = $numbertool.toNumber($request.offset).intValue())
+## If no offset is specified, start at 0.
 #if (!$offset)
-  #set($offset = 0)
+  #set ($offset = 0)
 #else
-  ## offset starts from 0 in velocity and 1 in javascript
-  #set($offset = $offset - 1)
-  #if($offset &lt; 0)
-    #set($offset = 0)
-  #end
+  ## The offset sent by the live table widget starts from 1.
+  #set ($offset = $mathtool.max($offset, 1) - 1)
 #end
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $numbertool.toNumber($request.limit).intValue())
+#set($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 0))
 ## If no limit is specified, limit at 15 items
 #if (!$limit)
   #set ($limit = 15)
@@ -81,17 +78,15 @@
   #end
 #end
 ## ===========
-## Filter Data here...
+## Filters
 ## ===========
-## TODO: Add code to filter data
-## Each column can be filtered and the filter for a column can be retrieved with:
-## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
+#set ($loggerFilter = "$!request.logger.toLowerCase()")
+#set ($levelFilter = "$!request.level.toLowerCase()")
 ## ===
 ## JSON
 ## ===
 #set ($logger_list = $services.logging.getLevels())
 #set ($logs = $logger_list.entrySet())
-#set ($logsSize = $logs.size())
 ## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
 ## properties (it is fixed in VelocityTools 2)
 #foreach ($log in $logs)
@@ -101,41 +96,35 @@
     #set($void = $log.setValue("${log.value.ordinal()}${log.value.name()}"))
   #end
 #end
+## Filter
+#set ($matchingLogs = [])
+#foreach ($log in $logs)
+  #set ($logLevel = "$!log.value")
+  #if ((!$loggerFilter || $log.key.toLowerCase().contains($loggerFilter))
+      &amp;&amp; (!$levelFilter || $logLevel.toLowerCase().contains($levelFilter)))
+    #set ($discard = $matchingLogs.add($log))
+  #end
+#end
 ## Sort
 #if ($request.sort)
-  #if ($request.sort == "logger" )
-    #set( $propertyName = "key" )
+  #if ($request.sort == "logger")
+    #set ($propertyName = "key")
   #else
-    #set( $propertyName = "value" )
+    #set ($propertyName = "value")
   #end
-
-  #set( $logs = $collectiontool.sort($logs, ["${propertyName}:${request.dir}"]) )
+  #set ($matchingLogs = $collectiontool.sort($matchingLogs, ["${propertyName}:${request.dir}"]))
 #end
-## Filter
-#set($resultLog = [])
-#foreach($logger in $logs)
-  #set($loggLevelName = "$!logger.value")
-  #if ($limit &lt;= $resultLog.size())
-    #break
-  #end
-  #if ($request.logger &amp;&amp; !$logger.key.toLowerCase().contains($request.logger.toLowerCase()))
-    #set($offset = $offset + 1)
-    #set($logsSize = $logsSize - 1)
-  #elseif ($request.level &amp;&amp; !$loggLevelName.toLowerCase().contains($request.level.toLowerCase()))
-    #set($offset = $offset + 1)
-    #set($logsSize = $logsSize - 1)
-  #else
-    #if ($foreach.count &gt;= $offset)
-      #set($void = $resultLog.add($logger))
-    #end
-  #end
+## Pagination
+#if ($offset &gt;= $matchingLogs.size())
+  #set ($offset = 0)
 #end
+#set($resultLog = $matchingLogs.subList($offset, $mathtool.min($mathtool.add($offset, $limit), $matchingLogs.size())))
 {
-  "totalrows": $logsSize,
+  "totalrows": $matchingLogs.size(),
   "matchingtags": {},
   "tags" : [],
   "returnedrows": $resultLog.size(),
-  "offset": $numbertool.toNumber($request.offset).intValue(),
+  "offset": $offset,
   "sort": "$request.sort",
   "dir": "$request.dir",
   "reqNo": $numbertool.toNumber($request.reqNo).intValue(),

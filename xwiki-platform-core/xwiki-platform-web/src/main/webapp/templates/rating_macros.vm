@@ -19,10 +19,17 @@
 ## ---------------------------------------------------------------------------
 #set ($discard = $xwiki.ssfx.use('uicomponents/rating/rating.css', true))
 
-###
-###    Display rating stars UI
-###
-###
+#**
+ * Display ratings stars UI.
+ * This macro is currently hardcoded to only display ratings of a maximum of 5 stars.
+ *
+ * @param $id the ID of the dom element created
+ * @param $cssclass the supplementary CSS class to use to display ratings
+ * @param $ratinglabel the label to display before the ratings
+ * @param $rating the actual vote on a scale of 5
+ * @param $nbVotes the total number of votes
+ * @param $locked if true display the CSS class locked to prevent voting
+ *#
 #macro(ratingstars $id $cssclass $ratinglabel $rating $nbVotes $locked)
 #set($width = $rating * 20)
 <div class="rating-container $cssclass" id="$id">

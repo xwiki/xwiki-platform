@@ -19,24 +19,16 @@
  */
 package org.xwiki.mentions.internal;
 
-import java.util.Objects;
-
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.user.UserProperties;
-import org.xwiki.user.UserPropertiesResolver;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-
-import static org.xwiki.mentions.DisplayStyle.FIRST_NAME;
-import static org.xwiki.mentions.DisplayStyle.LOGIN;
+import org.xwiki.mentions.MentionsFormatter;
 
 /**
  * Default implementation of {@link MentionsFormatter}.
+ * <p>
+ * Directly returns the actor references without further formatting.
  *
  * @version $Id$
  * @since 12.6
@@ -45,33 +37,9 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
 @Component
 public class DefaultMentionsFormatter implements MentionsFormatter
 {
-    @Inject
-    private UserPropertiesResolver userPropertiesResolver;
-
-    @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
     @Override
-    public String formatMention(String userReference, DisplayStyle style)
+    public String formatMention(String actorReference, DisplayStyle style)
     {
-        UserReference resolve = this.userReferenceResolver.resolve(userReference);
-        UserProperties userProperties =
-            this.userPropertiesResolver.resolve(resolve);
-        String firstName = Objects.toString(userProperties.getFirstName(), "");
-        String lastName = Objects.toString(userProperties.getLastName(), "");
-        final String content;
-        if (Objects.equals(style, LOGIN) || Objects.equals(firstName, "") && Objects.equals(lastName, "")) {
-            // if the login is asked explicitly we display it
-            // if the user has no first name and no last name, we display the login by default
-            content = this.documentReferenceResolver.resolve(userReference).getName();
-        } else if (Objects.equals(style, FIRST_NAME)) {
-            content = firstName;
-        } else {
-            content = String.format("%s %s", firstName, lastName).trim();
-        }
-        return "@" + content;
+        return actorReference;
     }
 }

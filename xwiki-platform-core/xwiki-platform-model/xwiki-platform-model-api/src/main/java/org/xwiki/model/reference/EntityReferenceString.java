@@ -19,15 +19,12 @@
  */
 package org.xwiki.model.reference;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a serialized {@link EntityReference}.
  * 
  * @version $Id$
  * @since 11.5RC1
  */
-@Unstable
 public interface EntityReferenceString
 {
 }

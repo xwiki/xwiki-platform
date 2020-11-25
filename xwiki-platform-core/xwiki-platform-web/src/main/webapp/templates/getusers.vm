@@ -27,34 +27,25 @@
   </div>
 #end
 
-#### get all the request parameters which are filters
-#set ($params = $request.getParameterMap())
-#set ($keys = $params.keySet())
-#set ($defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo", "sort", "dir"])
-#set ($docProps = ["fullName", "name"])
+#set ($userClassName = 'XWiki.XWikiUsers')
+#set ($userClass = $xwiki.getDocument($userClassName).xWikiClass)
+#set ($docProps = ['fullName', 'name'])
 #set ($filterMap = {})
 #set ($orderList = [])
 
-#foreach ($key in $keys)
-  #if (! $defaultKeys.contains( $key ) )
-    ## build the filters map
-    #foreach ($i in $params.get($key)) #set ($value = $i) #end
-    #if ($docProps.contains($key))
-      #set ($arr = [])
-      #set ($discard = $arr.add($NULL)) ## this may be variable...
-      #set ($discard = $arr.add("$value"))
-      #set ($discard = $filterMap.put("$key", $arr))
-      #set ($discard = $orderList.add("$key"))
-    #else
-      #set ($arr = [])
-      #set ($discard = $arr.add("StringProperty")) ## this may be variable...
-      #set ($discard = $arr.add("$value"))
-      #set ($discard = $filterMap.put("$key", $arr))
-      #set ($arr2 = [])
-      #set ($discard = $arr2.add("$key"))
-      #set ($discard = $arr2.add("StringProperty"))
-      #set ($discard = $orderList.add($arr2))
-    #end
+## Look for filters in request parameters.
+#foreach ($entry in $request.parameterMap.entrySet())
+  #set ($userProperty = $userClass.get($entry.key))
+  #if ($userProperty)
+    ## TODO: Get the property type from the user property. We don't have a scripting API for this ATM. Note that this is
+    ## the type used to store the property value in the database (represents the database table that stores the property
+    ## value).
+    #set ($propertyType = 'StringProperty')
+    #set ($discard = $filterMap.put($entry.key, [$propertyType, $entry.value.get(0)]))
+    #set ($discard = $orderList.add([$entry.key, $propertyType]))
+  #elseif ($docProps.contains($entry.key))
+    #set ($discard = $filterMap.put($entry.key, $entry.value.get(0)))
+    #set ($discard = $orderList.add($entry.key))
   #end
 #end
 
@@ -98,7 +89,7 @@
   #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
     #set ($wikiName = 'local')
   #end
-  #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
+  #set ($userObject = $user.getObject($userClassName))
   ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
     'username': $user.documentReference.name,
@@ -137,13 +128,13 @@
     'doc_delete_url': $user.getURL('delete'),
     'doc_hasdisable': $hasDisable,
     'doc_disable_url': $user.getURL('save', $escapetool.url({
-      'XWiki.XWikiUsers_0_active': 0,
+      "${userClassName}_0_active": 0,
       'comment': $services.localization.render('core.users.disable.saveComment'),
       'form_token': $services.csrf.token
     })),
     'doc_hasenable': $hasEnable,
     'doc_enable_url': $user.getURL('save', $escapetool.url({
-      'XWiki.XWikiUsers_0_active': 1,
+      "${userClassName}_0_active": 1,
       'comment': $services.localization.render('core.users.enable.saveComment'),
       'form_token': $services.csrf.token
     })),

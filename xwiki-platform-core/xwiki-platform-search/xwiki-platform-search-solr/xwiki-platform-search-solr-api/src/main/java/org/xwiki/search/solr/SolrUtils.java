@@ -163,6 +163,23 @@ public interface SolrUtils
     void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document);
 
     /**
+     * Store in the document the value associated with the passed field name.
+     *
+     * @param modifier the atomic update modifier to apply (set, add, add-distinct, remove, removeregex, inc)
+     * @param fieldName the name of the field in the document
+     * @param fieldValue the value to store in the {@link SolrDocument}
+     * @param valueType the type to use as reference to serialize the value
+     * @param document the Solr document
+     * @since 12.10
+     */
+    @Unstable
+    default void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
+        SolrInputDocument document)
+    {
+        setAtomic(modifier, fieldName, fieldValue, document);
+    }
+
+    /**
      * Store in the document the values associated with the passed field name.
      * <p>
      * The field is expected to be multivalued.
@@ -172,6 +189,8 @@ public interface SolrUtils
      * @param document the Solr document
      */
     void set(String fieldName, Collection<?> fieldValue, SolrInputDocument document);
+
+
 
     /**
      * Store in the document the value associated with the passed field name.
@@ -198,12 +217,37 @@ public interface SolrUtils
     void setString(String fieldName, Object fieldValue, Type valueType, SolrInputDocument document);
 
     /**
+     * @param fieldName the name of the field in the document
+     * @param fieldValue the value to store in the {@link SolrDocument}
+     * @param valueType the type to use as reference to serialize the values
+     * @param document the Solr document
+     * @since 12.9RC1
+     */
+    default void setString(String fieldName, Collection<?> fieldValue, Type valueType, SolrInputDocument document)
+    {
+        setString(fieldName, fieldValue, document);
+    }
+
+    /**
      * Serialize the value into a value usable in a Solr filter query.
      * 
      * @param fieldValue the value of a field
      * @return the Solr query version of the passed value
      */
     String toFilterQueryString(Object fieldValue);
+
+    /**
+     * Serialize the value into a value usable in a Solr filter query.
+     * 
+     * @param fieldValue the value of a field
+     * @param valueType the type to use as reference to serialize the value
+     * @return the Solr query version of the passed value
+     * @since 12.9RC1
+     */
+    default String toFilterQueryString(Object fieldValue, Type valueType)
+    {
+        return toFilterQueryString(fieldValue);
+    }
 
     /**
      * Extract from the document the value associated with the passed field name.
@@ -227,6 +271,21 @@ public interface SolrUtils
      * @since 12.6
      */
     <T> T get(String fieldName, SolrDocument document, T def);
+
+    /**
+     * Extract from the document the values associated with the passed field name.
+     * 
+     * @param <T> the of the value to return
+     * @param fieldName the name of the field in the document
+     * @param document the Solr document
+     * @param targetType the type of the value to return
+     * @return the value associated with the passed field name in the document
+     * @since 12.9RC1
+     */
+    default <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
+    {
+        return getCollection(fieldName, document);
+    }
 
     /**
      * Extract from the document the values associated with the passed field name.

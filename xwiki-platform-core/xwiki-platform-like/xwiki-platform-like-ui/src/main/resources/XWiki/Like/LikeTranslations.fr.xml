@@ -41,19 +41,23 @@ like.unlike.modal.title=Confirmation de suppression du J'aime
 like.unlike.modal.body=Êtes-vous sûr de vouloir enlever votre J''aime de la page {0} ?
 like.unlike.modal.closeButton=Fermer
 like.unlike.modal.unlikeButton=Je n'aime plus la page
-like.unlike.modal.viewLikersButton=Voir les J'aime
+like.unlike.modal.viewLikersButton=J'aime
 like.newlike.success=Cette page a été aimée.
 like.newlike.error=Erreur en essayant d'aimer une page.
 like.unlike.success=Cette page n'est plus aimée.
 like.unlike.error=Erreur en essayant de ne plus aimer une page.
 like.userprofile.menu=Pages Aimées
 like.button.title=Nombre de J''aime sur cette page : {0}
+like.button.title.like=Cliquez pour aimer cette page. Actuellement {0} "J''aime" pour cette page.
+like.button.title.unlike=Cliquez pour ne plus aimer cette page. Actuellement {0} "J''aime" pour cette page.
 like.likers.empty=Personne n'aime encore cette page.
 like.likers.number={0} personne(s) aime(nt) cette page :
-like.likers.title=J''aime sur {0}
+like.likers.title=Personnes qui aiment {0}
+like.livetable.column.title=Titre
+like.livetable.column.location=Emplacement
+like.livetable.column.likes=J'aime
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Toujours afficher le bouton J'aime
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Afficher le bouton même si l'utilisateur n'a pas les droits pour intéragir avec. Utilisez cette option si vous souhaitez toujours afficher le compteur de J'aime.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacité du Cache
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Nombre d'information J'aime à conserver dans le cache. Notez que vous devrez redémarrer XWiki pour que cette option soit prise en compte.</content>
-  
 </xwikidoc>

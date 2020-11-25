@@ -43,7 +43,7 @@
   #if ($newCounterOptional.isPresent())
     #set ($discard = $services.like.cleanCacheUIX())
     #jsonResponse({
-      'counter': $newCounterOptional.get().likeNumber
+      'counter': $newCounterOptional.get()
     })
   #end
 #elseif ($request.xaction == "unlike" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
@@ -52,7 +52,7 @@
     #if ($newCounterOptional.isPresent())
     #set ($discard = $services.like.cleanCacheUIX())
       #jsonResponse({
-        'counter': $newCounterOptional.get().likeNumber
+        'counter': $newCounterOptional.get()
       })
     #end
 #end
@@ -309,7 +309,8 @@
     </property>
     <property>
       <code>.like-button.btn-default.badge {
-  color: grey;
+  color: @btn-default-color;
+  background-color: @btn-default-bg;
 }
 .like-container {
   /* Leave some space between the like button and the next footer item (e.g. the page tags). */
@@ -317,7 +318,7 @@
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
@@ -458,24 +459,29 @@
       <content>{{velocity}}
 {{html wiki="true"}}
 #if ($services.like.displayButton($doc))
-  #set ($optLikeRecord = $services.like.getLikes($doc))
-  #if ($optLikeRecord.isPresent())
-    #set ($likeRecord = $optLikeRecord.get())
+  ## We want to be sure that the async rendering framework invalidate cache if the document is modified.
+  #set ($discard = $services.async.useEntity($doc))
+  #set ($optLikeCount = $services.like.getLikes($doc))
+  #if ($optLikeCount.isPresent())
+    #set ($likeCount = $optLikeCount.get())
     #set ($discard = $xwiki.ssx.use('XWiki.Like.LikeUIX'))
     #set ($discard = $xwiki.jsx.use('XWiki.Like.LikeUIX'))
     &lt;div class="like-container"&gt;
       &lt;input id="is-liked" type="hidden" value="$services.like.isLiked($doc)" /&gt;
       #if ($isGuest || $services.like.isLiked($doc))
         #set ($btnClass = "btn-default")
+        #set ($titleMessageTranslationKey = "like.button.title.unlike")
       #elseif (!$isGuest)
         #set ($btnClass = "btn-primary")
+        #set ($titleMessageTranslationKey = "like.button.title.like")
       #end
       #set ($disabledButton = "")
       #if (!$services.like.isAuthorized($doc))
         #set ($disabledButton = "disabled")
+        #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;div class="like-button btn $btnClass $disabledButton badge" title="$escapetool.xml($services.localization.render('like.button.title', [$likeRecord.likeNumber]))"&gt;
-          $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeRecord.likeNumber&lt;/span&gt;
+      &lt;div class="like-button btn $btnClass $disabledButton badge" title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
+          $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   #end

@@ -1,0 +1,9 @@
+org.xwiki.livedata.internal.rest.DefaultLiveDataEntriesResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataEntryPropertyResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataPropertiesResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypesResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypeResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataSourceResource
+org.xwiki.livedata.internal.rest.DefaultLiveDataSourcesResource

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.Validator;
 
@@ -190,11 +191,11 @@ public class DefaultValidationTest extends AbstractValidationTest
 
     protected boolean hasLogErrors(String output)
     {
-        return output.indexOf("ERROR") >= 0 || output.indexOf("ERR") >= 0;
+        return StringUtils.containsIgnoreCase(output, "error") || StringUtils.containsIgnoreCase(output, "err");
     }
 
     protected boolean hasLogWarnings(String output)
     {
-        return output.indexOf("WARNING") >= 0 || output.indexOf("WARN") >= 0;
+        return StringUtils.containsIgnoreCase(output, "warning") || StringUtils.containsIgnoreCase(output, "warn");
     }
 }

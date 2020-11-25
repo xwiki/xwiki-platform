@@ -67,7 +67,6 @@ platform.flamingo.themes.category.breadcrumb=Navigācijas pēdas
 platform.flamingo.themes.category.advanced=Padziļināti
 platform.flamingo.themes.defaultvalue=Noklusētais
 platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
-platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
 platform.flamingo.themes.local=Lokāla
 platform.flamingo.themes.global=Globāla
 
@@ -83,6 +82,11 @@ platform.flamingo.themes.global=Globāla
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=Diemžēl šī lauka vērtība priekšskatījumā netiek ņemta vērā.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
 
 #@deprecatedend</content>
 </xwikidoc>

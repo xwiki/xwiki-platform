@@ -2,7 +2,18 @@
 // Forms
 // --------------------------------------------------
 
-textarea, select, input[type="text"], input[type="password"] {
+input[type="color"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+select,
+textarea {
   &:extend(.form-control all);
   display: inline-block;
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
@@ -48,7 +59,18 @@ select[size="0"], select[size="1"] {
 }
 
 .xform {
-  input[type="text"], input[type="password"], select, textarea {
+  input[type="color"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="text"],
+  input[type="time"],
+  select,
+  textarea {
     width: 100%;
   }
   dl {

@@ -21,22 +21,22 @@ package org.xwiki.flamingo.test.docker;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -44,6 +44,8 @@ import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.DocumentSyntaxPicker;
+import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
@@ -51,13 +53,11 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.Conflict;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -800,7 +800,7 @@ public class EditIT
         wikiEditPage.setContent("First edit");
         wikiEditPage.clickSaveAndContinue();
 
-        // Simple way, just by going to the view page and going back to edit
+        // Simple way, just by going to the view page after a save and going back to edit
         setup.gotoPage(testReference);
         setup.getDriver().navigate().back();
         wikiEditPage = new WikiEditPage();
@@ -808,36 +808,24 @@ public class EditIT
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Second edit", viewPage.getContent());
 
-        // Complex way: continue to another editor, make other changes, and then get back to the editor.
+        // Complex way: Save&Continue first, then forget an edit and move on.
+        // Come back to check the unsaved changes are still there and can be saved.
         wikiEditPage = viewPage.editWiki();
         wikiEditPage.setContent("third edit");
         wikiEditPage.clickSaveAndContinue();
+        // We set the content without saving.
+        wikiEditPage.setContent("fourth edit");
 
         viewPage = setup.gotoPage(testReference);
         viewPage.waitUntilPageJSIsLoaded();
 
-        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
-        wysiwygEditPage.setContent("fourth edit");
-        wysiwygEditPage.clickSaveAndContinue();
-
-        // WYSIWYG editor -> view page
-        setup.getDriver().navigate().back();
         // view page -> wiki editor
         setup.getDriver().navigate().back();
 
-        setup.getDriver().waitUntilCondition(driver -> {
-            try {
-                return driver.findElement(By.id("content")) != null
-                && driver.findElement(By.id("content")).getText().equals("fourth edit");
-            } catch (NoSuchElementException | StaleElementReferenceException e) {
-                return false;
-            }
-        });
-
         wikiEditPage = new WikiEditPage();
-        wikiEditPage.setContent("fifth edit");
+        assertEquals("fourth edit", wikiEditPage.getExactContent());
         viewPage = wikiEditPage.clickSaveAndView();
-        assertEquals("fifth edit", viewPage.getContent());
+        assertEquals("fourth edit", viewPage.getContent());
     }
 
     @Test
@@ -906,102 +894,103 @@ public class EditIT
 
     @Test
     @Order(12)
-    public void switchSyntax(TestUtils setup, TestReference testReference) throws Exception
+    public void switchSyntaxFromWikiEditMode(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Fixture: enable xhtml syntax
+        // Fixture: enable the XHTML syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
             "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0");
         setup.deletePage(testReference);
 
         String pageContent = "= First heading =\n"
             + "\n"
-            + "Paragraph containing some **bold content**.";
+            + "Paragraph containing some **bold content**.\n"
+            + "\n"
+            // Add a macro to make sure that rendering transformations are not executed on syntax conversion.
+            + "{{toc/}}";
         setup.createPage(testReference, pageContent, "Test page");
 
+        // Add some meta data to the page in order to verify that it is updated.
+        setup.addClassProperty(testReference, "description", "TextArea");
+        setup.addClassProperty(testReference, "code", "TextArea");
+        setup.updateClassProperty(testReference, "description_contenttype", "FullyRenderedText", "code_contenttype",
+            "VelocityCode");
+        String className = setup.serializeReference(testReference.getLocalDocumentReference());
+        setup.addObject(testReference, className, "description", "one **two** three", "code", "a//b//c");
+
+        // Create a page translation in order to verify that it is also updated.
+        setup.setWikiPreference("multilingual", "true");
+        setup.setWikiPreference("languages", "en,fr");
+        DocumentReference testReferenceFR = new DocumentReference(testReference, Locale.FRENCH);
+        setup.createPage(testReferenceFR, "c'est ma //page// de test", "Page de test");
+
         try {
-            // Test that we can switch with wiki editor without loosing change not saved
-            WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
+            // Test that we can switch the syntax from the Wiki edit mode without loosing unsaved changes.
+            DocumentReference testReferenceEN = new DocumentReference(testReference, Locale.ENGLISH);
+            WikiEditPage wikiEditPage = setup.gotoPage(testReferenceEN).editWiki();
             final String newContent = pageContent + "\n\nA new paragraph with some new content.";
             wikiEditPage.setContent(newContent);
 
-            DocumentInformationPanel documentInformationPanel = new DocumentInformationPanel();
-            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
-            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
+            DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
+            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentSyntaxPicker.getAvailableSyntaxes());
+            assertEquals("xwiki/2.1", documentSyntaxPicker.getSelectedSyntax());
 
-            DocumentInformationPanel finalDocumentInformationPanel1 = documentInformationPanel;
-            assertThrows(UnhandledAlertException.class,
-                () -> finalDocumentInformationPanel1.selectSyntax("xhtml/1.0"));
-            Alert alert = setup.getDriver().switchTo().alert();
-            assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
-                + "objects to the selected syntax?"));
-            // In wiki edit mode, we shouldn't loose any content.
-            assertFalse(alert.getText().contains("you will loose modifications"));
-            alert.accept();
-
-            final WikiEditPage reloadedWikiEdit = new WikiEditPage();
+            SyntaxConversionConfirmationModal confirmationModal = documentSyntaxPicker.selectSyntaxById("xhtml/1.0");
+            assertTrue(confirmationModal.getMessage()
+                .contains("from the previous XWiki 2.1 syntax to the selected XHTML 1.0 syntax?"));
+            confirmationModal.confirmSyntaxConversion();
 
             String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
                 + "<span>First heading</span>"
                 + "</h1>"
                 + "<p>Paragraph containing some <strong>bold content</strong>.</p>"
                 + "<p>A new paragraph with some new content.</p>";
-
-            // The editor content is changed by triggering a JS event, we wait for a new content so we can do a proper
-            // assertEquals afterwards that is easier to read in case of failure.
-            setup.getDriver().waitUntilCondition(item -> !reloadedWikiEdit.getExactContent().equals(newContent));
-            assertEquals(expectedContent, reloadedWikiEdit.getExactContent());
+            assertEquals(expectedContent, wikiEditPage.getExactContent());
             // Ensure there's no edit conflict.
             wikiEditPage.clickSaveAndContinue();
 
-            // We set back the syntax to XWiki 2.1, dismissing the alert should only change the syntax and save it
-            // without processing the content.
-            documentInformationPanel = new DocumentInformationPanel();
-            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
-            assertEquals("xhtml/1.0", documentInformationPanel.getSelectedSyntax());
-            DocumentInformationPanel finalDocumentInformationPanel2 = documentInformationPanel;
-            assertThrows(UnhandledAlertException.class,
-                () -> finalDocumentInformationPanel2.selectSyntax("xwiki/2.1"));
-            alert = setup.getDriver().switchTo().alert();
-            alert.dismiss();
+            // Set back the syntax to XWiki 2.1 without the syntax conversion.
+            assertEquals("xhtml/1.0", documentSyntaxPicker.getSelectedSyntax());
+            confirmationModal = documentSyntaxPicker.selectSyntaxById("xwiki/2.1");
+            assertTrue(confirmationModal.getMessage()
+                .contains("from the previous XHTML 1.0 syntax to the selected XWiki 2.1 syntax?"));
+            confirmationModal.rejectSyntaxConversion();
 
             wikiEditPage.clickSaveAndContinue();
 
             // Ensure that only the syntax has changed, not the content.
             wikiEditPage = setup.gotoPage(testReference).editWiki();
-            documentInformationPanel = new DocumentInformationPanel();
-            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
+            documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
+            assertEquals("xwiki/2.1", documentSyntaxPicker.getSelectedSyntax());
             assertEquals(expectedContent, wikiEditPage.getContent());
-            wikiEditPage.setContent(pageContent);
-            ViewPage viewPage = wikiEditPage.clickSaveAndView();
 
-            // Test that we can switch the syntax with the wysiwyg editor
-            WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+            // Verify the document meta data.
+            ObjectPropertyReference descriptionReference =
+                new ObjectPropertyReference("description", new ObjectReference(className + "[0]", testReference));
+            Property descriptionProperty = setup.rest().get(descriptionReference);
+            // The description property holds wiki syntax so its value was converted.
+            assertEquals("<p>one <strong>two</strong> three</p>", descriptionProperty.getValue());
+            ObjectPropertyReference codeReference =
+                new ObjectPropertyReference("code", new ObjectReference(className + "[0]", testReference));
+            Property codeProperty = setup.rest().get(codeReference);
+            // The code property doesn't hold wiki syntax so its value was not converted.
+            assertEquals("a//b//c", codeProperty.getValue());
 
-            // With WYSIWYG editor the page is actually reloaded.
-            setup.getDriver().addPageNotYetReloadedMarker();
-            documentInformationPanel = new DocumentInformationPanel();
-            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
-            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
-
-            DocumentInformationPanel finalDocumentInformationPanel3 = documentInformationPanel;
-            assertThrows(UnhandledAlertException.class,
-                () -> finalDocumentInformationPanel3.selectSyntax("xhtml/1.0"));
-            alert = setup.getDriver().switchTo().alert();
-            assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
-                + "objects to the selected syntax?"));
-            assertTrue(alert.getText().contains("you will loose modifications"));
-            alert.accept();
-
-            setup.getDriver().waitUntilPageIsReloaded();
-            wikiEditPage = new WikiEditPage();
-            expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\"><span>First heading</span></h1>"
-                + "<p>Paragraph containing some <strong>bold content</strong>.</p>";
-            assertEquals(expectedContent, wikiEditPage.getContent());
-            // Ensure there's no edit conflict
-            wikiEditPage.clickSaveAndContinue();
+            // Verify the document translation.
+            wikiEditPage = setup.gotoPage(testReferenceFR).editWiki();
+            documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
+            // The translation syntax is still XHTML because the second syntax change was done without a syntax
+            // conversion which means the document translations have not been updated.
+            // In the future we may want to ask the user whether to update the translations or not when changing the
+            // syntax. But for now we update the translations only when syntax conversion is performed.
+            assertEquals("xhtml/1.0", documentSyntaxPicker.getSelectedSyntax());
+            assertEquals("<p>c'est ma <em>page</em> de test</p>", wikiEditPage.getContent());
         } finally {
-            // disable back xhtml syntax
+            // Disable back the XHTML syntax.
             setup.deleteObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass", 0);
+
+            // Restore the localization configuration.
+            setup.setWikiPreference("multilingual", "false");
+            setup.setWikiPreference("languages", "en");
         }
     }
 

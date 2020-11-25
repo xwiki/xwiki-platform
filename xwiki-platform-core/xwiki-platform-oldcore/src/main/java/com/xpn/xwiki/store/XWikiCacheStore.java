@@ -49,7 +49,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -787,7 +786,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
      * @return the cache that handle the limit size properties.
      * @since 11.4RC1
      */
-    @Unstable
     public Cache<Integer> getLimitSizePropertyCache()
     {
         return this.limitSizePropertyCache;

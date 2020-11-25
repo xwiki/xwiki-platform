@@ -19,11 +19,11 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,11 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -68,8 +70,11 @@ public class UsersParameterHandlerTest
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
     @Test
-    public void handlerUsersParameter()
+    void handlerUsersParameter()
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         this.usersParameterHandler.handleUsersParameter(null, notificationParameters);
@@ -119,6 +124,46 @@ public class UsersParameterHandlerTest
         assertEquals(expectedParameters, notificationParameters);
     }
 
+    @Test
+    void handlerUsersParameterWhenOnlyTheUserParameterIsGiven() throws NotificationException
+    {
+        final DocumentReference testUser = new DocumentReference("currentwiki", "XWiki", "SomeUser");
+
+        NotificationParameters notificationParameters = notificationParametersForUser(testUser);
+
+        NotificationParameters expectedParameters = notificationParametersForUser(testUser);
+        expectedParameters.filters = Collections.emptyList();
+        expectedParameters.filterPreferences = Collections.emptyList();
+
+        this.usersParameterHandler.handleUsersParameter("", notificationParameters);
+        assertEquals(expectedParameters, notificationParameters);
+
+        List<NotificationFilterPreference> userFilterPreferences = new ArrayList<>();
+
+        userFilterPreferences.add(getFilterPreference("currentwiki:XWiki.SomeUser"));
+        NotificationFilterPreference userFollowingFilterPref1 = getFilterPreferenceWithName(
+            "currentwiki:XWiki.Alice", "eventUserNotificationFilter");
+        userFilterPreferences.add(userFollowingFilterPref1);
+        when(notificationFilterPreferenceManager.getFilterPreferences(testUser))
+            .thenReturn(userFilterPreferences);
+
+        expectedParameters.filterPreferences = Collections.singletonList(userFollowingFilterPref1);
+        notificationParameters = notificationParametersForUser(testUser);
+        this.usersParameterHandler.handleUsersParameter("", notificationParameters);
+        assertEquals(expectedParameters, notificationParameters);
+
+        userFilterPreferences.add(getFilterPreferenceWithName("currentwiki:XWiki.SomeOther", ""));
+        NotificationFilterPreference userFollowingFilterPref2 = getFilterPreferenceWithName(
+            "currentwiki:XWiki.Bob", "eventUserNotificationFilter");
+        userFilterPreferences.add(userFollowingFilterPref2);
+        userFilterPreferences.add(getFilterPreference("currentwiki:XWiki.SomeUser4"));
+
+        expectedParameters.filterPreferences = Arrays.asList(userFollowingFilterPref1, userFollowingFilterPref2);
+        notificationParameters = notificationParametersForUser(testUser);
+        this.usersParameterHandler.handleUsersParameter("", notificationParameters);
+        assertEquals(expectedParameters, notificationParameters);
+    }
+
     private NotificationFilterPreference getFilterPreference(String userId)
     {
         DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
@@ -129,4 +174,20 @@ public class UsersParameterHandlerTest
         pref.setUser(userId);
         return pref;
     }
+
+    private NotificationFilterPreference getFilterPreferenceWithName(String userId, String filterName)
+    {
+        DefaultNotificationFilterPreference pref = (DefaultNotificationFilterPreference) getFilterPreference(userId);
+        pref.setFilterName(filterName);
+        return pref;
+    }
+
+    private NotificationParameters notificationParametersForUser(DocumentReference userRef)
+    {
+        NotificationParameters notificationParameters = new NotificationParameters();
+        notificationParameters.user = userRef;
+        notificationParameters.format = NotificationFormat.ALERT;
+        return notificationParameters;
+    }
+
 }

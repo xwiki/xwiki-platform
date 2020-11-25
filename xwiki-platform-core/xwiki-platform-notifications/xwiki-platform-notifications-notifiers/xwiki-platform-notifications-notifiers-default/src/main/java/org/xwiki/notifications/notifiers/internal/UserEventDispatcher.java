@@ -39,11 +39,13 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -226,7 +228,7 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         Event currentEvent = firstEvent;
 
         while (!this.disposed && currentEvent != null) {
-            if (currentEvent != WAKEUP_EVENT) {
+            if (currentEvent != WAKEUP_EVENT && !currentEvent.isPrefiltered()) {
                 // Dispatch event
                 dispatch(currentEvent);
             }
@@ -321,20 +323,59 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
 
     private void dispatch(Event event, DocumentReference user, boolean mailEnabled)
     {
+        // Get the entity id
+        String entityId = this.entityReferenceSerializer.serialize(user);
+
+        // Make sure the event is not already pre filtered
         // Make sure the user asked to be alerted about this event
-        if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
+        if (!isStatusPrefiltered(event, entityId)
+            && this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
             // Associate the event with the user
-            String userId = this.entityReferenceSerializer.serialize(user);
-            saveEventStatus(event, userId);
+            saveEventStatus(event, entityId);
         }
 
         // Make sure the notification module is allowed to send mails
+        // Make sure the event is not already pre filtered
         // Make sure the user asked to receive mails about this event
-        if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
+        if (mailEnabled && !isMailPrefiltered(event, entityId)
+            && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
             // Associate the event with the user
-            String userId = this.entityReferenceSerializer.serialize(user);
-            saveMailEntityEvent(event, userId);
+            saveMailEntityEvent(event, entityId);
         }
+    }
+
+    private boolean isStatusPrefiltered(Event event, String entityId)
+    {
+        return isPrefiltered(event, entityId, false);
+    }
+
+    private boolean isMailPrefiltered(Event event, String entityId)
+    {
+        return isPrefiltered(event, entityId, true);
+    }
+
+    private boolean isPrefiltered(Event event, String entityId, boolean mail)
+    {
+        SimpleEventQuery eventQuery = new SimpleEventQuery(0, 0);
+
+        eventQuery.eq(Event.FIELD_ID, event.getId());
+
+        if (mail) {
+            eventQuery.withMail(entityId);
+        } else {
+            eventQuery.withStatus(entityId);
+        }
+
+        EventSearchResult result;
+        try {
+            result = this.events.search(eventQuery);
+        } catch (EventStreamException e) {
+            this.logger.error("Failed to check status for event [{}] and entity [{}]", event.getId(), entityId, e);
+
+            return false;
+        }
+
+        return result.getTotalHits() > 0;
     }
 
     private void dispatch(Event event, List<DocumentReference> users)

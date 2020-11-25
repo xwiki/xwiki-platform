@@ -82,7 +82,6 @@ public class AppsLiveTableIT
     {
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
         classEditPage.addField("Short Text");
         classEditPage.clickNextStep().clickNextStep().clickFinish();

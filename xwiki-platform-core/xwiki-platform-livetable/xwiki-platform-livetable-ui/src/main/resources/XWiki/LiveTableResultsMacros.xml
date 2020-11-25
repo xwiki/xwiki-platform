@@ -451,7 +451,7 @@
   #elseif($colname == '_likes' &amp;&amp; "$!services.like" != "")
     #set($likes = $services.like.getLikes($docReference))
     #if ($likes.isPresent())
-      #set($discard = $row.put('_likes', $likes.get().likeNumber))
+      #set($discard = $row.put('_likes', $likes.get()))
     #end
   #else
     #livetable_getPropertyClassAndType($colname)

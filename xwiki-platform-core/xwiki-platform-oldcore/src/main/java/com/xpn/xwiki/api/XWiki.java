@@ -1599,6 +1599,12 @@ public class XWiki extends Api
      * Note that the list of backlinks can be retrieved with {@link Document#getBackLinkedReferences()}
      * and the list of children with {@link Document#getChildrenReferences()}.
      *
+     * <strong>Warning:</strong> Be aware that this method never triggers any event related to the rename
+     * of the document. If you want the right events to be sent for the event, please use the dedicated Refactoring
+     * Module API (see
+     * {@link org.xwiki.refactoring.script.RequestFactory#createRenameRequest(EntityReference, EntityReference)}
+     * and {@link org.xwiki.refactoring.job.MoveRequest}).
+     *
      * @param sourceDocumentReference the source document to rename.
      * @param targetDocumentReference the target reference to rename the document to.
      * @param overwrite if {@code true} the target document reference will be overwritten if it exists
@@ -2277,7 +2283,6 @@ public class XWiki extends Api
      * @return the user corresponding to the reference.
      * @since 11.8RC1
      */
-    @Unstable
     public User getUser(DocumentReference userReference)
     {
         return this.xwiki.getUser(userReference, getXWikiContext());

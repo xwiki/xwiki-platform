@@ -19,7 +19,6 @@
  */
 package org.xwiki.like.internal;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.xwiki.model.EntityType;
@@ -73,7 +72,7 @@ public final class LikeRight implements RightDescription
     @Override
     public Set<Right> getImpliedRights()
     {
-        return Collections.EMPTY_SET;
+        return null;
     }
 
     @Override

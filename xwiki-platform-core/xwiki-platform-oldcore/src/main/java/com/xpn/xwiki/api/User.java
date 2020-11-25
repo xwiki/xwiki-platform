@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -91,7 +90,6 @@ public class User extends Api
      * @param disabledStatus true to disable an user, false to enable it back.
      * @since 11.7RC1
      */
-    @Unstable
     public void setDisabledStatus(boolean disabledStatus)
     {
         this.user.setDisabled(disabledStatus, getXWikiContext());
@@ -101,7 +99,6 @@ public class User extends Api
      * @return {@code true} if the user is disabled, false if it is enabled.
      * @since 11.8RC1
      */
-    @Unstable
     public boolean isDisabled()
     {
         return this.user.isDisabled(getXWikiContext());

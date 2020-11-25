@@ -19,8 +19,6 @@
  */
 package org.xwiki.like.internal;
 
-import java.util.Collections;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
@@ -41,7 +39,7 @@ public class LikeRightTest
         assertEquals("Like", LikeRight.INSTANCE.getName());
         assertEquals(RuleState.ALLOW, LikeRight.INSTANCE.getDefaultState());
         assertEquals(RuleState.ALLOW, LikeRight.INSTANCE.getTieResolutionPolicy());
-        assertEquals(Collections.emptySet(), LikeRight.INSTANCE.getImpliedRights());
+        assertEquals(null, LikeRight.INSTANCE.getImpliedRights());
         assertEquals(Right.WIKI_SPACE_DOCUMENT, LikeRight.INSTANCE.getTargetedEntityType());
         assertFalse(LikeRight.INSTANCE.getInheritanceOverridePolicy());
         assertFalse(LikeRight.INSTANCE.isReadOnly());

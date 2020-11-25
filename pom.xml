@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>12.9-SNAPSHOT</version>
+  <version>13.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,7 +52,7 @@
     <hsqldb.version>2.5.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.50</ckeditor.version>
+    <ckeditor.version>1.51</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.13</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -64,7 +64,7 @@
     <jetty.version>9.4.29.v20200521</jetty.version>
 
     <!-- Netty version -->
-    <netty.version>4.1.48.Final</netty.version>
+    <netty.version>4.1.54.Final</netty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -86,14 +86,14 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.21.Final</hibernate.version>
+    <hibernate.version>5.4.23.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.21</mysql.version>
+    <mysql.version>8.0.22</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>2.7.0</mariadb.version>
@@ -102,7 +102,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.16</pgsql.version>
+    <pgsql.version>42.2.18</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -167,6 +167,13 @@
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
         <version>2.7.2</version>
+        <exclusions>
+          <!-- Not need in the context of XWiki and cause conflict with other dependencies -->
+          <exclusion>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
@@ -292,7 +299,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10.6</version>
+        <version>2.10.7</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -323,6 +330,13 @@
         <groupId>org.webjars</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>url-search-params-polyfill</artifactId>
+        <version>8.1.0</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -511,7 +525,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.2</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -610,13 +624,6 @@
             <artifactId>org.restlet</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <!-- Used by solr-core, tika and less4j -->
-      <dependency>
-        <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>3.13.0</version>
       </dependency>
 
       <!-- Used by solr-core and closure-compiler -->

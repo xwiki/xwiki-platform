@@ -41,7 +41,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
@@ -151,7 +150,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the XHTML result of rendering the given HTML fragment
      * @since 11.9RC1
      */
-    @Unstable
     public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference)
     {
         XWikiDocument securityDocument = createSecurityDocument();
@@ -249,7 +247,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the annotated XHTML result of the conversion
      * @since 11.9RC1
      */
-    @Unstable
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference)
     {
         XWikiDocument securityDocument = createSecurityDocument();

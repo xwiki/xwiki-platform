@@ -27,10 +27,13 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -52,6 +55,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +67,7 @@ import static org.mockito.Mockito.when;
 @SolrComponentList
 @ComponentTest
 @ComponentList({TestSolrCoreInitializer.class, LocaleConverter.class})
-public class DefaultSolrTest
+class DefaultSolrTest
 {
     @XWikiTempDir
     private File permanentDirectory;
@@ -103,7 +107,7 @@ public class DefaultSolrTest
     // Tests
 
     @Test
-    public void getXWikiClient() throws Exception
+    void getXWikiClient() throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class);
 
@@ -119,7 +123,7 @@ public class DefaultSolrTest
     }
 
     @Test
-    public void getTestClient() throws Exception
+    void testClient() throws Exception
     {
         Solr solr = this.componentManager.getInstance(Solr.class);
         SolrUtils solrUtils = this.componentManager.getInstance(SolrUtils.class);
@@ -127,6 +131,8 @@ public class DefaultSolrTest
         SolrClient client = solr.getClient("test");
 
         assertNotNull(client);
+
+        assertTrue(client.query(new SolrQuery()).getResults().isEmpty());
 
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put("name", "content");
@@ -136,6 +142,13 @@ public class DefaultSolrTest
         new SchemaRequest.AddField(fieldAttributes).process(client);
         fieldAttributes.put("name", "testlist");
         fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "testlocales");
+        fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "text");
+        fieldAttributes.put("type", "text_general");
+        fieldAttributes.remove("multiValued");
         new SchemaRequest.AddField(fieldAttributes).process(client);
 
         SolrInputDocument inputDocument = new SolrInputDocument();
@@ -156,14 +169,25 @@ public class DefaultSolrTest
 
         solrUtils.setString("testlocale", Locale.FRANCE, inputDocument);
 
+        solrUtils.setString("testlocales", Arrays.asList(Locale.ENGLISH, Locale.FRENCH), Locale.class, inputDocument);
+
+        solrUtils.set("text", "two words UPPERCASE", inputDocument);
+
         client.add(inputDocument);
         client.commit();
 
+        assertEquals(1, client.query(new SolrQuery()).getResults().size());
+
         SolrDocument storedDocument = client.getById("42");
+
+        assertNotNull(storedDocument);
 
         assertEquals("42", solrUtils.getId(storedDocument));
         assertEquals("content1", solrUtils.get("content", storedDocument));
         assertEquals(Locale.FRANCE, solrUtils.get("testlocale", storedDocument, Locale.class));
+        assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH),
+            solrUtils.getCollection("testlocales", storedDocument, Locale.class));
+        assertEquals("two words UPPERCASE", solrUtils.get("text", storedDocument));
 
         Map<String, Object> storedMap = solrUtils.getMap("testmap", storedDocument);
 
@@ -176,7 +200,49 @@ public class DefaultSolrTest
         assertEquals(Arrays.asList("testvalue1", "testvalue2"), storedMap.get("teststrings"));
         assertEquals(Arrays.asList(43, 44), storedMap.get("testints"));
 
-        assertNotNull(storedDocument);
+        SolrQuery query = new SolrQuery("content:content1");
+        SolrDocumentList documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("content1");
+        query.set(CommonParams.DF, "content");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("two");
+        query.set(CommonParams.DF, "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("words");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("uppercase");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("UPPERCASE");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
 
         SchemaResponse.FieldTypeResponse response = new SchemaRequest.FieldType("__xversion").process(client);
         assertEquals(String.valueOf(AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION),

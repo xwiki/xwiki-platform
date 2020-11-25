@@ -119,7 +119,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
                 return principal;
             } else {
-                authenticationFailureManager.recordAuthenticationFailure(username);
+                authenticationFailureManager.recordAuthenticationFailure(username, request);
             }
         }
 

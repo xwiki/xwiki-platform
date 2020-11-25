@@ -19,13 +19,10 @@
  */
 package org.xwiki.extension.xar.security;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * @version $Id$
  * @since 10.5RC1
  */
-@Unstable
 public enum ProtectionLevel
 {
     /**

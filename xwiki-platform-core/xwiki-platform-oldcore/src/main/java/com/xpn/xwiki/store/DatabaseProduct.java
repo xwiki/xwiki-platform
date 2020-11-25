@@ -84,6 +84,13 @@ public final class DatabaseProduct
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown", "unknown");
 
     /**
+     * The Product name and the JDBC scheme to recognize a MariaDB DB.
+     * <p>
+     * Keeping it private until we think it's different enough from MySQL behavior to justify it's own branches.
+     */
+    private static final DatabaseProduct MARIADB = new DatabaseProduct("MariaDB", "mariadb");
+
+    /**
      * @see #getProductName()
      */
     private String productName;
@@ -149,7 +156,7 @@ public final class DatabaseProduct
         {
             // See documentation above on why we check starts with for DB2
             product = DB2;
-        } else if (matches(productNameOrJDBCScheme, MYSQL)) {
+        } else if (isMySQL(productNameOrJDBCScheme)) {
             product = MYSQL;
         } else if (matches(productNameOrJDBCScheme, POSTGRESQL)) {
             product = POSTGRESQL;
@@ -160,6 +167,11 @@ public final class DatabaseProduct
         }
 
         return product;
+    }
+
+    private static boolean isMySQL(String productNameOrJDBCScheme)
+    {
+        return matches(productNameOrJDBCScheme, MYSQL) || matches(productNameOrJDBCScheme, MARIADB);
     }
 
     private static boolean matches(String productNameOrJDBCScheme, DatabaseProduct product)

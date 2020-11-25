@@ -126,7 +126,10 @@ public class LegacyEventMigrationJobTest
         LegacyEventMigrationRequest request = new LegacyEventMigrationRequest(new Date(42),
             Arrays.asList("myId", "42"));
         Query query = mock(Query.class);
-        when(this.queryManager.createQuery("WHERE event.date >= :since", Query.HQL)).thenReturn(query);
+        when(this.queryManager.createQuery("WHERE event.date >= :since ORDER BY event.date desc", Query.HQL)).thenReturn(query);
+        Query statusQuery = mock(Query.class);
+        when(this.queryManager.createQuery("select eventStatus.entityId from LegacyEventStatus eventStatus "
+            + "where eventStatus.activityEvent.id = :eventId", Query.HQL)).thenReturn(statusQuery);
 
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);

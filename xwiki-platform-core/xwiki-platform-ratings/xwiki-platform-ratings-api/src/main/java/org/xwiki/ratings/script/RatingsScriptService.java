@@ -19,421 +19,103 @@
  */
 package org.xwiki.ratings.script;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.ratings.AverageRatingApi;
-import org.xwiki.ratings.ConfiguredProvider;
-import org.xwiki.ratings.Rating;
-import org.xwiki.ratings.RatingsConfiguration;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
-import org.xwiki.user.CurrentUserReference;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Document;
 
 /**
- * Script service offering access to the ratings API.
- * 
+ * Script service to manipulate ratings for different ratings hints.
+ * This service might be used in two ways: by default it performs calls on the default Ratings Application hint
+ * (see {@link RatingsManagerFactory#DEFAULT_APP_HINT}), but it can be used with the hint of a custom application e.g.
+ * {@code $services.ratings.foo} will call the methods for a {@link RatingsManager} identified by {@code foo}.
+ * For more information, see the documentation of {@link RatingsManagerFactory}.
+ *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.9RC1
  */
 @Component
 @Singleton
 @Named("ratings")
-public class RatingsScriptService implements ScriptService
+@Unstable
+public class RatingsScriptService extends AbstractScriptRatingsManager implements Initializable, ScriptService
 {
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    static final String EXECUTION_CONTEXT_PREFIX = "ratings.script.";
 
     @Inject
-    private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
+    private RatingsManagerFactory ratingsManagerFactory;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private Execution execution;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> referenceDocumentReferenceResolver;
+    @Named("context")
+    private ComponentManager componentManager;
 
     @Inject
-    @Named("user/current")
-    private DocumentReferenceResolver<String> userReferenceResolver;
+    private Logger logger;
 
-    @Inject
-    private RatingsConfiguration ratingsConfiguration;
-
-    /**
-     * Retrieve the XWiki context from the current execution context.
-     * 
-     * @return the XWiki context
-     * @throws RuntimeException If there was an error retrieving the context
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return this.xcontextProvider.get();
-    }
-
-    /**
-     * Store a caught exception in the context.
-     * 
-     * @param e the exception to store, can be null to clear the previously stored exception
-     */
-    private void setError(Throwable e)
-    {
-        getXWikiContext().put("exception", e);
-    }
-
-    /**
-     * Retrieve the global configuration document.
-     *
-     * @return an absolute reference to the global configuration document
-     */
-    private DocumentReference getGlobalConfig()
-    {
-        return this.referenceDocumentReferenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE);
-    }
-
-    /**
-     * Wrap rating objects.
-     * 
-     * @param ratings a list of rating object
-     * @return list of object wrapped with the RatingAPI
-     */
-    private static List<RatingApi> wrapRatings(List<Rating> ratings)
-    {
-        if (ratings == null) {
-            return null;
-        }
-
-        List<RatingApi> ratingsResult = new ArrayList<RatingApi>();
-        for (Rating rating : ratings) {
-            ratingsResult.add(new RatingApi(rating));
-        }
-
-        return ratingsResult;
-    }
-
-    /**
-     * Set a new rating.
-     * 
-     * @param doc the document which is being rated
-     * @param author the author giving the rating
-     * @param vote the number of stars given (from 1 to 5)
-     * @return the new rating object
-     * @deprecated use {@link #setRating(DocumentReference, DocumentReference, int)} instead
-     */
-    @Deprecated
-    public RatingApi setRating(Document doc, String author, int vote)
-    {
-        DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
-        return setRating(documentRef, authorRef, vote);
-    }
-
-    /**
-     * Set a new rating.
-     * 
-     * @param document the document which is being rated
-     * @param author the author giving the rating
-     * @param vote the number of stars given (from 1 to 5)
-     * @return the new rating object
-     */
-    public RatingApi setRating(DocumentReference document, DocumentReference author, int vote)
-    {
-        // TODO protect this with programming rights
-        // and add a setRating(docName), not protected but for which the author is retrieved from getXWikiContext().
-        setError(null);
-
-        try {
-            return new RatingApi(this.ratingsManagerProvider.get(document).setRating(document, author, vote));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Retrieve a specific rating.
-     * 
-     * @param doc the document to which the rating belongs to
-     * @param author the user that gave the rating
-     * @return a rating object
-     * @deprecated use {@link #getRating(DocumentReference, DocumentReference)} instead
-     */
-    @Deprecated
-    public RatingApi getRating(Document doc, String author)
-    {
-        DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
-        return getRating(documentRef, authorRef);
-    }
-
-    /**
-     * Retrieve a specific rating.
-     * 
-     * @param document the document to which the rating belongs to
-     * @param author the user that gave the rating
-     * @return a rating object
-     */
-    public RatingApi getRating(DocumentReference document, DocumentReference author)
-    {
-        setError(null);
-
-        try {
-            Rating rating = this.ratingsManagerProvider.get(document).getRating(document, author);
-            if (rating == null) {
-                return null;
-            }
-            return new RatingApi(rating);
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get a list of ratings.
-     * 
-     * @param doc the document to which the ratings belong to
-     * @param start the offset from which to start
-     * @param count number of ratings to return
-     * @return a list of rating objects
-     * @deprecated use {@link #getRatings(DocumentReference, int, int)} instead
-     */
-    @Deprecated
-    public List<RatingApi> getRatings(Document doc, int start, int count)
-    {
-        return getRatings(doc.getDocumentReference(), start, count);
-    }
-
-    /**
-     * Get a list of ratings.
-     * 
-     * @param document the document to which the ratings belong to
-     * @param start the offset from which to start
-     * @param count number of ratings to return
-     * @return a list of rating objects
-     */
-    public List<RatingApi> getRatings(DocumentReference document, int start, int count)
-    {
-        return getRatings(document, start, count, true);
-    }
-
-    /**
-     * Get a sorted list of ratings.
-     * 
-     * @param doc the document to which the ratings belong to
-     * @param start the offset from which to start
-     * @param count number of ratings to return
-     * @param asc in ascending order or not
-     * @return a list of rating objects
-     * @deprecated use {@link #getRatings(DocumentReference, int, int, boolean)} instead
-     */
-    @Deprecated
-    public List<RatingApi> getRatings(Document doc, int start, int count, boolean asc)
-    {
-        return getRatings(doc.getDocumentReference(), start, count, asc);
-    }
-
-    /**
-     * Get a sorted list of ratings.
-     * 
-     * @param document the document to which the ratings belong to
-     * @param start the offset from which to start
-     * @param count number of ratings to return
-     * @param asc in ascending order or not
-     * @return a list of rating objects
-     */
-    public List<RatingApi> getRatings(DocumentReference document, int start, int count, boolean asc)
-    {
-        setError(null);
-
-        try {
-            return wrapRatings(this.ratingsManagerProvider.get(document).getRatings(document, start, count, asc));
-        } catch (Exception e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get average rating.
-     * 
-     * @param doc the document to which the average rating belongs to
-     * @param method the method of calculating the average
-     * @return a average rating API object
-     * @deprecated use {@link #getAverageRating(DocumentReference, String)} instead
-     */
-    @Deprecated
-    public AverageRatingApi getAverageRating(Document doc, String method)
-    {
-        return getAverageRating(doc.getDocumentReference(), method);
-    }
-
-    /**
-     * Get average rating.
-     * 
-     * @param document the document to which the average rating belongs to
-     * @param method the method of calculating the average
-     * @return a average rating API object
-     */
-    public AverageRatingApi getAverageRating(DocumentReference document, String method)
-    {
-        setError(null);
-
-        try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document, method));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get average rating.
-     * 
-     * @param doc the document to which the average rating belongs to
-     * @return a average rating API object
-     * @deprecated use {@link #getAverageRating(DocumentReference)} instead
-     */
-    @Deprecated
-    public AverageRatingApi getAverageRating(Document doc)
-    {
-        return getAverageRating(doc.getDocumentReference());
-    }
-
-    /**
-     * Get average rating.
-     * 
-     * @param document the document to which the average rating belongs to
-     * @return a average rating API object
-     */
-    public AverageRatingApi getAverageRating(DocumentReference document)
-    {
-        setError(null);
-
-        try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get average rating from query.
-     * 
-     * @param fromsql the from clause of the query
-     * @param wheresql the where clause of the query
-     * @param method the method of calculating the average
-     * @return a average rating API object
-     */
-    public AverageRatingApi getAverageRating(String fromsql, String wheresql, String method)
-    {
-        setError(null);
-
-        try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
-                fromsql, wheresql, method));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get average rating from query.
-     * 
-     * @param fromsql the from clause of the query
-     * @param wheresql the where clause of the query
-     * @return a average rating API object
-     */
-    public AverageRatingApi getAverageRating(String fromsql, String wheresql)
-    {
-        setError(null);
-
-        try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
-                fromsql, wheresql));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Get a user's reputation.
-     * 
-     * @param username the user document
-     * @return a average rating API object
-     */
-    public AverageRatingApi getUserReputation(String username)
-    {
-        DocumentReference userRef = this.userReferenceResolver.resolve(username);
-        return getUserReputation(userRef);
-    }
-
-    /**
-     * Get a user's reputation.
-     * 
-     * @param username the user document
-     * @return a average rating API object
-     */
-    public AverageRatingApi getUserReputation(DocumentReference username)
-    {
-        setError(null);
-
-        try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
-        } catch (Throwable e) {
-            setError(e);
-            return null;
-        }
-    }
-    
-    /**
-     * Get configuration document.
-      *
-      * @param documentReference the documentReference for which to return the configuration document
-      * @return the configuration document
-      * @since 8.2.1
-      */
-    public Document getConfigurationDocument(DocumentReference documentReference)
-    {
-        return ratingsConfiguration.getConfigurationDocument(documentReference).newDocument(getXWikiContext());
-    }
-
-    /**
-     * Retrieve all the ratings of the current user.
-     * @param start offset of ratings to start retrieve.
-     * @param count maximum number of ratings to retrieve.
-     * @param asc if the results should be ordered in ascending or descending order.
-     * @return a list of ratings.
-     * @since 12.6
-     */
-    @Unstable
-    public List<RatingApi> getCurrentUserRatings(int start, int count, boolean asc)
+    @Override
+    public void initialize() throws InitializationException
     {
         try {
-            return wrapRatings(this.ratingsManagerProvider.get(getGlobalConfig())
-                .getRatings(CurrentUserReference.INSTANCE, start, count, asc));
+            setRatingsManager(this.ratingsManagerFactory.getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT));
         } catch (RatingsException e) {
-            setError(e);
-            return null;
+            throw new InitializationException("Error when trying to retrieve the instance of RatingsManager", e);
         }
+    }
+
+    /**
+     * Retrieve a specific {@link DefaultScriptRatingsManager} for the given hint.
+     * This method will in fact instantiate the right {@link RatingsManager} for the given hint, and create a
+     * {@link DefaultScriptRatingsManager} around it to allow performing all script service calls on it.
+     * Note that the method also caches the instantiated {@link DefaultScriptRatingsManager} in the
+     * {@link ExecutionContext} so that it's kept during the execution of a script.
+     *
+     * @param managerHint the hint of a {@link RatingsManager} to use. See {@link RatingsManagerFactory} for more
+     *                    information.
+     * @return a wrapper around the {@link RatingsManager} to perform the script service calls.
+     */
+    public DefaultScriptRatingsManager get(String managerHint)
+    {
+        ExecutionContext executionContext = this.execution.getContext();
+        String executionContextCacheKey = EXECUTION_CONTEXT_PREFIX + managerHint;
+
+        DefaultScriptRatingsManager scriptRatingsManager = null;
+        if (executionContext.hasProperty(executionContextCacheKey)) {
+            scriptRatingsManager = (DefaultScriptRatingsManager) executionContext.getProperty(executionContextCacheKey);
+        } else {
+            try {
+                RatingsManager ratingsManager = this.ratingsManagerFactory.getRatingsManager(managerHint);
+                scriptRatingsManager = this.componentManager
+                    .getInstance(DefaultScriptRatingsManager.class, managerHint);
+                scriptRatingsManager.setRatingsManager(ratingsManager);
+                executionContext.setProperty(executionContextCacheKey, scriptRatingsManager);
+            } catch (RatingsException e) {
+                this.logger.error(
+                    String.format("Error when trying to retrieve RatingsManager instance with hint [%s]", managerHint),
+                    e);
+            } catch (ComponentLookupException e) {
+                this.logger.error(
+                    String.format("Error when trying to retrieve DefaultScriptRatingsManager instance with hint [%s]",
+                        managerHint),
+                    e);
+            }
+        }
+
+        return scriptRatingsManager;
     }
 }

@@ -24,17 +24,18 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -189,6 +190,14 @@ public class SaveAction extends PreviewAction
                 context.put("exception", e);
                 return true;
             }
+        }
+
+        // Convert the content and the meta data of the edited document and its translations if the syntax has changed
+        // and the request is asking for a syntax conversion. We do this after applying the template because the
+        // template may have content in the previous syntax that needs to be converted. We do this before applying the
+        // changes from the submitted form because it may contain content that was already converted.
+        if (form.isConvertSyntax() && !tdoc.getSyntax().toIdString().equals(form.getSyntaxId())) {
+            convertSyntax(tdoc, form.getSyntaxId(), context);
         }
 
         if (sectionNumber != 0) {
@@ -402,11 +411,11 @@ public class SaveAction extends PreviewAction
         Version previousVersion = new Version(request.getParameter("previousVersion"));
         Version latestVersion = originalDoc.getRCSVersion();
 
-        DateTime editingVersionDate = new DateTime(request.getParameter("editingVersionDate"));
-        DateTime latestVersionDate = new DateTime(originalDoc.getDate());
+        Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
+        Date latestVersionDate = originalDoc.getDate();
 
         // we ensure that nobody edited the document between the moment the user started to edit and now
-        if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
+        if (!latestVersion.equals(previousVersion) || latestVersionDate.after(editingVersionDate)) {
             try {
                 XWikiDocument previousDoc =
                     getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
@@ -584,5 +593,27 @@ public class SaveAction extends PreviewAction
     private String serializeJobId(List<String> jobId)
     {
         return StringUtils.join(jobId, "/");
+    }
+
+    private void convertSyntax(XWikiDocument doc, String targetSyntaxId, XWikiContext xcontext) throws XWikiException
+    {
+        // Convert the syntax without saving. The syntax conversion will be saved later along with the other changes.
+        doc.convertSyntax(targetSyntaxId, xcontext);
+
+        for (Locale locale : doc.getTranslationLocales(xcontext)) {
+            // Skip the edited translation because we handle it separately.
+            if (!Objects.equals(locale, doc.getLocale())) {
+                XWikiDocument tdoc = doc.getTranslatedDocument(locale, xcontext);
+                // Double check if the syntax has changed because each document translation can have a different syntax.
+                if (!tdoc.getSyntax().toIdString().equals(targetSyntaxId)) {
+                    // Convert the syntax and save the changes.
+                    tdoc.convertSyntax(targetSyntaxId, xcontext);
+                    xcontext.getWiki().saveDocument(tdoc,
+                        String.format("Document converted from syntax %s to syntax %s", tdoc.getSyntax().toIdString(),
+                            targetSyntaxId),
+                        xcontext);
+                }
+            }
+        }
     }
 }

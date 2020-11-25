@@ -22,6 +22,7 @@ package org.xwiki.rendering.async.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.GroupedJob;
@@ -30,6 +31,8 @@ import org.xwiki.job.Request;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
 import org.xwiki.template.TemplateManager;
+
+import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
  * Default implementation of {@link AsyncRendererJob}.
@@ -49,6 +52,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
     @Inject
     private TemplateManager templateManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     protected AsyncRendererJobRequest castRequest(Request request)
@@ -85,22 +91,33 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         this.asyncContext.setEnabled(!renderer.isCacheAllowed());
 
         // Prepare to catch stuff to invalidate the cache
-        ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        }
 
         // Many UI elements expect xwikivars.vm result to be in the context so we execute it
         // FIXME: not very happy with that but can't find a better place yet
         // (other than executing it at the beginning of every single element which might be executed asynchronously...)
         this.templateManager.execute("xwikivars.vm");
 
+        // Mark the context document as used if it was explicitly set in the context
+        if (this.request.getContext() != null
+            && this.request.getContext().containsKey(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE)) {
+            this.asyncContext.useEntity(this.documentAccessBridge.getCurrentDocumentReference());
+        }
+
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);
-        // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
-        ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
-        getStatus().setReferences(contextUse.getReferences());
-        getStatus().setRoles(contextUse.getRoles());
-        getStatus().setRoleTypes(contextUse.getRoleTypes());
-        getStatus().setUses(contextUse.getUses());
+
+        if (this.asyncContext instanceof DefaultAsyncContext) {
+            // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
+            ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+            getStatus().setReferences(contextUse.getReferences());
+            getStatus().setRoles(contextUse.getRoles());
+            getStatus().setRoleTypes(contextUse.getRoleTypes());
+            getStatus().setUses(contextUse.getUses());
+        }
     }
 
     @Override

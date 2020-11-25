@@ -78,46 +78,7 @@
 <input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 
-#**
- * AJAX Live table that displays XWiki data.
- *
- * Example of usage, in syntax 2.0:
- * <code>
- * {{velocity}}
- * #set($columns = [ "_avatar", "first_name", "last_name", "email"])
- * #set($columnsProperties = {
- *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"},
- *                  "last_name" : { "type" : "text" , "size" : 10, "link" : "view"},
- *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
- *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
- *                })
- * #set($options = {  "className":"XWiki.XWikiUsers",
- *                    "translationPrefix" : "platform.index.",
- *                    "tagCloud" : true,
- *                    "rowCount": 15,
- *                    "javascriptName" : "MyModule.myTable",
- *                    "description: "The description of this table here", })
- * #livetable("userstable" $columns $columnsProperties $options)
- * {{/velocity}}
- * </code>
- *
- * @param divid the id of the table div
- * @param collist the column list
- * @param colprops the columns properties
- * @param options the livetable options.
- *#
-#macro(livetable $divid $collist $colprops $options)
-## Open wiki syntax wrappers.
-#if("$!options.outputOnlyHtml" != 'true')
-## Do not indent:
-#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
-
-
-## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
-## attribute values (e.g. if the live table id contains whitespaces)
-{{html clean="false"}}
-#else {pre} #end
-#end
+#macro(livetable_html $divid $collist $colprops $options)
   ##
   ## SX deps.
   ##
@@ -321,11 +282,6 @@
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
 </div>## xwiki-livetable-container
-## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
-#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
-
-#else{/pre}#end##
-#end## end-wrappers
 #end## end-livetable-macro
 
 #macro (livetable_filter $column $columnProperties $xproperty)

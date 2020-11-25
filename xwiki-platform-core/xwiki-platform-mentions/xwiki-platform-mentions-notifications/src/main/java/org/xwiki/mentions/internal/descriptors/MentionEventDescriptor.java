@@ -62,4 +62,10 @@ public class MentionEventDescriptor implements RecordableEventDescriptor
     {
         return "bell";
     }
+
+    @Override
+    public String getEventTitle()
+    {
+        return "mentions.event.mention.title";
+    }
 }

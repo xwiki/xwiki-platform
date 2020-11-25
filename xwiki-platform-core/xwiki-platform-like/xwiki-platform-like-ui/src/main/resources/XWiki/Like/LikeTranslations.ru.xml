@@ -37,23 +37,27 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rightsmanager.like=Нравиться
-like.unlike.modal.title=Не нравиться?
+like.unlike.modal.title=Не нравиться
 like.unlike.modal.body=Вы действительно хотите удалить отметку "Нравится" для страницы {0}?
 like.unlike.modal.closeButton=Закрыть
 like.unlike.modal.unlikeButton=Не нравиться
-like.unlike.modal.viewLikersButton=Просмотреть отметки "Нравиться"
-like.newlike.success=Страничка понравилась.
-like.newlike.error=Ошибка при попытке поставить "Нравиться" странице.
-### Missing: like.unlike.success=The page has been unliked.
-### Missing: like.unlike.error=Error when trying to unlike the page.
-### Missing: like.userprofile.menu=Liked Pages
-### Missing: like.button.title=Number of likes on this page: {0}
-### Missing: like.likers.empty=No one likes this page yet.
-### Missing: like.likers.number={0} person(s) like this page:
-### Missing: like.likers.title=Likes on {0}
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
-  
+like.unlike.modal.viewLikersButton=Просмотреть отметки "Нравится"
+like.newlike.success=Страница "Нравится".
+like.newlike.error=Ошибка при попытке поставить "Нравится" странице.
+like.unlike.success=Страница "Не нравится".
+like.unlike.error=Ошибка при попытке поставить "Не нравится" странице.
+like.userprofile.menu=Понравившиеся страницы
+like.button.title=У этой страницы {0} отметок "Нравится"
+like.button.title.like=Нажмите, чтобы оценить текущую страницу. У этой страницы {0} отметок "Нравится".
+like.button.title.unlike=Нажмите, чтобы оценить текущую страницу. У этой страницы {0} отметок "Нравится".
+like.likers.empty=У этой страницы пока нет отметок "Нравится".
+like.likers.number={0} чел. поставили "Нравится" этой странице:
+like.likers.title="Нравится" {0} чел.
+like.livetable.column.title=Название
+like.livetable.column.location=Расположение
+like.livetable.column.likes=Понравившиеся страницы
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Всегда отображать кнопку "Нравится"
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Отображать кнопку, даже если у пользователя нет прав на взаимодействие с ней. Используйте его, если хотите, чтобы счетчик отметок "Нравится" всегда отображался.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Емкость кеш-памяти
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравиться" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.</content>
 </xwikidoc>

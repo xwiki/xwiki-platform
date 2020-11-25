@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -35,8 +36,8 @@ import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.Programming;
 
 /**
@@ -45,7 +46,6 @@ import com.xpn.xwiki.util.Programming;
  * @version $Id$
  * @since 11.6RC1
  */
-@Unstable
 @Component
 @Named(SecurityScriptService.ROLEHINT + '.' + AuthenticationScriptService.ID)
 @Singleton
@@ -66,16 +66,19 @@ public class AuthenticationScriptService implements ScriptService
     private ComponentManager componentManager;
 
     @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
     private Logger logger;
 
     /**
      * @param username the login used in the request for authentication.
      * @return the aggregated form field to validate for the authentication
-     *          (see {@link AuthenticationFailureManager#getForm(String)}).
+     *         (see {@link AuthenticationFailureManager#getForm(String, javax.servlet.http.HttpServletRequest)}
      */
     public String getForm(String username)
     {
-        return this.authenticationFailureManager.getForm(username);
+        return this.authenticationFailureManager.getForm(username, contextProvider.get().getRequest());
     }
 
     /**

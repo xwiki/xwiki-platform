@@ -70,7 +70,6 @@ platform.flamingo.themes.category.breadcrumb=Хлебные крошки
 platform.flamingo.themes.category.advanced=Дополнительно
 platform.flamingo.themes.defaultvalue=По-умолчанию
 platform.flamingo.themes.lessCode.description=В этом поле вы можете напрямую написать LESS-код, который будет добавлен в скин.
-platform.flamingo.themes.incompatiblebrowser=Извините, предварительный просмотр не работает с этой версией Internet Explorer. Вам нужно использовать более новый браузер.
 platform.flamingo.themes.local=Локальные
 platform.flamingo.themes.global=Глобальные
 
@@ -86,6 +85,11 @@ platform.flamingo.themes.global=Глобальные
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=К сожалению, это поле не учитывается при предварительном просмотре.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Извините, предварительный просмотр не работает с этой версией Internet Explorer. Вам нужно использовать более новый браузер.
 
 #@deprecatedend</content>
 </xwikidoc>

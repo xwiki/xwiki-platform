@@ -1,0 +1,103 @@
+{
+  "id": "notificationFilterPreferencesLiveTable",
+  "columns": ["name", "filterType", "eventTypes", "notificationFormats", "isEnabled", "_actions"],
+  "columnProperties": {
+    "name": {"sortable": false, "html": true, "filterable": "false"},
+    "filterType": {"sortable": false, "filterable": false, "displayName": "Filter Type"},
+    "eventTypes": {"sortable": "false", "html": true, "filterable": false},
+    "notificationFormats": {"type": "hidden"},
+    "isEnabled": {
+      "sortable": false,
+      "html" : true,
+      "filterable": false,
+      "class": "XWiki.Notifications.Code.ToggleableFilterPreferenceClass"
+    },
+    "_actions": {"sortable": false, "actions": ["delete"], "filterable": false}
+  },
+  "options": {
+    "resultPage": "XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
+    "rowCount": 10,
+    "description": "This table lists every filter registered for the current user.",
+    "translationPrefix": "notifications.settings.filters.preferences.table.",
+    "extraParams": "eventTypes=&format=&eventTypes=mention&user=xwiki%3AXWiki.mflorea&user=xwiki%3AXWiki.cdesableau",
+    "outputOnlyHtml": true,
+    "pageSize": false
+  }
+}
+---
+{
+  "id":"notificationFilterPreferencesLiveTable",
+  "query":{
+    "properties":["name","filterType","eventTypes","notificationFormats","isEnabled","_actions"],
+    "source":{
+      "id":"liveTable",
+      "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
+      "translationPrefix":"notifications.settings.filters.preferences.table.",
+      "format":"",
+      "user":["xwiki:XWiki.mflorea","xwiki:XWiki.cdesableau"]
+    },
+    "filters":[
+      {
+        "property":"eventTypes",
+        "constraints":[{"value":""},{"value":"mention"}]
+      }
+    ],
+    "sort":[
+      {"property":"name"}
+    ],
+    "limit":10
+  },
+  "meta":{
+    "propertyDescriptors":[
+      {
+        "id":"name",
+        "name":"Name",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"filterType",
+        "name":"Filter Type",
+        "sortable":false,
+        "visible":true,
+        "filterable":false
+      },
+      {
+        "id":"eventTypes",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"notificationFormats",
+        "sortable":true,
+        "visible":false,
+        "filterable":true
+      },
+      {
+        "id":"isEnabled",
+        "type":"Boolean",
+        "sortable":false,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"_actions",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{
+          "id":"actions",
+          "actions":["delete"]
+        }
+      }
+    ],
+    "pagination":{
+      "maxShownPages":10,
+      "showPageSizeDropdown":false
+    }
+  }
+}

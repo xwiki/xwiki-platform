@@ -4,6 +4,8 @@ Section: java
 Priority: optional
 Architecture: all
 Depends: 
+Replaces: xwiki-solr-data
+Conflicts: xwiki-solr-data
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

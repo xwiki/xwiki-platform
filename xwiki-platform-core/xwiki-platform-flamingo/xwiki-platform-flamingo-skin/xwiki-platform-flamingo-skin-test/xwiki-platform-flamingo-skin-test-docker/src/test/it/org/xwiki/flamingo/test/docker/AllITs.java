@@ -59,6 +59,12 @@ public class AllITs
 
     @Nested
     @DisplayName("Login Tests")
+    class NestedLoginIT extends LoginIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Login Protection Tests")
     class NestedLoginProtectionIT extends LoginProtectionIT
     {
     }
@@ -96,6 +102,12 @@ public class AllITs
     @Nested
     @DisplayName("Section editing tests")
     class NestedSectionEditIT extends SectionEditIT
+    {
+    }
+    
+    @Nested
+    @DisplayName("Document information tab tests")
+    class NestedInformationIT extends InformationIT
     {
     }
 }

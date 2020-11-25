@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -120,13 +120,12 @@
                  Don't forget to '\'-escape dots and other special characters in this case ;)
             <revapi.ignore>
               <item>
-                <code>java.class.removed</code>
-                <old>class org.xwiki.velocity.tools.CollectionsTool</old>
-                <justification>Not a Breakage. Moved to Legacy</justification>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.ratings.RatingsManager::setIdentifier(java.lang.String)</new>
+                <justification>Young API: fix typo.</justification>
               </item>
             </revapi.ignore>
             -->
-            
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -177,6 +176,7 @@
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-like</module>
     <module>xwiki-platform-linkchecker</module>
+    <module>xwiki-platform-livedata</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>

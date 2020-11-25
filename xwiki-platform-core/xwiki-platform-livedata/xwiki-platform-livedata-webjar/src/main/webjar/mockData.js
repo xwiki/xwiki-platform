@@ -105,7 +105,8 @@ define({
         type: "list",
         visible: true,
         filter: {
-          options: ["Tag 1", "Tag 2", "Tag 3"],
+          id: "suggest",
+          url: "http://localhost:8080/xwiki/rest/wikis/xwiki/classes/XWiki.DocumentClass/properties/author/values?fp=&limit=10&media=json",
         },
       },
       {
@@ -199,6 +200,14 @@ define({
         ],
       },
       {
+        id: "suggest",
+        defaultOperator: "is",
+        operators: [
+          { id: "is", name: "Is in", },
+          { id: "nis", name: "Is Not in", },
+        ],
+      },
+      {
         id: "number",
         defaultOperator: "equals",
         operators: [
@@ -272,7 +281,7 @@ define({
         "doc_creationDate": "2020/03/27 13:21",
         "doc_creator": "Creator 1",
         "age": 48,
-        "tags": ["Tag 1"],
+        "tags": "Tag 1",
         "country": "France",
         "other": "<em>lorem ipsum<em>",
       },
@@ -285,7 +294,7 @@ define({
         "doc_creationDate": "2020/04/22 14:06",
         "doc_creator": "Creator 2",
         "age": 24,
-        "tags": ["Tag 2"],
+        "tags": "Tag 2",
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
       },
@@ -298,7 +307,7 @@ define({
         "doc_creationDate": "2020/03/27 14:34",
         "doc_creator": "Creator 3",
         "age": 12,
-        "tags": ["Tag 3"],
+        "tags": "Tag 3",
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
       },

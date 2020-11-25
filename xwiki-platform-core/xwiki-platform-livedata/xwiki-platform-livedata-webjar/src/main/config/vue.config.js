@@ -27,6 +27,7 @@ module.exports = {
     config.externals({
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",
+      "xwiki-selectize": "xwiki-selectize",
     })
   },
   css: {

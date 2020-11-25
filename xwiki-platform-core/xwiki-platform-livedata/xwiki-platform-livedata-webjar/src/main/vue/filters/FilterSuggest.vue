@@ -94,7 +94,7 @@ export default {
       };
     },
 
-    // Taken from xwiki-platform-web/src/main/webapp/resources/uicomponents/suggest/
+    // Taken from xwiki-platform-web/src/main/webapp/resources/uicomponents/suggest/xwiki.seletize.js
     // Customized to work for suggest filter when it needs to be updated
     // from changes from another suggest filter
     loadSelectedValues (values) {

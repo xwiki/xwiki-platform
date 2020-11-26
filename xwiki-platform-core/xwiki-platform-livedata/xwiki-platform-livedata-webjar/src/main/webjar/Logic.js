@@ -974,16 +974,23 @@ define([
       const queryFilters = this.getQueryFilters(property);
       const currentEntry = queryFilters[index] || {};
       oldEntry = Object.assign({}, currentEntry, oldEntry);
-      // new entry
-      let newEntry = filterEntry || {};
+      // new entry (copy properties that are not undefined from filterEntry)
+      let newEntry = Object.fromEntries(Object.entries(filterEntry || {})
+        .filter(entry => entry[1] !== undefined));
       const self = this;
       const defaultEntry = {
         property: property,
         value: "",
-        get operator () { return self.getFilterDefaultOperator(this.property); },
+        operator: self.getFilterDefaultOperator(property),
         index: 0,
       };
       newEntry = Object.assign({}, defaultEntry, oldEntry, newEntry);
+      // check newEntry operator
+      const newEntryValidOperator = this.getFilterDescriptor(newEntry.property).operators
+        .some(operator => operator.id === newEntry.operator);
+      if (!newEntryValidOperator) {
+        newEntry.operator = self.getFilterDefaultOperator(newEntry.property);
+      }
       return {
         oldEntry: oldEntry,
         newEntry: newEntry,

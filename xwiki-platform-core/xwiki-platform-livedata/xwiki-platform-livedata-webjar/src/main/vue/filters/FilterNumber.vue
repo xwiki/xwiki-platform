@@ -32,7 +32,7 @@
     type="text"
     size="1"
     :value="filterEntry.value"
-    @change="applyFilter($event.target.value)"
+    @input="applyFilterWithDelay($event.target.value)"
   />
 </template>
 

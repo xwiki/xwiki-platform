@@ -82,10 +82,12 @@
         in the Livedata meta config
       -->
       <a
-        class="page-nav"
+        :class="['page-nav', {
+          'disabled': isFirstPage,
+        }]"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.setPageIndex(0)"
+        @click.prevent="!isFirstPage && logic.setPageIndex(0)"
       >
         <span class="fa fa-angle-double-left"></span>
       </a>
@@ -96,10 +98,12 @@
         in the Livedata meta config
       -->
       <a
-        class="page-nav"
+        :class="['page-nav', {
+          'disabled': isFirstPage,
+        }]"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageIndex() - 1)"
+        @click.prevent="!isFirstPage && logic.setPageIndex(logic.getPageIndex() - 1)"
       >
         <span class="fa fa-angle-left"></span>
       </a>
@@ -144,10 +148,12 @@
         in the Livedata meta config
       -->
       <a
-        class="page-nav"
+        :class="['page-nav', {
+          'disabled': isLastPage,
+        }]"
         v-if="data.meta.pagination.showNextPrevious"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageIndex() + 1)"
+        @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageIndex() + 1)"
       >
         <span class="fa fa-angle-right"></span>
       </a>
@@ -158,10 +164,12 @@
         in the Livedata meta config
       -->
       <a
-        class="page-nav"
+        :class="['page-nav', {
+          'disabled': isLastPage,
+        }]"
         v-if="data.meta.pagination.showFirstLast"
         href="#"
-        @click.prevent="logic.setPageIndex(logic.getPageCount() - 1)"
+        @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageCount() - 1)"
       >
         <span class="fa fa-angle-double-right"></span>
       </a>
@@ -181,6 +189,16 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+
+    // Whether current page is first page
+    isFirstPage () {
+      return this.logic.getPageIndex() === 0;
+    },
+
+    // Whether current page is last page
+    isLastPage () {
+      return this.logic.getPageIndex() === this.logic.getPageCount() - 1;
+    },
 
     // Return the page indexes (= page number but 0-based) to be displayed
     // It follows the following algorithm:
@@ -276,6 +294,12 @@ export default {
   text-decoration: underline;
 }
 .livedata-pagination .page-nav:not(:hover) {
+  text-decoration: none;
+}
+
+.livedata-pagination .page-nav.disabled {
+  color: gray;
+  cursor: default;
   text-decoration: none;
 }
 

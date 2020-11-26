@@ -45,7 +45,7 @@ public abstract class XWikiForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
-     * @since 12.9RC1
+     * @since 13.0RC1
      */
     @Unstable
     public void reset(HttpServletRequest request)
@@ -59,7 +59,7 @@ public abstract class XWikiForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
-     * @since 12.9RC1
+     * @since 13.0RC1
      */
     @Unstable
     public void reset(XWikiRequest request)

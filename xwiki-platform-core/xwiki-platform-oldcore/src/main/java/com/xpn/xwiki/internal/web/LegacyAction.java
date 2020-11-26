@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.XWikiAction;
  * A component role for the old {@link XWikiAction} based entry points.
  * 
  * @version $Id$
- * @since 12.9RC1
+ * @since 13.0RC1
  * @deprecated use entity resource reference handlers instead
  */
 @Deprecated

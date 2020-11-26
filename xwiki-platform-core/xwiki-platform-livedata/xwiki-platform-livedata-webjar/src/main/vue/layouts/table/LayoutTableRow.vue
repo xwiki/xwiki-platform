@@ -77,6 +77,11 @@ export default {
 
 <style>
 
+.layout-table .livedata-entry-selector {
+  align-items: flex-start;
+  padding: 10px 2rem;
+}
+
 .layout-table .cell {
   padding: 0;
   height: 100%;
@@ -87,14 +92,9 @@ export default {
 }
 
 .layout-table .entry-selector {
-    padding: 0;
-    height: 100%;
-    width: 0;
-}
-
-.layout-table .livedata-entry-selector {
-    justify-content: flex-start;
-    padding: 0 2rem;
+  padding: 0;
+  height: 100%;
+  width: 0;
 }
 
 </style>

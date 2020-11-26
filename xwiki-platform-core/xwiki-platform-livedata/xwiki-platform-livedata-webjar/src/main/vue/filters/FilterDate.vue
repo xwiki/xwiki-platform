@@ -39,6 +39,7 @@
 <script>
 import filterMixin from "./filterMixin.js";
 import daterangepicker from "daterangepicker";
+import moment from "moment";
 import $ from "jquery";
 
 export default {

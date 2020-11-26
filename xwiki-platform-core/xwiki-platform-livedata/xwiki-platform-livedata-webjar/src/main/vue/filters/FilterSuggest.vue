@@ -114,6 +114,7 @@ export default {
       });
     },
 
+    // Taken from xwiki-platform-web/src/main/webapp/resources/uicomponents/suggest/xwiki.selectize.js
     loadSelectedValue (value) {
       const selectize = this.$refs.filterSuggest.selectize;
       const deferred = $.Deferred();

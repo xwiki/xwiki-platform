@@ -19,9 +19,17 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+@Component
+@Named("attach")
+@Singleton
 public class AttachAction extends XWikiAction
 {
     @Override

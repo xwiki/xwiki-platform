@@ -1,3 +1,5 @@
+com.xpn.xwiki.web.JsxAction
+com.xpn.xwiki.web.SsxAction
 org.xwiki.skinx.internal.CssDocumentSkinExtension
 org.xwiki.skinx.internal.JsDocumentSkinExtension
 org.xwiki.skinx.internal.CssFileSkinExtension

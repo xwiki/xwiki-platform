@@ -30,12 +30,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -61,6 +65,9 @@ import com.xpn.xwiki.util.Util;
  * @since 2.4M1
  * @deprecated Use the "tmp" resource reference handler instead since 8.3
  */
+@Component
+@Named("temp")
+@Singleton
 @Deprecated
 public class TempResourceAction extends XWikiAction
 {

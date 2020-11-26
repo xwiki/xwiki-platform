@@ -126,6 +126,91 @@
               </item>
             </revapi.ignore>
             -->
+            <revapi.ignore>
+              <item>
+                <regex>true</regex>
+                <code>.*</code>
+                <old>.*org.apache.struts.*</old>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.web.*</old>
+                <new>class com.xpn.xwiki.web.*</new>
+                <annotation>@org.xwiki.component.annotation.Component</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.web.*</old>
+                <new>class com.xpn.xwiki.web.*</new>
+                <annotation>@javax.inject.Singleton</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.web.*</old>
+                <new>class com.xpn.xwiki.web.*</new>
+                <annotation>@javax.inject.Name.*</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.class.noLongerInheritsFromClass</code>
+                <old>class com.xpn.xwiki.web.*Form</old>
+                <new>class com.xpn.xwiki.web.*Form</new>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.class.noLongerImplementsInterface</code>
+                <old>class com.xpn.xwiki.web.*Form</old>
+                <new>class com.xpn.xwiki.web.*Form</new>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.class.noLongerInheritsFromClass</code>
+                <old>class com.xpn.xwiki.web.*Action</old>
+                <new>class com.xpn.xwiki.web.*Action</new>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.web.XWikiRequestProcessor</old>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <code>java.class.noLongerInheritsFromClass</code>
+                <old>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</old>
+                <new>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</new>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</old>
+                <new>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</new>
+                <annotation>@javax.inject.Named("charting")</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</old>
+                <new>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</new>
+                <annotation>@javax.inject.Singleton</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</old>
+                <new>class com.xpn.xwiki.plugin.charts.actions.ChartingAction</new>
+                <annotation>@org.xwiki.component.annotation.Component</annotation>
+                <justification>We don't use Struts anymore</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Default implementation of the Resource API and some default Resources</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Default Resource Implementation</xwiki.extension.name>
   </properties>

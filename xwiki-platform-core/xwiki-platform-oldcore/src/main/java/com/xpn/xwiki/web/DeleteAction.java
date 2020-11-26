@@ -23,7 +23,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -49,6 +53,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("delete")
+@Singleton
 public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */

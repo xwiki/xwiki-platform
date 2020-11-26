@@ -300,12 +300,6 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/struts-config.xml</linkName>
-              <linkTarget>/etc/xwiki/struts-config.xml</linkTarget>
-            </data>
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
               <linkName>/usr/lib/xwiki/WEB-INF/sun-web.xml</linkName>
               <linkTarget>/etc/xwiki/sun-web.xml</linkTarget>
             </data>

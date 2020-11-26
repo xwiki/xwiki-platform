@@ -325,7 +325,7 @@ public class EditForm extends XWikiForm
      */
     public boolean isConvertSyntax()
     {
-        return convertSyntax;
+        return this.convertSyntax;
     }
 
     /**

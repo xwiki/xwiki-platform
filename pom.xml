@@ -259,34 +259,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
-      <dependency>
-        <groupId>org.apache.struts</groupId>
-        <artifactId>struts-core</artifactId>
-        <version>1.3.10</version>
-        <exclusions>
-          <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
-          <exclusion>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
-          </exclusion>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.struts</groupId>
-        <artifactId>struts-taglib</artifactId>
-        <version>1.3.10</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.struts</groupId>
-        <artifactId>struts-tiles</artifactId>
-        <version>1.3.10</version>
-      </dependency>
       <!-- Embedded in the Standard Flavor and used by the Dashboard Application (to add/edit gadgets) -->
       <dependency>
         <groupId>org.xwiki.contrib</groupId>

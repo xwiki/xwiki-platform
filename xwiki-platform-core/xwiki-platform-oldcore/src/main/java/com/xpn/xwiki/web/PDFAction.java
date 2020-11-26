@@ -21,7 +21,11 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +40,9 @@ import com.xpn.xwiki.pdf.impl.PdfExportImpl;
  * @deprecated Use {@link ExportAction}.
  * @version $Id$
  */
+@Component
+@Named("pdf")
+@Singleton
 @Deprecated
 public class PDFAction extends XWikiAction
 {

@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,6 +44,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("preview")
+@Singleton
 public class PreviewAction extends EditAction
 {
     /**
@@ -48,6 +55,12 @@ public class PreviewAction extends EditAction
     public PreviewAction()
     {
         this.waitForXWikiInitialization = true;
+    }
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
     }
 
     /**

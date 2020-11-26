@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -30,6 +34,9 @@ import com.xpn.xwiki.doc.XWikiLock;
 /**
  * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
  */
+@Component
+@Named("inline")
+@Singleton
 @Deprecated
 public class InlineAction extends XWikiAction
 {

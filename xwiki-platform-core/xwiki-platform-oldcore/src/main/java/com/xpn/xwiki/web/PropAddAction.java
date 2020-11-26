@@ -22,7 +22,11 @@ package com.xpn.xwiki.web;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -34,6 +38,9 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.util.Util;
 
+@Component
+@Named("propadd")
+@Singleton
 public class PropAddAction extends XWikiAction
 {
     @Override

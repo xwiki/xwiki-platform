@@ -25,7 +25,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -62,6 +66,9 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  */
+@Component
+@Named("export")
+@Singleton
 public class ExportAction extends XWikiAction
 {
     /**

@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,6 +36,9 @@ import com.xpn.xwiki.doc.XWikiLock;
  *
  * @version $Id$
  */
+@Component
+@Named("admin")
+@Singleton
 public class AdminAction extends XWikiAction
 {
     /** The logger. */

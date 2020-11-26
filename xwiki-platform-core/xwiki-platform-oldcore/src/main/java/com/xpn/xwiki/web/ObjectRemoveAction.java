@@ -21,10 +21,13 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -33,6 +36,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+@Component
+@Named("objectremove")
+@Singleton
 public class ObjectRemoveAction extends XWikiAction
 {
     @Override

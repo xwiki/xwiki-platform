@@ -27,13 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUpload;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.RequestContext;
-import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +37,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.internal.fileupload.FileUploadUtils;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.Utils;
@@ -214,47 +208,11 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             return;
         }
 
-        // Get the FileUpload Data
-        // Make sure the factory only ever creates file items which will be deleted when the jvm is stopped.
-        DiskFileItemFactory factory = new DiskFileItemFactory(uploadSizeThreshold, new File(tempdir))
-        {
-            @Override
-            public FileItem createItem(String fieldName, String contentType, boolean isFormField, String fileName)
-            {
-                try {
-                    DiskFileItem item =
-                        (DiskFileItem) super.createItem(fieldName, contentType, isFormField, fileName);
-                    // Needed to make sure the File object is created.
-                    item.getOutputStream();
-                    return item;
-                } catch (IOException e) {
-                    throw new RuntimeException(
-                        String.format("Unable to create a temporary file for saving the attachment. "
-                        + "Do you have write access on [%s]?", getRepository()), e);
-                }
-            }
-        };
+        List<FileItem> items =
+            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest());
 
-        // TODO: Does this work in portlet mode, or we must use PortletFileUpload?
-        FileUpload fileupload = new ServletFileUpload(factory);
-        RequestContext reqContext = new ServletRequestContext(context.getRequest().getHttpServletRequest());
-        fileupload.setSizeMax(uploadMaxSize);
-
-        try {
-            @SuppressWarnings("unchecked")
-            List<FileItem> list = fileupload.parseRequest(reqContext);
-            if (list.size() > 0) {
-                LOGGER.info("Loaded " + list.size() + " uploaded files");
-            }
-            // We store the file list in the context
-            context.put(FILE_LIST_KEY, list);
-        } catch (FileUploadBase.SizeLimitExceededException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "Exception uploaded file");
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
-        }
+        // We store the file list in the context
+        context.put(FILE_LIST_KEY, items);
     }
 
     /**

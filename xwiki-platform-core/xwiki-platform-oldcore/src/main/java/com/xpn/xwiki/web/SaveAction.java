@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
@@ -72,6 +75,9 @@ import com.xpn.xwiki.objects.ObjectDiff;
  *
  * @version $Id$
  */
+@Component
+@Named("save")
+@Singleton
 public class SaveAction extends PreviewAction
 {
     /** The identifier of the save action. */

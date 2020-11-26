@@ -23,8 +23,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -38,6 +41,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
+@Component
+@Named("objectadd")
+@Singleton
 public class ObjectAddAction extends XWikiAction
 {
     private static final String[] EMPTY_PROPERTY = new String[] { "" };

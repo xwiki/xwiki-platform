@@ -17,44 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.internal.fileupload;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Iterator;
 
-import org.xwiki.component.annotation.Component;
+import javax.servlet.http.Part;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.apache.commons.fileupload.FileItemHeaders;
 
-@Component
-@Named("viewrev")
-@Singleton
-public class ViewrevAction extends XWikiAction
+/**
+ * Implement a {@link FileItemHeaders} based on a {@link Part}.
+ * 
+ * @version $Id$
+ * @since 13.0RC1
+ */
+public class PartFileItemHeaders implements FileItemHeaders
 {
+    private final Part part;
+
     /**
-     * Default constructor.
+     * @param part the servlet part
      */
-    public ViewrevAction()
+    public PartFileItemHeaders(Part part)
     {
-        this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
+        this.part = part;
     }
 
     @Override
-    public String render(XWikiContext context) throws XWikiException
+    public String getHeader(String name)
     {
-        try {
-            handleRevision(context);
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
-                context.put("message", "revisiondoesnotexist");
-                return "exception";
-
-            } else {
-                throw e;
-            }
-        }
-        return "view";
+        return this.part.getHeader(name);
     }
+
+    @Override
+    public Iterator<String> getHeaders(String name)
+    {
+        return this.part.getHeaders(name).iterator();
+    }
+
+    @Override
+    public Iterator<String> getHeaderNames()
+    {
+        return this.part.getHeaderNames().iterator();
+    }
+
 }

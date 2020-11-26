@@ -44,8 +44,10 @@ import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
+import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
@@ -141,6 +143,12 @@ public abstract class XWikiAction implements LegacyAction
 
     @Inject
     protected ComponentDescriptor<LegacyAction> componentDescriptor;
+
+    @Inject
+    protected Container container;
+
+    @Inject
+    protected Execution execution;
 
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
@@ -795,9 +803,6 @@ public abstract class XWikiAction implements LegacyAction
 
     protected void cleanupComponents()
     {
-        Container container = Utils.getComponent(Container.class);
-        Execution execution = Utils.getComponent(Execution.class);
-
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
         container.removeRequest();
@@ -808,7 +813,13 @@ public abstract class XWikiAction implements LegacyAction
 
     public String getRealPath(String path)
     {
-        return ServletActionContext.getServletContext().getRealPath(path);
+        Request request = this.container.getRequest();
+
+        if (request instanceof ServletRequest) {
+            return ((ServletRequest) request).getHttpServletRequest().getServletContext().getRealPath(path);
+        }
+
+        return null;
     }
 
     // hook

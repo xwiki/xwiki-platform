@@ -22,6 +22,8 @@ package com.xpn.xwiki.internal.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.xwiki.component.annotation.Role;
+
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
@@ -32,6 +34,7 @@ import com.xpn.xwiki.web.XWikiAction;
  * @deprecated use entity resource reference handlers instead
  */
 @Deprecated
+@Role
 public interface LegacyAction
 {
     /**

@@ -23,10 +23,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -48,6 +51,9 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 2.4M2
  */
+@Component
+@Named("create")
+@Singleton
 public class CreateAction extends XWikiAction
 {
     /**

@@ -21,11 +21,19 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.svg.SVGPlugin;
 import com.xpn.xwiki.util.Util;
 
+@Component
+@Named("svg")
+@Singleton
 public class SVGAction extends XWikiAction
 {
     @Override

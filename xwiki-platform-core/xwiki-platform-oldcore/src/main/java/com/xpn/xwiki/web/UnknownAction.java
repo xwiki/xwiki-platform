@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -28,6 +32,8 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Singleton
 public class UnknownAction extends XWikiAction
 {
     @Override

@@ -106,7 +106,7 @@ define({
         visible: true,
         filter: {
           id: "suggest",
-          url: "http://localhost:8080/xwiki/rest/wikis/xwiki/classes/XWiki.DocumentClass/properties/author/values?fp=&limit=10&media=json",
+          url: "http://localhost:8080/xwiki/rest/wikis/xwiki/classes/XWiki.DocumentClass/properties/author/values",
         },
       },
       {

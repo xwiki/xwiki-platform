@@ -168,11 +168,14 @@ public class SaveAction extends PreviewAction
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
+                // In that specific case, we want the original doc to be the translation document so that we
+                // never raised a conflict.
+                originalDoc = tdoc;
             } else if (tdoc != doc) {
                 // Saving an existing document translation (but not the default one).
                 // Same as above, clone the object retrieved from the store cache.
-                tdoc = tdoc.clone();
                 originalDoc = tdoc;
+                tdoc = tdoc.clone();
             }
         }
 
@@ -422,7 +425,7 @@ public class SaveAction extends PreviewAction
 
                 // if doc is new and we're here: it's a conflict, we can skip the diff check
                 // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
-                if (!originalDoc.isNew() && previousDoc != null) {
+                if (!originalDoc.isNew() && previousDoc != null && !"true".equals(request.getParameter("isNew"))) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
                     List<Delta> contentDiff =

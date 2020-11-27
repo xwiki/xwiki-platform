@@ -510,5 +510,11 @@ public class LiveDataQuery
         if (this.sort == null) {
             this.sort = new ArrayList<>();
         }
+        if (this.offset == null) {
+            this.offset = 0L;
+        }
+        if (this.limit == null) {
+            this.limit = 15;
+        }
     }
 }

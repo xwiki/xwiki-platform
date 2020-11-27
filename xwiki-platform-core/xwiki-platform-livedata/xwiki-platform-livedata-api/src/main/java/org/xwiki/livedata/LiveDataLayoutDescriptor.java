@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.stability.Unstable;
@@ -90,5 +91,15 @@ public class LiveDataLayoutDescriptor extends BaseDescriptor
     public void setIcon(Map<String, Object> icon)
     {
         this.icon = icon;
+    }
+
+    /**
+     * Prevent {@code null} values where it's possible.
+     */
+    public void initialize()
+    {
+        if (this.icon == null) {
+            this.icon = new HashMap<>();
+        }
     }
 }

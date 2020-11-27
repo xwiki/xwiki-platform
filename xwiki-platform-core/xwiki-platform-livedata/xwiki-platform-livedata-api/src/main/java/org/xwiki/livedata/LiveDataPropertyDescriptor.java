@@ -468,6 +468,9 @@ public class LiveDataPropertyDescriptor
      */
     public void initialize()
     {
+        if (this.visible == null) {
+            this.visible = true;
+        }
         if (this.icon == null) {
             this.icon = new HashMap<>();
         }
@@ -477,6 +480,5 @@ public class LiveDataPropertyDescriptor
         if (this.filter == null) {
             this.filter = new FilterDescriptor();
         }
-        this.filter.initialize();
     }
 }

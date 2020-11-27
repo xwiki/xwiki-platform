@@ -19,7 +19,7 @@
  */
 package org.xwiki.livedata;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.stability.Unstable;
@@ -165,8 +165,17 @@ public class LiveDataPaginationConfiguration
      */
     public void initialize()
     {
+        if (this.maxShownPages == null) {
+            this.maxShownPages = 10;
+        }
         if (this.pageSizes == null) {
-            this.pageSizes = new ArrayList<>();
+            this.pageSizes = Arrays.asList(15, 25, 50, 100);
+        }
+        if (this.showEntryRange == null) {
+            this.showEntryRange = true;
+        }
+        if (this.showNextPrevious == null) {
+            this.showNextPrevious = true;
         }
     }
 }

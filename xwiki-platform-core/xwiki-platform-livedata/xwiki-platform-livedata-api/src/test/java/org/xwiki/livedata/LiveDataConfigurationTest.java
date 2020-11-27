@@ -19,9 +19,14 @@
  */
 package org.xwiki.livedata;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -45,11 +50,16 @@ class LiveDataConfigurationTest
         assertTrue(config.getQuery().getSource().getParameters().isEmpty());
         assertTrue(config.getQuery().getSort().isEmpty());
         assertTrue(config.getQuery().getFilters().isEmpty());
+        assertEquals(0L, config.getQuery().getOffset());
+        assertEquals(15, config.getQuery().getLimit());
 
         assertTrue(config.getMeta().getLayouts().isEmpty());
         assertTrue(config.getMeta().getPropertyDescriptors().isEmpty());
         assertTrue(config.getMeta().getPropertyTypes().isEmpty());
-        assertTrue(config.getMeta().getPagination().getPageSizes().isEmpty());
+        assertEquals(10, config.getMeta().getPagination().getMaxShownPages());
+        assertEquals(Arrays.asList(15, 25, 50, 100), config.getMeta().getPagination().getPageSizes());
+        assertTrue(config.getMeta().getPagination().getShowEntryRange());
+        assertTrue(config.getMeta().getPagination().getShowNextPrevious());
     }
 
     @Test
@@ -59,10 +69,12 @@ class LiveDataConfigurationTest
         config.initialize();
         config.getQuery().getFilters().add(new Filter());
         config.getMeta().getPropertyDescriptors().add(new LiveDataPropertyDescriptor());
+        config.getMeta().getFilters().add(new FilterDescriptor());
 
         config.initialize();
 
         assertTrue(config.getQuery().getFilters().get(0).getConstraints().isEmpty());
-        assertTrue(config.getMeta().getPropertyDescriptors().iterator().next().getFilter().getOperators().isEmpty());
+        assertNotNull(config.getMeta().getPropertyDescriptors().iterator().next().getFilter());
+        assertTrue(config.getMeta().getFilters().iterator().next().getOperators().isEmpty());
     }
 }

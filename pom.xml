@@ -993,6 +993,10 @@
                 <id>cglib:cglib</id>
                 <features>cglib:cglib-nodep</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.hibernate.validator:hibernate-validator</id>
+                <features>org.hibernate:hibernate-validator</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

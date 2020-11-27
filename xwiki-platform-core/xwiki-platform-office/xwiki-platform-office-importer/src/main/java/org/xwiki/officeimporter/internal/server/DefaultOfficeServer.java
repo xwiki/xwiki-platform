@@ -146,22 +146,22 @@ public class DefaultOfficeServer implements OfficeServer
         }
 
         this.jodConverter = null;
+
         // Try to use the JSON document format registry to configure the office document conversion.
-        InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
-        if (input != null) {
-            try {
+        try (InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH)) {
+            if (input != null) {
                 this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)
                     .formatRegistry(JsonDocumentFormatRegistry.create(input))
-                    .filterChain(new LinkedImagesEmbedderFilter())
-                    .build();
-            } catch (Exception e) {
-                this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
-                    DOCUMENT_FORMATS_PATH, e);
+                    .filterChain(new LinkedImagesEmbedderFilter()).build();
+            } else {
+                this.logger.debug("{} is missing. The default document format registry will be used instead.",
+                    DOCUMENT_FORMATS_PATH);
             }
-        } else {
-            this.logger.debug("{} is missing. The default document format registry will be used instead.",
-                DOCUMENT_FORMATS_PATH);
+        } catch (Exception e) {
+            this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
+                DOCUMENT_FORMATS_PATH, e);
         }
+
         if (this.jodConverter == null) {
             // Use the default document format registry.
             this.jodConverter = LocalConverter.builder().officeManager(this.jodManager)

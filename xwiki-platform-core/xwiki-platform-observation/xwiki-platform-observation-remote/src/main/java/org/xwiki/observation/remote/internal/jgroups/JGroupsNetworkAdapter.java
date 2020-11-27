@@ -190,6 +190,13 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
      */
     private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException
     {
+        try (InputStream stream = getChannelConfiguration(channelId)) {
+            return XmlConfigurator.getInstance(stream);
+        }
+    }
+
+    private InputStream getChannelConfiguration(String channelId) throws IOException
+    {
         String channelFile = channelId + ".xml";
         String path = "/WEB-INF/" + CONFIGURATION_PATH + channelFile;
 
@@ -212,7 +219,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             }
         }
 
-        return XmlConfigurator.getInstance(is);
+        return is;
     }
 
     @Override

@@ -19,6 +19,8 @@
  */
 package org.xwiki.index.tree.internal.nestedpages.query;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -49,6 +52,9 @@ public class QueryRegistrationHandler implements EventListener
     @Inject
     private HibernateSessionFactory sessionFactory;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public List<Event> getEvents()
     {
@@ -69,7 +75,12 @@ public class QueryRegistrationHandler implements EventListener
 
     protected void loadMappingFile(String path)
     {
-        // This only adds the mappings to a queue. The mappings will be available after the session factory is created.
-        this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(path));
+        try (InputStream stream = Util.getResourceAsStream(path)) {
+            // This only adds the mappings to a queue. The mappings will be available after the session factory is
+            // created.
+            this.sessionFactory.getConfiguration().addInputStream(stream);
+        } catch (IOException e) {
+            this.logger.error("Failed to close the resoure stream", e);
+        }
     }
 }

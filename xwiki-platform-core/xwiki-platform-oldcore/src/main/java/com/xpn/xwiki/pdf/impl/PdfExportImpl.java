@@ -236,8 +236,15 @@ public class PdfExportImpl implements PdfExport
      */
     private String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
-        String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        String xmlfo = null;
+        try (InputStream stream = getXhtml2FopXslt(context)) {
+            xmlfo = applyXSLT(xhtml, stream);
+        } catch (IOException e) {
+            LOGGER.error("Failed to close the XSLT stream", e);
+        }
+
         LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
+
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 

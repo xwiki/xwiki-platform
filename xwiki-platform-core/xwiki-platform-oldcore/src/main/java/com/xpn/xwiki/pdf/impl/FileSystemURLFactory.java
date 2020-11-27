@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -192,15 +193,15 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
     {
         try {
-            InputStream data = context.getWiki().getResourceAsStream(resourceName);
-            if (data != null) {
-                // Copy the resource to a temporary file
-                File file = getTemporaryFile(key, context);
-                FileOutputStream fos = new FileOutputStream(file);
-                IOUtils.copy(data, fos);
-                fos.close();
-                usedFiles.put(key, file);
-                return true;
+            try (InputStream data = context.getWiki().getResourceAsStream(resourceName)) {
+                if (data != null) {
+                    // Copy the resource to a temporary file
+                    File file = getTemporaryFile(key, context);
+                    FileUtils.copyInputStreamToFile(data, file);
+                    usedFiles.put(key, file);
+
+                    return true;
+                }
             }
         } catch (Exception ex) {
             // Can't access the resource, let's hope FOP can handle the http:// URL

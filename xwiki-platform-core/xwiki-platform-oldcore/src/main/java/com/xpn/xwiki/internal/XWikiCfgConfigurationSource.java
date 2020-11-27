@@ -101,14 +101,12 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     {
         this.configurationLocation = getConfigPath();
 
-        InputStream xwikicfgis = loadConfiguration();
-
-        if (xwikicfgis != null) {
-            try {
+        try (InputStream xwikicfgis = loadConfiguration()) {
+            if (xwikicfgis != null) {
                 this.properties.load(xwikicfgis);
-            } catch (Exception e) {
-                this.logger.error("Failed to load configuration", e);
             }
+        } catch (Exception e) {
+            this.logger.error("Failed to load configuration", e);
         }
     }
 

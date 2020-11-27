@@ -43,7 +43,6 @@ public abstract class XWikiForm
     /**
      * Reset all properties to their default values.
      *
-     * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      * @since 13.0RC1
      */
@@ -57,7 +56,6 @@ public abstract class XWikiForm
     /**
      * Reset all properties to their default values.
      *
-     * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      * @since 13.0RC1
      */

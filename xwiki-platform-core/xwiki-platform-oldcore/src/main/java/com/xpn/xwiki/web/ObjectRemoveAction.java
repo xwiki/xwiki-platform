@@ -44,7 +44,7 @@ public class ObjectRemoveAction extends XWikiAction
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
-        return ObjectAddForm.class;
+        return ObjectRemoveForm.class;
     }
 
     protected BaseObject getObject(XWikiDocument doc, XWikiContext context)

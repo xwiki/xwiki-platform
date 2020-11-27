@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*
+/*!
 #set ($liveDataEntry = 'xwiki-livedata.umd.min')
 #set ($liveDataPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', $liveDataEntry))
 #set ($liveDataBasePath = $stringtool.removeEnd($liveDataPath, $liveDataEntry))
+#set ($evaluate = {'evaluate': true})
 */
 require.config({
   paths: {
     Logic: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'Logic.min')),
     liveDataSource: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'liveDataSource.min.js', {'evaluate': true})),
+      'liveDataSource.min.js', $evaluate)),
     Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
     'xwiki-livedata': $jsontool.serialize($liveDataPath)
   }

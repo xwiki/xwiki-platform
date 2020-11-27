@@ -147,7 +147,7 @@ public class DefaultAsyncRendererExecutorTest
         AsyncRendererExecutorResponse response = this.executor.render(this.renderer, this.configuration);
 
         assertNull(response.getAsyncClientId());
-        assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
+        assertEquals("1/2/celement1/value1%25255c/celement2/value2%25252f", response.getJobIdHTTPPath());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f"),
             response.getStatus().getRequest().getId());
         assertEquals("false true", response.getStatus().getResult().getResult());
@@ -168,7 +168,7 @@ public class DefaultAsyncRendererExecutorTest
         assertNotNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f"),
             response.getStatus().getRequest().getId());
-        assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
+        assertEquals("1/2/celement1/value1%25255c/celement2/value2%25252f", response.getJobIdHTTPPath());
         assertEquals("true true", response.getStatus().getResult().getResult());
         assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
@@ -188,7 +188,7 @@ public class DefaultAsyncRendererExecutorTest
         assertNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f"),
             response.getStatus().getRequest().getId());
-        assertEquals("1/2/celement1/value1%255c/celement2/value2%252f", response.getJobIdHTTPPath());
+        assertEquals("1/2/celement1/value1%25255c/celement2/value2%25252f", response.getJobIdHTTPPath());
         assertEquals("false true", response.getStatus().getResult().getResult());
         assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
     }
@@ -208,7 +208,7 @@ public class DefaultAsyncRendererExecutorTest
         assertNotNull(response.getAsyncClientId());
         assertEquals(Arrays.asList("1", "2", "celement1", "value1%5c", "celement2", "value2%2f",
             String.valueOf(response.getAsyncClientId())), response.getStatus().getRequest().getId());
-        assertEquals("1/2/celement1/value1%255c/celement2/value2%252f/" + response.getAsyncClientId(),
+        assertEquals("1/2/celement1/value1%25255c/celement2/value2%25252f/" + response.getAsyncClientId(),
             response.getJobIdHTTPPath());
         assertEquals("true false", response.getStatus().getResult().getResult());
         assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());

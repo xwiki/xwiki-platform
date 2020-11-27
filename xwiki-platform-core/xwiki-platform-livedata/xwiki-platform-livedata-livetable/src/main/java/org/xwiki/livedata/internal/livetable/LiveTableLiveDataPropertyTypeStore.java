@@ -96,7 +96,6 @@ public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataProperty
     {
         LiveDataPropertyDescriptor type = new LiveDataPropertyDescriptor();
         type.setId(id);
-        type.setVisible(true);
         if (displayer != null) {
             type.setDisplayer(new DisplayerDescriptor(displayer));
         }

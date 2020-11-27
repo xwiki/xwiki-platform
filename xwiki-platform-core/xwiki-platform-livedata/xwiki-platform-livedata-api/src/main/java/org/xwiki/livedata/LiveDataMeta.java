@@ -248,25 +248,32 @@ public class LiveDataMeta
         if (this.layouts == null) {
             this.layouts = new ArrayList<>();
         }
+        this.layouts.forEach(LiveDataLayoutDescriptor::initialize);
+
         if (this.propertyDescriptors == null) {
             this.propertyDescriptors = new ArrayList<>();
         }
         this.propertyDescriptors.forEach(LiveDataPropertyDescriptor::initialize);
+
         if (this.propertyTypes == null) {
             this.propertyTypes = new ArrayList<>();
         }
         this.propertyTypes.forEach(LiveDataPropertyDescriptor::initialize);
+
         if (this.filters == null) {
             this.filters = new ArrayList<>();
         }
         this.filters.forEach(FilterDescriptor::initialize);
+
         if (this.displayers == null) {
             this.displayers = new ArrayList<>();
         }
+
         if (this.pagination == null) {
             this.pagination = new LiveDataPaginationConfiguration();
         }
         this.pagination.initialize();
+
         if (this.entryDescriptor == null) {
             this.entryDescriptor = new LiveDataEntryDescriptor();
         }

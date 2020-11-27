@@ -260,12 +260,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         // The live table macro considers all columns, except for "actions", as sortable by default.
         propertyDescriptor.setSortable(columnProperties.path("sortable").asBoolean(!columnProperties.has(ACTIONS)));
 
-        // We have to explicitly set the visibility if there is no property type to inherit from (or if the column has
-        // been marked as hidden).
-        boolean hidden = HIDDEN.equals(columnProperties.path(TYPE).asText());
-        if (propertyDescriptor.getType() == null || hidden) {
-            propertyDescriptor.setVisible(!hidden);
-        }
+        // All columns are visible by default, unless explicitly marked as hidden.
+        propertyDescriptor.setVisible(!HIDDEN.equals(columnProperties.path(TYPE).asText()));
         propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
 
         // The live table macro considers all columns, except for "actions", as filterable by default.
@@ -284,6 +280,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         if (displayName.isTextual()) {
             return displayName.asText();
         } else if (translationPrefix.isTextual()) {
+            // This returns null if the translation key is missing, so that the property name can fall-back on the value
+            // specified by the live data source (property store).
             return this.localization.getTranslationPlain(translationPrefix.asText() + column);
         }
         return column;

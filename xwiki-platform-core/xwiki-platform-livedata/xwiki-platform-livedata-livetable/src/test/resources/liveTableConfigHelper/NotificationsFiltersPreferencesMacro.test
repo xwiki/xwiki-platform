@@ -81,6 +81,7 @@
         "id":"isEnabled",
         "type":"Boolean",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{"id":"html"}
       },

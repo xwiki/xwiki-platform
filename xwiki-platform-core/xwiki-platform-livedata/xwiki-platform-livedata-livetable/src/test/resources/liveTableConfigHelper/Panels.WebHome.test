@@ -39,6 +39,7 @@
         "id":"name",
         "type":"String",
         "sortable":true,
+        "visible":true,
         "filterable":true,
         "displayer":{"id":"link","propertyHref":"doc.url"},
         "filter":{"id":"text"}
@@ -54,6 +55,7 @@
         "id":"type",
         "type":"StaticList",
         "sortable":true,
+        "visible":true,
         "filterable":true,
         "filter":{
           "id":"list",

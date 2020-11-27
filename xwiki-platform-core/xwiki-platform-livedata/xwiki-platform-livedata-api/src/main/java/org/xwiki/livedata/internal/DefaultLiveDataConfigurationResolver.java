@@ -67,10 +67,17 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     {
         try {
             Source source = config.getQuery() != null ? config.getQuery().getSource() : null;
+
             LiveDataConfiguration defaultConfig = getDefaultConfig(source);
             // Make sure both configurations have the same id so that they are properly merged.
             defaultConfig.setId(config.getId());
-            return translate(this.jsonMerge.merge(defaultConfig, config));
+
+            LiveDataConfiguration mergedConfig = this.jsonMerge.merge(defaultConfig, config);
+            // Prevent null values (make the configuration explicit).
+            mergedConfig.initialize();
+
+            // Translate using the context locale.
+            return translate(mergedConfig);
         } catch (IOException e) {
             throw new LiveDataException(e);
         }
@@ -81,8 +88,6 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         InputStream configInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
         String configJSON = IOUtils.toString(configInputStream, "UTF-8");
         LiveDataConfiguration config = this.stringLiveDataConfigResolver.resolve(configJSON);
-
-        config.initialize();
 
         Source actualSourceConfig = sourceConfig;
         if (actualSourceConfig == null) {

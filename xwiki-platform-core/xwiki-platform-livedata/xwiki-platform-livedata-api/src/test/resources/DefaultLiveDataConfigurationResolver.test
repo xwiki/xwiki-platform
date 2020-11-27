@@ -69,6 +69,7 @@
         },
         "type":"String",
         "sortable":false,
+        "visible":true,
         "displayer":{
           "id":"link",
           "propertyHref":"bar"
@@ -91,6 +92,7 @@
           "iconSetType":"font"
         },
         "sortable":true,
+        "visible":true,
         "displayer":{"id":"html"},
         "filter":{
           "id":"text",

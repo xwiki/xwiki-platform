@@ -33,6 +33,7 @@
   <description>XWiki Solr cores</description>
   <modules>
     <module>xwiki-platform-distribution-debian-solr-events</module>
+    <module>xwiki-platform-distribution-debian-solr-extension_index</module>
     <module>xwiki-platform-distribution-debian-solr-ratings</module>
     <module>xwiki-platform-distribution-debian-solr-search</module>
     

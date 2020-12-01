@@ -997,6 +997,10 @@
                 <id>org.hibernate.validator:hibernate-validator</id>
                 <features>org.hibernate:hibernate-validator</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>jakarta.validation:jakarta.validation-api</id>
+                <features>javax.validation:validation-api</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

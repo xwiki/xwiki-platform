@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -118,7 +120,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     /**
      * The name of the property for configuring the current timezone.
      */
-    private static final String PROPERTY_TIMEZONE = "timezone";
+    private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
 
     private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
 
@@ -281,8 +283,12 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
                 this.environment.getPermanentDirectory().getAbsolutePath());
 
-            newURL =
-                StringUtils.replace(newURL, String.format("${%s}", PROPERTY_TIMEZONE), TimeZone.getDefault().getID());
+            try {
+                newURL = StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
+                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.logger.error("Failedd to encode the current timezone id", e);
+            }
 
             // Set the new URL
             hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);

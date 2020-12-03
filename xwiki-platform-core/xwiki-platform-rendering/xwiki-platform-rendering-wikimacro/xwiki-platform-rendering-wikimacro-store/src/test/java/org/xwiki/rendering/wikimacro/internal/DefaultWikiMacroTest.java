@@ -213,11 +213,13 @@ class DefaultWikiMacroTest
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
 
         assertXHTML("<p>This is <strong>bold</strong></p>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
-        assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string>"
-            + "<org.xwiki.rendering.syntax.Syntax><type><name>XWiki</name><id>xwiki</id></type><version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
-            + "<macroMarker name=\"wikimacro1\"><p><parameters><entry><string>param1</string><string>value1</string></entry><entry><string>param2</string><string>value2</string></entry></parameters></p>"
-            + "<paragraph><word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word></format></paragraph>"
-            + "</macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
+        assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string><org.xwiki.rendering.syntax.Syntax>"
+            + "<type><name>XWiki</name><id>xwiki</id><variants class=\"empty-list\"></variants></type>"
+            + "<version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
+            + "<macroMarker name=\"wikimacro1\"><p><parameters><entry><string>param1</string><string>value1</string>"
+            + "</entry><entry><string>param2</string><string>value2</string></entry></parameters></p><paragraph>"
+            + "<word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word>"
+            + "</format></paragraph></macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -276,7 +278,8 @@ class DefaultWikiMacroTest
     void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
         registerWikiMacro("wikimacrowithresult", "{{groovy}}"
-            + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
+            + "xcontext.macro.result = java.util.Collections.singletonList("
+                + "new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
             + "{{/groovy}}", Syntax.XWIKI_2_0);
 
         assertXHTML("<p>Hello World</p>", "Hello {{wikimacrowithresult param1=\"World\" param2=\"param2\"/}}");
@@ -666,7 +669,8 @@ class DefaultWikiMacroTest
             "onSpecialSymbol [.]\n" + 
             "onWord [mauser]\n" + 
             "onNewLine\n" + 
-            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n" + 
+            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[wikimacrocontent]=[true]]\n" +
             "beginMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
             "onWord [swiki]\n" + 
             "onSpecialSymbol [:]\n" + 
@@ -678,7 +682,8 @@ class DefaultWikiMacroTest
             "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
             "onWord [label]\n" + 
             "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
-            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n" + 
+            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[wikimacrocontent]=[true]]\n" +
             "endParagraph\n" + 
             "endMacroMarkerStandalone [wikimacro] [] [{{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
             "[[label>>path:reference]]]\n" + 
@@ -709,7 +714,8 @@ class DefaultWikiMacroTest
         //@formatter:off
         String expect =
             "beginDocument [[syntax]=[XWiki 2.1]]\n" + 
-            "beginMacroMarkerStandalone [wikimacro] [param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
+            "beginMacroMarkerStandalone [wikimacro] "
+                + "[param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" +
             "[[label>>path:reference]]]\n" + 
             "beginParagraph\n" + 
             "onWord [mawiki]\n" + 
@@ -718,7 +724,8 @@ class DefaultWikiMacroTest
             "onSpecialSymbol [.]\n" + 
             "onWord [mauser]\n" + 
             "onNewLine\n" + 
-            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>][parameter-name]=[param1][wikimacrocontent]=[true]]\n" + 
+            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n" +
             "beginMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
             "onWord [swiki]\n" + 
             "onSpecialSymbol [:]\n" + 
@@ -730,9 +737,11 @@ class DefaultWikiMacroTest
             "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
             "onWord [label]\n" + 
             "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
-            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>][parameter-name]=[param1][wikimacrocontent]=[true]]\n" + 
+            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n" +
             "endParagraph\n" + 
-            "endMacroMarkerStandalone [wikimacro] [param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
+            "endMacroMarkerStandalone [wikimacro] "
+                + "[param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" +
             "[[label>>path:reference]]]\n" + 
             "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on

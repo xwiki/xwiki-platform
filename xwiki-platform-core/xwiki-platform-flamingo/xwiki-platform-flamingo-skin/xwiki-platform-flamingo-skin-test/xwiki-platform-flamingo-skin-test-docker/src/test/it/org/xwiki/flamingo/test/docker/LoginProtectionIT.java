@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,8 +34,10 @@ import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test related to login protection on flamingo skin (captcha appearing after N attempts, etc).
@@ -55,12 +58,14 @@ public class LoginProtectionIT
         setup.addObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass",
             "failureStrategy", "captcha",
             "maxAuthorizedAttempts", 3,
-            "timeWindowAttempts", 300);
+            "timeWindowAttempts", 300,
+            "isAuthenticationSecurityEnabled", true);
     }
 
     @AfterAll
     public void tearDown(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
         setup.deletePage(AUTHENTICATION_CONFIGURATION);
     }
 
@@ -68,6 +73,7 @@ public class LoginProtectionIT
      * Ensure that the repeated authentication failure mechanism is triggered.
      */
     @Test
+    @Order(1)
     public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration)
     {
@@ -108,7 +114,45 @@ public class LoginProtectionIT
         assertTrue(loginPage.hasCaptchaErrorMessage());
         assertTrue(loginPage.hasCaptchaChallenge());
 
+        // trying with another login: captcha is still triggered because it's on the same session
+        loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        loginPage = new LoginPage();
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasCaptchaErrorMessage());
+        assertTrue(loginPage.hasCaptchaChallenge());
+
         logCaptureConfiguration.registerExpected(
             "Authentication failure with login [repeatedAuthenticationFailure]");
+    }
+
+    /**
+     * Ensure that when the protection mechanism is disabled a user can directly login.
+     * Note that if this test is failing it might impact the whole test suite since superadmin might be prevented to
+     * login.
+     */
+    @Test
+    @Order(2)
+    void canLoginWhenSecurityIsDisabled(TestUtils setup)
+    {
+        LoginPage loginPage = LoginPage.gotoPage();
+        loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        loginPage = new LoginPage();
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasCaptchaErrorMessage());
+        assertTrue(loginPage.hasCaptchaChallenge());
+
+        // We disable the security mechanism
+        setup.updateObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass", 0,
+            "isAuthenticationSecurityEnabled", false);
+
+        try {
+            setup.loginAsSuperAdmin();
+            setup.gotoPage("Main", "WebHome");
+            assertEquals(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), setup.getLoggedInUserName());
+        } catch (Exception e) {
+            fail("The authentication security mechanism is still enabled");
+        }
     }
 }

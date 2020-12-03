@@ -594,4 +594,14 @@ public class DefaultAuthenticationFailureManagerTest
         verify(strategy1, times(1)).notify("foo");
         verify(strategy2, times(1)).notify(any());
     }
+
+    @Test
+    void sessionFailingIsClearedWhenSecurityIsDisabled()
+    {
+        HttpServletRequest request = getRequest("clear");
+        when(configuration.isAuthenticationSecurityEnabled()).thenReturn(false);
+        this.defaultAuthenticationFailureManager.getForm("foo", request);
+        verify(sessionFailing).removeAll();
+
+    }
 }

@@ -162,6 +162,12 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             && !getFailureStrategyList().isEmpty();
     }
 
+    private void clearRecords()
+    {
+        this.authFailures.clear();
+        this.sessionFailures.removeAll();
+    }
+
     /**
      * Determine which username we should skip.
      * We don't handle empty usernames to avoid triggering the security mechanism for nothing and having unexpected
@@ -183,7 +189,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         // If the config is set to 0 for max attempts or time window, it means the feature is disabled,
         // we can immediately return, and we clear the data.
         if (!isAuthenticationSecurityEnabled()) {
-            this.authFailures.clear();
+            this.clearRecords();
             return false;
         } else if (skipUsername(username)) {
             return false;
@@ -199,7 +205,6 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
                 userAndAssociatedUsernames.put(userReference, username);
             }
         }
-
 
         if (isSessionAlreadyFailing(request)) {
             authFailures.get(username).setThresholdReached();
@@ -251,6 +256,11 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     {
         StringBuilder builder = new StringBuilder();
 
+        // We need to take care of clearing the security
+        if (!isAuthenticationSecurityEnabled()) {
+            this.clearRecords();
+        }
+
         // We only call the strategies if the threshold is reached.
         if ((!skipUsername(username) && isThresholdReached(username)) || isSessionAlreadyFailing(request)) {
             for (AuthenticationFailureStrategy authenticationFailureStrategy : getFailureStrategyList()) {
@@ -270,7 +280,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         // If the config is set to 0 for max attempts or time window, it means the feature is disabled,
         // we can clear the data.
         if (!isAuthenticationSecurityEnabled()) {
-            this.authFailures.clear();
+            this.clearRecords();
         }
 
         // We only call the strategies if the threshold is reached.

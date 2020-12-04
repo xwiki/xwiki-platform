@@ -65,7 +65,7 @@
 |Lien vers une ancre dans une page|{{{[label&gt;Space.Page#ancre]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||ancre=ancre]]
 |Lien vers un titre dans une page|{{{[label&gt;Space.Page#HMontitre]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMontitre]]
 
-{{info}}Quand vous ajoutez un Titre, une ancre nommée "H" suivie du titre avec uniquement les lettres est créé. Par exemple, pour le Titre "Mon titre", l'ancre générée sera "HMontitre".{{/info}}
+{{info}}Quand vous ajoutez un titre, une ancre nommée "H" suivie du titre avec uniquement les lettres est créé. Par exemple, pour le titre "Mon titre", l'ancre générée sera "HMontitre".{{/info}}
 
 {{velocity}}
 $subHeading Spécifications des liens pour la syntaxe XWiki 1.0 $subHeading
@@ -75,11 +75,11 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 
 * ##alias##: Un String optionnel qui sera affiché à l'utilisateur comme le nom du lien au moment du rendu. Exemple: "Ma page".
 * ##link##: La référence complète du lien en utilisant la syntaxe suivante: ##(virtualWikiAlias{{{:)}}}+(space.)+(reference)(?queryString)+(#anchor)+##
-* Notez qu'il faut préciser soit le ##link## , soit  l'##alias##.
+* Notez qu'il faut préciser soit le ##link## , soit l'##alias##.
 ** ##virtualWikiAlias##: Un String optionnel contenant le nom d'un wiki virtuel. Le lien est vers une page de ce wiki virtuel. Exemple: "mywiki".
 ** ##space##: Le nom d'un espace Wiki optionnel. Si aucun espace n'est spécifié, alors l'espace courant sera utilisé. Exemple: "Main".
 ** ##reference##: La référence du lien. Elle peut contenir soit un URI##{{{ protocol:path }}}##(example: {{{"http://xwiki.org"}}}, {{{"mailto:john@smith.com"}}}) ou le nom d'une page wiki (exemple: "WebHome").
-** ##queryString##: Un String optionnel de requêtes pour spécifier les paramètres qui seront utilisés dans l'URL rendu.  Exemple: {{{"mydata1=5&amp;mydata2=Bonjour"}}}.
+** ##queryString##: Un String optionnel de requêtes pour spécifier les paramètres qui seront utilisés dans l'URL rendu. Exemple: {{{"mydata1=5&amp;mydata2=Bonjour"}}}.
 ** ##anchor##: Le nom d'un ancre optionnel vers un ancre défini dans le lien référencé. Notez qu'en XWiki les ancres sont créés automatiquement pour les titres. Exemple: "AncreDeLaTableDesMatières".
 * ##interWikiAlias##: Un alias optionnel [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] défini comme dans "InterWiki Map" (pour plus d'informations, allez au [[guide de l'administrateur&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Exemple: "wikipedia".
 * ##target##: Un String optionnel qui correspond à l'attribut HTML ##target## d'un élément HTML de liaison ##A##. Cet élément est utilisé lors du rendu du lien. Par défaut, le lien est ouvert dans la page courante. Exemples: "_self", "_blank"

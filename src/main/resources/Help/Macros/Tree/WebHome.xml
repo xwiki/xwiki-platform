@@ -44,7 +44,7 @@
 {{/box}}
 
 {{velocity}}
-$services.localization.render('help.macros.tree.pageDescription', ['**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro]]
+$services.localization.render('help.macros.tree.pageDescription', ['**']) [[$services.localization.render('help.more.label')&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro]]
 
 == $services.localization.render('help.macros.tree.header1') ==
 {{/velocity}}

@@ -66,7 +66,7 @@
   'icon': 'fa fa-support',
   'title': $services.localization.render('help.start.title'),
   'description': $services.localization.render('help.start.description'),
-  'documentation': "http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$escapetool.url($xwiki.version)"
+  'documentation': "https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/?version=$escapetool.url($xwiki.version)"
 }, {
   'icon': 'fa fa-play-circle',
   'title': $services.localization.render('help.videos.title'),
@@ -105,8 +105,8 @@
 #set ($featureCards = [{
   'icon': 'fa fa-pencil',
   'title': $services.localization.render('help.edit.title'),
-  'description': $services.localization.render('help.edit.description',["&lt;a href='http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing' class='wikiexternallink'&gt;",'&lt;/a&gt;',"&lt;a href='$xwiki.getURL('XWiki.XWikiSyntax')'&gt;"]),
-  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing',
+  'description': $services.localization.render('help.edit.description',["&lt;a href='https://platform.xwiki.org/xwiki/bin/view/Features/PageEditing' class='wikiexternallink'&gt;",'&lt;/a&gt;',"&lt;a href='$xwiki.getURL('XWiki.XWikiSyntax')'&gt;"]),
+  'documentation': 'https://platform.xwiki.org/xwiki/bin/view/Features/PageEditing',
   'examples': $xwiki.getURL('Sandbox.WebHome', 'edit', 'editor=wysiwyg')
 }, {
   'icon': 'fa fa-file-text-o',
@@ -130,19 +130,19 @@
   'icon': 'fa fa-sitemap',
   'title': $services.localization.render('help.organization.title'),
   'description':  $services.localization.render('help.organization.description'),
-  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/ContentOrganization/',
+  'documentation': 'https://platform.xwiki.org/xwiki/bin/view/Features/ContentOrganization/',
   'examples': $xwiki.getURL('Main.AllDocs', 'view', 'view=tree')
 }, {
   'icon': 'fa fa-history',
   'title': $services.localization.render('help.history.title'),
   'description':  $services.localization.render('help.history.description'),
-  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/VersionControl',
+  'documentation': 'https://platform.xwiki.org/xwiki/bin/view/Features/VersionControl',
   'examples': $historyURL
 }, {
   'icon': 'fa fa-download',
   'title': $services.localization.render('help.import.title'),
   'description':  $services.localization.render('help.import.description'),
-  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/Imports'
+  'documentation': 'https://platform.xwiki.org/xwiki/bin/view/Features/Imports'
 }])
 {{/velocity}}
 

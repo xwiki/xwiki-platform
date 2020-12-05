@@ -44,14 +44,14 @@
 {{/box}}
 
 {{velocity}}
-$services.localization.render('help.macros.box.description1', ['**','**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro]]
+$services.localization.render('help.macros.box.description1', ['**','**']) [[$services.localization.render('help.more.label')&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro]]
 
 $services.localization.render('help.macros.box.description2')
-* [[$services.localization.render('help.macros.box')&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Box%20Macro]]
-* [[$services.localization.render('help.macros.info')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Info+Macro]]
-* [[$services.localization.render('help.macros.success')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Success+Macro]]
-* [[$services.localization.render('help.macros.warning')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Warning+Macro]]
-* [[$services.localization.render('help.macros.error')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Error+Macro]]
+* [[$services.localization.render('help.macros.box')&gt;&gt;$exoPrefix/Box%20Macro]]
+* [[$services.localization.render('help.macros.info')&gt;&gt;$exoPrefix/Info+Macro]]
+* [[$services.localization.render('help.macros.success')&gt;&gt;$exoPrefix/Success+Macro]]
+* [[$services.localization.render('help.macros.warning')&gt;&gt;$exoPrefix/Warning+Macro]]
+* [[$services.localization.render('help.macros.error')&gt;&gt;$exoPrefix/Error+Macro]]
 
 == $services.localization.render('help.macros.box') ==
 

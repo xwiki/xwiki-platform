@@ -42,10 +42,13 @@
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
+#set ($plaformPrefix = 'https://platform.xwiki.org/xwiki/bin/view/Features')
+#set ($exoPrefix = 'https://extensions.xwiki.org/xwiki/bin/view/Extension')
 #set ($actionCards = [{
   'title': $services.localization.render('help.templates.useTemplates.title'),
   'description': $services.localization.render('help.templates.useTemplates.description'),
-  'tip': $services.localization.render('help.templates.useTemplates.tip', ["&lt;a href='http://platform.xwiki.org/xwiki/bin/view/Features/DocumentLifecycle#HCreate' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
+  'tip': $services.localization.render('help.templates.useTemplates.tip',
+    ["&lt;a href='$plaformPrefix/DocumentLifecycle#HCreate' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'Template',
   'actions': [{
     'label': $services.localization.render('help.try.label'),
@@ -57,11 +60,12 @@
 }, {
   'title': $services.localization.render('help.templates.create.title'),
   'description': $services.localization.render('help.templates.create.description'),
-  'tip': $services.localization.render('help.templates.create.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application#HCreatetheTemplateProvider' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
+  'tip': $services.localization.render('help.templates.create.tip',
+    ["&lt;a href='$exoPrefix/Administration+Application#HCreatetheTemplateProvider' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'Administration',
   'actions': [{
     'label': $services.localization.render('help.more.label'),
-    'url': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application#HCreatetheTemplateProvider'
+    'url': "$exoPrefix/Administration+Application#HCreatetheTemplateProvider"
   }]
 }])
 
@@ -78,7 +82,7 @@
     #set ($outputCard = {
       'title': $inputCard.title,
       'description': $inputCard.description,
-      'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Templates+Application/',
+      'documentation': "$exoPrefix/Templates+Application/",
       'thumbnail': $inputCard.thumbnail
     })
     #else
@@ -148,7 +152,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Templates+Application/" class="wikiexternallink"&gt;$services.localization.render('help.templates.more')&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="$exoPrefix/Templates+Application/" class="wikiexternallink"&gt;$services.localization.render('help.templates.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
   <attachment>

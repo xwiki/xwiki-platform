@@ -50,13 +50,13 @@
   #end
   #set ($browseMacrosURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=${section}&amp;search=macro&amp;repo="))
 #else
-  #set ($browseMacrosURL = 'http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro')
+  #set ($browseMacrosURL = 'https://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro')
 #end
 
 #set ($actionCards = [{
   'title': $services.localization.render('help.macros.useMacros.title'),
   'description': $services.localization.render('help.macros.useMacros.description'),
-  'tip':$services.localization.render('help.macros.useMacros.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration' class='wikiexternallink'&gt;",'&lt;/a&gt;', $services.icon.renderHTML('cog')]),
+  'tip':$services.localization.render('help.macros.useMacros.tip', ["&lt;a href='https://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration' class='wikiexternallink'&gt;",'&lt;/a&gt;', $services.icon.renderHTML('cog')]),
   'thumbnail': 'Macro',
   'actions': [{
     'label':  $services.localization.render('help.try.label'),
@@ -73,44 +73,44 @@
     'url': $browseMacrosURL
   }, {
     'label': $services.localization.render('help.more.label'),
-    'url': 'http://platform.xwiki.org/xwiki/bin/view/DevGuide/WikiMacroTutorial'
+    'url': 'https://platform.xwiki.org/xwiki/bin/view/DevGuide/WikiMacroTutorial'
   }]
 }])
 
 #set ($exampleCards = [{
   'title': $services.localization.render('help.macros.box.title'),
   'description': $services.localization.render('help.macros.box.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro',
   'examples': 'Help.Macros.Box.WebHome',
   'thumbnail': 'Help.Macros.Box.WebHome@box.png'
 }, {
   'title': $services.localization.render('help.macros.toc.title'),
   'description': $services.localization.render('help.macros.toc.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro',
   'examples': 'Help.Macros.ToC.WebHome',
   'thumbnail': 'Help.Macros.ToC.WebHome@toc.png'
 }, {
   'title': $services.localization.render('help.macros.gallery.title'),
   'description': $services.localization.render('help.macros.gallery.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Gallery+Macro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Gallery+Macro',
   'examples': 'Help.Macros.Gallery.WebHome',
   'thumbnail': 'Help.Macros.Gallery.WebHome@gallery.png'
 }, {
   'title': $services.localization.render('help.macros.chart.title') ,
   'description': $services.localization.render('help.macros.chart.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro',
   'examples': 'Help.Macros.Chart.WebHome',
   'thumbnail': 'Help.Macros.Chart.WebHome@chart.png'
 }, {
   'title': $services.localization.render('help.macros.tree.title') ,
   'description': $services.localization.render('help.macros.tree.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro',
   'examples': 'Help.Macros.Tree.WebHome',
   'thumbnail': 'Help.Macros.Tree.WebHome@tree.png'
 }, {
   'title': $services.localization.render('help.macros.notifications.title') ,
   'description': $services.localization.render('help.macros.notifications.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Notifications%20Application/#HNotificationsMacro',
+  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Notifications%20Application/#HNotificationsMacro',
   'examples': 'Help.Macros.Notifications.WebHome',
   'thumbnail': 'Help.Macros.Notifications.WebHome@notifications.png'
 }])
@@ -145,7 +145,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Main/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro" class="wikiexternallink"&gt;$services.localization.render('help.macros.more')&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://extensions.xwiki.org/xwiki/bin/view/Main/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro" class="wikiexternallink"&gt;$services.localization.render('help.macros.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

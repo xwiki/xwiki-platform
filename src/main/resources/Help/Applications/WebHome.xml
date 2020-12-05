@@ -42,6 +42,7 @@
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
+#set ($exoPrefix = 'https://extensions.xwiki.org/xwiki/bin/view/Extension')
 #if ($hasAdmin)
   #set ($section = 'XWiki.Extensions')
   #if (!$xwiki.exists($section))
@@ -50,13 +51,13 @@
   #end
   #set ($browseAppsURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=${section}&amp;search=application&amp;repo=recommended"))
 #else
-  #set ($browseAppsURL = 'http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application')
+  #set ($browseAppsURL = "$exoPrefix/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application")
 #end
 
 #set ($actionCards = [{
   'title': $services.localization.render('help.applications.create.title'),
   'description': $services.localization.render('help.applications.create.description'),
-  'tip': $services.localization.render('help.applications.create.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/App+Within+Minutes+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
+  'tip': $services.localization.render('help.applications.create.tip', ["&lt;a href='$exoPrefix/App+Within+Minutes+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
   'thumbnail': 'AWM',
   'actions': [{
     'label': $services.localization.render('help.try.label'),
@@ -69,7 +70,7 @@
 }, {
   'title': $services.localization.render('help.applications.browse.title'),
   'description': $services.localization.render('help.applications.browse.description'),
-  'tip': $services.localization.render('help.applications.browse.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
+  'tip': $services.localization.render('help.applications.browse.tip', ["&lt;a href='$exoPrefix/Extension+Manager+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
   'thumbnail': 'EM',
   'actions': [{
     'label': $services.localization.render('help.browse.label'),
@@ -80,37 +81,37 @@
 #set ($exampleCards = [{
   'title': $services.localization.render('help.applications.blog.title'),
   'description': $services.localization.render('help.applications.blog.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Blog+Application',
+  'documentation': "$exoPrefix/Blog+Application",
   'icon': 'fa fa-rss', 
   'thumbnail': 'Help.Applications.WebHome@blog.png'
 }, {
   'title': $services.localization.render('help.applications.forum.title'),
   'description': $services.localization.render('help.applications.forum.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/ForumApplication',
+  'documentation': "$exoPrefix/ForumApplication",
   'icon': 'fa fa-comments',
   'thumbnail': 'Help.Applications.WebHome@forum.png'
 }, {
   'title': $services.localization.render('help.applications.menu.title'),
   'description': $services.localization.render('help.applications.menu.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Menu+Application',
+  'documentation': "$exoPrefix/Menu+Application",
   'icon': 'fa fa-list-ul',
   'thumbnail': 'Help.Applications.WebHome@menu.png'
 }, {
   'title': $services.localization.render('help.applications.ideas.title'),
   'description': $services.localization.render('help.applications.ideas.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Ideas',
+  'documentation': "$exoPrefix/Ideas",
   'icon': 'fa fa-lightbulb-o',
   'thumbnail': 'Help.Applications.WebHome@ideas.png'
 }, {
   'title': $services.localization.render('help.applications.meetings.title'),
   'description': $services.localization.render('help.applications.meetings.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Meeting+Application',
+  'documentation': "$exoPrefix/Meeting+Application",
   'icon': 'fa fa-calendar',
   'thumbnail': 'Help.Applications.WebHome@meeting.png'
 }, {
   'title': $services.localization.render('help.applications.fileManager.title'),
   'description': $services.localization.render('help.applications.fileManager.description'),
-  'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/File+Manager+Application',
+  'documentation': "$exoPrefix/File+Manager+Application",
   'icon': 'fa fa-folder',
   'thumbnail': 'Help.Applications.WebHome@filemanager.png'
 }])
@@ -145,7 +146,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;$services.localization.render('help.applications.link')&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="$exoPrefixn/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;$services.localization.render('help.applications.link')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

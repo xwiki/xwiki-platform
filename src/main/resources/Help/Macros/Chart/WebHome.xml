@@ -44,7 +44,7 @@
 {{/box}}
 
 {{velocity}}
-$services.localization.render('help.macros.chart', ['**', '**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro]]
+$services.localization.render('help.macros.chart', ['**', '**']) [[$services.localization.render('help.more.label')&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro]]
 
 == $services.localization.render('help.macros.chart.pie') ==
 

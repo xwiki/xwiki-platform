@@ -26,7 +26,10 @@
   <tr>
 
     <!-- Entry Select -->
-    <td class="entry-selector">
+    <td
+      v-if="isSelectionEnabled"
+      class="entry-selector"
+    >
       <LivedataEntrySelector :entry="entry"/>
     </td>
 
@@ -69,6 +72,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
     properties () { return this.logic.getPropertyDescriptors(); },
+    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
   },
 
 };

@@ -38,7 +38,10 @@
       tag="tr"
   >
     <!-- Entry Select All -->
-    <th class="entry-selector">
+    <th
+      v-if="isSelectionEnabled"
+      class="entry-selector"
+    >
       <LivedataEntrySelectorAll/>
     </th>
 
@@ -114,6 +117,10 @@ export default {
       return this.data.query.sort[0] || {};
     },
 
+    isSelectionEnabled () {
+      return this.logic.isSelectionEnabled();
+    },
+
   },
 
 
@@ -139,6 +146,10 @@ export default {
       // and there is the select-entry-all component as first child
       // we need to substract 1 to the indexes that the draggable plugin handles
       // so that it matches the true property order
+      // When selection is disabled (and the select-entry-all component hidden)
+      // we don't need to readjust the offset of the indexes
+      // as Vue handily creates a html comment where the component shoud be
+      // So that it does not messes up with indexes
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
 

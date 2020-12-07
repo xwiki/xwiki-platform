@@ -624,6 +624,15 @@ define([
 
 
     /**
+     * Return whether selecting properties is enabled
+     */
+    isSelectionEnabled () {
+      // TODO: fetch value from config
+      return true;
+    },
+
+
+    /**
      * Return whether the entry is currently selected
      * @param {Object} entry
      * @returns {Boolean}
@@ -643,6 +652,7 @@ define([
      * @param {Object|Array} entries
      */
     selectEntries (entries) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
         const entryId = this.getEntryId(entry);
@@ -664,6 +674,7 @@ define([
      * @param {Object|Array} entries
      */
     deselectEntries (entries) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
         const entryId = this.getEntryId(entry);
@@ -686,6 +697,7 @@ define([
      * @param {Boolean} select Whether to select or not the entries. Undefined toggle current state
      */
     toggleSelectEntries (entries, select) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
         if (select === undefined) {
@@ -718,6 +730,7 @@ define([
      * @param {Boolean} global
      */
     setEntrySelectGlobal (global) {
+      if (!this.isSelectionEnabled()) { return; }
       this.entrySelection.isGlobal = global;
       this.entrySelection.selected.splice(0);
       this.entrySelection.deselected.splice(0);

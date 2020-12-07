@@ -67,8 +67,11 @@ export default {
     // This method should be used to apply edit and go back to view mode
     // It validate the entered value, ensuring that is is valid for the server
     applyEdit (newValue) {
-      // TODO: should call the logic API instead, but this is just for quick prove of concept
-      this.entry[this.propertyId] = newValue;
+      this.logic.setValue({
+        entry: this.entry,
+        propertyId: this.propertyId,
+        value: newValue
+      });
       // Go back to view mode
       // (there might be a cleaner way to do this)
       this.$el.__vue__.view();

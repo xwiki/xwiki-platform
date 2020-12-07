@@ -405,7 +405,16 @@ define([
     },
 
 
+    /**
+     * Return whether selecting properties is enabled
+     */
+    canAddEntry () {
+      // TODO: fetch value from config
+      return false;
+    },
+
     addEntry () {
+      if (!this.canAddEntry()) { return; }
       const mockNewUrl = () => this.getEntryId(this.data.data.entries.slice(-1)[0]) + "0";
       // TODO: CALL FUNCTION TO CREATE NEW DATA HERE
       Promise.resolve({ /* MOCK DATA */

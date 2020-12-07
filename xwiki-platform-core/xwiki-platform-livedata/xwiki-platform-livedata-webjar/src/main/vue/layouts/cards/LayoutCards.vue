@@ -37,7 +37,7 @@
     <LivedataTopbar>
       <template #left>
         <LivedataDropdownMenu/>
-        <LivedataEntrySelectorAll/>
+        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
         <LivedataRefreshButton/>
       </template>
       <template #right>
@@ -102,6 +102,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
+    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
   },
 
 };

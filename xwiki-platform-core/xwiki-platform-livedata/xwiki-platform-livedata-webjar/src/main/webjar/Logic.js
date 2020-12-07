@@ -406,6 +406,55 @@ define([
 
 
     /**
+     * Return whether the Livedata is editable or not
+     * if entry given, return whether it is editable
+     * if property given, return whether it is editable (for any entries)
+     * If entry and property given, return whether specific value is editable
+     * @param {Object} parameters
+     * @param {Object} parameters.entry The entry object
+     * @param {Number} parameters.propertyId The property id of the entry
+     */
+    isEditable ({ entry, propertyId }) {
+      // TODO: Ensure entry is valid (need other current PR)
+      // TODO: Ensure property is valid (need other current PR)
+      // Whole Livedata
+      if (entry === undefined && propertyId === undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Entry
+      if (entry !== undefined && propertyId === undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Property
+      if (entry === undefined && propertyId !== undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Specific value
+      if (entry !== undefined && propertyId !== undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+    },
+
+    /**
+     * Set the value of the given entry property
+     * @param {Object} parameters
+     * @param {Object} parameters.entry The entry we want to modify
+     * @param {Number} parameters.propertyId The property id we want to modify in the entry
+     */
+    setValue ({ entry, propertyId, value }) {
+      // TODO: Ensure entry is valid (need other current PR)
+      // TODO: Ensure property is valid (need other current PR)
+      if (!this.isEditable({ entry, propertyId })) { return; }
+      entry[propertyId] = value;
+      // TODO: push value to server
+    },
+
+
+    /**
      * Return whether selecting properties is enabled
      */
     canAddEntry () {

@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.validation.EntityNameValidation;
-import org.xwiki.model.validation.EntityNameValidationConfiguration;
-import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -41,10 +38,8 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -58,19 +53,13 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList
 @ReferenceComponentList
-@OldcoreTest(mockXWiki = false)
+@OldcoreTest
 public class SaveActionTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "FooBar");
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
-
-    @MockComponent
-    private EntityNameValidationManager entityNameValidationManager;
-
-    @MockComponent
-    private EntityNameValidationConfiguration entityNameValidationConfiguration;
 
     @MockComponent
     private Execution execution;
@@ -115,25 +104,8 @@ public class SaveActionTest
 
         mockForm = mock(EditForm.class);
         context.setForm(mockForm);
-        when(this.entityNameValidationConfiguration.useValidation()).thenReturn(false);
 
         context.setUserReference(USER_REFERENCE);
-    }
-
-    @Test
-    void newDocumentInvalidName() throws Exception
-    {
-        when(mockDocument.isNew()).thenReturn(true);
-        DocumentReference documentReference = new DocumentReference("XWiki", "Foo", "Bar");
-        when(mockDocument.getDocumentReference()).thenReturn(documentReference);
-        when(this.entityNameValidationConfiguration.useValidation()).thenReturn(true);
-        EntityNameValidation entityNameValidation = mock(EntityNameValidation.class);
-        when(this.entityNameValidationManager.getEntityReferenceNameStrategy()).thenReturn(entityNameValidation);
-        when(entityNameValidation.isValid(documentReference)).thenReturn(false);
-
-        assertTrue(saveAction.save(this.context));
-        assertEquals("entitynamevalidation.create.invalidname", context.get("message"));
-        assertArrayEquals(new Object[] { "Foo.Bar" }, (Object[]) context.get("messageParameters"));
     }
 
     @Test

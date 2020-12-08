@@ -410,11 +410,11 @@ define([
      * if entry given, return whether it is editable
      * if property given, return whether it is editable (for any entries)
      * If entry and property given, return whether specific value is editable
-     * @param {Object} parameters
-     * @param {Object} parameters.entry The entry object
-     * @param {Number} parameters.propertyId The property id of the entry
+     * @param {Object} [parameters]
+     * @param {Object} [parameters.entry] The entry object
+     * @param {Number} [parameters.propertyId] The property id of the entry
      */
-    isEditable ({ entry, propertyId }) {
+    isEditable ({ entry, propertyId } = {}) {
       // TODO: Ensure entry is valid (need other current PR)
       // TODO: Ensure property is valid (need other current PR)
       // Whole Livedata
@@ -443,7 +443,8 @@ define([
      * Set the value of the given entry property
      * @param {Object} parameters
      * @param {Object} parameters.entry The entry we want to modify
-     * @param {Number} parameters.propertyId The property id we want to modify in the entry
+     * @param {number} parameters.propertyId The property id we want to modify in the entry
+     * @param {string} parameters.value The new value of entry property
      */
     setValue ({ entry, propertyId, value }) {
       // TODO: Ensure entry is valid (need other current PR)
@@ -681,10 +682,18 @@ define([
 
     /**
      * Return whether selecting properties is enabled
+     * If entry is given, return whether this entry can be selected
+     * @param {Object} [parameters]
+     * @param {Object} [parameters.entry]
      */
-    isSelectionEnabled () {
+    isSelectionEnabled ({ entry } = {}) {
+      // TODO: Ensure entry is valid (need other current PR)
+      if (entry !== undefined) {
+        return entry.age < 40;
+        // return this.isEditable({ entry });
+      }
       // TODO: fetch value from config
-      return true;
+        return true;
     },
 
 
@@ -711,6 +720,7 @@ define([
       if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         const entryId = this.getEntryId(entry);
         if (this.entrySelection.isGlobal) {
           this.uniqueArrayRemove(this.entrySelection.deselected, entryId);
@@ -733,6 +743,7 @@ define([
       if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         const entryId = this.getEntryId(entry);
         if (this.entrySelection.isGlobal) {
           this.uniqueArrayAdd(this.entrySelection.deselected, entryId);
@@ -756,6 +767,7 @@ define([
       if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         if (select === undefined) {
           select = !this.isEntrySelected(entry);
         }
@@ -769,15 +781,14 @@ define([
 
 
     /**
-     * Get number of selected entries
+     * Get number of selectable entries in page
      * @returns {Number}
      */
-    getSelectedEntriesCount () {
-      if (this.entrySelection.isGlobal) {
-        return this.data.data.count - this.entrySelection.deselected.length;
-      } else {
-        return this.entrySelection.selected.length;
-      }
+    selectableCountInPage () {
+      if (!this.isSelectionEnabled()) { return 0; }
+      return this.data.data.entries
+        .filter(entry => this.isSelectionEnabled({ entry }))
+        .length;
     },
 
 

@@ -27,11 +27,13 @@
 
     <!-- Entry Select -->
     <td
-      v-if="isSelectionEnabled"
+      v-if="isSelectionEnabled && isEntrySelectable"
       class="entry-selector"
     >
       <LivedataEntrySelector :entry="entry"/>
     </td>
+    <!-- If selection is enable but entry is not selectable -->
+    <td v-else-if="isSelectionEnabled"></td>
 
     <!-- Entry cells -->
     <td
@@ -73,6 +75,9 @@ export default {
     data () { return this.logic.data; },
     properties () { return this.logic.getPropertyDescriptors(); },
     isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
+    isEntrySelectable () {
+      return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
   },
 
 };

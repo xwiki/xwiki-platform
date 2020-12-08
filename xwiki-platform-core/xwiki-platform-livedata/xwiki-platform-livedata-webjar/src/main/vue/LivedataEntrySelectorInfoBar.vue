@@ -34,7 +34,15 @@
     class="livedata-entry-selector-info-bar"
     v-if="selectedCount > 0"
   >
-  {{ selectedCount }} / {{ data.data.count }} entries selected
+    <span v-if="!logic.entrySelection.isGlobal">
+      {{ this.logic.entrySelection.selected.length }} entries selected
+    </span>
+    <span v-else-if="logic.entrySelection.isGlobal && selectedCount === totalPageCount">
+      All entries selected
+    </span>
+    <span v-else>
+      All entries selected but {{ this.logic.entrySelection.deselected.length }}
+    </span>
   </div>
 </template>
 
@@ -51,8 +59,16 @@ export default {
 
     // The number of selected entries to be displayed
     selectedCount () {
-      return this.logic.getSelectedEntriesCount();
+      if (this.logic.entrySelection.isGlobal) {
+        return this.data.data.entries.length - this.logic.entrySelection.deselected.length;
+      } else {
+        return this.logic.entrySelection.selected.length;
+      }
     },
+
+    totalPageCount () {
+      return this.data.data.entries.length;
+    }
   },
 
 };

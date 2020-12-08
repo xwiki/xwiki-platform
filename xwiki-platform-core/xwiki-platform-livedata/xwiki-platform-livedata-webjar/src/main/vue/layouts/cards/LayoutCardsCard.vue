@@ -32,6 +32,7 @@
       <!-- Entry selector -->
       <LivedataEntrySelector
         v-if="isSelectionEnabled"
+        v-show="isEntrySelectable"
         :entry="entry"
       />
       <!-- Title property -->
@@ -121,6 +122,10 @@ export default {
 
     isSelectionEnabled () {
       return this.logic.isSelectionEnabled();
+    },
+
+    isEntrySelectable () {
+      return this.logic.isSelectionEnabled({ entry: this.entry });
     },
 
   },

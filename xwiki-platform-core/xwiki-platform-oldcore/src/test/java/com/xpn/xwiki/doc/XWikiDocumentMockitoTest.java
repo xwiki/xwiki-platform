@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
@@ -75,6 +77,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -1029,33 +1032,64 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testReadFromTemplate() throws Exception
     {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
         SpaceReference spaceReference = new SpaceReference("Space", new WikiReference("wiki"));
         XWikiDocument template = new XWikiDocument(new DocumentReference("Template", spaceReference));
         template.setParentReference(new EntityReference("Parent", EntityType.DOCUMENT, spaceReference));
         template.setTitle("Enter title here");
         template.setSyntax(Syntax.XWIKI_2_0);
         template.setContent("Enter content here");
+        
+        DocumentReference templateAuthor = new DocumentReference("test", "Users", "John");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         XWikiAttachment aliceAttachment = new XWikiAttachment(template, "alice.png");
         aliceAttachment.setContent(new ByteArrayInputStream("alice content".getBytes()));
-        template.addAttachment(aliceAttachment);
+        aliceAttachment.setVersion("2.3");
+        aliceAttachment.setDate(simpleDateFormat.parse("12/03/2018"));
+        aliceAttachment.setAuthorReference(templateAuthor);
+        template.setAttachment(aliceAttachment);
 
         XWikiAttachment bobAttachment = new XWikiAttachment(template, "bob.png");
-        bobAttachment.setContent(new ByteArrayInputStream("bob content".getBytes()));
-        template.addAttachment(bobAttachment);
+        bobAttachment.setVersion("5.3");
+        bobAttachment.setDate(simpleDateFormat.parse("25/5/2019"));
+        bobAttachment.setAuthorReference(templateAuthor);
+        template.setAttachment(bobAttachment);
 
-        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        // Verify that the attachment content is loaded before being copied.
+        XWikiAttachmentStoreInterface attachmentContentStore = mock(XWikiAttachmentStoreInterface.class);
+        xcontext.getWiki().setDefaultAttachmentContentStore(attachmentContentStore);
+        doAnswer(invocation -> {
+            XWikiAttachment attachment = invocation.getArgument(0);
+            if ("bob.png".equals(attachment.getFilename())) {
+                XWikiAttachmentContent attachmentContent = new XWikiAttachmentContent(attachment);
+                attachmentContent.setContent(new ByteArrayInputStream("bob content".getBytes()));
+                attachment.setAttachment_content(attachmentContent);
+            }
+            return null;
+        }).when(attachmentContentStore).loadAttachmentContent(any(XWikiAttachment.class), eq(xcontext), eq(true));
+
         this.oldcore.getSpyXWiki().saveDocument(template, xcontext);
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
 
+        DocumentReference targetAuthor = new DocumentReference("test", "Users", "Denis");
+        xcontext.setUserReference(targetAuthor);
+
         XWikiAttachment aliceModifiedAttachment = new XWikiAttachment(target, "alice.png");
         aliceModifiedAttachment.setContent(new ByteArrayInputStream("alice modified content".getBytes()));
-        target.addAttachment(aliceModifiedAttachment);
+        aliceModifiedAttachment.setVersion("1.2");
+        aliceModifiedAttachment.setDate(simpleDateFormat.parse("07/10/2020"));
+        aliceModifiedAttachment.setAuthorReference(targetAuthor);
+        target.setAttachment(aliceModifiedAttachment);
 
         XWikiAttachment carolAttachment = new XWikiAttachment(target, "carol.png");
         carolAttachment.setContent(new ByteArrayInputStream("carol content".getBytes()));
-        target.addAttachment(carolAttachment);
+        carolAttachment.setVersion("3.1");
+        carolAttachment.setDate(simpleDateFormat.parse("13/11/2020"));
+        carolAttachment.setAuthorReference(targetAuthor);
+        target.setAttachment(carolAttachment);
 
         target.readFromTemplate(template.getDocumentReference(), xcontext);
 
@@ -1066,12 +1100,27 @@ public class XWikiDocumentMockitoTest
         Assert.assertEquals(template.getContent(), target.getContent());
 
         assertEquals(3, target.getAttachmentList().size());
-        assertTrue(IOUtils.contentEquals(target.getAttachment("alice.png").getContentInputStream(xcontext),
-            aliceModifiedAttachment.getContentInputStream(xcontext)));
-        assertTrue(IOUtils.contentEquals(target.getAttachment("bob.png").getContentInputStream(xcontext),
-            bobAttachment.getContentInputStream(xcontext)));
-        assertTrue(IOUtils.contentEquals(target.getAttachment("carol.png").getContentInputStream(xcontext),
-            carolAttachment.getContentInputStream(xcontext)));
+        assertAttachment("alice modified content", "1.2", targetAuthor, simpleDateFormat.parse("07/10/2020"),
+            target.getAttachment("alice.png"));
+        assertAttachment("bob content", "1.1", targetAuthor, null, target.getAttachment("bob.png"));
+        assertAttachment("carol content", "3.1", targetAuthor, simpleDateFormat.parse("13/11/2020"),
+            target.getAttachment("carol.png"));
+    }
+
+    private void assertAttachment(String expectedContent, String expectedVersion,
+        DocumentReference expectedAuthorReference, Date expectedDate, XWikiAttachment actualAttachment) throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        assertEquals(expectedContent, IOUtils.toString(actualAttachment.getContentInputStream(xcontext), "UTF-8"));
+        assertEquals(expectedVersion, actualAttachment.getVersion());
+        assertEquals(expectedAuthorReference, actualAttachment.getAuthorReference());
+        if (expectedDate != null) {
+            assertEquals(expectedDate, actualAttachment.getDate());
+        } else {
+            // The expected date is pretty recent (no more than 5 seconds ago).
+            long delta = new Date().getTime() - actualAttachment.getDate().getTime();
+            assertTrue(delta < 5000);
+        }
     }
 
     @Test

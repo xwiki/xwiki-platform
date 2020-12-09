@@ -1079,21 +1079,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(Metadata metadata)
     {
-        SchemaUpdate updater = new SchemaUpdate();
-        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
-
-        List<Exception> exceptions = updater.getExceptions();
-
-        if (exceptions.isEmpty()) {
-            return;
-        }
-
-        // Print the errors
-        for (Exception exception : exceptions) {
-            this.logger.error(exception.getMessage(), exception);
-        }
-
-        throw new HibernateException("Failed to update the database. See the log for all errors", exceptions.get(0));
+        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
     }
 
     /**

@@ -4275,19 +4275,51 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
             if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
-                XWikiAttachment newAttachment = attachment.clone();
-
-                // We need to set the content of the attachment to be dirty because the dirty bit
-                // is used to signal that there is a reason to save the copied attachment, otherwise
-                // the copied attachment will be empty since the original attachment content is not
-                // modified in this operation.
-                if (newAttachment.getAttachment_content() != null) {
-                    newAttachment.getAttachment_content().setContentDirty(true);
+                try {
+                    copyAttachment(attachment, true);
+                } catch (XWikiException e) {
+                    LOGGER.warn("Cannot copy attachment [{}] from [{}] to [{}]. Root cause is [{}].",
+                        attachment.getFilename(), sourceDocument.getDocumentReference(), this.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                    // Skip this attachment because we cannot load its content.
+                    continue;
                 }
-
-                setAttachment(newAttachment);
             }
         }
+    }
+
+    /**
+     * Copies the given attachment to this document.
+     * 
+     * @param attachment the source attachment to be copied to this document
+     * @param reset whether to reset or not the attachment meta data that is specific to the source (version, author,
+     *            date)
+     * @throws XWikiException if loading the content of the given attachment fails
+     */
+    private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWikiAttachment newAttachment = attachment.clone();
+
+        // Make sure we copy the attachment content also, not just its meta data. For this we need to load
+        // the attachment content from the source document. Note that the owner document will be overwritten
+        // below when we call setAttachment().
+        newAttachment.setDoc(attachment.getDoc(), false);
+        newAttachment.loadAttachmentContent(xcontext);
+        // We need to set the content of the attachment to be dirty because the dirty bit is used to signal
+        // that there is a reason to save the copied attachment, otherwise the copied attachment will be
+        // empty since the original attachment content is not modified in this operation.
+        newAttachment.getAttachment_content().setContentDirty(true);
+
+        if (reset) {
+            // Reset the meta data that is specific to the original attachment (version, author, date).
+            newAttachment.setRCSVersion(null);
+            newAttachment.setAuthorReference(xcontext.getUserReference());
+            newAttachment.setDate(new Date());
+        }
+
+        // Add the attachment copy to the list of attachments of this document.
+        setAttachment(newAttachment);
     }
 
     /**

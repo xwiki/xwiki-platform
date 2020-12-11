@@ -60,6 +60,9 @@
     <pdfbox.version>2.0.21</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
+    <!-- CSS4J/Carte -->
+    <css4j.version>3.1.0</css4j.version>
+
     <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
 
@@ -536,6 +539,18 @@
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-x86asm</artifactId>
         <version>1.0.2</version>
+      </dependency>
+
+      <!-- CSS4J -->
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>xml-dtd</artifactId>
+        <version>${css4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>css4j-dom4j</artifactId>
+        <version>${css4j.version}</version>
       </dependency>
 
       <!-- Restlet -->

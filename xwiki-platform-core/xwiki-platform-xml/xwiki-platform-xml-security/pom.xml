@@ -24,15 +24,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-xml</artifactId>
     <version>12.10.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-xml</artifactId>
-  <name>XWiki Platform - XML - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - XML - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-xml-security</module>
-    <module>xwiki-platform-xml-script</module>
-  </modules>
+  <artifactId>xwiki-platform-xml-security</artifactId>
+  <name>XWiki Platform - XML - Script Security</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - XML - Script Security</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
+    </dependency>
+  </dependencies>
 </project>

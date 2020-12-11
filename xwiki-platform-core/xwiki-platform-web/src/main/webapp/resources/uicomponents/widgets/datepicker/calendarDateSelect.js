@@ -102,14 +102,14 @@ window.f_scrollTop = function() {
   return ([window.pageYOffset ? window.pageYOffset : null, document.documentElement ? document.documentElement.scrollTop : null, document.body ? document.body.scrollTop : null].select(function(x){return x>0}).first()||0 );
 }
 
-_translations = {
+var _translations = {
   "OK": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate'))",
   "Now": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerSelectCurrentTime'))",
   "Today": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerSelectCurrentDate'))",
   "Clear": "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerClearSelectedDate'))"
 }
 
-SelectBox = Class.create();
+var SelectBox = Class.create();
 SelectBox.prototype = {
   initialize: function(parent_element, values, html_options, style_options) {
     this.element = $(parent_element).build("select", html_options, style_options);
@@ -225,7 +225,7 @@ Externals.CalendarDateSelect.prototype = {
     var that = this;
     // create the divs
     $w("top header body buttons footer bottom").each(function(name) {
-      eval("var " + name + "_div = that." + name + "_div = that.calendar_div.build('div', { className: 'cds_"+name+"' }, { clear: 'left'} ); ");
+      that[name + '_div'] = that.calendar_div.build('div', {className: 'cds_' + name}, {clear: 'left'}); 
     });
 
     this.initHeaderDiv();
@@ -262,7 +262,7 @@ Externals.CalendarDateSelect.prototype = {
 
     var days_tbody = days_table.build("tbody")
     // Make the days!
-    var row_number = 0, weekday;
+    var row_number = 0, weekday, days_row;
     for(var cell_index = 0; cell_index<42; cell_index++)
     {
       weekday = (cell_index+Date.first_day_of_week ) % 7;
@@ -312,7 +312,7 @@ Externals.CalendarDateSelect.prototype = {
     if (this.options.get("buttons")) {
       buttons_div.build("span", {innerHTML: "&#160;"});
       if (this.options.get("time") == "mixed" || !this.options.get("time")) {
-        b = buttons_div.build("a", {
+        buttons_div.build("a", {
           innerHTML: _translations["Today"],
           href: "#",
           onclick: function() {this.today(false); return false;}.bindAsEventListener(this)
@@ -324,7 +324,7 @@ Externals.CalendarDateSelect.prototype = {
       }
 
       if (this.options.get("time")) {
-        b = buttons_div.build("a", {
+        buttons_div.build("a", {
           innerHTML: _translations["Now"],
           href: "#",
           onclick: function() {
@@ -380,11 +380,12 @@ Externals.CalendarDateSelect.prototype = {
 
     var today = new Date().stripTime();
     var this_month = this.date.getMonth();
-    vdc = this.options.get("valid_date_check");
+    var vdc = this.options.get("valid_date_check");
     for (var cell_index = 0;cell_index<42; cell_index++) {
-      day = iterator.getDate(); month = iterator.getMonth();
-      cell = this.calendar_day_grid[cell_index];
-      Element.remove(cell.childNodes[0]); div = cell.build("div", {innerHTML:day});
+      var day = iterator.getDate(), month = iterator.getMonth();
+      var cell = this.calendar_day_grid[cell_index];
+      Element.remove(cell.childNodes[0]);
+      var div = cell.build("div", {innerHTML:day});
       if (month!=this_month) div.className = "other";
       cell.day = day; cell.month = month; cell.year = iterator.getFullYear();
       if (vdc) { if (vdc(iterator.stripTime())) cell.removeClassName("disabled"); else cell.addClassName("disabled") };
@@ -393,6 +394,7 @@ Externals.CalendarDateSelect.prototype = {
 
     if (this.today_cell) this.today_cell.removeClassName("today");
 
+    var days_until;
     if ( $R( 0, 41 ).include(days_until = this.beginning_date.stripTime().daysDistance(today)) ) {
       this.today_cell = this.calendar_day_grid[days_until];
       this.today_cell.addClassName("today");
@@ -450,6 +452,7 @@ Externals.CalendarDateSelect.prototype = {
   setSelectedClass: function() {
     if (!this.selection_made) return;
     this.clearSelectedClass()
+    var days_until;
     if ($R(0,42).include( days_until = this.beginning_date.stripTime().daysDistance(this.selected_date.stripTime()) )) {
       this.selected_cell = this.calendar_day_grid[days_until];
       this.selected_cell.addClassName("selected");
@@ -529,11 +532,13 @@ Externals.CalendarDateSelect.prototype = {
       return (this.options.get("close_on_click"))
   },
   navMonth: function(month) {
-    (target_date = new Date(this.date)).setMonth(month);
+    var target_date = new Date(this.date);
+    target_date.setMonth(month);
     return (this.navTo(target_date));
   },
   navYear: function(year) {
-    (target_date = new Date(this.date)).setYear(year);
+    var target_date = new Date(this.date);
+    target_date.setYear(year);
     return (this.navTo(target_date));
   },
   navTo: function(date) {

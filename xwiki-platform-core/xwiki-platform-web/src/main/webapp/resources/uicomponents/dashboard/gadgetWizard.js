@@ -17,12 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-ckeditor': new XWiki.Document('EditSheet', 'CKEditor').getURL('jsx', 'r=1')
-  }
-});
-
 define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   /*!
   #set ($l10nKeys = [

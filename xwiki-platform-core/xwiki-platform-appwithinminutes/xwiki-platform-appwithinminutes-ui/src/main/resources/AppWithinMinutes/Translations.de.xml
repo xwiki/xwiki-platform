@@ -186,7 +186,7 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Bilder
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Eine spezielle Spalte, um Bilder für einen Eintrag anzuzeigen
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Eine spezielle Spalte, die Benutzeravatare anzeigt. Sie funktioniert nur, wenn in der Datenstruktur Benutzer verwendet werden.
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+platform.appwithinminutes.liveTableEditorTitleHint=Der Titel der Anwendung, der auf der Startseite der Anwendung, im Bedienfeld, der Live-Tabelle und den Brotkrumen usw. angezeigt werden soll.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Die Beschreibung ist eine Zusammenfassung, wozu die Anwendung gut ist und was für Daten sie verwaltet.
 platform.appwithinminutes.liveTableEditorColumnsHint=Wählen Sie die Spalten aus, die in der Tabelle auf der Startseite der Anwendung dargestellt werden.
 platform.appwithinminutes.liveTableEditorSaveComment=Tabelle aktualisieren
@@ -211,7 +211,7 @@ platform.appwithinminutes.appHomePageTranslateAppLabel=Anwendung übersetzen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Anwendung löschen
 platform.appwithinminutes.appHomePageMovedWarning=Die Anwendung funktioniert möglicherweise nicht richtig, da sie umbenannt oder verschoben wurde, ohne den Code zu aktualisieren. Bitte bearbeiten Sie die Anwendung und folgen Sie den Schritten, um den Code zu aktualisieren.
 AppWithinMinutes.LiveTableClass_description=Beschreibung
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+AppWithinMinutes.LiveTableClass_columns=Spalten der Live-Tabelle
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Die Anwendung {0} und ALLE Einträge werden gelöscht. Sind Sie sicher, dass Sie fortfahren wollen?

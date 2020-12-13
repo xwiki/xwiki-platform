@@ -451,11 +451,13 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# And here those for "maven" repositories:
 #-# * [Since 10.7RC1] checksumPolicy: what to do when checksum validation fail. Possible values are "fail", "warn"
 #-#   (the default) and "ignore"
+#-# * [Since 13.0RC1] http.headers: Custom HTTP headers to be used when connecting to the maven repository.
 #-#
 #-# Here is an example:
 # extension.repositories = privatemavenid:maven:http://host.com/private/maven/
 # extension.repositories.privatemavenid.auth.user = someuser
 # extension.repositories.privatemavenid.auth.password = thepassword
+# extension.repositories.privatemavenid.http.headers.headername = headervalue
 #-#
 #-# Here's an example to add your local Maven Repository
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the

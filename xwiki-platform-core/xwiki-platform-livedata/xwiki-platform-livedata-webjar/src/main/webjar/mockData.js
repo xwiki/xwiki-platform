@@ -225,7 +225,7 @@ define({
           { id: "nequals", name: "Not Equals", },
           { id: "before", name: "Before", },
           { id: "after", name: "After", },
-          { id: "range", name: "Range", },
+          { id: "isBetween", name: "Is between", },
         ],
       },
     ],

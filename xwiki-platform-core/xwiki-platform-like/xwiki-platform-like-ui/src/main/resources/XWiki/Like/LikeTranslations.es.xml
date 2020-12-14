@@ -48,8 +48,8 @@ like.unlike.success=La página ha recibido algún "Ya no me gusta".
 like.unlike.error=Error al intentar dar "ya no me gusta" a la página.
 like.userprofile.menu=Páginas que me gustan
 like.button.title=Número de "Me gusta" de esta página: {0}
-like.button.title.like=Clica para activar "me gusta" para la página en curso.   El número de "me gusta" en esta página es {0}.
-like.button.title.unlike=Clica para desactivar "me gusta" en la página en curso.   El número de "me gusta" en esta página es {0}.
+like.button.title.like=Clica para activar "me gusta" para la página en curso. El número de "me gusta" en esta página es {0}.
+like.button.title.unlike=Clica para desactivar "me gusta" en la página en curso. El número de "me gusta" en esta página es {0}.
 like.likers.empty=Todavía no le gusta a nadie esta página.
 like.likers.number={0} person(as) le gustas esta página:
 like.likers.title=Personas a las que les gusta {0}
@@ -57,7 +57,8 @@ like.livetable.column.title=Título
 like.livetable.column.location=Ubicación
 like.livetable.column.likes="Me gusta"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Mostrar siempre el botón "Me gusta"
-XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Mostrar el botón incluso si el usuario no tiene derecho de interaccionar con él.  Úsalo si deseas mostrar siempre el contador de "Me gusta".
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Mostrar el botón incluso si el usuario no tiene derecho de interaccionar con él. Úsalo si deseas mostrar siempre el contador de "Me gusta".
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacidad de la caché
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Número de información de "Me gusta" guardada en la caché. Ten en cuenta que tienes que reiniciar XWiki para que se activen los cambios de esta opción.</content>
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Número de información de "Me gusta" guardada en la caché. Ten en cuenta que tienes que reiniciar XWiki para que se activen los cambios de esta opción.
+</content>
 </xwikidoc>

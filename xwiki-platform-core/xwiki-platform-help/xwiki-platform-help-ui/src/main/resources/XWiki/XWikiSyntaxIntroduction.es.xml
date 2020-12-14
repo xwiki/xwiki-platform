@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.1" locale="es">
   <web>XWiki</web>
   <name>XWikiSyntaxIntroduction</name>
   <language>es</language>
@@ -36,35 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= General =
-
-== Introducción ==
-
-{{comment}}please do not translate the sub headlines{{/comment}}
-=== 1.0 Introduction ===
-
-La sintaxis XWiki 1.0 fue el primer intento de implementar una sintaxis estilo Wiki. Tiene algunas limitaciones y hay algunos formatos que solo se pueden llevar a cabo insertando HTML directamente. Recomendamos utilizar las sintaxis más modernas; solo se soporta la sintaxis XWiki 1.0 por compatibilidad.
-
-Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
-
-=== 2.0 Introduction ===
-
-Con la versión 1.7 de XWiki Enterprise, hemos introducido una sintaxis wiki nueva. Hemos llamado a la sintaxis antigua //Sintaxis XWiki 1.0// y, lógicamente, la sintaxis nueva se llama //Sintaxis XWiki 2.0//. Las razones principales para introducir la sintaxis nueva han sido:
-* Solucionar las limitaciones y ambigüedades de la Sintaxis XWiki 1.0 (inspirada en Radeox, el motor de renderizado interno, y TWiki).
-** Sin símbolos óptimos. Por ejemplo, el símbolo de la negrita eran asteriscos sencillos. Esto creaba problemas cuando los usuarios tecleaban texto que contenía asteriscos, ya que ese texto se consideraba en negrita por error cuando no lo estaba. Por lo tanto, hemos racionalizado la sintaxis utilizando al menos caracteres dobles en todas partes.
-** Ambigüedades. Por ejemplo, había una ambigüedad entre un elemento en negrita que comenzaba una línea y una lista de viñetas. Se requería resolver las ambigüedades para reescribir el editor WYSIWYG de modo que pudiera ser determinista.
-* Estar más cerca de la [[Sintaxis Creole 1.0 &gt;&gt; http://www.wikicreole.org/]] que se está convirtiendo en un estándar para la sintaxis wiki. Además, la comunidad Creole ha dedicado tiempo a analizar todas las sintaxis wiki existentes antes de decidir sobre los símbolos. Las elecciones hechas son, por lo tanto, muy buenas.
-
-Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
-
+  <content>=== 2.1 Introduction ===
 === 2.1 Introduction ===
-
-La Sintaxis XWiki 2.0 ha demostrado ser bastante útil y robusta en general; sin embargo, desde su introducción se han encontrado algunas deficiencias. Las mejoras correspondientes se han consolidado en la Sintaxis XWiki 2.1. Algunas características nuevas de esta sintaxis son:
-* Homogenización de la sintaxis de enlaces e imágenes para una mayor claridad, consistencia y extensibilidad.
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.1 Introduction ===
+### Missing: The XWiki Syntax 2.0 has proven to be quite useful and robust in general; however since its introduction a few shortcomings have been found. The corresponding improvements have been consolidated in XWiki Syntax 2.1. Some new features of this syntax are:
+### Missing: In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future).  This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+=== 2.1 Introduction ===
+### Missing: Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. We've named the old syntax the //XWiki Syntax 1.0// and the new syntax was logically called the //XWiki Syntax 2.0//. The main reasons for introducing the new syntax were:
 * Se ha añadido la capacidad de mostrar iconos, incrustar imágenes a través del esquema URI Data, vincular archivos usando la notación UNC y vincular a URLs relativas.
-
-{{info}}Como la Sintaxis XWiki 2.1 se basa en la Sintaxis XWiki 2.0, toda la Sintaxis XWiki 2.0 es válida a menos que las especificaciones de la 2.1 indiquen lo contrario.{{/info}}
-
-Además de las sintaxis específicas de XWiki también hemos cambiado el motor de renderizado interno en XWiki Enterprise versión 1.7 (anteriormente era Radeox) por nuestro motor propio que es un superconjunto que envuelve a [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] y [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (y otros posiblemente en el futuro). Esto nos ha permitido proporcionar otras sintaxis en la wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki y más&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
+** Ambigüedades. Por ejemplo, había una ambigüedad entre un elemento en negrita que comenzaba una línea y una lista de viñetas. Se requería resolver las ambigüedades para reescribir el editor WYSIWYG de modo que pudiera ser determinista.
+** Ambigüedades. Por ejemplo, había una ambigüedad entre un elemento en negrita que comenzaba una línea y una lista de viñetas. Se requería resolver las ambigüedades para reescribir el editor WYSIWYG de modo que pudiera ser determinista.
+* Se ha añadido la capacidad de mostrar iconos, incrustar imágenes a través del esquema URI Data, vincular archivos usando la notación UNC y vincular a URLs relativas.
+### Missing: In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future).  This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+=== 2.1 Introduction ===
+### Missing: The XWiki Syntax 2.0 has proven to be quite useful and robust in general; however since its introduction a few shortcomings have been found. The corresponding improvements have been consolidated in XWiki Syntax 2.1. Some new features of this syntax are:
+* Se ha añadido la capacidad de mostrar iconos, incrustar imágenes a través del esquema URI Data, vincular archivos usando la notación UNC y vincular a URLs relativas.
+* Se ha añadido la capacidad de mostrar iconos, incrustar imágenes a través del esquema URI Data, vincular archivos usando la notación UNC y vincular a URLs relativas.
+### Missing: {{info}}Since XWiki Syntax 2.1 is based on XWiki Syntax 2.0 all syntax from XWiki Syntax 2.0 is valid unless the 2.1 specifications suggest differently.{{/info}}
+### Missing: In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future).  This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+</content>
   
 </xwikidoc>

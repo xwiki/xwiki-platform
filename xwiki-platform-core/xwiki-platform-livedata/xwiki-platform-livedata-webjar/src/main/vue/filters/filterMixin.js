@@ -75,9 +75,7 @@ export default {
     // This can be used when we want to call the applyFilter method inside an input event
     applyFilterWithDelay (newValue) {
       // Clear existing timeout
-      if (this._applyFilterTimeoutId) {
-        clearTimeout(this._applyFilterTimeoutId);
-      }
+      clearTimeout(this._applyFilterTimeoutId);
       // Set a 250 milliseconds timeout before calling applyFilter method
       const timeoutDelay = 250;
       this._applyFilterTimeoutId = setTimeout(() => {

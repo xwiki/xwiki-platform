@@ -31,7 +31,7 @@
     :class="isView ? 'view' : 'edit'"
     @dblclick="edit"
     @keypress.self.enter="edit"
-    tabindex="0"
+    :tabindex="isEditable ? 0 : ''"
   >
     <!--
       The base displayer contains two slots: `viewer` and `editor`.
@@ -98,6 +98,14 @@ export default {
     };
   },
 
+  computed: {
+    isEditable () {
+      return this.logic.isEditable({
+        entry: this.entry,
+        propertyId: this.propertyId,
+      });
+    }
+  },
 
   // The following methods are only used by the BaseDisplayer component
   // The methods for specific displayers can be found in the displayerMixin
@@ -117,6 +125,7 @@ export default {
     // This function is only used for the baseDisplayer logic
     // and should not be used inside a specific displayer
     edit () {
+      if (!this.isEditable) { return; }
       if (!this.isView) { return; }
       this.isView = false;
     },

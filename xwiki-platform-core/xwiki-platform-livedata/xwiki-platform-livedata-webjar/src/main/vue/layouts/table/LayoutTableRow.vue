@@ -26,9 +26,14 @@
   <tr>
 
     <!-- Entry Select -->
-    <td class="entry-selector">
+    <td
+      v-if="isSelectionEnabled && isEntrySelectable"
+      class="entry-selector"
+    >
       <LivedataEntrySelector :entry="entry"/>
     </td>
+    <!-- If selection is enable but entry is not selectable -->
+    <td v-else-if="isSelectionEnabled"></td>
 
     <!-- Entry cells -->
     <td
@@ -69,6 +74,10 @@ export default {
   computed: {
     data () { return this.logic.data; },
     properties () { return this.logic.getPropertyDescriptors(); },
+    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
+    isEntrySelectable () {
+      return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
   },
 
 };
@@ -76,6 +85,11 @@ export default {
 
 
 <style>
+
+.layout-table .livedata-entry-selector {
+  align-items: flex-start;
+  padding: 10px 2rem;
+}
 
 .layout-table .cell {
   padding: 0;
@@ -87,14 +101,9 @@ export default {
 }
 
 .layout-table .entry-selector {
-    padding: 0;
-    height: 100%;
-    width: 0;
-}
-
-.layout-table .livedata-entry-selector {
-    justify-content: flex-start;
-    padding: 0 2rem;
+  padding: 0;
+  height: 100%;
+  width: 0;
 }
 
 </style>

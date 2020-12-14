@@ -30,7 +30,11 @@
     <!-- Cartd title-->
     <div class="card-title">
       <!-- Entry selector -->
-      <LivedataEntrySelector :entry="entry"/>
+      <LivedataEntrySelector
+        v-if="isSelectionEnabled"
+        v-show="isEntrySelectable"
+        :entry="entry"
+      />
       <!-- Title property -->
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
         <LivedataDisplayer
@@ -114,6 +118,14 @@ export default {
     // The id of the property that is going to be in the card title
     titlePropertyId () {
       return this.logic.getLayoutDescriptor("cards").titleProperty;
+    },
+
+    isSelectionEnabled () {
+      return this.logic.isSelectionEnabled();
+    },
+
+    isEntrySelectable () {
+      return this.logic.isSelectionEnabled({ entry: this.entry });
     },
 
   },

@@ -73,7 +73,7 @@
         />
 
         <!-- Component to create a new entry -->
-        <LayoutTableNewRow/>
+        <LayoutTableNewRow v-if="canAddEntry"/>
       </tbody>
 
     </table>
@@ -114,6 +114,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
+    canAddEntry () { return this.logic.canAddEntry(); },
   },
 
 };

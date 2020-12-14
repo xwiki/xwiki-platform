@@ -67,6 +67,7 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+
     // The colspan value to specify to the create-new-entry cell
     // It is set to the number of properties that can be displayed
     // as it is the max number of column that could be displayed at once

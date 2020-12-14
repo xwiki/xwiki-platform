@@ -103,17 +103,21 @@ export default {
     // It is checked if all the page entries are selected,
     // or if global mode is on
     checked () {
-         const allPageEntriesSeleted = this.data.data.entries.every(entry => this.logic.isEntrySelected(entry));
-         const allEntriesSelected = this.entrySelection.isGlobal && this.entrySelection.deselected.length === 0;
-        return allPageEntriesSeleted || allEntriesSelected;
+      const selectablePageEntries = this.data.data.entries
+        .filter(entry => this.logic.isSelectionEnabled({ entry }));
+      const allPageEntriesSeleted = selectablePageEntries
+        .every(entry => this.logic.entrySelection.selected.includes(this.logic.getEntryId(entry)));
+      const allEntriesSelected = this.entrySelection.isGlobal && this.entrySelection.deselected.length === 0;
+      return allPageEntriesSeleted || allEntriesSelected;
     },
 
     // Whether the button is indeterminate
     // It is in indeterminate state if at least one but not all
     // the page entries are selected
     indeterminate () {
-       const selectedCount = this.logic.getSelectedEntriesCount();
-        return selectedCount > 0 && !this.checked;
+      const someDeselected = this.logic.entrySelection.deselected.length > 0;
+      const someselected = this.logic.entrySelection.selected.length > 0;
+      return someDeselected || (someselected && !this.checked);
     },
 
   },
@@ -132,12 +136,24 @@ export default {
   methods: {
     // Event handler for when the user click on the checkbox
     toggle () {
-      // if Global mode is on, uncheck everything
+      // if Global mode is on
       if (this.entrySelection.isGlobal) {
-        this.logic.setEntrySelectGlobal(false);
-      // else, toggle `this.checked` state
+        if (this.checked) {
+          // Remove global mode if everything is checked
+          this.logic.setEntrySelectGlobal(false);
+        } else {
+          // Reinforce global mode if state is indeterminate
+          this.logic.setEntrySelectGlobal(true);
+        }
+      // else, normal mode
       } else {
-        this.logic.toggleSelectEntries(this.data.data.entries, !this.checked);
+        if (this.checked) {
+          // Deselect all selected entries
+          this.logic.deselectEntries(this.logic.entrySelection.selected);
+        } else {
+          // Selecte all entries in current page
+          this.logic.selectEntries(this.data.data.entries);
+        }
       }
     },
   },

@@ -37,7 +37,7 @@
     <LivedataTopbar>
       <template #left>
         <LivedataDropdownMenu/>
-        <LivedataEntrySelectorAll/>
+        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
         <LivedataRefreshButton/>
       </template>
       <template #right>
@@ -63,7 +63,7 @@
       />
 
       <!-- Component to create a new entry -->
-      <LayoutCardsNewCard/>
+      <LayoutCardsNewCard v-if="canAddEntry"/>
 
     </div>
 
@@ -102,6 +102,8 @@ export default {
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
+    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
+    canAddEntry () { return this.logic.canAddEntry(); },
   },
 
 };

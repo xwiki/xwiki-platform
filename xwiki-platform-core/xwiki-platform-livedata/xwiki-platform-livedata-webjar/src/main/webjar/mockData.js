@@ -27,7 +27,7 @@ define({
   id: "LD0",
 
   query: {
-    properties: ["doc_title", "age", "country", "tags", "other"],
+    properties: ["doc_date", "doc_title", "age", "country", "tags", "other"],
 
     source: {
       id: "...",
@@ -75,6 +75,15 @@ define({
 
     propertyDescriptors: [
       {
+        id: "doc_date",
+        name: "Date",
+        type: "date",
+        visible: true,
+        displayer: {
+          id: 'date',
+        },
+      },
+      {
         id: "doc_title",
         name: "Name",
         type: "string",
@@ -96,7 +105,8 @@ define({
         type: "list",
         visible: true,
         filter: {
-          options: ["Tag 1", "Tag 2", "Tag 3"],
+          id: "suggest",
+          url: "http://localhost:8080/xwiki/rest/wikis/xwiki/classes/XWiki.DocumentClass/properties/author/values",
         },
       },
       {
@@ -155,6 +165,18 @@ define({
           id: 'list'
         },
       },
+      {
+        id: 'date',
+        name: 'Date',
+        displayer: {
+          id: 'date',
+        },
+        sortable: true,
+        filterable: true,
+        filter: {
+          id: 'date'
+        },
+      },
     ],
 
     defaultFilter: 'text',
@@ -178,6 +200,14 @@ define({
         ],
       },
       {
+        id: "suggest",
+        defaultOperator: "is",
+        operators: [
+          { id: "is", name: "Is in", },
+          { id: "nis", name: "Is Not in", },
+        ],
+      },
+      {
         id: "number",
         defaultOperator: "equals",
         operators: [
@@ -185,6 +215,17 @@ define({
           { id: "nequals", name: "≠", },
           { id: "lower", name: "<", },
           { id: "greater", name: ">", },
+        ],
+      },
+      {
+        id: "date",
+        defaultOperator: "equals",
+        operators: [
+          { id: "equals", name: "Equals", },
+          { id: "nequals", name: "Not Equals", },
+          { id: "before", name: "Before", },
+          { id: "after", name: "After", },
+          { id: "range", name: "Range", },
         ],
       },
     ],
@@ -200,6 +241,9 @@ define({
       },
       {
         id: "html",
+      },
+      {
+        id: "date",
       },
     ],
 
@@ -237,7 +281,7 @@ define({
         "doc_creationDate": "2020/03/27 13:21",
         "doc_creator": "Creator 1",
         "age": 48,
-        "tags": ["Tag 1"],
+        "tags": "Tag 1",
         "country": "France",
         "other": "<em>lorem ipsum<em>",
       },
@@ -250,7 +294,7 @@ define({
         "doc_creationDate": "2020/04/22 14:06",
         "doc_creator": "Creator 2",
         "age": 24,
-        "tags": ["Tag 2"],
+        "tags": "Tag 2",
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
       },
@@ -263,7 +307,7 @@ define({
         "doc_creationDate": "2020/03/27 14:34",
         "doc_creator": "Creator 3",
         "age": 12,
-        "tags": ["Tag 3"],
+        "tags": "Tag 3",
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
       },

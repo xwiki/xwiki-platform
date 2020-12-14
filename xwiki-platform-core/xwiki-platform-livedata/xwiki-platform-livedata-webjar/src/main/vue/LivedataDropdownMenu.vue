@@ -54,6 +54,9 @@
       <li
         v-for="layout in data.meta.layouts"
         :key="layout.id"
+        :class="{
+          'disabled': logic.currentLayoutId === layout.id,
+        }"
       >
         <a href="#" @click.prevent="logic.changeLayout(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>

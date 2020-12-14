@@ -407,7 +407,66 @@ define([
     },
 
 
+    /**
+     * Return whether the Livedata is editable or not
+     * if entry given, return whether it is editable
+     * if property given, return whether it is editable (for any entries)
+     * If entry and property given, return whether specific value is editable
+     * @param {Object} [parameters]
+     * @param {Object} [parameters.entry] The entry object
+     * @param {Number} [parameters.propertyId] The property id of the entry
+     */
+    isEditable ({ entry, propertyId } = {}) {
+      // TODO: Ensure entry is valid (need other current PR)
+      // TODO: Ensure property is valid (need other current PR)
+      // Whole Livedata
+      if (entry === undefined && propertyId === undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Entry
+      if (entry !== undefined && propertyId === undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Property
+      if (entry === undefined && propertyId !== undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+      // Specific value
+      if (entry !== undefined && propertyId !== undefined) {
+        // TODO: fetch value from config
+        return true;
+      }
+    },
+
+    /**
+     * Set the value of the given entry property
+     * @param {Object} parameters
+     * @param {Object} parameters.entry The entry we want to modify
+     * @param {number} parameters.propertyId The property id we want to modify in the entry
+     * @param {string} parameters.value The new value of entry property
+     */
+    setValue ({ entry, propertyId, value }) {
+      // TODO: Ensure entry is valid (need other current PR)
+      // TODO: Ensure property is valid (need other current PR)
+      if (!this.isEditable({ entry, propertyId })) { return; }
+      entry[propertyId] = value;
+      // TODO: push value to server
+    },
+
+
+    /**
+     * Return whether selecting properties is enabled
+     */
+    canAddEntry () {
+      // TODO: fetch value from config
+      return false;
+    },
+
     addEntry () {
+      if (!this.canAddEntry()) { return; }
       const mockNewUrl = () => this.getEntryId(this.data.data.entries.slice(-1)[0]) + "0";
       // TODO: CALL FUNCTION TO CREATE NEW DATA HERE
       Promise.resolve({ /* MOCK DATA */
@@ -624,6 +683,23 @@ define([
 
 
     /**
+     * Return whether selecting properties is enabled
+     * If entry is given, return whether this entry can be selected
+     * @param {Object} [parameters]
+     * @param {Object} [parameters.entry]
+     */
+    isSelectionEnabled ({ entry } = {}) {
+      // TODO: Ensure entry is valid (need other current PR)
+      if (entry !== undefined) {
+        return entry.age < 40;
+        // return this.isEditable({ entry });
+      }
+      // TODO: fetch value from config
+        return true;
+    },
+
+
+    /**
      * Return whether the entry is currently selected
      * @param {Object} entry
      * @returns {Boolean}
@@ -643,8 +719,10 @@ define([
      * @param {Object|Array} entries
      */
     selectEntries (entries) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         const entryId = this.getEntryId(entry);
         if (this.entrySelection.isGlobal) {
           this.uniqueArrayRemove(this.entrySelection.deselected, entryId);
@@ -664,8 +742,10 @@ define([
      * @param {Object|Array} entries
      */
     deselectEntries (entries) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         const entryId = this.getEntryId(entry);
         if (this.entrySelection.isGlobal) {
           this.uniqueArrayAdd(this.entrySelection.deselected, entryId);
@@ -686,8 +766,10 @@ define([
      * @param {Boolean} select Whether to select or not the entries. Undefined toggle current state
      */
     toggleSelectEntries (entries, select) {
+      if (!this.isSelectionEnabled()) { return; }
       const entryArray = (entries instanceof Array) ? entries : [entries];
       entryArray.forEach(entry => {
+        if (!this.isSelectionEnabled({ entry })) { return; }
         if (select === undefined) {
           select = !this.isEntrySelected(entry);
         }
@@ -701,15 +783,14 @@ define([
 
 
     /**
-     * Get number of selected entries
+     * Get number of selectable entries in page
      * @returns {Number}
      */
-    getSelectedEntriesCount () {
-      if (this.entrySelection.isGlobal) {
-        return this.data.data.count - this.entrySelection.deselected.length;
-      } else {
-        return this.entrySelection.selected.length;
-      }
+    selectableCountInPage () {
+      if (!this.isSelectionEnabled()) { return 0; }
+      return this.data.data.entries
+        .filter(entry => this.isSelectionEnabled({ entry }))
+        .length;
     },
 
 
@@ -718,6 +799,7 @@ define([
      * @param {Boolean} global
      */
     setEntrySelectGlobal (global) {
+      if (!this.isSelectionEnabled()) { return; }
       this.entrySelection.isGlobal = global;
       this.entrySelection.selected.splice(0);
       this.entrySelection.deselected.splice(0);
@@ -974,16 +1056,23 @@ define([
       const queryFilters = this.getQueryFilters(property);
       const currentEntry = queryFilters[index] || {};
       oldEntry = Object.assign({}, currentEntry, oldEntry);
-      // new entry
-      let newEntry = filterEntry || {};
+      // new entry (copy properties that are not undefined from filterEntry)
+      let newEntry = Object.fromEntries(Object.entries(filterEntry || {})
+        .filter(entry => entry[1] !== undefined));
       const self = this;
       const defaultEntry = {
         property: property,
         value: "",
-        get operator () { return self.getFilterDefaultOperator(this.property); },
+        operator: self.getFilterDefaultOperator(property),
         index: 0,
       };
       newEntry = Object.assign({}, defaultEntry, oldEntry, newEntry);
+      // check newEntry operator
+      const newEntryValidOperator = this.getFilterDescriptor(newEntry.property).operators
+        .some(operator => operator.id === newEntry.operator);
+      if (!newEntryValidOperator) {
+        newEntry.operator = self.getFilterDefaultOperator(newEntry.property);
+      }
       return {
         oldEntry: oldEntry,
         newEntry: newEntry,

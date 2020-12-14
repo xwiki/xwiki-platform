@@ -34,6 +34,12 @@ export default {
     index: Number,
   },
 
+  data () {
+    return {
+      _applyFilterTimeoutId: undefined,
+    };
+  },
+
   // The computed values provide common data needed by filters
   computed: {
     // The filter group (the whole filter configuration) of `this.propertyId`
@@ -42,7 +48,7 @@ export default {
     },
     // The filter entry (the filter at `this.index`) of `this.propertyId`
     filterEntry () {
-        return (this.filterGroup.constraints || [])[this.index] || {};
+      return (this.filterGroup.constraints || [])[this.index] || {};
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {
@@ -64,6 +70,20 @@ export default {
     applyFilter (newValue) {
       this.logic.filter(this.propertyId, this.index, {value: newValue});
     },
+
+    // Call applyFilter method, but using a delay
+    // This can be used when we want to call the applyFilter method inside an input event
+    applyFilterWithDelay (newValue) {
+      // Clear existing timeout
+      if (this._applyFilterTimeoutId) {
+        clearTimeout(this._applyFilterTimeoutId);
+      }
+      // Set a 250 milliseconds timeout before calling applyFilter method
+      const timeoutDelay = 250;
+      this._applyFilterTimeoutId = setTimeout(() => {
+        this.applyFilter(newValue);
+      }, timeoutDelay);
+    }
   },
 
 };

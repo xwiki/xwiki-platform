@@ -32,7 +32,10 @@
       so that it align well with the entries selectors of the rows
       and the select-all entries in the header
     -->
-    <th class="entry-selector"></th>
+    <th
+      v-if="isSelectionEnabled"
+      class="entry-selector"
+    ></th>
 
     <!-- The filters cells -->
     <th
@@ -67,6 +70,7 @@ export default {
   computed: {
     data () { return this.logic.data; },
     properties () { return this.logic.getPropertyDescriptors(); },
+    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
   },
 
 };

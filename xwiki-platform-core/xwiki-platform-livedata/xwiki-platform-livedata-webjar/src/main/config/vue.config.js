@@ -24,6 +24,15 @@ module.exports = {
   // __webpack_public_path__ variable (see https://webpack.js.org/configuration/output/#outputpublicpath).
   publicPath: '',
   filenameHashing: false,
+  chainWebpack: config => {
+    // Provided dependencies (that shouldn't be bundled).
+    config.externals({
+      "jquery": "jquery",
+      "daterangepicker": "daterangepicker",
+      "moment": "moment",
+      "xwiki-selectize": "xwiki-selectize",
+    })
+  },
   css: {
     extract: false,
   },

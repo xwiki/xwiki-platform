@@ -52,7 +52,6 @@ XWiki.XWikiPreferences_use_email_verification.hint=Si la respuesta es "Sí", se 
 XWiki.XWikiPreferences_validation_email_content.hint=La plantilla del mensaje que se enviará a los usuarios para validar su dirección de correo electrónico.
 XWiki.XWikiPreferences_confirmation_email_content.hint=La plantilla de correo electrónico que corresponde al correo que se envía tras validar el usuario su cuenta clicando en el enlace de validación en el primer mensaje que recibe.
 XWiki.XWikiPreferences_invitation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios invitados a registrarse.
-
 XWiki.Registration_heading.hint=Esta es la línea en la parte superior de la página que se muestra a las personas que se están registrando y cuando se acaban de registrar. Se puede usar sintaxis Velocity y wiki.
 XWiki.Registration_welcomeMessage.hint=Solo se muestra cuando alguna persona está rellenando el formulario. Se puede usar sintaxis Velocity y wiki.
 XWiki.Registration_liveValidation_enabled.hint=Defina esta opción como false para desactivar el código JavaScript de validación en tiempo real (los campos seguirán siendo validados en el lado del servidor).
@@ -152,16 +151,17 @@ admin.social=Social
 admin.social.description=Configuración de funciones sociales.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedstart
+#@deprecatedend
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.XWikiPreferences_auth_active_check.hint=Si su valor es "Sí", evitará que los usuarios inicien sesión sin introducir el token que se envió con anterioridad por correo electrónico.
+administration.section.users.deleteUser.markInactiveMessage=En lugar de eliminar el usuario, puedes marcar su perfil como inactivo. Esto evitará que inicien sesión y preservará los derechos de acceso asociados con los scripts que escribieron.
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=En lugar de eliminar el usuario, puede marcar su perfil como inactivo. Esto evitará que inicien sesión y preservará los derechos de acceso asociados con los scripts que escribieron.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
   
 </xwikidoc>

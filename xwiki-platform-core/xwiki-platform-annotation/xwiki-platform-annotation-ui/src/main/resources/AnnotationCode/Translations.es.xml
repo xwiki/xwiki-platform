@@ -40,17 +40,14 @@
 annotations.menu.loading=Cargando los ajustes de las anotaciones
 annotations.menu.loaderror=Error:
 annotations.tab.info.noannotations=Esta página no tiene anotaciones
-
 annotations.settings.display=Mostrar anotaciones
 annotations.settings.error.wrongsyntax=Las anotaciones no están disponibles para las páginas con sintaxis XWiki/1.0.
-annotations.settings.error.notarget=No se ha especificado ninguna página de la que obtener los ajustes de  configuración de las anotaciones.
-
+annotations.settings.error.notarget=No se ha especificado ninguna página de la que obtener los ajustes de configuración de las anotaciones.
 annotations.annotated.loading=Cargando página con anotaciones
 annotations.annotated.loaderror=Error:
 annotations.annotated.loaderror.wrongresponse=Respuesta del servidor mal formateada
 annotations.annotated.error.noannotatedelement=Las anotaciones no han podido cargarse porque el contenido no está disponible.
 annotations.annotated.error.wrongsyntax=Las anotaciones no están disponibles para las páginas con sintaxis XWiki/1.0.
-
 annotations.action.edit.text=[Editar]
 annotations.action.edit.tooltip=Editar anotación
 annotations.action.edit.submit.text=Actualizar
@@ -58,14 +55,12 @@ annotations.action.edit.cancel.text=Cancelar
 annotations.action.edit.success=Anotación actualizada.
 annotations.action.edit.loaderror=Error:
 annotations.action.edit.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
-
 annotations.action.delete.text=[Borrar]
 annotations.action.delete.tooltip=Borrar anotación
-annotations.action.delete.confirm=¿Está seguro de querer borrar esta anotación?
+annotations.action.delete.confirm=¿Estás seguro de querer borrar esta anotación?
 annotations.action.delete.inProgress=Borrando la anotación...
 annotations.action.delete.done=Anotación borrada
 annotations.action.delete.failed=Error al borrar la anotación:
-
 annotations.action.create.submit.text=Añadir anotación
 annotations.action.create.cancel.text=Cancelar
 annotations.action.create.selection.invalid=Por favor, seleccione un texto no vacío en el contenido de la página.
@@ -77,33 +72,28 @@ annotations.action.create.error.unauthorizedguest=No estás autorizado a añadir
 annotations.action.create.helpmessage=Para anotar un trozo de texto, selecciónelo y clique {0}.
 annotations.action.create.error.wrongsyntax=Las anotaciones no están disponibles para las páginas con sintaxis XWiki/1.0.
 annotations.action.create.error.notarget=No se ha especificado el destino (página) en el que crear anotaciones.
-
 annotations.action.view.hide.text=ocultar
 annotations.action.view.form.loaderror=Error:
 annotations.action.view.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
 annotations.action.view.thread=Ver hilo
-
 annotations.altered.text=Esta anotación no se puede mostrar porque el texto anotado no se ha encontrado en la página:
 annotations.updated.text=Esta anotación se ha desplazado automáticamente tras una actualización de la página. Originalmente:
 annotations.action.validate.text=[Validar]
 annotations.action.validate.tooltip=Validar la actualización automática del texto seleccionado de esta anotación
 annotations.action.validate.success=Anotación validada.
 annotations.action.validate.loaderror=Error:
-
 annotations.filters.show=Filtrar
 annotations.filters.nooption=No hay valores que filtrar para "{0}"
 annotations.filters.anyvalue=cualquier valor
 annotations.filters.clearvalue=limpiar
-
 annotations.config.title=Panel de configuración de anotaciones
 annotations.config.display.title=Pantalla de anotaciones
 annotations.config.type.title=Tipo de anotación
 annotations.config.activate.title=Activación de anotaciones
-annotations.config.activate.explanation=Los dos ajustes siguientes te permiten configurar en que localizaciones están activas las anotaciones. El primer ajuste especifica la regla general, mientras que la lista  segunda especifica en que localizaciones no se debería aplicar. Por ejemplo, activado "yes" y localizaciones excluidas "XWiki" y "Main" significa que las anotaciones estarán activas en todas las localizaciones excepto "XWiki" y "Main". Como ejemplo contrario, empleando activado "no" y localizaciones excluidas "Documents" significa que las anotaciones solo estarán activas en la localización "Documents".
+annotations.config.activate.explanation=Los dos ajustes siguientes te permiten configurar en que localizaciones están activas las anotaciones. El primer ajuste especifica la regla general, mientras que la lista segunda especifica en que localizaciones no se debería aplicar. Por ejemplo, activado "yes" y localizaciones excluidas "XWiki" y "Main" significa que las anotaciones estarán activas en todas las localizaciones excepto "XWiki" y "Main". Como ejemplo contrario, empleando activado "no" y localizaciones excluidas "Documents" significa que las anotaciones solo estarán activas en la localización "Documents".
 annotations.config.type.explanation=Añade propiedades a esta clase si necesitas propiedades adicionales para tus anotaciones.
 admin.annotations=Anotaciones
 admin.annotations.description=Configurar las anotaciones de página
-
 AnnotationCode.AnnotationConfig_activated=Las anotaciones están activas
 AnnotationCode.AnnotationConfig_activated.hint=Decide si las anotaciones están activas en la wiki
 AnnotationCode.AnnotationConfig_exceptionSpaces=Excepto en las localizaciones siguientes
@@ -112,5 +102,6 @@ AnnotationCode.AnnotationConfig_displayed=Mostrar anotaciones de forma predeterm
 AnnotationCode.AnnotationConfig_displayed.hint=Decidir si las anotaciones se muestran de forma predeterminada o solo cuando "Mostrar anotaciones" está activado en cada página
 AnnotationCode.AnnotationConfig_displayHighlight=Resaltar anotaciones de forma predeterminada
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Decidir si el resaltado de una anotación debe mostrarse siempre o solo al pasa el puntero del ratón sobre una anotación o una estructura de anotaciones
-AnnotationCode.AnnotationConfig_annotationClass=Clase XWiki que define la estructura de anotaciones</content>
+AnnotationCode.AnnotationConfig_annotationClass=Clase XWiki que define la estructura de anotaciones
+</content>
 </xwikidoc>

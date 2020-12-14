@@ -538,10 +538,12 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
+        <version>${css4j.version}</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
+        <version>${css4j.version}</version>
       </dependency>
 
       <!-- Restlet -->

@@ -35,13 +35,13 @@
     v-if="selectedCount > 0"
   >
     <span v-if="!logic.entrySelection.isGlobal">
-      {{ this.logic.entrySelection.selected.length }} entries selected
+      {{ selectedCount }} entries selected
     </span>
-    <span v-else-if="logic.entrySelection.isGlobal && selectedCount === totalPageCount">
+    <span v-else-if="logic.entrySelection.isGlobal && !logic.entrySelection.deselected.length">
       All entries selected
     </span>
     <span v-else>
-      All entries selected but {{ this.logic.entrySelection.deselected.length }}
+      All entries selected but {{ logic.entrySelection.deselected.length }}
     </span>
   </div>
 </template>
@@ -60,15 +60,11 @@ export default {
     // The number of selected entries to be displayed
     selectedCount () {
       if (this.logic.entrySelection.isGlobal) {
-        return this.data.data.entries.length - this.logic.entrySelection.deselected.length;
+        return this.data.data.count - this.logic.entrySelection.deselected.length;
       } else {
         return this.logic.entrySelection.selected.length;
       }
     },
-
-    totalPageCount () {
-      return this.data.data.entries.length;
-    }
   },
 
 };

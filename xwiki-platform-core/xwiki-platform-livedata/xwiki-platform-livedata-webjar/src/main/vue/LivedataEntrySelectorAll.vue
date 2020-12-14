@@ -116,8 +116,8 @@ export default {
     // the page entries are selected
     indeterminate () {
       const someDeselected = this.logic.entrySelection.deselected.length > 0;
-      const someselected = this.logic.entrySelection.selected.length > 0;
-      return someDeselected || (someselected && !this.checked);
+      const someSelected = this.logic.entrySelection.selected.length > 0;
+      return someDeselected || (someSelected && !this.checked);
     },
 
   },

@@ -3,10 +3,15 @@
   "columns": ["name", "filterType", "eventTypes", "notificationFormats", "isEnabled", "_actions"],
   "columnProperties": {
     "name": {"sortable": false, "html": true, "filterable": "false"},
-    "filterType": {"sortable": false, "filterable": false},
+    "filterType": {"sortable": false, "filterable": false, "displayName": "Filter Type"},
     "eventTypes": {"sortable": "false", "html": true, "filterable": false},
     "notificationFormats": {"type": "hidden"},
-    "isEnabled": {"sortable": false, "html" : true, "filterable": false},
+    "isEnabled": {
+      "sortable": false,
+      "html" : true,
+      "filterable": false,
+      "class": "XWiki.Notifications.Code.ToggleableFilterPreferenceClass"
+    },
     "_actions": {"sortable": false, "actions": ["delete"], "filterable": false}
   },
   "options": {
@@ -14,7 +19,7 @@
     "rowCount": 10,
     "description": "This table lists every filter registered for the current user.",
     "translationPrefix": "notifications.settings.filters.preferences.table.",
-    "extraParams": "eventType=&format=&user=xwiki%3AXWiki.mflorea",
+    "extraParams": "eventTypes=&format=&eventTypes=mention&user=xwiki%3AXWiki.mflorea&user=xwiki%3AXWiki.cdesableau",
     "outputOnlyHtml": true,
     "pageSize": false
   }
@@ -27,23 +32,14 @@
     "source":{
       "id":"liveTable",
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
-      "translationPrefix":"notifications.settings.filters.preferences.table."
+      "translationPrefix":"notifications.settings.filters.preferences.table.",
+      "format":"",
+      "user":["xwiki:XWiki.mflorea","xwiki:XWiki.cdesableau"]
     },
     "filters":[
       {
-        "property":"format",
-        "readOnly":true,
-        "constraints":[{"value":""}]
-      },
-      {
-        "property":"eventType",
-        "readOnly":true,
-        "constraints":[{"value":""}]
-      },
-      {
-        "property":"user",
-        "readOnly":true,
-        "constraints":[{"value":"xwiki:XWiki.mflorea"}]
+        "property":"eventTypes",
+        "constraints":[{"value":""},{"value":"mention"}]
       }
     ],
     "sort":[
@@ -53,14 +49,46 @@
   },
   "meta":{
     "propertyDescriptors":[
-      {"id":"name","sortable":false,"filterable":false,"displayer":{"id":"html"}},
-      {"id":"filterType","sortable":false,"filterable":false},
-      {"id":"eventTypes","sortable":false,"filterable":false,"displayer":{"id":"html"}},
-      {"id":"notificationFormats","sortable":true,"visible":false,"filterable":true},
-      {"id":"isEnabled","sortable":false,"filterable":false,"displayer":{"id":"html"}},
+      {
+        "id":"name",
+        "name":"Name",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"filterType",
+        "name":"Filter Type",
+        "sortable":false,
+        "visible":true,
+        "filterable":false
+      },
+      {
+        "id":"eventTypes",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
+      {
+        "id":"notificationFormats",
+        "sortable":true,
+        "visible":false,
+        "filterable":true
+      },
+      {
+        "id":"isEnabled",
+        "type":"Boolean",
+        "sortable":false,
+        "visible":true,
+        "filterable":false,
+        "displayer":{"id":"html"}
+      },
       {
         "id":"_actions",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{
           "id":"actions",

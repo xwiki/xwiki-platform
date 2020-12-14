@@ -46,8 +46,6 @@ rating.rate=Ocijenite\!
 ### Missing: rating.setvote.success=Your vote has been saved!
 ### Missing: rating.setvote.error=Error when saving your vote.
 ### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Enable
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Disable
 ### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
 
 #@deprecatedstart

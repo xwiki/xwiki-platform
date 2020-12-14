@@ -78,7 +78,7 @@ public interface RatingsManager
      *
      * @param identifier the identifier to be set.
      */
-    void setIdentifer(String identifier);
+    void setIdentifier(String identifier);
 
     /**
      * @return the upper bound of the scale used by this manager for rating.
@@ -171,6 +171,20 @@ public interface RatingsManager
      * @throws RatingsException in case of problem during the query.
      */
     long removeRatings(EntityReference entityReference) throws RatingsException;
+
+    /**
+     * Update all ratings concerning the given reference to point to the new reference.
+     * This update is performed for both ratings targeting directly the given reference, but also for those having the
+     * reference as ancestor.
+     *
+     * @param oldReference the old reference to be updated.
+     * @param newReference the new reference.
+     * @return the total number of updated ratings.
+     * @throws RatingsException in case of problem during the query.
+     * @since 12.10
+     */
+    @Unstable
+    long moveRatings(EntityReference oldReference, EntityReference newReference) throws RatingsException;
 
     /**
      * Retrieve the average rating information of the given reference.

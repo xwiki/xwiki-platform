@@ -32,6 +32,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
@@ -55,7 +56,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultLiveDataConfigurationResolver}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @ComponentTest
 @ComponentList(StringLiveDataConfigurationResolver.class)
@@ -84,6 +85,10 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
         Source source = new Source();
         source.setId("test");
         when(this.sourceManager.get(source)).thenReturn(Optional.of(this.liveDataSource));
+
+        LiveDataEntryStore entryStore = mock(LiveDataEntryStore.class);
+        when(entryStore.getIdProperty()).thenReturn("entryId");
+        when(this.liveDataSource.getEntries()).thenReturn(entryStore);
 
         LiveDataPropertyDescriptorStore propertyStore = mock(LiveDataPropertyDescriptorStore.class, "properties");
         when(this.liveDataSource.getProperties()).thenReturn(propertyStore);

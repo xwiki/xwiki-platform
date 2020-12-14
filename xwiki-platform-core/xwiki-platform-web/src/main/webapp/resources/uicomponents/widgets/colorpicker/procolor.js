@@ -698,7 +698,7 @@ var ProColor = Class.create({
 		if (hsb.brt > 100) hsb.brt = 100;
 
 		/* Determine which sources we're *not* going to update visually. */
-		source = { };
+		var source = { };
 		sources.each(function(s) { source[s] = true; });
 
 		/* Positional representations allow fractional RGB or HSB values, so do those first. */
@@ -783,6 +783,7 @@ var ProColor = Class.create({
 	/* Safely convert an unknown chunk of data to a decimal value, even if it's a string with
 	   all sorts of weird characters in it. */
 	toNumber: function(x) {
+          var matches;
 		switch (typeof x) {
 		case 'number':
 			return x;
@@ -1088,7 +1089,7 @@ var ProColor = Class.create({
 	/* Given pixel coordinates of the mouse, return the palette color that lies
 	   under those coordinates.  If the mouse lies outside the palette, return false. */
 	colorFromPalette: function(x, y) {
-		var d = this.img_palette.getDimensions();
+		var line, d = this.img_palette.getDimensions();
 		var p = this.img_palette.cumulativeOffset();
 
 		if (x < p.left || x >= p.left + d.width)

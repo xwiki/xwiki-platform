@@ -22,7 +22,6 @@ package org.xwiki.rendering.async.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Used as return value for {@link AsyncRendererExecutor#render(AsyncRenderer, AsyncRendererConfiguration)}.
@@ -84,7 +83,27 @@ public class AsyncRendererExecutorResponse
     {
         List<String> id = getStatus().getRequest().getId();
 
-        return id != null ? id.stream().map(this::encodeURL).collect(Collectors.joining("/")) : null;
+        if (id == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        for (String element : id) {
+            if (builder.length() > 0) {
+                builder.append('/');
+            }
+
+            String encodedElement = encodeURL(element);
+
+            // Encode again the path segments which have been double escaped to avoid problems with the ridiculous
+            // default behavior of Tomcat regarding / and \
+            encodedElement = encodeURL(encodedElement);
+
+            builder.append(encodedElement);
+        }
+
+        return builder.toString();
     }
 
     private String encodeURL(String element)

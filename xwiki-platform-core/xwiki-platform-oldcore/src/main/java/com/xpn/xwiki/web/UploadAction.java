@@ -28,6 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -50,6 +53,9 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  *
  * @version $Id$
  */
+@Component
+@Named("upload")
+@Singleton
 public class UploadAction extends XWikiAction
 {
     /** Logging helper object. */

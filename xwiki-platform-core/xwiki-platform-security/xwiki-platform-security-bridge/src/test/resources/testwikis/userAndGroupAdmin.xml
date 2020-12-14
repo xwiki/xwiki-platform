@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<wikis>
+  <wiki name="wiki" mainWiki="true" owner="XWiki.Admin">
+    <user name="user" />
+    <group name="group">
+      <user name="user" />
+    </group>
+    <allowGroup name="XWiki.group" type="admin" />
+  </wiki>
+</wikis>

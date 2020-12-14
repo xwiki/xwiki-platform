@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,6 +37,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  * @since 2.4M2
  */
+@Component
+@Named("propdelete")
+@Singleton
 public class PropDeleteAction extends AbstractPropChangeAction
 {
     @Override

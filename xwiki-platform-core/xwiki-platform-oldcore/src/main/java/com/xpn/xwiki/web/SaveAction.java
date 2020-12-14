@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
@@ -72,6 +75,9 @@ import com.xpn.xwiki.objects.ObjectDiff;
  *
  * @version $Id$
  */
+@Component
+@Named("save")
+@Singleton
 public class SaveAction extends PreviewAction
 {
     /** The identifier of the save action. */
@@ -168,11 +174,14 @@ public class SaveAction extends PreviewAction
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
+                // In that specific case, we want the original doc to be the translation document so that we
+                // never raised a conflict.
+                originalDoc = tdoc;
             } else if (tdoc != doc) {
                 // Saving an existing document translation (but not the default one).
                 // Same as above, clone the object retrieved from the store cache.
-                tdoc = tdoc.clone();
                 originalDoc = tdoc;
+                tdoc = tdoc.clone();
             }
         }
 
@@ -422,7 +431,7 @@ public class SaveAction extends PreviewAction
 
                 // if doc is new and we're here: it's a conflict, we can skip the diff check
                 // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
-                if (!originalDoc.isNew() && previousDoc != null) {
+                if (!originalDoc.isNew() && previousDoc != null && !"true".equals(request.getParameter("isNew"))) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
                     List<Delta> contentDiff =

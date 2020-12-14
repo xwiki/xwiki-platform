@@ -20,6 +20,7 @@
 package org.xwiki.ratings.internal;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -68,11 +70,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -180,7 +184,7 @@ public class SolrRatingsManagerTest
         queryParameters.put(RatingQueryField.SCALE, 12);
 
         String managerId = "managerTest";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(true);
         when(this.solr.getClient(managerId)).thenReturn(this.solrClient);
 
@@ -205,7 +209,7 @@ public class SolrRatingsManagerTest
         queryParameters.put(RatingQueryField.SCALE, "6");
 
         String managerId = "otherId";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
@@ -309,7 +313,7 @@ public class SolrRatingsManagerTest
     void getAverageRating() throws Exception
     {
         String managerId = "averageId2";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         EntityReference reference = new EntityReference("xwiki:Something", EntityType.PAGE);
         AverageRating expectedAverageRating = new DefaultAverageRating("average1")
             .setAverageVote(2.341f)
@@ -330,7 +334,7 @@ public class SolrRatingsManagerTest
     {
         String ratingingId = "ratinging389";
         String managerId = "removeRating1";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
@@ -351,7 +355,7 @@ public class SolrRatingsManagerTest
     {
         String ratingingId = "ratinging429";
         String managerId = "removeRating2";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         when(this.configuration.hasDedicatedCore()).thenReturn(false);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
 
@@ -407,7 +411,7 @@ public class SolrRatingsManagerTest
     void saveRatingOutScale()
     {
         when(this.configuration.getScaleUpperBound()).thenReturn(5);
-        this.manager.setIdentifer("saveRating1");
+        this.manager.setIdentifier("saveRating1");
         RatingsException exception = assertThrows(RatingsException.class, () -> {
             this.manager.saveRating(new EntityReference("test", EntityType.PAGE), mock(UserReference.class), -1);
         });
@@ -423,7 +427,7 @@ public class SolrRatingsManagerTest
     void saveRatingZeroNotExisting() throws Exception
     {
         String managerId = "saveRating2";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         int scale = 10;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
         EntityReference reference = mock(EntityReference.class);
@@ -503,7 +507,7 @@ public class SolrRatingsManagerTest
     void saveRatingExisting() throws Exception
     {
         String managerId = "saveRating3";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         int scale = 8;
         int newVote = 2;
         int oldVote = 3;
@@ -593,7 +597,7 @@ public class SolrRatingsManagerTest
     void saveRatingExistingToZero() throws Exception
     {
         String managerId = "saveRating4";
-        this.manager.setIdentifer(managerId);
+        this.manager.setIdentifier(managerId);
         int scale = 8;
         int newVote = 0;
         int oldVote = 3;
@@ -683,5 +687,325 @@ public class SolrRatingsManagerTest
         verify(this.solrClient).commit();
         verify(this.observationManager).notify(any(DeletedRatingEvent.class), eq(managerId), eq(oldRating));
         verify(this.averageRatingManager).removeVote(reference, oldVote);
+    }
+
+    @Test
+    void saveRating() throws Exception
+    {
+        String ratingId = "myId";
+        String managerId = "managerId";
+        EntityReference entityReference = mock(EntityReference.class);
+        when(entityReference.toString()).thenReturn("wiki:foobar");
+        UserReference userReference = mock(UserReference.class);
+        when(userReference.toString()).thenReturn("user:Toto");
+        int scale = 8;
+        int vote = 3;
+
+        DefaultRating inputRating = new DefaultRating(ratingId)
+            .setManagerId(managerId)
+            .setReference(entityReference)
+            .setCreatedAt(new Date(48))
+            .setUpdatedAt(new Date(54))
+            .setVote(vote)
+            .setScaleUpperBound(scale)
+            .setAuthor(userReference);
+
+        SolrInputDocument expectedInputDocument = new SolrInputDocument();
+        expectedInputDocument.setField("id", ratingId);
+        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date(48));
+        expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(54));
+        expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
+        expectedInputDocument.setField(RatingQueryField.SCALE.getFieldName(), scale);
+        expectedInputDocument.setField(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+        expectedInputDocument.setField(RatingQueryField.VOTE.getFieldName(), vote);
+
+        when(this.configuration.hasDedicatedCore()).thenReturn(false);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        when(this.solrClient.add(any(SolrInputDocument.class))).then(invocationOnMock -> {
+            // allow to check that add retrieve the right argument: there's no equals method in SolrInputDocument
+            assertEquals(expectedInputDocument.toString(), invocationOnMock.getArgument(0).toString());
+            return null;
+        });
+        this.manager.saveRating(inputRating);
+        verify(this.solrClient).add(any(SolrInputDocument.class));
+        verify(this.solrClient).commit();
+    }
+
+    @Test
+    void recomputeAverageRatingNotStored()
+    {
+        when(this.configuration.isAverageStored()).thenReturn(false);
+        RatingsException ratingsException = assertThrows(RatingsException.class, () -> {
+            this.manager.recomputeAverageRating(mock(EntityReference.class));
+        });
+        assertEquals("This rating manager is not configured to store average rating.", ratingsException.getMessage());
+    }
+
+    @Test
+    void recomputeAverageRating() throws Exception
+    {
+        when(this.configuration.isAverageStored()).thenReturn(true);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        EntityReference inputReference = mock(EntityReference.class);
+        when(inputReference.toString()).thenReturn("document:Input.Reference");
+        String managerId = "myManager";
+
+        this.manager.setIdentifier(managerId);
+
+        String filterQuery = String.format("filter(%s:%s) AND filter(%s:%s)",
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), "document\\:Input.Reference",
+            RatingQueryField.MANAGER_ID.getFieldName(), managerId);
+
+        SolrQuery expectedQuery1 = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(100)
+            .setStart(0)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        SolrDocument rating1 = mock(SolrDocument.class);
+        SolrDocument rating2 = mock(SolrDocument.class);
+        SolrDocument rating3 = mock(SolrDocument.class);
+        SolrDocument rating4 = mock(SolrDocument.class);
+        when(rating1.get(RatingQueryField.VOTE.getFieldName())).thenReturn(4);
+        when(rating1.get(RatingQueryField.SCALE.getFieldName())).thenReturn(5);
+        when(rating2.get(RatingQueryField.VOTE.getFieldName())).thenReturn(1);
+        when(rating2.get(RatingQueryField.SCALE.getFieldName())).thenReturn(5);
+        when(rating3.get(RatingQueryField.VOTE.getFieldName())).thenReturn(0);
+        when(rating3.get(RatingQueryField.SCALE.getFieldName())).thenReturn(5);
+        when(rating4.get(RatingQueryField.VOTE.getFieldName())).thenReturn(2);
+        when(rating4.get(RatingQueryField.SCALE.getFieldName())).thenReturn(5);
+        when(this.documentList.stream())
+            .thenReturn(Arrays.asList(rating1, rating2, rating3, rating4).stream());
+
+        SolrQuery expectedQuery2 = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(100)
+            .setStart(100)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        QueryResponse response1 = mock(QueryResponse.class);
+        QueryResponse response2 = mock(QueryResponse.class);
+
+        AtomicInteger queryCounter = new AtomicInteger(0);
+        when(solrClient.query(any())).then(invocationOnMock -> {
+
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            QueryResponse result = null;
+            if (queryCounter.get() == 0) {
+                assertEquals(expectedQuery1.getQuery(), givenQuery.getQuery());
+                assertArrayEquals(expectedQuery1.getFilterQueries(), givenQuery.getFilterQueries());
+                assertEquals(expectedQuery1.getRows(), givenQuery.getRows());
+                assertEquals(expectedQuery1.getStart(), givenQuery.getStart());
+                assertEquals(expectedQuery1.getSorts(), givenQuery.getSorts());
+                result = response1;
+            } else if (queryCounter.get() == 1) {
+                assertEquals(expectedQuery2.getQuery(), givenQuery.getQuery());
+                assertArrayEquals(expectedQuery2.getFilterQueries(), givenQuery.getFilterQueries());
+                assertEquals(expectedQuery2.getRows(), givenQuery.getRows());
+                assertEquals(expectedQuery2.getStart(), givenQuery.getStart());
+                assertEquals(expectedQuery2.getSorts(), givenQuery.getSorts());
+                result = response2;
+            } else {
+                fail("Too many requests performed.");
+            }
+            queryCounter.getAndIncrement();
+            return result;
+        });
+        when(response1.getResults()).thenReturn(this.documentList);
+        when(response2.getResults()).thenReturn(new SolrDocumentList());
+
+        AverageRating averageRating = mock(AverageRating.class);
+        when(this.averageRatingManager.resetAverageRating(inputReference, 1.75f, 4)).thenReturn(averageRating);
+        assertEquals(averageRating, this.manager.recomputeAverageRating(inputReference));
+    }
+
+    @Test
+    void removeRatings() throws Exception
+    {
+        String managerId = "myRatingManager";
+        this.manager.setIdentifier(managerId);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+
+        EntityReference entityReference = mock(EntityReference.class);
+        when(entityReference.toString()).thenReturn("document:My.Doc");
+        String filterQuery = String.format("filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))",
+            RatingQueryField.MANAGER_ID.getFieldName(), managerId,
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), "document\\:My.Doc",
+            RatingQueryField.PARENTS_REFERENCE.getFieldName(), "document\\:My.Doc");
+
+        SolrQuery expectedQuery = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(0)
+            .setStart(0);
+        QueryResponse response = prepareSolrClientQueryWhenStatement(this.solrClient, expectedQuery);
+        when(response.getResults()).thenReturn(this.documentList);
+        when(this.documentList.getNumFound()).thenReturn(42L);
+        when(this.configuration.isAverageStored()).thenReturn(true);
+
+        assertEquals(42L, this.manager.removeRatings(entityReference));
+        verify(this.solrClient).deleteByQuery(filterQuery);
+        verify(this.solrClient).commit();
+        verify(this.averageRatingManager).removeAverageRatings(entityReference);
+    }
+
+    @Test
+    void moveRatings() throws Exception
+    {
+        String managerId = "moveRatingsManagerId";
+        this.manager.setIdentifier(managerId);
+        when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
+        
+        EntityReference oldReference = mock(EntityReference.class);
+        EntityReference newReference = mock(EntityReference.class);
+        when(oldReference.toString()).thenReturn("document:My.Old.Doc");
+
+        String filterQuery = String.format("filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))",
+            RatingQueryField.MANAGER_ID.getFieldName(), managerId,
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), "document\\:My.Old.Doc",
+            RatingQueryField.PARENTS_REFERENCE.getFieldName(), "document\\:My.Old.Doc");
+
+        SolrQuery expectedQuery1 = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(100)
+            .setStart(0)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        SolrDocument rating1 = mock(SolrDocument.class);
+        SolrDocument rating2 = mock(SolrDocument.class);
+        SolrDocument rating3 = mock(SolrDocument.class);
+        SolrDocument rating4 = mock(SolrDocument.class);
+
+        // rating1 have the appropriate reference, but not the appropriate parent
+        when(rating1.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating1");
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating1, EntityReference.class))
+            .thenReturn(oldReference);
+        when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating1,
+            EntityReference.class))
+            .thenReturn(Collections.emptyList());
+
+        // rating2 have not the appropriate reference but the appropriate parent
+        when(rating2.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating2");
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating2, EntityReference.class))
+            .thenReturn(mock(EntityReference.class));
+        when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating2,
+            EntityReference.class))
+            .thenReturn(Collections.singletonList(oldReference));
+
+        // rating3 have the appropriate reference and also contain the appropriate parent
+        when(rating3.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating3");
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating3, EntityReference.class))
+            .thenReturn(oldReference);
+        when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating3,
+            EntityReference.class))
+            .thenReturn(Arrays.asList(mock(EntityReference.class), oldReference, mock(EntityReference.class)));
+
+        // rating4 only contain the appropriate parent
+        when(rating4.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating4");
+        when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating4, EntityReference.class))
+            .thenReturn(mock(EntityReference.class));
+        when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating4,
+            EntityReference.class))
+            .thenReturn(Arrays.asList(mock(EntityReference.class), mock(EntityReference.class), oldReference));
+
+        when(this.documentList.iterator())
+            .thenReturn(Arrays.asList(rating1, rating2, rating3, rating4).iterator());
+
+        SolrQuery expectedQuery2 = new SolrQuery()
+            .addFilterQuery(filterQuery)
+            .setRows(100)
+            .setStart(100)
+            .setSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
+
+        QueryResponse response1 = mock(QueryResponse.class);
+        QueryResponse response2 = mock(QueryResponse.class);
+
+        AtomicInteger queryCounter = new AtomicInteger(0);
+        when(solrClient.query(any())).then(invocationOnMock -> {
+
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            QueryResponse result = null;
+            if (queryCounter.get() == 0) {
+                assertEquals(expectedQuery1.getQuery(), givenQuery.getQuery());
+                assertArrayEquals(expectedQuery1.getFilterQueries(), givenQuery.getFilterQueries());
+                assertEquals(expectedQuery1.getRows(), givenQuery.getRows());
+                assertEquals(expectedQuery1.getStart(), givenQuery.getStart());
+                assertEquals(expectedQuery1.getSorts(), givenQuery.getSorts());
+                result = response1;
+            } else if (queryCounter.get() == 1) {
+                assertEquals(expectedQuery2.getQuery(), givenQuery.getQuery());
+                assertArrayEquals(expectedQuery2.getFilterQueries(), givenQuery.getFilterQueries());
+                assertEquals(expectedQuery2.getRows(), givenQuery.getRows());
+                assertEquals(expectedQuery2.getStart(), givenQuery.getStart());
+                assertEquals(expectedQuery2.getSorts(), givenQuery.getSorts());
+                result = response2;
+            } else {
+                fail("Too many requests performed.");
+            }
+            queryCounter.getAndIncrement();
+            return result;
+        });
+        when(response1.getResults()).thenReturn(this.documentList);
+        when(response2.getResults()).thenReturn(new SolrDocumentList());
+
+        doAnswer(invocationOnMock -> {
+            String modifier = invocationOnMock.getArgument(0);
+            String fieldName = invocationOnMock.getArgument(1);
+            Object fieldValue = invocationOnMock.getArgument(2);
+            // we normally only invoke it with entity reference.
+            assertEquals(EntityReference.class, invocationOnMock.getArgument(3));
+            SolrInputDocument solrInputDocument = invocationOnMock.getArgument(4);
+            solrInputDocument.setField(fieldName, Collections.singletonMap(modifier, fieldValue));
+            return null;
+        }).when(this.solrUtils).setAtomic(any(), any(), any(), any(), any());
+
+        // expected committed documents
+        SolrInputDocument solrInputDocument1 = new SolrInputDocument();
+        solrInputDocument1.setField("id", "rating1");
+        solrInputDocument1.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, newReference));
+
+        SolrInputDocument solrInputDocument2 = new SolrInputDocument();
+        solrInputDocument2.setField("id", "rating2");
+        solrInputDocument2.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, oldReference));
+        solrInputDocument2.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD, newReference));
+
+        SolrInputDocument solrInputDocument3 = new SolrInputDocument();
+        solrInputDocument3.setField("id", "rating3");
+        solrInputDocument3.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, newReference));
+        solrInputDocument3.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, oldReference));
+        solrInputDocument3.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD, newReference));
+
+        SolrInputDocument solrInputDocument4 = new SolrInputDocument();
+        solrInputDocument4.setField("id", "rating4");
+        solrInputDocument4.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, oldReference));
+        solrInputDocument4.setField(RatingQueryField.PARENTS_REFERENCE.getFieldName(),
+            Collections.singletonMap(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD, newReference));
+
+        List<SolrInputDocument> expectedAddDocuments = new ArrayList<>(Arrays.asList(
+            solrInputDocument1, solrInputDocument2, solrInputDocument3, solrInputDocument4));
+
+        when(this.solrClient.add(any(SolrInputDocument.class))).then(invocationOnMock -> {
+            SolrInputDocument solrInputDocument = invocationOnMock.getArgument(0);
+            SolrInputDocument expectedSolrInputDocument = expectedAddDocuments.remove(0);
+
+            // There's no proper equals method for SolrInputDocument, so we're comparing the toString
+            assertEquals(expectedSolrInputDocument.toString(), solrInputDocument.toString());
+            return null;
+        });
+
+        when(this.configuration.isAverageStored()).thenReturn(true);
+        this.manager.moveRatings(oldReference, newReference);
+        verify(this.solrClient, times(4)).add(any(SolrInputDocument.class));
+        verify(this.solrClient).commit();
+        verify(this.averageRatingManager).moveAverageRatings(oldReference, newReference);
     }
 }

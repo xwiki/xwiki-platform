@@ -149,14 +149,15 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
-import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -1250,7 +1251,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(XWikiContext context) throws XWikiException
     {
         return displayDocument(getOutputSyntax(), context);
@@ -1266,7 +1266,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(boolean restricted, XWikiContext context) throws XWikiException
     {
         return displayDocument(getOutputSyntax(), restricted, context);
@@ -1282,7 +1281,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.3RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(targetSyntax, true, false, context, false);
@@ -1299,7 +1297,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.5RC1
      */
-    @Unstable
     public String displayDocument(Syntax targetSyntax, boolean restricted, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(targetSyntax, true, restricted, context, false);
@@ -3534,12 +3531,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // If we're in new rendering engine we want to wrap the HTML returned by displayView() in
             // a {{html/}} macro so that the user doesn't have to do it.
             // We test if we're inside the rendering engine since it's also possible that this display() method is
-            // called
-            // directly from a template and in this case we only want HTML as a result and not wiki syntax.
+            // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
-                && (result.indexOf("<") != -1 || result.indexOf(">") != -1)) {
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId) && HTMLUtils.containsElementText(result)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }
@@ -4276,19 +4271,51 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
             if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
-                XWikiAttachment newAttachment = attachment.clone();
-
-                // We need to set the content of the attachment to be dirty because the dirty bit
-                // is used to signal that there is a reason to save the copied attachment, otherwise
-                // the copied attachment will be empty since the original attachment content is not
-                // modified in this operation.
-                if (newAttachment.getAttachment_content() != null) {
-                    newAttachment.getAttachment_content().setContentDirty(true);
+                try {
+                    copyAttachment(attachment, true);
+                } catch (XWikiException e) {
+                    LOGGER.warn("Cannot copy attachment [{}] from [{}] to [{}]. Root cause is [{}].",
+                        attachment.getFilename(), sourceDocument.getDocumentReference(), this.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                    // Skip this attachment because we cannot load its content.
+                    continue;
                 }
-
-                setAttachment(newAttachment);
             }
         }
+    }
+
+    /**
+     * Copies the given attachment to this document.
+     * 
+     * @param attachment the source attachment to be copied to this document
+     * @param reset whether to reset or not the attachment meta data that is specific to the source (version, author,
+     *            date)
+     * @throws XWikiException if loading the content of the given attachment fails
+     */
+    private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWikiAttachment newAttachment = attachment.clone();
+
+        // Make sure we copy the attachment content also, not just its meta data. For this we need to load
+        // the attachment content from the source document. Note that the owner document will be overwritten
+        // below when we call setAttachment().
+        newAttachment.setDoc(attachment.getDoc(), false);
+        newAttachment.loadAttachmentContent(xcontext);
+        // We need to set the content of the attachment to be dirty because the dirty bit is used to signal
+        // that there is a reason to save the copied attachment, otherwise the copied attachment will be
+        // empty since the original attachment content is not modified in this operation.
+        newAttachment.getAttachment_content().setContentDirty(true);
+
+        if (reset) {
+            // Reset the meta data that is specific to the original attachment (version, author, date).
+            newAttachment.setRCSVersion(null);
+            newAttachment.setAuthorReference(xcontext.getUserReference());
+            newAttachment.setDate(new Date());
+        }
+
+        // Add the attachment copy to the list of attachments of this document.
+        setAttachment(newAttachment);
     }
 
     /**
@@ -5910,7 +5937,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the retrieved value or the default value.
      * @since 11.9RC1
      */
-    @Unstable
     public int getIntValue(DocumentReference classReference, String fieldName, int defaultValue)
     {
         BaseObject obj = getXObject(classReference, 0);
@@ -9016,7 +9042,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the maximum authorized length for a document full name.
      * @since 11.4RC1
      */
-    @Unstable
     public int getLocalReferenceMaxLength()
     {
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");

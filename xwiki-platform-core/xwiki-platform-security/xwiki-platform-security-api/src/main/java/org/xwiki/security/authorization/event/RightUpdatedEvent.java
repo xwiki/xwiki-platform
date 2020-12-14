@@ -20,7 +20,6 @@
 package org.xwiki.security.authorization.event;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event triggered when a change might have impacted rights (modified, right, group, etc.).
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.8RC1
  */
-@Unstable
 public class RightUpdatedEvent implements Event
 {
     @Override

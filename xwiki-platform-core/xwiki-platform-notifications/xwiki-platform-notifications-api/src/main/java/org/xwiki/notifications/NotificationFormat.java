@@ -19,15 +19,12 @@
  */
 package org.xwiki.notifications;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The different formats for notifications.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-@Unstable
 public enum NotificationFormat
 {
     /**

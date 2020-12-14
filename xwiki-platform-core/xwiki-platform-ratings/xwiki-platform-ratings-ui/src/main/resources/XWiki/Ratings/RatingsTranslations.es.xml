@@ -39,16 +39,14 @@
   <content>admin.ratings=Valoraciones
 
 rating.rate=¡Vota!
-### Missing: rating.saveexception=Error when saving the rating.
-### Missing: rating.votenotvalid=You cannot vote with 0 value.
-### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
-### Missing: rating.setvote.inprogress=Your vote is being saved...
-### Missing: rating.setvote.success=Your vote has been saved!
-### Missing: rating.setvote.error=Error when saving your vote.
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Enable
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Disable
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
+rating.saveexception=Error al guardar la valoración.
+rating.votenotvalid=No puedes votar con una valoración 0.
+rating.voteoutofbounds=El voto está fuera del límite de la escala.
+rating.setvote.inprogress=Se está guardando tu voto...
+rating.setvote.success=¡Tu voto está guardado!
+rating.setvote.error=Error al guardar tu voto.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Activar las valoraciones
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Activar las valoraciones permite que los usuarios valoren las páginas y muestra las valoraciones medias.    Desactivarlo no elimina los votos existente, solo oculta la interfaz.
 
 #@deprecatedstart
 

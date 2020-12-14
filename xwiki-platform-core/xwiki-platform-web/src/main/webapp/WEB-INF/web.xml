@@ -42,7 +42,7 @@
   <!-- Filter in charge of deciding whether to call the ResourceReferenceHandler Servlet (currently used to handle new
        Resource Types registered as Components) or instead to continue with the rest of the filters and mappings below.
        In the future, the goal is to move more and more Resource handling using the ResourceReferenceHandler Servlet and
-       remove the Struts Action Servlet at some point.
+       remove the Legacy Action Servlet at some point.
 
        Note: it is important that this filter be the first filter declared (and thus executed). -->
   <filter>
@@ -235,7 +235,7 @@
 
   <servlet>
     <servlet-name>action</servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <servlet-class>com.xpn.xwiki.web.LegacyActionServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>ApplicationResources</param-value>
@@ -243,10 +243,6 @@
     <init-param>
       <param-name>xwiki</param-name>
       <param-value>com.xpn.xwiki.XWiki</param-value>
-    </init-param>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>/WEB-INF/struts-config.xml</param-value>
     </init-param>
     <init-param>
       <param-name>debug</param-name>

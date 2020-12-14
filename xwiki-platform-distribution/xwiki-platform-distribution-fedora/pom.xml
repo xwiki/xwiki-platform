@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-fedora</artifactId>
   <name>XWiki Platform - Distribution - Fedora</name>
@@ -192,7 +192,6 @@
                     <link path="/etc/xwiki/hibernate.cfg.xml" target="/usr/lib/xwiki/WEB-INF/hibernate.cfg.xml" />
                     <link path="/etc/xwiki/jboss-deployment-structure.xml" target="/usr/lib/xwiki/WEB-INF/jboss-deployment-structure.xml" />
                     <link path="/etc/xwiki/portlet.xml" target="/usr/lib/xwiki/WEB-INF/portlet.xml" />
-                    <link path="/etc/xwiki/struts-config.xml" target="/usr/lib/xwiki/WEB-INF/struts-config.xml" />
                     <link path="/etc/xwiki/sun-web.xml" target="/usr/lib/xwiki/WEB-INF/sun-web.xml" />
                     <link path="/etc/xwiki/version.properties" target="/usr/lib/xwiki/WEB-INF/version.properties" />
                     <link path="/etc/xwiki/web.xml" target="/usr/lib/xwiki/WEB-INF/web.xml" />

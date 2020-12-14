@@ -19,15 +19,12 @@
  */
 package org.xwiki.notifications.preferences;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Possible properties that can be bound to a notification in order to characterize it.
  *
  * @version $Id$
  * @since 9.7RC1
  */
-@Unstable
 public enum NotificationPreferenceProperty
 {
     /**

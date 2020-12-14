@@ -28,14 +28,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.livedata.LiveDataSource;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
  * Represents a property of a live data entry.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/entries/{entryId}/properties/{propertyId}")
 @Unstable
@@ -45,43 +44,39 @@ public interface LiveDataEntryPropertyResource
      * Retrieves the value of a property from a specified live data entry.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
-     * @param entryId identifies the live data entry
-     * @param propertyId identifies the property whose value to return
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param entryId identifies the live data entry
+     * @param propertyId identifies the property whose value to return
      * @return the value of the specified property
      * @throws Exception if retrieving the property value fails
      */
     @GET
     Object getProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
+        @QueryParam("namespace") @DefaultValue("") String namespace,
         @PathParam("entryId") String entryId,
-        @PathParam("propertyId") String propertyId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @PathParam("propertyId") String propertyId
     ) throws Exception;
 
     /**
      * Sets the value of a property from a live data entry.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation whose entry needs to be updated
-     * @param sourceParams optional live data source parameters
+     * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
+     *            not specified then the context / current name-space is used
      * @param entryId identifies the live data entry whose property needs to be set
      * @param propertyId identifies the property whose value needs to be set
      * @param value the new property value
-     * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
-     *            not specified then the context / current name-space is used
      * @return the response
      * @throws Exception if settings the property value fails
      */
     @PUT
     Response setProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
+        @QueryParam("namespace") @DefaultValue("") String namespace,
         @PathParam("entryId") String entryId,
         @PathParam("propertyId") String propertyId,
-        Object value,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        Object value
     ) throws Exception;
 }

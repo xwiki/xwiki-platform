@@ -19,20 +19,24 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.TimeoutException;
+import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
 import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,17 +49,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 6.3M1
  */
 @UITest
-public class FlamingoThemeIT
+class FlamingoThemeIT
 {
     @AfterEach
-    public void verify(LogCaptureConfiguration logCaptureConfiguration)
+    void verify(LogCaptureConfiguration logCaptureConfiguration)
     {
         // TODO: Understand the problem and fix it
         logCaptureConfiguration.registerExcludes("line 13: NS_ERROR_NOT_INITIALIZED");
     }
 
     @Test
-    public void validateColorThemeFeatures(TestUtils setup, TestInfo info)
+    void validateColorThemeFeatures(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
 
@@ -70,7 +74,7 @@ public class FlamingoThemeIT
         // Only caveat is that if you run this test several times and it fails the first time then it may fail the
         // second time when we test that the default CT is Charcoal...
 
-        // Go to the Theme section of the administration
+        // Go to the Theme section of the wiki administration UI
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         ThemesAdministrationSectionPage presentationAdministrationSectionPage =
             administrationPage.clickThemesSection();
@@ -89,7 +93,22 @@ public class FlamingoThemeIT
         assertTrue(otherThemes.contains("Kitty"));
         assertFalse(otherThemes.contains("Charcoal"));
 
-        // Create a new theme
+        // Create a new theme both to validate that the feature works and to be used as the new theme to set in the
+        // tests below.
+        validateThemeCreation(themeApplicationWebHomePage, testMethodName);
+
+        // Validate viewing and setting a color theme from the color theme home page
+        validateViewAndSetThemeFromThemeHomePage(testMethodName);
+
+        // Validate setting a color theme from the wiki Admin UI
+        validateSetThemeFromWikiAdminUI(testMethodName);
+
+        // Validate setting a color theme from the page Admin UI for the page and its children
+        validateSetThemeFromPageAdminUI(testMethodName, setup, info);
+    }
+
+    private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)
+    {
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
 
         // First, disable auto refresh because it slows down the test
@@ -101,55 +120,108 @@ public class FlamingoThemeIT
         verifyThatPreviewWorks(editThemePage);
 
         editThemePage.clickSaveAndView();
+    }
 
+    private void validateViewAndSetThemeFromThemeHomePage(String testMethodName)
+    {
         // Go back to the theme application
-        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        ThemeApplicationWebHomePage themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
 
         // Set the new theme as current, from the Theme Home page
         themeApplicationWebHomePage.useTheme(testMethodName);
         // Verify that the new theme is used
         assertEquals(testMethodName, themeApplicationWebHomePage.getCurrentTheme());
-        // Look at the values
-        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
-        // for now we get rgb value with Firefox and rgba value with Chrome
-        //assertEquals("rgb(255, 0, 0)", themeApplicationWebHomePage.getPageBackgroundColor());
-        // Test 'lessCode' is correctly handled
-        //assertEquals("rgb(0, 0, 255)", themeApplicationWebHomePage.getTextColor());
-        assertColor(255, 0, 0, themeApplicationWebHomePage.getPageBackgroundColor());
-        assertColor(0, 0, 255, themeApplicationWebHomePage.getTextColor());
-        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
+        // Check the colors used on the page
+        assertCustomThemeColors(themeApplicationWebHomePage);
 
-        // Verify we can select a theme by clicking the "use this theme" link, and view it
-        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        // Verify we can view a theme by clicking it
         themeApplicationWebHomePage.seeTheme(testMethodName);
 
         // Switch back to Charcoal
+        // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
+        //  been tested already. We just need this to be as fast as possible.
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
         themeApplicationWebHomePage.useTheme("Charcoal");
+    }
 
+    private void validateSetThemeFromWikiAdminUI(String testMethodName)
+    {
         // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
-        administrationPage = AdministrationPage.gotoPage();
-        presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
         // Set the newly created color theme as the active theme
         presentationAdministrationSectionPage.setColorTheme(testMethodName);
         assertEquals(testMethodName, presentationAdministrationSectionPage.getCurrentColorTheme());
         presentationAdministrationSectionPage.clickSave();
 
+        // Verify that the color theme has been applied.
+        assertCustomThemeColors(new ViewPage());
+
         // Click on the 'customize' button to edit the theme to verify it works
         presentationAdministrationSectionPage.clickOnCustomize();
-        editThemePage = new EditThemePage();
+        EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
 
-        // Switch back to Charcoal (just to set the default back if you need to execute the test again)
-        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        // Switch back to Charcoal
+        // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
+        //  been tested already. We just need this to be as fast as possible.
+        ThemeApplicationWebHomePage themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
         themeApplicationWebHomePage.useTheme("Charcoal");
+    }
+
+    private void validateSetThemeFromPageAdminUI(String testMethodName, TestUtils setup, TestInfo info)
+    {
+        // Create two nested pages. We'll apply the theme on the top page and verify that the nested page has it too.
+        DocumentReference topPage = new DocumentReference("xwiki", info.getTestClass().get().getSimpleName() +
+            "Parent", "WebHome");
+        DocumentReference childPage = new DocumentReference("xwiki", Arrays.asList(
+            info.getTestClass().get().getSimpleName() + "Parent",
+            info.getTestClass().get().getSimpleName() + "Child"), "WebHome");
+        setup.deletePage(topPage, true);
+        setup.createPage(childPage, "top page");
+        setup.createPage(topPage, "top page");
+        AdministrablePage ap = new AdministrablePage();
+
+        // Navigate to the top page's admin UI.
+        AdministrationPage page = ap.clickAdministerPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = page.clickThemesSection();
+
+        // Set the newly created color theme as the active theme for the page and children
+        presentationAdministrationSectionPage.setColorTheme(testMethodName);
+        assertEquals(testMethodName, presentationAdministrationSectionPage.getCurrentColorTheme());
+        presentationAdministrationSectionPage.clickSave();
+
+        // Verify that the color theme has been applied to the top page
+        ViewPage vp = setup.gotoPage(topPage);
+        assertCustomThemeColors(vp);
+
+        // Verify that the color theme has been applied to the children page
+        vp = setup.gotoPage(childPage);
+        assertCustomThemeColors(vp);
+
+        // Verify that the color theme has not been applied to other pages not under the top page and that we have the
+        // Charcoal background color set.
+        vp = setup.gotoPage("NonExistentSpace", "NonExistentPage");
+        assertColor(255, 255, 255, vp.getPageBackgroundColor());
+    }
+
+    private void assertCustomThemeColors(ViewPage page)
+    {
+        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
+        // for now we get rgb value with Firefox and rgba value with Chrome
+        //assertEquals("rgb(255, 0, 0)", page.getPageBackgroundColor());
+        // Test 'lessCode' is correctly handled
+        //assertEquals("rgb(0, 0, 255)", page.getTextColor());
+        assertColor(255, 0, 0, page.getPageBackgroundColor());
+        assertColor(0, 0, 255, page.getTitleColor());
+        assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
 
     private void assertColor(int red, int green, int blue, String obtainedValue)
     {
-        assertTrue(obtainedValue.contains("rgb"), "This is not an rgb value: "+obtainedValue);
+        assertTrue(obtainedValue.contains("rgb"), "This is not an rgb value: " + obtainedValue);
         String rgbComponent = String.format("%s, %s, %s", red, green, blue);
         assertTrue(obtainedValue.contains(rgbComponent),
             "Wrong RGB component [expected = " + rgbComponent + "| Obtained = " + obtainedValue);
@@ -211,15 +283,8 @@ public class FlamingoThemeIT
         previewBox = editThemePage.getPreviewBox();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
-        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
-        // for now we get rgb value with Firefox and rgba value with Chrome
-        // Verify that the modification have been made in the preview
-        //assertEquals("rgb(255, 0, 0)", previewBox.getPageBackgroundColor());
-        // Test 'lessCode' is correctly handled (since 7.3M1)
-        //assertEquals("rgb(0, 0, 255)", previewBox.getTextColor());
-        assertColor(255, 0, 0, previewBox.getPageBackgroundColor());
-        assertColor(0, 0, 255, previewBox.getTextColor());
-        assertEquals("monospace", previewBox.getFontFamily());
+        // Verify colors
+        assertCustomThemeColors(previewBox);
         previewBox.switchToDefaultContent();
     }
 }

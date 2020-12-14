@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * The interface used to store and retrieve the property descriptors.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Role
 @Unstable

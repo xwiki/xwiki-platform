@@ -19,14 +19,28 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
+@Component
+@Named("rollback")
+@Singleton
 public class RollbackAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return RollbackForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

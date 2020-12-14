@@ -22,10 +22,11 @@
 define([
   "Vue",
   "xwiki-livedata",
-  //"polyfills"
+  "liveDataSource"
 ], function (
   Vue,
-  XWikiLivedata
+  XWikiLivedata,
+  liveDataSource
 ) {
 
   /**
@@ -62,7 +63,7 @@ define([
    */
   const Logic = function (element) {
     this.element = element;
-    this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+    this.data = JSON.parse(element.getAttribute("data-config") || "{}");
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -72,7 +73,7 @@ define([
     };
     this.openedPanels = [];
 
-    element.removeAttribute("data-data");
+    element.removeAttribute("data-config");
     // create Vuejs instance
     new Vue({
       el: this.element,
@@ -84,6 +85,11 @@ define([
         logic: this,
       },
     });
+
+    // Fetch the data if we don't have any.
+    if (!this.data.data.entries.length) {
+      this.updateEntries();
+    }
   };
 
 
@@ -390,17 +396,13 @@ define([
 
 
     fetchEntries () {
-      return new Promise(function (resolve, reject) {
-        const err = new Error("Error while fetching entries");
-        // TODO: FETCH ENTRIES FROM HERE
-        reject(err);
-      });
+      return liveDataSource.getEntries(this.data.query);
     },
 
 
     updateEntries () {
       return this.fetchEntries()
-        .then(entries => this.data.data.entries = entries)
+        .then(data => this.data.data = data)
         .catch(err => console.error(err));
     },
 
@@ -561,8 +563,7 @@ define([
           pageIndex: pageIndex,
           previousPageIndex: previousPageIndex,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -612,12 +613,13 @@ define([
         const previousPageSize = this.data.query.limit;
         if (pageSize === previousPageSize) { return void resolve(); }
         this.data.query.limit = pageSize;
+        // Reset the offset whenever the page size changes.
+        this.data.query.offset = 0;
         this.triggerEvent("pageSizeChange", {
           pageSize: pageSize,
           previousPageSize: previousPageSize,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -894,8 +896,7 @@ define([
           descending: descending,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -946,8 +947,7 @@ define([
           level: toIndex,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -998,12 +998,12 @@ define([
     /**
      * Get the filters in the query data object associated to a property id
      * @param {String} propertyId
-     * @returns {Array} The constrains array of the filter group, or empty array if it does not exist
+     * @returns {Array} The constraints array of the filter group, or empty array if it does not exist
      */
     getQueryFilters (propertyId) {
       if (!this.isValidPropertyId(propertyId)) { return; }
       const queryFilterGroup = this.getQueryFilterGroup(propertyId);
-      return queryFilterGroup && queryFilterGroup.constrains || [];
+      return queryFilterGroup && queryFilterGroup.constraints || [];
     },
 
 
@@ -1134,11 +1134,11 @@ define([
             this.data.query.filters.push({
               property: newEntry.property,
               matchAll: true,
-              constrains: [],
+              constraints: [],
             });
           }
           // add entry
-          this.getQueryFilterGroup(newEntry.property).constrains.splice(newEntry.index, 0, {
+          this.getQueryFilterGroup(newEntry.property).constraints.splice(newEntry.index, 0, {
             operator: newEntry.operator,
             value: newEntry.value,
           });
@@ -1147,6 +1147,8 @@ define([
         if (this.getQueryFilters(oldEntry.property).length === 0) {
           this.removeAllFilters(oldEntry.property);
         }
+        // Reset the offset whenever the filters are updated.
+        this.data.query.offset = 0;
         // dispatch events
         this.triggerEvent("filter", {
           type: filteringType,
@@ -1154,8 +1156,7 @@ define([
           newEntry: newEntry,
         });
 
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 
@@ -1170,7 +1171,7 @@ define([
      */
     addFilter (property, operator, value, index) {
       if (index === undefined) {
-        index = ((this.getQueryFilterGroup(property) || {}).constrains || []).length;
+        index = ((this.getQueryFilterGroup(property) || {}).constraints || []).length;
       }
       return this.filter(property, -1, {
         property: property,
@@ -1204,14 +1205,15 @@ define([
           .findIndex(filterGroup => filterGroup.property === property);
         if (filterIndex === -1) { return void reject(); }
         const removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
+        // Reset the offset whenever the filters are updated.
+        this.data.query.offset = 0;
         // dispatch events
         this.triggerEvent("filter", {
           type: "removeAll",
           property: property,
-          removedFilters: removedFilterGroups[0].constrains,
+          removedFilters: removedFilterGroups[0].constraints,
         });
-        // TODO: CALL FUNCTION TO FETCH NEW DATA HERE
-        resolve();
+        this.updateEntries().then(resolve, reject);
       });
     },
 

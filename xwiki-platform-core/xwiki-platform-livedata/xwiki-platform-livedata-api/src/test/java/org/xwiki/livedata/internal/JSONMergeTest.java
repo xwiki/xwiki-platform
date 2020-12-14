@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Unit tests for {@link JSONMerge}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 class JSONMergeTest
 {
@@ -95,8 +95,10 @@ class JSONMergeTest
         assertMerge("[true,'red']", "[17]", "[true,'red']");
 
         assertMerge(
-            "[{'name':'bob','country':'fr'},{'id':'alice','age':16,'birthday':1234567890,'graduated':false},'test']",
-            "[{'id':'alice','age':17,'birthday':1234567890},{'name':'bob','age':25}]",
+            "[{'name':'bob','country':'fr'}," + "{'id':'alice','age':16,'birthday':1234567890,'graduated':false},"
+                + "'test',{'id':'carol','age':29}]",
+            "[{'id':'alice','age':17,'birthday':1234567890}," + "{'name':'bob','age':25}," + "{'id':'carol','age':29},"
+                + "{'id':null,'country':'uk'}]",
             "[{'name':'bob','country':'fr'},{'id':'alice','age':16,'graduated':false},'test']");
     }
 

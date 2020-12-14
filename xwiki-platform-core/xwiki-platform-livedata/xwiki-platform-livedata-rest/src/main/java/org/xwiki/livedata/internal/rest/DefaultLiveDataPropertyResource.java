@@ -29,16 +29,16 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataPropertyResource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 
 /**
  * Default implementation of {@link LiveDataPropertyResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyResource")
@@ -46,14 +46,14 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
 public class DefaultLiveDataPropertyResource extends AbstractLiveDataResource implements LiveDataPropertyResource
 {
     @Override
-    public PropertyDescriptor getProperty(String hint, StringMap sourceParams, String id, String namespace)
-        throws Exception
+    public PropertyDescriptor getProperty(String sourceId, String namespace, String propertyId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<LiveDataPropertyDescriptor> property = source.get().getProperties().get(id);
+            Optional<LiveDataPropertyDescriptor> property = source.get().getProperties().get(propertyId);
             if (property.isPresent()) {
-                return createProperty(property.get(), hint, namespace);
+                return createProperty(property.get(), querySource, namespace);
             }
         }
 
@@ -61,17 +61,18 @@ public class DefaultLiveDataPropertyResource extends AbstractLiveDataResource im
     }
 
     @Override
-    public Response updateProperty(String hint, StringMap sourceParams, String id,
-        PropertyDescriptor propertyDescriptor, String namespace) throws Exception
+    public Response updateProperty(String sourceId, String namespace, String propertyId,
+        PropertyDescriptor propertyDescriptor) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
             // Force the id specified in the URL.
-            propertyDescriptor.setId(id);
+            propertyDescriptor.setId(propertyId);
             if (source.get().getProperties().update(convert(propertyDescriptor))) {
-                Optional<LiveDataPropertyDescriptor> property = source.get().getProperties().get(id);
+                Optional<LiveDataPropertyDescriptor> property = source.get().getProperties().get(propertyId);
                 if (property.isPresent()) {
-                    PropertyDescriptor updatedProperty = createProperty(property.get(), hint, namespace);
+                    PropertyDescriptor updatedProperty = createProperty(property.get(), querySource, namespace);
                     return Response.status(Status.ACCEPTED).entity(updatedProperty).build();
                 }
             }
@@ -81,11 +82,12 @@ public class DefaultLiveDataPropertyResource extends AbstractLiveDataResource im
     }
 
     @Override
-    public void deleteProperty(String hint, StringMap sourceParams, String id, String namespace) throws Exception
+    public void deleteProperty(String sourceId, String namespace, String propertyId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<LiveDataPropertyDescriptor> removedProperty = source.get().getProperties().remove(id);
+            Optional<LiveDataPropertyDescriptor> removedProperty = source.get().getProperties().remove(propertyId);
             if (removedProperty.isPresent()) {
                 return;
             }

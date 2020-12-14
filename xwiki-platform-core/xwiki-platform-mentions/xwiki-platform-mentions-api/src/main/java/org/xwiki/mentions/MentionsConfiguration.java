@@ -33,6 +33,16 @@ import org.xwiki.stability.Unstable;
 public interface MentionsConfiguration
 {
     /**
+     * The type of the mentions to local users.
+     * <p>
+     * This is also the default type when it is not defined.
+     *
+     * @since 12.10
+     */
+    @Unstable
+    String USER_MENTION_TYPE = "user";
+
+    /**
      * 
      * @return the color for the mentions.
      */

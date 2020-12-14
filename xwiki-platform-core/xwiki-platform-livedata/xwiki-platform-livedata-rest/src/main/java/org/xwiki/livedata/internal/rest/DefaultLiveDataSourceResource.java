@@ -27,16 +27,16 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataSourceResource;
 import org.xwiki.livedata.rest.model.jaxb.Source;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 
 /**
  * Default implementation of {@link LiveDataSourceResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataSourceResource")
@@ -44,11 +44,12 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
 public class DefaultLiveDataSourceResource extends AbstractLiveDataResource implements LiveDataSourceResource
 {
     @Override
-    public Source getSource(String hint, StringMap parameters, String namespace) throws Exception
+    public Source getSource(String sourceId, String namespace) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, parameters, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            return createSource(hint, parameters, namespace);
+            return createSource(querySource, namespace);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

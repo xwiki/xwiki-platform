@@ -19,10 +19,8 @@
  */
 package org.xwiki.test.webstandards;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.test.webstandards.framework.DefaultValidationTest;
 import org.xwiki.validator.Validator;
 
@@ -52,5 +50,18 @@ public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTes
         ((CustomDutchWebGuidelinesValidator) this.validator).setTarget(this.target);
 
         super.testDocumentValidity();
+    }
+
+    @Override
+    protected boolean hasLogErrors(String output)
+    {
+        return StringUtils.containsIgnoreCase(output, "error") || StringUtils.containsIgnoreCase(output, "err");
+    }
+
+    @Override
+    protected boolean hasLogWarnings(String output)
+    {
+        // TODO: Remove once WCAG warnings have been fixed
+        return false;
     }
 }

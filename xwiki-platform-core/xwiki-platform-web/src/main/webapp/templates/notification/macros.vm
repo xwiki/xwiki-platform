@@ -193,15 +193,45 @@ $xwiki.getPlainUserName($user)##
 #**
  * Display a notification for a message sent through the Message Stream.
  * TODO: find a way to move it to the "message stream" module
+ *
+ * @param compositeEvent displays the message of the event
+ * @param translationKey the translation key of the title of the message
+ * @param icon the icon of the message
  * @since 10.5RC1
  * @since 9.11.6
  *#
 #macro(displayMessageNotification $compositeEvent $translationKey $icon)
   #define($content)
     #set ($messageEvent = $event.events[0])
-    <p>$services.localization.render($translationKey, ["#displayNotificationEventUser($messageEvent.user, false)"])</p>
+  <p>$services.localization.render($translationKey, ["#displayNotificationEventUser($messageEvent.user, false)"])</p>
+  <blockquote>
+    $messageEvent.body
+  </blockquote>
+  <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
+  #end
+  #displayNotificationEventSkeleton($icon, 'comment', $content, '')
+#end
+##
+#*
+ * Display a notification from a message to a group sent through the Message Stream.
+ * TODO: find a way to move it to the "message stream" module
+ *
+ * @param compositeEvent displays the message of the event
+ * @param translationKey the translation key of the title of the message, takes two parameters, the first one for the
+ *                       user the second one for the group
+ * @param icon the icon of the message
+ * @since 12.10
+ *#
+#macro(displayGroupMessageNotification $compositeEvent $translationKey $icon)
+  #define($content)
+    #set ($messageEvent = $event.events[0])
+    #set ($translationParameters = [
+      "#displayNotificationEventUser($messageEvent.user, false)",
+      "#displayNotificationEventUser($messageEvent.stream, false)"
+    ])
+    <p>$services.localization.render($translationKey, $translationParameters)</p>
     <blockquote>
-     $messageEvent.body
+    $messageEvent.body
     </blockquote>
     <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
   #end

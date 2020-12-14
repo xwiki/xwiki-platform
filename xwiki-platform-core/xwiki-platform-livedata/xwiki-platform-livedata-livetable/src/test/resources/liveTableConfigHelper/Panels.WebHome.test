@@ -37,25 +37,42 @@
     "propertyDescriptors":[
       {
         "id":"name",
+        "type":"String",
         "sortable":true,
+        "visible":true,
         "filterable":true,
         "displayer":{"id":"link","propertyHref":"doc.url"},
         "filter":{"id":"text"}
       },
-      {"id":"description","sortable":true,"filterable":true,"filter":{"id":"text"}},
+      {
+        "id":"description",
+        "sortable":true,
+        "visible":true,
+        "filterable":true,
+        "filter":{"id":"text"}
+      },
       {
         "id":"type",
+        "type":"StaticList",
         "sortable":true,
+        "visible":true,
         "filterable":true,
         "filter":{
           "id":"list",
           "defaultOperator":"equals"
         }
       },
-      {"id":"category","sortable":true,"filterable":true,"filter":{"id":"list"}},
+      {
+        "id":"category",
+        "sortable":true,
+        "visible":true,
+        "filterable":true,
+        "filter":{"id":"list"}
+      },
       {
         "id":"_actions",
         "sortable":false,
+        "visible":true,
         "filterable":false,
         "displayer":{
           "id":"actions",

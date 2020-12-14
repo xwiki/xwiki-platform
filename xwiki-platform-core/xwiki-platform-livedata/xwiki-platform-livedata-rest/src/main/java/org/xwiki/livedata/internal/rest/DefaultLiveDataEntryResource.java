@@ -29,16 +29,17 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataEntryStore;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataEntryResource;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 
 /**
  * Default implementation of {@link LiveDataEntryResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource")
@@ -46,13 +47,15 @@ import org.xwiki.livedata.rest.model.jaxb.StringMap;
 public class DefaultLiveDataEntryResource extends AbstractLiveDataResource implements LiveDataEntryResource
 {
     @Override
-    public Entry getEntry(String hint, StringMap sourceParams, String id, String namespace) throws Exception
+    public Entry getEntry(String sourceId, String namespace, String entryId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<Map<String, Object>> values = source.get().getEntries().get(id);
+            LiveDataEntryStore entryStore = source.get().getEntries();
+            Optional<Map<String, Object>> values = entryStore.get(entryId);
             if (values.isPresent()) {
-                return createEntry(values.get(), hint, namespace);
+                return createEntry(values.get(), entryId, querySource, namespace);
             }
         }
 
@@ -60,16 +63,18 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     }
 
     @Override
-    public Response updateEntry(String hint, StringMap sourceParams, String id, Entry entry, String namespace)
-        throws Exception
+    public Response updateEntry(String sourceId, String namespace, String entryId, Entry entry) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<Object> entryId = source.get().getEntries().update(entry.getValues());
-            if (entryId.isPresent()) {
-                Optional<Map<String, Object>> values = source.get().getEntries().get(entryId.get());
+            LiveDataEntryStore entryStore = source.get().getEntries();
+            entry.getValues().put(entryStore.getIdProperty(), entryId);
+            Optional<Object> updatedEntryId = entryStore.update(entry.getValues());
+            if (updatedEntryId.isPresent()) {
+                Optional<Map<String, Object>> values = entryStore.get(updatedEntryId.get());
                 if (values.isPresent()) {
-                    Entry updatedEntry = createEntry(values.get(), hint, namespace);
+                    Entry updatedEntry = createEntry(values.get(), updatedEntryId.get(), querySource, namespace);
                     return Response.status(Status.ACCEPTED).entity(updatedEntry).build();
                 }
             }
@@ -79,11 +84,12 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     }
 
     @Override
-    public void deleteEntry(String hint, StringMap sourceParams, String id, String namespace) throws Exception
+    public void deleteEntry(String sourceId, String namespace, String entryId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<Map<String, Object>> removedEntry = source.get().getEntries().remove(id);
+            Optional<Map<String, Object>> removedEntry = source.get().getEntries().remove(entryId);
             if (removedEntry.isPresent()) {
                 return;
             }

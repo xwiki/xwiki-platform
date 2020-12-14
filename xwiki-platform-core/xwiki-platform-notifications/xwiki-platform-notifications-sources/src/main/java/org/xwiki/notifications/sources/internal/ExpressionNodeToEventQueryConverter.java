@@ -290,7 +290,15 @@ public class ExpressionNodeToEventQueryConverter
                 }
             } else if (forUser.getFormat() == NotificationFormat.EMAIL) {
                 if (forUser.getUser() != null) {
-                    result.withMail(this.serializer.serialize(forUser.getUser()));
+                    result.open();
+                    String entity = this.serializer.serialize(forUser.getUser());
+                    result.withMail(entity);
+                    if (forUser.isRead() != null) {
+                        result.withStatus(entity, forUser.isRead());
+                    }
+                    result.close();
+                } else if (forUser.isRead() != null) {
+                    result.withStatus(forUser.isRead());
                 }
             }
         } else {

@@ -17,23 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.criteria.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.criteria.impl.Duration} class.
  */
-public class DurationTest
+class DurationTest
 {
     /**
      * Test for {@link com.xpn.xwiki.criteria.impl.Duration#Duration(int, int, int, int)}
      */
     @Test
-    public void testConstructor()
+    void constructor()
     {
         doConstructorTest(0, 0, 0, 0);
         doConstructorTest(1, 2, 3, 4);

@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Parameters for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Unstable
 public class LiveDataMacroParameters
@@ -41,8 +41,6 @@ public class LiveDataMacroParameters
     private String sourceParameters;
 
     private String sort;
-
-    private String hiddenFilters;
 
     private String filters;
 
@@ -152,26 +150,6 @@ public class LiveDataMacroParameters
     public void setSort(String sort)
     {
         this.sort = sort;
-    }
-
-    /**
-     * @return the hidden filters, that the user cannot change from the user interface
-     */
-    public String getHiddenFilters()
-    {
-        return hiddenFilters;
-    }
-
-    /**
-     * Sets the hidden filters, that the user cannot change from the user interface, specified as an URL query string.
-     * 
-     * @param hiddenFilters the hidden filters, specified as an URL query string
-     */
-    @PropertyDescription("The hidden filters, that the user cannot change from the live data widget, specified as an "
-        + "URL query string.")
-    public void setHiddenFilters(String hiddenFilters)
-    {
-        this.hiddenFilters = hiddenFilters;
     }
 
     /**

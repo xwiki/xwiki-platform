@@ -51,13 +51,19 @@ class DocumentRestURLGeneratorTest
     @InjectMockComponents
     private DocumentRestURLGenerator generator;
 
+    private XWikiContext xwikiContext;
+
+    private XWiki xwiki;
+
+    private XWikiURLFactory urlFactory;
+
     @BeforeEach
     void setup(ComponentManager componentManager) throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        XWikiContext xwikiContext = xwikiContextProvider.get();
-        XWiki xwiki = mock(XWiki.class);
-        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        xwikiContext = xwikiContextProvider.get();
+        xwiki = mock(XWiki.class);
+        urlFactory = mock(XWikiURLFactory.class);
 
         when(xwikiContext.getWiki()).thenReturn(xwiki);
         when(xwikiContext.getURLFactory()).thenReturn(urlFactory);
@@ -70,6 +76,15 @@ class DocumentRestURLGeneratorTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page",
+            this.generator.getURL(documentReference).toString());
+    }
+
+    @Test
+    void getURLWitTrailingServerURLSlash() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(urlFactory.getServerURL(xwikiContext)).thenReturn(new URL("http://localhost2/"));
+        assertEquals("http://localhost2/rest/wikis/wiki/spaces/space/pages/page",
             this.generator.getURL(documentReference).toString());
     }
 

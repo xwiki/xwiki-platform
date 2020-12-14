@@ -30,14 +30,13 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
  * Represents a live data entry.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/entries/{entryId}")
 @Unstable
@@ -47,29 +46,26 @@ public interface LiveDataEntryResource
      * Fetches an entry from the specified live data source.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams the live data source parameters
-     * @param entryId identifies the entry to retrieve
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param entryId identifies the entry to retrieve
      * @return the specified entry
      * @throws Exception if retrieving the entry fails
      */
     @GET
     Entry getEntry(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
-        @PathParam("entryId") String entryId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @QueryParam("namespace") @DefaultValue("") String namespace,
+        @PathParam("entryId") String entryId
     ) throws Exception;
 
     /**
      * Updates an existing entry.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams the live data source parameters
-     * @param entry the new entry values
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param entry the new entry values
      * @param entryId identifies the entry to update
      * @return the response
      * @throws Exception if updating the specified entry fails
@@ -77,26 +73,24 @@ public interface LiveDataEntryResource
     @PUT
     Response updateEntry(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
+        @QueryParam("namespace") @DefaultValue("") String namespace,
         @PathParam("entryId") String entryId,
-        Entry entry,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        Entry entry
     ) throws Exception;
 
     /**
      * Deletes an entry from the data set.
+     * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams the live data source parameters
-     * @param entryId identifies the entry to delete
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param entryId identifies the entry to delete
      * @throws Exception if deleting the specified entry fails
      */
     @DELETE
     void deleteEntry(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
-        @PathParam("entryId") String entryId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @QueryParam("namespace") @DefaultValue("") String namespace,
+        @PathParam("entryId") String entryId
     ) throws Exception;
 }

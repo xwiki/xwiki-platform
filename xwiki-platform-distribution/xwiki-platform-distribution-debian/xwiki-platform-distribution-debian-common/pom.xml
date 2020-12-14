@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>12.9-SNAPSHOT</version>
+      <version>13.0-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -296,12 +296,6 @@
               <symlink>true</symlink>
               <linkName>/usr/lib/xwiki/WEB-INF/portlet.xml</linkName>
               <linkTarget>/etc/xwiki/portlet.xml</linkTarget>
-            </data>
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/struts-config.xml</linkName>
-              <linkTarget>/etc/xwiki/struts-config.xml</linkTarget>
             </data>
             <data>
               <type>link</type>

@@ -2,6 +2,7 @@
 ## Merge default configuration
 ##
 {
+  "id":"defaultConfigResolverTest",
   "query":{
     "source":"test"
   },
@@ -37,11 +38,13 @@
 }
 ---
 {
+  "id":"defaultConfigResolverTest",
   "query":{
     "properties":[],
     "source":{"id":"test"},
     "filters":[],
     "sort":[],
+    "offset":0,
     "limit":15
   },
   "data":{
@@ -66,6 +69,7 @@
         },
         "type":"String",
         "sortable":false,
+        "visible":true,
         "displayer":{
           "id":"link",
           "propertyHref":"bar"
@@ -88,6 +92,7 @@
           "iconSetType":"font"
         },
         "sortable":true,
+        "visible":true,
         "displayer":{"id":"html"},
         "filter":{
           "id":"text",
@@ -150,8 +155,11 @@
     "pagination":{
       "maxShownPages":10,
       "pageSizes":[15,25,50,100],
+      "showEntryRange":true,
       "showNextPrevious":true
     },
-    "entryDescriptor":{}
+    "entryDescriptor":{
+      "idProperty":"entryId"
+    }
   }
 }

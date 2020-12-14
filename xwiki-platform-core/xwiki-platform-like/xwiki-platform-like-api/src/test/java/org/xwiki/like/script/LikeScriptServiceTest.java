@@ -304,4 +304,16 @@ public class LikeScriptServiceTest
         when(this.likeManager.getUserLikes(this.userReference, 2, 32)).thenReturn(expectedList);
         assertEquals(expectedList, this.likeScriptService.getUserLikes(this.userReference, 2, 32));
     }
+
+    @Test
+    void getLikers() throws LikeException
+    {
+        List<UserReference> expectedList = Arrays.asList(
+            mock(UserReference.class),
+            mock(UserReference.class),
+            mock(UserReference.class));
+        EntityReference entityReference = mock(EntityReference.class);
+        when(this.likeManager.getLikers(entityReference, 12, 28)).thenReturn(expectedList);
+        assertEquals(expectedList, this.likeScriptService.getLikers(entityReference, 12, 28));
+    }
 }

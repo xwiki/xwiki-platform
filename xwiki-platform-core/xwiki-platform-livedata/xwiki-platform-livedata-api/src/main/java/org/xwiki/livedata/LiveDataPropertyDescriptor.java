@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * Describes how the user interacts with a given property.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -468,6 +468,9 @@ public class LiveDataPropertyDescriptor
      */
     public void initialize()
     {
+        if (this.visible == null) {
+            this.visible = true;
+        }
         if (this.icon == null) {
             this.icon = new HashMap<>();
         }
@@ -477,6 +480,5 @@ public class LiveDataPropertyDescriptor
         if (this.filter == null) {
             this.filter = new FilterDescriptor();
         }
-        this.filter.initialize();
     }
 }

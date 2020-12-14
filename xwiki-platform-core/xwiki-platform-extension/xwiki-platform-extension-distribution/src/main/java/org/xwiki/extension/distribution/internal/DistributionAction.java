@@ -19,6 +19,11 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,6 +37,9 @@ import com.xpn.xwiki.web.XWikiAction;
  * @version $Id$
  * @since 4.2M3
  */
+@Component
+@Named("distribution")
+@Singleton
 public class DistributionAction extends XWikiAction
 {
     /**

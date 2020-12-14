@@ -24,11 +24,15 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.input.BeanInputFilterStream;
@@ -76,6 +80,9 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  */
+@Component
+@Named("import")
+@Singleton
 public class ImportAction extends XWikiAction
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);

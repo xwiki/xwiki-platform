@@ -247,7 +247,7 @@ public class DefaultIconSetManagerTest
         // Verify
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
-        assertEquals("Failed to get the current default icon set.", exceptionCaught.getMessage());
+        assertEquals("Failed to load the current default icon set resource.", exceptionCaught.getMessage());
     }
 
     @Test

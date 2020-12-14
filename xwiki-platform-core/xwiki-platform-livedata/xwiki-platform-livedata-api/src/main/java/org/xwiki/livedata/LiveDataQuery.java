@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * The query used to get the live data.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -78,11 +78,6 @@ public class LiveDataQuery
          * Specifies whether all the constraints need to be met or any of them.
          */
         private boolean matchAll;
-
-        /**
-         * Specifies whether the user should be able to change this filter or not.
-         */
-        private boolean readOnly;
 
         /**
          * The constraints to apply to property values.
@@ -185,24 +180,6 @@ public class LiveDataQuery
         public void setMatchAll(boolean matchAll)
         {
             this.matchAll = matchAll;
-        }
-
-        /**
-         * @return {@code true} if the user shouldn't be able to change this filter, {@code false} otherwise
-         */
-        public boolean isReadOnly()
-        {
-            return readOnly;
-        }
-
-        /**
-         * Sets whether the user can change this filter or not.
-         * 
-         * @param readOnly {@code true} to prevent the user from changing this filter, {@code false} otherwise
-         */
-        public void setReadOnly(boolean readOnly)
-        {
-            this.readOnly = readOnly;
         }
 
         /**
@@ -532,6 +509,12 @@ public class LiveDataQuery
         }
         if (this.sort == null) {
             this.sort = new ArrayList<>();
+        }
+        if (this.offset == null) {
+            this.offset = 0L;
+        }
+        if (this.limit == null) {
+            this.limit = 15;
         }
     }
 }

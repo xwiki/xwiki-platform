@@ -19,6 +19,8 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import org.xwiki.model.reference.EntityReference;
@@ -54,6 +56,11 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         return this.ratingsManager.getIdentifier();
     }
 
+    protected ObservationManager getObservationManager()
+    {
+        return this.observationManager;
+    }
+
     protected int getScale()
     {
         return this.ratingsManager.getScale();
@@ -74,16 +81,16 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
     private AverageRating updateAverageRating(AverageRating averageRating, float oldAverageVote, int oldTotalVote)
         throws RatingsException
     {
-        this.observationManager.notify(new UpdatingAverageRatingEvent(averageRating, oldAverageVote, oldTotalVote),
+        this.getObservationManager().notify(new UpdatingAverageRatingEvent(averageRating, oldAverageVote, oldTotalVote),
             this.getIdentifier(), averageRating);
         try {
             this.saveAverageRating(averageRating);
-            this.observationManager.notify(
+            this.getObservationManager().notify(
                 new UpdatedAverageRatingEvent(averageRating, oldAverageVote, oldTotalVote), this.getIdentifier(),
                 averageRating);
             return averageRating;
         } catch (RatingsException e) {
-            this.observationManager.notify(
+            this.getObservationManager().notify(
                 new UpdateAverageRatingFailedEvent(averageRating, oldAverageVote, oldTotalVote), this.getIdentifier(),
                 averageRating);
             throw e;
@@ -131,6 +138,7 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         DefaultAverageRating updatedAverageRating = new DefaultAverageRating(averageRating);
         updatedAverageRating.setAverageVote(averageVote);
         updatedAverageRating.setTotalVote(totalVote);
+        updatedAverageRating.setUpdatedAt(new Date());
         return this.updateAverageRating(updatedAverageRating, oldAverageVote, oldTotalVote);
     }
 }

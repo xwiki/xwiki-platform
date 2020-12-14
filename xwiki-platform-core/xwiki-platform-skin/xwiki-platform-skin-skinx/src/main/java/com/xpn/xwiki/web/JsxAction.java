@@ -24,10 +24,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -49,6 +53,9 @@ import com.xpn.xwiki.web.sx.SxSource;
  * @version $Id$
  * @since 1.4M2
  */
+@Component
+@Named("jsx")
+@Singleton
 public class JsxAction extends AbstractSxAction
 {
     /** The extension type of this action. */

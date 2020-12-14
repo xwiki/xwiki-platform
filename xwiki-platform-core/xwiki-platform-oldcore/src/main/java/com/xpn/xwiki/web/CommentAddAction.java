@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -42,6 +45,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  *
  * @version $Id$
  */
+@Component
+@Named("commentadd")
+@Singleton
 public class CommentAddAction extends XWikiAction
 {
     /** The name of the XWikiComments property identifying the author. */
@@ -51,6 +57,12 @@ public class CommentAddAction extends XWikiAction
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return ObjectAddForm.class;
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

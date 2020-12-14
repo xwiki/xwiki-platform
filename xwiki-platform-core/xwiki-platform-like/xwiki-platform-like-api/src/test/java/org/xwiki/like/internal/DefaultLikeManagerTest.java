@@ -34,9 +34,9 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.like.LikeConfiguration;
-import org.xwiki.like.LikeEvent;
+import org.xwiki.like.events.LikeEvent;
 import org.xwiki.like.LikeException;
-import org.xwiki.like.UnlikeEvent;
+import org.xwiki.like.events.UnlikeEvent;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -318,5 +318,13 @@ public class DefaultLikeManagerTest
             .thenReturn(42L);
 
         assertEquals(42L, this.defaultLikeManager.countUserLikes(this.userReference));
+    }
+
+    @Test
+    void dispose() throws Exception
+    {
+        this.defaultLikeManager.dispose();
+        verify(this.likeExistCache).dispose();
+        verify(this.likedEntityCache).dispose();
     }
 }

@@ -92,7 +92,7 @@
           -->
           <XWikiDraggable
             class="filter-entries"
-            :value="logic.getQueryFilterGroup(filterGroup.property).constrains"
+            :value="logic.getQueryFilterGroup(filterGroup.property).constraints"
             @change="reorderFilter($event, filterGroup)"
             :group="'filter-panel' + logic.getFilterDescriptor(filterGroup.property).id"
           >
@@ -102,7 +102,7 @@
               XWikiDraggable one
             -->
             <XWikiDraggableItem
-                v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constrains"
+                v-for="(filter, filterIdx) in logic.getQueryFilterGroup(filterGroup.property).constraints"
                 :key="filterIdx"
               >
               <!-- Filter entries -->
@@ -193,7 +193,7 @@ export default {
     unfilteredProperties () {
       return this.logic.getFilterablePropertyDescriptors().filter(propertyDescriptor => {
         const filter = this.logic.getQueryFilterGroup(propertyDescriptor.id);
-        return !filter || filter.constrains.length === 0;
+        return !filter || filter.constraints.length === 0;
       });
     },
 

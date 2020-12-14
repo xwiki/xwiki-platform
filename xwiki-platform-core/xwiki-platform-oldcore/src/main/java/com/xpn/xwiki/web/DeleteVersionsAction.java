@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,8 +37,17 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
  *
  * @version $Id$
  */
+@Component
+@Named("deleteversions")
+@Singleton
 public class DeleteVersionsAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return DeleteVersionsForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Merge JSON nodes.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 public class JSONMerge
 {
@@ -112,20 +112,30 @@ public class JSONMerge
     private ArrayNode merge(ArrayNode left, ArrayNode right)
     {
         ArrayNode result = left.arrayNode();
+        // Add the items from the right, merging them with the corresponding item from the left.
         for (JsonNode rightItem : right) {
-            JsonNode foundItem = null;
-            if (rightItem.isObject() && rightItem.has(ID)) {
-                // Find the corresponding left item to merge.
-                for (JsonNode leftItem : left) {
-                    if (leftItem.isObject() && Objects.equals(left.get(ID), right.get(ID))) {
-                        foundItem = leftItem;
-                        break;
-                    }
+            // Find the corresponding left item to merge with.
+            JsonNode leftItem = findById(rightItem.path(ID), left);
+            result.add(merge(leftItem, rightItem));
+        }
+        // Add the items from the left that are identifiable and that are not present on the right.
+        for (JsonNode leftItem : left) {
+            if (leftItem.hasNonNull(ID) && findById(leftItem.get(ID), right) == null) {
+                result.add(leftItem.deepCopy());
+            }
+        }
+        return result;
+    }
+
+    private JsonNode findById(JsonNode id, ArrayNode array)
+    {
+        if (id != null && !id.isNull() && !id.isMissingNode()) {
+            for (JsonNode item : array) {
+                if (id.equals(item.path(ID))) {
+                    return item;
                 }
             }
-            result.add(merge(foundItem, rightItem));
         }
-
-        return result;
+        return null;
     }
 }

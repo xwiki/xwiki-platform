@@ -2283,7 +2283,6 @@ public class XWiki extends Api
      * @return the user corresponding to the reference.
      * @since 11.8RC1
      */
-    @Unstable
     public User getUser(DocumentReference userReference)
     {
         return this.xwiki.getUser(userReference, getXWikiContext());

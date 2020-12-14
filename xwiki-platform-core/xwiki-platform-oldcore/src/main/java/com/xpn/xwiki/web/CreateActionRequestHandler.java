@@ -45,7 +45,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -683,7 +682,6 @@ public class CreateActionRequestHandler
      *         {@link XWikiDocument#getLocalReferenceMaxLength()}.
      * @since 11.4RC1
      */
-    @Unstable
     public boolean isDocumentPathTooLong(DocumentReference reference)
     {
         int maxLength = document.getLocalReferenceMaxLength();

@@ -31,7 +31,6 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;

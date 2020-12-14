@@ -30,7 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.query.CompareQueryCondition;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.query.GroupQueryCondition;
 import org.xwiki.eventstream.query.InQueryCondition;
+import org.xwiki.eventstream.query.MailEntityQueryCondition;
 import org.xwiki.eventstream.query.QueryCondition;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause;
@@ -43,6 +45,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.expression.EmptyNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
+import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.internal.status.ForUserNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -476,6 +479,56 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
         assertEquals(new StatusQueryCondition(USER_REFERENCE.toString(), null, false), conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
+
+        List<SortClause> sortClause = query.getSorts();
+
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+    }
+
+    @Test
+    public void generateQueryWithPreFilteringEmailReadFilter() throws Exception
+    {
+        // Mocks
+        NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
+            any(NotificationPreference.class))).thenReturn(new ForUserNode(USER_REFERENCE, true));
+        when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+
+        NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
+        when(notificationFilter2.filterExpression(any(DocumentReference.class), any(Collection.class),
+            any(NotificationPreference.class))).thenReturn(
+                new NotNode(new ForUserNode(USER_REFERENCE, true, NotificationFormat.EMAIL)));
+        when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+
+        when(this.notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
+            any(NotificationPreference.class)))
+            .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
+
+        // Test
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = USER_REFERENCE;
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = this.startDate;
+        parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
+        parameters.preferences = Arrays.asList(this.pref1);
+        parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
+
+        SimpleEventQuery query = this.generator.generateQuery(parameters);
+
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
+
+        assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
+            conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
+            conditions.next());
+        assertEquals(
+            new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
+            conditions.next());
+        assertEquals(new StatusQueryCondition(USER_REFERENCE.toString(), true, false), conditions.next());
+        assertEquals(new GroupQueryCondition(false, true,
+            new MailEntityQueryCondition(SERIALIZED_USER_REFERENCE, false),
+            new StatusQueryCondition(SERIALIZED_USER_REFERENCE, true, false)), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();

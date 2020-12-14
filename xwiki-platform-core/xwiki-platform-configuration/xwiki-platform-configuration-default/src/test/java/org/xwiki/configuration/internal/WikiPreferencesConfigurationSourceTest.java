@@ -195,11 +195,16 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(reference,
             this.oldcore.getXWikiContext());
         BaseClass baseClass = document.getXClass();
-        baseClass.addTextField("key", "Some Key", 30);
+        baseClass.addTextField("textKey", "Text Key", 30);
+        baseClass.addBooleanField("booleanKey", "Boolean Key");
 
-        this.source.setProperties(Collections.singletonMap("key", "value"));
+        Map<String, Object> properties =new HashMap<>();
+        properties.put("textKey", "value");
+        properties.put("booleanKey", true);
+        this.source.setProperties(properties);
 
-        assertEquals("value", this.source.getProperty("key"));
+        assertEquals("value", this.source.getProperty("textKey"));
+        assertEquals(1, this.source.getProperty("booleanKey", Boolean.class));
     }
 
     @Test

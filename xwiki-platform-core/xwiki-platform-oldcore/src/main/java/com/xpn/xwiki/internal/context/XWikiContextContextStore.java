@@ -89,6 +89,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_LOCALE = "locale";
 
     /**
+     * Name of the entry containing the action.
+     * 
+     * @since 12.10
+     */
+    public static final String PROP_ACTION = "action";
+
+    /**
      * The prefix of the entries containing request related informations.
      */
     public static final String PREFIX_PROP_REQUEST = "request.";
@@ -202,8 +209,8 @@ public class XWikiContextContextStore extends AbstractContextStore
      */
     public XWikiContextContextStore()
     {
-        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_REQUEST_BASE, PROP_REQUEST_URL, PROP_REQUEST_PARAMETERS,
-            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
+        super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
+            PROP_REQUEST_PARAMETERS, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE);
     }
 
     @Override
@@ -217,6 +224,7 @@ public class XWikiContextContextStore extends AbstractContextStore
             save(contextStore, PROP_USER, xcontext.getUserReference(), entries);
             save(contextStore, PROP_SECURE_AUTHOR, xcontext.getAuthorReference(), entries);
             save(contextStore, PROP_LOCALE, xcontext.getLocale(), entries);
+            save(contextStore, PROP_ACTION, xcontext.getAction(), entries);
 
             save(contextStore, PREFIX_PROP_DOCUMENT, xcontext.getDoc(), entries);
 
@@ -250,15 +258,15 @@ public class XWikiContextContextStore extends AbstractContextStore
             save((key, subkey) -> {
                 switch (subkey) {
                     case SUFFIX_PROP_REQUEST_BASE:
-                        saveRequestBase(contextStore, key, request);
+                        saveRequestBase(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_URL:
-                        saveRequestURL(contextStore, key, request);
+                        saveRequestURL(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_PARAMETERS:
-                        saveRequestParameters(contextStore, key, request);
+                        saveRequestParameters(contextStore, request);
                         break;
 
                     case SUFFIX_PROP_REQUEST_WIKI:
@@ -274,12 +282,12 @@ public class XWikiContextContextStore extends AbstractContextStore
         }
     }
 
-    private void saveRequestBase(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestBase(Map<String, Serializable> contextStore, XWikiRequest request)
     {
         URL url = HttpServletUtils.getSourceURL(request);
 
         try {
-            contextStore.put(key, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
+            contextStore.put(PROP_REQUEST_BASE, new URL(url.getProtocol(), url.getHost(), url.getPort(), ""));
         } catch (MalformedURLException e) {
             // Cannot happen
         }
@@ -287,9 +295,9 @@ public class XWikiContextContextStore extends AbstractContextStore
         saveRequestContextPath(contextStore, request);
     }
 
-    private void saveRequestURL(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestURL(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, HttpServletUtils.getSourceURL(request));
+        contextStore.put(PROP_REQUEST_URL, HttpServletUtils.getSourceURL(request));
 
         saveRequestContextPath(contextStore, request);
     }
@@ -299,15 +307,15 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_CONTEXTPATH, request.getContextPath());
     }
 
-    private void saveRequestParameters(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestParameters(Map<String, Serializable> contextStore, XWikiRequest request)
     {
-        contextStore.put(key, new LinkedHashMap<>(request.getParameterMap()));
+        contextStore.put(PROP_REQUEST_PARAMETERS, new LinkedHashMap<>(request.getParameterMap()));
     }
 
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
-        saveRequestURL(contextStore, key, request);
-        saveRequestParameters(contextStore, key, request);
+        saveRequestURL(contextStore, request);
+        saveRequestParameters(contextStore, request);
     }
 
     @Override
@@ -339,6 +347,11 @@ public class XWikiContextContextStore extends AbstractContextStore
         // Locale
         if (contextStore.containsKey(PROP_LOCALE)) {
             xcontext.setLocale((Locale) contextStore.get(PROP_LOCALE));
+        }
+
+        // Action
+        if (contextStore.containsKey(PROP_ACTION)) {
+            xcontext.setAction((String) contextStore.get(PROP_ACTION));
         }
 
         // Document
@@ -424,7 +437,13 @@ public class XWikiContextContextStore extends AbstractContextStore
     private void restoreDocument(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         if (contextStore.containsKey(PROP_DOCUMENT_REFERENCE)) {
-            restoreDocument((DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE), xcontext);
+            DocumentReference document = (DocumentReference) contextStore.get(PROP_DOCUMENT_REFERENCE);
+            restoreDocument(document, xcontext);
+
+            // Set the document's wiki when it's not explicitly set
+            if (storedWikiId == null) {
+                xcontext.setWikiReference(document.getWikiReference());
+            }
         } else if (storedWikiId != null) {
             // If no document reference is provided get the wiki home page
             try {

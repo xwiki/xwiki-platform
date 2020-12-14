@@ -20,10 +20,12 @@
 
 module.exports = {
   // See https://cli.vuejs.org/config/
-  publicPath: "/xwiki/resources/uicomponents/livedata/",
+  // We don't know the public path at build time so we have to leave it empty and set it at runtime using the
+  // __webpack_public_path__ variable (see https://webpack.js.org/configuration/output/#outputpublicpath).
+  publicPath: '',
   filenameHashing: false,
   chainWebpack: config => {
-    config.optimization.delete("splitChunks");
+    // Provided dependencies (that shouldn't be bundled).
     config.externals({
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",

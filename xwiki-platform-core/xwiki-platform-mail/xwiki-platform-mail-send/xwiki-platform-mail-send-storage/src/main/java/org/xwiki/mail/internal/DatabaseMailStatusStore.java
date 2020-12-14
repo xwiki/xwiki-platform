@@ -29,8 +29,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -39,7 +37,6 @@ import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
@@ -80,14 +77,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
             // Delete any previous state of the message
             delete(status.getMessageId(), parameters);
 
-            store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
-            {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    session.save(status);
-                    return null;
-                }
+            store.executeWrite(xwikiContext, session -> {
+                session.save(status);
+                return null;
             });
 
             // Log the save for debugging purpose
@@ -103,7 +95,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     public MailStatus load(String uniqueMessageId) throws MailStoreException
     {
         List<MailStatus> statuses =
-            load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, uniqueMessageId), 0, 0, null, false);
+            load(Collections.singletonMap(ID_PARAMETER_NAME, uniqueMessageId), 0, 0, null, false);
         if (statuses.isEmpty()) {
             return null;
         }
@@ -129,22 +121,17 @@ public class DatabaseMailStatusStore implements MailStatusStore
 
         try {
             List<MailStatus> mailStatuses =
-                store.executeRead(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
-                {
-                    @Override
-                    public List<MailStatus> doInHibernate(Session session) throws HibernateException, XWikiException
-                    {
-                        Query<MailStatus> query = session.createQuery(queryString, MailStatus.class);
-                        if (offset > 0) {
-                            query.setFirstResult(offset);
-                        }
-                        if (count > 0) {
-                            query.setMaxResults(count);
-                        }
-                        query.setProperties(filterMap);
-
-                        return query.list();
+                store.executeRead(xwikiContext, session -> {
+                    Query<MailStatus> query = session.createQuery(queryString, MailStatus.class);
+                    if (offset > 0) {
+                        query.setFirstResult(offset);
                     }
+                    if (count > 0) {
+                        query.setMaxResults(count);
+                    }
+                    query.setProperties(filterMap);
+
+                    return query.list();
                 });
 
             // Log loaded statuses
@@ -179,15 +166,10 @@ public class DatabaseMailStatusStore implements MailStatusStore
         final String queryString = computeCountQueryString(filterMap);
 
         try {
-            return store.executeRead(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Long>()
-            {
-                @Override
-                public Long doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    Query<Long> query = session.createQuery(queryString, Long.class);
-                    query.setProperties(filterMap);
-                    return query.uniqueResult();
-                }
+            return store.executeRead(xwikiContext, session -> {
+                Query<Long> query = session.createQuery(queryString, Long.class);
+                query.setProperties(filterMap);
+                return query.uniqueResult();
             });
         } catch (Exception e) {
             throw new MailStoreException(
@@ -209,16 +191,11 @@ public class DatabaseMailStatusStore implements MailStatusStore
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
         try {
-            store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
-            {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    // Delete the message
-                    String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
-                    session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, uniqueMessageId).executeUpdate();
-                    return null;
-                }
+            store.executeWrite(xwikiContext, session -> {
+                // Delete the message
+                String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
+                session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, uniqueMessageId).executeUpdate();
+                return null;
             });
         } catch (Exception e) {
             throw new MailStoreException(String

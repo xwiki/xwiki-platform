@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -47,6 +47,12 @@
       <groupId>org.webjars</groupId>
       <artifactId>vue</artifactId>
       <version>2.6.11</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-livedata-rest</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>
@@ -86,6 +92,9 @@
               <resources>
                 <resource>
                   <directory>${project.build.directory}/vue/dist</directory>
+                  <excludes>
+                    <exclude>demo.html</exclude>
+                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -114,7 +123,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v12.18.3</nodeVersion>
+              <nodeVersion>v10.23.0</nodeVersion>
             </configuration>
           </execution>
           <execution>
@@ -157,7 +166,11 @@
   </build>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <!-- We don't use 'integration-tests' because:
+        * We cannot run the tests on CI yet (Chrome is not installed) and we're waiting for this issue
+          https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker.
+        * We don't have any JavaScript tests ATM anyway -->
+      <id>integration-tests-chrome</id>
       <build>
         <plugins>
           <plugin>

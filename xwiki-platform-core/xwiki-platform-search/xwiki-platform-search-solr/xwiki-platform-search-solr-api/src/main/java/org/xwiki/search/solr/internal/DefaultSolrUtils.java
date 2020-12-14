@@ -130,7 +130,23 @@ public class DefaultSolrUtils implements SolrUtils
      */
     public static final String SOLR_TYPE_BINARY = "binary";
 
+    /**
+     * The name of the type text_general.
+     * 
+     * @since 12.10
+     */
+    public static final String SOLR_TYPE_TEXT_GENERAL = "text_general";
+
+    /**
+     * The name of the type text_generals.
+     * 
+     * @since 12.10
+     */
+    public static final String SOLR_TYPE_TEXT_GENERALS = "text_generals";
+
     private static final String PATTERN_GROUP = "(.+)";
+
+    private static final Pattern PATTERN_OR_AND_NOT = Pattern.compile("(OR|AND|NOT)");
 
     private static final Map<Class<?>, String> CLASS_SUFFIX_MAPPING = new HashMap<>();
 
@@ -352,6 +368,13 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
+        SolrInputDocument document)
+    {
+        document.setField(fieldName, Collections.singletonMap(modifier, toString(fieldValue, valueType)));
+    }
+
+    @Override
     public void setString(String fieldName, Object fieldValue, SolrInputDocument document)
     {
         document.setField(fieldName, toString(fieldValue));
@@ -414,6 +437,16 @@ public class DefaultSolrUtils implements SolrUtils
         return str;
     }
 
+    private String toFilterQueryString(String fieldValue)
+    {
+        String escaped = ClientUtils.escapeQueryChars(fieldValue);
+
+        // ClientUtils does not escape OR/AND/NOT
+        escaped = PATTERN_OR_AND_NOT.matcher(escaped).replaceAll("\\\\$1");
+
+        return escaped;
+    }
+
     @Override
     public String toFilterQueryString(Object fieldValue)
     {
@@ -425,7 +458,7 @@ public class DefaultSolrUtils implements SolrUtils
         if (fieldValue instanceof Date) {
             str = ((Date) fieldValue).toInstant().toString();
         } else {
-            str = ClientUtils.escapeQueryChars(toString(fieldValue));
+            str = toFilterQueryString(toString(fieldValue));
         }
 
         return str;
@@ -434,6 +467,10 @@ public class DefaultSolrUtils implements SolrUtils
     @Override
     public String toFilterQueryString(Object fieldValue, Type valueType)
     {
+        if (fieldValue == null) {
+            return null;
+        }
+
         Object value = fieldValue;
         if (!TypeUtils.isInstance(fieldValue, valueType)) {
             value = this.converter.convert(valueType, fieldValue);
@@ -443,7 +480,7 @@ public class DefaultSolrUtils implements SolrUtils
         if (value instanceof Date) {
             str = ((Date) value).toInstant().toString();
         } else {
-            str = ClientUtils.escapeQueryChars(toString(value, valueType));
+            str = toFilterQueryString(toString(value, valueType));
         }
 
         return str;

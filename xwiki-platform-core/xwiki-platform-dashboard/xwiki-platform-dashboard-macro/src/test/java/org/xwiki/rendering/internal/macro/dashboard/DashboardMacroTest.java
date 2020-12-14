@@ -21,8 +21,7 @@ package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.Collections;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.properties.BeanDescriptor;
@@ -32,10 +31,13 @@ import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardRenderer;
 import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,56 +47,54 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class DashboardMacroTest
+@ComponentTest
+class DashboardMacroTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DashboardMacro> mocker =
-        new MockitoComponentMockingRule<>(DashboardMacro.class);
+    @InjectMockComponents
+    private DashboardMacro macro;
+
+    @MockComponent
+    private BeanManager beanManager;
+
+    @MockComponent
+    private Execution execution;
 
     @Test
-    public void executeWhenInsideDashboardMacro() throws Exception
+    void executeWhenInsideDashboardMacro()
     {
-        BeanManager beanManager = this.mocker.getInstance(BeanManager.class);
         BeanDescriptor descriptor = mock(BeanDescriptor.class);
-        when(beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
+        when(this.beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
         when(descriptor.getProperties()).thenReturn(Collections.emptyList());
 
-        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext ec = new ExecutionContext();
-        when(execution.getContext()).thenReturn(ec);
+        when(this.execution.getContext()).thenReturn(ec);
         ec.setProperty("dashboardMacroCalls", 1);
 
         DashboardMacroParameters parameters = new DashboardMacroParameters();
         MacroTransformationContext macroContext = new MacroTransformationContext();
 
-        try {
-            this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
-            fail("Exception should have been raised here");
-        } catch (MacroExecutionException expected) {
-            assertEquals("Dashboard macro recursion detected. Don't call the Dashboard macro inside of itself...",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.macro.execute(parameters, "", macroContext));
+        assertEquals("Dashboard macro recursion detected. Don't call the Dashboard macro inside of itself...",
+            exception.getMessage());
     }
 
     @Test
-    public void executeWhenNotInsideDashboardMacro() throws Exception
+    void executeWhenNotInsideDashboardMacro(MockitoComponentManager componentManager) throws Exception
     {
-        BeanManager beanManager = this.mocker.getInstance(BeanManager.class);
         BeanDescriptor descriptor = mock(BeanDescriptor.class);
-        when(beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
+        when(this.beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
         when(descriptor.getProperties()).thenReturn(Collections.emptyList());
 
-        DashboardRenderer renderer = this.mocker.registerMockComponent(DashboardRenderer.class, "columns");
+        componentManager.registerMockComponent(DashboardRenderer.class, "columns");
+        componentManager.registerMockComponent(GadgetRenderer.class);
 
-        GadgetRenderer gadgetRenderer = this.mocker.registerMockComponent(GadgetRenderer.class);
-
-        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext ec = new ExecutionContext();
-        when(execution.getContext()).thenReturn(ec);
+        when(this.execution.getContext()).thenReturn(ec);
 
         DashboardMacroParameters parameters = new DashboardMacroParameters();
         MacroTransformationContext macroContext = new MacroTransformationContext();
-        this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
+        this.macro.execute(parameters, "", macroContext);
 
         // We verify that the counter ends up at 0 so that calls to subsequent dashboard macros can succeed.
         assertEquals(0, ec.getProperty("dashboardMacroCalls"));

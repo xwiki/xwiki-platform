@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * The content of a template.
@@ -41,7 +40,6 @@ public interface TemplateContent
      * @version $Id$
      * @since 11.8RC1
      */
-    @Unstable
     enum UniqueContext
     {
         /**
@@ -116,7 +114,6 @@ public interface TemplateContent
      * @return true if the result be reused several times
      * @since 11.8RC1
      */
-    @Unstable
     default boolean isCacheAllowed()
     {
         return false;
@@ -126,7 +123,6 @@ public interface TemplateContent
      * @return true if the execution should be asynchronous when possible
      * @since 11.8RC1
      */
-    @Unstable
     default boolean isAsyncAllowed()
     {
         return false;
@@ -136,7 +132,6 @@ public interface TemplateContent
      * @return the list of context entries to take remember for the execution
      * @since 11.8RC1
      */
-    @Unstable
     default Set<String> getContextEntries()
     {
         return Collections.emptySet();
@@ -146,7 +141,6 @@ public interface TemplateContent
      * @return true if the template should be executed only once even if referenced several times
      * @since 11.8RC1
      */
-    @Unstable
     default UniqueContext getUnique()
     {
         return null;

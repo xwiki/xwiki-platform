@@ -162,7 +162,7 @@ export default {
         $_filters: ["array", {
           property: this.encodingSpecsProperties,
           matchAll: ["boolean"],
-          constrains: ["array", {
+          constraints: ["array", {
             operator: this.encodingSpecsFilterOperators,
             value: ["varchar"],
           }],

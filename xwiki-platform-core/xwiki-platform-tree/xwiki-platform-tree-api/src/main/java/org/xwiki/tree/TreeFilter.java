@@ -22,7 +22,6 @@ package org.xwiki.tree;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to filter tree nodes.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.10
  */
 @Role
-@Unstable
 public interface TreeFilter
 {
     /**

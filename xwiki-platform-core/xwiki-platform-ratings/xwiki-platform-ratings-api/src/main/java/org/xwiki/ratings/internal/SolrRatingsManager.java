@@ -21,6 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -74,7 +75,9 @@ import org.xwiki.user.UserReference;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class SolrRatingsManager implements RatingsManager
 {
-    private static final int AVERAGE_COMPUTATION_BATCH_SIZE = 100;
+    private static final int BULK_OPERATIONS_BATCH_SIZE = 100;
+
+    private static final String FILTER_REFERENCE_OR_PARENTS = "filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))";
 
     private static final String AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE =
         "This rating manager is not configured to store average rating.";
@@ -138,7 +141,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public void setIdentifer(String identifier)
+    public void setIdentifier(String identifier)
     {
         this.identifier = identifier;
     }
@@ -356,6 +359,13 @@ public class SolrRatingsManager implements RatingsManager
     public List<Rating> getRatings(Map<RatingQueryField, Object> queryParameters, int offset, int limit,
         RatingQueryField orderBy, boolean asc) throws RatingsException
     {
+        SolrDocumentList rawRatings = getRawRatings(queryParameters, offset, limit, orderBy, asc);
+        return this.getRatingsFromQueryResult(rawRatings);
+    }
+
+    private SolrDocumentList getRawRatings(Map<RatingQueryField, Object> queryParameters, int offset, int limit,
+        RatingQueryField orderBy, boolean asc) throws RatingsException
+    {
         SolrQuery solrQuery = new SolrQuery()
             .addFilterQuery(this.mapToQuery(queryParameters))
             .setStart(offset)
@@ -364,7 +374,7 @@ public class SolrRatingsManager implements RatingsManager
 
         try {
             QueryResponse query = this.getRatingSolrClient().query(solrQuery);
-            return this.getRatingsFromQueryResult(query.getResults());
+            return query.getResults();
         } catch (SolrServerException | IOException | SolrException e) {
             throw new RatingsException("Error while trying to get ratings", e);
         }
@@ -415,7 +425,7 @@ public class SolrRatingsManager implements RatingsManager
     public long removeRatings(EntityReference entityReference) throws RatingsException
     {
         String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
-        String filterQuery = String.format("filter(%s:%s) AND (filter(%s:%s) OR filter(%s:%s))",
+        String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
             RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
             RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
@@ -430,8 +440,75 @@ public class SolrRatingsManager implements RatingsManager
             result = query.getResults().getNumFound();
             this.getRatingSolrClient().deleteByQuery(filterQuery);
             this.getRatingSolrClient().commit();
+            if (this.getRatingConfiguration().isAverageStored()) {
+                this.getAverageRatingManager().removeAverageRatings(entityReference);
+            }
         } catch (SolrServerException | IOException | SolrException e) {
             throw new RatingsException("Error while trying to remove ratings", e);
+        }
+        return result;
+    }
+
+    @Override
+    public long moveRatings(EntityReference oldReference, EntityReference newReference)
+        throws RatingsException
+    {
+        String escapedEntityReference = this.solrUtils.toFilterQueryString(oldReference, EntityReference.class);
+        String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
+            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
+            RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
+        int offset = 0;
+        SolrDocumentList rawRatings;
+        long result = 0;
+        do {
+            SolrQuery solrQuery = new SolrQuery()
+                .addFilterQuery(filterQuery)
+                .setStart(offset)
+                .setRows(BULK_OPERATIONS_BATCH_SIZE)
+                .setSort(RatingQueryField.CREATED_DATE.getFieldName(), this.getOrder(true));
+
+            try {
+                QueryResponse queryResponse = this.getRatingSolrClient().query(solrQuery);
+                rawRatings = queryResponse.getResults();
+
+                offset += BULK_OPERATIONS_BATCH_SIZE;
+                for (SolrDocument rawRating : rawRatings) {
+                    SolrInputDocument solrInputDocument = new SolrInputDocument();
+                    this.solrUtils.setId(this.solrUtils.getId(rawRating), solrInputDocument);
+
+                    EntityReference ratingReference = this.solrUtils.get(
+                        RatingQueryField.ENTITY_REFERENCE.getFieldName(), rawRating, EntityReference.class);
+
+                    if (oldReference.equals(ratingReference)) {
+                        this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET,
+                            RatingQueryField.ENTITY_REFERENCE.getFieldName(), newReference,
+                            EntityReference.class, solrInputDocument);
+                    }
+
+                    Collection<EntityReference> parentReferences = this.solrUtils
+                        .getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rawRating,
+                            EntityReference.class);
+                    if (parentReferences.contains(oldReference)) {
+                        this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
+                            RatingQueryField.PARENTS_REFERENCE
+                            .getFieldName(), oldReference, EntityReference.class, solrInputDocument);
+                        this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD,
+                            RatingQueryField.PARENTS_REFERENCE
+                                .getFieldName(), newReference, EntityReference.class, solrInputDocument);
+                    }
+                    this.getRatingSolrClient().add(solrInputDocument);
+                    result++;
+                }
+                if (!rawRatings.isEmpty()) {
+                    this.getRatingSolrClient().commit();
+                }
+            } catch (SolrException | IOException | SolrServerException e) {
+                throw new RatingsException("Error while trying to update rating reference", e);
+            }
+        } while (!rawRatings.isEmpty());
+        if (this.getRatingConfiguration().isAverageStored()) {
+            this.getAverageRatingManager().moveAverageRatings(oldReference, newReference);
         }
         return result;
     }
@@ -470,14 +547,14 @@ public class SolrRatingsManager implements RatingsManager
             List<Rating> ratings;
             int offsetIndex = 0;
             do {
-                ratings = this.getRatings(queryMap, offsetIndex, AVERAGE_COMPUTATION_BATCH_SIZE,
+                ratings = this.getRatings(queryMap, offsetIndex, BULK_OPERATIONS_BATCH_SIZE,
                     RatingQueryField.CREATED_DATE, true);
                 sumOfVotes += ratings.stream().map(Rating::getVote).map(Long::valueOf).reduce(0L, Long::sum);
                 numberOfVotes += ratings.size();
-                offsetIndex += AVERAGE_COMPUTATION_BATCH_SIZE;
+                offsetIndex += BULK_OPERATIONS_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
-            float newAverage = sumOfVotes / numberOfVotes;
+            float newAverage = Float.valueOf(sumOfVotes) / numberOfVotes;
             return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);

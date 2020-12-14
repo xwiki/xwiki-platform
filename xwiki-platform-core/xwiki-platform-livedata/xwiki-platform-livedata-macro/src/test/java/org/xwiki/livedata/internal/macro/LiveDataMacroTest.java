@@ -51,7 +51,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
  * Unit tests for {@link LiveDataMacro}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @ComponentTest
 @ComponentList({HTML5RendererFactory.class, HTML5Renderer.class, DefaultXHTMLLinkRenderer.class,
@@ -102,8 +102,8 @@ class LiveDataMacroTest
         expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
         expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
         expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {'property':'position','readOnly':true,'constraints':[{'value':'lead'}]},".trim());
-        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]}".trim());
+        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]},".trim());
+        expectedConfig.append("      {'property':'position','constraints':[{'value':'lead'}]}".trim());
         expectedConfig.append("    ],".trim());
         expectedConfig.append("    'sort':[".trim());
         expectedConfig.append("      {'property':'firstName'},".trim());
@@ -133,8 +133,7 @@ class LiveDataMacroTest
         parameters.setSourceParameters("wiki=dev&group=apps");
         parameters.setProperties("avatar, firstName, lastName, position");
         parameters.setSort("firstName, lastName:desc, position:asc");
-        parameters.setHiddenFilters("position=lead");
-        parameters.setFilters("firstName=m");
+        parameters.setFilters("firstName=m&position=lead");
         parameters.setLimit(10);
         parameters.setOffset(20L);
         parameters.setLayouts("table, cards");

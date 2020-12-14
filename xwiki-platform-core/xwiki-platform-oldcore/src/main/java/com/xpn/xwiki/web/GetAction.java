@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -31,6 +36,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("get")
+@Singleton
 public class GetAction extends XWikiAction
 {
     /**

@@ -85,6 +85,19 @@
     }
   },
   {
+    "id":"Levels",
+    "sortable":true,
+    "filterable":true,
+    "filter":{
+      "id":"list",
+      "operators":[
+        {"id":"equals","name":"equals"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"contains","name":"contains"}
+      ]
+    }
+  },
+  {
     "id":"Number",
     "sortable":true,
     "filterable":true,
@@ -146,6 +159,19 @@
     "sortable":true,
     "filterable":true,
     "displayer":{"id":"html"},
+    "filter":{
+      "id":"text",
+      "operators":[
+        {"id":"contains","name":"contains"},
+        {"id":"startsWith","name":"startsWith"},
+        {"id":"equals","name":"equals"}
+      ]
+    }
+  },
+  {
+    "id":"Timezone",
+    "sortable":true,
+    "filterable":true,
     "filter":{
       "id":"text",
       "operators":[

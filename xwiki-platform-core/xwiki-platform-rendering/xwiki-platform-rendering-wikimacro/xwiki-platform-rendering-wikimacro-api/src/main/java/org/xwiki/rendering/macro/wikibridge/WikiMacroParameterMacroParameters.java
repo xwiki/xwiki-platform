@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for wikimacroparameter macro.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.5RC1
  */
-@Unstable
 public class WikiMacroParameterMacroParameters
 {
     private String name;

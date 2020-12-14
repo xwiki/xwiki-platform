@@ -1284,18 +1284,38 @@ $Msz MB##
  * @param colprops the columns properties
  * @param options the livetable options.
  *#
-#macro(livetable $divid $collist $colprops $options)
+#macro (livetable $divid $collist $colprops $options)
 ## Open wiki syntax wrappers.
 #if("$!options.outputOnlyHtml" != 'true')
 ## Do not indent:
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
-## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
-## attribute values (e.g. if the live table id contains whitespaces)
+## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in
+## the attribute values (e.g. if the live table id contains whitespaces)
 {{html clean="false"}}
 #else {pre} #end
 #end
+#if ($services.liveData.liveTable && $request.useLiveData == 'true')
+#livetable_liveData($divid $collist $colprops $options)
+#else
+#livetable_html($divid $collist $colprops $options)
+#end
+## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
+#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+
+#else{/pre}#end##
+#end## end-wrappers
+#end
+
+#macro (livetable_liveData $divid $collist $colprops $options)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/liveData.js', true))
+  #set ($liveDataConfig = $services.liveData.liveTable.getConfig($divid, $collist, $colprops, $options))
+  #set ($liveDataConfigJSON = $jsontool.serialize($liveDataConfig))
+  <div class="liveData" id="$!escapetool.xml($divid)" data-config="$escapetool.xml($liveDataConfigJSON)"></div>
+#end
+
+#macro(livetable_html $divid $collist $colprops $options)
   ##
   ## SX deps.
   ##
@@ -1492,19 +1512,15 @@ $Msz MB##
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
 </div>## xwiki-livetable-container
-## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
-#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
-
-#else{/pre}#end##
-#end## end-wrappers
 #end## end-livetable-macro
 
 #macro (livetable_filters $columns $columnsProperties $xclassName)
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      #if ($columnProperties.type != 'hidden')
-        <td class="xwiki-livetable-display-header-filter">
+      ## Note: Even though the column is hidden, we still need a TD to generate valid HTML
+      <td class="xwiki-livetable-display-header-filter">
+        #if ($columnProperties.type != 'hidden')
           #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
             #set ($columnXPropertyName = $column)
@@ -1520,8 +1536,8 @@ $Msz MB##
             #set ($xproperty = $xclass.get($columnXPropertyName))
             #livetable_filter($column $columnProperties $xproperty)
           #end
-        </td>
-      #end
+        #end
+      </td>
     #end
   </tr>
 #end

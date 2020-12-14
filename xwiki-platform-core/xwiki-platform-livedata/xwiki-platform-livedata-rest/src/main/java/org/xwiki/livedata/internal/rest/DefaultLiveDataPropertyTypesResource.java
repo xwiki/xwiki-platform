@@ -31,11 +31,11 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataPropertyTypesResource;
 import org.xwiki.livedata.rest.LiveDataSourceResource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.livedata.rest.model.jaxb.Types;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
@@ -44,7 +44,7 @@ import org.xwiki.rest.model.jaxb.Link;
  * Default implementation of {@link LiveDataPropertyTypesResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypesResource")
@@ -53,24 +53,27 @@ public class DefaultLiveDataPropertyTypesResource extends AbstractLiveDataResour
     implements LiveDataPropertyTypesResource
 {
     @Override
-    public Types getTypes(String hint, StringMap sourceParams, String namespace) throws Exception
+    public Types getTypes(String sourceId, String namespace) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            return createPropertyTypes(source.get().getPropertyTypes().get(), hint, namespace);
+            return createPropertyTypes(source.get().getPropertyTypes().get(), querySource, namespace);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
 
-    private Types createPropertyTypes(Collection<LiveDataPropertyDescriptor> propertyTypes, String hint,
+    private Types createPropertyTypes(Collection<LiveDataPropertyDescriptor> propertyTypes, LiveDataQuery.Source source,
         String namespace)
     {
         Link self = new Link().withRel(Relations.SELF).withHref(this.uriInfo.getAbsolutePath().toString());
-        Link parent = withNamespace(createLink(Relations.PARENT, LiveDataSourceResource.class, hint), namespace);
+        Link parent =
+            withNamespaceAndSourceParams(createLink(Relations.PARENT, LiveDataSourceResource.class, source.getId()),
+                namespace, source.getParameters());
 
         List<PropertyDescriptor> types = propertyTypes.stream()
-            .map(propertyType -> createPropertyType(propertyType, hint, namespace)).collect(Collectors.toList());
+            .map(propertyType -> createPropertyType(propertyType, source, namespace)).collect(Collectors.toList());
         return (Types) new Types().withTypes(types).withLinks(self, parent);
     }
 }

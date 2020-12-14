@@ -61,6 +61,8 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 
 /**
  * Common features for all Document sources (ie configuration data coming from wiki pages).
@@ -244,12 +246,20 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return null;
     }
 
-    protected void setBaseProperty(String propertyName, Object propertyValue) throws XWikiException
+    protected void setBaseProperty(String propertyName, Object propertyValue, BaseObject baseObject,
+        BaseClass baseClass)
     {
-        BaseObject baseObject = getBaseObject();
-        if (baseObject != null) {
-            baseObject.set(propertyName, propertyValue, this.xcontextProvider.get());
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // Convert boolean into integer if the target property is of boolean type, since booleans are implemented
+        // as integer in xproperties.
+        Object normalizedPropertyValue = propertyValue;
+        if (baseClass.get(propertyName) instanceof BooleanClass && propertyValue instanceof Boolean)
+        {
+            normalizedPropertyValue = ((Boolean) propertyValue) ? 1 : 0;
         }
+
+        baseObject.set(propertyName, normalizedPropertyValue, xcontext);
     }
 
     @Override
@@ -369,17 +379,21 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     {
         try {
             List<String> setPropertyNames = new ArrayList<>();
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                setBaseProperty(entry.getKey(), entry.getValue());
-                setPropertyNames.add(entry.getKey());
-            }
-            DocumentReference documentReference = getFailsafeDocumentReference();
-            if (documentReference != null) {
+            BaseObject baseObject = getBaseObject();
+            if (baseObject != null) {
                 XWikiContext xcontext = this.xcontextProvider.get();
-                xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
-                    StringUtils.join(setPropertyNames, ',')), xcontext);
-            } else {
-                // The configuration document doesn't exist, don't do anything
+                BaseClass baseClass = baseObject.getXClass(xcontext);
+                for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                    setBaseProperty(entry.getKey(), entry.getValue(), baseObject, baseClass);
+                    setPropertyNames.add(entry.getKey());
+                }
+                DocumentReference documentReference = getFailsafeDocumentReference();
+                if (documentReference != null) {
+                    xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
+                        StringUtils.join(setPropertyNames, ',')), xcontext);
+                } else {
+                    // The configuration document doesn't exist, don't do anything
+                }
             }
         } catch (Exception e) {
             throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "

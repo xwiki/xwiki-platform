@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultLiveDataSourceManager}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @ComponentTest
 class DefaultLiveDataSourceManagerTest
@@ -127,7 +127,7 @@ class DefaultLiveDataSourceManagerTest
         when(this.contextComponentManager.getInstance(LiveDataSource.class, "test")).thenReturn(this.source);
 
         Map<String, Object> sourceParams = new HashMap<>();
-        when(((WithParameters) this.source).getParameters()).thenReturn(sourceParams);
+        when(this.source.getParameters()).thenReturn(sourceParams);
 
         assertSame(this.source, this.sourceManager.get(sourceInfo).get());
         assertEquals("value", sourceParams.get("key"));

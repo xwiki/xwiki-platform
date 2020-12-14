@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.stability.Unstable;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * Holds the layout configuration.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
@@ -90,5 +91,15 @@ public class LiveDataLayoutDescriptor extends BaseDescriptor
     public void setIcon(Map<String, Object> icon)
     {
         this.icon = icon;
+    }
+
+    /**
+     * Prevent {@code null} values where it's possible.
+     */
+    public void initialize()
+    {
+        if (this.icon == null) {
+            this.icon = new HashMap<>();
+        }
     }
 }

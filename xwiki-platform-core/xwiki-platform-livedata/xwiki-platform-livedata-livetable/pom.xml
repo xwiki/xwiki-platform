@@ -25,14 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>12.9-SNAPSHOT</version>
+    <version>13.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-livetable</artifactId>
   <name>XWiki Platform - Live Data - Live Table Connector</name>
   <description>Adds support for reusing existing Live Table results as a Live Data source.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data - Live Table Connector</xwiki.extension.name>
   </properties>

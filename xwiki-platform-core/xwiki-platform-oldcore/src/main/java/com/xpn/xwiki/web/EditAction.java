@@ -19,12 +19,15 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -37,6 +40,9 @@ import com.xpn.xwiki.doc.XWikiLock;
  *
  * @version $Id$
  */
+@Component
+@Named("edit")
+@Singleton
 public class EditAction extends XWikiAction
 {
     /**
@@ -50,6 +56,12 @@ public class EditAction extends XWikiAction
     public EditAction()
     {
         this.waitForXWikiInitialization = false;
+    }
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
     }
 
     @Override

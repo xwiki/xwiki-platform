@@ -19,11 +19,13 @@
  */
 package org.xwiki.livedata.internal.rest;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
@@ -31,7 +33,6 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
-import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.rest.LiveDataEntriesResource;
 import org.xwiki.livedata.rest.LiveDataEntryResource;
@@ -54,20 +55,32 @@ import org.xwiki.rest.model.jaxb.Link;
  * Base class for live data REST resources.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 public abstract class AbstractLiveDataResource extends XWikiResource
 {
+    private static final String SOURCE_PARAMS_PREFIX = "sourceParams.";
+
     @Inject
     protected LiveDataSourceManager liveDataSourceManager;
 
-    protected Optional<LiveDataSource> getLiveDataSource(String sourceId, Map<String, Object> sourceParams,
-        String namespace)
+    protected LiveDataQuery.Source getLiveDataQuerySource(String sourceId)
     {
-        LiveDataQuery.Source source = new LiveDataQuery.Source();
-        source.setId(sourceId);
-        source.getParameters().putAll(sourceParams);
-        return this.liveDataSourceManager.get(source, namespace);
+        LiveDataQuery.Source source = new LiveDataQuery.Source(sourceId);
+        source.getParameters().putAll(getLiveDataSourceParameters());
+        return source;
+    }
+
+    protected Map<String, Object> getLiveDataSourceParameters()
+    {
+        Map<String, Object> params = new HashMap<>();
+        this.uriInfo.getQueryParameters().forEach((key, values) -> {
+            if (key.startsWith(SOURCE_PARAMS_PREFIX)) {
+                Object value = values.size() == 1 ? values.get(0) : values;
+                params.put(key.substring(SOURCE_PARAMS_PREFIX.length()), value);
+            }
+        });
+        return params;
     }
 
     protected Link createLink(String relation, java.lang.Class<?> resourceClass, java.lang.Object... pathElements)
@@ -76,40 +89,61 @@ public abstract class AbstractLiveDataResource extends XWikiResource
         return new Link().withRel(relation).withHref(href);
     }
 
-    protected Source createSource(String hint, StringMap parameters, String namespace)
+    protected Source createSource(LiveDataQuery.Source source, String namespace)
     {
-        Link self = withNamespace(createLink(Relations.SELF, LiveDataSourceResource.class, hint), namespace);
+        Link self =
+            withNamespaceAndSourceParams(createLink(Relations.SELF, LiveDataSourceResource.class, source.getId()),
+                namespace, source.getParameters());
 
         Link parent = withNamespace(createLink(Relations.PARENT, LiveDataSourcesResource.class), namespace);
 
-        Link entries = withNamespace(
-            createLink("http://www.xwiki.org/rel/entries", LiveDataEntriesResource.class, hint), namespace);
+        Link entries = withNamespaceAndSourceParams(
+            createLink("http://www.xwiki.org/rel/entries", LiveDataEntriesResource.class, source.getId()), namespace,
+            source.getParameters());
 
-        Link properties =
-            withNamespace(createLink(Relations.PROPERTIES, LiveDataPropertiesResource.class, hint), namespace);
+        Link properties = withNamespaceAndSourceParams(
+            createLink(Relations.PROPERTIES, LiveDataPropertiesResource.class, source.getId()), namespace,
+            source.getParameters());
 
-        Link propertyTypes = withNamespace(
-            createLink("http://www.xwiki.org/rel/propertyTypes", LiveDataPropertyTypesResource.class, hint), namespace);
+        Link propertyTypes = withNamespaceAndSourceParams(
+            createLink("http://www.xwiki.org/rel/propertyTypes", LiveDataPropertyTypesResource.class, source.getId()),
+            namespace, source.getParameters());
 
-        return (Source) new Source().withHint(hint).withLinks(self, parent, entries, properties, propertyTypes);
+        return (Source) new Source().withHint(source.getId()).withLinks(self, parent, entries, properties,
+            propertyTypes);
     }
 
     protected Link withNamespace(Link link, String namespace)
     {
-        if (!StringUtils.isEmpty(namespace)) {
-            try {
-                link.setHref(link.getHref() + "?namespace=" + URLEncoder.encode(namespace, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // Shouldn't happen.
-            }
+        return withNamespaceAndSourceParams(link, namespace, Collections.emptyMap());
+    }
+
+    protected Link withNamespaceAndSourceParams(Link link, String namespace, Map<String, Object> sourceParams)
+    {
+        try {
+            link.setHref(withNamespaceAndSourceParams(new URI(link.getHref()), namespace, sourceParams).toString());
+        } catch (URISyntaxException e) {
+            // Shouldn't happen.
         }
         return link;
     }
 
-    protected URI withNamespaceAndParams(URI uri, String namespace, StringMap sourceParams)
+    protected URI withNamespaceAndSourceParams(URI uri, String namespace, Map<String, Object> sourceParams)
     {
-        return UriBuilder.fromUri(uri).queryParam("namespace", namespace)
-            .queryParam("sourceParams", sourceParams.toString()).build();
+        UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+        if (!StringUtils.isEmpty(namespace)) {
+            uriBuilder.queryParam("namespace", namespace);
+        }
+        sourceParams.entrySet().forEach(entry -> {
+            Iterable<?> values;
+            if (entry.getValue() instanceof Iterable) {
+                values = (Iterable<?>) entry.getValue();
+            } else {
+                values = Collections.singletonList(entry.getValue());
+            }
+            values.forEach(value -> uriBuilder.queryParam(SOURCE_PARAMS_PREFIX + entry.getKey(), value));
+        });
+        return uriBuilder.build();
     }
 
     protected PropertyDescriptor createPropertyDescriptor(LiveDataPropertyDescriptor descriptor)
@@ -127,47 +161,58 @@ public abstract class AbstractLiveDataResource extends XWikiResource
             .withStyleName(descriptor.getStyleName());
     }
 
-    protected PropertyDescriptor createProperty(LiveDataPropertyDescriptor descriptor, String sourceHint,
+    protected PropertyDescriptor createProperty(LiveDataPropertyDescriptor descriptor, LiveDataQuery.Source source,
         String namespace)
     {
         PropertyDescriptor property = createPropertyDescriptor(descriptor);
 
-        Link self = withNamespace(
-            createLink(Relations.SELF, LiveDataPropertyResource.class, sourceHint, property.getId()), namespace);
+        Link self = withNamespaceAndSourceParams(
+            createLink(Relations.SELF, LiveDataPropertyResource.class, source.getId(), property.getId()), namespace,
+            source.getParameters());
         property.getLinks().add(self);
 
         Link parent =
-            withNamespace(createLink(Relations.PARENT, LiveDataPropertiesResource.class, sourceHint), namespace);
+            withNamespaceAndSourceParams(createLink(Relations.PARENT, LiveDataPropertiesResource.class, source.getId()),
+                namespace, source.getParameters());
         property.getLinks().add(parent);
 
         return property;
     }
 
-    protected PropertyDescriptor createPropertyType(LiveDataPropertyDescriptor descriptor, String sourceHint,
+    protected PropertyDescriptor createPropertyType(LiveDataPropertyDescriptor descriptor, LiveDataQuery.Source source,
         String namespace)
     {
         PropertyDescriptor propertyType = createPropertyDescriptor(descriptor);
 
-        Link self = withNamespace(
-            createLink(Relations.SELF, LiveDataPropertyTypeResource.class, sourceHint, propertyType.getId()),
-            namespace);
+        Link self = withNamespaceAndSourceParams(
+            createLink(Relations.SELF, LiveDataPropertyTypeResource.class, source.getId(), propertyType.getId()),
+            namespace, source.getParameters());
         propertyType.getLinks().add(self);
 
-        Link parent =
-            withNamespace(createLink(Relations.PARENT, LiveDataPropertyTypesResource.class, sourceHint), namespace);
+        Link parent = withNamespaceAndSourceParams(
+            createLink(Relations.PARENT, LiveDataPropertyTypesResource.class, source.getId()), namespace,
+            source.getParameters());
         propertyType.getLinks().add(parent);
 
         return propertyType;
     }
 
-    protected Entry createEntry(Map<String, Object> values, String sourceHint, String namespace)
+    protected Entry createEntry(Map<String, Object> values, Object entryId, LiveDataQuery.Source source,
+        String namespace)
     {
-        Link self = withNamespace(createLink(Relations.SELF, LiveDataEntryResource.class, sourceHint, values.get("id")),
-            namespace);
+        List<Link> links = new ArrayList<>();
 
-        Link parent = withNamespace(createLink(Relations.PARENT, LiveDataEntriesResource.class, sourceHint), namespace);
+        if (entryId != null) {
+            links.add(withNamespaceAndSourceParams(
+                createLink(Relations.SELF, LiveDataEntryResource.class, source.getId(), entryId), namespace,
+                source.getParameters()));
+        }
 
-        return (Entry) new Entry().withValues(StringMap.fromMap(values)).withLinks(self, parent);
+        links.add(
+            withNamespaceAndSourceParams(createLink(Relations.PARENT, LiveDataEntriesResource.class, source.getId()),
+                namespace, source.getParameters()));
+
+        return (Entry) new Entry().withValues(StringMap.fromMap(values)).withLinks(links);
     }
 
     protected LiveDataPropertyDescriptor convert(PropertyDescriptor descriptor)

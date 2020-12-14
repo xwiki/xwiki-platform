@@ -19,20 +19,21 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Source;
@@ -44,7 +45,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Adds default values to a live data configuration.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Singleton
@@ -62,11 +63,21 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private JSONMerge jsonMerge = new JSONMerge();
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
+    public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
         try {
-            Source source = input.getQuery() != null ? input.getQuery().getSource() : null;
-            return translate(this.jsonMerge.merge(getDefaultConfig(source), input));
+            Source source = config.getQuery() != null ? config.getQuery().getSource() : null;
+
+            LiveDataConfiguration defaultConfig = getDefaultConfig(source);
+            // Make sure both configurations have the same id so that they are properly merged.
+            defaultConfig.setId(config.getId());
+
+            LiveDataConfiguration mergedConfig = this.jsonMerge.merge(defaultConfig, config);
+            // Prevent null values (make the configuration explicit).
+            mergedConfig.initialize();
+
+            // Translate using the context locale.
+            return translate(mergedConfig);
         } catch (IOException e) {
             throw new LiveDataException(e);
         }
@@ -74,11 +85,9 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
 
     private LiveDataConfiguration getDefaultConfig(Source sourceConfig) throws LiveDataException, IOException
     {
-        File configFile = new File(getClass().getResource("/liveDataConfiguration.json").getFile());
-        String configJSON = FileUtils.readFileToString(configFile, "UTF-8");
+        InputStream configInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
+        String configJSON = IOUtils.toString(configInputStream, "UTF-8");
         LiveDataConfiguration config = this.stringLiveDataConfigResolver.resolve(configJSON);
-
-        config.initialize();
 
         Source actualSourceConfig = sourceConfig;
         if (actualSourceConfig == null) {
@@ -87,6 +96,9 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         if (actualSourceConfig != null) {
             Optional<LiveDataSource> source = this.sourceManager.get(actualSourceConfig);
             if (source.isPresent()) {
+                LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
+                entryDescriptor.setIdProperty(source.get().getEntries().getIdProperty());
+                config.getMeta().setEntryDescriptor(entryDescriptor);
                 config.getMeta().setPropertyDescriptors(source.get().getProperties().get());
                 config.getMeta().setPropertyTypes(source.get().getPropertyTypes().get());
             }

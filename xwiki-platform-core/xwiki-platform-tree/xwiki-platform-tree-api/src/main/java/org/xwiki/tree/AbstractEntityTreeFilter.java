@@ -27,7 +27,6 @@ import javax.inject.Named;
 
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.converter.Converter;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for entity tree filters.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.10
  */
-@Unstable
 public abstract class AbstractEntityTreeFilter implements TreeFilter, EntityTreeFilter
 {
     @Inject

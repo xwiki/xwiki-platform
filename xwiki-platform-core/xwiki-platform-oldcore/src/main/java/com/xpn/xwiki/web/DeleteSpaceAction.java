@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -28,6 +33,9 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 3.4M1
  */
+@Component
+@Named("deletespace")
+@Singleton
 public class DeleteSpaceAction extends DeleteAction
 {
     @Override

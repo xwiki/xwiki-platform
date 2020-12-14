@@ -21,7 +21,6 @@ package org.xwiki.security.authentication.api;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * This event occurs when a login authentication failure reach the level defined in the configuration (e.g. an user
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 11.6RC1
  */
-@Unstable
 public class AuthenticationFailureLimitReachedEvent implements Event
 {
     @Override

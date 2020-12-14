@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -30,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,6 +42,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  */
+@Component
+@Named("saveandcontinue")
+@Singleton
 public class SaveAndContinueAction extends XWikiAction
 {
 
@@ -62,6 +68,18 @@ public class SaveAndContinueAction extends XWikiAction
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
+    protected String getName()
+    {
+        return "save";
+    }
 
     /**
      * Perform the internal action implied by the save and continue request. If the request is an ajax request,

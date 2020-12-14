@@ -22,7 +22,6 @@ package com.xpn.xwiki.objects.classes;
 import javax.script.ScriptContext;
 
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -104,7 +103,6 @@ public class ComputedFieldClass extends PropertyClass
      * @throws Exception in case an error occurs
      * @since 11.8RC1
      */
-    @Unstable
     public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws
             Exception
     {

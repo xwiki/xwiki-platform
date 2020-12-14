@@ -327,6 +327,8 @@
     var source = createSourceUI(sourceTemplate.clone(), sourceFormHTML);
     searchEngines.next('.tab-content').find(searchEngines.find('li.active a').attr('href'))
       .find('ul.searchSuggestSources').append(source);
+    // Let the others know that the DOM has been updated (e.g. to enhance the source fields with pickers).
+    $(document).trigger('xwiki:dom:updated', {'elements': source.toArray()});
   }
   $('.addSearchSuggestSource').click(function(event) {
     event.stopPropagation();

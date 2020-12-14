@@ -30,14 +30,13 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 import org.xwiki.stability.Unstable;
 
 /**
  * Represents a live data property.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/properties/{propertyId}")
 @Unstable
@@ -47,57 +46,51 @@ public interface LiveDataPropertyResource
      * Provides information about a live data property.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
-     * @param propertyId identifies the live data property
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param propertyId identifies the live data property
      * @return the descriptor of the specified live data property
      * @throws Exception if retrieving the property fails
      */
     @GET
     PropertyDescriptor getProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
-        @PathParam("propertyId") String propertyId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @QueryParam("namespace") @DefaultValue("") String namespace,
+        @PathParam("propertyId") String propertyId
     ) throws Exception;
 
     /**
      * Updates the descriptor of a live data property.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
-     * @param propertyId identifies the live data property to update
-     * @param propertyDescriptor the updated descriptor of the specified property
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param propertyId identifies the live data property to update
+     * @param propertyDescriptor the updated descriptor of the specified property
      * @return the response
      * @throws Exception if updating the property fails
      */
     @PUT
     Response updateProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
+        @QueryParam("namespace") @DefaultValue("") String namespace,
         @PathParam("propertyId") String propertyId,
-        PropertyDescriptor propertyDescriptor,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        PropertyDescriptor propertyDescriptor
     ) throws Exception;
 
     /**
      * Deletes a live data property.
      * 
      * @param sourceId indicates the {@link LiveDataSource} component implementation
-     * @param sourceParams optional live data source parameters
-     * @param propertyId identifies the live data property to delete
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
+     * @param propertyId identifies the live data property to delete
      * @throws Exception if deleting the specified property fails
      */
     @DELETE
     void deleteProperty(
         @PathParam("sourceId") String sourceId,
-        @QueryParam("sourceParams") @DefaultValue("{}") StringMap sourceParams,
-        @PathParam("propertyId") String propertyId,
-        @QueryParam("namespace") @DefaultValue("") String namespace
+        @QueryParam("namespace") @DefaultValue("") String namespace,
+        @PathParam("propertyId") String propertyId
     ) throws Exception;
 }

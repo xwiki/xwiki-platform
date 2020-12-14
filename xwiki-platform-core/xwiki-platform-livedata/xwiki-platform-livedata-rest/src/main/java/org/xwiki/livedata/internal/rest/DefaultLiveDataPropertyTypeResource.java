@@ -28,16 +28,16 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataPropertyTypeResource;
 import org.xwiki.livedata.rest.model.jaxb.PropertyDescriptor;
-import org.xwiki.livedata.rest.model.jaxb.StringMap;
 
 /**
  * Default implementation of {@link LiveDataPropertyTypeResource}.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypeResource")
@@ -46,13 +46,14 @@ public class DefaultLiveDataPropertyTypeResource extends AbstractLiveDataResourc
     implements LiveDataPropertyTypeResource
 {
     @Override
-    public PropertyDescriptor getType(String hint, StringMap sourceParams, String id, String namespace) throws Exception
+    public PropertyDescriptor getType(String sourceId, String namespace, String typeId) throws Exception
     {
-        Optional<LiveDataSource> source = getLiveDataSource(hint, sourceParams, namespace);
+        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            Optional<LiveDataPropertyDescriptor> propertyType = source.get().getPropertyTypes().get(id);
+            Optional<LiveDataPropertyDescriptor> propertyType = source.get().getPropertyTypes().get(typeId);
             if (propertyType.isPresent()) {
-                return createPropertyType(propertyType.get(), hint, namespace);
+                return createPropertyType(propertyType.get(), querySource, namespace);
             }
         }
 

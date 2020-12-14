@@ -20,7 +20,8 @@
 package org.xwiki.rendering.async.internal.service;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,17 +55,15 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
         Map<String, Object> parameters) throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         List<String> pathSegments = representation.getSegments();
-        if (!pathSegments.isEmpty()) {
-            StringBuilder pathBuilder = new StringBuilder();
+
+        // Decode again the path segments which have been double escaped to avoid problems with the ridiculous default
+        // behavior of Tomcat regarding / and \
+        List<String> id = new ArrayList<>(pathSegments.size());
+        for (String pathSegment : representation.getSegments()) {
             try {
-                for (String pathSegment : representation.getSegments()) {
-                    if (pathBuilder.length() > 0) {
-                        pathBuilder.append('/');
-                    }
-                    pathBuilder.append(URLEncoder.encode(pathSegment, "UTF8"));
-                }
+                id.add(URLDecoder.decode(pathSegment, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                // Should never happen
+                throw new CreateResourceReferenceException("Failed to decode the path segment", e);
             }
         }
 
@@ -78,7 +77,7 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
 
         String wiki = getParameter(representation, "wiki");
 
-        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId, timeout, wiki);
+        return new AsyncRendererResourceReference(resourceType, id, clientId, timeout, wiki);
     }
 
     private String getParameter(ExtendedURL representation, String key)

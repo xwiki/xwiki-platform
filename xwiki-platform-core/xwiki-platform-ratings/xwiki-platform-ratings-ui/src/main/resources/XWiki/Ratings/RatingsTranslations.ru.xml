@@ -39,16 +39,14 @@
   <content>admin.ratings=Рейтинги
 
 rating.rate=Оценить!
-### Missing: rating.saveexception=Error when saving the rating.
-### Missing: rating.votenotvalid=You cannot vote with 0 value.
-### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
-### Missing: rating.setvote.inprogress=Your vote is being saved...
-### Missing: rating.setvote.success=Your vote has been saved!
-### Missing: rating.setvote.error=Error when saving your vote.
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Enable
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled_yes=Disable
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
+rating.saveexception=Ошибка при сохранении рейтинга.
+rating.votenotvalid=Вы не можете проголосовать с нулевым значением.
+rating.voteoutofbounds=Голосование вышло за пределы шкалы.
+rating.setvote.inprogress=Ваш голос сохраняется...
+rating.setvote.success=Ваш голос учтен!
+rating.setvote.error=Ошибка при сохранении вашего голоса.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Включить оценки
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Включение рейтингов позволяет пользователям голосовать на страницах и отображать среднее количество голосов. Их отключение не удаляет существующий голос, а просто скрывает интерфейс.
 
 #@deprecatedstart
 

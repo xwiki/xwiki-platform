@@ -41,6 +41,9 @@
 
 
 <script>
+// eslint-disable-next-line camelcase
+__webpack_public_path__ = window.liveDataBaseURL;
+
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";

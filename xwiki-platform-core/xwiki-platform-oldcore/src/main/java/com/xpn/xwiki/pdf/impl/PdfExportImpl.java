@@ -48,8 +48,6 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -109,6 +107,8 @@ public class PdfExportImpl implements PdfExport
 
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+
+    private static XMLReaderFactory xmlReaderFactory = Utils.getComponent(XMLReaderFactory.class);
 
     /**
      * Used to get the temporary directory.
@@ -236,8 +236,15 @@ public class PdfExportImpl implements PdfExport
      */
     private String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
-        String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        String xmlfo = null;
+        try (InputStream stream = getXhtml2FopXslt(context)) {
+            xmlfo = applyXSLT(xhtml, stream);
+        } catch (IOException e) {
+            LOGGER.error("Failed to close the XSLT stream", e);
+        }
+
         LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
+
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 
@@ -329,26 +336,10 @@ public class PdfExportImpl implements PdfExport
             XHTMLDocumentFactory docFactory = XHTMLDocumentFactory.getInstance();
             SAXReader reader = new SAXReader(docFactory);
 
-            // Dom4J 2.1.1 disables external DTDs by default, which is required here, putting it back.
+            // Dom4J 2.1.1 disables external DTDs by default, so we set our own XMLReader.
             // See https://github.com/dom4j/dom4j/issues/51
-            try {
-                reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
-            } catch (SAXNotSupportedException | SAXNotRecognizedException e) {
-                // We ingore these 2 exceptions to properly handle the case when a non-Xerces parser is provided by
-                // JAXP. Here are the possible flows:
-                //
-                // A) JAXP gives a Xerces instance:
-                // dom4j 2.1.1 sets "http://apache.org/xml/features/nonvalidating/load-external-dtd" to false,
-                // to disable DTD. No exception is thrown.
-                // XWiki sets "http://apache.org/xml/features/nonvalidating/load-external-dtd" to true, to enable DTD
-                // loading. No exception.
-                //
-                // B) JAXP gives a non-Xerces instance:
-                // dom4j 2.1.1 sets "http://apache.org/xml/features/nonvalidating/load-external-dtd" to false. The
-                // feature is not recognized: exception is thrown and ignored.
-                // XWiki sets "http://apache.org/xml/features/nonvalidating/load-external-dtd" to true. Exception is
-                // thrown (and was not being ignored). Boom.
-            }
+            XMLReader xmlReader = xmlReaderFactory.createXMLReader();
+            reader.setXMLReader(xmlReader);
 
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
@@ -370,10 +361,7 @@ public class PdfExportImpl implements PdfExport
             XMLWriter writer = new XMLWriter(out, outputFormat);
             writer.write(document);
             String result = out.toString();
-            // Debug output
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("HTML with CSS applied [{}]", result);
-            }
+            LOGGER.debug("HTML with CSS applied [{}]", result);
             return result;
         } catch (Exception e) {
             LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);

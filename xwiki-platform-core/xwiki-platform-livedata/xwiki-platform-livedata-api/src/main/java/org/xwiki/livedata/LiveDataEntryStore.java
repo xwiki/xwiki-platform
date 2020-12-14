@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * The interface used to store and retrieve live data entries.
  * 
  * @version $Id$
- * @since 12.9
+ * @since 12.10
  */
 @Role
 @Unstable
@@ -118,4 +118,9 @@ public interface LiveDataEntryStore
      * @throws LiveDataException if removing the specified entry fails
      */
     Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException;
+
+    /**
+     * @return the property that identifies the live data entries for this store
+     */
+    String getIdProperty();
 }

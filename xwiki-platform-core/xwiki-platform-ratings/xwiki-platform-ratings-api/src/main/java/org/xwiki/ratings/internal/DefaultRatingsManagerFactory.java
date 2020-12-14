@@ -98,7 +98,7 @@ public class DefaultRatingsManagerFactory implements RatingsManagerFactory
 
                 // step 4: set the information of the RatingManager
                 result.setRatingConfiguration(ratingsConfiguration);
-                result.setIdentifer(managerName);
+                result.setIdentifier(managerName);
 
                 // step 5: copy the descriptor and modifies the hint and the instantiation strategy
                 DefaultComponentDescriptor<RatingsManager> componentDescriptorCopy =

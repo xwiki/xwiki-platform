@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to filter entity tree nodes.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.10
  */
 @Role
-@Unstable
 public interface EntityTreeFilter
 {
     /**

@@ -237,6 +237,37 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return $.extend({}, defaultSettings, getDefaultSettings(input), settings, input.data('xwiki-selectize'));
   };
 
+  var isSelectizeValueUpToDate = function(input) {
+    var expectedValues = $(input).val();
+    var actualValues = input.selectize.getValue();
+    if (Array.isArray(expectedValues)) {
+      return Array.isArray(actualValues) && actualValues.length === expectedValues.length &&
+        actualValues.every((actualValue, index) => actualValue === expectedValues[index]);
+    } else {
+      return actualValues === expectedValues;
+    }
+  };
+
+  var updateSelectizeValue = function(input) {
+    var selectize = input.selectize;
+    var values = $(input).val() || [];
+    if (typeof values === 'string') {
+      values = values.split(selectize.settings.delimiter);
+    }
+    // Clear the selection without triggering a change event.
+    selectize.clear(true);
+    values.forEach(value => {
+      if (selectize.options.hasOwnProperty(value)) {
+        // Select a known value without triggering a change event.
+        selectize.addItem(value, true);
+      } else {
+        // Select unknown value.
+        selectize.createItem(value, false);
+      }
+    });
+    loadSelectedValues.call(input);
+  };
+
   $.fn.xwikiSelectize = function(settings) {
     // Save the width before the input is hidden.
     // Each input in the current collection might have a different initial width.
@@ -246,10 +277,16 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return this.not('.selectized, .selectize-control')
       .on('initialize', customize)
       .on('change', function(event) {
-        // Update the live table if the widget is used as a live table filter.
-        var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
-          .closest('.xwiki-livetable').attr('id');
-        liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+        // Check if the value of the selectize widget is synchronized with the value of the underlying input.
+        if (isSelectizeValueUpToDate(this)) {
+          // Update the live table if the widget is used as a live table filter.
+          var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
+            .closest('.xwiki-livetable').attr('id');
+          liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+        } else {
+          // The input value has been changed outside of the selectize widget. Update the widget.
+          updateSelectizeValue(this);
+        }
       })
       // Each input in the current collection might have different in-line settings.
       .each(function() {

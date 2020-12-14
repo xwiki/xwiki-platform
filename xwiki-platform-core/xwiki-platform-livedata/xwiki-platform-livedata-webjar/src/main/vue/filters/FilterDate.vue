@@ -96,7 +96,7 @@ export default {
     },
 
     filterConfig () {
-      if (this.operator === "range") {
+      if (this.operator === "isBetween") {
         return Object.assign({}, this.defaultFilterConfig, {
           singleDatePicker: false,
           ranges: this.ranges,
@@ -110,8 +110,8 @@ export default {
 
   methods: {
     getValue (daterangepicker) {
-      if (this.operator === "range") {
-        return `${daterangepicker.startDate.format(this.format)} - ${daterangepicker.endDate.format(this.format)}`
+      if (this.operator === "isBetween") {
+        return `${daterangepicker.startDate.valueOf()}-${daterangepicker.endDate.valueOf()}`
       } else {
         return daterangepicker.startDate.format(this.format);
       }

@@ -93,76 +93,13 @@ export default {
         }).done(callback).fail(callback);
       };
     },
-
-    // Taken from xwiki-platform-web/src/main/webapp/resources/uicomponents/suggest/xwiki.selectize.js
-    // Customized to work for suggest filter when it needs to be updated
-    // from changes from another suggest filter
-    loadSelectedValues (values) {
-      const selectize = this.$refs.filterSuggest.selectize;
-      const wrapper = selectize.$wrapper;
-      wrapper.addClass(selectize.settings.loadingClass);
-      selectize.loading++;
-      values.reduce((deferred, value) => {
-        return deferred.then(() => {
-          return this.loadSelectedValue(value);
-        });
-      }, $.Deferred().resolve()).always(() => {
-        selectize.loading = Math.max(selectize.loading - 1, 0);
-        if (!selectize.loading) {
-          wrapper.removeClass(selectize.settings.loadingClass);
-        }
-      });
-    },
-
-    // Taken from xwiki-platform-web/src/main/webapp/resources/uicomponents/suggest/xwiki.selectize.js
-    loadSelectedValue (value) {
-      const selectize = this.$refs.filterSuggest.selectize;
-      const deferred = $.Deferred();
-      let load;
-      if (typeof selectize.settings.loadSelected === "function") {
-        load = selectize.settings.loadSelected;
-      } else {
-        load = selectize.settings.load;
-      }
-      if (value && typeof load === "function") {
-        load.call(selectize, value, function (options) {
-          $.isArray(options) && options.forEach(function (option) {
-            const value = option[selectize.settings.valueField];
-            if (selectize.options.hasOwnProperty(value)) {
-              selectize.updateOption(value, option);
-            } else {
-              selectize.addOption(option);
-            }
-          });
-          deferred.resolve();
-        });
-      } else {
-        deferred.resolve();
-      }
-      return deferred.promise();
-    },
   },
 
   // Watch for filter entry value changes
   // When any, update the suggest picker to match corresponding value
   watch: {
     value (newValue, oldValue) {
-      if (newValue === oldValue) { return; }
-      const selectize = this.$refs.filterSuggest.selectize;
-      const valueArray = newValue.split(",");
-      // Update selectize plugin if needed
-      if (selectize.getValue() === newValue) { return; }
-      // Clear all items and add all new items
-      selectize.clear(true);
-      valueArray.forEach((val) => {
-        if (selectize.options.hasOwnProperty(val)) {
-          selectize.addItem(val, true);
-        } else {
-          selectize.createItem(val, false);
-        }
-      });
-      // Load options for selected values
-      this.loadSelectedValues(valueArray);
+      $(this.$refs.filterSuggest).val(newValue).trigger('change');
     },
   },
 

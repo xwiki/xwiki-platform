@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc locale="es">
   <web>XWiki</web>
   <name>XWikiSyntaxGroups</name>
   <language>es</language>
@@ -78,5 +78,9 @@ Algún párrafo incrustado.
 
 Párrafo siguiente en el documento de nivel superior
 )))
-|((({{{(% class="miClase" style="color:blue" %)(((párrafos azules en miClase)))}}})))| (% class="miClase" style="color:blue" %)(((párrafos azules en mi grupo)))</content>
+|((({{{(% class="miClase" style="color:blue" %)(((párrafos azules
+
+ en miClase)))}}})))| (% class="miClase" style="color:blue" %)(((párrafos azules
+
+ en mi grupo)))</content>
 </xwikidoc>

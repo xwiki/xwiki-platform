@@ -243,6 +243,11 @@ public class LiveDataPropertyDescriptor
     private Boolean filterable;
 
     /**
+     * Whether the user can edit this property.
+     */
+    private Boolean editable;
+
+    /**
      * Displayer configuration, specifies how the property value should be displayed or edited.
      */
     private DisplayerDescriptor displayer;
@@ -461,6 +466,28 @@ public class LiveDataPropertyDescriptor
     public void setFilter(FilterDescriptor filter)
     {
         this.filter = filter;
+    }
+
+    /**
+     * @return whether the user can edit the values of this property or not; the returned value can be {@code null} in
+     *         which case the value should be inherited from the property type descriptor
+     */
+    public Boolean isEditable()
+    {
+        return editable;
+    }
+
+    /**
+     * Sets whether the user can edit the values of this property or not. Pass {@code null} to inherit from the property
+     * type descriptor.
+     * 
+     * @param editable {@code true} if the user can edit the values of this property, {@code false} if the user
+     *            shouldn't be able to edit the property values, {@code null} to inherit from the property descriptor
+     *            type
+     */
+    public void setEditable(Boolean editable)
+    {
+        this.editable = editable;
     }
 
     /**

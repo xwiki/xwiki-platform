@@ -160,6 +160,8 @@
     },
     "entryDescriptor":{
       "idProperty":"entryId"
-    }
+    },
+    "actions":[],
+    "selection":{"enabled":false}
   }
 }

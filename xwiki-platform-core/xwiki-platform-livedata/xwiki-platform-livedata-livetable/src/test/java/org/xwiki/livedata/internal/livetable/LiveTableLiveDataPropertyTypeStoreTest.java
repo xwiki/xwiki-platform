@@ -68,9 +68,9 @@ class LiveTableLiveDataPropertyTypeStoreTest
     @Test
     void getOne() throws Exception
     {
-        String expectedJSON = "{'id':'Page','sortable':true,'filterable':true,'displayer':{'id':'html'},"
-            + "'filter':{'id':'suggest','operators':[{'id':'equals','name':'equals'},{'id':'startsWith',"
-            + "'name':'startsWith'},{'id':'contains','name':'contains'}]}}";
+        String expectedJSON = "{'id':'Page','sortable':true,'filterable':true,'editable':true,"
+            + "'displayer':{'id':'html'},'filter':{'id':'suggest','operators':[{'id':'equals','name':'equals'},"
+            + "{'id':'startsWith','name':'startsWith'},{'id':'contains','name':'contains'}]}}";
         LiveDataPropertyDescriptor pageType = this.typeStore.get("Page").get();
         assertEquals(expectedJSON.replace('\'', '"'), objectMapper.writeValueAsString(pageType));
     }

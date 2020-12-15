@@ -60,6 +60,10 @@ public class LiveDataMeta
 
     private LiveDataEntryDescriptor entryDescriptor;
 
+    private Collection<LiveDataActionDescriptor> actions;
+
+    private LiveDataSelectionConfiguration selection;
+
     /**
      * @return the default layout used to display the live data
      */
@@ -241,6 +245,50 @@ public class LiveDataMeta
     }
 
     /**
+     * @return the descriptors of supported live data actions
+     * @since 12.10.1
+     * @since 13.0RC1
+     */
+    public Collection<LiveDataActionDescriptor> getActions()
+    {
+        return actions;
+    }
+
+    /**
+     * Sets the supported actions.
+     * 
+     * @param actions the descriptors for the supported actions
+     * @since 12.10.1
+     * @since 13.0RC1
+     */
+    public void setActions(Collection<LiveDataActionDescriptor> actions)
+    {
+        this.actions = actions;
+    }
+
+    /**
+     * @return the live data entry selection
+     * @since 12.10.1
+     * @since 13.0RC1
+     */
+    public LiveDataSelectionConfiguration getSelection()
+    {
+        return selection;
+    }
+
+    /**
+     * Sets the live data entry selection.
+     * 
+     * @param selection the new live data entry selection
+     * @since 12.10.1
+     * @since 13.0RC1
+     */
+    public void setSelection(LiveDataSelectionConfiguration selection)
+    {
+        this.selection = selection;
+    }
+
+    /**
      * Prevent {@code null} values where it's possible.
      */
     public void initialize()
@@ -278,5 +326,15 @@ public class LiveDataMeta
             this.entryDescriptor = new LiveDataEntryDescriptor();
         }
         this.entryDescriptor.initialize();
+
+        if (this.actions == null) {
+            this.actions = new ArrayList<>();
+        }
+        this.actions.forEach(LiveDataActionDescriptor::initialize);
+
+        if (this.selection == null) {
+            this.selection = new LiveDataSelectionConfiguration();
+        }
+        this.selection.initialize();
     }
 }

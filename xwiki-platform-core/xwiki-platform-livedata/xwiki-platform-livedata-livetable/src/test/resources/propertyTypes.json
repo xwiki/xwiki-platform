@@ -3,6 +3,7 @@
     "id":"Boolean",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"boolean"},
     "filter":{
       "id":"boolean",
@@ -15,12 +16,14 @@
     "id":"ComputedField",
     "sortable":false,
     "filterable":false,
+    "editable":false,
     "displayer":{"id":"html"}
   },
   {
     "id":"DBList",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"suggest",
       "operators":[
@@ -34,6 +37,7 @@
     "id":"DBTreeList",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"suggest",
       "operators":[
@@ -47,6 +51,7 @@
     "id":"Date",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"date"},
     "filter":{
       "id":"date",
@@ -60,6 +65,7 @@
     "id":"Email",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"html"},
     "filter":{
       "id":"text",
@@ -74,6 +80,7 @@
     "id":"Groups",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"html"},
     "filter":{
       "id":"suggest",
@@ -88,6 +95,7 @@
     "id":"Levels",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"list",
       "operators":[
@@ -101,6 +109,7 @@
     "id":"Number",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"number"},
     "filter":{
       "id":"number",
@@ -113,6 +122,7 @@
     "id":"Page",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"html"},
     "filter":{
       "id":"suggest",
@@ -126,12 +136,14 @@
   {
     "id":"Password",
     "sortable":false,
-    "filterable":false
+    "filterable":false,
+    "editable":false
   },
   {
     "id":"StaticList",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"list",
       "operators":[
@@ -145,6 +157,7 @@
     "id":"String",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"text",
       "operators":[
@@ -158,6 +171,7 @@
     "id":"TextArea",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"html"},
     "filter":{
       "id":"text",
@@ -172,6 +186,7 @@
     "id":"Timezone",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "filter":{
       "id":"text",
       "operators":[
@@ -185,6 +200,7 @@
     "id":"Users",
     "sortable":true,
     "filterable":true,
+    "editable":true,
     "displayer":{"id":"html"},
     "filter":{
       "id":"suggest",

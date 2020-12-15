@@ -99,16 +99,14 @@ public class LiveTableLiveDataPropertyTypeStore extends AbstractLiveDataProperty
         if (displayer != null) {
             type.setDisplayer(new DisplayerDescriptor(displayer));
         }
-        if (filter != null) {
-            type.setSortable(true);
-            type.setFilterable(true);
+        type.setEditable(filter != null);
+        type.setSortable(type.isEditable());
+        type.setFilterable(type.isEditable());
+        if (type.isFilterable()) {
             type.setFilter(new FilterDescriptor(filter));
             if (operators != null) {
                 type.getFilter().setOperators(Arrays.asList(operators));
             }
-        } else {
-            type.setSortable(false);
-            type.setFilterable(false);
         }
         return type;
     }

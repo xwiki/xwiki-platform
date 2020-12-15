@@ -419,26 +419,44 @@ define([
     isEditable ({ entry, propertyId } = {}) {
       // TODO: Ensure entry is valid (need other current PR)
       // TODO: Ensure property is valid (need other current PR)
-      // Whole Livedata
-      if (entry === undefined && propertyId === undefined) {
-        // TODO: fetch value from config
-        return true;
+
+      // Check if the edit entry action is available.
+      if (!this.data.meta.actions.find(action => action.id === 'editEntry')) {
+        return false;
       }
-      // Entry
-      if (entry !== undefined && propertyId === undefined) {
-        // TODO: fetch value from config
-        return true;
+
+      // Check if we are allowed to edit the given entry.
+      if (entry && !isEntryEditable(entry)) {
+        return false;
       }
-      // Property
-      if (entry === undefined && propertyId !== undefined) {
-        // TODO: fetch value from config
-        return true;
-      }
-      // Specific value
-      if (entry !== undefined && propertyId !== undefined) {
-        // TODO: fetch value from config
-        return true;
-      }
+
+      // Check if the specified property is editable.
+      return !propertyId || isPropertyEditable(propertyId);
+    },
+
+    /**
+     * Returns whether the given entry is editable or not.
+     *
+     * @param {Object} entry
+     * @returns {Boolean}
+     */    
+    isEntryEditable (entry) {
+      const allowEditProperty = this.data.meta.entryDescriptor.allowEditProperty || "allowEdit";
+      return entry[allowEditProperty];
+    },
+
+    /**
+     * Returns whether a certain property is editable or not.
+     *
+     * @param {String} propertyId
+     * @returns {Boolean}
+     */
+    isPropertyEditable (propertyId) {
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      return propertyDescriptor.editable !== undefined ?
+      propertyDescriptor.editable :
+      propertyTypeDescriptor.editable;
     },
 
     /**
@@ -458,11 +476,11 @@ define([
 
 
     /**
-     * Return whether selecting properties is enabled
+     * Return whether adding new entries is enabled.
      */
     canAddEntry () {
-      // TODO: fetch value from config
-      return false;
+      // Check if the add entry action is available.
+      return this.data.meta.actions.find(action => action.id === 'addEntry');
     },
 
     addEntry () {
@@ -683,19 +701,14 @@ define([
 
 
     /**
-     * Return whether selecting properties is enabled
-     * If entry is given, return whether this entry can be selected
+     * Return whether selecting entries is enabled. If an entry is given, return whether that entry can be selected.
+     *
      * @param {Object} [parameters]
      * @param {Object} [parameters.entry]
      */
     isSelectionEnabled ({ entry } = {}) {
-      // TODO: Ensure entry is valid (need other current PR)
-      if (entry !== undefined) {
-        return entry.age < 40;
-        // return this.isEditable({ entry });
-      }
-      // TODO: fetch value from config
-        return true;
+      // An entry is selectable if it has an id specified.
+      return this.data.meta.selection.enabled && (!entry || this.getEntryId(entry));
     },
 
 

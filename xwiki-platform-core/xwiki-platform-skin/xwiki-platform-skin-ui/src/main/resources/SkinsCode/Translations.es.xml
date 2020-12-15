@@ -55,8 +55,10 @@ skin.sheet.js.deleteConfirmationNo=No, cancelar
 skin.sheet.js.adding=Añadiendo...
 skin.sheet.js.addingDone=La plantilla ha sido añadida!
 
-## Used to indicate where deprecated keys end
-#@deprecatedend
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

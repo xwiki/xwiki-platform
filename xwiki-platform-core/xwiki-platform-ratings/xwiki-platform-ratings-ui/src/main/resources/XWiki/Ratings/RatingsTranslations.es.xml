@@ -47,8 +47,8 @@ rating.setvote.error=Error al guardar tu voto.
 XWiki.Ratings.RatingsConfigurationClass_enabled=Activar las valoraciones
 XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Activar las valoraciones permite que los usuarios valoren las páginas y muestra las valoraciones medias. Desactivarlo no elimina los votos existentes, solo oculta la interfaz.
 
-## Used to indicate where deprecated keys end
-#@deprecatedend
+## Used to indicate where deprecated keys start
+#@deprecatedstart
 
 ## until 12.9RC1
 admin.ratings.activateratings=Activar las valoraciones en este wiki

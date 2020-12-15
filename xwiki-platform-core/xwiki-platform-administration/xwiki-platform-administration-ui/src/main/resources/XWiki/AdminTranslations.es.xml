@@ -150,8 +150,8 @@ administration.section.analytics.status.hint=Determinar si el seguimiento en Goo
 admin.social=Social
 admin.social.description=Configuración de funciones sociales.
 
-## Used to indicate where deprecated keys end
-#@deprecatedend
+## Used to indicate where deprecated keys start
+#@deprecatedstart
 
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Si su valor es "Sí", evitará que los usuarios inicien sesión sin introducir el token que se envió con anterioridad por correo electrónico.

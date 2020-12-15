@@ -164,8 +164,8 @@ solr.field.attsize=Tamaño del fichero
 solr.uix.docdoesnotexist.title=¿Estaba buscando una de las siguientes páginas?
 solr.uix.attachmentdoesnotexist.title=¿Estaba buscando uno de los siguientes archivos adjuntos?
 
-## Used to indicate where deprecated keys end
-#@deprecatedend
+## Used to indicate where deprecated keys start
+#@deprecatedstart
 
 ## until 7.2M3
 solr.result.location=Ubicado en {0} » {1} » {2}

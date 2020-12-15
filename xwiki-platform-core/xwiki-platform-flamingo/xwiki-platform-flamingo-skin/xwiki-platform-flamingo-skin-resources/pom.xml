@@ -125,7 +125,6 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>momentjs</artifactId>
-      <version>2.24.0</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>
@@ -140,13 +139,11 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap-daterangepicker</artifactId>
-      <version>3.0.3</version>
     </dependency>
     <dependency>
       <!-- Used by the Database List, List of Users, List of Groups and Page property displayers and filters. -->
       <groupId>org.webjars</groupId>
       <artifactId>selectize.js</artifactId>
-      <version>0.12.5</version>
     </dependency>
     <!-- Refactoring -->
     <dependency>

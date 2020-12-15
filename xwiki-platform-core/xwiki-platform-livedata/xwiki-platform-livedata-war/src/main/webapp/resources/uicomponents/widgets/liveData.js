@@ -30,8 +30,30 @@ require.config({
     liveDataSource: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'liveDataSource.min.js', $evaluate)),
     Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
-    'xwiki-livedata': $jsontool.serialize($liveDataPath)
+    'xwiki-livedata': $jsontool.serialize($liveDataPath),
+    moment: $jsontool.serialize($services.webjars.url('momentjs', 'moment.js')),
+    daterangepicker: $jsontool.serialize($services.webjars.url('bootstrap-daterangepicker',
+      'js/bootstrap-daterangepicker.js'))
+  },
+  map: {
+    '*': {
+      daterangepicker: 'daterangepicker-with-css'
+    },
+    'daterangepicker-with-css': {
+      daterangepicker: 'daterangepicker'
+    }
   }
+});
+
+define('daterangepicker-with-css', ['daterangepicker'], function() {
+  // Load the CSS for the date range picker.
+  (function loadCss(url) {
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = url;
+    document.getElementsByTagName("head")[0].appendChild(link);
+  })($jsontool.serialize($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')));
 });
 
 window.liveDataBaseURL = $jsontool.serialize($liveDataBasePath);

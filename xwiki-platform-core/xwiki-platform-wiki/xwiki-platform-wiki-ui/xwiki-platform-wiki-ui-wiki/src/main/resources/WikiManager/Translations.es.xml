@@ -127,11 +127,12 @@ platform.wiki.currentwiki.candidates.empty=Ningún usuario ha solicitado o ha si
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Administra ajustes de configuración como el nombre de la wiki, la descripción, el propietario y el tipo de miembro.
-admin.xwiki.workspaceusers.description=Administración de miembros de la wiki:  añadir, eliminar, invitar, aceptar o rechazar miembros de la wiki.
+admin.xwiki.workspaceusers.description=Administración de miembros de la wiki: añadir, eliminar, invitar, aceptar o rechazar miembros de la wiki.
 admin.xwiki.usersconfiguration.title=Configuración
 admin.xwiki.members.title=Miembros actuales
 admin.xwiki.users.title=Todos los usuarios
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Inicio</content>
+platform.wiki.drawer.homeWiki=Inicio
+</content>
 </xwikidoc>

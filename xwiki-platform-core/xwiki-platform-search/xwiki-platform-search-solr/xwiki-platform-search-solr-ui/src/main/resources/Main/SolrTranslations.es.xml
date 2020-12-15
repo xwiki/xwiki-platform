@@ -42,11 +42,9 @@ solr.admin.error.action={0} falló:
 solr.admin.error.notallowed=No está autorizado a realizar esta acción.
 solr.admin.error.norights=Necesita derechos administrativos para acceder a esta sección.
 solr.admin.success.action={0} ejecutado con éxito.
-
 solr.admin.status.title=Estado
 solr.admin.status.queueSize.label=Tamaño de cola
 solr.admin.status.queueSize.hint=El número de entidades que quedan por indexar, re-indexar o eliminar del índice (dependiendo de la acción ejecutada).
-
 solr.admin.indexing.title=Indexando
 solr.admin.indexing.action.label=Acción
 solr.admin.indexing.action.hint=La acción a realizar en el índice.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=El wiki para el que todos sus documentos se verán
 solr.admin.indexing.wiki.select_farm=Granja completa
 solr.admin.indexing.query.label=Consulta personalizada
 solr.admin.indexing.query.hint=Consulta opcional para limitar los documentos que se verán afectados por la acción seleccionada en el índice.
-
 solr.admin.info.affectedDocuments=Documentos afectados en el índice:
-
 solr.sortBy=Ordenar por:
 solr.sortBy.score=Relevancia
 solr.sortBy.title_sort=Título
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Fecha de subida
 solr.sortBy.attauthor_display_sort=Subido por
 solr.sortOrder.asc=Ascendente
 solr.sortOrder.desc=Descendiente
-
 solr.options=Mostrar:
 solr.options.highlight=Resaltando
 solr.options.highlight.title=Mostrar un extracto de lo que coincidió en cada resultado
 solr.options.facet=Facetas
 solr.options.facet.title=Permitir un filtrado adicional sobre el resultado
-
 solr.result.language=Idioma
 solr.result.locatedIn=Ubicado en
 solr.result.author=Modificado por {0} el {1}
 solr.result.mediaType=Fichero de tipo {0}
 solr.result.uploadedBy=Subido por {0} el {1} ({2})
 solr.result.highlightAll=Resaltar todos los resultados
-
 solr.facets.title=Refine su búsqueda
 solr.facets.hint=Seleccione una categoría y active los filtros sobre los resultados actuales
 solr.facets.resetAll=Restablecer todos
@@ -93,12 +86,10 @@ solr.facets.expandAll=Expandir Todo
 solr.facets.collapseAll=Contraer todo
 solr.facets.emptyValue=Valor vacío
 solr.facets.moreValues={0} más
-
 solr.filterBy.type.document=Documento
 solr.filterBy.type.attachment=Adjunto
 solr.filterBy.type.object=Objeto
 solr.filterBy.type.object_property=Propiedad del objeto
-
 solr.filterBy.fileType.image=Imagen
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Vídeo
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Icono
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Datos binarios
-
 solr.facet.date.today=Hoy
 solr.facet.date.last7Days=Últimos 7 días
 solr.facet.date.last30Days=Últimos 30 días
@@ -131,7 +121,6 @@ solr.facet.date.between=Desde {0} hasta {1}
 solr.facet.date.after=Tras {0}
 solr.facet.date.before=Antes de {0}
 solr.facet.date.any=Cualquier fecha
-
 solr.facet.size.tiny=Diminuto
 solr.facet.size.small=Pequeño
 solr.facet.size.medium=Mediano
@@ -140,7 +129,6 @@ solr.facet.size.between=Entre {0} y {1}
 solr.facet.size.lessThan=Menor que {0}
 solr.facet.size.moreThan=Mayor que {0}
 solr.facet.size.any=Cualquier tamaño
-
 solr.field.type=Tipo de resultado
 solr.field.locale=Idioma
 solr.field.locale.emptyValue=Ningún idioma
@@ -173,7 +161,6 @@ solr.field.attauthor=Subido por
 solr.field.attauthor_display=Subido por
 solr.field.attdate=Fecha de subida
 solr.field.attsize=Tamaño del fichero
-
 solr.uix.docdoesnotexist.title=¿Estaba buscando una de las siguientes páginas?
 solr.uix.attachmentdoesnotexist.title=¿Estaba buscando uno de los siguientes archivos adjuntos?
 
@@ -184,8 +171,9 @@ solr.uix.attachmentdoesnotexist.title=¿Estaba buscando uno de los siguientes ar
 solr.result.location=Ubicado en {0} » {1} » {2}
 
 ## until 7.2RC1
-### Missing: solr.field.space=Location
+solr.field.space=Ubicación
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

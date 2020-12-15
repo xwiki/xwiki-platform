@@ -25,6 +25,7 @@ module.exports = {
   publicPath: '',
   filenameHashing: false,
   chainWebpack: config => {
+    // Provided dependencies (that shouldn't be bundled).
     config.externals({
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",

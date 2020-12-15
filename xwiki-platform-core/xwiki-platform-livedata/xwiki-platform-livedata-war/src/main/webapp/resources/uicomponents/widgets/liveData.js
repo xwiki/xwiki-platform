@@ -31,29 +31,53 @@ require.config({
       'liveDataSource.min.js', $evaluate)),
     Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
     'xwiki-livedata': $jsontool.serialize($liveDataPath),
+    // Required by the date filter.
     moment: $jsontool.serialize($services.webjars.url('momentjs', 'moment.js')),
     daterangepicker: $jsontool.serialize($services.webjars.url('bootstrap-daterangepicker',
-      'js/bootstrap-daterangepicker.js'))
+      'js/bootstrap-daterangepicker.js')),
+    // Required by the suggest filter.
+    'xwiki-selectize': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true))
   },
   map: {
     '*': {
-      daterangepicker: 'daterangepicker-with-css'
+      daterangepicker: 'daterangepicker-with-css',
+      'xwiki-selectize': 'xwiki-selectize-with-css'
     },
     'daterangepicker-with-css': {
       daterangepicker: 'daterangepicker'
+    },
+    'xwiki-selectize-with-css': {
+      'xwiki-selectize': 'xwiki-selectize'
     }
   }
 });
 
-define('daterangepicker-with-css', ['daterangepicker'], function() {
-  // Load the CSS for the date range picker.
-  (function loadCss(url) {
+define('loadCSS', function() {
+  var loadCSS = function(url) {
     var link = document.createElement("link");
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = url;
     document.getElementsByTagName("head")[0].appendChild(link);
-  })($jsontool.serialize($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')));
+  };
+
+  return (url) => {
+    var urls = Array.isArray(url) ? url : [url];
+    urls.forEach(loadCSS);
+  };
+});
+
+define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
+  // Load the CSS for the date range picker.
+  loadCSS($jsontool.serialize($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')));
+});
+
+define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
+  // Load the CSS for the suggest picker.
+  loadCSS([
+    $jsontool.serialize($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css')),
+    $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true))
+  ]);
 });
 
 window.liveDataBaseURL = $jsontool.serialize($liveDataBasePath);

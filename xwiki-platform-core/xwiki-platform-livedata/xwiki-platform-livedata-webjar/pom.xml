@@ -48,6 +48,7 @@
       <artifactId>vue</artifactId>
       <version>2.6.11</version>
     </dependency>
+    <!-- Used by the date filter. -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>momentjs</artifactId>
@@ -55,6 +56,11 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap-daterangepicker</artifactId>
+    </dependency>
+    <!-- Used by the suggest filter. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>selectize.js</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

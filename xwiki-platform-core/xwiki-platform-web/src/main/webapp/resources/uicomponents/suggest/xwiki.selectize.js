@@ -290,7 +290,24 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       })
       // Each input in the current collection might have different in-line settings.
       .each(function() {
+        // FIXME: Apostrophe in input id breaks the selectize widget. The workaround is to remove the id before creating
+        // the selectize widget and then restore it afterwards. Remove this hack when the reported issue is closed.
+        // See https://github.com/selectize/selectize.js/issues/1568
+        var id = $(this).attr('id');
+        $(this).removeAttr('id');
+
         $(this).selectize(getSettings($(this), settings));
+
+        if (id) {
+          // Workaround for selectize bug #1568 (see above).
+          this.selectize.get$('control_input').attr('id', id + '-selectized');
+          // We call filter instead of using a CSS selector because the id can contain special characters.
+          $('label').filter(function() {
+            return $(this).attr('for') === id;
+          }).attr('for', id + '-selectized');
+          // Restore the id.
+          $(this).attr('id', id);
+        }
       })
       .trigger('initialize')
       .each(loadSelectedValues);

@@ -3857,10 +3857,14 @@ public class XWiki implements EventListener
 
             // Compare the two keys
             if ((!storedKey.equals("") && (storedKey.equals(validationKey)))) {
+                // Ensure to remove the validation key value, so it cannot be used afterwards to enable back
+                // a disabled user.
+                userObject.setStringValue("validkey", "");
+                saveDocument(userDocument, context);
+
                 XWikiUser xWikiUser = new XWikiUser(userDocument.getDocumentReference());
                 xWikiUser.setDisabled(false, context);
                 xWikiUser.setEmailChecked(true, context);
-                saveDocument(userDocument, context);
 
                 if (withConfirmEmail) {
                     String email = userObject.getStringValue("email");

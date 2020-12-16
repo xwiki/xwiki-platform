@@ -580,6 +580,8 @@ public class XWikiTest
         this.xwiki.saveDocument(testUser, context);
 
         assertEquals(0, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));
+        XWikiDocument reloadedDocument = this.xwiki.getDocument(testUser, context);
+        assertEquals("", reloadedDocument.getObject("XWiki.XWikiUsers").getStringValue("validkey"));
 
         // Check with an incorrect plaintext key
         validationKey.setValue("wrong key");

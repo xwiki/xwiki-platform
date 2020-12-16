@@ -553,6 +553,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         userObject.safeput("validkey", validationKey);
 
         assertEquals(0, this.xwiki.validateUser(false, getContext()));
+        XWikiDocument reloadedDocument = this.xwiki.getDocument(testUser, context);
+        assertEquals("", reloadedDocument.getObject("XWiki.XWikiUsers").getStringValue("validkey"));
 
         // Check with an incorrect plaintext key
         validationKey.setValue("wrong key");

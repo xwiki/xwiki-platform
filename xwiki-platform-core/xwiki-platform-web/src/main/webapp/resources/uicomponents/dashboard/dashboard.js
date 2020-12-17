@@ -19,7 +19,7 @@
  */
 require.config({
   paths: {
-    gadgetWizard: "$xwiki.getSkinFile('uicomponents/dashboard/gadgetWizard', true)"
+    gadgetWizard: $jsontool.serialize($xwiki.getSkinFile('uicomponents/dashboard/gadgetWizard.js', true))
   }
 });
 

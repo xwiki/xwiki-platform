@@ -19,8 +19,7 @@
  */
 require.config({
   paths: {
-    'xwiki-selectize': "$xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
+    'xwiki-selectize': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true))
   }
 });
 

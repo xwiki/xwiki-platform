@@ -19,8 +19,7 @@
  */
 require.config({
   paths: {
-    'xwiki-suggestPages': "$xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
+    'xwiki-suggestPages': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true))
   }
 });
 
@@ -74,18 +73,18 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       content,
       {
         "show" : {
-	        method : this.showDialog,
-	        keys : [$services.localization.render('core.viewers.jump.shortcuts')]
-	      },
+          method : this.showDialog,
+          keys : [$services.localization.render('core.viewers.jump.shortcuts')]
+        },
         "view" : {
-	        method : this.openDocument,
-	        keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
-	        options : { 'propagate' : true }
-	      },
+          method : this.openDocument,
+          keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
+          options : { 'propagate' : true }
+        },
         "edit" : {
-	        method : this.openDocument,
-	        keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
-	      }
+          method : this.openDocument,
+          keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
+        }
       },
       {
         title : "$services.localization.render('core.viewers.jump.dialog.content')",

@@ -125,12 +125,12 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   'paths': {
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
-    'xwiki-meta': $stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js'),
-    'xwiki-events-bridge': $stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js'),
-    'xwiki-locale-picker': $stringtool.removeEnd($xwiki.getSkinFile("localePicker$jsExtension", true), '.js'),
+    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
+    'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
     'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/jquery.drawer${jsExtension}""))",
-    'deferred': $stringtool.removeEnd($xwiki.getSkinFile('uicomponents/require/deferred.js'), '.js')
+    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
   },
   'shim': {
     'bootstrap' : ['jquery'],

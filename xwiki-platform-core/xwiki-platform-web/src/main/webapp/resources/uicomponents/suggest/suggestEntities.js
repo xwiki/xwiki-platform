@@ -19,10 +19,9 @@
  */
 require.config({
   paths: {
-    'xwiki-suggestPages': "$xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)" +
-      "?v=$escapetool.url($xwiki.version)",
-    'xwiki-suggestAttachments': "$xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
+    'xwiki-suggestPages': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)),
+    'xwiki-suggestAttachments': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js',
+      true))
   }
 });
 

@@ -237,7 +237,6 @@
 
   var init = function ()
   {
-    console.log($(".rating-wrapper"));
     $(".rating-wrapper").each(initRating);
   };
 

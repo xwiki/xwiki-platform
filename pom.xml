@@ -57,7 +57,7 @@
     <batik.version>1.13</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.25</tika.version>
-    <pdfbox.version>2.0.21</pdfbox.version>
+    <pdfbox.version>2.0.22</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- CSS4J/Carte -->

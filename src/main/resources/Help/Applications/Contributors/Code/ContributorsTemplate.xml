@@ -131,6 +131,9 @@
       </title1>
     </class>
     <property>
+      <content1/>
+    </property>
+    <property>
       <date1/>
     </property>
     <property>
@@ -138,6 +141,9 @@
     </property>
     <property>
       <staticList1/>
+    </property>
+    <property>
+      <title1/>
     </property>
   </object>
 </xwikidoc>

@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -50,10 +51,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
 /**
@@ -119,6 +122,9 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     @Inject
     private EventStore eventStore;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     private final MailListener listener = new VoidMailListener()
     {
@@ -332,8 +338,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private String getUserEmail(DocumentReference user)
     {
         return (String) this.documentAccessBridge.getProperty(user,
-            new DocumentReference(user.getWikiReference().getName(), "XWiki", "XWikiUsers"), 0,
-            EMAIL_PROPERTY);
+            new DocumentReference(user.getWikiReference().getName(), "XWiki", "XWikiUsers"), 0, EMAIL_PROPERTY);
     }
 
     @Override
@@ -345,8 +350,15 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     @Override
     public MimeMessage next()
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        WikiReference currentWiki = xcontext.getWikiReference();
+
         MimeMessage message = null;
         try {
+            // Switch to user's wiki to make sure the mail is generated from target user point of view
+            xcontext.setWikiReference(this.currentUser.getWikiReference());
+
             DocumentReference templateDocumentReference =
                 this.documentReferenceResolver.resolve(this.templateReference, this.currentUser);
 
@@ -364,6 +376,9 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             }
         } catch (Exception e) {
             this.logger.error(ERROR_MESSAGE, this.currentUser, e);
+        } finally {
+            // Restore wiki
+            xcontext.setWikiReference(currentWiki);
         }
 
         // Look for the next email to send

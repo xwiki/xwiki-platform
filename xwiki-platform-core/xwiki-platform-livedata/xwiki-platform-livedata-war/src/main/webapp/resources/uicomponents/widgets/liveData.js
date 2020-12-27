@@ -20,24 +20,33 @@
 /*!
 #set ($liveDataEntry = 'xwiki-livedata.umd.min')
 #set ($liveDataPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', $liveDataEntry))
-#set ($liveDataBasePath = $stringtool.removeEnd($liveDataPath, $liveDataEntry))
-#set ($evaluate = {'evaluate': true})
-*/
-require.config({
-  paths: {
-    Logic: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'Logic.min')),
-    liveDataSource: $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'liveDataSource.min.js', $evaluate)),
-    Vue: $jsontool.serialize($services.webjars.url('vue', 'vue.min')),
-    'xwiki-livedata': $jsontool.serialize($liveDataPath),
-    // Required by the date filter.
-    moment: $jsontool.serialize($services.webjars.url('momentjs', 'moment.js')),
-    daterangepicker: $jsontool.serialize($services.webjars.url('bootstrap-daterangepicker',
-      'js/bootstrap-daterangepicker.js')),
-    // Required by the suggest filter.
-    'xwiki-selectize': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true))
+#set ($paths = {
+  'js': {
+    'Logic': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'Logic.min'),
+    'liveDataSource': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'liveDataSource.min.js', {'evaluate': true}),
+    'Vue': $services.webjars.url('vue', 'vue.min'),
+    'xwiki-livedata': $liveDataPath,
+    'moment': $services.webjars.url('momentjs', 'moment.js'),
+    'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js'),
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
   },
+  'css': {
+    'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
+    'selectize': [
+      $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+      $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true)
+    ]
+  },
+  'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry)
+})
+*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
+require.config({
+  paths: paths.js,
   map: {
     '*': {
       daterangepicker: 'daterangepicker-with-css',
@@ -69,22 +78,17 @@ define('loadCSS', function() {
 
 define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
   // Load the CSS for the date range picker.
-  loadCSS($jsontool.serialize($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')));
+  loadCSS(paths.css.dateRangePicker);
 });
 
 define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
   // Load the CSS for the suggest picker.
-  loadCSS([
-    $jsontool.serialize($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css')),
-    $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true))
-  ]);
+  loadCSS(paths.css.selectize);
 });
 
-window.liveDataBaseURL = $jsontool.serialize($liveDataBasePath);
+window.liveDataBaseURL = paths.liveDataBasePath;
 
 require(['jquery', 'Logic'], function($, LiveData) {
-  "use strict";
-
   $.fn.liveData = function(config) {
     return this.each(function() {
       if (!$(this).data('liveData')) {
@@ -102,3 +106,6 @@ require(['jquery', 'Logic'], function($, LiveData) {
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

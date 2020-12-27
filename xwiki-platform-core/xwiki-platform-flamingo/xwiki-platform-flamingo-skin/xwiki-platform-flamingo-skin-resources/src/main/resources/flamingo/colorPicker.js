@@ -17,11 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
+/*!
+## Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
+#set ($paths = {
+  'colpick': $services.webjars.url('colpick', 'js/colpick')
+})
+*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
 require.config({
-  paths: {
-    'colpick': "$services.webjars.url('colpick', 'js/colpick')"
-  },
+  paths,
   shim: {
     'colpick' : ['jquery']
   }
@@ -87,3 +94,6 @@ require(['jquery', 'colpick'], function($, Colpick) {
   $(document).on('xwiki:dom:updated', init);
   return XWiki.domIsLoaded && init();
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

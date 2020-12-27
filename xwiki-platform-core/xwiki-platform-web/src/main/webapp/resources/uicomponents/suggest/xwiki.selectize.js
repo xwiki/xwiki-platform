@@ -17,18 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'selectize': $services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')
+})
+#set ($l10n = {
+  'selectTypedText': $services.localization.render('web.uicomponents.suggest.selectTypedText', ['{0}'])
+})
+*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
+
 require.config({
-  paths: {
-    'selectize': "$!services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')"
-  },
+  paths,
   shim: {
     'selectize': ['jquery']
   }
 });
 
 define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
-  'use strict';
-
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
       '<span class="xwiki-selectize-option-icon" />',
@@ -118,10 +126,9 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        var text = $jsontool.serialize($services.localization.render('web.uicomponents.suggest.selectTypedText',
-          ['{0}']));
+        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em/>');
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
-        var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
+        var output = $('<div class="create option"/>').html(label);
         output.find('em').text(data.input);
         return output;
       }
@@ -222,7 +229,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   // minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly by their name
   // (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
   Selectize.prototype.get$ = function(key) {
-    return this[$jsontool.serialize($escapetool.d) + key];
+    return this['$' + key];
   };
 
   var getDefaultSettings = function(input) {
@@ -330,3 +337,6 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $l10n]));

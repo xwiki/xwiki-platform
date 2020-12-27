@@ -23,15 +23,19 @@
 #if (!$services.debug.minify)
   #set ($jsExtension = '.js')
 #end
+#set ($paths = {
+  'jsTree': $services.webjars.url('jstree', "jstree$jsExtension"),
+  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension"),
+  'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder$jsExtension"),
+  'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree$jsExtension")
+})
 */
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
 
 require.config({
-  paths: {
-    jsTree: '$!services.webjars.url("jstree", "jstree$jsExtension")',
-    JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner$jsExtension")',
-    'tree-finder': '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "finder$jsExtension")',
-    tree: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "tree$jsExtension")'
-  },
+  paths,
   shim: {
     jsTree: {
       deps: ['jquery']
@@ -40,7 +44,6 @@ require.config({
 });
 
 require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
-  'use strict';
   /**
    * Called when a question is being asked
    */
@@ -144,3 +147,6 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     initQuestion.bind(uiQuestion)(null);
   });
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

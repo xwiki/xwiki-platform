@@ -17,14 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'moment': $services.webjars.url('momentjs', 'min/moment.min'),
+  'moment-jdateformatparser': $services.webjars.url('org.webjars.bower:moment-jdateformatparser',
+    'moment-jdateformatparser'),
+  'bootstrap-datetimepicker': $services.webjars.url('Eonasdan-bootstrap-datetimepicker',
+    'js/bootstrap-datetimepicker.min')
+})
+*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
 require.config({
-  paths: {
-    moment: "$services.webjars.url('momentjs', 'min/moment.min')",
-    'moment-jdateformatparser': $jsontool.serialize($services.webjars.url('org.webjars.bower:moment-jdateformatparser',
-      'moment-jdateformatparser')),
-    'bootstrap-datetimepicker': $jsontool.serialize($services.webjars.url('Eonasdan-bootstrap-datetimepicker',
-      'js/bootstrap-datetimepicker.min'))
-  },
+  paths,
   shim: {
     // This has been fixed in the latest version of moment-jdateformatparser.
     'moment-jdateformatparser': ['moment']
@@ -95,3 +102,6 @@ require(['moment'], function(moment) {
     return XWiki.domIsLoaded && init();
   });
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

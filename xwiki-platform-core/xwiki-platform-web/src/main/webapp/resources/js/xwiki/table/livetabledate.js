@@ -17,16 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'moment': "$services.webjars.url('momentjs', 'moment.js')",
-    'jdateformatparser': "$services.webjars.url('org.webjars.bower:moment-jdateformatparser', 'moment-jdateformatparser.js')",
-    'daterangepicker': "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
-  }
-});
+/*!
+#set ($paths = {
+  'moment': $services.webjars.url('momentjs', 'moment.js'),
+  'jdateformatparser': $services.webjars.url('org.webjars.bower:moment-jdateformatparser',
+    'moment-jdateformatparser.js'),
+  'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
+})
+#set ($l10nKeys = ['today', 'yesterday', 'lastSevenDays', 'lastThirtyDays', 'thisMonth', 'lastMonth', 'clear', 'apply',
+  'customRange', 'from', 'to'])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render("daterange.$key")))
+#end
+*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
 
-require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'],
-  function($) {
+  require.config({paths});
+
+  require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'], function($) {
     var bindInputs = function(livetable, moment) {
       $(livetable).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
@@ -40,26 +51,21 @@ require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'
           timePicker: true,
           timePicker24Hour: true,
           ranges: {
-            '$escapetool.javascript($services.localization.render("daterange.today"))':
-              [moment().startOf('day'), moment().endOf('day')],
-            '$escapetool.javascript($services.localization.render("daterange.yesterday"))':
-              [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
-            '$escapetool.javascript($services.localization.render("daterange.lastSevenDays"))':
-              [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
-            '$escapetool.javascript($services.localization.render("daterange.lastThirtyDays"))':
-              [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
-            '$escapetool.javascript($services.localization.render("daterange.thisMonth"))':
-              [moment().startOf('month'), moment().endOf('month')],
-            '$escapetool.javascript($services.localization.render("daterange.lastMonth"))':
-              [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            [l10n.today]: [moment().startOf('day'), moment().endOf('day')],
+            [l10n.yesterday]: [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            [l10n.lastSevenDays]: [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+            [l10n.lastThirtyDays]: [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+            [l10n.thisMonth]: [moment().startOf('month'), moment().endOf('month')],
+            [l10n.lastMonth]: [moment().subtract(1, 'month').startOf('month'),
+              moment().subtract(1, 'month').endOf('month')]
           },
           locale: {
             format: dateFormat,
-            cancelLabel: '$escapetool.javascript($services.localization.render("daterange.clear"))',
-            applyLabel: '$escapetool.javascript($services.localization.render("daterange.apply"))',
-            customRangeLabel: '$escapetool.javascript($services.localization.render("daterange.customRange"))',
-            fromLabel: '$escapetool.javascript($services.localization.render("daterange.from"))',
-            toLabel: '$escapetool.javascript($services.localization.render("daterange.to"))',
+            cancelLabel: l10n.clear,
+            applyLabel: l10n.apply,
+            customRangeLabel: l10n.customRange,
+            fromLabel: l10n.from,
+            toLabel: l10n.to
           }
         });
 
@@ -122,5 +128,7 @@ require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'
         bindInputs(livetable, moment);
       });
     });
-  }
-);
+  });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $l10n]));

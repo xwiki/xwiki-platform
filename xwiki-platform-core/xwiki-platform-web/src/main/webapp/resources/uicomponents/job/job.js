@@ -22,16 +22,21 @@
 #if (!$services.debug.minify)
   #set ($jsExtension = '')
 #end
+#set ($paths = {
+  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension")
+})
+#set ($l10n = {
+  'answering': $services.localization.render('job.question.notification.answering'),
+  'canceling': $services.localization.render('job.question.notification.canceling')
+})
 */
+// Start JavaScript-only code.
+(function(paths, contextPath, l10n) {
+  "use strict";
 
-require.config({
-  paths: {
-    JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner$jsExtension")'
-  }
-});
+require.config({paths});
 
 require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
-  'use strict';
   var updateProgress = function(jobUI, job) {
     jobUI.find('.ui-progress-background').toggle(job.state !== 'NONE');
     jobUI.find('.ui-progress-message').toggle(job.state === 'NONE');
@@ -55,7 +60,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
     if (typeof answerCallback === 'function') {
       // Display the question
-      var displayerURL = "${request.contextPath}/job/wiki/" + xm.wiki + "/question/" + job.id.join('/');
+      var displayerURL = contextPath + '/job/wiki/' + xm.wiki + '/question/' + job.id.join('/');
 
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
@@ -176,15 +181,13 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           } else {
             var properties = createAnswerProperties(questionForm, button);
 
-            var answeringNotification =
-              "$escapetool.javascript($services.localization.render('job.question.notification.answering'))";
+            var answeringNotification = l10n.answering;
 
             // Set cancel marker if needed
             if (button.hasClass('btAnswerCancel')) {
               properties.cancel = 'true';
 
-              answeringNotification =
-                "$escapetool.javascript($services.localization.render('job.question.notification.canceling'))";
+              answeringNotification = l10n.canceling;
             }
 
             var notif = new XWiki.widgets.Notification(
@@ -243,7 +246,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           if (typeof data === 'function') {
             return data();
           } else {
-            var answerURL = '${request.contextPath}/job/question/' + jobId.join('/');
+            var answerURL = contextPath + '/job/question/' + jobId.join('/');
 
             return {
               url: answerURL,
@@ -260,3 +263,6 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     }
   });
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $request.contextPath, $l10n]));

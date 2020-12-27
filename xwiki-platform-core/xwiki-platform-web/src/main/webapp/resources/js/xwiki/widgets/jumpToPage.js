@@ -17,14 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-suggestPages': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true))
+/*!
+#set ($paths = {
+  'js': {
+    'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)
+  },
+  'css': {
+    'selectize': [
+      $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+      $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true)
+    ]
   }
+})
+#set ($l10n = {
+  'inputTooltip': $services.localization.render('core.viewers.jump.dialog.input.tooltip'),
+  'viewLabel': $services.localization.render('core.viewers.jump.dialog.actions.view'),
+  'viewTooltip': $services.localization.render('core.viewers.jump.dialog.actions.view.tooltip'),
+  'editLabel': $services.localization.render('core.viewers.jump.dialog.actions.edit'),
+  'editTooltip': $services.localization.render('core.viewers.jump.dialog.actions.edit.tooltip'),
+  'content': $services.localization.render('core.viewers.jump.dialog.content')
+})
+#set ($shortcuts = {
+  'show': 'core.viewers.jump.shortcuts',
+  'view': 'core.viewers.jump.dialog.actions.view.shortcuts',
+  'edit': 'core.viewers.jump.dialog.actions.edit.shortcuts'
+})
+#foreach ($entry in $shortcuts.entrySet())
+  #set ($discard = $entry.setValue($services.localization.render($entry.value).split('\s*,\s*')))
+#end
+*/
+// Start JavaScript-only code.
+(function(paths, l10n, shortcuts) {
+  "use strict";
+
+require.config({
+  paths: paths.js
 });
 
-var XWiki = (function(XWiki) {
-// Start XWiki augmentation.
+window.XWiki = window.XWiki || {};
 var widgets = XWiki.widgets = XWiki.widgets || {};
 // Make sure the ModalPopup class exist.
 if (!XWiki.widgets.ModalPopup) {
@@ -38,7 +68,7 @@ if (!XWiki.widgets.ModalPopup) {
  */
 widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   /** The template of the XWiki URL. (deprecated) */
-  urlTemplate : "$xwiki.getURL('__space__.__document__', '__action__')",
+  urlTemplate : new XWiki.Document('__document__', '__space__').getURL('__action__'),
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function($super) {
     // Build the modal popup's content
@@ -46,23 +76,12 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     this.input = new Element("input", {
       "type" : "text",
       "id" : "jmp_target",
-      "title" : "$services.localization.render('core.viewers.jump.dialog.input.tooltip')"
+      "title" : l10n.inputTooltip
     });
     this.input.placeholder = this.input.title;
     content.appendChild(this.input);
-    this.viewButton = this.createButton(
-      "button",
-      "$services.localization.render('core.viewers.jump.dialog.actions.view')",
-      "$services.localization.render('core.viewers.jump.dialog.actions.view.tooltip')",
-      "jmp_view"
-    );
-    this.editButton = this.createButton(
-      "button",
-      "$services.localization.render('core.viewers.jump.dialog.actions.edit')",
-      "$services.localization.render('core.viewers.jump.dialog.actions.edit.tooltip')",
-      "jmp_edit",
-      "secondary"
-    );
+    this.viewButton = this.createButton("button", l10n.viewLabel, l10n.viewTooltip, "jmp_view");
+    this.editButton = this.createButton("button", l10n.editLabel, l10n.editTooltip, "jmp_edit", "secondary");
     var buttonContainer = new Element("div", {"class" : "buttons"});
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
@@ -74,20 +93,20 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       {
         "show" : {
           method : this.showDialog,
-          keys : [$services.localization.render('core.viewers.jump.shortcuts')]
+          keys : shortcuts.show
         },
         "view" : {
           method : this.openDocument,
-          keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
+          keys : shortcuts.view,
           options : { 'propagate' : true }
         },
         "edit" : {
           method : this.openDocument,
-          keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
+          keys : shortcuts.edit
         }
       },
       {
-        title : "$services.localization.render('core.viewers.jump.dialog.content')",
+        title : l10n.content,
         extraClassName: "jump-dialog",
         verticalPosition : "top"
       }
@@ -112,10 +131,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     var self = this;
     require(['jquery', 'xwiki-suggestPages'], function($) {
       // Load the required CSS.
-      [
-        $jsontool.serialize($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css')),
-        $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true))
-      ].forEach(function(url) {
+      paths.css.selectize.forEach(function(url) {
         var link = $('<link/>').attr({
           type: 'text/css',
           rel: 'stylesheet',
@@ -195,6 +211,6 @@ function init() {
 || document.observe("xwiki:dom:loaded", init);
 
 } // if the parent widget is defined
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $l10n, $shortcuts]));

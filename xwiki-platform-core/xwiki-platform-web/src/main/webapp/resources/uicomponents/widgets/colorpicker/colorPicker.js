@@ -17,10 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'procolor': $xwiki.getSkinFile('uicomponents/widgets/colorpicker/procolor.js', true)
+})
+*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
 require.config({
-  paths: {
-    'procolor': $jsontool.serialize($xwiki.getSkinFile('uicomponents/widgets/colorpicker/procolor.js', true))
-  },
+  paths,
   shim: {
     procolor: {
       exports: 'ProColor'
@@ -46,3 +53,6 @@ require(['procolor'], function(ProColor) {
   (XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
   document.observe('xwiki:dom:updated', init);
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

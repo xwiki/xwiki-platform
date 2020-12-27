@@ -17,17 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-selectize': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true))
-  }
-});
+/*!
+#set ($paths = {
+  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+})
+#set ($pageIcon = $services.icon.getMetaData('page_white'))
+#set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
+*/
+// Start JavaScript-only code.
+(function(paths, pageIcon, webHome) {
+  "use strict";
+
+require.config({paths});
 
 define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
-  'use strict';
-
-  var pageIcon = $jsontool.serialize($services.icon.getMetaData('page_white'));
-  var webHome = $jsontool.serialize($services.model.getEntityReference('DOCUMENT', 'default').name) || 'WebHome';
+  webHome = webHome || 'WebHome';
 
   var getSelectizeOptions = function(select) {
     return {
@@ -164,3 +168,6 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
   $(init);
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $pageIcon, $webHome]));

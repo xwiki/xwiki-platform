@@ -17,20 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-selectize': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true))
-  }
-});
+/*!
+#set ($paths = {
+  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+})
+#set ($discard = "#mimetypeimg('' '')")
+#set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
+#foreach ($map in [$mimetypeMap, $extensionMap])
+  #foreach ($entry in $map.entrySet())
+    #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
+    #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
+    #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
+  #end
+#end
+#set ($l10nBundle = {
+  'upload': $services.localization.render('web.uicomponents.suggest.attachments.upload'),
+  'uploading': $services.localization.render('web.uicomponents.suggest.attachments.uploading', ['{0}']),
+  'uploadDone': $services.localization.render('web.uicomponents.suggest.attachments.uploadDone', ['{0}']),
+  'uploadFailed': $services.localization.render('web.uicomponents.suggest.attachments.uploadFailed', ['{0}'])
+})
+*/
+// Start JavaScript-only code.
+(function(paths, contextPath, mimeTypeMap, extensionMap, l10nBundle) {
+  "use strict";
+
+require.config({paths});
 
 define('xwiki-attachments-store', ['jquery'], function($) {
-  'use strict';
-
   /**
    * Returns the REST URL that can be used to search or retrieve the attachments located inside the specified entity.
    */
   var getAttachmentsRestURL = function(entityReference, parameters) {
-    var path = ['$request.contextPath', 'rest'];
+    var path = [contextPath, 'rest'];
     entityReference.getReversedReferenceChain().forEach(function(reference) {
       var restResourceType = reference.type === XWiki.EntityType.DOCUMENT ? 'page' :
         XWiki.EntityType.getName(reference.type);
@@ -124,8 +142,6 @@ define('xwiki-attachments-store', ['jquery'], function($) {
 });
 
 define('xwiki-attachments-icon', ['jquery'], function($) {
-  'use strict';
-
   var getAttachmentIcon = function(attachment) {
     if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
       var url = attachment.xwikiRelativeUrl;
@@ -161,20 +177,6 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
     }
     return deferred.promise();
   };
-
-  /*!
-   * #set ($discard = "#mimetypeimg('' '')")
-   * #set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
-   * #foreach ($map in [$mimetypeMap, $extensionMap])
-   *   #foreach ($entry in $map.entrySet())
-   *     #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
-   *     #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
-   *     #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
-   *   #end
-   * #end
-   */
-  var mimeTypeMap = $jsontool.serialize($mimetypeMap);
-  var extensionMap = $jsontool.serialize($extensionMap);
 
   var getIcon = function(mimeType, fileName) {
     var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
@@ -214,8 +216,6 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
 });
 
 define('xwiki-attachments-filter', ['jquery'], function($) {
-  'use strict';
-
   var filterAttachments = function(attachments, accept) {
     var allowedFileTypes = [];
     if (typeof accept === 'string') {
@@ -251,8 +251,6 @@ define('xwiki-attachments-filter', ['jquery'], function($) {
 });
 
 define('xwiki-file-picker', ['jquery'], function($) {
-  'use strict';
-
   var pickLocalFiles = function(options) {
     var deferred = $.Deferred();
 
@@ -288,9 +286,7 @@ define('xwiki-file-picker', ['jquery'], function($) {
     return deferred.promise();
   };
 
-  return {
-    pickLocalFiles: pickLocalFiles
-  };
+  return {pickLocalFiles};
 });
 
 define('xwiki-l10n', ['jquery'], function($) {
@@ -323,17 +319,7 @@ define('xwiki-suggestAttachments', [
   'xwiki-l10n',
   'xwiki-selectize'
 ], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker, L10n) {
-  'use strict';
-
-  var l10n = L10n({
-    upload: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.upload')),
-    uploading: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploading',
-      ['{0}'])),
-    uploadDone: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadDone',
-      ['{0}'])),
-    uploadFailed: $jsontool.serialize($services.localization.render('web.uicomponents.suggest.attachments.uploadFailed',
-      ['{0}']))
-  });
+  var l10n = L10n(l10nBundle);
 
   var getSelectizeOptions = function(select) {
     return {
@@ -687,8 +673,6 @@ define('xwiki-suggestAttachments', [
 });
 
 define('xwiki-attachmentResourcePicker', ['jquery', 'xwiki-suggestAttachments'], function($) {
-  'use strict';
-
   // Load the selected values only if they represent attachment resources.
   var overwriteLoadSelected = function() {
     adjustOptions(this.selectize);
@@ -764,3 +748,6 @@ require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker',
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths, $request.contextPath, $mimetypeMap, $extensionMap, $l10nBundle]));

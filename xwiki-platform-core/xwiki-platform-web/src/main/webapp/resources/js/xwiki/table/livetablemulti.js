@@ -17,22 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-    paths: {
-        'bootstrap-select': "$services.webjars.url('bootstrap-select', 'js/bootstrap-select.js')"
-    },
-    shim: {
-        'bootstrap-select': ['jquery', 'bootstrap']
-    }
-});
+/*!
+#set ($paths = {
+  'bootstrap-select': $services.webjars.url('bootstrap-select', 'js/bootstrap-select.js')
+})
+*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
 
-require(['jquery', 'bootstrap-select'],
-function($) {
+  require.config({
+    paths,
+    shim: {
+      'bootstrap-select': ['jquery', 'bootstrap']
+    }
+  });
+
+  require(['jquery', 'bootstrap-select'], function($) {
     $('.xwiki-livetable select.xwiki-livetable-multilist').each(function(i, element) {
-        $(element).selectpicker({
-            width: '100%',
-            container: 'body',
-            noneSelectedText: '', // empty to imitate other inputs in livetable
-        });
+      $(element).selectpicker({
+        width: '100%',
+        container: 'body',
+        noneSelectedText: '', // empty to imitate other inputs in livetable
+      });
     });
-});
+  });
+
+// End JavaScript-only code.
+}).apply(null, $jsontool.serialize([$paths]));

@@ -239,12 +239,10 @@ class ExtensionIndexStoreTest
         this.indexStore.add(extension, true);
         this.indexStore.commit();
 
-        // assertSimpleSearch("", extensionId);
+        assertSimpleSearch("", extensionId);
 
-        /*
-         * assertSimpleSearch(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + extensionId.getId(),
-         * extensionId);
-         */
+        assertSimpleSearch(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':' + extensionId.getId(),
+            extensionId);
 
         assertSimpleSearch("Name1", extensionId);
     }

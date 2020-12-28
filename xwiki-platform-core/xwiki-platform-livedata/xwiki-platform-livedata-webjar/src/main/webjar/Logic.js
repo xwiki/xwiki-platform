@@ -421,7 +421,7 @@ define([
       // TODO: Ensure property is valid (need other current PR)
 
       // Check if the edit entry action is available.
-      if (!this.data.meta.actions.find(action => action.id === 'editEntry')) {
+      if (!this.data.meta.actions.find(action => action.id === "editEntry")) {
         return false;
       }
 
@@ -439,7 +439,7 @@ define([
      *
      * @param {Object} entry
      * @returns {Boolean}
-     */    
+     */
     isEntryEditable (entry) {
       const allowEditProperty = this.data.meta.entryDescriptor.allowEditProperty || "allowEdit";
       return entry[allowEditProperty];
@@ -455,8 +455,8 @@ define([
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
       return propertyDescriptor.editable !== undefined ?
-      propertyDescriptor.editable :
-      propertyTypeDescriptor.editable;
+        propertyDescriptor.editable :
+        propertyTypeDescriptor.editable;
     },
 
     /**
@@ -480,7 +480,7 @@ define([
      */
     canAddEntry () {
       // Check if the add entry action is available.
-      return this.data.meta.actions.find(action => action.id === 'addEntry');
+      return this.data.meta.actions.find(action => action.id === "addEntry");
     },
 
     addEntry () {

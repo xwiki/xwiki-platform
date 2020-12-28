@@ -30,6 +30,15 @@ export default {
   inject: ["logic"],
 
   directives: {
+    onInserted: {
+      inserted (el, binding) {
+        const handler = binding.value;
+        if (!(handler instanceof Function)) {
+          return void console.warn(`Warning: v-on-inserted directive expects a function`);
+        }
+        handler();
+      }
+    },
     // This directive autofocus the element that has it
     // This can be usefull in order to autofocus the input in the Editor widget
     // right after the user switched from the Viewer widget

@@ -34,7 +34,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 5.0M1
  */
-public class ReleaseTest extends AbstractTest
+public class ReleaseIT extends AbstractTest
 {
     /**
      * Note: we use a dot in the release version name to verify it's supported by the Release application

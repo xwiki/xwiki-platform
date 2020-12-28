@@ -28,7 +28,7 @@
   'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}"),
   'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree${minified}")
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -41,4 +41,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

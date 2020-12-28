@@ -22,7 +22,7 @@
   'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true),
   'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -92,4 +92,4 @@ require(['jquery', 'xwiki-entityTypeSwitch', 'xwiki-events-bridge'], function($)
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

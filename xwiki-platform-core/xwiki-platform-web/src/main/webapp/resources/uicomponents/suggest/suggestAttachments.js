@@ -36,7 +36,7 @@
   'uploadDone': $services.localization.render('web.uicomponents.suggest.attachments.uploadDone', ['{0}']),
   'uploadFailed': $services.localization.render('web.uicomponents.suggest.attachments.uploadFailed', ['{0}'])
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, contextPath, mimeTypeMap, extensionMap, l10nBundle) {
   "use strict";
@@ -750,4 +750,4 @@ require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker',
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $request.contextPath, $mimetypeMap, $extensionMap, $l10nBundle]));
+}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $mimetypeMap, $extensionMap, $l10nBundle]));

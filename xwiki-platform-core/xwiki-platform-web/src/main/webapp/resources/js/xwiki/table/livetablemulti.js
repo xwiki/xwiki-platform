@@ -21,7 +21,7 @@
 #set ($paths = {
   'bootstrap-select': $services.webjars.url('bootstrap-select', 'js/bootstrap-select.js')
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -44,4 +44,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

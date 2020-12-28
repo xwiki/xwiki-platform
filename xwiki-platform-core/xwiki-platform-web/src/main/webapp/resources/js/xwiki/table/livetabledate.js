@@ -30,7 +30,7 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render("daterange.$key")))
 #end
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, l10n) {
   "use strict";
@@ -131,4 +131,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $l10n]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

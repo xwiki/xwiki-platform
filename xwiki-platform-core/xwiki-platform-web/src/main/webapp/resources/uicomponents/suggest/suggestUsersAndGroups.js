@@ -21,7 +21,7 @@
 #set ($paths = {
   'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -189,4 +189,4 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

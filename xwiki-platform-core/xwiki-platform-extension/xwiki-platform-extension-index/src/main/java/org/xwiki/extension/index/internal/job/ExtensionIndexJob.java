@@ -37,6 +37,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
@@ -593,7 +594,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     }
 
     private void addRemoteExtensions(Map<String, SortedSet<Version>> indexedExtensions)
-        throws SearchException, SolrServerException, IOException
+        throws SolrServerException, IOException
     {
         boolean updated = false;
 
@@ -602,7 +603,12 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         for (ExtensionRepository repository : repositories) {
             this.progress.startStep(repositories);
             if (repository instanceof Searchable) {
-                updated |= addRemoteExtensions((Searchable) repository, indexedExtensions);
+                try {
+                    updated |= addRemoteExtensions((Searchable) repository, indexedExtensions);
+                } catch (Exception e) {
+                    this.logger.warn("Failed to get remote extension from repository [{}]: {}",
+                        repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
+                }
             }
         }
         this.progress.popLevelProgress(repositories);

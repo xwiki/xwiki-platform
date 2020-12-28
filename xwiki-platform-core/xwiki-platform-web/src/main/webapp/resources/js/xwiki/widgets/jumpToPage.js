@@ -45,7 +45,7 @@
 #foreach ($entry in $shortcuts.entrySet())
   #set ($discard = $entry.setValue($services.localization.render($entry.value).split('\s*,\s*')))
 #end
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, l10n, shortcuts) {
   "use strict";
@@ -213,4 +213,4 @@ function init() {
 } // if the parent widget is defined
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $l10n, $shortcuts]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n, $shortcuts]));

@@ -40,7 +40,7 @@
   },
   'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry)
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -108,4 +108,4 @@ require(['jquery', 'Logic'], function($, LiveData) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

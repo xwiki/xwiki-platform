@@ -24,7 +24,7 @@
 #set ($l10n = {
   'selectTypedText': $services.localization.render('web.uicomponents.suggest.selectTypedText', ['{0}'])
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, l10n) {
   "use strict";
@@ -339,4 +339,4 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $l10n]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

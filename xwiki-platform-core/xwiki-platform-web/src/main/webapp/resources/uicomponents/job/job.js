@@ -29,7 +29,7 @@
   'answering': $services.localization.render('job.question.notification.answering'),
   'canceling': $services.localization.render('job.question.notification.canceling')
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, contextPath, l10n) {
   "use strict";
@@ -265,4 +265,4 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $request.contextPath, $l10n]));
+}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $l10n]));

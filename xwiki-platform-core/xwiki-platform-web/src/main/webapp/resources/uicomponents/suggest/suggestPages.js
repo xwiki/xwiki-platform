@@ -23,7 +23,7 @@
 })
 #set ($pageIcon = $services.icon.getMetaData('page_white'))
 #set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, pageIcon, webHome) {
   "use strict";
@@ -170,4 +170,4 @@ require(['jquery', 'xwiki-suggestPages', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $pageIcon, $webHome]));
+}).apply(']]#', $jsontool.serialize([$paths, $pageIcon, $webHome]));

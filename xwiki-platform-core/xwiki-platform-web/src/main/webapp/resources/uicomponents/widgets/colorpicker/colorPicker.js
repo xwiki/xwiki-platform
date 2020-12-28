@@ -21,7 +21,7 @@
 #set ($paths = {
   'procolor': $xwiki.getSkinFile('uicomponents/widgets/colorpicker/procolor.js', true)
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -55,4 +55,4 @@ require(['procolor'], function(ProColor) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

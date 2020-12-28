@@ -22,7 +22,7 @@
 #set ($paths = {
   'colpick': $services.webjars.url('colpick', 'js/colpick')
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -96,4 +96,4 @@ require(['jquery', 'colpick'], function($, Colpick) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

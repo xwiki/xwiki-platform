@@ -25,7 +25,7 @@
   'bootstrap-datetimepicker': $services.webjars.url('Eonasdan-bootstrap-datetimepicker',
     'js/bootstrap-datetimepicker.min')
 })
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths) {
   "use strict";
@@ -104,4 +104,4 @@ require(['moment'], function(moment) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths]));
+}).apply(']]#', $jsontool.serialize([$paths]));

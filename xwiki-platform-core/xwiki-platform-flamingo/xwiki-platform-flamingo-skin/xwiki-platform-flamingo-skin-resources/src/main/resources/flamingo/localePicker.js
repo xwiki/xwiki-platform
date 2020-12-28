@@ -35,7 +35,7 @@
     #set ($discard = $locales.add({'code': $locale.toString(), 'name': $localeName}))
   #end
 #end
-*/
+#[[*/
 // Start JavaScript-only code.
 (function(paths, locales) {
   'use strict';
@@ -135,4 +135,4 @@ require(['jquery', 'xwiki-locale-picker', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(null, $jsontool.serialize([$paths, $locales]));
+}).apply(']]#', $jsontool.serialize([$paths, $locales]));

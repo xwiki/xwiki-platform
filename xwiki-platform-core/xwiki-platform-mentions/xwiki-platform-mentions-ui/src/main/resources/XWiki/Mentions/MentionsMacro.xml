@@ -127,7 +127,8 @@
     <property>
       <code>require.config({
   paths: {
-    'xwiki-suggestUsers': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', true))
+    'xwiki-suggestUsers': "$xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', true))" +
+      "?v=$escapetool.url($xwiki.version)"
   }
 });
 require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], function (ckeditorPromise, suggestUsers, $, xm) {

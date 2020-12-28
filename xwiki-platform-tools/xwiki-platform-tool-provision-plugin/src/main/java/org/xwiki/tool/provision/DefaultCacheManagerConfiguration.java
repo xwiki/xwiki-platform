@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
  * any component relying on a cache to use the "default" cache, that does nothing.
  *
  * @version $Id$
- * @since 12.10.1
+ * @since 12.10.2
  * @since 13.0-rc1
  */
 @Component

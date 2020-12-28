@@ -79,9 +79,7 @@ define({
         name: "Date",
         type: "date",
         visible: true,
-        displayer: {
-          id: 'date',
-        },
+        editable: false,
       },
       {
         id: "doc_title",
@@ -140,6 +138,7 @@ define({
         filter: {
           id: 'text'
         },
+        editable: true,
       },
       {
         id: 'number',
@@ -152,6 +151,7 @@ define({
         filter: {
           id: 'number'
         },
+        editable: true,
       },
       {
         id: 'list',
@@ -164,6 +164,7 @@ define({
         filter: {
           id: 'list'
         },
+        editable: true,
       },
       {
         id: 'date',
@@ -176,6 +177,7 @@ define({
         filter: {
           id: 'date'
         },
+        editable: true,
       },
     ],
 
@@ -261,6 +263,13 @@ define({
     entryDescriptor: {
       idProperty: "doc_url",
       propertySaveHref: "save_url",
+      allowEditProperty: "editable",
+    },
+
+    actions: ["editEntry", "addEntry"],
+
+    selection: {
+      enabled: true,
     },
 
   },
@@ -275,52 +284,56 @@ define({
       {
         "doc_url": "#link1",
         "doc_name": "Name1",
-        "doc_date": "2020/03/27 13:23",
+        "doc_date": "1585311780000",
         "doc_title": "Title 1",
         "doc_author": "Author 1",
-        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creationDate": "1585311660000",
         "doc_creator": "Creator 1",
         "age": 48,
         "tags": "Tag 1",
         "country": "France",
         "other": "<em>lorem ipsum<em>",
+        "editable": false,
       },
       {
         "doc_url": "#link2",
         "doc_name": "Name2",
-        "doc_date": "2020/04/22 14:07",
+        "doc_date": "1587557220000",
         "doc_title": "Title 2",
         "doc_author": "Author 2",
-        "doc_creationDate": "2020/04/22 14:06",
+        "doc_creationDate": "1587557160000",
         "doc_creator": "Creator 2",
         "age": 24,
         "tags": "Tag 2",
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
+        "editable": true,
       },
       {
         "doc_url": "#link3",
         "doc_name": "Name3",
-        "doc_date": "2020/03/27 14:34",
+        "doc_date": "1585316040000",
         "doc_title": "Title 3",
         "doc_author": "Author 3",
-        "doc_creationDate": "2020/03/27 14:34",
+        "doc_creationDate": "1585316040000",
         "doc_creator": "Creator 3",
         "age": 12,
         "tags": "Tag 3",
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
+        "editable": true,
       },
       {
         "doc_url": "#link4",
         "doc_name": "Name4",
-        "doc_date": "2020/03/27 14:34",
+        "doc_date": "1585316040000",
         "doc_title": "Title 4",
         "doc_author": "Author 4",
-        "doc_creationDate": "2020/03/27 14:34",
+        "doc_creationDate": "1585316040000",
         "doc_creator": "Creator 4",
         "age": 52,
         "country": "Romania",
+        "editable": true,
       },
     ],
 

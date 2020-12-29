@@ -58,8 +58,9 @@
 <dl>
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
-    #if($xwiki.exists('XWiki.ForgotUsername') && $xwiki.hasAccessLevel('view', 'XWiki.ForgotUsername'))
-      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ForgotUsername')" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('forgot', $NULL))
+    #if("$!forgotUsernameURL" != "")
+      <span class="xAdditional"><a href="$forgotUsernameURL" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">
@@ -68,8 +69,9 @@
   </dd>
   <dt>
     <label for="j_password">$services.localization.render('password')</label>
-    #if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
-      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ResetPassword')" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('reset', $NULL))
+    #if("$!resetPasswordUrl" != '')
+      <span class="xAdditional"><a href="$resetPasswordUrl" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
     #end
   </dt>
   <dd class="input-group">

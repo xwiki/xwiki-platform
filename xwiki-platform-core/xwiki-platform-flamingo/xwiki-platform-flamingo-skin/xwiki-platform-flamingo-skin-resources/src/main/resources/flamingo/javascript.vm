@@ -218,7 +218,13 @@ XWiki.editor = "$!{escapetool.javascript($editor)}";
 XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
 XWiki.skin = '$escapetool.javascript($xwiki.skin)';
+## Special case for when the request is about a resource reference not related to a document.
+## Note that we don't need to do it for the other variables since they are all of type string.
+#if ("$!doc" != "")
 XWiki.docisnew = $!doc.isNew();
+#else
+XWiki.docisnew = false;
+#end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($foreach.count > 1),#end"$space"#end ];

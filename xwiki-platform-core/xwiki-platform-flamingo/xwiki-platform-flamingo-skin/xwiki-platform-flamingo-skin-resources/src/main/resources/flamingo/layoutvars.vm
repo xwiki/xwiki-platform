@@ -37,7 +37,8 @@
   #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
   #set($leftPanelsWidth = $xwiki.getXWikiPreference("leftPanelsWidth"))
   #set($rightPanelsWidth = $xwiki.getXWikiPreference("rightPanelsWidth"))
-#else
+#elseif ("$!doc" != "") ## We only rely on the space reference if we are displaying a doc
+                        ## we want to be able to control this value in case of special resources such as authenticate.
   #set($showLeftPanels = $xwiki.getSpacePreference("showLeftPanels"))
   #set($showRightPanels = $xwiki.getSpacePreference("showRightPanels"))
   #set($leftPanelsWidth = $xwiki.getSpacePreference("leftPanelsWidth"))

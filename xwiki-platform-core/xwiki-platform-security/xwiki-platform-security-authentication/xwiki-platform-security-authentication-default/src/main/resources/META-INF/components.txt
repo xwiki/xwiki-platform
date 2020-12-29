@@ -4,3 +4,6 @@ org.xwiki.security.authentication.internal.DefaultAuthenticationFailureManager
 org.xwiki.security.authentication.internal.AuthenticationFailureLoggerListener
 org.xwiki.security.authentication.internal.AuthenticationConfigurationSource
 org.xwiki.security.authentication.internal.DisableAccountFailureStrategy
+org.xwiki.security.authentication.internal.resource.AuthenticationResourceReferenceHandler
+org.xwiki.security.authentication.internal.resource.AuthenticationResourceReferenceResolver
+org.xwiki.security.authentication.internal.resource.AuthenticationResourceReferenceSerializer

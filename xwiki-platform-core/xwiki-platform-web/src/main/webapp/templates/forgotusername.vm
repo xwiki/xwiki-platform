@@ -1,0 +1,86 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#set ($title = "XWiki - $services.localization.render('xe.admin.forgotUsername.title')")
+#set ($showLeftPanels = "no")
+#set ($showRightPanels = "no")
+#template("startpage.vm")
+#macro(forgotUsernameBoxStart $panelClass)
+    #if ("$!panelClass" == "")
+        #set ($panelClass = "default")
+    #end
+    <div class="centered panel panel-$panelClass xwikimessage panel-body">
+      <div class="panel-heading">
+        <div class="panel-title">$services.localization.render('xe.admin.forgotUsername.title')</div>
+      </div>
+    <div class="panel-body">
+#end
+<div class="main layoutsubsection">
+  <div id="mainContentArea">
+      #set($email = "$!request.get('e')")
+      #if($email == '')
+        #forgotUsernameBoxStart("default")
+        $services.localization.render('xe.admin.forgotUsername.instructions')
+        <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" class="xformInline">
+        <div>
+          <label for="e">$services.localization.render('xe.admin.forgotUsername.email.label')</label> 
+          <input type="text" id="e" name="e"/> 
+          <span class="buttonwrapper">
+            <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/>
+          </span>
+        </div>
+        </form>
+      #else
+          #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = :email").bindValue('email', $email.toLowerCase()))
+          #set($results = $query.execute())
+          ## If local user does not exist check global user
+          #if($results.size() == 0 && ${xcontext.database} != ${xcontext.mainWikiName})
+              #set($results = $query.setWiki("${xcontext.mainWikiName}").execute())
+          #end
+          #if($results.size() == 0)
+            #forgotUsernameBoxStart("danger")
+            $services.localization.render('xe.admin.forgotUsername.error.noAccount')
+            <div>
+              <a href="$services.security.authentication.getAuthenticationURL('forgot', $NULL)">$services.localization.render('xe.admin.forgotUsername.error.retry')</a> |
+              <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
+            </div>
+          #elseif($results.size() == 1)
+              #forgotUsernameBoxStart("success")
+              $services.localization.render('xe.admin.forgotUsername.result', ["<strong>${results.get(0).substring($results.get(0).indexOf('.')).substring(1)}</strong>"])
+
+                <div>
+                  <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
+                </div>
+          #else
+            #forgotUsernameBoxStart("success")
+            $services.localization.render('xe.admin.forgotUsername.multipleResults')
+            <ul>
+              #foreach($item in $results)
+                <li><strong>${item.substring($item.indexOf('.')).substring(1)}</strong></li>
+              #end
+            </ul>
+            <div>
+              <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
+            </div>
+          #end
+          #xwikimessageboxend()
+      #end
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")

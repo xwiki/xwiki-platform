@@ -19,7 +19,10 @@
  */
 package org.xwiki.security.authentication.script;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -27,17 +30,25 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.SerializeResourceReferenceException;
+import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authentication.api.AuthenticationResourceReference;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
+import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -71,6 +82,9 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> defaultResourceReferenceSerializer;
 
     @Inject
     private Logger logger;
@@ -124,6 +138,64 @@ public class AuthenticationScriptService implements ScriptService
     {
         if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
             this.authenticationFailureManager.resetAuthenticationFailureCounter(username);
+        }
+    }
+
+    /**
+     * Compute a relative URL for an {@link AuthenticationResourceReference} based on the given action string.
+     * See {@link AuthenticationResourceReference.AuthenticationAction} for more information.
+     *
+     * @param action the authentication action from which to build the right URL.
+     * @param params the query string parameters of the URL.
+     * @return a relative URL for the current wiki.
+     * @since 13.0RC1
+     */
+    @Unstable
+    public String getAuthenticationURL(String action, Map<String, Object> params)
+    {
+        try {
+            AuthenticationResourceReference.AuthenticationAction authenticationAction =
+                AuthenticationResourceReference.AuthenticationAction.getFromRequestParameter(action);
+
+            AuthenticationResourceReference resourceReference =
+                new AuthenticationResourceReference(authenticationAction);
+            if (params != null) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    resourceReference.addParameter(entry.getKey(), entry.getValue());
+                }
+            }
+            ExtendedURL extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
+            return extendedURL.serialize();
+        } catch (IllegalArgumentException | SerializeResourceReferenceException
+            | UnsupportedResourceReferenceException e) {
+            logger.error("Error while getting authentication URL for action [{}]: [{}]", action,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+    }
+
+    /**
+     * Compute an absolute URL for an {@link AuthenticationResourceReference} based on the given action string.
+     * See {@link AuthenticationResourceReference.AuthenticationAction} for more information.
+     * @param action the authentication action from which to build the right URL.
+     * @param params the query string parameters of the URL.
+     * @return an absolute URL.
+     * @since 13.0RC1
+     */
+    @Unstable
+    public String getAuthenticationExternalURL(String action, Map<String, Object> params)
+    {
+        XWikiContext xWikiContext = this.contextProvider.get();
+        String authenticationURL = getAuthenticationURL(action, params);
+        try {
+            URL serverURL = xWikiContext.getURLFactory().getServerURL(xWikiContext);
+            URL result = new URL(serverURL, authenticationURL);
+
+            return result.toExternalForm();
+        } catch (IllegalArgumentException | MalformedURLException e) {
+            logger.error("Error while getting external authentication URL for action [{}]: [{}]", action,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
     }
 }

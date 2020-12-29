@@ -415,12 +415,12 @@ define([
       }
 
       // Check if we are allowed to edit the given entry.
-      if (entry && !isEntryEditable(entry)) {
+      if (entry && !this.isEntryEditable(entry)) {
         return false;
       }
 
       // Check if the specified property is editable.
-      return !propertyId || isPropertyEditable(propertyId);
+      return !propertyId || this.isPropertyEditable(propertyId);
     },
 
     /**
@@ -478,10 +478,10 @@ define([
       Promise.resolve({ /* MOCK DATA */
         "doc_url": mockNewUrl(),
         "doc_name": undefined,
-        "doc_date": "2020/03/27 13:23",
+        "doc_date": "1585311660000",
         "doc_title": undefined,
         "doc_author": "Author 1",
-        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creationDate": "1585311660000",
         "doc_creator": "Creator 1",
         "age": undefined,
         "tags": undefined,

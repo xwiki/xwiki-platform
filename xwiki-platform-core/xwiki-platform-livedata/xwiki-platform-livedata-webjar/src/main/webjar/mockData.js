@@ -266,7 +266,10 @@ define({
       allowEditProperty: "editable",
     },
 
-    actions: ["editEntry", "addEntry"],
+    actions: [
+      { id: "editEntry" },
+      { id: "addEntry" },
+    ],
 
     selection: {
       enabled: true,

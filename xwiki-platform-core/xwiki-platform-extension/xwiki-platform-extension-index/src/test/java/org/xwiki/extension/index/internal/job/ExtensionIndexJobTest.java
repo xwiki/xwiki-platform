@@ -26,8 +26,11 @@ import java.util.Collections;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.SearchableExtensionRepository;
@@ -46,13 +49,16 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class ExtensionIndexJobTest
+class ExtensionIndexJobTest
 {
     @InjectMockComponents
     private ExtensionIndexJob job;
 
     @MockComponent
     private ExtensionIndexStore indexStore;
+
+    @MockComponent
+    private ExtensionRepositoryManager repositoryManager;
 
     private SearchableExtensionRepository repository1;
 
@@ -66,28 +72,37 @@ public class ExtensionIndexJobTest
 
     private Extension extension22;
 
+    public static class TestExtension extends AbstractExtension
+    {
+        public TestExtension(ExtensionId id, String type)
+        {
+            super(null, id, type);
+        }
+    }
+
     @BeforeEach
     void beforeEach() throws SearchException
     {
         this.repository1 = mock(SearchableExtensionRepository.class);
-        this.extension11 = mock(Extension.class);
-        this.extension12 = mock(Extension.class);
-        when(this.repository1.search("", 0, 0)).thenReturn(
+        this.extension11 = new TestExtension(new ExtensionId("id11", "version"), null);
+        this.extension12 = new TestExtension(new ExtensionId("id12", "version"), null);
+        when(this.repository1.search("", 0, 100)).thenReturn(
             new CollectionIterableResult<Extension>(0, 0, Arrays.asList(this.extension11, this.extension12)));
-        when(this.repository1.search("fail1", 0, 0)).thenThrow(SearchException.class);
 
         this.repository2 = mock(SearchableExtensionRepository.class);
-        this.extension21 = mock(Extension.class);
-        this.extension22 = mock(Extension.class);
-        when(this.repository2.search("", 0, 0)).thenReturn(
+        this.extension21 = new TestExtension(new ExtensionId("id21", "version"), null);
+        this.extension22 = new TestExtension(new ExtensionId("id22", "version"), null);
+        when(this.repository2.search("", 0, 100)).thenReturn(
             new CollectionIterableResult<Extension>(0, 0, Arrays.asList(this.extension21, this.extension22)));
-        when(this.repository2.search("fail2", 0, 0)).thenReturn(
-            new CollectionIterableResult<Extension>(0, 0, Arrays.asList(this.extension21, this.extension22)));
+
+        when(this.repositoryManager.getRepositories()).thenReturn(Arrays.asList(this.repository1, this.repository2));
     }
 
     @Test
-    void failingRepository1() throws SolrServerException, IOException
+    void failingRepository1() throws SolrServerException, IOException, SearchException
     {
+        when(this.repository1.search("", 0, 100)).thenThrow(SearchException.class);
+
         ExtensionIndexRequest request = new ExtensionIndexRequest(false, true, Collections.emptyList());
 
         this.job.initialize(request);

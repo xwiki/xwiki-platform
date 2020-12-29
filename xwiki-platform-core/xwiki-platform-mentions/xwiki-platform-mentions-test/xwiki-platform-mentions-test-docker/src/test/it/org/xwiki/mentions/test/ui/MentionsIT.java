@@ -65,11 +65,6 @@ class MentionsIT
     private static final String U2_USERNAME = "U2";
 
     /**
-     * Increased timeout for waiting to receive mention notifications.
-     */
-    private static final int NOTIFICATIONS_COUNT_TIMEOUT = 15;
-
-    /**
      * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
      * @see  Runnable
      * @see <a href="https://www.baeldung.com/java-lambda-exceptions">Baeldung's Exceptions in Java 8 Lambda Expressions</a>.
@@ -112,7 +107,7 @@ class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1, NOTIFICATIONS_COUNT_TIMEOUT);
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();
@@ -173,7 +168,7 @@ class MentionsIT
 
         runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
             setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1, NOTIFICATIONS_COUNT_TIMEOUT);
+            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
             // check that a notif is well received
             NotificationsTrayPage tray = new NotificationsTrayPage();
             tray.showNotificationTray();

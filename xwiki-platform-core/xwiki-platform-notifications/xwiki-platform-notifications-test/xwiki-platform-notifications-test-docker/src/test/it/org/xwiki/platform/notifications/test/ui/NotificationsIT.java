@@ -161,10 +161,8 @@ public class NotificationsIT
         // Check that the badge is showing «20+»
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
-        // We use an explicit timeout here because we're waiting on PAGES_TOP_CREATION_COUNT notifications and the
-        // process can be really slow on our CI sometimes.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
-            PAGES_TOP_CREATION_COUNT, setup.getDriver().getTimeout() * 2);
+            PAGES_TOP_CREATION_COUNT);
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
@@ -179,10 +177,7 @@ public class NotificationsIT
         // Make sure it's still OK after a refresh (change the page so we are sure it refreshes)
         setup.gotoPage("Main", "WebHome");
         // Marking the notification as read is done async, so we need to wait to be sure it has been taken into account.
-        // Note: Default timeout increased since we got some CI agent failures because of timeouts (waiting on 20
-        // notifications can take time).
-        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 20,
-            setup.getDriver().getTimeout() * 2);
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 20);
         tray = new NotificationsTrayPage();
         assertEquals(20, tray.getNotificationsCount());
         assertEquals(9, tray.getUnreadNotificationsCount());

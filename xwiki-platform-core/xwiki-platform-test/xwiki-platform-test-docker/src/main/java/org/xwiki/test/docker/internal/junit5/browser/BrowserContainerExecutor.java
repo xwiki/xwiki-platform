@@ -92,7 +92,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("Test resource path mapped: On Host [{}], in Docker: [{}]",
                 getTestResourcePathOnHost(), browser.getTestResourcesPath());
-            LOGGER.info("Docker image used: [{}]", BrowserWebDriverContainer.getImageForCapabilities(
+            LOGGER.info("Docker image used: [{}]", BrowserWebDriverContainer.getDockerImageForCapabilities(
                 this.testConfiguration.getBrowser().getCapabilities(),
                 SeleniumUtils.determineClasspathSeleniumVersion()));
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));

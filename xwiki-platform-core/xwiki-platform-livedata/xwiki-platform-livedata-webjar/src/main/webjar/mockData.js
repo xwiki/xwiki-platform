@@ -27,7 +27,7 @@ define({
   id: "LD0",
 
   query: {
-    properties: ["doc_date", "doc_title", "age", "country", "tags", "other"],
+    properties: ["doc_date", "doc_title", "age", "country", "tags", "other", "_actions"],
 
     source: {
       id: "...",
@@ -63,12 +63,12 @@ define({
       {
         id: "table",
         name: "Table",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-table"},
       },
       {
         id: "cards",
         name: "Cards",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-th"},
         titleProperty: "doc_title",
       },
     ],
@@ -87,7 +87,7 @@ define({
         type: "string",
         visible: true,
         displayer: {
-          id: 'link',
+          id: "link",
           propertyHref: "doc_url",
         },
       },
@@ -124,64 +124,80 @@ define({
         sortable: false,
         filterable: false,
       },
+      {
+        id: "_actions",
+        name: "Actions",
+        type: "_actions",
+        visible: true,
+      },
     ],
 
     propertyTypes: [
       {
-        id: 'string',
-        name: 'String',
+        id: "string",
+        name: "String",
         displayer: {
-          id: 'text',
+          id: "text",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'text'
+          id: "text"
         },
         editable: true,
       },
       {
-        id: 'number',
-        name: 'Number',
+        id: "number",
+        name: "Number",
         displayer: {
-          id: 'number',
+          id: "number",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'number'
+          id: "number"
         },
         editable: true,
       },
       {
-        id: 'list',
-        name: 'List',
+        id: "list",
+        name: "List",
         displayer: {
-          id: 'list',
+          id: "list",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'list'
+          id: "list"
         },
         editable: true,
       },
       {
-        id: 'date',
-        name: 'Date',
+        id: "date",
+        name: "Date",
         displayer: {
-          id: 'date',
+          id: "date",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'date'
+          id: "date"
         },
         editable: true,
+      },
+      {
+        id: "_actions",
+        name: "Actions",
+        displayer: {
+          id: "actions",
+        },
+        sortable: false,
+        filterable: false,
+        editable: false,
       },
     ],
 
-    defaultFilter: 'text',
+    defaultFilter: "text",
 
     filters: [
       {
@@ -232,7 +248,7 @@ define({
       },
     ],
 
-    defaultDisplayer: 'text',
+    defaultDisplayer: "text",
 
     displayers: [
       {
@@ -246,6 +262,9 @@ define({
       },
       {
         id: "date",
+      },
+      {
+        id: "_actions",
       },
     ],
 
@@ -267,8 +286,35 @@ define({
     },
 
     actions: [
-      { id: "editEntry" },
-      { id: "addEntry" },
+      {
+        id: "viewEntry",
+        name: "View entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-eye"},
+        propertyHref: "doc_url",
+      },
+      {
+        id: "editEntry",
+        name: "Edit entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-pencil"},
+        propertyHref: "doc_edit_url",
+      },
+      {
+        id: "editRights",
+        name: "Edit rights",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-lock"},
+        propertyHref: "doc_rights_url",
+      },
+      {
+        id: "deleteEntry",
+        name: "Delete entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-trash"},
+        propertyHref: "doc_delete_url",
+      },
+      {
+        id: "addEntry",
+        name: "Add entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-th"},
+      },
     ],
 
     selection: {

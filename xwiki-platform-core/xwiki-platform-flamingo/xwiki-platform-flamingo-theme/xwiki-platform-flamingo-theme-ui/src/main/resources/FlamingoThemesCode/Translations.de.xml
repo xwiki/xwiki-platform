@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  
+  <content>platform.flamingo.themes.home.title=Themes für Flamingo
+platform.flamingo.themes.home.currenttheme=Aktuelles Theme
+platform.flamingo.themes.home.otherthemes=Andere verfügbare Themes
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Dies ist die Anwendung zur Verwaltung der Flamingo-Themes. Ein Flamingo-Thema ist eine anpassbare Variante eines beliebigen Skins, das auf Flamingo basiert. Wenn Sie Color Themes für Colibri-basierte Skins verwalten möchten, sollten Sie zu {0}Colibri Color Themes Application{1} gehen.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Das aktuelle Theme ist ein Colibri-Color-Theme, das nicht für die Arbeit mit einem auf Flamingo basierenden Skin optimiert ist. Wir haben unser Bestes versucht, um es kompatibel zu machen, aber die Ergebnisse sind möglicherweise nicht optimal.
+platform.flamingo.themes.home.useThisTheme=Benutze dieses Theme
+platform.flamingo.themes.home.newThemeName=Theme-Name...
+platform.flamingo.themes.home.create=Neues Theme erstellen
+platform.flamingo.themes.home.create.invalid=Ungültiger Theme-Name!
+platform.flamingo.themes.home.create.csrf=Bestätigen Sie bitte aus Sicherheitsgründen, dass Sie ein Thema mit dem Namen "{0}" erstellen möchten.
+platform.flamingo.themes.home.create.confirm=Bestätigung
+platform.flamingo.themes.home.set.success=Theme auf "{0}" gesetzt.
+platform.flamingo.themes.title.variables=Variablen
+platform.flamingo.themes.title.preview=Vorschau
+platform.flamingo.themes.autorefresh=Automatische Aktualisierung
+platform.flamingo.themes.refresh=Aktualisieren
+platform.flamingo.themes.refreshwarning=Die Aktualisierung kann einige Sekunden dauern.
+platform.flamingo.themes.loading=Lade...
+platform.flamingo.themes.category.logos=Logos
+platform.flamingo.themes.category.base-colors=Basisfarben
+platform.flamingo.themes.category.typography=Typografie
+platform.flamingo.themes.category.forms=Formulare
+platform.flamingo.themes.category.buttons=Knöpfe
+platform.flamingo.themes.category.tables=Tabellen
+platform.flamingo.themes.category.navbar=Navigationsleiste
+### Missing: platform.flamingo.themes.category.dropdowns=Drop downs
+### Missing: platform.flamingo.themes.category.panels=Panels
+### Missing: platform.flamingo.themes.category.breadcrumb=Breadcrumb
+platform.flamingo.themes.category.advanced=Erweitert
+platform.flamingo.themes.defaultvalue=Standard
+platform.flamingo.themes.lessCode.description=In diesem Feld können Sie direkt LESS-Code schreiben, der in den Skin eingefügt wird.
+platform.flamingo.themes.local=Lokal
+platform.flamingo.themes.global=Global
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=Leider wird dieses Feld in der Live-Vorschau nicht berücksichtigt.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Die Vorschau funktioniert leider nicht mit dieser Version des Internet Explorers. Sie müssen einen neueren Browser verwenden.
+
+#@deprecatedend</content>
+</xwikidoc>

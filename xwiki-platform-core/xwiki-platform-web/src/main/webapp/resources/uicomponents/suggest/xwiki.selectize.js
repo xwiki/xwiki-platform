@@ -26,7 +26,7 @@ require.config({
   }
 });
 
-define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($) {
+define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
   'use strict';
 
   var optionTemplate = [
@@ -225,6 +225,13 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       defaultSettings.dropdownWidth = 'auto';
     }
     return defaultSettings;
+  };
+
+  // Hack needed in order to be able to access internal selectize fields that are prefixed with $ when the JavaScript is
+  // minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly by their name
+  // (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
+  Selectize.prototype.get$ = function(key) {
+    return this[$jsontool.serialize($escapetool.d) + key];
   };
 
   var getSettings = function(input, settings) {

@@ -135,11 +135,11 @@ public class NotificationsIT
 
         // The user 1 creates a new page, the user 2 shouldn’t receive any notification
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.createPage(testReference.getLastSpaceReference().getName(),
-            "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
+        String space = testReference.getLastSpaceReference().getName();
+        setup.createPage(space, "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.gotoPage(space, "WebHome");
 
         tray = new NotificationsTrayPage();
         assertFalse(tray.areNotificationsAvailable());
@@ -152,15 +152,14 @@ public class NotificationsIT
         // We create a lot of pages in order to test the notification badge
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
-            setup.createPage(testReference.getLastSpaceReference().getName(),
-                "Page" + i, "Simple content", "Simple title");
+            setup.deletePage(space, "Page" + i);
+            setup.createPage(space, "Page" + i, "Simple content", "Simple title");
         }
-        setup.createPage(testReference.getLastSpaceReference().getName(),
-            "DTP", "Deletion test page", "Deletion test content");
+        setup.createPage(space, "DTP", "Deletion test page", "Deletion test content");
 
         // Check that the badge is showing «20+»
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.gotoPage(space, "WebHome");
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
             PAGES_TOP_CREATION_COUNT);
         tray = new NotificationsTrayPage();
@@ -202,10 +201,10 @@ public class NotificationsIT
 
         // Delete the "Deletion test page" and test the notification
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.deletePage(testReference.getLastSpaceReference().getName(), "DTP");
+        setup.deletePage(space, "DTP");
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+        setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
         tray = new NotificationsTrayPage();
@@ -395,10 +394,12 @@ public class NotificationsIT
 
     @Test
     @Order(5)
-    public void guestUsersDontSeeNotificationPanel(TestUtils setup)
+    public void guestUsersDontSeeNotificationMenu(TestUtils setup)
     {
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.gotoPage("Main", "WebHome");
+        // Move to any page in view mode so that the notification menu is visible. Note that we use a non-existing page
+        // for improved test performance.
+        setup.gotoPage("NotExistingSpace", "NotExistingPage");
         assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
         setup.forceGuestUser();
         assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());

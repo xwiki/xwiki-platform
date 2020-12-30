@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Singleton;
@@ -47,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UserEventDispatcherTest
+class UserEventDispatcherTest
 {
     @Component(roles = UserEventDispatcher.class)
     @Singleton
@@ -57,7 +59,7 @@ public class UserEventDispatcherTest
 
         ReentrantLock lock = new ReentrantLock();
 
-        ReentrantLock nextLock = new ReentrantLock();
+        CountDownLatch count = new CountDownLatch(0);
 
         List<Event> dispatched = new ArrayList<>();
 
@@ -65,6 +67,7 @@ public class UserEventDispatcherTest
         public void dispatch(Event event)
         {
             this.dispatched.add(event);
+            this.count.countDown();
 
             this.lock.lock();
             if (!this.disposed && !this.skipDispatch) {
@@ -122,10 +125,12 @@ public class UserEventDispatcherTest
         assertEquals(0, this.dispatcher.priorityQueue.size());
         assertEquals(0, this.dispatcher.secondaryQueue.size());
 
+        this.dispatcher.count = new CountDownLatch(1);
+
         this.dispatcher.addEvent(storeEvent("event1"));
 
         // Make sure the thread catched the event added to the queue
-        Thread.sleep(100);
+        this.dispatcher.count.await(1, TimeUnit.SECONDS);
 
         assertEquals(0, this.dispatcher.priorityQueue.size());
         assertEquals(0, this.dispatcher.secondaryQueue.size());
@@ -157,10 +162,11 @@ public class UserEventDispatcherTest
         assertEquals(1, this.dispatcher.dispatched.size());
 
         this.dispatcher.skipDispatch = true;
+        this.dispatcher.count = new CountDownLatch(5);
         this.dispatcher.lock.unlock();
 
         // Make sure the thread have time to dispatch all the events
-        Thread.sleep(100);
+        this.dispatcher.count.await(1, TimeUnit.SECONDS);
 
         assertEquals(0, this.dispatcher.priorityQueue.size());
         assertEquals(0, this.dispatcher.secondaryQueue.size());

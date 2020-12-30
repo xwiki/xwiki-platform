@@ -21,6 +21,8 @@ package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -31,19 +33,16 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ForgotUsernameCompletePage extends ViewPage
 {
+    @FindBy(css = ".xwikimessage")
+    private WebElement messageBox;
+
     public boolean isUsernameRetrieved(String username)
     {
-        try {
-            getDriver()
-                .findElementWithoutWaiting(By.xpath("//div[@id='xwikicontent']//strong[text()='" + username + "']"));
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return messageBox.getText().contains(username);
     }
 
     public boolean isAccountNotFound()
     {
-        return getContent().contains("No account is registered using this email address");
+        return messageBox.getText().contains("No account is registered using this email address");
     }
 }

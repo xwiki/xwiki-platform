@@ -37,7 +37,7 @@
       #if($email == '')
         #forgotUsernameBoxStart("default")
         $services.localization.render('xe.admin.forgotUsername.instructions')
-        <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" class="xformInline">
+        <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" id="forgotUsernameForm" class="xformInline">
         <div>
           <label for="e">$services.localization.render('xe.admin.forgotUsername.email.label')</label> 
           <input type="text" id="e" name="e"/> 

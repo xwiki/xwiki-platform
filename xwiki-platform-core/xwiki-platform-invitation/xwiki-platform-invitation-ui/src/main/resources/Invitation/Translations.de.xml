@@ -39,11 +39,11 @@
   <content>invitation.applicationsPanelEntryLabel=Einladung
 
 # Invitation Administration Section
-### Missing: Invitation.WebHome_from_address.hint=The email address used to send the invitation emails from.
-### Missing: Invitation.WebHome_smtp_server_password.hint=The password to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_server_username.hint=The username to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_port.hint=The port of the SMTP server to use.
-### Missing: Invitation.WebHome_smtp_server.hint=The SMTP server to send to.
-### Missing: Invitation.WebHome_javamail_extra_props.hint=The list of additional JavaMail properties to use.</content>
+Invitation.WebHome_from_address.hint=Die E-Mail-Adresse, von der aus die Einladungs-E-Mails gesendet werden sollen.
+Invitation.WebHome_smtp_server_password.hint=Das Kennwort für die Verbindung mit dem SMTP-Server, nur wenn eine Authentifizierung erforderlich ist.
+Invitation.WebHome_smtp_server_username.hint=Der Benutzername zur Verbindung mit dem SMTP-Server, nur wenn eine Authentifizierung erforderlich ist.
+Invitation.WebHome_smtp_port.hint=Der Port des zu verwendenden SMTP-Servers.
+Invitation.WebHome_smtp_server.hint=Der SMTP-Server, an den gesendet werden soll.
+Invitation.WebHome_javamail_extra_props.hint=Die Liste der zusätzlich zu verwendenden JavaMail-Eigenschaften.</content>
   
 </xwikidoc>

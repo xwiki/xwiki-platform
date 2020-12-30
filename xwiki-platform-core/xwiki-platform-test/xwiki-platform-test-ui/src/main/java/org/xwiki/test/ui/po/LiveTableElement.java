@@ -26,11 +26,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the actions possible on a livetable.
@@ -40,6 +40,8 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class LiveTableElement extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LiveTableElement.class);
+
     private String livetableId;
 
     public LiveTableElement(String livetableId)
@@ -247,11 +249,29 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getDriver().waitUntilCondition(driver -> {
-            // Refresh the current page since we need the livetable to fetch the JSON again
-            driver.navigate().refresh();
-            return driver.findElements(by).size() >= minimalExpectedRowCount;
-        });
+        // TODO: Remove the try/catch and the logging once we understand the issue. This is done to debug an issue
+        //  with the MailIT test where the timeout is not the issue since the CI screenshots shows that the number of
+        //  rows displayed is correct and yet this method returns less than the expected count. Thus we suppose that
+        //  the refresh() might not be working. We thus also try to navigate to the same page in the hope to get better
+        //  results.
+        try {
+            getDriver().waitUntilCondition(driver -> {
+                // Refresh the current page since we need the livetable to fetch the JSON again
+                driver.navigate().refresh();
+                int count = driver.findElements(by).size();
+                LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
+                return count >= minimalExpectedRowCount;
+            });
+        } catch (TimeoutException e) {
+            // Try again but this time with driver.get(), in case refresh() doesn't work.
+            getDriver().waitUntilCondition(driver -> {
+                // Refresh the current page since we need the livetable to fetch the JSON again
+                driver.get(driver.getCurrentUrl());
+                int count = driver.findElements(by).size();
+                LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/get(): count = [{}]", count);
+                return count >= minimalExpectedRowCount;
+            });
+        }
     }
 
     /**

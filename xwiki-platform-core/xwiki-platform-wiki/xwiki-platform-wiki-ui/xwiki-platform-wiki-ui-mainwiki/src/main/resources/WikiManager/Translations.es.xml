@@ -44,7 +44,7 @@
 #
 # This contains the translations of the module in the default language
 # (generally English).
-# 
+#
 # Translation key syntax:
 #   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
 #   where:
@@ -59,7 +59,7 @@
 #   translate it by adding a comment before it. To make sure a comment is not
 #   assigned to the following key use at least three sharps (###) for the comment
 #   or after it.
-# 
+#
 # Deprecated keys:
 #   * when deleting a key it should be moved to deprecated section at the end
 #     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.dw=Después de clicar en el botón "Crear", se 
 platform.wiki.create.wizard.step.previous=Paso anterior
 platform.wiki.create.wizard.step.next=Paso siguiente
 platform.wiki.create.wizard.step.create=Crear
-
 platform.wiki.create.wizard.step.creation=Creación de wikis
 platform.wiki.create.wizard.step.creation.wait=Por favor, espere hasta que se haya creado la wiki.
 platform.wiki.create.wizard.step.creation.complete=La wiki {0} se ha creado con éxito. Ya puedes acceder a ella.
@@ -279,7 +278,7 @@ platform.wiki.sheet.aliases=Un alias es otro nombre para la wiki. Puedes añadir
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing=El {0}Plugin Application Manager{1} no está instalado. Por favor, instalálo y vuelve a intentarlo.
 
 #######################################
 ## until 6.4RC1
@@ -290,18 +289,19 @@ platform.wiki.sheet.aliases=Un alias es otro nombre para la wiki. Puedes añadir
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=El sistema está aprovisionando la wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Por favor, espera mientras el sistema aprovisiona la wiki.
+platform.wiki.create.wizard.step.provisioning.complete=La wiki está casi preparada. Haz clic en "finalizar" para ejecutar la última operación.
+platform.wiki.create.wizard.step.provisioning.error=Se ha creado la wiki {0}, pero algunas páginas incluidas en la plantilla no se han copiado. Probablemente, deberías eliminarla.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalizar
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=Sí, por favor, ¡borra esta wiki!
+platform.wiki.delete.confirmation.no=No, ¡vuelve atrás!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

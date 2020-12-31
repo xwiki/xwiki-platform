@@ -350,6 +350,10 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             }
         }
 
+        // Update the macro content to take into consideration any change that could have happened to the content
+        // during the macro execution.
+        this.macroContent = macroBinding.getContent();
+
         return result;
     }
 

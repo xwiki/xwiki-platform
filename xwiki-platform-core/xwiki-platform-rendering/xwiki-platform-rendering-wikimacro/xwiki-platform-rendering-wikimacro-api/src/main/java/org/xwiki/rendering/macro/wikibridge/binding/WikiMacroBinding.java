@@ -88,7 +88,12 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         return (String) this.get(CONTENT);
     }
 
-    protected void setContent(String content)
+    /**
+     * Set the content of the macro.
+     *
+     * @param content the new macro content
+     */
+    public void setContent(String content)
     {
         this.put(CONTENT, content);
     }

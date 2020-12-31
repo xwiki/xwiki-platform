@@ -2534,12 +2534,18 @@ public class Document extends Api
 
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
-        if (hasAccessLevel("edit")) {
-            saveDocument(comment, minorEdit);
+        // If the current author does not have PR don't let it set current user as author of the saved document since it
+        // can lead to right escalation
+        if (hasProgrammingRights()) {
+            if (hasAccessLevel("edit")) {
+                saveDocument(comment, minorEdit);
+            } else {
+                java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access denied in edit mode on document {0}", null, args);
+            }
         } else {
-            java.lang.Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied in edit mode on document {0}", null, args);
+            saveAsAuthor(comment, minorEdit);
         }
     }
 
@@ -2586,8 +2592,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
@@ -2598,8 +2604,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
@@ -2611,8 +2617,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next

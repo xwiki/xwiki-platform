@@ -115,7 +115,7 @@ $response.setContentType('application/json')
      #set($originalDocument = $ddoc.getDocument())
      "fullname"  : "$escapetool.javascript($ddoc.fullName)",
      "title"  : #if ($originalDocument)"$escapetool.javascript($originalDocument.displayTitle)"#else"$escapetool.javascript($ddoc.documentReference.name)"#end,
-     "url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'viewrev', $escapetool.url({'rev' : "deleted:${item}"})))",
+     "url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'view', $escapetool.url({'rev' : "deleted:${item}"})))",
      "originalUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference))",
      "canDelete" : $ddoc.canDelete(),
      "deleteUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",

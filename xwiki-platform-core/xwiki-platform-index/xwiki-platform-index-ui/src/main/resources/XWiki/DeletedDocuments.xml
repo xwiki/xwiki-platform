@@ -106,7 +106,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
     #set($ddoc = $xwiki.getDeletedDocument($id))
     #set($originalDocument = $ddoc.getDocument())
     &lt;tr&gt;
-      &lt;td&gt;&lt;a href="$originalDocument.getURL('viewrev', $escapetool.url({'rev' : "deleted:${id}"}))"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getURL('view', $escapetool.url({'rev' : "deleted:${id}"}))"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;
       &lt;td&gt;$escapetool.xml($originalDocument.plainTitle)&lt;/td&gt;
       &lt;td&gt;$xwiki.formatDate($ddoc.getDate(), $dateFormat)&lt;/td&gt;
       &lt;td&gt;$xwiki.getUserName($ddoc.getDeleter())&lt;/td&gt;

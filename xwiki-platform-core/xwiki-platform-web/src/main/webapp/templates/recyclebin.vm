@@ -17,7 +17,7 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-##@deprecated since 9.4RC1, use viewrev action with "rev=deleted:<id>" instead
+##@deprecated since 9.4RC1, use view action with "rev=deleted:<id>" instead
 ## Preview deleted document in recycle bin
 #set ($deletedDocument = $xwiki.getDeletedDocument($request.get('id')))
 #if ($deletedDocument)

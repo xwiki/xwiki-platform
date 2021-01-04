@@ -637,8 +637,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         URL attachmentURL = null;
 
         // If we are viewing a specific revision, then we need to get the attachment for this specific revision.
-        if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
-            && isContextDoc(xwikidb, spaces, name, context) && Locale.ROOT.equals(context.getDoc().getLocale())) {
+        if ((context != null) && context.get("rev") != null && isContextDoc(xwikidb, spaces, name, context)
+            && Locale.ROOT.equals(context.getDoc().getLocale())) {
             try {
                 String docRevision = context.get("rev").toString();
                 attachment = findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);

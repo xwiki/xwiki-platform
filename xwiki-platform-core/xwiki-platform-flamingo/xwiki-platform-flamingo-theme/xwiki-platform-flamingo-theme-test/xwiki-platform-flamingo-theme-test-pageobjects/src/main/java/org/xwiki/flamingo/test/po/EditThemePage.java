@@ -129,6 +129,7 @@ public class EditThemePage extends EditPage
     protected void waitUntilReady()
     {
         // The refresh button is disabled initially, until the preview is ready, and whenever a refresh is in progress.
-        getDriver().waitUntilCondition(elementToBeClickable(this.refreshButton));
+        // Note: Putting a large timeout since the Theme preview is slow and can take a lot of time.
+        getDriver().waitUntilCondition(elementToBeClickable(this.refreshButton), getDriver().getTimeout() * 10);
     }
 }

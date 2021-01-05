@@ -129,7 +129,7 @@ Caused by: #printThrowable($throwable.cause true)
   ## Add the last message element.
   ## Replace \ with <br/> so that new lines are visible in the generated HTML display
   #set ($message = "$message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))")
-  #set ($message = $message.replaceAll('\n', '<br/>'))
+  #set ($message = $message.replace($escapetool.n, '<br/>'))
   $message##
 #end
 

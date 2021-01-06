@@ -249,6 +249,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
     {
         this.configurationMetadata = null;
+        this.databaseProductCache = DatabaseProduct.UNKNOWN;
     }
 
     /**
@@ -422,14 +423,12 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        DatabaseProduct product = this.databaseProductCache;
-
-        if (product == DatabaseProduct.UNKNOWN) {
+        if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
             if (this.sessionFactory != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
-                        product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                        this.databaseProductCache = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
                     } catch (SQLException ignored) {
                         // do not care, return UNKNOWN
                     }
@@ -443,11 +442,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                 if (connectionURL == null) {
                     connectionURL = this.configuration.getProperty("connection.url");
                 }
-                product = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
+                this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
 
-        return product;
+        return this.databaseProductCache;
     }
 
     private String extractJDBCConnectionURLScheme(String fullConnectionURL)

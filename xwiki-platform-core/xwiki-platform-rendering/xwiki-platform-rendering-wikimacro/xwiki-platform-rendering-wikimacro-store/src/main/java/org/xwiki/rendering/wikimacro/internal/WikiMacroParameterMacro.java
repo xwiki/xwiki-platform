@@ -20,7 +20,9 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +30,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -87,6 +92,15 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
     public List<Block> execute(WikiMacroParameterMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        return Collections.emptyList();
+        Map<String, String> placeholderParameters = new LinkedHashMap<>();
+        placeholderParameters.put("data-wikimacro-id", ID);
+        placeholderParameters.put("name", parameters.getName());
+
+        if (context.isInline()) {
+            return Collections
+                .singletonList(new FormatBlock(Collections.emptyList(), Format.NONE, placeholderParameters));
+        } else {
+            return Collections.singletonList(new GroupBlock(placeholderParameters));
+        }
     }
 }

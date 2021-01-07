@@ -20,13 +20,18 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -78,6 +83,14 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Collections.emptyList();
+        Map<String, String> placeholderParameters = new LinkedHashMap<>();
+        placeholderParameters.put("data-wikimacro-id", ID);
+
+        if (context.isInline()) {
+            return Collections
+                .singletonList(new FormatBlock(Collections.emptyList(), Format.NONE, placeholderParameters));
+        } else {
+            return Collections.singletonList(new GroupBlock(placeholderParameters));
+        }
     }
 }

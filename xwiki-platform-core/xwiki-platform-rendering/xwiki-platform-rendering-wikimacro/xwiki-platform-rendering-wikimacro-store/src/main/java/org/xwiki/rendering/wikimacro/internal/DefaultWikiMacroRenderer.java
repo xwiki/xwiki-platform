@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,6 +54,7 @@ import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
@@ -70,6 +73,7 @@ import org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -173,10 +177,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final BlockMatcher MACRO_MARKER_MATCHER = testedBlock -> (testedBlock instanceof MacroMarkerBlock);
 
-    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER =
-        testedBlock -> (testedBlock instanceof MacroMarkerBlock
+    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> ((testedBlock instanceof RawBlock
+        && (((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.XHTML)
+            || ((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.HTML)))
+        || (testedBlock instanceof MacroMarkerBlock
             && (((MacroMarkerBlock) testedBlock).getId().equals(WikiMacroContentMacro.ID)
-                || ((MacroMarkerBlock) testedBlock).getId().equals(WikiMacroParameterMacro.ID)));
+                || ((MacroMarkerBlock) testedBlock).getId().equals(WikiMacroParameterMacro.ID))));
 
     /**
      * Match all the metadata blocks that contains wikimacrocontent=true.
@@ -191,6 +197,10 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final BlockMatcher NON_GENERATED_CONTENT_METADATA_MATCHER =
         testedBlock -> (testedBlock instanceof MetaDataBlock)
             && ((MetaDataBlock) testedBlock).getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
+
+    private static final Pattern HTML_PLACEHOLDER_PATTERN =
+        Pattern.compile("<(span|div) data-wikimacro-id=(?:[\"'])([^\"']+)(?:[\"'])"
+            + "(?: name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
 
     @Inject
     private AsyncContext asyncContext;
@@ -614,6 +624,26 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private Block resolveMacroPlaceholders(Block block)
     {
         // Check if the result itself is a place holder
+        Block replacedBlock = replacePlaceHolder(block);
+        if (replacedBlock != block) {
+            return replacedBlock;
+        }
+
+        // Search and replace place holders in children blocks
+        List<Block> placeholders = block.getBlocks(PLACEHOLDERS_BLOCKMATCHER, Axes.DESCENDANT);
+        for (Block placeholder : placeholders) {
+            replacedBlock = replacePlaceHolder(placeholder);
+
+            if (replacedBlock != block) {
+                placeholder.getParent().replaceChild(replacedBlock, placeholder);
+            }
+        }
+
+        return block;
+    }
+
+    private Block replacePlaceHolder(Block block)
+    {
         if (block instanceof MacroMarkerBlock) {
             MacroMarkerBlock macroBlock = (MacroMarkerBlock) block;
 
@@ -622,24 +652,55 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             } else if (macroBlock.getId().equals(WikiMacroParameterMacro.ID)) {
                 return resolveMacroParameter(macroBlock);
             }
-        }
+        } else if (block instanceof RawBlock) {
+            // We need the wikimacro content and parameter to be executed in the right context so if any can be found in
+            // an html raw block we need to refactor that raw block to be two raw blocks around a proper blocks to
+            // execute later
+            RawBlock rawBlock = (RawBlock) block;
 
-        // Search and replace place holders in children blocks
-        List<MacroMarkerBlock> placeholders = block.getBlocks(PLACEHOLDERS_BLOCKMATCHER, Axes.DESCENDANT);
-        for (MacroMarkerBlock macroBlock : placeholders) {
-            Block replacedBlock;
-            if (macroBlock.getId().equals(WikiMacroContentMacro.ID)) {
-                replacedBlock = resolveMacroContent(macroBlock);
-            } else if (macroBlock.getId().equals(WikiMacroParameterMacro.ID)) {
-                replacedBlock = resolveMacroParameter(macroBlock);
-            } else {
-                continue;
+            if (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
+                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML)) {
+                return replaceHTMLPlaceHolder(rawBlock);
             }
-
-            macroBlock.getParent().replaceChild(replacedBlock, macroBlock);
         }
 
         return block;
+    }
+
+    private Block replaceHTMLPlaceHolder(RawBlock rawBlock)
+    {
+        Matcher matcher = HTML_PLACEHOLDER_PATTERN.matcher(rawBlock.getRawContent());
+
+        if (matcher.find()) {
+            CompositeBlock replacedBlock = new CompositeBlock();
+
+            int previousIndex = 0;
+            do {
+                String macroId = matcher.group(2);
+                boolean isInline = matcher.group(1).equals("span");
+
+                replacedBlock.addChild(new RawBlock(rawBlock.getRawContent().substring(previousIndex, matcher.start()),
+                    rawBlock.getSyntax()));
+
+                if (macroId.equals(WikiMacroContentMacro.ID)) {
+                    replacedBlock.addChild(resolveMacroContent(
+                        new MacroMarkerBlock(macroId, Collections.emptyMap(), Collections.emptyList(), isInline)));
+                } else {
+                    replacedBlock.addChild(resolveMacroParameter(new MacroMarkerBlock(macroId,
+                        Collections.singletonMap("name", matcher.group(3)), Collections.emptyList(), isInline)));
+                }
+
+                previousIndex = matcher.end();
+            } while (matcher.find());
+
+            replacedBlock.addChild(
+                new RawBlock(rawBlock.getRawContent().substring(previousIndex, rawBlock.getRawContent().length()),
+                    rawBlock.getSyntax()));
+
+            return replacedBlock;
+        }
+
+        return rawBlock;
     }
 
     private Block resolveMacroContent(MacroMarkerBlock macroBlock)
@@ -656,6 +717,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                     macroBlock.isInline());
             }
 
+            // We don't execute the content to make sure it's execute later in the right context (where it was passed to
+            // the wiki macro)
             return new MetaDataBlock(blocks, nonGeneratedContentMetaData);
         }
 

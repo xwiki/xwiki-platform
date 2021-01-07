@@ -275,9 +275,10 @@ class DefaultWikiMacroTest
     @Test
     void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
-        registerWikiMacro("wikimacrowithresult", "{{groovy}}"
-            + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
-            + "{{/groovy}}", Syntax.XWIKI_2_0);
+        registerWikiMacro("wikimacrowithresult",
+            "{{groovy}}" + "xcontext.macro.result = java.util.Collections.singletonList("
+                + "new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));" + "{{/groovy}}",
+            Syntax.XWIKI_2_0);
 
         assertXHTML("<p>Hello World</p>", "Hello {{wikimacrowithresult param1=\"World\" param2=\"param2\"/}}");
     }
@@ -734,6 +735,80 @@ class DefaultWikiMacroTest
             "endParagraph\n" + 
             "endMacroMarkerStandalone [wikimacro] [param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
             "[[label>>path:reference]]]\n" + 
+            "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void testWikimacrocontentWhenInRawBlock() throws Exception
+    {
+        registerWikiMacro("wikimacro",
+            "{{html wiki='true' clean='false'}}<span class='class'>{{wikimacrocontent/}}</span>{{/html}}",
+            Syntax.XWIKI_2_0, new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE),
+            Collections.<WikiMacroParameterDescriptor>emptyList());
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro}}[[label>>path:reference]]{{/wikimacro}}"), Syntax.XWIKI_2_1,
+            Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n"
+            + "beginMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
+            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "beginMetaData [[non-generated-content]="
+                + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
+            + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "onWord [label]\n"
+            + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "endMetaData [[non-generated-content]="
+                + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
+            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "endMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
+            + "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void testWikimacroparameterWhenInRawBlock() throws Exception
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
+            .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("wikimacro",
+        //@formatter:off
+            "{{html wiki='true' clean='false'}}"
+              + "<span class='class'>{{wikimacroparameter name=\"param1\"/}}</span>" +
+            "{{/html}}",
+        //@formatter:on
+            Syntax.XWIKI_2_0, new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE), parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro param1=\"[[label>>path:reference]]\"/}}"),
+            Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n"
+            + "beginMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n"
+            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
+            + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "onWord [label]\n"
+            + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
+            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "endMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n" +
             "endDocument [[syntax]=[XWiki 2.1]]";
         //@formatter:on
 

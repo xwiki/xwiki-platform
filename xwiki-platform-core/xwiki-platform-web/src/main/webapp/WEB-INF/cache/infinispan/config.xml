@@ -36,6 +36,13 @@
    -->
 
    <cache-container name="xwiki" statistics="true" default-cache="default" shutdown-hook="DEFAULT">
+     <!-- The default serializer since Infinispan 10 is Protostream which unfortunately support a very
+          limited set of type and more importantly not Serializable classes anymore.
+          Since this change is an important regression from XWiki point of view we switch back to
+          the deprecated JavaSerializationMarshaller (until they remove it completely...).
+          We don't use JBossUserMarshaller (the previous default) because it's now deprecated.
+     -->
+     <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller"/>
 
      <jmx domain="org.xwiki.infinispan" />
 

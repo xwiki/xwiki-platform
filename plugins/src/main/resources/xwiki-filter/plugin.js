@@ -39,63 +39,6 @@
     __namespace: true
   };
 
-  // Determine if a plain space is converted into a non-breaking space when the character before it is deleted. For this
-  // we create a test editor instance, try to reproduce the problem and then destroy it. We do this as soon as the first
-  // editor instance is created, in order to be sure all the required resources are loaded.
-  // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
-  var hasNonBreakingSpaceIssue = false;
-  CKEDITOR.once('instanceCreated', function() {
-    // Backup the current text selection because the test editor instance requires the focus.
-    var nativeSelection = window.getSelection();
-    var originalRange = nativeSelection.rangeCount > 0 && nativeSelection.getRangeAt(0);
-    // Note that the editor must be visible in order to reproduce the issue.
-    var container = $('<p id="CKEDITOR-323"/>').prop('contenteditable', true).css({
-      // Using position fixed in order to prevent the browser from scrolling the page when the editor is focused.
-      position: 'fixed',
-      // Make sure the editor is on the screen, but not visible (see below).
-      top: 0,
-      left: 0,
-      // Make sure the users don't notice the test editor instance.
-      color: 'transparent'
-    }).text('ab c').appendTo('body');
-    // Using the inline mode for the test editor instance because it's faster and take less UI space.
-    CKEDITOR.inline(container[0], {
-      'xwiki-filter': {
-        // Check if the problem reproduces without our fix.
-        fixNonBreakingSpace: false
-      }
-    }).once('instanceReady', function(event) {
-      var editor = event.editor;
-      var textNode = editor.editable().getFirst();
-      // Split the text node after 'b' to simulate the CKEditor behavior when pressing the delete key.
-      textNode.split(2);
-      // Select the 'b' character.
-      var range = editor.createRange();
-      range.setStart(textNode, 1);
-      range.setEnd(textNode, 2);
-      editor.getSelection().selectRanges([range]);
-      // Delete the selected text. We need to use the low level command because there's no corresponding high level
-      // command in CKEditor.
-      editor.document.$.execCommand('delete');
-      // Restore the original text selection. Always clear the current text selection before destroying the editor
-      // because otherwise the browser will adjust the selection (e.g. move it before the editor) which can make the
-      // page scroll down. See CKEDITOR-352: Firefox focus on the last CKEDITOR field of the page
-      nativeSelection.removeAllRanges();
-      if (originalRange) {
-        nativeSelection.addRange(originalRange);
-      }
-      // Ensure to not have focus anymore on the editor so that keyboard shortcuts are available again
-      // (see CKEDITOR-362)
-      container.blur();
-      // Destroy the test editor and check the produced HTML.
-      editor.destroy();
-      hasNonBreakingSpaceIssue = container.html().indexOf('a&nbsp;c') >= 0;
-      container.remove();
-    // This listener destroys the test editor so make sure it is called last.
-    }, null, null, 1000);
-  // Make sure this listener is called as early as possible.
-  }, null, null, 1);
-
   CKEDITOR.plugins.add('xwiki-filter', {
     init: function(editor) {
       var replaceEmptyLinesWithEmptyParagraphs = {
@@ -248,118 +191,122 @@
         ]
       ]);
 
-      var config = editor.config['xwiki-filter'] || {};
-      if (config.fixNonBreakingSpace === undefined || config.fixNonBreakingSpace) {
-        this.maybeFixNonBreakingSpace(editor);
+      // CKEditor splits text nodes where the caret (selection) is when the Delete/Backspace key is pressed. This makes
+      // Chrome convert a plain space at the start of the right side of the split into a non-breaking space, which in
+      // turn breaks the text wrapping on small screens. What Chrome does makes a bit of sense because white space at
+      // the start / end of a text is not visible in HTML unless we use non-breaking spaces. But Chrome should check if
+      // the text node is alone. In any case, the root cause is the fact that CKEditor splits text nodes on delete.
+      // Preventing the split is too dangerous, so we're trying to fix the non-breaking space after the Delete/Backspace
+      // key is pressed (and thus after the text node split is done).
+      // See https://github.com/ckeditor/ckeditor4/issues/3819 ([Chrome] &nbsp; is inserted instead of space)
+      // See https://dev.ckeditor.com/ticket/11415 ([Chrome] &nbsp; is inserted instead of space)
+      // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
+      // See CKEDITOR-385: A non-breaking space is saved after adding and removing a space
+      this.maybeFixNonBreakingSpaceOnDelete(editor);
+    },
+
+    nbspTimeout: null,
+
+    maybeFixNonBreakingSpaceOnDelete: function(editor) {
+      var thisPlugin = this;
+      // Catch the Delete and Backspace key press.
+      editor.on('key', function(event) {
+        if (event.data.keyCode === /* Backspace */ 8 || event.data.keyCode === /* Delete */ 46) {
+          // Unschedule the previous fix, in case it wasn't applied yet, because we're going to schedule a new one. This
+          // is useful when the Delete / Backspace key is kept pressed and thus multiple key events are being fired one
+          // after another. If we don't do this we may slow down the deletion of the characters on the screen.
+          clearTimeout(thisPlugin.nbspTimeout);
+          // Schedule the fix for the non-breaking space after the text node is split.
+          thisPlugin.nbspTimeout = setTimeout($.proxy(thisPlugin, 'maybeFixNonBreakingSpaceAfterDelete', editor), 0);
+        }
+      });
+    },
+
+    maybeFixNonBreakingSpaceAfterDelete: function(editor) {
+      var selection = editor.getSelection();
+      if (selection && selection.isCollapsed()) {
+        var range = selection.getRanges()[0];
+        var newCaretPosition = this.maybeFixNonBreakingSpaceAt(range.startContainer, range.startOffset);
+        if (newCaretPosition) {
+          // Update the caret position after we fixed the non-breaking space.
+          range.setEnd(newCaretPosition.node, newCaretPosition.offset);
+          range.collapse();
+          selection.selectRanges([range]);
+        }
       }
     },
 
-    maybeFixNonBreakingSpace: function(editor) {
-      // Listen to text mutations in the edited content.
-      editor.once('instanceReady', function(event) {
-        var mutationObserver = new MutationObserver(function(mutations, mutationObserver) {
-          if (!hasNonBreakingSpaceIssue) {
-            mutationObserver.disconnect();
-            return;
-          }
-          mutations.forEach(function(mutation) {
-            if (mutation.target.nodeType === Node.TEXT_NODE) {
-              onTextMutation(mutation);
-            }
-          });
-        });
-        mutationObserver.observe(editor.editable().$, {
-          characterData: true,
-          characterDataOldValue: true,
-          subtree: true
-        });
-      });
+    maybeFixNonBreakingSpaceAt: function(node, offset) {
+      // We want to check if the caret (node, offset) is between text nodes or at the start/end of a text node and if
+      // these text nodes start/end with a non-breaking space that is not really needed. If that is the case then we
+      // replace the non-breaking space with a plain space, also merging the sibling text nodes.
 
-      // Detect when a plain space is converted to a non-breaking space at the start or end of a text node.
-      var onTextMutation = function(mutation) {
-        var newLength = mutation.target.nodeValue.length;
-        if (newLength === 0 || mutation.oldValue.length !== newLength) {
-          // Nothing to fix.
-          return;
+      if (node.type === CKEDITOR.NODE_ELEMENT) {
+        // Check if the caret is between text nodes. Collect the sibling text nodes because we're going to merge them
+        // after applying the fix. It's also easier to check if there is a non-breaking space to fix by looking at the
+        // full text before / after the caret (no matter how many text nodes there are).
+        var getSiblingTextNodes = function(node, direction) {
+          var textNodes = [];
+          while (node && node.type === CKEDITOR.NODE_TEXT) {
+            textNodes.push(node);
+            node = node[direction]();
+          }
+          return textNodes;
+        };
+        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious');
+        var textNodesAfter = getSiblingTextNodes(node.getChild(offset), 'getNext');
+        return this.maybeFixNonBreakingSpace(textNodesBefore, textNodesAfter);
+      } else if (node.type === CKEDITOR.NODE_TEXT) {
+        if (offset === 0) {
+          // The caret is at the start of the text node.
+          return this.maybeFixNonBreakingSpaceAt(node.getParent(), node.getIndex());
+        } else if (offset === node.getLength()) {
+          // The caret is at the end of the text node.
+          return this.maybeFixNonBreakingSpaceAt(node.getParent(), node.getIndex() + 1);
         }
-        [0, newLength - 1].some(function(position) {
-          if (isSpaceConvertedAt(mutation.oldValue, mutation.target.nodeValue, position) &&
-              isNonBreakingSpaceOptional(mutation.target, position)) {
-            scheduleFixNonBreakingSpace(mutation.target, position);
-            return true;
-          }
-        });
-      };
+      }
+    },
 
-      var isSpaceConvertedAt = function(oldValue, newValue, position) {
-        return newValue.charAt(position) === '\u00A0' && oldValue.charAt(position) === ' ' &&
-          newValue.substring(0, position) === oldValue.substring(0, position) &&
-          newValue.substring(position + 1) === oldValue.substring(position + 1);
-      };
+    maybeFixNonBreakingSpace: function(textNodesBefore, textNodesAfter) {
+      var leftText = textNodesBefore.map(function(textNode) {
+        return textNode.getText();
+      }).join('');
+      var rightText = textNodesAfter.map(function(textNode) {
+        return textNode.getText();
+      }).join('');
+      var needsFix = false;
 
-      var isNonBreakingSpaceOptional = function(textNode, position) {
-        return isPrecededByNonSpace(textNode, position) && isFollowedByNonSpace(textNode, position);
-      };
+      // Check if the text on the right starts with a non-breaking space followed by a non-space character (otherwise
+      // the non-breaking space might be needed) and if the text on the left ends with a non-space character (otherwise
+      // the non-breaking space from the right side might be needed). Basically we want to see if there is a
+      // non-breaking space on the right side of the split and if it can be safely replaced with a plain space. Note
+      // that the non-breaking space could have been inserted on purpose by the user but we cannot know this for sure so
+      // we cannot preserve it. Anyway, testing shows that browsers don't preserve the non-breaking space when the user
+      // deletes the text before/after it so our behavior is consistent.
+      if (/\S$/.test(leftText) && /^\u00a0\S/.test(rightText)) {
+        // Replace the non-breaking space with a plain space.
+        rightText = ' ' + rightText.substring(1);
+        needsFix = true;
 
-      var isPrecededByNonSpace = function(textNode, position) {
-        if (position > 0) {
-          return textNode.nodeValue.charAt(position - 1) !== ' ';
-        } else {
-          var previousNode = getAdjacentLeafNode(textNode, 'previousSibling', 'lastChild');
-          return previousNode && previousNode.nodeType === Node.TEXT_NODE && previousNode.nodeValue.length > 0 &&
-            previousNode.nodeValue.charAt(previousNode.nodeValue.length - 1) !== ' ';
+      // Check if the text on the left ends with a non-breaking space preceded by a non-space character (otherwise the
+      // non-breaking space might be needed) and if the text on the right starts with a non-space character (otherwise
+      // the non-breaking space from the left side might be needed). Basically we want to see if there is a non-breaking
+      // space on the left side of the split and if it can be safely replaced with a plain space.
+      } else if (/\S\u00a0$/.test(leftText) && /^\S/.test(rightText)) {
+        // Replace the non-breaking space with a plain space.
+        leftText = leftText.substring(0, leftText.length - 1) + ' ';
+        needsFix = true;
+      }
+
+      if (needsFix) {
+        // Merge the sibling text nodes and return the new caret position.
+        var textNode = textNodesBefore[0];
+        while (textNode.hasNext() && textNode.getNext().type === CKEDITOR.NODE_TEXT) {
+          textNode.getNext().remove();
         }
-      };
-
-      var isFollowedByNonSpace = function(textNode, position) {
-        if (position < textNode.nodeValue.length - 1) {
-          return textNode.nodeValue.charAt(position + 1) !== ' ';
-        } else {
-          var nextNode = getAdjacentLeafNode(textNode, 'nextSibling', 'firstChild');
-          return nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.nodeValue.length > 0 &&
-            nextNode.nodeValue.charAt(0) !== ' ';
-        }
-      };
-
-      var getAdjacentLeafNode = function(node, whichSibling, whichChild) {
-        if (node[whichSibling]) {
-          var leaf = node[whichSibling];
-          // Go down but don't leave the current block.
-          while (leaf[whichChild] && CKEDITOR.dtd.$inline[leaf.nodeName.toLowerCase()]) {
-            leaf = leaf[whichChild];
-          }
-          if (!leaf[whichChild]) {
-            return leaf;
-          }
-        // Go up but don't leave the current block.
-        } else if (CKEDITOR.dtd.$inline[node.parentNode.nodeName.toLowerCase()]) {
-          return getAdjacentLeafNode(node.parentNode, whichSibling, whichChild);
-        }
-      };
-
-      var scheduleFixNonBreakingSpace = function(textNode, position) {
-        setTimeout(function() {
-          // Double check if the text node still needs to be fixed.
-          if (textNode.nodeValue.charAt(position) === '\u00A0') {
-            fixNonBreakingSpace(textNode, position);
-          }
-        }, 0);
-      };
-
-      var fixNonBreakingSpace = function(textNode, position) {
-        var selection = editor.getSelection().getNative();
-        var selectionOffsetBefore = selection && selection.isCollapsed && selection.anchorNode === textNode &&
-          selection.anchorOffset;
-        textNode.replaceData(position, 1, ' ');
-        if (typeof selectionOffsetBefore === 'number') {
-          var selectionOffsetAfter = selection.isCollapsed && selection.anchorNode === textNode &&
-            selection.anchorOffset;
-          if (selectionOffsetAfter !== selectionOffsetBefore) {
-            // The selection shouldn't change. Let's fix that.
-            selection.collapse(textNode, selectionOffsetBefore);
-          }
-        }
-      };
+        textNode.setText(leftText + rightText);
+        return {node: textNode, offset: leftText.length};
+      }
     }
   });
 })();

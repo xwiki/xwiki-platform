@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
@@ -290,12 +291,18 @@ class DocumentTest
 
         assertEquals(new DocumentReference("wiki1", "XWiki", "initialauthor"), document.getAuthorReference());
 
+        when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
+            document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(false);
+
+        assertThrows(XWikiException.class, () -> document.save());
+
+        when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
+            document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);
+
         document.save();
 
         assertEquals(authorReference, document.getAuthorReference());
 
-        when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
-            document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
 
         document.save();

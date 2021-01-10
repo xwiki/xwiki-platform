@@ -17,13 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    gadgetWizard: $jsontool.serialize($xwiki.getSkinFile('uicomponents/dashboard/gadgetWizard.js', true))
-  }
-});
+/*!
+#set ($paths = {
+  'gadgetWizard': $xwiki.getSkinFile('uicomponents/dashboard/gadgetWizard.js', true)
+})
+#set ($l10nKeys = [
+  'dashboard.actions.edit.differentsource.information',
+  'dashboard.actions.edit.differentsource.warning',
+  'dashboard.gadget.actions.drop',
+  'dashboard.gadget.actions.delete.tooltip',
+  'dashboard.gadget.actions.edit.tooltip',
+  'dashboard.actions.add.tooltip',
+  'dashboard.actions.add.button',
+  'dashboard.actions.add.loading',
+  'dashboard.actions.add.failed',
+  'dashboard.gadget.actions.edit.error.notmacro',
+  'dashboard.gadget.actions.edit.error.notmacro.title',
+  'dashboard.gadget.actions.edit.loading',
+  'dashboard.gadget.actions.edit.failed',
+  'dashboard.gadget.actions.delete.confirm',
+  'dashboard.gadget.actions.delete.inProgress',
+  'dashboard.gadget.actions.delete.done',
+  'dashboard.gadget.actions.delete.failed',
+  'dashboard.actions.columns.add.tooltip',
+  'dashboard.actions.columns.add.button',
+  'dashboard.actions.edit.failed',
+  'dashboard.actions.save.loading'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
 
-var XWiki = (function (XWiki) {
+require.config({paths});
+
+window.XWiki = window.XWiki || {};
 // Start XWiki augmentation.
 XWiki.Dashboard = Class.create( {
   initialize : function(element) {
@@ -78,8 +110,8 @@ XWiki.Dashboard = Class.create( {
       // by default styled by the colibri skin
       var warningElt = new Element('div', {'class' : 'box warningmessage differentsource'});
       // FIXME: I don't like the way these messages are used, should be able to insert the link in the translation
-      var information = "$escapetool.javascript($services.localization.render('dashboard.actions.edit.differentsource.information'))";
-      var warning = "$escapetool.javascript($services.localization.render('dashboard.actions.edit.differentsource.warning'))";
+      var information = l10n['dashboard.actions.edit.differentsource.information'];
+      var warning = l10n['dashboard.actions.edit.differentsource.warning'];
       var link = new Element('a', {'href' : this.sourceURL});
       link.update(this.sourceWiki + ':' + this.sourceSpace + '.' + this.sourcePage);
       warningElt.insert(information);
@@ -145,7 +177,7 @@ XWiki.Dashboard = Class.create( {
     if ( container.down('.gadget') || container.down('.gadget-placeholder')) {
       return;
     }
-    var placeholder = new Element('div', {'class' : 'gadget-placeholder'}).update("$escapetool.javascript($services.localization.render('dashboard.gadget.actions.drop'))");
+    var placeholder = new Element('div', {'class': 'gadget-placeholder'}).update(l10n['dashboard.gadget.actions.drop']);
     container.insert(placeholder);
   },
 
@@ -222,12 +254,16 @@ XWiki.Dashboard = Class.create( {
    * @param gadget the gadget to add the action buttons to
    */
   addGadgetHandlers : function(gadget) {
-    var removeIcon = new Element('span', {'class' : 'remove action', 'title' :
-      "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.tooltip'))"});
+    var removeIcon = new Element('span', {
+      'class': 'remove action',
+      'title': l10n['dashboard.gadget.actions.delete.tooltip']
+    });
     removeIcon.observe('click', this.onRemoveGadget.bindAsEventListener(this));
 
-    var editIcon = new Element('span', {'class' : 'edit action', 'title' :
-      "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.tooltip'))"});
+    var editIcon = new Element('span', {
+      'class': 'edit action',
+      'title': l10n['dashboard.gadget.actions.edit.tooltip']
+    });
     editIcon.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
 
     var actionsContainer = new Element('div', {'class' : 'gadget-actions'})
@@ -241,8 +277,11 @@ XWiki.Dashboard = Class.create( {
    */
   addNewGadgetHandler : function() {
     // create the button
-    var addButton = new Element('div', {'class' : 'addgadget', 'title' : "$escapetool.javascript($services.localization.render('dashboard.actions.add.tooltip'))"});
-    addButton.update("$escapetool.javascript($services.localization.render('dashboard.actions.add.button'))");
+    var addButton = new Element('div', {
+      'class': 'addgadget',
+      'title': l10n['dashboard.actions.add.tooltip']
+    });
+    addButton.update(l10n['dashboard.actions.add.button']);
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
     // check if the warning is there, if it is, put the button under it
     var warning = this.element.down('.differentsource');
@@ -306,7 +345,7 @@ XWiki.Dashboard = Class.create( {
     var formToken = this.getFormToken();
     addParameters.set('form_token', formToken);
     // aaaand send the request
-    this._x_notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('dashboard.actions.add.loading'))", "inprogress");
+    this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.add.loading'], "inprogress");
     new Ajax.Request(
       this.addURL,
       {
@@ -322,7 +361,7 @@ XWiki.Dashboard = Class.create( {
             failureReason = 'Server not responding';
           }
           this._x_notification.replace(new XWiki.widgets.Notification(
-              "$escapetool.javascript($services.localization.render('dashboard.actions.add.failed'))" + failureReason, "error", {timeout : 5}));
+            l10n['dashboard.actions.add.failed'] + failureReason, "error", {timeout: 5}));
         }.bind(this),
         on0: function (response) {
           response.request.options.onFailure(response);
@@ -372,9 +411,9 @@ XWiki.Dashboard = Class.create( {
         // this is not a macro, cannot be edited with wysiwyg macro dialog. Display a message, pointing the user to 
         // object editor.
         var dialog = new XWiki.widgets.ModalPopup(
-            "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.error.notmacro'))",
-            {}, 
-            {title: "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.error.notmacro.title'))"}
+          l10n['dashboard.gadget.actions.edit.error.notmacro'],
+          {}, 
+          {title: l10n['dashboard.gadget.actions.edit.error.notmacro.title']}
         );
         dialog.showDialog();
       }
@@ -411,7 +450,7 @@ XWiki.Dashboard = Class.create( {
     // parameters are edited, since it will not preserve position    
 
     // aaaand send the request
-    this._x_notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.loading'))", "inprogress");
+    this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.gadget.actions.edit.loading'], "inprogress");
     new Ajax.Request(
       this.editURL,
       {
@@ -426,8 +465,8 @@ XWiki.Dashboard = Class.create( {
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
             failureReason = 'Server not responding';
           }
-          this._x_notification.replace(new XWiki.widgets.Notification(
-              "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.edit.failed'))" + failureReason, "error", {timeout : 5}));
+          this._x_notification.replace(new XWiki.widgets.Notification(l10n['dashboard.gadget.actions.edit.failed'] +
+            failureReason, "error", {timeout: 5}));
         }.bind(this),
         on0: function (response) {
           response.request.options.onFailure(response);
@@ -471,10 +510,10 @@ XWiki.Dashboard = Class.create( {
       },
       /* Interaction parameters */
       {
-         confirmationText: "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.confirm'))",
-         progressMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.inProgress'))",
-         successMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.done'))",
-         failureMessageText : "$escapetool.javascript($services.localization.render('dashboard.gadget.actions.delete.failed'))"
+         confirmationText: l10n['dashboard.gadget.actions.delete.confirm'],
+         progressMessageText: l10n['dashboard.gadget.actions.delete.inProgress'],
+         successMessageText: l10n['dashboard.gadget.actions.delete.done'],
+         failureMessageText: l10n['dashboard.gadget.actions.delete.failed']
       }
     );
   },
@@ -485,8 +524,11 @@ XWiki.Dashboard = Class.create( {
    */
   addNewContainerHandler : function() {
     // create the button
-    var addButton = new Element('div', {'class' : 'addcontainer', 'title' : "$escapetool.javascript($services.localization.render('dashboard.actions.columns.add.tooltip'))"});
-    addButton.update("$escapetool.javascript($services.localization.render('dashboard.actions.columns.add.button'))");
+    var addButton = new Element('div', {
+      'class': 'addcontainer',
+      'title': l10n['dashboard.actions.columns.add.tooltip']
+    });
+    addButton.update(l10n['dashboard.actions.columns.add.button']);
     addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
     var addGadgetButton = this.element.down('.addgadget');
     addGadgetButton.insert({'before' : addButton});
@@ -571,8 +613,8 @@ XWiki.Dashboard = Class.create( {
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          this._x_notification = new XWiki.widgets.Notification(
-              "$escapetool.javascript($services.localization.render('dashboard.actions.edit.failed'))" + failureReason, "error", {timeout : 5});
+          this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.edit.failed'] + failureReason,
+            "error", {timeout: 5});
           if (onComplete) {
             onComplete();
           }
@@ -615,8 +657,7 @@ XWiki.Dashboard = Class.create( {
     var eventElt = event.memo.originalEvent.element();
 
     // start to submit the edit, notify
-    this._x_edit_notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('dashboard.actions.save.loading'))",
-        "inprogress");
+    this._x_edit_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.save.loading'], "inprogress");
 
     // save the edit
     this.doEditGadgets(function() {
@@ -692,6 +733,5 @@ function init() {
 (XWiki.domIsLoaded && init())
 || document.observe("xwiki:dom:loaded", init);
 
-//End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

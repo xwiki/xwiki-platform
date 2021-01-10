@@ -17,23 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'css': {
+    'macroWizard': $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
+      'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})
+  }
+})
+#set ($l10nKeys = [
+  'dashboard.gadgetSelector.title',
+  'dashboard.gadgetEditor.title',
+  'dashboard.gadgetEditor.changeGadget.label',
+  'dashboard.gadgetEditor.gadgetTitle.label',
+  'dashboard.gadgetEditor.gadgetTitle.hint'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
+
 define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
-  /*!
-  #set ($l10nKeys = [
-    'dashboard.gadgetSelector.title',
-    'dashboard.gadgetEditor.title',
-    'dashboard.gadgetEditor.changeGadget.label',
-    'dashboard.gadgetEditor.gadgetTitle.label',
-    'dashboard.gadgetEditor.gadgetTitle.hint'
-  ])
-  #set ($l10n = {})
-  #foreach ($key in $l10nKeys)
-    #set ($discard = $l10n.put($key, $services.localization.render($key)))
-  #end
-  */
-
-  var l10n = $jsontool.serialize($l10n);
-
   var gadgetTitleTemplate = $(
     '<li class="macro-parameter" data-id="$gadgetTitle">' +
       '<div class="macro-parameter-name"></div>' +
@@ -44,8 +51,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   gadgetTitleTemplate.find('.macro-parameter-name').text(l10n['dashboard.gadgetEditor.gadgetTitle.label']);
   gadgetTitleTemplate.find('.macro-parameter-description').text(l10n['dashboard.gadgetEditor.gadgetTitle.hint']);
 
-  $('head').append($('<link type="text/css" rel="stylesheet"/>').attr('href',
-    "$services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})"));
+  $('head').append($('<link type="text/css" rel="stylesheet"/>').attr('href', paths.css.macroWizard));
 
   var getMacroCall = function(gadget, ckeditor) {
     if (gadget && typeof gadget.content === 'string') {
@@ -63,7 +69,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
 
   var getDefaultGadgetTitle = function(macroEditor) {
     var gadgetName = macroEditor.attr('data-macroid').split('/')[0];
-    return "${escapetool.d}services.localization.render('rendering.macro." + gadgetName + ".name')";
+    return "$services.localization.render('rendering.macro." + gadgetName + ".name')";
   };
 
   var currentGadget;
@@ -135,3 +141,6 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
     return ckeditorPromise.then(getMacroWizard).then($.proxy(runGadgetWizard, null, gadget));
   };
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

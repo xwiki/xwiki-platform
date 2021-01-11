@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -48,6 +49,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -329,7 +332,13 @@ class XWikiWikiModelTest
             new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
         when(configuration.isImageDimensionsIncludedInImageURL())
             .thenReturn(expectedIsImageDimensionsIncludedInImageURL);
-        when(this.referenceResolver.resolve(imageReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);
+        when(this.referenceResolver.resolve(argThat(new ArgumentMatcher<ResourceReference>()
+        {
+            public boolean matches(ResourceReference argument)
+            {
+                return argument.getReference().equals(imageReference.getReference());
+            }
+        }), same(EntityType.ATTACHMENT))).thenReturn(attachmentReference);
         when(this.documentAccessBridge.getAttachmentURL(attachmentReference, expectedQueryString, false))
             .thenReturn("?" + expectedQueryString);
 

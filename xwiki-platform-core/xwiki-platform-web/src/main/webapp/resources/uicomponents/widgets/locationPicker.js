@@ -17,9 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
+    {'evaluate': true, 'minify': $services.debug.minify})
+})
+#set ($l10nKeys = [
+  'entitynamevalidation.nametransformation.error',
+  'core.validation.valid.message',
+  'core.validation.required.message',
+  'core.validation.required.message.terminal'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
 
 // Location Tree Picker
-require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+require([paths.treeRequireConfig], function() {
   require(['tree'], function($) {
     $('.location-picker').each(function() {
       var picker = $(this);
@@ -201,10 +220,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         enableButtons();
       }).fail(function (response) {
         if (titleInputVal === titleInput.val()) {
-          new XWiki.widgets.Notification(
-            "$services.localization.render('entitynamevalidation.nametransformation.error')",
-            'error'
-          );
+          new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // we trigger a change so we can validate the name
           nameInput.val(titleInputVal).trigger('change');
           // Update the location preview.
@@ -361,7 +377,7 @@ require(['jquery'], function($) {
     // The advanced location edit fields are not accessible to simple users.
     var isSimpleUser = titleInput.length > 0 && isSimplePicker(picker);
     var pageValidator = new LiveValidation(pageInput[0], {
-      validMessage: "$services.localization.render('core.validation.valid.message')",
+      validMessage: l10n['core.validation.valid.message'],
       // Show the validation message after the title input for simple users because they can't access the page input.
       insertAfterWhatNode: isSimpleUser ? titleInput[0] : pageInput[0]
     });
@@ -369,7 +385,7 @@ require(['jquery'], function($) {
     // attribute.
     pageValidator.displayMessageWhenEmpty = true;
     pageValidator.add(Validate.Custom, {
-      failureMessage: "$services.localization.render('core.validation.required.message')",
+      failureMessage: l10n['core.validation.required.message'],
       against: function(value) {
         return !pageInput.hasClass('empty') && typeof value === 'string' && value.strip().length > 0;
       }
@@ -397,7 +413,7 @@ require(['jquery'], function($) {
       // The advanced location edit fields are not accessible to simple users.
       var isSimpleUser = breadcrumbContainer.length > 0 && isSimplePicker(picker);
       var spaceValidator = new LiveValidation(spaceReferenceInput[0], {
-        validMessage: "$services.localization.render('core.validation.valid.message')",
+        validMessage: l10n['core.validation.valid.message'],
         // Validating automatically only on submit to avoid double validation caused by jQuery-PrototypeJS event
         // triggering incompatibilities when setting the space reference with the tree picker. We are calling validate
         // manually in the 'input' handler to achieve the same behavior as if 'onlyOnBlur' was false.
@@ -442,7 +458,7 @@ require(['jquery'], function($) {
 
   var addTerminalPageValidation = function(spaceValidator, terminalCheckbox) {
     spaceValidator.add(Validate.Custom, {
-      failureMessage: "$services.localization.render('core.validation.required.message.terminal')",
+      failureMessage: l10n['core.validation.required.message.terminal'],
       against: function(value) {
         if (terminalCheckbox.prop('checked')) {
           // Space reference is required for terminal documents.
@@ -584,3 +600,6 @@ require(['jquery'], function($) {
     });
   });
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

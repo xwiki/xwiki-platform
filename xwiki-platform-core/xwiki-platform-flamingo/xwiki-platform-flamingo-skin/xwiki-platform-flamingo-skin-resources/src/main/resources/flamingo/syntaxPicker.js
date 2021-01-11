@@ -17,13 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($l10nKeys = [
+  'web.widgets.syntaxPicker.conversionConfirmation.title',
+  'web.widgets.syntaxPicker.conversionUnsupported.acknowledge',
+  'no',
+  'yes',
+  [
+    'web.widgets.syntaxPicker.conversionConfirmation.message',
+    '<strong class="previousSyntax"></strong>',
+    '<strong class="nextSyntax"></strong>'
+  ],
+  [
+    'web.widgets.syntaxPicker.conversionUnsupported.message',
+    '<strong class="previousSyntax"></strong>',
+    '<strong class="nextSyntax"></strong>'
+  ],
+  'web.widgets.syntaxPicker.conversion.inProgress',
+  'web.widgets.syntaxPicker.conversion.done',
+  'web.widgets.syntaxPicker.conversion.failed',
+  'web.widgets.syntaxPicker.contentUpdate.inProgress',
+  'web.widgets.syntaxPicker.contentUpdate.done',
+  'web.widgets.syntaxPicker.contentUpdate.failed'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($params = $key.subList(1, $key.size()))
+  #if ($params)
+    #set ($discard = $l10n.put($key[0], $services.localization.render($key[0], $params)))
+  #else
+    #set ($discard = $l10n.put($key, $services.localization.render($key)))
+  #end
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(l10n) {
+  "use strict";
 
 /**
  * The syntax picker.
  */
 require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxConverter) {
-  'use strict';
-
   var syntaxPickerSelector = '#xwikidocsyntaxinput2';
 
   $(document).on('change.xwikiDocumentSyntaxPicker', syntaxPickerSelector, function() {
@@ -103,12 +137,10 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     confirmationModal.data('data').convertSyntax = true;
   }).appendTo('body').modal({show: false});
 
-  confirmationModal.find('.modal-title').text($jsontool.serialize($services.localization.render(
-    'web.widgets.syntaxPicker.conversionConfirmation.title')));
-  confirmationModal.find('button.dontConvertSyntax').text($jsontool.serialize($services.localization.render('no')));
-  confirmationModal.find('button.convertSyntax').text($jsontool.serialize($services.localization.render('yes')));
-  confirmationModal.find('button.acknowledge').text($jsontool.serialize($services.localization.render(
-    'web.widgets.syntaxPicker.conversionUnsupported.acknowledge')));
+  confirmationModal.find('.modal-title').text(l10n['web.widgets.syntaxPicker.conversionConfirmation.title']);
+  confirmationModal.find('button.dontConvertSyntax').text(l10n.no);
+  confirmationModal.find('button.convertSyntax').text(l10n.yes);
+  confirmationModal.find('button.acknowledge').text(l10n['web.widgets.syntaxPicker.conversionUnsupported.acknowledge']);
 
   var maybeAskForSyntaxConversionConfirmation = function(previousSyntax, nextSyntax) {
     var deferred = $.Deferred();
@@ -117,16 +149,10 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     var canConvertSyntax = previousSyntax.parser && nextSyntax.renderer;
     if (canConvertSyntax) {
       // Ask for confirmation to convert the syntax.
-      message = $jsontool.serialize($services.localization.render(
-        'web.widgets.syntaxPicker.conversionConfirmation.message',
-        ['<strong class="previousSyntax"></strong>', '<strong class="nextSyntax"></strong>']
-      ));
+      message = l10n['web.widgets.syntaxPicker.conversionConfirmation.message'];
     } else {
       // Let the user know that the automatic syntax conversion is not possible.
-      message = $jsontool.serialize($services.localization.render(
-        'web.widgets.syntaxPicker.conversionUnsupported.message',
-        ['<strong class="previousSyntax"></strong>', '<strong class="nextSyntax"></strong>']
-      ));
+      message = l10n['web.widgets.syntaxPicker.conversionUnsupported.message'];
     }
     confirmationModal.find('.modal-body').html(message);
     confirmationModal.find('.previousSyntax').text(previousSyntax.label);
@@ -267,25 +293,19 @@ require(['jquery'], function($) {
     } else if (data.convertSyntax && contentField.val() && !data.reverting) {
       // Convert the content to the new syntax.
       data.promise = data.promise.then(function() {
-        var notification = new XWiki.widgets.Notification(
-          $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.conversion.inProgress')),
-          'inprogress'
-        );
+        var notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.inProgress'],
+          'inprogress');
         // Pass the content since it may have unsaved changes.
         return data.syntaxConverter.convert(data.syntax, data.previousSyntax, contentField.val())
           .done(function(newContent) {
             // Update the content and the syntax. We trigger the change event in case the content field is enhanced with
             // syntax highlighting.
             contentField.val(newContent).data('syntax', data.syntax.id).trigger('change');
-            notification.replace(new XWiki.widgets.Notification(
-              $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.conversion.done')),
-              'done'
-            ));
+            notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.done'],
+              'done'));
           }).fail(function() {
-            notification.replace(new XWiki.widgets.Notification(
-              $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.conversion.failed')),
-              'error'
-            ));
+            notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.failed'],
+              'error'));
           });
       });
     } else {
@@ -307,25 +327,19 @@ require(['jquery'], function($) {
     var contentWrapper = $('#xwikicontent').not('[contenteditable]');
     if (contentWrapper.length && XWiki.currentDocument.documentReference.equals(data.documentReference)) {
       data.promise = data.promise.then(function() {
-        var notification = new XWiki.widgets.Notification(
-          $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.contentUpdate.inProgress')),
-          'inprogress'
-        );
+        var notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.inProgress'],
+          'inprogress');
         return maybeConvertAndRender(data).done(function(output) {
           // Update the displayed document title and content.
           $('#document-title h1').html(output.renderedTitle);
           contentWrapper.html(output.renderedContent);
           // Let others know that the DOM has been updated, in order to enhance it.
           $(document).trigger('xwiki:dom:updated', {'elements': contentWrapper.toArray()});
-          notification.replace(new XWiki.widgets.Notification(
-            $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.contentUpdate.done')),
-            'done'
-          ));
+          notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.done'],
+            'done'));
         }).fail(function() {
-          notification.replace(new XWiki.widgets.Notification(
-            $jsontool.serialize($services.localization.render('web.widgets.syntaxPicker.contentUpdate.failed')),
-            'error'
-          ));
+          notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.failed'],
+            'error'));
         });
       });
     }
@@ -342,3 +356,6 @@ require(['jquery'], function($) {
     }
   };
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$l10n]));

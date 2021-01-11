@@ -233,7 +233,8 @@
           </execution>
         </executions>
         <configuration>
-          <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
+          <!-- Run the tests on the minified files in order to verify the minification also. -->
+          <jsSrcDir>${project.build.directory}/${project.build.finalName}/resources</jsSrcDir>
           <customRunnerConfiguration>
             ${project.basedir}/src/test/resources/jasmine-require-config.txt
           </customRunnerConfiguration>

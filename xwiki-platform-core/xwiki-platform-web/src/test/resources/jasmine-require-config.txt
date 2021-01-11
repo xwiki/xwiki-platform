@@ -1,14 +1,14 @@
 paths: {
-  'jquery': '/webjars/jquery',
+  'jquery': '/webjars/jquery.min',
   'jQueryNoConflict': '/spec/jQueryNoConflict',
 
-  'bootstrap': '/webjars/bootstrap',
+  'bootstrap': '/webjars/bootstrap.min',
 
   // Tree
-  'jsTree': '/webjars/jstree',
-  'JobRunner': '/webjars/jobRunner',
-  'tree-finder': '/webjars/finder',
-  'tree': '/webjars/tree'
+  'jsTree': '/webjars/jstree.min',
+  'JobRunner': '/webjars/jobRunner.min',
+  'tree-finder': '/webjars/finder.min',
+  'tree': '/webjars/tree.min'
 },
 map: {
   // '*' means all modules will get 'jQueryNoConflict' for their 'jquery' dependency.

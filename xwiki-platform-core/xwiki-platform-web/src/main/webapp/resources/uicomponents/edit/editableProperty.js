@@ -17,6 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($l10nKeys = [
+  'edit',
+  'cancel',
+  'save',
+  'core.editors.saveandcontinue.notification.inprogress',
+  'core.editors.saveandcontinue.notification.done',
+  ['core.editors.saveandcontinue.notification.error', '<span id="saveFailureReason"/>'],
+  'web.editableProperty.editFailed',
+  'web.editableProperty.viewFailed'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($params = $key.subList(1, $key.size()))
+  #if ($params)
+    #set ($discard = $l10n.put($key[0], $services.localization.render($key[0], $params)))
+  #else
+    #set ($discard = $l10n.put($key, $services.localization.render($key)))
+  #end
+#end
+#set ($iconNames = ['pencil', 'cross', 'check'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(l10n, icons) {
+  "use strict";
+
 define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   $.fn.editableProperty = function() {
     return this.each(init);
@@ -28,16 +58,16 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Maybe add the action icons.
     if ($(this).find('.editableProperty-edit').length === 0) {
       var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>');
-      editIcon.attr('title', $jsontool.serialize($services.localization.render('edit')));
-      editIcon.html($jsontool.serialize($services.icon.renderHTML('pencil')));
+      editIcon.attr('title', l10n.edit);
+      editIcon.html(icons.pencil);
 
       var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>');
-      cancelIcon.attr('title', $jsontool.serialize($services.localization.render('cancel')));
-      cancelIcon.hide().html($jsontool.serialize($services.icon.renderHTML('cross')));
+      cancelIcon.attr('title', l10n.cancel);
+      cancelIcon.hide().html(icons.cross);
 
       var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>');
-      saveIcon.attr('title', $jsontool.serialize($services.localization.render('save')));
-      saveIcon.hide().html($jsontool.serialize($services.icon.renderHTML('check')));
+      saveIcon.attr('title', l10n.save);
+      saveIcon.hide().html(icons.check);
 
       // Insert the action icons right after the label because it may be followed by a hint on the next line.
       $(this).find('label').after(editIcon, cancelIcon, saveIcon);
@@ -102,10 +132,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Focus the first visible input.
       editor.find(':input').filter(':visible').focus();
     }).fail(function() {
-      new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('Failed to edit property.')),
-        'error'
-      );
+      new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
     }).always(function() {
       // Re-enable the edit action (even if hidden).
       editIcon.removeClass('disabled');
@@ -126,10 +153,8 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Disable the save and cancel actions while the property is being saved.
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').addClass('disabled');
     // Show progress notification message.
-    var notification = new XWiki.widgets.Notification(
-      $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.inprogress')),
-      'inprogress'
-    );
+    var notification = new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.inprogress'],
+      'inprogress');
     // Collect the submit data.
     var editor = editableProperty.next('.editableProperty-viewer').next('.editableProperty-editor');
     // Notify the others that we're about to save so that they have the chance to update the submit data.
@@ -143,17 +168,12 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Make the request to save the property.
     return $.post(XWiki.currentDocument.getURL('save'), data).done(function() {
       editor.trigger('xwiki:document:saved');
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.done')),
-        'done'
-      ));
+      notification.replace(new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.done'],
+        'done'));
     }).fail(function(response) {
       editor.trigger('xwiki:document:saveFailed');
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.error',
-          ['<span id="saveFailureReason"/>'])),
-        'error'
-      ));
+      notification.replace(new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.error'],
+        'error'));
       $('#saveFailureReason').text(response.statusText);
     }).always(function() {
       // Re-enable the save and cancel actions.
@@ -176,10 +196,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Allow others to enhance the viewer.
       $(document).trigger('xwiki:dom:updated', {'elements': viewer.toArray()});
     }).fail(function() {
-      new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('Failed to view property.')),
-        'error'
-      );
+      new XWiki.widgets.Notification(l10n['web.editableProperty.viewFailed'], 'error');
     });
   };
 
@@ -215,3 +232,6 @@ require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

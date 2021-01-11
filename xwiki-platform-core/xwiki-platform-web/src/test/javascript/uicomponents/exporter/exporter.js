@@ -19,10 +19,10 @@
  */
 require.config({
   paths: {
-    'export-tree': 'uicomponents/exporter/exporter',
-    'export-tree-filter': 'uicomponents/exporter/exporter',
-    'entityReference': 'uicomponents/model/entityReference',
-    'prototype': 'js/prototype/prototype'
+    'export-tree': 'uicomponents/exporter/exporter.min',
+    'export-tree-filter': 'uicomponents/exporter/exporter.min',
+    'entityReference': 'uicomponents/model/entityReference.min',
+    'prototype': 'js/prototype/prototype.min'
   },
   shim: {
     entityReference: ['prototype']
@@ -30,25 +30,12 @@ require.config({
 });
 
 // Mock Velocity bindings.
-var $requireConfigParams;
 var $jsontool = {
-  serialize: function() {}
+  serialize: function(input) {return input;}
 };
-var $services = {
-  webjars: {
-    url: function() {
-      return '';
-    }
-  },
-  icon: {
-    getMetaData: function() {
-      return {};
-    }
-  },
-  debug: {
-    minify: false
-  }
-};
+var $paths = {};
+var $l10n = {};
+var $icons = {};
 
 define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], function($) {
   var dataURLPrefix = 'data:application/json';

@@ -17,13 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
+    {'evaluate': true, 'minify': $services.debug.minify})
+})
+#set ($l10nKeys = [
+  'core.exporter.selectChildren',
+  'core.exporter.unselectChildren'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#set ($iconNames = ['check', 'shape_square'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.getMetaData($iconName)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n, icons) {
+  "use strict";
 
 /**
  * Export Tree
  */
 define('export-tree', ['jquery', 'tree'], function($) {
-  'use strict';
-
   var selectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     selectNodes(tree, parentNode.children);
@@ -215,11 +235,6 @@ define('export-tree', ['jquery', 'tree'], function($) {
     }
   };
 
-  var icons = {
-    check: $jsontool.serialize($services.icon.getMetaData('check')),
-    square: $jsontool.serialize($services.icon.getMetaData('shape_square'))
-  };
-
   var exportTreeSettings = {
     plugins: ['checkbox', 'contextmenu'],
     checkbox: {
@@ -233,7 +248,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
         var tree = $.jstree.reference(node);
         return {
           select_children: {
-            label: $jsontool.serialize($services.localization.render('core.exporter.selectChildren')),
+            label: l10n['core.exporter.selectChildren'],
             icon: icons.check.cssClass || icons.check.url,
             action: function () {
               selectChildNodes(tree, node);
@@ -241,8 +256,8 @@ define('export-tree', ['jquery', 'tree'], function($) {
             _disabled: !tree.is_open(node)
           },
           unselect_children: {
-            label: $jsontool.serialize($services.localization.render('core.exporter.unselectChildren')),
-            icon: icons.square.cssClass || icons.square.url,
+            label: l10n['core.exporter.unselectChildren'],
+            icon: icons.shape_square.cssClass || icons.shape_square.url,
             action: function () {
               deselectChildNodes(tree, node);
             },
@@ -300,8 +315,6 @@ define('export-tree', ['jquery', 'tree'], function($) {
  * Export Tree Filter
  */
 define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($) {
-  'use strict';
-
   var filterRegex = /filters=(\w*)/;
   var getCurrentFilter = function(url) {
     var result = filterRegex.exec(url);
@@ -392,14 +405,7 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
   });
 });
 
-require([
-  'jquery',
-  /*! #set ($requireConfigParams = {'evaluate': true, 'minify': $services.debug.minify}) */
-  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    $requireConfigParams))
-], function ($) {
-  'use strict';
-
+require(['jquery', paths.treeRequireConfig], function ($) {
   // Fill the form with the selected pages from the export tree.
   var createHiddenInputsFromExportTree = function(exportTree, container) {
     var exportPages = exportTree.getExportPages();
@@ -497,3 +503,6 @@ require([
     $('.export-tree').exportTree();
   });
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));

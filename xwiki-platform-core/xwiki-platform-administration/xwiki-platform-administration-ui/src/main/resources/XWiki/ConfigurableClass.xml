@@ -194,16 +194,25 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
         #set($escapedAppName = $escapetool.xml($app.getFullName()))
         #foreach($configurableObj in $configurableObjs)
+          ## Execute the content code if any
+          ## FIXEM: we have to do that before the title before of the dropPermissions
+          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          #if($codeToExecute != '')
+            #set($codeToExecuteResult = $configurableObj.display('codeToExecute', 'view', false))
+          #end
           ## Display the header if one exists.
           #set($heading = $app.getValue('heading', $configurableObj))
           #if($heading &amp;&amp; $heading != '')
-            == $configurableObj.display('heading', 'view', false) ==
+            ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
+            ## Removing the next line will open a security hole.
+            ## FIXME: introduce proper velocity field so that we can directly use configurableObj.display instead like for the content
+            #set($void = $doc.dropPermissions())
+            == #evaluate($heading) ==
           #end
-          ##
-          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          ## Display code to execute
           #if($codeToExecute != '')
             (%class="codeToExecute"%)(((##
-              $configurableObj.display('codeToExecute', 'view', false)
+              $codeToExecuteResult
             )))
           #end
           ##

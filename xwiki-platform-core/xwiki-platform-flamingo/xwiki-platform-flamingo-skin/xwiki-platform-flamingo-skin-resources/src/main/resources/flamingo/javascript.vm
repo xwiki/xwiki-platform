@@ -223,7 +223,7 @@ XWiki.skin = '$escapetool.javascript($xwiki.skin)';
 #if ("$!doc" != "")
 XWiki.docisnew = $!doc.isNew();
 #else
-XWiki.docisnew = false;
+XWiki.docisnew = null;
 #end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";

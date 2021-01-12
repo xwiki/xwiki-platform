@@ -195,7 +195,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         #set($escapedAppName = $escapetool.xml($app.getFullName()))
         #foreach($configurableObj in $configurableObjs)
           ## Execute the content code if any
-          ## FIXEM: we have to do that before the title before of the dropPermissions
+          ## FIXME: we have to do that before the title before of the dropPermissions
           #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
           #if($codeToExecute != '')
             #set($codeToExecuteResult = $configurableObj.display('codeToExecute', 'view', false))

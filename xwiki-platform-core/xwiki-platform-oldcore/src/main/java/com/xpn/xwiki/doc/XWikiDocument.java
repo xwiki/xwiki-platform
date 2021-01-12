@@ -1452,7 +1452,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         } catch (ParseException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
-            LOGGER.warn("Failed to render content [" + text + "]", e);
+            LOGGER.warn("Failed to render content [{}]", text, e);
         }
 
         return "";
@@ -1522,7 +1522,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
-            LOGGER.warn("Failed to render content [" + text + "]", e);
+            LOGGER.warn("Failed to render content [{}]", text, e);
         } finally {
             if (backup != null) {
                 restoreContext(backup, context);
@@ -3411,9 +3411,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the rendered field
      * @since 13.0RC1
      */
-    public String display(String fieldname, String type, BaseObject obj, boolean isolate, XWikiContext context)
+    public String display(String fieldname, String type, BaseObject obj, boolean isolated, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, isolate, context);
+        return display(fieldname, type, "", obj, isolated, context);
     }
 
     /**
@@ -3477,10 +3477,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the rendered field
      * @since 13.0RC1
      */
-    public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolate, XWikiContext context)
+    public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated,
+        XWikiContext context)
     {
         return display(fieldname, type, pref, obj,
-            context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context), isolate, context);
+            context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context), isolated, context);
     }
 
     /**

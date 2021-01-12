@@ -56,6 +56,7 @@ like.likers.title=Personnes qui aiment {0}
 like.livetable.column.title=Titre
 like.livetable.column.location=Emplacement
 like.livetable.column.likes=J'aime
+like.configuration.heading=Préférences des J'aime
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Toujours afficher le bouton J'aime
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Afficher le bouton même si l'utilisateur n'a pas les droits pour intéragir avec. Utilisez cette option si vous souhaitez toujours afficher le compteur de J'aime.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacité du Cache

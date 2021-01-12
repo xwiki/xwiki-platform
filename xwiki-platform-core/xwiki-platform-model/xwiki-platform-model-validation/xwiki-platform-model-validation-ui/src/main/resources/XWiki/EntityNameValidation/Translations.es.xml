@@ -70,6 +70,7 @@ entitynamevalidation.replacementCharacter.removeCharacter.remove=Borrar
 entitynamevalidation.replacementCharacter.remove.inProgress=El carácter prohibido está siendo borrado...
 entitynamevalidation.replacementCharacter.remove.done=Se ha borrado el carácter prohibido.
 entitynamevalidation.replacementCharacter.remove.failed=Error al borrar el carácter prohibido.
-entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Ninguno</content>
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Ninguno
+### Missing: entitynamevalidation.admin.heading=Name Strategies</content>
   
 </xwikidoc>

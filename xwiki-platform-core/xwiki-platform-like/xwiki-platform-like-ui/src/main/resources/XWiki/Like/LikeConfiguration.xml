@@ -253,7 +253,7 @@
       <displayInSection>Likes</displayInSection>
     </property>
     <property>
-      <heading>Likes Preferences</heading>
+      <heading>$services.localization.render('like.configuration.heading')</heading>
     </property>
     <property>
       <iconAttachment/>

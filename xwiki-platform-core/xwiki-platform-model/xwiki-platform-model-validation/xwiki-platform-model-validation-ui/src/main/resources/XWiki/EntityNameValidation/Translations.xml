@@ -70,7 +70,8 @@ entitynamevalidation.replacementCharacter.removeCharacter.remove=Delete
 entitynamevalidation.replacementCharacter.remove.inProgress=The forbidden character is being deleted...
 entitynamevalidation.replacementCharacter.remove.done=The forbidden character has been deleted.
 entitynamevalidation.replacementCharacter.remove.failed=Error when deleting a forbidden character.
-entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None</content>
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None
+entitynamevalidation.admin.heading=Name Strategies</content>
   <object>
     <name>XWiki.EntityNameValidation.Translations</name>
     <number>0</number>

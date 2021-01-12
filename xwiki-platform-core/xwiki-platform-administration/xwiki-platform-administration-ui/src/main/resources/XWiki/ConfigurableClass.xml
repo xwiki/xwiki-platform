@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ConfigurableClass" locale="">
+<xwikidoc version="1.4" reference="XWiki.ConfigurableClass" locale="">
   <web>XWiki</web>
   <name>ConfigurableClass</name>
   <language/>
@@ -87,10 +87,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
 #end
 #set($currentSpace = $xwiki.getDocument($currentDoc).getSpace())
-##
-## This application should not run with programming rights because it evaluates code which may not be trustworthy.
-## Removing the next line will open a security hole.
-$doc.dropPermissions()##
 ##
 ##------------------------------------------------------------------------------------------------------------
 ## If $section exists then we are viewing the admin page for a particular section.
@@ -201,13 +197,13 @@ $doc.dropPermissions()##
           ## Display the header if one exists.
           #set($heading = $app.getValue('heading', $configurableObj))
           #if($heading &amp;&amp; $heading != '')
-            == #evaluate($heading) ==
+            == $configurableObj.display('heading', 'view', false) ==
           #end
           ##
           #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
           #if($codeToExecute != '')
             (%class="codeToExecute"%)(((##
-              #evaluate($codeToExecute)##
+              $configurableObj.display('codeToExecute', 'view', false)
             )))
           #end
           ##
@@ -496,10 +492,10 @@ $doc.dropPermissions()##
       <number>3</number>
       <picker>1</picker>
       <prettyName>configurationClass</prettyName>
-      <size>30</size>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators/>
+      <size>30</size>
       <sort>none</sort>
       <sql/>
       <unmodifiable>0</unmodifiable>
@@ -651,8 +647,11 @@ $doc.dropPermissions()##
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -700,6 +699,8 @@ $doc.dropPermissions()##
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

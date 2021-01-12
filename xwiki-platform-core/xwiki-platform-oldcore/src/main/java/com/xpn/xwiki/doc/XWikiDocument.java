@@ -1446,6 +1446,47 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
         boolean restrictedTransformationContext, XWikiDocument sDocument, XWikiContext context)
     {
+        try {
+            return getRenderedContent(text, Syntax.valueOf(sourceSyntaxId), Syntax.valueOf(targetSyntaxId),
+                restrictedTransformationContext, sDocument, true, context);
+        } catch (ParseException e) {
+            // Failed to render for some reason. This method should normally throw an exception but this
+            // requires changing the signature of calling methods too.
+            LOGGER.warn("Failed to render content [" + text + "]", e);
+        }
+
+        return "";
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param isolated true of the content should be executed in this document's context
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 13.0RC1
+     */
+    public String getRenderedContent(String text, Syntax sourceSyntaxId, XWikiDocument sDocument, boolean isolated,
+        XWikiContext context)
+    {
+        return getRenderedContent(text, sourceSyntaxId, getOutputSyntax(), false, sDocument, isolated, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param isolated true of the content should be executed in this document's context
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 13.0RC1
+     */
+    public String getRenderedContent(String text, Syntax sourceSyntaxId, Syntax targetSyntaxId,
+        boolean restrictedTransformationContext, XWikiDocument sDocument, boolean isolated, XWikiContext context)
+    {
         Map<String, Object> backup = null;
 
         getProgress().startStep(this, "document.progress.renderText",
@@ -1458,7 +1499,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // on the context (same Java object reference). We don't check if the document references are equal
             // because this document can have temporary changes that are not present on the context document even if
             // it has the same document reference.
-            if (context.getDoc() != this) {
+            if (isolated && context.getDoc() != this) {
                 backup = new HashMap<>();
                 backupContext(backup, context);
                 setAsContextDoc(context);
@@ -1471,12 +1512,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
             XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
-            fakeDocument.setSyntax(Syntax.valueOf(sourceSyntaxId));
+            fakeDocument.setSyntax(sourceSyntaxId);
             fakeDocument.setContent(text);
 
             // We don't let displayer take care of the context isolation because we don't want the fake document to be
             // context document
-            return fakeDocument.display(Syntax.valueOf(targetSyntaxId), false, true, restrictedTransformationContext,
+            return fakeDocument.display(targetSyntaxId, false, isolated, restrictedTransformationContext,
                 false);
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -3358,7 +3399,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, context);
+        return display(fieldname, type, obj, true, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 13.0RC1
+     */
+    public String display(String fieldname, String type, BaseObject obj, boolean isolate, XWikiContext context)
+    {
+        return display(fieldname, type, "", obj, isolate, context);
     }
 
     /**
@@ -3409,8 +3464,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, pref, obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
-            context);
+        return display(fieldname, type, pref, obj, true, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 13.0RC1
+     */
+    public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolate, XWikiContext context)
+    {
+        return display(fieldname, type, pref, obj,
+            context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context), isolate, context);
     }
 
     /**
@@ -3426,6 +3496,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         XWikiContext context)
     {
+        return display(fieldname, type, pref, obj, wrappingSyntaxId, true, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param context the XWiki context
+     * @return the rendered field
+     */
+    public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
+        boolean isolated, XWikiContext context)
+    {
         if (obj == null) {
             return "";
         }
@@ -3433,8 +3520,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
-            backupContext(backup, context);
-            setAsContextDoc(context);
+            if (isolated) {
+                backupContext(backup, context);
+                setAsContextDoc(context);
+            }
 
             // Make sure to execute with the right of the document author instead of the content author
             // (because modifying object property does not modify content author)
@@ -3457,7 +3546,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else if (pclass.isCustomDisplayed(context)) {
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);
             } else if (type.equals("view")) {
-                pclass.displayView(result, fieldname, prefix, obj, context);
+                pclass.displayView(result, fieldname, prefix, obj, isolated, context);
             } else if (type.equals("rendered")) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
@@ -3547,7 +3636,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 + getDefaultEntityReferenceSerializer().serialize(obj.getDocumentReference()) + "]", ex);
             return "";
         } finally {
-            restoreContext(backup, context);
+            if (!backup.isEmpty()) {
+                restoreContext(backup, context);
+            }
         }
     }
 

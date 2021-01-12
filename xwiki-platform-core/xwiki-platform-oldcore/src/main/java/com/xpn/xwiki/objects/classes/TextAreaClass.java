@@ -366,6 +366,13 @@ public class TextAreaClass extends StringClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
+        displayView(buffer, name, prefix, object, true, context);
+    }
+
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, boolean isolated,
+        XWikiContext context)
+    {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
 
@@ -385,8 +392,9 @@ public class TextAreaClass extends StringClass
             if (property != null) {
                 String content = property.toText();
                 if (doc != null) {
-                    String syntax = getObjectDocumentSyntax(object, context).toIdString();
-                    buffer.append(context.getDoc().getRenderedContent(content, syntax, context));
+                    Syntax syntax = getObjectDocumentSyntax(object, context);
+                    buffer.append(
+                        context.getDoc().getRenderedContent(content, syntax, context.getDoc(), isolated, context));
                 } else {
                     buffer.append(content);
                 }

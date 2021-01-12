@@ -80,6 +80,14 @@ public class Object extends Collection
 
     public java.lang.Object display(String name, String mode)
     {
+        return display(name, mode, true);
+    }
+
+    /**
+     * @since 13.0RC1
+     */
+    public java.lang.Object display(String name, String mode, boolean isolate)
+    {
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
             if (doc == null) {
@@ -87,7 +95,7 @@ public class Object extends Collection
                     getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
             }
 
-            return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
+            return doc.display(name, mode, this.getBaseObject(), isolate, getXWikiContext());
         } catch (XWikiException e) {
             return null;
         }

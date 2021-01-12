@@ -56,6 +56,7 @@ like.likers.title="Нравится" {0} чел.
 like.livetable.column.title=Название
 like.livetable.column.location=Расположение
 like.livetable.column.likes=Понравившиеся страницы
+### Missing: like.configuration.heading=Like Preferences
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Всегда отображать кнопку "Нравится"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Отображать кнопку, даже если у пользователя нет прав на взаимодействие с ней. Используйте его, если хотите, чтобы счетчик отметок "Нравится" всегда отображался.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Емкость кеш-памяти

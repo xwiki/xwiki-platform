@@ -41,6 +41,8 @@ import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -57,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
@@ -71,6 +74,9 @@ class DefaultGadgetSourceTest
 
     @MockComponent
     private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
 
     @Mock
     private DocumentReference documentReference;
@@ -99,6 +105,11 @@ class DefaultGadgetSourceTest
     @Mock
     private MacroTransformationContext macroTransformationContext;
 
+    @Mock
+    private VelocityEngine velocityEngine;
+
+    private ContentExecutor<MacroTransformationContext> contentExecutor;
+
     @BeforeEach
     void setup(MockitoComponentManager componentManager) throws Exception
     {
@@ -123,23 +134,14 @@ class DefaultGadgetSourceTest
         when(transformationContext.getId()).thenReturn(transformationId);
 
         VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
-        VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-        when(velocityEngine.evaluate(any(), any(), any(), any(String.class))).then((Answer<Void>) invocation -> {
-            Object[] args = invocation.getArguments();
-            StringWriter stringWriter = (StringWriter) args[1];
-            String title = (String) args[3];
-            stringWriter.append(title);
-            return null;
-        });
 
-        AuthorExecutor authorExecutor = componentManager.getInstance(AuthorExecutor.class);
         when(authorExecutor.call(any(), eq(ownerAuthorReference), eq(ownerSourceReference))).then(invocationOnMock -> {
             Callable callable = (Callable) invocationOnMock.getArguments()[0];
             return callable.call();
         });
 
-        ContentExecutor<MacroTransformationContext> contentExecutor =
+        this.contentExecutor =
             componentManager.getInstance(ContentExecutor.TYPE_MACRO_TRANSFORMATION);
         when(contentExecutor.execute(any(), any(), any(), any())).then((Answer<XDOM>) invocationOnMock -> {
             String content = invocationOnMock.getArgument(0);
@@ -162,12 +164,50 @@ class DefaultGadgetSourceTest
         when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some content");
         when(gadgetObject1.getStringValue("position")).thenReturn("0");
         when(gadgetObject1.getNumber()).thenReturn(42);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(true);
+        when(this.velocityEngine.evaluate(any(), any(), any(), eq("Gadget 1"))).then((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            StringWriter stringWriter = (StringWriter) args[1];
+            String title = "Evaluated velocity version of gadget 1";
+            stringWriter.append(title);
+            return null;
+        });
 
         List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
         assertEquals(1, gadgets.size());
         Gadget gadget = gadgets.get(0);
-        assertEquals("Gadget 1", gadget.getTitle().get(0).toString());
+        assertEquals("Evaluated velocity version of gadget 1", gadget.getTitle().get(0).toString());
         assertEquals("Some content", gadget.getContent().get(0).toString());
         assertEquals("42", gadget.getId());
+        verify(this.contentExecutor)
+            .execute(eq("Evaluated velocity version of gadget 1"), any(), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Some content"), any(), any(), any());
+    }
+
+    @Test
+    void getGadgetWithoutScriptRight() throws Exception
+    {
+        assertEquals(new ArrayList<>(), this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext));
+
+        BaseObject gadgetObject1 = mock(BaseObject.class);
+        when(xWikiDocument.getXObjects(gadgetClassReference)).thenReturn(Collections.singletonList(gadgetObject1));
+        when(gadgetObject1.getOwnerDocument()).thenReturn(ownerDocument);
+        when(gadgetObject1.getStringValue("title")).thenReturn("Gadget 2");
+        when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some other content");
+        when(gadgetObject1.getStringValue("position")).thenReturn("2");
+        when(gadgetObject1.getNumber()).thenReturn(12);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(false);
+
+        List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
+        assertEquals(1, gadgets.size());
+        Gadget gadget = gadgets.get(0);
+        assertEquals("Gadget 2", gadget.getTitle().get(0).toString());
+        assertEquals("Some other content", gadget.getContent().get(0).toString());
+        assertEquals("12", gadget.getId());
+        verify(this.contentExecutor)
+            .execute(eq("Gadget 2"), any(), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Some other content"), any(), any(), any());
     }
 }

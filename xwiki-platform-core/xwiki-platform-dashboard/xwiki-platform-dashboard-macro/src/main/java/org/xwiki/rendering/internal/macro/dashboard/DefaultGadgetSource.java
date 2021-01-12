@@ -44,17 +44,16 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.executor.ContentExecutor;
-import org.xwiki.rendering.executor.ContentExecutorException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetSource;
-import org.xwiki.rendering.parser.MissingParserException;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
@@ -119,6 +118,9 @@ public class DefaultGadgetSource implements GadgetSource
 
     @Inject
     private JobProgressManager progress;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     /**
      * Prepare the parser to parse the title and content of the gadget into blocks.
@@ -194,19 +196,23 @@ public class DefaultGadgetSource implements GadgetSource
                 String position = xObject.getStringValue("position");
                 String id = xObject.getNumber() + "";
 
-                // render title with velocity
-                StringWriter writer = new StringWriter();
-                // FIXME: the engine has an issue with $ and # as last character. To test and fix if it happens
-                velocityEngine.evaluate(velocityContext, writer, key, title);
-                String gadgetTitle = writer.toString();
+                String gadgetTitle;
+
+                XWikiDocument ownerDocument = xObject.getOwnerDocument();
+                if (this.authorizationManager.hasAccess(Right.SCRIPT, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference())) {
+                    gadgetTitle =
+                        this.evaluateVelocityTitle(velocityContext, velocityEngine, key, title, ownerDocument);
+                } else {
+                    gadgetTitle = title;
+                }
 
                 // parse both the title and content in the syntax of the transformation context
                 List<Block> titleBlocks =
                     renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(),
-                        xObject.getOwnerDocument(), context);
+                        ownerDocument, context);
                 List<Block> contentBlocks =
                     renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(),
-                        xObject.getOwnerDocument(), context);
+                        ownerDocument, context);
 
                 // create a gadget will all these and add the gadget to the container of gadgets
                 Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
@@ -220,6 +226,18 @@ public class DefaultGadgetSource implements GadgetSource
         }
 
         return gadgets;
+    }
+
+    private String evaluateVelocityTitle(VelocityContext velocityContext, VelocityEngine velocityEngine, String key,
+        String title, XWikiDocument ownerDocument) throws Exception
+    {
+        return this.authorExecutor.call(() -> {
+            // render title with velocity
+            StringWriter writer = new StringWriter();
+            // FIXME: the engine has an issue with $ and # as last character. To test and fix if it happens
+            velocityEngine.evaluate(velocityContext, writer, key, title);
+            return writer.toString();
+        }, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference());
     }
 
     private List<Block> renderGadgetProperty(String content, Syntax sourceSyntax, EntityReference sourceReference,

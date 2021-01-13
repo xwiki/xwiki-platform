@@ -19,7 +19,10 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,16 +35,22 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.converter.Converter;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
+import org.xwiki.ratings.events.UpdateAverageRatingFailedEvent;
+import org.xwiki.ratings.events.UpdatedAverageRatingEvent;
+import org.xwiki.ratings.events.UpdatingAverageRatingEvent;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import static org.xwiki.model.EntityType.DOCUMENT;
+import static org.xwiki.model.EntityType.WIKI;
 
 /**
  * Implementation of {@link AverageRatingManager} that stores the average rating in an xobject.
@@ -93,7 +102,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         long result = 0;
         // if the reference is a wiki, then everything's already deleted we don't need to do anything here
         // and we avoid trying to load document to avoid errors.
-        if (entityReference.getType() != EntityType.WIKI) {
+        if (entityReference.getType() != WIKI) {
             try {
                 BaseObject baseObject = retrieveAverageRatingXObject(entityReference);
                 if (baseObject != null) {
@@ -115,8 +124,84 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     public long moveAverageRatings(EntityReference oldReference, EntityReference newReference)
         throws RatingsException
     {
-        // We don't need to do anything here: if a document reference has been moved then the xobject move with it.
-        return 0;
+        // Checks that we are in the presence of entity types that can be handled by the move method.
+        if (oldReference == null
+            || newReference == null
+            || oldReference.extractReference(DOCUMENT) == null
+            || newReference.extractReference(DOCUMENT) == null)
+        {
+            throw new RatingsException(
+                "Impossible to move the average ratings from [" + oldReference + "] to [" + newReference + "].");
+        }
+
+        // The list of the average ratings updated during the move.
+        List<AverageRating> changedAverageRatings = new ArrayList<>();
+
+        try {
+            XWikiDocument actualDoc = (XWikiDocument) this.documentAccessBridge.getDocumentInstance(newReference);
+
+            // We must inspect all the XObject to see of they need to be updated, some of them can be attached to
+            // sub-elements of the page.
+            for (BaseObject ratingsObject : actualDoc
+                .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE)) {
+                moveAverageRatingsObject(oldReference, newReference, ratingsObject, changedAverageRatings);
+            }
+
+            // Save the document if something has changed
+            if (!changedAverageRatings.isEmpty()) {
+                XWikiContext context = this.contextProvider.get();
+                this.getObservationManager()
+                    .notify(new UpdatingAverageRatingEvent(), this.getIdentifier(), changedAverageRatings);
+                try {
+                    context.getWiki().saveDocument(actualDoc, "Move average ratings XObjects", true, context);
+                    this.getObservationManager()
+                        .notify(new UpdatedAverageRatingEvent(), this.getIdentifier(), changedAverageRatings);
+                } catch (XWikiException e) {
+                    this.getObservationManager()
+                        .notify(new UpdateAverageRatingFailedEvent(), this.getIdentifier(), changedAverageRatings);
+                }
+            }
+        } catch (Exception e) {
+            throw new RatingsException(
+                String.format("Error while moving the average ratings from [%s] to [%s]", oldReference, newReference),
+                e);
+        }
+
+        return changedAverageRatings.size();
+    }
+
+    private void moveAverageRatingsObject(EntityReference oldDocumentEntityReference,
+        EntityReference newDocumentEntityReference,
+        BaseObject ratingsObject, List<AverageRating> changedAverageRatings)
+    {
+        String xobjectManagerId = ratingsObject.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName());
+
+        // Checks that the object is attached to the current manager
+        // Checks that the xobject references the old entity or one of its children.
+        if (Objects.equals(getIdentifier(), xobjectManagerId)) {
+            String reference = ratingsObject.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName());
+            EntityReference oldEntityReference =
+                this.entityReferenceConverter.convert(EntityReference.class, reference);
+            if (oldEntityReference.equals(oldDocumentEntityReference)
+                || oldEntityReference.hasParent(oldDocumentEntityReference))
+            {
+                // If the entity reference of the average ratings object is the same as the old document reference, we
+                // use the new document reference.
+                // If the entity reference a child of the old entity reference, we  update its parent document with the
+                // new document reference.
+                EntityReference newEntityReference;
+                if (oldEntityReference.equals(oldDocumentEntityReference)) {
+                    newEntityReference = newDocumentEntityReference;
+                } else {
+                    newEntityReference = oldEntityReference.replaceParent(newDocumentEntityReference);
+                }
+                String newReference = this.entityReferenceConverter.convert(String.class, newEntityReference);
+
+                ratingsObject.setStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), newReference);
+
+                changedAverageRatings.add(transformXObjectToAverageRating(ratingsObject, newEntityReference));
+            }
+        }
     }
 
     private BaseObject retrieveAverageRatingXObject(EntityReference entityReference) throws Exception
@@ -142,7 +227,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     private String computeAverageRatingId(EntityReference entityReference)
     {
         String serializedOwnerDocReference =
-            this.stringEntityReferenceSerializer.serialize(entityReference.extractReference(EntityType.DOCUMENT));
+            this.stringEntityReferenceSerializer.serialize(entityReference.extractReference(DOCUMENT));
         String managerId = this.getIdentifier();
         String serializedEntityReference = this.stringEntityReferenceSerializer.serialize(entityReference);
         String entityType = entityReference.getType().getLowerCase();

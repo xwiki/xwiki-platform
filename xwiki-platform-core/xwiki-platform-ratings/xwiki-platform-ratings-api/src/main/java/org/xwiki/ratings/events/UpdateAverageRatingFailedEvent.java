@@ -25,9 +25,11 @@ import org.xwiki.ratings.RatingsManager;
 import org.xwiki.stability.Unstable;
 
 /**
- * Event sent whenever an update of {@link AverageRating} failed.
- * The event is sent with the following informations:
- *   - source: the identifier of the {@link RatingsManager}
+ * Event sent whenever an update of {@link AverageRating} failed. The event is sent with the following information:
+ * <ul>
+ *   <li>source: the identifier of the {@link RatingsManager}</li>
+ *   <li>data: a {@link java.util.List} of updated {@link AverageRating}</li>
+ * </ul>
  *
  * @version $Id$
  * @since 12.9RC1
@@ -35,6 +37,16 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class UpdateAverageRatingFailedEvent extends AbstractAverageRatingEvent implements EndEvent
 {
+    /**
+     * Default constructor.
+     *
+     * @since 13.0RC1
+     */
+    @Unstable
+    public UpdateAverageRatingFailedEvent()
+    {
+    }
+
     /**
      * Default constructor.
      *

@@ -21,34 +21,30 @@ package org.xwiki.ratings;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Properties;
 
 import javax.inject.Named;
 
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.junit.jupiter.api.BeforeEach;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.ratings.script.RatingsScriptService;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.template.TemplateManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,55 +59,37 @@ import static org.mockito.Mockito.when;
 @XHTML10ComponentList
 class RatingsTest extends PageTest
 {
+    // Needs to be registered for the ratings macro to be loaded successfully.
     @MockComponent
     @Named("template")
     private Macro templateMacro;
 
-    // Needs to be registered for the ratings macro to be loaded.
+    // Needs to be registered for the ratings macro to be loaded successfully.
     @MockComponent
     @Named("controlcharacters")
     private HTMLFilter htmlFilter;
 
-    @BeforeEach
-    void setUp() throws Exception
+    @Test
+    void displayFullRatingEscapesRequestDocRef() throws Exception
     {
-        // The Ratings macro uses Velocity macros from the macros.vm template. We need to overwrite the Velocity
-        // configuration in order to use the ClasspathResourceLoader for loading the macros.vm template from the class
-        // path.
-        VelocityConfiguration velocityConfiguration = this.oldcore.getMocker().getInstance(VelocityConfiguration.class);
-        Properties velocityConfigProps = velocityConfiguration.getProperties();
-        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADERS, "class");
-        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER + ".class." + RuntimeConstants.RESOURCE_LOADER_CLASS,
-            ClasspathResourceLoader.class.getName());
-        velocityConfigProps.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
-        velocityConfiguration = this.oldcore.getMocker().registerMockComponent(VelocityConfiguration.class);
-        when(velocityConfiguration.getProperties()).thenReturn(velocityConfigProps);
-
-        // The Ratings macro page includes the rating_macros.vm template.
-        this.oldcore.getMocker().registerMockComponent(TemplateManager.class);
-
         MacroDescriptor templateMacroDescriptor = mock(MacroDescriptor.class);
         when(this.templateMacro.getDescriptor()).thenReturn(templateMacroDescriptor);
         when(templateMacroDescriptor.getParametersBeanClass()).thenReturn((Class) "".getClass());
 
         registerVelocityTool("escapetool", new EscapeTool());
 
+        // Initialize the ratings script service to allow displayFullRating to display the blocks to be tested.
+        RatingsScriptService ratingsScriptService = mock(RatingsScriptService.class);
+        when(ratingsScriptService.getAverageRating(any())).thenReturn(Optional.of(mock(AverageRating.class)));
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "ratings", ratingsScriptService);
+
+        setOutputSyntax(Syntax.XHTML_1_0);
+
         // Initialize a document reference to be used as parameter when calling displayFullRating.
         ModelScriptService modelScriptService = mock(ModelScriptService.class);
         when(modelScriptService.createDocumentReference("a", "b", "c\"d"))
             .thenReturn(new DocumentReference("a", "b", "c\"d"));
         this.oldcore.getMocker().registerComponent(ScriptService.class, "model", modelScriptService);
-
-        // Initialize the ratings script service to allow displayFullRating to display the blocks to be tested.
-        RatingsScriptService ratingsScriptService = mock(RatingsScriptService.class);
-        when(ratingsScriptService.getAverageRating(any())).thenReturn(Optional.of(mock(AverageRating.class)));
-        this.oldcore.getMocker().registerComponent(ScriptService.class, "ratings", ratingsScriptService);
-    }
-
-    @Test
-    void displayFullRatingEscapesRequestDocRef() throws Exception
-    {
-        setOutputSyntax(Syntax.XHTML_1_0);
 
         // Load the RatingsMacros that contains the tested displayFullRating.
         loadPage(new DocumentReference("xwiki", Arrays.asList("XWiki", "Ratings"), "RatingsMacros"));
@@ -127,7 +105,11 @@ class RatingsTest extends PageTest
         this.xwiki.saveDocument(document, "registering document", true, this.context);
         String content = document.getRenderedContent(this.context);
 
+        Document parse = Jsoup.parse(content);
+        Elements elementsByClass = parse.getElementsByClass("rating-wrapper");
+        assertEquals(1, elementsByClass.size());
+        String attr = elementsByClass.first().attr("data-reference");
         // Verify that the displayFullRating parameter is actually escaped when used.
-        assertTrue(content.contains("data-reference=\"a:b.c&#34;d\""));
+        assertEquals("a:b.c\"d", attr);
     }
 }

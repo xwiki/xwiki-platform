@@ -82,7 +82,7 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
             if (deque != null && !deque.isEmpty()) {
                 DocumentReference document = deque.peek();
 
-                this.prlogger.error("PRChecker: Block programming right for page [{}]", document);
+                this.prlogger.debug("PRChecker: Block programming right for page [{}]", document);
 
                 return false;
             }

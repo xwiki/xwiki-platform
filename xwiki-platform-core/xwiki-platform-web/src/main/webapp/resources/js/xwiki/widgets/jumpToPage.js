@@ -43,7 +43,14 @@
   'edit': 'core.viewers.jump.dialog.actions.edit.shortcuts'
 })
 #foreach ($entry in $shortcuts.entrySet())
-  #set ($discard = $entry.setValue($services.localization.render($entry.value).split('\s*,\s*')))
+  ## An action can have multiple  keyboard shortcuts associated (comma separated).
+  #set ($values = $services.localization.render($entry.value).split('\s*,\s*'))
+  #foreach ($value in $values)
+    ## Each keyboard shortcut is wrapped in quotes because it was (poorly) designed to be injected direcly in JavaScript,
+    ## which we don't do anymore. So we need to remove the quotes.
+    #set ($discard = $values.set($foreach.index, $value.replaceAll('(^[''"])|([''"]$)', '')))
+  #end
+  #set ($discard = $entry.setValue($values))
 #end
 #[[*/
 // Start JavaScript-only code.

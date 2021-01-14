@@ -42,16 +42,12 @@
         "constraints":[{"value":""},{"value":"mention"}]
       }
     ],
-    "sort":[
-      {"property":"name"}
-    ],
     "limit":10
   },
   "meta":{
     "propertyDescriptors":[
       {
         "id":"name",
-        "name":"Name",
         "sortable":false,
         "visible":true,
         "filterable":false,

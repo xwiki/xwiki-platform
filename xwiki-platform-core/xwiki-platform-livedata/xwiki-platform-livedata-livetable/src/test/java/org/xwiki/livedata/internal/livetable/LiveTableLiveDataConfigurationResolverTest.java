@@ -25,13 +25,15 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -39,6 +41,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,16 +57,16 @@ class LiveTableLiveDataConfigurationResolverTest
     private LiveTableLiveDataConfigurationResolver liveTableLiveDataConfigResolver;
 
     @MockComponent
-    private ContextualLocalizationManager localization;
-
-    @MockComponent
     private PropertyTypeSupplier propertyTypeSupplier;
 
+    @MockComponent
+    @Named("liveTable")
+    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver;
+
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
-        when(this.localization.getTranslationPlain("notifications.settings.filters.preferences.table.name"))
-            .thenReturn("Name");
+        when(this.defaultConfigResolver.resolve(any())).then(invocation -> invocation.getArgument(0));
 
         when(this.propertyTypeSupplier.getPropertyType("isEnabled",
             "XWiki.Notifications.Code.ToggleableFilterPreferenceClass")).thenReturn("Boolean");

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -50,7 +49,6 @@ import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
-import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,8 +75,6 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String HIDDEN = "hidden";
 
-    private static final String TRANSLATION_PREFIX = "translationPrefix";
-
     private static final String CLASS_NAME = "className";
 
     @SuppressWarnings("serial")
@@ -94,8 +90,12 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     @Inject
     private Logger logger;
 
+    /**
+     * Used to add missing live data configuration values specific to the live table source.
+     */
     @Inject
-    private ContextualLocalizationManager localization;
+    @Named("liveTable")
+    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver;
 
     @Inject
     private PropertyTypeSupplier propertyTypeSupplier;
@@ -108,7 +108,9 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode columnPropertiesJSON = objectMapper.valueToTree(liveTableConfig.getColumnProperties());
         ObjectNode optionsJSON = objectMapper.valueToTree(liveTableConfig.getOptions());
-        return getConfig(liveTableConfig.getId(), liveTableConfig.getColumns(), columnPropertiesJSON, optionsJSON);
+        LiveDataConfiguration config =
+            getConfig(liveTableConfig.getId(), liveTableConfig.getColumns(), columnPropertiesJSON, optionsJSON);
+        return this.defaultConfigResolver.resolve(config);
     }
 
     private LiveDataConfiguration getConfig(String id, List<String> columns, ObjectNode columnProperties,
@@ -141,7 +143,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         Source source = new Source();
         source.setId("liveTable");
-        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", "queryFilters", TRANSLATION_PREFIX)) {
+        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", "queryFilters", "translationPrefix")) {
             if (options.path(parameter).isTextual()) {
                 source.setParameter(parameter, options.path(parameter).asText());
             }
@@ -214,22 +216,13 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private List<SortEntry> getSortConfig(List<String> columns, ObjectNode options)
     {
-        SortEntry sortEntry = new SortEntry();
         JsonNode selectedColumn = options.path("selectedColumn");
-        if (selectedColumn.isTextual()) {
-            sortEntry.setProperty(selectedColumn.asText());
-        } else {
-            // Use the first non-special column.
-            Optional<String> firstNonSpecialColumn =
-                columns.stream().filter(column -> !column.startsWith("_")).findFirst();
-            if (firstNonSpecialColumn.isPresent()) {
-                sortEntry.setProperty(firstNonSpecialColumn.get());
-            } else {
-                return null;
-            }
+        JsonNode defaultOrder = options.path("defaultOrder");
+        if (selectedColumn.isTextual() || defaultOrder.isTextual()) {
+            SortEntry sortEntry = new SortEntry(selectedColumn.asText(), "desc".equals(defaultOrder.asText()));
+            return Collections.singletonList(sortEntry);
         }
-        sortEntry.setDescending("desc".equals(options.path("defaultOrder").asText()));
-        return Collections.singletonList(sortEntry);
+        return null;
     }
 
     private LiveDataMeta getMetaConfig(ObjectNode columnProperties, ObjectNode options)
@@ -276,15 +269,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     private String getPropertyName(String column, ObjectNode columnProperties, ObjectNode options)
     {
         JsonNode displayName = columnProperties.path("displayName");
-        JsonNode translationPrefix = options.path(TRANSLATION_PREFIX);
-        if (displayName.isTextual()) {
-            return displayName.asText();
-        } else if (translationPrefix.isTextual()) {
-            // This returns null if the translation key is missing, so that the property name can fall-back on the value
-            // specified by the live data source (property store).
-            return this.localization.getTranslationPlain(translationPrefix.asText() + column);
-        }
-        return column;
+        return displayName.isTextual() ? displayName.asText() : null;
     }
 
     private String getPropertyType(String column, ObjectNode columnProperties, ObjectNode options)

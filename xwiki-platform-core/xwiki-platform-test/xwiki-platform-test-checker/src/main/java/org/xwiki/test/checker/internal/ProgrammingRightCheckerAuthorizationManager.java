@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.checker.internal;
 
+import java.util.Deque;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -74,10 +76,11 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     private boolean check(Right right)
     {
         if (right == Right.PROGRAM) {
-            XWikiContext xcontext = this.xwikiContextProvider.get();
-            if (xcontext != null) {
-                DocumentReference document =
-                    (DocumentReference) xcontext.get(ProgrammingRightCheckerListener.PRCHECK_KEY);
+            Deque<DocumentReference> deque =
+                ProgrammingRightCheckerListener.getStack(this.xwikiContextProvider.get(), false);
+
+            if (deque != null && !deque.isEmpty()) {
+                DocumentReference document = deque.peek();
 
                 this.logger.debug("PRChecker: Block programming right for page [{}]", document);
 

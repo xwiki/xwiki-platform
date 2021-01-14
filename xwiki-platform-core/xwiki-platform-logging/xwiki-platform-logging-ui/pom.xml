@@ -43,6 +43,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- Used to display the administration section -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-display-macro</artifactId>
       <version>${project.version}</version>
@@ -58,6 +59,25 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-message</artifactId>
       <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The logging live data source is still implemented using the old live table format. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

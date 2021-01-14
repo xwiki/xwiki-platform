@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="XWiki.LoggingAdmin" locale="">
   <web>XWiki</web>
   <name>LoggingAdmin</name>
   <language/>
@@ -114,7 +114,7 @@
       <codeToExecute>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -139,10 +139,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -279,6 +279,9 @@
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
       <codeToExecute>{{display reference="XWiki.LoggingAdmin"/}}</codeToExecute>
     </property>
     <property>
@@ -286,6 +289,12 @@
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
     </property>
     <property>
       <displayInSection>Logging</displayInSection>
@@ -301,6 +310,9 @@
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder/>
     </property>
   </object>
 </xwikidoc>

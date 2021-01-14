@@ -20,6 +20,8 @@
 package org.xwiki.test.checker.internal;
 
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -38,10 +40,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.event.ScriptEvaluatedEvent;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -58,7 +57,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class ProgrammingRightCheckerListener implements EventListener, Initializable
 {
-    private static final String PRCHECK_KEY = "PRCheckDroppedPermissions";
+    /**
+     * The context key used to store the status of the PR check.
+     */
+    public static final String PRCHECK_KEY = "PRCheckDroppedPermissions";
 
     private Pattern excludePattern;
 
@@ -67,9 +69,6 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
-
-    @Inject
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
     @Named("xwikiproperties")
@@ -102,47 +101,64 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
         XWikiContext context = this.xwikiContextProvider.get();
 
         // Should the current document be excluded from the PR check?
-        XWikiDocument contextDocument = context.getDoc();
-        DocumentReference currentDocReference = contextDocument.getDocumentReference();
-        if (this.excludePattern != null && this.excludePattern.matcher(currentDocReference.toString()).matches()) {
-            this.logger.info("PRChecker: Skipping check for [{}] since it's excluded", currentDocReference);
-            return;
+        XWikiDocument contextDocument = (XWikiDocument) context.get("sdoc");
+        if (contextDocument == null) {
+            contextDocument = context.getDoc();
         }
 
-        if (event instanceof ScriptEvaluatingEvent) {
+        if (contextDocument != null) {
+            DocumentReference currentDocReference = contextDocument.getDocumentReference();
+            if (this.excludePattern != null && this.excludePattern.matcher(currentDocReference.toString()).matches()) {
+                if (event instanceof ScriptEvaluatingEvent) {
+                    this.logger.info("PRChecker: Skipping check for [{}] since it's excluded", currentDocReference);
+                }
 
-            // Make it simpler to debug why a test will fail with the PR checker active by logging that we dropped
-            // permissions.
-            boolean logPrinted = false;
-            boolean hasPR = this.contextualAuthorizationManager.hasAccess(Right.PROGRAM, currentDocReference);
-            if (hasPR) {
-                // Ideally we would print this in info mode but since right now all pages have PR by default, this is
-                // just swamping the logs...
-                this.logger.debug("PRChecker: Dropping permissions for page [{}], which had PR",
-                    currentDocReference);
-                logPrinted = true;
+                return;
             }
 
-            // Save the original value
-            Boolean originalValue = (Boolean) context.get(XWikiConstant.DROPPED_PERMISSIONS);
-            if (originalValue != null) {
-                context.put(PRCHECK_KEY, originalValue);
-            }
-
-            if (!logPrinted) {
-                this.logger.debug("PRChecker: Dropping permissions for page [{}]", currentDocReference);
-            }
-            context.dropPermissions();
-        } else {
-            // Restore the original value
-            Boolean originalValue = (Boolean) context.get(PRCHECK_KEY);
-            this.logger.debug("PRChecker: Restoring permissions for page [{}]", currentDocReference);
-            if (originalValue != null) {
-                context.put(XWikiConstant.DROPPED_PERMISSIONS, originalValue);
+            if (event instanceof ScriptEvaluatingEvent) {
+                push(currentDocReference);
             } else {
-                context.remove(XWikiConstant.DROPPED_PERMISSIONS);
+                pop();
             }
-            context.remove(PRCHECK_KEY);
+        }
+    }
+
+    /**
+     * @param context the XWikicontext
+     * @param create true if a stack should be create and added to the context if none exist
+     * @return the stack
+     */
+    public static Deque<DocumentReference> getStack(XWikiContext context, boolean create)
+    {
+        Deque<DocumentReference> deque = null;
+        if (context != null) {
+            deque = (Deque<DocumentReference>) context.get(PRCHECK_KEY);
+
+            if (deque == null && create) {
+                deque = new LinkedList<>();
+                context.put(PRCHECK_KEY, deque);
+            }
+        }
+
+        return deque;
+    }
+
+    private void push(DocumentReference document)
+    {
+        XWikiContext context = this.xwikiContextProvider.get();
+
+        if (context != null) {
+            getStack(context, true).push(document);
+        }
+    }
+
+    private void pop()
+    {
+        Deque<DocumentReference> deque = getStack(this.xwikiContextProvider.get(), false);
+
+        if (deque != null) {
+            deque.pop();
         }
     }
 }

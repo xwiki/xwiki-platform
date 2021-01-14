@@ -1,2 +1,2 @@
-500:org.xwiki.test.checker.internal.ProgrammingRightCheckerAuthorizationManager
+1:org.xwiki.test.checker.internal.ProgrammingRightCheckerAuthorizationManager
 org.xwiki.test.checker.internal.ProgrammingRightCheckerListener

@@ -45,10 +45,10 @@ import com.xpn.xwiki.XWikiContext;
 public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthorizationManager
 {
     @Inject
-    private Provider<XWikiContext> xwikiContextProvider;
+    private Provider<XWikiContext> prxwikiContextProvider;
 
     @Inject
-    private Logger logger;
+    private Logger prlogger;
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
@@ -77,12 +77,12 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     {
         if (right == Right.PROGRAM) {
             Deque<DocumentReference> deque =
-                ProgrammingRightCheckerListener.getStack(this.xwikiContextProvider.get(), false);
+                ProgrammingRightCheckerListener.getStack(this.prxwikiContextProvider.get(), false);
 
             if (deque != null && !deque.isEmpty()) {
                 DocumentReference document = deque.peek();
 
-                this.logger.debug("PRChecker: Block programming right for page [{}]", document);
+                this.prlogger.error("PRChecker: Block programming right for page [{}]", document);
 
                 return false;
             }

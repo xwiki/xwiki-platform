@@ -59,24 +59,29 @@
   #end
 #end
 ##
-## Livetable #
+## Live Data
 ##
-#set($columns = [ 'logger'  , 'level'])
-#set($columnsProperties = {
-    'logger' : { 'type' : 'text' },
-    'level' : { 'type' : 'text', 'size' : '3' }
+#set ($properties = ['logger', 'level'])
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': []
+  }
 })
-#set($options = {
-    'resultPage': 'XWiki.LoggingAdminTableJson',
-    'translationPrefix' : 'logging.admin.livetable.'
-})
-##
-#if ($xwiki.hasAccessLevel('programming'))
-  #set($void = $columns.add('actions'))
-  #set($void = $columnsProperties.put('actions', { 'html' : true, 'sortable' : false, 'filterable' : false }))
+#if ($services.security.authorization.hasAccess('programming'))
+  #set ($discard = $properties.add('actions'))
+  #set ($discard = $liveDataConfig.meta.propertyDescriptors.add({
+    'id': 'actions',
+    'displayer': 'html',
+    'sortable': false,
+    'filterable': false
+  }))
 #end
-##
-#livetable("logging" $columns $columnsProperties $options)
+{{liveData
+  id="logging"
+  properties="$stringtool.join($properties, ',')"
+  source="liveTable"
+  sourceParameters="resultPage=XWiki.LoggingAdminTableJson&amp;translationPrefix=logging.admin.livetable."
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.LoggingAdmin</name>

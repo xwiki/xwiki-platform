@@ -20,18 +20,26 @@
 package org.xwiki.livedata.internal;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
@@ -45,10 +53,13 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,14 +85,20 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     @MockComponent
     private IconManager iconManager;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
     @Mock
     private LiveDataSource liveDataSource;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void before() throws Exception
+    void before(MockitoComponentManager componentManager) throws Exception
     {
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+
         Source source = new Source();
         source.setId("test");
         when(this.sourceManager.get(source)).thenReturn(Optional.of(this.liveDataSource));
@@ -142,5 +159,24 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     private static Stream<String[]> getTestData() throws Exception
     {
         return getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));
+    }
+
+    @Test
+    void addSourceSpecificDefaults(MockitoComponentManager componentManager) throws Exception
+    {
+        Type role =
+            new DefaultParameterizedType(null, LiveDataConfigurationResolver.class, LiveDataConfiguration.class);
+        LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver =
+            componentManager.registerMockComponent(role, "foo");
+
+        // Verify that the default source-specific resolver is called.
+        LiveDataConfiguration output = new LiveDataConfiguration();
+        output.initialize();
+        when(defaultConfigResolver.resolve(any())).thenReturn(output);
+
+        LiveDataConfiguration input = new LiveDataConfiguration();
+        input.initialize();
+        input.getQuery().getSource().setId("foo");
+        assertSame(output, this.resolver.resolve(input));
     }
 }

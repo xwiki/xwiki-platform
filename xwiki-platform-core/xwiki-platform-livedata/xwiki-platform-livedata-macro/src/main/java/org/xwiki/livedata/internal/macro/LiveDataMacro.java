@@ -36,7 +36,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
@@ -47,11 +46,13 @@ import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
+import org.xwiki.livedata.internal.JSONMerge;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
@@ -72,8 +73,23 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
 
     private static final String UTF8 = "UTF-8";
 
+    /**
+     * Used to add default Live Data configuration values.
+     */
     @Inject
-    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
+    private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigResolver;
+
+    /**
+     * Used to read the Live Data configuration from the macro content.
+     */
+    @Inject
+    private LiveDataConfigurationResolver<String> stringLiveDataConfigResolver;
+
+    /**
+     * Used to merge the Live Data configuration built from the macro parameters with the live data configuration read
+     * from the macro content.
+     */
+    private JSONMerge jsonMerge = new JSONMerge();
 
     /**
      * The component used to load the JavaScript code of the Live Data widget.
@@ -87,7 +103,9 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
      */
     public LiveDataMacro()
     {
-        super("Live Data", "Display dynamic lists of data.", LiveDataMacroParameters.class);
+        super("Live Data", "Display dynamic lists of data.",
+            new DefaultContentDescriptor("Advanced Live Data configuration (JSON)", false),
+            LiveDataMacroParameters.class);
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
@@ -106,9 +124,9 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         }
         try {
             // Compute the live data configuration based on the macro parameters.
-            LiveDataConfiguration liveDataConfig = getLiveDataConfiguration(parameters, content);
+            LiveDataConfiguration liveDataConfig = getLiveDataConfiguration(content, parameters);
             // Add the default values.
-            liveDataConfig = this.defaultLiveDataConfigurationResolver.resolve(liveDataConfig);
+            liveDataConfig = this.defaultLiveDataConfigResolver.resolve(liveDataConfig);
             // Serialize as JSON.
             ObjectMapper objectMapper = new ObjectMapper();
             output.setParameter("data-config", objectMapper.writeValueAsString(liveDataConfig));
@@ -124,13 +142,22 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         return false;
     }
 
-    private LiveDataConfiguration getLiveDataConfiguration(LiveDataMacroParameters parameters, String content)
+    private LiveDataConfiguration getLiveDataConfiguration(String content, LiveDataMacroParameters parameters)
         throws Exception
+    {
+        String json = StringUtils.defaultIfBlank(content, "{}");
+        LiveDataConfiguration advancedConfig = this.stringLiveDataConfigResolver.resolve(json);
+        LiveDataConfiguration basicConfig = getLiveDataConfiguration(parameters);
+        // Make sure both configurations have the same id so that they are properly merged.
+        advancedConfig.setId(basicConfig.getId());
+        return this.jsonMerge.merge(advancedConfig, basicConfig);
+    }
+
+    private LiveDataConfiguration getLiveDataConfiguration(LiveDataMacroParameters parameters) throws Exception
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
         liveDataConfig.setId(parameters.getId());
         liveDataConfig.setQuery(getQuery(parameters));
-        liveDataConfig.setData(getData(content));
         liveDataConfig.setMeta(getMeta(parameters));
         return liveDataConfig;
     }
@@ -210,12 +237,6 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         filter.setProperty(entry.getKey());
         filter.getConstraints().addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
         return filter;
-    }
-
-    private LiveData getData(String content)
-    {
-        // TODO: Read live data entries from the macro content.
-        return null;
     }
 
     private LiveDataMeta getMeta(LiveDataMacroParameters parameters)

@@ -1,3 +1,4 @@
+org.xwiki.livedata.internal.livetable.DefaultLiveDataConfigurationResolver
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataConfigurationResolver
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataEntryStore
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataPropertyStore

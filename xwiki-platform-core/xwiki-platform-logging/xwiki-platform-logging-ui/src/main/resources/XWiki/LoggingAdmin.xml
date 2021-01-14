@@ -81,6 +81,7 @@
   properties="$stringtool.join($properties, ',')"
   source="liveTable"
   sourceParameters="resultPage=XWiki.LoggingAdminTableJson&amp;translationPrefix=logging.admin.livetable."
+  showPageSizeDropdown="true"
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
   <object>

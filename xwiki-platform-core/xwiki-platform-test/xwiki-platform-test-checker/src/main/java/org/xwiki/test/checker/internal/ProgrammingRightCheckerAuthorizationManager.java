@@ -21,8 +21,10 @@ package org.xwiki.test.checker.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -36,6 +38,8 @@ import com.xpn.xwiki.XWikiContext;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthorizationManager
 {
     @Inject

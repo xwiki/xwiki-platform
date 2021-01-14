@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -88,6 +89,9 @@ public class XObjectAverageRatingManagerTest
 
     @MockComponent
     private ObservationManager observationManager;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     @Mock
     private RatingsManager ratingsManager;
@@ -233,6 +237,9 @@ public class XObjectAverageRatingManagerTest
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
 
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("Update average rating");
+
         this.averageRatingManager.saveAverageRating(averageRating);
 
         verify(xObject).setStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName(), expectedManagerID);
@@ -286,6 +293,9 @@ public class XObjectAverageRatingManagerTest
 
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
+
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("Update average rating");
 
         this.averageRatingManager.saveAverageRating(averageRating);
 
@@ -350,7 +360,11 @@ public class XObjectAverageRatingManagerTest
         when(this.contextProvider.get()).thenReturn(context);
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.remove.comment"))
+            .thenReturn("Remove average rating");
+
         assertEquals(1, this.averageRatingManager.removeAverageRatings(reference));
+
         verify(xWikiDocument).removeXObject(matchingAverageRating);
         verify(xWiki).saveDocument(xWikiDocument, "Remove average rating", true, context);
     }
@@ -465,6 +479,8 @@ public class XObjectAverageRatingManagerTest
 
         when(this.stringEntityReferenceSerializer.serialize(newReference.extractReference(DOCUMENT))).thenReturn(
             "xwiki:XWiki.New");
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.move.comment"))
+            .thenReturn("Move average ratings XObjects");
 
         long count = this.averageRatingManager.moveAverageRatings(oldReference, newReference);
 

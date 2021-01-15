@@ -35,6 +35,9 @@
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <!-- Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
+         the test creates this page with Groovy code and thus requires PR FTM -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
     <xwiki.database.directory>${project.build.directory}/data/database</xwiki.database.directory>
     <xwiki.instance.directory>${project.build.directory}/xwiki</xwiki.instance.directory>
     <xwiki.store.file.directory>${xwiki.instance.directory}/data/store/file</xwiki.store.file.directory>
@@ -158,6 +161,7 @@
                     <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                     <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
                     <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>
+                    <xwikiPropertiesAdditionalProperties>${xwikiPropertiesAdditionalProperties}</xwikiPropertiesAdditionalProperties>
                   </properties>
                 </configuration>
               </execution>

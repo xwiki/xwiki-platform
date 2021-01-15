@@ -19,12 +19,18 @@
  */
 package org.xwiki.test.checker.internal;
 
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -43,7 +49,7 @@ import com.xpn.xwiki.internal.template.InternalTemplateManager;
  */
 @Component
 @Singleton
-public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthorizationManager
+public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthorizationManager implements Initializable
 {
     private static final LocalDocumentReference SUREFERENCE = new LocalDocumentReference("SUSpace", "SUPage");
 
@@ -51,7 +57,22 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     private Provider<XWikiContext> prxwikiContextProvider;
 
     @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
+    @Inject
     private Logger prlogger;
+
+    private Pattern excludePattern;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        String regex = this.configurationSource.getProperty("test.prchecker.excludePattern");
+        if (regex != null) {
+            this.excludePattern = Pattern.compile(regex);
+        }
+    }
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
@@ -59,7 +80,7 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     {
         super.checkAccess(right, userReference, entityReference);
 
-        if (!check(right, userReference, entityReference)) {
+        if (!check(right, userReference)) {
             throw new AccessDeniedException(right, userReference, entityReference);
         }
     }
@@ -69,14 +90,14 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     {
         boolean hasAccess = super.hasAccess(right, userReference, entityReference);
 
-        if (hasAccess && !check(right, userReference, entityReference)) {
+        if (hasAccess && !check(right, userReference)) {
             return false;
         }
 
         return hasAccess;
     }
 
-    private boolean check(Right right, DocumentReference userReference, EntityReference entityReference)
+    private boolean check(Right right, DocumentReference userReference)
     {
         if (right == Right.PROGRAM) {
             XWikiContext xcontext = this.prxwikiContextProvider.get();
@@ -85,15 +106,30 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
                 // Get the current secure document
                 XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
 
-                // Try to make sure we are in a script associated to a wiki page: a secure document has been set and
-                // it's not the author/secure document used for things authorized to have PR by definition (like
-                // filesystem templates)
-                if (sdoc != null && (!InternalTemplateManager.SUPERADMIN_REFERENCE.equals(userReference)
-                    || !SUREFERENCE.equals(sdoc.getDocumentReference().getLocalDocumentReference()))) {
-                    this.prlogger.debug("PRChecker: Block programming right for page [{}]", entityReference);
+                return check(userReference, sdoc);
+            }
+        }
 
-                    return false;
-                }
+        return true;
+    }
+
+    private boolean check(DocumentReference userReference, XWikiDocument sdoc)
+    {
+        // Try to make sure we are in a script associated to a wiki page: a secure document has been set and
+        // it's not the author/secure document used for things authorized to have PR by definition (like
+        // filesystem templates)
+        if (sdoc != null && (!InternalTemplateManager.SUPERADMIN_REFERENCE.equals(userReference)
+            || !SUREFERENCE.equals(sdoc.getDocumentReference().getLocalDocumentReference()))) {
+            DocumentReference sref = sdoc.getDocumentReference();
+
+            if (this.excludePattern != null && this.excludePattern.matcher(sref.toString()).matches()) {
+                this.prlogger.info("PRChecker: Skipping check for [{}] since it's excluded", sref);
+
+                return true;
+            } else {
+                this.prlogger.debug("PRChecker: Block programming right for page [{}]", sref);
+
+                return false;
             }
         }
 

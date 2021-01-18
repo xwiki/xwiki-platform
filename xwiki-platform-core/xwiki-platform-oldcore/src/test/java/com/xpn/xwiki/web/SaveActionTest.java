@@ -19,11 +19,16 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Collections;
 import java.util.Date;
 
+import javax.inject.Named;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.EntityNameValidation;
@@ -34,6 +39,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -74,6 +80,13 @@ public class SaveActionTest
 
     @MockComponent
     private Execution execution;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource propertiesConf;
+
+    @MockComponent
+    private DocumentRevisionProvider documentRevisionProvider;
 
     private XWikiContext context;
 
@@ -194,5 +207,42 @@ public class SaveActionTest
         assertEquals(new Version("1.4"), this.context.get("SaveAction.savedObjectVersion"));
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+    }
+
+    /**
+     * This tests aims at checking the usecase when uploading an image in the WYSIWYG editor before the first save
+     * and saving afterwards.
+     */
+    @Test
+    void validSaveRequestImageUploadAndConflictCheck() throws Exception
+    {
+        when(mockDocument.getRCSVersion()).thenReturn(new Version("1.2"));
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        when(mockForm.getTemplate()).thenReturn("");
+        when(this.propertiesConf.getProperty("edit.conflictChecking.enabled")).thenReturn(true);
+        when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
+        context.put("ajax", true);
+        when(mockRequest.getParameter("forceSave")).thenReturn("");
+        when(mockRequest.getParameter("isNew")).thenReturn("true");
+
+        when(mockDocument.getDate()).thenReturn(new Date(42));
+        when(mockRequest.getParameter("editingVersionDate")).thenReturn("43");
+        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(mock(XWikiDocument.class));
+        when(mockDocument.getContentDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
+        when(mockDocument.getMetaDataDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
+        when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
+
+        assertFalse(saveAction.save(this.context));
+        assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
+
+        verify(mockClonedDocument).readFromTemplate("", this.context);
+        verify(mockClonedDocument).setAuthor("XWiki.FooBar");
+        verify(mockClonedDocument).setMetaDataDirty(true);
+        verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
+        verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+        verify(mockClonedDocument).removeLock(this.context);
+
     }
 }

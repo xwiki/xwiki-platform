@@ -423,9 +423,12 @@ public class SaveAction extends PreviewAction
                 XWikiDocument previousDoc =
                     getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
 
-                // if doc is new and we're here: it's a conflict, we can skip the diff check
-                // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
-                if (!originalDoc.isNew() && previousDoc != null && !"true".equals(request.getParameter("isNew"))) {
+                // We also check that the previousDoc revision exists to avoid an exception if it has been deleted
+                // Note that if we're here and the request says that the document is new, it's not necessarily a
+                // conflict: we might be in the case where the doc has been created during the edition because of
+                // an image added to it, without updating the client. So it's still accurate to check that the diff
+                // hasn't changed.
+                if (!originalDoc.isNew() && previousDoc != null) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
                     List<Delta> contentDiff =

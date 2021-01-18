@@ -205,7 +205,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if($heading &amp;&amp; $heading != '')
             ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
             ## Removing the next line will open a security hole.
-            ## FIXME: introduce proper velocity field so that we can directly use configurableObj.display instead like for the content
+            ## Can't use $configurableObj.display('heading', 'view', false) to have proper heading id (because of the html macro)
+            ## FIXME: find a cleaner solution
             #set($void = $doc.dropPermissions())
             == #evaluate($heading) ==
           #end
@@ -463,6 +464,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <categoryIcon>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>categoryIcon</name>
       <number>11</number>
       <picker>0</picker>
@@ -474,9 +476,11 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </categoryIcon>
     <codeToExecute>
+      <contenttype>VelocityWiki</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>Text</editor>
+      <editor>---</editor>
+      <hint/>
       <name>codeToExecute</name>
       <number>7</number>
       <picker>0</picker>
@@ -492,10 +496,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <cache>0</cache>
       <classname/>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
       <hint/>
       <idField/>
+      <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>configurationClass</name>
       <number>3</number>
@@ -519,6 +526,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>configureGlobally</name>
       <number>4</number>
       <prettyName>configureGlobally</prettyName>
@@ -530,6 +538,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <displayBeforeCategory>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayBeforeCategory</name>
       <number>10</number>
       <picker>0</picker>
@@ -543,6 +552,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <displayInCategory>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayInCategory</name>
       <number>9</number>
       <picker>0</picker>
@@ -556,6 +566,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <displayInSection>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayInSection</name>
       <number>1</number>
       <picker>0</picker>
@@ -567,21 +578,26 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </displayInSection>
     <heading>
+      <contenttype>VelocityWiki</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>heading</name>
       <number>2</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>heading</prettyName>
+      <rows>1</rows>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </heading>
     <iconAttachment>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>iconAttachment</name>
       <number>8</number>
       <picker>0</picker>
@@ -595,6 +611,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <linkPrefix>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>linkPrefix</name>
       <number>5</number>
       <picker>0</picker>
@@ -608,8 +625,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <propertiesToShow>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>propertiesToShow</name>
       <number>6</number>
@@ -629,6 +650,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     <sectionOrder>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>sectionOrder</name>
       <number>12</number>
       <numberType>integer</numberType>

@@ -25,17 +25,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
@@ -66,8 +67,8 @@ public class TextAreaClass extends StringClass
          */
         WYSIWYG("Wysiwyg");
 
-        private static final Map<String, EditorType> editorTypeMap = Arrays.stream(EditorType.values())
-            .collect(Collectors.toMap(e -> e.value.toLowerCase(), e -> e));
+        private static final Map<String, EditorType> editorTypeMap =
+            Arrays.stream(EditorType.values()).collect(Collectors.toMap(e -> e.value.toLowerCase(), e -> e));
 
         private final String value;
 
@@ -119,10 +120,17 @@ public class TextAreaClass extends StringClass
         /**
          * Velocity content.
          */
-        VELOCITY_CODE("VelocityCode");
+        VELOCITY_CODE("VelocityCode"),
 
-        private static final Map<String, ContentType> contentTypeMap = Arrays.stream(ContentType.values())
-            .collect(Collectors.toMap(c -> c.value.toLowerCase(), c -> c));
+        /**
+         * Velocity content producing wiki content.
+         * 
+         * @since 13.0RC1
+         */
+        VELOCITYWIKI("VelocityWiki");
+
+        private static final Map<String, ContentType> contentTypeMap =
+            Arrays.stream(ContentType.values()).collect(Collectors.toMap(c -> c.value.toLowerCase(), c -> c));
 
         private final String value;
 
@@ -373,12 +381,12 @@ public class TextAreaClass extends StringClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, boolean isolated,
         XWikiContext context)
     {
-        String contentType = getContentType();
-        XWikiDocument doc = context.getDoc();
+        String contentTypeString = getContentType();
+        ContentType contentType = ContentType.getByValue(contentTypeString);
 
-        if ("puretext".equals(contentType) && doc != null) {
+        if (contentType == ContentType.PURE_TEXT) {
             super.displayView(buffer, name, prefix, object, context);
-        } else if ("velocitycode".equals(contentType) && context.getWiki() != null) {
+        } else if (contentType == ContentType.VELOCITY_CODE) {
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0)) {
@@ -391,10 +399,20 @@ public class TextAreaClass extends StringClass
             BaseProperty property = (BaseProperty) object.safeget(name);
             if (property != null) {
                 String content = property.toText();
-                if (doc != null) {
-                    Syntax syntax = getObjectDocumentSyntax(object, context);
+                XWikiDocument sdoc = getObjectDocument(object, context);
+
+                if (sdoc != null) {
+                    if (contentType == ContentType.VELOCITYWIKI) {
+                        // Start with a pass of Velocity
+                        // TODO: maybe make velocity+wiki a syntax so that getRenderedContent can directly take care
+                        // of that
+                        VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
+                        content = velocityEvaluator.evaluateVelocityNoException(content,
+                            isolated ? sdoc.getDocumentReference() : null);
+                    }
+
                     buffer.append(
-                        context.getDoc().getRenderedContent(content, syntax, context.getDoc(), isolated, context));
+                        context.getDoc().getRenderedContent(content, sdoc.getSyntax(), sdoc, isolated, context));
                 } else {
                     buffer.append(content);
                 }
@@ -402,32 +420,31 @@ public class TextAreaClass extends StringClass
         }
     }
 
-    /**
-     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the object
-     *         document cannot be retrieved
-     */
-    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    private XWikiDocument getObjectDocument(BaseCollection object, XWikiContext context)
     {
-        Syntax syntax;
-
         try {
             XWikiDocument doc = object.getOwnerDocument();
             if (doc == null) {
                 doc = context.getWiki().getDocument(object.getDocumentReference(), context);
             }
 
-            syntax = doc.getSyntax();
+            return doc;
         } catch (Exception e) {
-            // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
-            // current wiki).
-            EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-            LOGGER.warn("Error while getting the syntax corresponding to object ["
-                + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
-                + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
-            syntax = Syntax.XWIKI_1_0;
+            // Used to convert a Document Reference to string (compact form without the wiki part if it matches
+            // the current wiki).
+            LOGGER.warn(
+                "Error while getting the syntax corresponding to object [{}]. "
+                    + "Defaulting to using XWiki 1.0 syntax. Internal error [{}]",
+                object.getReference(), ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return syntax;
+        return null;
+    }
+
+    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    {
+        XWikiDocument doc = getObjectDocument(object, context);
+
+        return doc != null && doc.getSyntax() != null ? doc.getSyntax() : Syntax.XWIKI_1_0;
     }
 }

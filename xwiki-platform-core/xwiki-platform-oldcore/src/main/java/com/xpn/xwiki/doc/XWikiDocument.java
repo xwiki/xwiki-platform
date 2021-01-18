@@ -3520,6 +3520,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
+        XWikiDocument currentSDoc = (XWikiDocument )context.get(CKEY_SDOC);
         try {
             if (isolated) {
                 backupContext(backup, context);
@@ -3528,7 +3529,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             // Make sure to execute with the right of the document author instead of the content author
             // (because modifying object property does not modify content author)
-            XWikiDocument sdoc = context.getDoc();
+            XWikiDocument sdoc = obj.getOwnerDocument();
             if (sdoc != null && !Objects.equals(sdoc.getContentAuthorReference(), sdoc.getAuthorReference())) {
                 // Hack the sdoc to make test module believe the content author is the author
                 sdoc = sdoc.clone();
@@ -3640,6 +3641,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (!backup.isEmpty()) {
                 restoreContext(backup, context);
             }
+            context.put(CKEY_SDOC, currentSDoc);
         }
     }
 

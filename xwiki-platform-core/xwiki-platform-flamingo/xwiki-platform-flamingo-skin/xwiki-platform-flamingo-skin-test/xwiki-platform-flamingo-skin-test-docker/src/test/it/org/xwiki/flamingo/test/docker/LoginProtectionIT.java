@@ -30,14 +30,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
-import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test related to login protection on flamingo skin (captcha appearing after N attempts, etc).
@@ -147,12 +145,8 @@ public class LoginProtectionIT
         setup.updateObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass", 0,
             "isAuthenticationSecurityEnabled", false);
 
-        try {
-            setup.loginAsSuperAdmin();
-            setup.gotoPage("Main", "WebHome");
-            assertEquals(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), setup.getLoggedInUserName());
-        } catch (Exception e) {
-            fail("The authentication security mechanism is still enabled");
-        }
+        setup.loginAsSuperAdmin();
+        setup.gotoPage("Main", "WebHome");
+        assertEquals(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), setup.getLoggedInUserName());
     }
 }

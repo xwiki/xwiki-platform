@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -46,9 +47,12 @@ import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.api.ResetPasswordException;
+import org.xwiki.security.authentication.api.ResetPasswordManager;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -85,6 +89,9 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> defaultResourceReferenceSerializer;
+
+    @Inject
+    private ResetPasswordManager resetPasswordManager;
 
     @Inject
     private Logger logger;
@@ -197,5 +204,23 @@ public class AuthenticationScriptService implements ScriptService
                 ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
+    }
+
+    public InternetAddress requestResetPassword(UserReference user) throws ResetPasswordException
+    {
+        return this.resetPasswordManager.requestResetPassword(user);
+    }
+
+    public void resetPassword(UserReference user, String verificationCode, String newPassword)
+        throws ResetPasswordException
+    {
+        this.resetPasswordManager.checkVerificationCode(user, verificationCode, false);
+        this.resetPasswordManager.resetPassword(user, newPassword);
+    }
+
+    public String checkAndResetVerificationCode(UserReference user, String verificationCode)
+        throws ResetPasswordException
+    {
+        return this.resetPasswordManager.checkVerificationCode(user, verificationCode, true);
     }
 }

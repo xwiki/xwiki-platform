@@ -664,6 +664,13 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # security.authorization.settler=default
 
+#-# [Since 13.0]
+#-# Control if document save API should also check the right of the script author when saving a document.
+#-# When false only the current user right is checked.
+#-#
+#-# The default is:
+# security.script.save.checkAuthor=true
+
 #-------------------------------------------------------------------------------------
 # URL
 #-------------------------------------------------------------------------------------

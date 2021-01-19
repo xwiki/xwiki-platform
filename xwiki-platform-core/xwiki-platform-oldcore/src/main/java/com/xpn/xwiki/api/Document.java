@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -69,6 +70,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
@@ -132,6 +134,8 @@ public class Document extends Api
 
     private DocumentRevisionProvider documentRevisionProvider;
 
+    private ConfigurationSource configuration;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -177,6 +181,15 @@ public class Document extends Api
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private ConfigurationSource getConfiguration()
+    {
+        if (this.configuration == null) {
+            this.configuration = Utils.getComponent(ConfigurationSource.class);
+        }
+
+        return this.configuration;
     }
 
     /**
@@ -2537,7 +2550,7 @@ public class Document extends Api
         if (hasAccessLevel("edit")) {
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
-            if (hasProgrammingRights()) {
+            if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
                 saveDocument(comment, minorEdit);
             } else {
                 saveAsAuthor(comment, minorEdit);

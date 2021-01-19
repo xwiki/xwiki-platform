@@ -28,6 +28,7 @@
     <version>13.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-docker</artifactId>
+  <name>XWiki Platform - Notifications - Test - Functional Docker Tests</name>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

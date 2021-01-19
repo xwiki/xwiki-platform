@@ -578,21 +578,18 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </displayInSection>
     <heading>
-      <contenttype>VelocityWiki</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
       <hint/>
       <name>heading</name>
       <number>2</number>
-      <picker>1</picker>
+      <picker>0</picker>
       <prettyName>heading</prettyName>
-      <rows>1</rows>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </heading>
     <iconAttachment>
       <customDisplay/>

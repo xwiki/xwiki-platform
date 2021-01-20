@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authentication.script;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -155,7 +153,7 @@ public class AuthenticationScriptService implements ScriptService
      * @param action the authentication action from which to build the right URL.
      * @param params the query string parameters of the URL.
      * @return a relative URL for the current wiki.
-     * @since 13.0RC1
+     * @since 13.1RC1
      */
     @Unstable
     public String getAuthenticationURL(String action, Map<String, Object> params)
@@ -182,45 +180,56 @@ public class AuthenticationScriptService implements ScriptService
     }
 
     /**
-     * Compute an absolute URL for an {@link AuthenticationResourceReference} based on the given action string.
-     * See {@link AuthenticationResourceReference.AuthenticationAction} for more information.
-     * @param action the authentication action from which to build the right URL.
-     * @param params the query string parameters of the URL.
-     * @return an absolute URL.
-     * @since 13.0RC1
+     * Request a password reset for the given user.
+     * This will result in computing a verification code and sending the appropriate link by email to the user.
+     * This method returns the email address used, so that we can display it to the user.
+     *
+     * @param user the user for which to perform a reset password request.
+     * @return the email address used to send the verification code.
+     * @throws ResetPasswordException if any error occurs for performing the reset password request.
+     * @since 13.1RC1
      */
     @Unstable
-    public String getAuthenticationExternalURL(String action, Map<String, Object> params)
-    {
-        XWikiContext xWikiContext = this.contextProvider.get();
-        String authenticationURL = getAuthenticationURL(action, params);
-        try {
-            URL serverURL = xWikiContext.getURLFactory().getServerURL(xWikiContext);
-            URL result = new URL(serverURL, authenticationURL);
-
-            return result.toExternalForm();
-        } catch (IllegalArgumentException | MalformedURLException e) {
-            logger.error("Error while getting external authentication URL for action [{}]: [{}]", action,
-                ExceptionUtils.getRootCauseMessage(e));
-            return null;
-        }
-    }
-
     public InternetAddress requestResetPassword(UserReference user) throws ResetPasswordException
     {
-        return this.resetPasswordManager.requestResetPassword(user);
+        ResetPasswordManager.ResetPasswordRequestResponse resetPasswordRequestResponse =
+            this.resetPasswordManager.requestResetPassword(user);
+        this.resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
+        return resetPasswordRequestResponse.getUserEmail();
     }
 
+    /**
+     * Check that the given verification code is correct.
+     * Since a new verification code is generated (to avoid reusing a code several times), we also return the new code.
+     *
+     * @param user the user for which to check the verification code.
+     * @param verificationCode the code to check.
+     * @return a newly generated verification code if it is correct.
+     * @throws ResetPasswordException if the code is not correct or if an error occurs.
+     * @since 13.1RC1
+     */
+    @Unstable
+    public String checkVerificationCode(UserReference user, String verificationCode)
+        throws ResetPasswordException
+    {
+        return this.resetPasswordManager.checkVerificationCode(user, verificationCode).getVerificationCode();
+    }
+
+    /**
+     * Reset the password of the given user, iff the given verification code is correct.
+     * This methods throws a {@link ResetPasswordException} if the verification code is wrong.
+     *
+     * @param user the user for which to reset the password.
+     * @param verificationCode the code to check before resetting the passord.
+     * @param newPassword the new password to user.
+     * @throws ResetPasswordException if the verification code is wrong, or if an error occurs.
+     * @since 13.1RC1
+     */
+    @Unstable
     public void resetPassword(UserReference user, String verificationCode, String newPassword)
         throws ResetPasswordException
     {
-        this.resetPasswordManager.checkVerificationCode(user, verificationCode, false);
+        this.resetPasswordManager.checkVerificationCode(user, verificationCode);
         this.resetPasswordManager.resetPassword(user, newPassword);
-    }
-
-    public String checkAndResetVerificationCode(UserReference user, String verificationCode)
-        throws ResetPasswordException
-    {
-        return this.resetPasswordManager.checkVerificationCode(user, verificationCode, true);
     }
 }

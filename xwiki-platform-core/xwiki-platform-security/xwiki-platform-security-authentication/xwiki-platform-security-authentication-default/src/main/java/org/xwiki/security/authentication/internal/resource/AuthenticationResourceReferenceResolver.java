@@ -39,7 +39,7 @@ import org.xwiki.url.internal.AbstractResourceReferenceResolver;
  * a {@link AuthenticationResourceReference} with it.
  *
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.1RC1
  */
 @Component
 @Named(AuthenticationResourceReference.RESOURCE_TYPE_ID)

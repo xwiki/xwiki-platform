@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * Default serializer for {@link AuthenticationResourceReference}.
  *
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.1RC1
  */
 @Component
 @Singleton

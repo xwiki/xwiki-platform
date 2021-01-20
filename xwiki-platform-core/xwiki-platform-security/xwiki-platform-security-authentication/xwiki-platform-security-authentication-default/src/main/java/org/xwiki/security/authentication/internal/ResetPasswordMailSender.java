@@ -48,6 +48,12 @@ import org.xwiki.security.authentication.api.ResetPasswordException;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * Component dedicated to send reset password information by email.
+ *
+ * @version $Id$
+ * @since 13.1RC1
+ */
 @Component(roles = ResetPasswordMailSender.class)
 @Singleton
 public class ResetPasswordMailSender
@@ -70,7 +76,7 @@ public class ResetPasswordMailSender
     private MailListener mailListener;
 
     @Inject
-    protected SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
     @Inject
     private ContextualLocalizationManager localizationManager;
@@ -78,6 +84,14 @@ public class ResetPasswordMailSender
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    /**
+     * Send the reset password information by email.
+     *
+     * @param username the name of the user for which to reset the password.
+     * @param email the email of the user for which to reset the password.
+     * @param resetPasswordURL the URL to use for resetting the password.
+     * @throws ResetPasswordException in case of error when preparing or sending the email.
+     */
     public void sendResetPasswordEmail(String username, InternetAddress email, URL resetPasswordURL) throws
         ResetPasswordException
     {

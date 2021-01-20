@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
  * Default component to handle {@link AuthenticationResourceReference}.
  *
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.1RC1
  */
 @Component
 @Named(AuthenticationResourceReference.RESOURCE_TYPE_ID)

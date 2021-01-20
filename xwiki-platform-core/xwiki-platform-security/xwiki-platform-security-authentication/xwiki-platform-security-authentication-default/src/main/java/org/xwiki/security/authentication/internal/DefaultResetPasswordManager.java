@@ -24,10 +24,15 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
@@ -41,6 +46,7 @@ import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -51,16 +57,31 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 
+/**
+ * Default implementation of the {@link ResetPasswordManager}.
+ * This implementation considers that the given {@link UserReference} are actually {@link DocumentUserReference} since
+ * right now it's the only known implementation and the reset password mechanism lies on changing an xobject value in a
+ * user a document.
+ *
+ * @version $Id$
+ * @since 13.1RC1
+ */
+@Component
+@Singleton
 public class DefaultResetPasswordManager implements ResetPasswordManager
 {
-    private static final LocalDocumentReference LDAP_CLASS_REFERENCE =
-        new LocalDocumentReference("XWiki", "LDAPProfileClass");
+    protected static final String XWIKI_SPACE = "XWiki";
 
-    private static final LocalDocumentReference RESET_PASSWORD_REQUEST_CLASS_REFERENCE =
-        new LocalDocumentReference("XWiki", "ResetPasswordRequestClass");
+    protected static final LocalDocumentReference LDAP_CLASS_REFERENCE =
+        new LocalDocumentReference(XWIKI_SPACE, "LDAPProfileClass");
 
-    private static final LocalDocumentReference USER_CLASS_REFERENCE =
-        new LocalDocumentReference("XWiki", "XWikiUsers");
+    protected static final LocalDocumentReference RESET_PASSWORD_REQUEST_CLASS_REFERENCE =
+        new LocalDocumentReference(XWIKI_SPACE, "ResetPasswordRequestClass");
+
+    protected static final LocalDocumentReference USER_CLASS_REFERENCE =
+        new LocalDocumentReference(XWIKI_SPACE, "XWikiUsers");
+
+    protected static final String VERIFICATION_PROPERTY = "verification";
 
     @Inject
     private UserManager userManager;
@@ -75,13 +96,78 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private EntityReferenceSerializer<String> referenceSerializer;
-
-    @Inject
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer;
 
     @Inject
+    private UserReferenceSerializer<String> referenceSerializer;
+
+    @Inject
     private ResetPasswordMailSender resetPasswordMailSender;
+
+    /**
+     * Default implementation of the {@link ResetPasswordManager.ResetPasswordRequestResponse}.
+     *
+     * @version $Id$
+     * @since 13.1RC1
+     */
+    static final class DefaultResetPasswordRequestResponse implements ResetPasswordRequestResponse
+    {
+        private final UserReference userReference;
+        private final InternetAddress userEmail;
+        private final String verificationCode;
+
+        DefaultResetPasswordRequestResponse(UserReference reference, InternetAddress userEmail, String verificationCode)
+        {
+            this.userReference = reference;
+            this.userEmail = userEmail;
+            this.verificationCode = verificationCode;
+        }
+
+        public UserReference getUserReference()
+        {
+            return userReference;
+        }
+
+        public InternetAddress getUserEmail()
+        {
+            return userEmail;
+        }
+
+        public String getVerificationCode()
+        {
+            return verificationCode;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            DefaultResetPasswordRequestResponse that = (DefaultResetPasswordRequestResponse) o;
+
+            return new EqualsBuilder()
+                .append(userReference, that.userReference)
+                .append(userEmail, that.userEmail)
+                .append(verificationCode, that.verificationCode)
+                .isEquals();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 37)
+                .append(userReference)
+                .append(userEmail)
+                .append(verificationCode)
+                .toHashCode();
+        }
+    }
 
     private void checkUserReference(UserReference userReference) throws ResetPasswordException
     {
@@ -100,7 +186,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     }
 
     @Override
-    public InternetAddress requestResetPassword(UserReference userReference) throws ResetPasswordException
+    public ResetPasswordRequestResponse requestResetPassword(UserReference userReference) throws ResetPasswordException
     {
         this.checkUserReference(userReference);
 
@@ -129,36 +215,63 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
             BaseObject xObject = userDocument.getXObject(RESET_PASSWORD_REQUEST_CLASS_REFERENCE, true, context);
             String verificationCode = context.getWiki().generateRandomString(30);
-            xObject.set("verification", verificationCode, context);
+            xObject.set(VERIFICATION_PROPERTY, verificationCode, context);
 
             String saveComment =
                 this.localizationManager.getTranslationPlain("xe.admin.passwordReset.versionComment");
             context.getWiki().saveDocument(userDocument, saveComment, true, context);
 
-            AuthenticationResourceReference resourceReference =
-                new AuthenticationResourceReference(
-                    AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
-            resourceReference.addParameter("u", this.referenceSerializer.serialize(reference));
-            resourceReference.addParameter("v", verificationCode);
-            ExtendedURL extendedURL = this.resourceReferenceSerializer.serialize(resourceReference);
-
-            URL serverURL = context.getURLFactory().getServerURL(context);
-            URL externalVerificationURL = new URL(serverURL, extendedURL.serialize());
-
-            this.resetPasswordMailSender.sendResetPasswordEmail(reference.getName(), email, externalVerificationURL);
-            return email;
-        } catch (XWikiException | SerializeResourceReferenceException | UnsupportedResourceReferenceException
-            | MalformedURLException e) {
+            return new DefaultResetPasswordRequestResponse(userReference, email, verificationCode);
+        } catch (XWikiException e) {
             throw new ResetPasswordException("Unknown error", e);
         }
     }
 
     @Override
-    public String checkVerificationCode(UserReference userReference, String verificationCode, boolean reset)
+    public void sendResetPasswordEmailRequest(ResetPasswordRequestResponse requestResponse)
+        throws ResetPasswordException
+    {
+        AuthenticationResourceReference resourceReference =
+            new AuthenticationResourceReference(
+                AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
+
+        UserReference userReference = requestResponse.getUserReference();
+        UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
+        String serializedUserReference = this.referenceSerializer.serialize(userReference);
+
+        // FIXME: this should be provided as part of the User API.
+        String formattedName = String.format("%s %s", userProperties.getFirstName(), userProperties.getLastName());
+        if (StringUtils.isBlank(formattedName)) {
+            formattedName = serializedUserReference;
+        }
+        resourceReference.addParameter("u", serializedUserReference);
+        resourceReference.addParameter("v", requestResponse.getVerificationCode());
+
+        XWikiContext context = contextProvider.get();
+
+        ExtendedURL extendedURL = null;
+        try {
+            extendedURL = this.resourceReferenceSerializer.serialize(resourceReference);
+            URL serverURL = context.getURLFactory().getServerURL(context);
+            URL externalVerificationURL = new URL(serverURL, extendedURL.serialize());
+
+            this.resetPasswordMailSender.sendResetPasswordEmail(formattedName, requestResponse.getUserEmail(),
+                externalVerificationURL);
+        } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException | MalformedURLException e)
+        {
+            throw new ResetPasswordException("Error when processing information for creating the email.", e);
+        }
+    }
+
+    @Override
+    public ResetPasswordRequestResponse checkVerificationCode(UserReference userReference, String verificationCode)
         throws ResetPasswordException
     {
         this.checkUserReference(userReference);
         XWikiContext context = this.contextProvider.get();
+
+        UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
+        InternetAddress email = userProperties.getEmail();
 
         DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
         DocumentReference reference = documentUserReference.getReference();
@@ -173,30 +286,30 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 throw new ResetPasswordException(exceptionMessage);
             }
 
-            String storedVerificationCode = xObject.getStringValue("verification");
+            String storedVerificationCode = xObject.getStringValue(VERIFICATION_PROPERTY);
             BaseClass xClass = xObject.getXClass(context);
-            PropertyInterface verification = xClass.get("verification");
+            PropertyInterface verification = xClass.get(VERIFICATION_PROPERTY);
             if (!(verification instanceof PasswordClass)) {
                 throw new ResetPasswordException("Bad definition of ResetPassword XClass.");
             }
             PasswordClass passwordClass = (PasswordClass) verification;
             String equivalentPassword =
                 passwordClass.getEquivalentPassword(storedVerificationCode, verificationCode);
+
+            // We ensure to reset the verification code before checking if it's correct to avoid any bruteforce attack.
+            String newVerificationCode = context.getWiki().generateRandomString(30);
+            xObject.set(VERIFICATION_PROPERTY, newVerificationCode, context);
+            String saveComment = this.localizationManager
+                .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
+            context.getWiki().saveDocument(userDocument, saveComment, true, context);
+
             if (!verificationCode.equals(equivalentPassword)) {
                 throw new ResetPasswordException(exceptionMessage);
             }
-            if (reset) {
-                String newVerificationCode = context.getWiki().generateRandomString(30);
-                xObject.set("verification", newVerificationCode, context);
-                String saveComment = this.localizationManager
-                    .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
-                context.getWiki().saveDocument(userDocument, saveComment, true, context);
-                return saveComment;
-            } else {
-                return null;
-            }
+
+            return new DefaultResetPasswordRequestResponse(userReference, email, newVerificationCode);
         } catch (XWikiException e) {
-            throw new ResetPasswordException("Cannot open user document.", e);
+            throw new ResetPasswordException("Cannot open user document to check verification code.", e);
         }
     }
 
@@ -220,7 +333,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 "xe.admin.passwordReset.step2.versionComment.passwordReset");
             context.getWiki().saveDocument(userDocument, saveComment, true, context);
         } catch (XWikiException e) {
-            throw new ResetPasswordException("Cannot open user document.", e);
+            throw new ResetPasswordException("Cannot open user document to perform reset password.", e);
         }
     }
 }

@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * See {@link AuthenticationAction} for the possible actions.
  *
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.1RC1
  */
 @Unstable
 public class AuthenticationResourceReference extends AbstractResourceReference

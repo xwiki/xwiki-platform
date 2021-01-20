@@ -26,7 +26,12 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
- * Component dedicated to handle the reset password requests.
+ * Component dedicated to handle the reset password operation.
+ * This component is designed to handle a reset password in 3 steps:
+ *   1. a request is performed for doing a reset password for a given user: a verification code is transmitted to the
+ *      user by a side way (e.g. email)
+ *   2. the user certifies her identity by sending back the verification code
+ *   3. the user specify a new password which is updated internally.
  *
  * @version $Id$
  * @since 13.1RC1
@@ -35,11 +40,70 @@ import org.xwiki.user.UserReference;
 @Unstable
 public interface ResetPasswordManager
 {
-    InternetAddress requestResetPassword(UserReference userReference) throws ResetPasswordException;
+    /**
+     * Dedicated response interface for the first reset password request.
+     *
+     * @version $Id$
+     * @since 13.1RC1
+     */
+    @Unstable
+    interface ResetPasswordRequestResponse
+    {
+        /**
+         * @return the reference of the user for whom the reset password request have been performed.
+         */
+        UserReference getUserReference();
 
-    String checkVerificationCode(UserReference userReference, String verificationCode, boolean reset)
+        /**
+         * @return the email address of the user for whom the reset password request have been performed.
+         */
+        InternetAddress getUserEmail();
+
+        /**
+         * @return the verification code to be send to the user.
+         */
+        String getVerificationCode();
+    }
+
+    /**
+     * Perform a reset password request and return the information to send to the user.
+     * Note that the implementation of this method might have some side effect like modifying the user information.
+     * @param userReference the reference of the user for which to reset the password.
+     * @return the needed information to send to the user for confirming her identity.
+     * @throws ResetPasswordException if any problem occurs.
+     */
+    ResetPasswordRequestResponse requestResetPassword(UserReference userReference) throws ResetPasswordException;
+
+    /**
+     * Send {@link ResetPasswordRequestResponse} information by email to the user.
+     *
+     * @param requestResponse the reset password information to send to the user to confirm her identity.
+     * @throws ResetPasswordException in case of problem for sending the email.
+     */
+    void sendResetPasswordEmailRequest(ResetPasswordRequestResponse requestResponse) throws ResetPasswordException;
+
+    /**
+     * Check if the given verification code is correct for the user reference.
+     * This method throws the {@link ResetPasswordException} if the verification code is not correct.
+     * The verification code must be reset at each check, even if the validation is not correct, to ensure that an
+     * attacker cannot bruteforce it.
+     *
+     * @param userReference the reference for which to check the verification code.
+     * @param verificationCode the code to check.
+     * @return the information about the user and the up-to-date verification code.
+     * @throws ResetPasswordException if the verification code is wrong or cannot be validated.
+     */
+    ResetPasswordRequestResponse checkVerificationCode(UserReference userReference, String verificationCode)
         throws ResetPasswordException;
 
+    /**
+     * Reset the password of the given user with the given new password.
+     * Note that this method should always be called after the verification code has been checked out.
+     *
+     * @param userReference the reference of the user for which to reset the password.
+     * @param newPassword the new password to set.
+     * @throws ResetPasswordException in case of problem when modifying the password.
+     */
     void resetPassword(UserReference userReference, String newPassword)
         throws ResetPasswordException;
 }

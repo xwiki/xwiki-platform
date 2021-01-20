@@ -47,7 +47,7 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
     void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
     /**
-     * @since 13.0RC1
+     * @since 13.0
      */
     default void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, boolean isolated,
         XWikiContext context)

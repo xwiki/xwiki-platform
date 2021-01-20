@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * 
  * @version $Id$
  * @since 12.10.1
- * @since 13.0RC1
+ * @since 13.0
  */
 @Unstable
 public class LiveDataActionDescriptor extends BaseDescriptor

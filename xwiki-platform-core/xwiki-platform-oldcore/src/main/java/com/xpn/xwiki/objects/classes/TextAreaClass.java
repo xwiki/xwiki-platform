@@ -125,7 +125,7 @@ public class TextAreaClass extends StringClass
         /**
          * Velocity content producing wiki content.
          * 
-         * @since 13.0RC1
+         * @since 13.0
          */
         VELOCITYWIKI("VelocityWiki");
 

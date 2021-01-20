@@ -84,7 +84,7 @@ public class Object extends Collection
     }
 
     /**
-     * @since 13.0RC1
+     * @since 13.0
      */
     public java.lang.Object display(String name, String mode, boolean isolate)
     {

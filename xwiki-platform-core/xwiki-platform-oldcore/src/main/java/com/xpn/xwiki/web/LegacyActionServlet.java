@@ -48,7 +48,7 @@ import com.xpn.xwiki.internal.web.LegacyAction;
  * if enabled, etc.).
  * 
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.0
  */
 @Unstable
 @MultipartConfig

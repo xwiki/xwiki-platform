@@ -46,7 +46,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
  * File upload related tools.
  * 
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.0
  */
 public final class FileUploadUtils
 {

@@ -45,7 +45,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * 
  * @version $Id$
  * @since 12.10.3
- * @since 13.0RC1
+ * @since 13.0
  */
 @Component
 @Named("liveTable")

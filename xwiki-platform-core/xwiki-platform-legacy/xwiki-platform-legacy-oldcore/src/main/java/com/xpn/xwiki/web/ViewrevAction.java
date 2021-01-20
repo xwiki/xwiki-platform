@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
- * @deprecated since 13.0RC1, it's redundant with {@link ViewAction} which should be preferred
+ * @deprecated since 13.0, it's redundant with {@link ViewAction} which should be preferred
  */
 @Component
 @Named("viewrev")

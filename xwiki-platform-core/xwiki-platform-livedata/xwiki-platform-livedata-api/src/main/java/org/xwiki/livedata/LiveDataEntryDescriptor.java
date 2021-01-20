@@ -58,7 +58,7 @@ public class LiveDataEntryDescriptor
     /**
      * @return the name of the property that should be used to check if a live data entry can be edited
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public String getAllowEditProperty()
     {
@@ -70,7 +70,7 @@ public class LiveDataEntryDescriptor
      * 
      * @param allowEditProperty the name of a property of a live data entry
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public void setAllowEditProperty(String allowEditProperty)
     {

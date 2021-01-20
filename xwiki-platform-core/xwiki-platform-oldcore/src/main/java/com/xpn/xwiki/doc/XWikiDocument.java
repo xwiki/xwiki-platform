@@ -1465,7 +1465,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param isolated true of the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
-     * @since 13.0RC1
+     * @since 13.0
      */
     public String getRenderedContent(String text, Syntax sourceSyntaxId, XWikiDocument sDocument, boolean isolated,
         XWikiContext context)
@@ -1482,7 +1482,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param isolated true of the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
-     * @since 13.0RC1
+     * @since 13.0
      */
     public String getRenderedContent(String text, Syntax sourceSyntaxId, Syntax targetSyntaxId,
         boolean restrictedTransformationContext, XWikiDocument sDocument, boolean isolated, XWikiContext context)
@@ -3409,7 +3409,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param isolated true if the property should be displayed in it's own document context
      * @param context the XWiki context
      * @return the rendered field
-     * @since 13.0RC1
+     * @since 13.0
      */
     public String display(String fieldname, String type, BaseObject obj, boolean isolated, XWikiContext context)
     {
@@ -3475,7 +3475,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param isolated true if the property should be displayed in it's own document context
      * @param context the XWiki context
      * @return the rendered field
-     * @since 13.0RC1
+     * @since 13.0
      */
     public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated,
         XWikiContext context)

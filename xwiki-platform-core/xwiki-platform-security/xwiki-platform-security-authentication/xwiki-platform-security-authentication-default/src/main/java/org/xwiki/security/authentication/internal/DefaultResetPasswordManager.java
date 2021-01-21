@@ -223,7 +223,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
             return new DefaultResetPasswordRequestResponse(userReference, email, verificationCode);
         } catch (XWikiException e) {
-            throw new ResetPasswordException("Unknown error", e);
+            throw new ResetPasswordException("Error when reading user document to perform reset password request.", e);
         }
     }
 

@@ -214,13 +214,4 @@ class LiveTableLiveDataEntryStoreTest
             assertEquals("Failed to execute the live data query.", e.getMessage());
         }
     }
-
-    @Test
-    void getIdProperty()
-    {
-        assertEquals("doc.fullName", this.entryStore.getIdProperty());
-
-        this.entryStore.getParameters().put("idProperty", "entryId");
-        assertEquals("entryId", this.entryStore.getIdProperty());
-    }
 }

@@ -19,46 +19,36 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
-import org.xwiki.livedata.LiveDataEntryStore;
-import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
+import org.xwiki.icon.IconManager;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link LiveTableLiveDataSource}.
+ * Unit tests for {@link DefaultLiveDataConfigurationProvider}.
  * 
  * @version $Id$
- * @since 12.10
  */
 @ComponentTest
-public class LiveTableLiveDataSourceTest
+@ComponentList(StringLiveDataConfigurationResolver.class)
+class DefaultLiveDataConfigurationProviderTest
 {
     @InjectMockComponents
-    private LiveTableLiveDataSource liveTableSource;
+    private DefaultLiveDataConfigurationProvider provider;
 
     @MockComponent
-    @Named("liveTable")
-    private LiveDataEntryStore entryStore;
-
-    @MockComponent
-    @Named("liveTable")
-    private LiveDataPropertyDescriptorStore propertyStore;
+    private IconManager iconManager;
 
     @Test
-    void getEntries()
+    void get()
     {
-        assertSame(this.entryStore, this.liveTableSource.getEntries());
-    }
-
-    @Test
-    void getProperties()
-    {
-        assertSame(this.propertyStore, this.liveTableSource.getProperties());
+        LiveDataConfiguration config = this.provider.get();
+        assertEquals("liveTable", config.getQuery().getSource().getId());
     }
 }

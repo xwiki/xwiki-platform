@@ -69,7 +69,7 @@ public class DefaultLiveDataPropertyResource extends AbstractLiveDataResource im
         if (source.isPresent()) {
             // Force the id specified in the URL.
             propertyDescriptor.setId(propertyId);
-            if (source.get().getProperties().update(convert(propertyDescriptor))) {
+            if (source.get().getProperties().save(convert(propertyDescriptor))) {
                 Optional<LiveDataPropertyDescriptor> property = source.get().getProperties().get(propertyId);
                 if (property.isPresent()) {
                     PropertyDescriptor updatedProperty = createProperty(property.get(), querySource, namespace);

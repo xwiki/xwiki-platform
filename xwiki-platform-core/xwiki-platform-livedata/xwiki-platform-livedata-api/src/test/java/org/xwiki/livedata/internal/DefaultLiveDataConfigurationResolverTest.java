@@ -22,32 +22,27 @@ package org.xwiki.livedata.internal;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.LiveDataEntryStore;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
-import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
-import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.livedata.LiveDataSource;
-import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -58,9 +53,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -77,9 +70,6 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     private DefaultLiveDataConfigurationResolver resolver;
 
     @MockComponent
-    private LiveDataSourceManager sourceManager;
-
-    @MockComponent
     private ContextualLocalizationManager l10n;
 
     @MockComponent
@@ -89,30 +79,27 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    @Mock
-    private LiveDataSource liveDataSource;
-
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private JSONMerge jsonMerge = new JSONMerge();
 
     @BeforeEach
     void before(MockitoComponentManager componentManager) throws Exception
     {
         when(this.componentManagerProvider.get()).thenReturn(componentManager);
 
-        Source source = new Source();
-        source.setId("test");
-        when(this.sourceManager.get(source)).thenReturn(Optional.of(this.liveDataSource));
+        when(this.iconManager.getMetaData("table"))
+            .thenReturn(Collections.singletonMap(IconManager.META_DATA_CSS_CLASS, "fa fa-table"));
+        when(this.iconManager.getMetaData("eye"))
+            .thenReturn(Collections.singletonMap(IconManager.META_DATA_CSS_CLASS, "fa fa-eye"));
 
-        LiveDataEntryStore entryStore = mock(LiveDataEntryStore.class);
-        when(entryStore.getIdProperty()).thenReturn("entryId");
-        when(this.liveDataSource.getEntries()).thenReturn(entryStore);
+        when(this.l10n.getTranslationPlain("liveData.layout.table")).thenReturn("Table");
+        when(this.l10n.getTranslationPlain("liveData.operator.equals")).thenReturn("Equals");
+        when(this.l10n.getTranslationPlain("liveData.action.edit")).thenReturn("Edit");
+        when(this.l10n.getTranslationPlain("liveData.action.edit.hint")).thenReturn("Edit entry");
 
-        LiveDataPropertyDescriptorStore propertyStore = mock(LiveDataPropertyDescriptorStore.class, "properties");
-        when(this.liveDataSource.getProperties()).thenReturn(propertyStore);
-
-        LiveDataPropertyDescriptorStore propertyTypeStore =
-            mock(LiveDataPropertyDescriptorStore.class, "propertyTypes");
-        when(this.liveDataSource.getPropertyTypes()).thenReturn(propertyTypeStore);
+        LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
+        entryDescriptor.setIdProperty("entryId");
 
         Map<String, Object> fileIconMetaData = new HashMap<>();
         fileIconMetaData.put(IconManager.META_DATA_ICON_SET_TYPE, "font");
@@ -131,8 +118,6 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
         propertyDescriptor.setFilter(new FilterDescriptor("text"));
         propertyDescriptor.getFilter().setDefaultOperator("contains");
 
-        when(propertyStore.get()).thenReturn(Arrays.asList(propertyDescriptor));
-
         LiveDataPropertyDescriptor propertyType = new LiveDataPropertyDescriptor();
         propertyType.setId("String");
         propertyType.setDescription("A string property");
@@ -144,7 +129,21 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
         propertyType.setFilter(new FilterDescriptor("text"));
         propertyType.getFilter().setDefaultOperator("contains");
 
-        when(propertyTypeStore.get()).thenReturn(Arrays.asList(propertyType));
+        LiveDataMeta meta = new LiveDataMeta();
+        meta.setEntryDescriptor(entryDescriptor);
+        meta.setPropertyDescriptors(Arrays.asList(propertyDescriptor));
+        meta.setPropertyTypes(Arrays.asList(propertyType));
+
+        LiveDataConfiguration sourceDefaultConfig = new LiveDataConfiguration();
+        sourceDefaultConfig.setId("defaultConfigResolverTest");
+        sourceDefaultConfig.setMeta(meta);
+
+        Type role =
+            new DefaultParameterizedType(null, LiveDataConfigurationResolver.class, LiveDataConfiguration.class);
+        LiveDataConfigurationResolver<LiveDataConfiguration> sourceDefaultConfigResolver =
+            componentManager.registerMockComponent(role, "test");
+        when(sourceDefaultConfigResolver.resolve(any()))
+            .thenAnswer(invocation -> this.jsonMerge.merge(sourceDefaultConfig, invocation.getArgument(0)));
     }
 
     @ParameterizedTest
@@ -159,24 +158,5 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     private static Stream<String[]> getTestData() throws Exception
     {
         return getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));
-    }
-
-    @Test
-    void addSourceSpecificDefaults(MockitoComponentManager componentManager) throws Exception
-    {
-        Type role =
-            new DefaultParameterizedType(null, LiveDataConfigurationResolver.class, LiveDataConfiguration.class);
-        LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver =
-            componentManager.registerMockComponent(role, "foo");
-
-        // Verify that the default source-specific resolver is called.
-        LiveDataConfiguration output = new LiveDataConfiguration();
-        output.initialize();
-        when(defaultConfigResolver.resolve(any())).thenReturn(output);
-
-        LiveDataConfiguration input = new LiveDataConfiguration();
-        input.initialize();
-        input.getQuery().getSource().setId("foo");
-        assertSame(output, this.resolver.resolve(input));
     }
 }

@@ -57,6 +57,7 @@
   #else
     {{error}}Failed to set log level: the logger "$request.logger_name" doesn't exist.{{/error}}
   #end
+
 #end
 ##
 ## Live Data
@@ -81,7 +82,6 @@
   properties="$stringtool.join($properties, ',')"
   source="liveTable"
   sourceParameters="resultPage=XWiki.LoggingAdminTableJson&amp;translationPrefix=logging.admin.livetable."
-  showPageSizeDropdown="true"
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
   <object>

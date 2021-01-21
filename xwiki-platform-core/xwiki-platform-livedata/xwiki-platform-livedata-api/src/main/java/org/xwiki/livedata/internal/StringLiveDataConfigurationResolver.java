@@ -32,10 +32,11 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
-import org.xwiki.livedata.LiveDataLayoutDescriptor;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Filter;
@@ -85,6 +86,8 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
     private static final String FILTERS = "filters";
 
     private static final String LAYOUTS = "layouts";
+
+    private static final String ACTIONS = "actions";
 
     @Inject
     private Logger logger;
@@ -208,6 +211,7 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
             normalizeLayouts(metaConfigObj, objectMapper);
             normalizeFilters(metaConfigObj, objectMapper);
             normalizeDisplayers(metaConfigObj, objectMapper);
+            normalizeActions(metaConfigObj, objectMapper);
         } else {
             liveDataConfig.remove(META);
         }
@@ -337,5 +341,28 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
         } else {
             return null;
         }
+    }
+
+    private void normalizeActions(ObjectNode metaConfig, ObjectMapper objectMapper)
+    {
+        JsonNode actionsConfig = metaConfig.path(ACTIONS);
+        if (actionsConfig.isArray()) {
+            ArrayNode actions = metaConfig.putArray(ACTIONS);
+            for (JsonNode action : actionsConfig) {
+                actions.add(normalizeAction(action, objectMapper));
+            }
+        } else {
+            metaConfig.remove(ACTIONS);
+        }
+    }
+
+    private JsonNode normalizeAction(JsonNode actionConfig, ObjectMapper objectMapper)
+    {
+        if (actionConfig.isTextual()) {
+            return objectMapper.valueToTree(new LiveDataActionDescriptor(actionConfig.asText()));
+        } else if (actionConfig.isObject()) {
+            normalizeIcon((ObjectNode) actionConfig, objectMapper);
+        }
+        return actionConfig;
     }
 }

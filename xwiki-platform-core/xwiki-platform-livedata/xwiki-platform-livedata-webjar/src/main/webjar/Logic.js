@@ -454,9 +454,8 @@ define([
     isPropertyEditable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.editable !== undefined ?
-      propertyDescriptor.editable :
-      propertyTypeDescriptor.editable;
+      return propertyDescriptor && (propertyDescriptor.editable !== undefined ? propertyDescriptor.editable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.editable));
     },
 
     /**
@@ -838,9 +837,8 @@ define([
     isPropertySortable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.sortable !== undefined ?
-      propertyDescriptor.sortable :
-      propertyTypeDescriptor.sortable;
+      return propertyDescriptor && (propertyDescriptor.sortable !== undefined ? propertyDescriptor.sortable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.sortable));
     },
 
 
@@ -981,9 +979,8 @@ define([
     isPropertyFilterable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.filterable !== undefined ?
-        propertyDescriptor.filterable :
-        propertyTypeDescriptor.filterable;
+      return propertyDescriptor && (propertyDescriptor.filterable !== undefined ? propertyDescriptor.filterable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.filterable));
     },
 
 

@@ -25,8 +25,6 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
@@ -41,19 +39,15 @@ import org.xwiki.livedata.WithParameters;
 @Component
 @Named("liveTable")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataSource extends WithParameters implements LiveDataSource, Initializable
+public class LiveTableLiveDataSource extends WithParameters implements LiveDataSource
 {
     @Inject
     @Named("liveTable")
     private LiveDataEntryStore entryStore;
 
     @Inject
-    @Named("liveTable/property")
+    @Named("liveTable")
     private LiveDataPropertyDescriptorStore propertyStore;
-
-    @Inject
-    @Named("liveTable/propertyType")
-    private LiveDataPropertyDescriptorStore propertyTypeStore;
 
     @Override
     public LiveDataEntryStore getEntries()
@@ -71,21 +65,5 @@ public class LiveTableLiveDataSource extends WithParameters implements LiveDataS
             ((WithParameters) this.propertyStore).getParameters().putAll(this.getParameters());
         }
         return this.propertyStore;
-    }
-
-    @Override
-    public LiveDataPropertyDescriptorStore getPropertyTypes()
-    {
-        if (this.propertyTypeStore instanceof WithParameters) {
-            ((WithParameters) this.propertyTypeStore).getParameters().putAll(this.getParameters());
-        }
-        return this.propertyTypeStore;
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        // Set default source parameters.
-        getParameters().put("queryFilters", "currentlanguage,hidden");
     }
 }

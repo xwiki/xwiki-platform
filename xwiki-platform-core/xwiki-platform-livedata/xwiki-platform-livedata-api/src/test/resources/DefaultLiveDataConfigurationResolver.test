@@ -53,7 +53,7 @@
   },
   "meta":{
     "layouts":[
-      {"id":"table","name":"table","icon":{}},
+      {"id":"table","name":"Table","icon":{"cssClass":"fa fa-table"}},
       {"id":"cards","name":"cards","icon":{}}
     ],
     "defaultLayout":"table",
@@ -107,7 +107,7 @@
         "operators":[
           {"id":"contains","name":"contains"},
           {"id":"startsWith","name":"startsWith"},
-          {"id":"equals","name":"equals"},
+          {"id":"equals","name":"Equals"},
           {"id":"notEquals","name":"notEquals"}
         ]
       },
@@ -121,6 +121,12 @@
         ]
       },
       {
+        "id":"boolean",
+        "operators":[
+          {"id":"equals","name":"Equals"}
+        ]
+      },
+      {
         "id":"date",
         "operators":[
           {"id":"isBetween","name":"isBetween"},
@@ -130,7 +136,7 @@
       {
         "id":"list",
         "operators":[
-          {"id":"equals","name":"equals"},
+          {"id":"equals","name":"Equals"},
           {"id":"startsWith","name":"startsWith"},
           {"id":"contains","name":"contains"}
         ]
@@ -138,7 +144,7 @@
       {
         "id":"suggest",
         "operators":[
-          {"id":"equals","name":"equals"},
+          {"id":"equals","name":"Equals"},
           {"id":"startsWith","name":"startsWith"},
           {"id":"contains","name":"contains"}
         ]
@@ -161,7 +167,14 @@
     "entryDescriptor":{
       "idProperty":"entryId"
     },
-    "actions":[],
+    "actions":[
+      {"id":"view","name":"view","icon":{"cssClass":"fa fa-eye"}},
+      {"id":"edit","name":"Edit","description":"Edit entry","icon":{}},
+      {"id":"delete","name":"delete","icon":{}},
+      {"id":"copy","name":"copy","icon":{}},
+      {"id":"rename","name":"rename","icon":{}},
+      {"id":"rights","name":"rights","icon":{}}
+    ],
     "selection":{"enabled":false}
   }
 }

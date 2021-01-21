@@ -35,7 +35,9 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryStore;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
@@ -73,13 +75,14 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
         List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
         List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        LiveDataQuery query =
-            getQuery(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
-        Optional<LiveDataSource> source = this.liveDataSourceManager.get(query.getSource(), namespace);
+        LiveDataConfiguration config =
+            getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
         if (source.isPresent()) {
+            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
             LiveDataEntryStore entryStore = source.get().getEntries();
-            return createEntries(entryStore.get(query), entryStore.getIdProperty(), query.getSource(), namespace)
-                .withOffset(offset).withLimit(limit);
+            return createEntries(entryStore.get(config.getQuery()), idProperty, config.getQuery().getSource(),
+                namespace).withOffset(offset).withLimit(limit);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -92,7 +95,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
             LiveDataEntryStore entryStore = source.get().getEntries();
-            Optional<Object> entryId = entryStore.add(entry.getValues());
+            Optional<Object> entryId = entryStore.save(entry.getValues());
             if (entryId.isPresent()) {
                 Optional<Map<String, Object>> values = entryStore.get(entryId.get());
                 if (values.isPresent()) {
@@ -111,8 +114,8 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         }
     }
 
-    private LiveDataQuery getQuery(String sourceId, List<String> properties, List<String> matchAll, List<String> sort,
-        List<Boolean> descending, long offset, int limit)
+    private LiveDataConfiguration getConfig(String sourceId, List<String> properties, List<String> matchAll,
+        List<String> sort, List<Boolean> descending, long offset, int limit) throws LiveDataException
     {
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(getLiveDataQuerySource(sourceId));
@@ -121,7 +124,10 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         query.setSort(getSort(sort, descending));
         query.setOffset(offset);
         query.setLimit(limit);
-        return query;
+
+        LiveDataConfiguration config = new LiveDataConfiguration();
+        config.setQuery(query);
+        return this.defaultLiveDataConfigResolver.resolve(config);
     }
 
     private List<SortEntry> getSort(List<String> sortList, List<Boolean> descendingList)

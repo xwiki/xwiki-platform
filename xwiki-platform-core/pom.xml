@@ -117,8 +117,64 @@
                  cannot be empty.
 
                  Note: you can use regexes by using the syntax: <regex>true</regex>
-                 Don't forget to '\'-escape dots and other special characters in this case ;) -->
-            
+                 Don't forget to '\'-escape dots and other special characters in this case ;)
+            <revapi.ignore>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.ratings.RatingsManager::setIdentifier(java.lang.String)</new>
+                <justification>Young API: fix typo.</justification>
+              </item>
+            </revapi.ignore>
+            -->
+            <revapi.ignore>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class org.xwiki.livedata.LiveDataActionDescriptor</old>
+                <new>class org.xwiki.livedata.LiveDataActionDescriptor</new>
+                <annotation>@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)</annotation>
+                <justification>Unstable API: don't serialize unset fields to JSON</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.lang.String org.xwiki.livedata.LiveDataEntryDescriptor::getAllowEditProperty()</old>
+                <justification>Unstable API: moved to edit action descriptor</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.livedata.LiveDataEntryDescriptor::setAllowEditProperty(java.lang.String)</old>
+                <justification>Unstable API: moved to edit action descriptor</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.util.Optional&lt;java.lang.Object&gt; org.xwiki.livedata.LiveDataEntryStore::add(java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException</old>
+                <justification>Unstable API: replaced by 'save'</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.lang.String org.xwiki.livedata.LiveDataEntryStore::getIdProperty()</old>
+                <justification>Unstable API: moved to entry descriptor</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.util.Optional&lt;java.lang.Object&gt; org.xwiki.livedata.LiveDataEntryStore::update(java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException</old>
+                <justification>Unstable API: replaced by 'save'</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method boolean org.xwiki.livedata.LiveDataPropertyDescriptorStore::add(org.xwiki.livedata.LiveDataPropertyDescriptor) throws org.xwiki.livedata.LiveDataException</old>
+                <justification>Unstable API: replaced by 'save'</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method boolean org.xwiki.livedata.LiveDataPropertyDescriptorStore::update(org.xwiki.livedata.LiveDataPropertyDescriptor) throws org.xwiki.livedata.LiveDataException</old>
+                <justification>Unstable API: replaced by 'save'</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method org.xwiki.livedata.LiveDataPropertyDescriptorStore org.xwiki.livedata.LiveDataSource::getPropertyTypes()</old>
+                <justification>Unstable API: Use the default LiveDataConfigurationResolver instead</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

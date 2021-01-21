@@ -36,15 +36,6 @@ import org.xwiki.stability.Unstable;
 public interface LiveDataEntryStore
 {
     /**
-     * Adds a new live data entry.
-     * 
-     * @param entry the entry to add
-     * @return the identifier of the added entry
-     * @throws LiveDataException if adding the given entry fails
-     */
-    Optional<Object> add(Map<String, Object> entry) throws LiveDataException;
-
-    /**
      * @param entryId identifies the entry to return
      * @return the specified entry
      * @throws LiveDataException if retrieving the specified entry fails
@@ -80,13 +71,18 @@ public interface LiveDataEntryStore
     LiveData get(LiveDataQuery query) throws LiveDataException;
 
     /**
-     * Updates an existing entry.
+     * Creates a new entry or updates an existing one.
      * 
-     * @param entry the entry to update
-     * @return the identifier of the updated entry
-     * @throws LiveDataException if updating the given entry fails
+     * @param entry the entry to save
+     * @return the identifier of the saved entry
+     * @throws LiveDataException if saving the given entry fails
+     * @since 12.10.4
+     * @since 13.0
      */
-    Optional<Object> update(Map<String, Object> entry) throws LiveDataException;
+    default Optional<Object> save(Map<String, Object> entry) throws LiveDataException
+    {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Updates a property of a live data entry.
@@ -102,7 +98,7 @@ public interface LiveDataEntryStore
         Optional<Map<String, Object>> entry = get(entryId);
         if (entry.isPresent()) {
             Object previousValue = entry.get().put(property, value);
-            if (update(entry.get()).isPresent() && previousValue != null) {
+            if (save(entry.get()).isPresent() && previousValue != null) {
                 return Optional.of(previousValue);
             }
         }
@@ -117,10 +113,8 @@ public interface LiveDataEntryStore
      * @return {@code true} if the entry was removed, {@code false} otherwise
      * @throws LiveDataException if removing the specified entry fails
      */
-    Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException;
-
-    /**
-     * @return the property that identifies the live data entries for this store
-     */
-    String getIdProperty();
+    default Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException
+    {
+        throw new UnsupportedOperationException();
+    }
 }

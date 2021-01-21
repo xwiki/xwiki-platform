@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,16 +34,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.livedata.LiveDataSource;
-import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -61,9 +58,6 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private LiveDataConfigurationResolver<String> stringLiveDataConfigResolver;
 
     @Inject
-    private LiveDataSourceManager sourceManager;
-
-    @Inject
     private ContextualLocalizationManager l10n;
 
     @Inject
@@ -76,61 +70,24 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
         try {
-            Source source = config.getQuery() != null ? config.getQuery().getSource() : null;
-
-            LiveDataConfiguration baseConfig = getBaseConfig(source);
-            // Make sure both configurations have the same id so that they are properly merged.
-            baseConfig.setId(config.getId());
-
-            LiveDataConfiguration mergedConfig = this.jsonMerge.merge(baseConfig, config);
-            // Prevent null values (make the configuration explicit).
-            mergedConfig.initialize();
-
-            // Add default configuration values that are specific to the live data source being used.
-            mergedConfig = addSourceSpecificDefaults(mergedConfig);
-
-            // Translate using the context locale.
-            return translate(mergedConfig);
+            return mergeBaseConfig(mergeSourceConfig(config));
         } catch (IOException e) {
             throw new LiveDataException(e);
         }
     }
 
-    private LiveDataConfiguration getBaseConfig(Source sourceConfig) throws LiveDataException, IOException
+    private LiveDataConfiguration mergeSourceConfig(LiveDataConfiguration config) throws LiveDataException
     {
-        InputStream configInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
-        String configJSON = IOUtils.toString(configInputStream, "UTF-8");
-        LiveDataConfiguration baseConfig = this.stringLiveDataConfigResolver.resolve(configJSON);
-
-        Source actualSourceConfig = sourceConfig;
-        if (actualSourceConfig == null) {
-            actualSourceConfig = baseConfig.getQuery() != null ? baseConfig.getQuery().getSource() : null;
-        }
-        if (actualSourceConfig != null) {
-            Optional<LiveDataSource> source = this.sourceManager.get(actualSourceConfig);
-            if (source.isPresent()) {
-                LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
-                entryDescriptor.setIdProperty(source.get().getEntries().getIdProperty());
-                baseConfig.getMeta().setEntryDescriptor(entryDescriptor);
-                baseConfig.getMeta().setPropertyDescriptors(source.get().getProperties().get());
-                baseConfig.getMeta().setPropertyTypes(source.get().getPropertyTypes().get());
-            }
-        }
-
-        return baseConfig;
-    }
-
-    private LiveDataConfiguration addSourceSpecificDefaults(LiveDataConfiguration config) throws LiveDataException
-    {
+        Source source = config.getQuery() != null ? config.getQuery().getSource() : null;
+        String hint = source != null ? source.getId() : null;
         Type role =
             new DefaultParameterizedType(null, LiveDataConfigurationResolver.class, LiveDataConfiguration.class);
-        String hint = config.getQuery().getSource().getId();
         ComponentManager componentManager = this.componentManagerProvider.get();
-        if (hint != null && componentManager.hasComponent(role, hint)) {
+        if (hint != null && !"".equals(hint) && !"default".equals(hint) && componentManager.hasComponent(role, hint)) {
             try {
-                LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver =
+                LiveDataConfigurationResolver<LiveDataConfiguration> sourceConfigResolver =
                     componentManager.getInstance(role, hint);
-                return defaultConfigResolver.resolve(config);
+                return sourceConfigResolver.resolve(config);
             } catch (ComponentLookupException e) {
                 // Nothing to do.
             }
@@ -138,10 +95,29 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return config;
     }
 
+    private LiveDataConfiguration mergeBaseConfig(LiveDataConfiguration config) throws LiveDataException, IOException
+    {
+        InputStream baseConfigInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
+        String baseConfigJSON = IOUtils.toString(baseConfigInputStream, "UTF-8");
+        LiveDataConfiguration baseConfig = this.stringLiveDataConfigResolver.resolve(baseConfigJSON);
+
+        // Make sure both configurations have the same id so that they are properly merged.
+        baseConfig.setId(config.getId());
+
+        LiveDataConfiguration mergedConfig = this.jsonMerge.merge(baseConfig, config);
+
+        // Prevent null values (make the configuration explicit).
+        mergedConfig.initialize();
+
+        // Translate using the context locale.
+        return translate(mergedConfig);
+    }
+
     private LiveDataConfiguration translate(LiveDataConfiguration config)
     {
         config.getMeta().getLayouts().stream().filter(Objects::nonNull).forEach(this::translate);
         config.getMeta().getFilters().stream().filter(Objects::nonNull).forEach(this::translate);
+        config.getMeta().getActions().stream().filter(Objects::nonNull).forEach(this::translate);
         return config;
     }
 
@@ -167,6 +143,20 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
             if (operator.getName() == null) {
                 operator.setName(operator.getId());
             }
+        }
+    }
+
+    private void translate(LiveDataActionDescriptor action)
+    {
+        if (action.getName() == null && action.getId() != null) {
+            action.setName(this.l10n.getTranslationPlain("liveData.action." + action.getId()));
+            if (action.getName() == null) {
+                action.setName(action.getId());
+            }
+        }
+        if (action.getDescription() == null && action.getId() != null) {
+            action.setDescription(
+                this.l10n.getTranslationPlain(String.format("liveData.action.%s.hint", action.getId())));
         }
     }
 }

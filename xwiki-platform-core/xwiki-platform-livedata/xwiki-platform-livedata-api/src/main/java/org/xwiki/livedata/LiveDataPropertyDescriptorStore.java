@@ -20,6 +20,7 @@
 package org.xwiki.livedata;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
@@ -36,20 +37,14 @@ import org.xwiki.stability.Unstable;
 public interface LiveDataPropertyDescriptorStore
 {
     /**
-     * Adds a new property descriptor.
-     * 
-     * @param propertyDescriptor the property descriptor to add
-     * @return {@code true} if the property descriptor was added, {@code false} otherwise
-     * @throws LiveDataException if adding the property descriptor fails
-     */
-    boolean add(LiveDataPropertyDescriptor propertyDescriptor) throws LiveDataException;
-
-    /**
      * @param propertyId identifies the property whose descriptor to return
      * @return the descriptor of the specified property
      * @throws LiveDataException if retrieving the property descriptor fails
      */
-    Optional<LiveDataPropertyDescriptor> get(String propertyId) throws LiveDataException;
+    default Optional<LiveDataPropertyDescriptor> get(String propertyId) throws LiveDataException
+    {
+        return get().stream().filter(property -> Objects.equals(property.getId(), propertyId)).findFirst();
+    }
 
     /**
      * @return all property descriptors
@@ -58,11 +53,16 @@ public interface LiveDataPropertyDescriptorStore
     Collection<LiveDataPropertyDescriptor> get() throws LiveDataException;
 
     /**
-     * @param propertyDescriptor the property descriptor to update
-     * @return {@code true} if the property descriptor was updated, {@code false} otherwise
-     * @throws LiveDataException if updating the property descriptor fails
+     * Adds a new property descriptor or updates an existing one.
+     * 
+     * @param propertyDescriptor the property descriptor to save
+     * @return {@code true} if the property descriptor was saved, {@code false} otherwise
+     * @throws LiveDataException if saving the property descriptor fails
      */
-    boolean update(LiveDataPropertyDescriptor propertyDescriptor) throws LiveDataException;
+    default boolean save(LiveDataPropertyDescriptor propertyDescriptor) throws LiveDataException
+    {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Removes the specified property descriptor.
@@ -71,5 +71,8 @@ public interface LiveDataPropertyDescriptorStore
      * @return the removed property descriptor
      * @throws LiveDataException if removing the property descriptor fails
      */
-    Optional<LiveDataPropertyDescriptor> remove(String propertyId) throws LiveDataException;
+    default Optional<LiveDataPropertyDescriptor> remove(String propertyId) throws LiveDataException
+    {
+        throw new UnsupportedOperationException();
+    }
 }

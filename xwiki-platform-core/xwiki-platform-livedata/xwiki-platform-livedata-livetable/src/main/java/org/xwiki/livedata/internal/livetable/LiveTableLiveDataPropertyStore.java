@@ -20,7 +20,6 @@
 package org.xwiki.livedata.internal.livetable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,11 +32,14 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
+import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -57,47 +59,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * @since 12.10
  */
 @Component
-@Named("liveTable/property")
+@Named("liveTable")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDescriptorStore
+public class LiveTableLiveDataPropertyStore extends WithParameters implements LiveDataPropertyDescriptorStore
 {
-    private static final String STRING = "String";
-
-    private static final String DATE = "Date";
-
-    private static final String USERS = "Users";
-
-    private static final String LINK = "link";
-
-    private static final String HTML = "html";
-
-    private static final String ACTIONS = "actions";
-
-    private static final String PROPERTY_HREF = "propertyHref";
-
-    private static final String TEXT = "text";
-
-    @SuppressWarnings("serial")
-    private static class PropertyDescriptorList extends ArrayList<LiveDataPropertyDescriptor>
-    {
-        protected LiveDataPropertyDescriptor add(String id, String type, String displayer, Boolean sortable)
-        {
-            LiveDataPropertyDescriptor property = new LiveDataPropertyDescriptor();
-            property.setId(id);
-            property.setType(type);
-            if (displayer != null) {
-                property.setDisplayer(new DisplayerDescriptor(displayer));
-            }
-            if (Boolean.FALSE.equals(sortable)) {
-                // If we cannot sort on this property then we cannot filter either.
-                property.setFilterable(false);
-            }
-            property.setSortable(sortable);
-            add(property);
-            return property;
-        }
-    }
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -108,13 +73,16 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
     @Inject
     private ContextualAuthorizationManager authorization;
 
+    @Inject
+    @Named("liveTable")
+    private Provider<LiveDataConfiguration> defaultConfigProvider;
+
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
         List<LiveDataPropertyDescriptor> properties = new ArrayList<>();
-        properties.addAll(translate(getDocumentProperties()));
+        properties.addAll(getDocumentProperties());
         try {
-            // Class properties use their own translation process.
             properties.addAll(getClassProperties());
         } catch (Exception e) {
             throw new LiveDataException("Failed to retrieve class properties.", e);
@@ -122,27 +90,10 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
         return properties;
     }
 
-    private List<LiveDataPropertyDescriptor> getDocumentProperties()
+    private Collection<LiveDataPropertyDescriptor> getDocumentProperties()
     {
-        PropertyDescriptorList props = new PropertyDescriptorList();
-        props.add("doc.name", STRING, LINK, null);
-        props.add("doc.title", STRING, LINK, null);
-        props.add("doc.space", STRING, LINK, null).getDisplayer().setParameter(PROPERTY_HREF, "doc.space_url");
-        props.add("doc.location", STRING, HTML, null);
-        props.add("doc.fullName", STRING, LINK, null);
-        // Display as text because the returned value is the formatted date.
-        props.add("doc.creationDate", DATE, TEXT, null);
-        props.add("doc.date", DATE, TEXT, null);
-        props.add("doc.creator", USERS, TEXT, null);
-        props.add("doc.author", USERS, LINK, null).getDisplayer().setParameter(PROPERTY_HREF, "doc.author_url");
-        props.add("doc.objectCount", "Number", null, false);
-
-        props.add("_images", STRING, HTML, false);
-        props.add("_attachments", STRING, HTML, false);
-        props.add("_actions", STRING, ACTIONS, false).getDisplayer().setParameter(ACTIONS,
-            Arrays.asList("edit", "delete"));
-        props.add("_avatar", STRING, HTML, false);
-        return props;
+        // The default configuration includes only the descriptors for the document properties (which are read-only).
+        return this.defaultConfigProvider.get().getMeta().getPropertyDescriptors();
     }
 
     private List<LiveDataPropertyDescriptor> getClassProperties() throws Exception
@@ -181,13 +132,13 @@ public class LiveTableLiveDataPropertyStore extends AbstractLiveDataPropertyDesc
             descriptor.setSortable(false);
         }
         // The returned property value is the displayer output.
-        descriptor.setDisplayer(new DisplayerDescriptor(HTML));
+        descriptor.setDisplayer(new DisplayerDescriptor("html"));
         if (xproperty.newProperty() instanceof StringListProperty) {
             // The default live table results page currently supports only exact matching for list properties with
             // multiple selection and no relational storage (selected values are stored concatenated on a single
             // database column).
             descriptor.setFilter(new FilterDescriptor());
-            descriptor.getFilter().setOperators(Collections.singletonList(createOperator("equals")));
+            descriptor.getFilter().setOperators(Collections.singletonList(new OperatorDescriptor("equals", null)));
         }
         return descriptor;
     }

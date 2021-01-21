@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.xwiki.stability.Unstable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Describes a live data action.
  * 
@@ -31,6 +33,7 @@ import org.xwiki.stability.Unstable;
  * @since 12.10.1
  * @since 13.0
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Unstable
 public class LiveDataActionDescriptor extends BaseDescriptor
 {
@@ -49,6 +52,34 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * URL or CSS class name.
      */
     private Map<String, Object> icon;
+
+    /**
+     * Specifies the live data property that can be used to asses whether the current user is allowed to perform this
+     * action on a given entry.
+     */
+    private String allowProperty;
+
+    /**
+     * Specifies the live data property that holds the URL that can be used to perform this action on a given entry.
+     */
+    private String urlProperty;
+
+    /**
+     * Default constructor.
+     */
+    public LiveDataActionDescriptor()
+    {
+    }
+
+    /**
+     * Creates a new descriptor for the specified action.
+     * 
+     * @param id the action id
+     */
+    public LiveDataActionDescriptor(String id)
+    {
+        this.setId(id);
+    }
 
     /**
      * @return the action pretty name
@@ -102,6 +133,54 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     public void setIcon(Map<String, Object> icon)
     {
         this.icon = icon;
+    }
+
+    /**
+     * @return the live data property used to determine if the current user is allowed to perform this action on a given
+     *         live data entry
+     * @since 12.10.4
+     * @since 13.0
+     */
+    public String getAllowProperty()
+    {
+        return allowProperty;
+    }
+
+    /**
+     * Sets the live data property to be used to determine if the current user is allowed to perform this action on a
+     * given live data entry.
+     * 
+     * @param allowProperty the live data property used to determine if the current user is allowed to perform this
+     *            action on a given live data entry
+     * @since 12.10.4
+     * @since 13.0
+     */
+    public void setAllowProperty(String allowProperty)
+    {
+        this.allowProperty = allowProperty;
+    }
+
+    /**
+     * @return the live data property that holds the URL that can be used to perform this action on a given entry
+     * @since 12.10.4
+     * @since 13.0
+     */
+    public String getUrlProperty()
+    {
+        return urlProperty;
+    }
+
+    /**
+     * Sets the live data property that holds the URL that can be used to perform this action on a given entry.
+     * 
+     * @param urlProperty the live data property that holds the URL that can be used to perform this action on a given
+     *            entry
+     * @since 12.10.4
+     * @since 13.0
+     */
+    public void setUrlProperty(String urlProperty)
+    {
+        this.urlProperty = urlProperty;
     }
 
     /**

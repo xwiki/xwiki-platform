@@ -87,7 +87,7 @@ public class DefaultLiveDataPropertiesResource extends AbstractLiveDataResource 
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            if (source.get().getProperties().add(convert(propertyDescriptor))) {
+            if (source.get().getProperties().save(convert(propertyDescriptor))) {
                 Optional<LiveDataPropertyDescriptor> property =
                     source.get().getProperties().get(propertyDescriptor.getId());
                 if (property.isPresent()) {

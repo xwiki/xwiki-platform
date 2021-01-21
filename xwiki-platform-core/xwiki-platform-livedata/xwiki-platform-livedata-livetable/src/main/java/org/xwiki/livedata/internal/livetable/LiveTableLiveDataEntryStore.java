@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -88,12 +87,6 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private LiveTableRequestHandler liveTableRequestHandler;
 
     @Override
-    public Optional<Object> add(Map<String, Object> entry)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<Map<String, Object>> get(Object entryId)
     {
         throw new UnsupportedOperationException();
@@ -118,18 +111,6 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         } catch (Exception e) {
             throw new LiveDataException("Failed to execute the live data query.", e);
         }
-    }
-
-    @Override
-    public Optional<Object> update(Map<String, Object> entry)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<Map<String, Object>> remove(Object entryId)
-    {
-        throw new UnsupportedOperationException();
     }
 
     private ObjectNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
@@ -206,11 +187,5 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             }
         }
         return entries;
-    }
-
-    @Override
-    public String getIdProperty()
-    {
-        return Objects.toString(getParameters().getOrDefault("idProperty", "doc.fullName"), null);
     }
 }

@@ -22,15 +22,22 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,91 +56,108 @@ class DefaultLiveDataConfigurationResolverTest
     private DefaultLiveDataConfigurationResolver resolver;
 
     @MockComponent
-    private ContextualLocalizationManager localization;
+    private ContextualLocalizationManager l10n;
+
+    @MockComponent
+    @Named("liveTable")
+    private LiveDataPropertyDescriptorStore propertyStore;
+
+    @MockComponent
+    @Named("liveTable")
+    private Provider<LiveDataConfiguration> defaultConfigProvider;
+
+    private LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
 
     private LiveDataConfiguration config = new LiveDataConfiguration();
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void configure()
     {
-        config.initialize();
+        this.defaultConfig.initialize();
+        when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);
+
+        this.config.initialize();
+        this.objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
     }
 
     @Test
     void setDefaultSort() throws Exception
     {
-        // Verify when no sort is set.
         this.config.getQuery().setProperties(Arrays.asList("_one", "two", "three"));
-        this.config.getQuery().setSort(null);
-        this.resolver.resolve(this.config);
 
-        SortEntry sortEntry = this.config.getQuery().getSort().get(0);
+        // Verify when no sort is set.
+        this.config.getQuery().setSort(null);
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        SortEntry sortEntry = actualConfig.getQuery().getSort().get(0);
         assertEquals("two", sortEntry.getProperty());
         assertFalse(sortEntry.isDescending());
 
         // Verify when only the sort order is set.
-        sortEntry.setProperty(null);
-        sortEntry.setDescending(true);
-        this.resolver.resolve(this.config);
+        this.config.getQuery().setSort(Collections.singletonList(new SortEntry(null, true)));
+        actualConfig = this.resolver.resolve(this.config);
 
-        sortEntry = this.config.getQuery().getSort().get(0);
+        sortEntry = actualConfig.getQuery().getSort().get(0);
         assertEquals("two", sortEntry.getProperty());
         assertTrue(sortEntry.isDescending());
 
         // Verify when no properties are specified.
         this.config.getQuery().setProperties(Collections.emptyList());
-        sortEntry.setProperty(null);
-        this.resolver.resolve(this.config);
-        assertTrue(this.config.getQuery().getSort().isEmpty());
+        this.config.getQuery().setSort(Collections.singletonList(new SortEntry(null)));
+        actualConfig = this.resolver.resolve(this.config);
+        assertTrue(actualConfig.getQuery().getSort().isEmpty());
     }
 
     @Test
-    void addMissingPropertyDescriptors() throws Exception
+    void resolvePropertyDescriptors() throws Exception
     {
-        this.config.getQuery().setProperties(Arrays.asList("alice", "bob"));
-
-        LiveDataPropertyDescriptor aliceDescriptor = new LiveDataPropertyDescriptor();
-        aliceDescriptor.setId("alice");
-
-        LiveDataPropertyDescriptor carolDescriptor = new LiveDataPropertyDescriptor();
-        carolDescriptor.setId("carol");
-
-        this.config.getMeta().getPropertyDescriptors().add(aliceDescriptor);
-        this.config.getMeta().getPropertyDescriptors().add(carolDescriptor);
-
-        this.resolver.resolve(this.config);
-
-        assertEquals(3, this.config.getMeta().getPropertyDescriptors().size());
-        LiveDataPropertyDescriptor bobDescriptor = getPropertyDescritor("bob");
-        assertEquals("String", bobDescriptor.getType());
-        assertTrue(bobDescriptor.isVisible());
-    }
-
-    @Test
-    void setDefaultPropertyNames() throws Exception
-    {
+        this.config.setId("test");
         this.config.getQuery().getSource().setParameter("translationPrefix", "test.liveData.");
+        this.config.getQuery().setProperties(Arrays.asList("doc.title", "manager", "active"));
 
-        LiveDataPropertyDescriptor aliceDescriptor = new LiveDataPropertyDescriptor();
-        aliceDescriptor.setId("alice");
-        this.config.getMeta().getPropertyDescriptors().add(aliceDescriptor);
+        LiveDataPropertyDescriptor docTitle = new LiveDataPropertyDescriptor();
+        docTitle.setId("doc.title");
+        LiveDataPropertyDescriptor count = new LiveDataPropertyDescriptor();
+        count.setId("count");
+        when(this.propertyStore.get()).thenReturn(Arrays.asList(docTitle, count));
 
-        LiveDataPropertyDescriptor carolDescriptor = new LiveDataPropertyDescriptor();
-        carolDescriptor.setId("carol");
-        carolDescriptor.setName("*Carol*");
-        this.config.getMeta().getPropertyDescriptors().add(carolDescriptor);
+        LiveDataPropertyDescriptor docName = new LiveDataPropertyDescriptor();
+        docName.setId("doc.name");
+        // This will get overwritten with the descriptors from the property store.
+        this.defaultConfig.getMeta().getPropertyDescriptors().add(docName);
 
-        when(this.localization.getTranslationPlain("test.liveData.alice")).thenReturn("Bob");
+        LiveDataPropertyDescriptor manager = new LiveDataPropertyDescriptor();
+        manager.setId("manager");
+        manager.setName("*Manager*");
+        count = new LiveDataPropertyDescriptor();
+        count.setId("count");
+        count.setDescription("Some count");
+        this.config.getMeta().getPropertyDescriptors().add(manager);
+        this.config.getMeta().getPropertyDescriptors().add(count);
 
-        this.resolver.resolve(this.config);
+        when(this.l10n.getTranslationPlain("test.liveData.doc.title")).thenReturn("Title");
+        when(this.l10n.getTranslationPlain("test.liveData.doc.title.hint")).thenReturn("Page title");
+        when(this.l10n.getTranslationPlain("test.liveData.count")).thenReturn("Count");
+        when(this.l10n.getTranslationPlain("test.liveData.manager.hint")).thenReturn("The manager");
+        when(this.l10n.getTranslationPlain("test.liveData.active")).thenReturn("Active");
+        when(this.l10n.getTranslationPlain("test.liveData.active.hint")).thenReturn("Is it active?");
 
-        assertEquals("Bob", getPropertyDescritor("alice").getName());
-        assertEquals("*Carol*", getPropertyDescritor("carol").getName());
-    }
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
-    private LiveDataPropertyDescriptor getPropertyDescritor(String property)
-    {
-        return this.config.getMeta().getPropertyDescriptors().stream()
-            .filter(descriptor -> property.equals(descriptor.getId())).findFirst().get();
+        StringBuilder expectedProps = new StringBuilder();
+        expectedProps.append("[");
+        expectedProps
+            .append("{'id':'manager','name':'*Manager*','description':'The manager','type':'String','visible':true},");
+        expectedProps.append("{'id':'count','name':'Count','description':'Some count'},");
+        expectedProps.append("{'id':'doc.title','name':'Title','description':'Page title'},");
+        expectedProps
+            .append("{'id':'active','name':'Active','description':'Is it active?','type':'String','visible':true}");
+        expectedProps.append("]");
+
+        String expectedJSON = expectedProps.toString().replace('\'', '"');
+        assertEquals(expectedJSON,
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
     }
 }

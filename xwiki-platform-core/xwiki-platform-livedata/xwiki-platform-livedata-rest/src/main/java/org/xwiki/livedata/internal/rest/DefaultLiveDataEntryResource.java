@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
@@ -65,16 +66,18 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     @Override
     public Response updateEntry(String sourceId, String namespace, String entryId, Entry entry) throws Exception
     {
-        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
-        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
+        LiveDataConfiguration config = getLiveDataConfig(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
         if (source.isPresent()) {
+            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
+            entry.getValues().put(idProperty, entryId);
             LiveDataEntryStore entryStore = source.get().getEntries();
-            entry.getValues().put(entryStore.getIdProperty(), entryId);
-            Optional<Object> updatedEntryId = entryStore.update(entry.getValues());
+            Optional<Object> updatedEntryId = entryStore.save(entry.getValues());
             if (updatedEntryId.isPresent()) {
                 Optional<Map<String, Object>> values = entryStore.get(updatedEntryId.get());
                 if (values.isPresent()) {
-                    Entry updatedEntry = createEntry(values.get(), updatedEntryId.get(), querySource, namespace);
+                    Entry updatedEntry =
+                        createEntry(values.get(), updatedEntryId.get(), config.getQuery().getSource(), namespace);
                     return Response.status(Status.ACCEPTED).entity(updatedEntry).build();
                 }
             }

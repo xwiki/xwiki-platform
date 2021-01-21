@@ -19,19 +19,17 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
-import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -74,13 +72,14 @@ class LiveTableLiveDataPropertyStoreTest
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     @MockComponent
-    private ContextualLocalizationManager l10n;
-
-    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    @Named("liveTable")
+    private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @Mock
     private XWikiContext xcontext;
@@ -98,6 +97,15 @@ class LiveTableLiveDataPropertyStoreTest
 
         this.objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
         this.propertyStore.getParameters().clear();
+
+        LiveDataPropertyDescriptor docTitle = new LiveDataPropertyDescriptor();
+        docTitle.setId("doc.title");
+
+        LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
+        defaultConfig.initialize();
+        defaultConfig.getMeta().getPropertyDescriptors().add(docTitle);
+
+        when(this.defaultConfigProvider.get()).thenReturn(defaultConfig);
     }
 
     @Test
@@ -144,7 +152,7 @@ class LiveTableLiveDataPropertyStoreTest
             + "'type':'Computed','displayer':{'id':'html'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
             + "'type':'List','sortable':false,'displayer':{'id':'html'},"
-            + "'filter':{'operators':[{'id':'equals','name':'equals'}]}}");
+            + "'filter':{'operators':[{'id':'equals'}]}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 
@@ -179,23 +187,10 @@ class LiveTableLiveDataPropertyStoreTest
         verify(this.xcontextProvider, never()).get();
     }
 
-    @Test
-    void getWithTranslationPrefix() throws Exception
-    {
-        this.propertyStore.getParameters().put("translationPrefix", "test.");
-        when(this.l10n.getTranslationPlain("test.doc.title")).thenReturn("Title");
-        when(this.l10n.getTranslationPlain("test.doc.title.hint")).thenReturn("The page title");
-
-        LiveDataPropertyDescriptor property = this.propertyStore.get("doc.title").get();
-
-        assertEquals("Title", property.getName());
-        assertEquals("The page title", property.getDescription());
-    }
-
     private String getExpectedDocPropsJSON() throws Exception
     {
-        String docPropsJSON = IOUtils.toString(new FileReader("src/test/resources/docProperties.json"));
-        docPropsJSON = docPropsJSON.replaceAll("\\n\\s*", "");
+        String docPropsJSON =
+            this.objectMapper.writeValueAsString(this.defaultConfigProvider.get().getMeta().getPropertyDescriptors());
         // Remove the array wrapper because we want to concatenate other properties.
         return docPropsJSON.substring(1, docPropsJSON.length() - 1);
     }

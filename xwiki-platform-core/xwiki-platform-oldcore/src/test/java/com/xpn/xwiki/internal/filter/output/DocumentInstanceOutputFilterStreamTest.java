@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
+class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStreamTest
 {
     // Tests
 
@@ -148,7 +148,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void importDocument1WithPreserveVersion() throws FilterException, XWikiException, ParseException
+    void importDocument1WithPreserveVersion() throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -166,7 +166,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void importDocument1WithDeletePreviousAndPreserveVersion()
+    void importDocument1WithDeletePreviousAndPreserveVersion()
         throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
@@ -193,7 +193,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void importDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
+    void importDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -293,7 +293,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithunexistingobjectproperty() throws FilterException, XWikiException
+    void documentwithunexistingobjectproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -322,7 +322,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithnumberversion() throws FilterException, XWikiException
+    void documentwithnumberversion() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -341,7 +341,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithoutauthorandcreator() throws FilterException, XWikiException
+    void documentwithoutauthorandcreator() throws FilterException, XWikiException
     {
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
         this.oldcore.getXWikiContext().setUserReference(contextUser);
@@ -364,7 +364,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithattachmentwithoutdate() throws FilterException, XWikiException
+    void documentwithattachmentwithoutdate() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -393,7 +393,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithattachmentwithoutcontent() throws FilterException, XWikiException
+    void documentwithattachmentwithoutcontent() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -444,7 +444,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void documentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
+    void documentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -471,7 +471,35 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void importAttachmentWithRevisions() throws FilterException, XWikiException, ParseException, IOException
+    void documentwithobjectmissingapropertyfromanotexistingclass() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithobjectmissingapropertyfromanotexistingclass", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "missingspace", "missingclass"));
+        assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(2, documentObject.getFieldList().size());
+        assertEquals("propvalue", documentObject.getStringValue("prop"));
+        assertEquals("", documentObject.getStringValue("missingprop"));
+    }
+
+    @Test
+    void importAttachmentWithRevisions() throws FilterException, XWikiException, ParseException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -521,7 +549,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void importDocumentWithRevisionsAndPreserveVersion() throws FilterException, XWikiException
+    void importDocumentWithRevisionsAndPreserveVersion() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 

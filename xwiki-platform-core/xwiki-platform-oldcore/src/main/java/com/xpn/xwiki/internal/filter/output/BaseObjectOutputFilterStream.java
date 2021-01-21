@@ -60,8 +60,6 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private BaseObject externalEntity;
 
-    private BaseClass databaseXClass;
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -89,6 +87,11 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     private void setCurrentXClass(BaseClass xclass)
     {
         getBasePropertyOutputFilterStream().setCurrentXClass(xclass);
+    }
+
+    private BaseClass getCurrentXClass()
+    {
+        return getBasePropertyOutputFilterStream().getCurrentXClass();
     }
 
     // Events
@@ -155,16 +158,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
             }
             this.entity.setXClassReference(classReference);
 
-            // Get the class in the current instance
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext != null && xcontext.getWiki() != null) {
-                try {
-                    this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
-                    setCurrentXClass(this.databaseXClass);
-                } catch (XWikiException e) {
-                    // TODO: log something ?
-                }
-            }
+            // Set database class as current class if any exist
+            checkDatabaseClass();
 
             this.entity.setNumber(number);
 
@@ -175,14 +170,30 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
         }
     }
 
+    private void checkDatabaseClass()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext != null && xcontext.getWiki() != null) {
+            try {
+                BaseClass databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
+                if (!databaseXClass.getOwnerDocument().isNew()) {
+                    setCurrentXClass(databaseXClass);
+                }
+            } catch (XWikiException e) {
+                // TODO: log something ?
+            }
+        }
+    }
+
     @Override
     public void endWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
         // Add missing properties from the class
-        if (this.entity != null && this.databaseXClass != null) {
-            for (String key : this.databaseXClass.getPropertyList()) {
+        BaseClass xclass = getCurrentXClass();
+        if (this.entity != null && xclass != null) {
+            for (String key : xclass.getPropertyList()) {
                 if (this.entity.safeget(key) == null) {
-                    PropertyClass classProperty = (PropertyClass) this.databaseXClass.getField(key);
+                    PropertyClass classProperty = (PropertyClass) xclass.getField(key);
                     this.entity.safeput(key, classProperty.newProperty());
                 }
             }

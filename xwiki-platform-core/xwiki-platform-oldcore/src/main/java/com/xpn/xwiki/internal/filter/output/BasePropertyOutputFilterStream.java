@@ -47,6 +47,16 @@ public class BasePropertyOutputFilterStream extends AbstractEntityOutputFilterSt
         this.currentXClass = currentXClass;
     }
 
+    /**
+     * @return the current class
+     * @since 12.10.4
+     * @since 13.0
+     */
+    public BaseClass getCurrentXClass()
+    {
+        return this.currentXClass;
+    }
+
     // Events
 
     @Override

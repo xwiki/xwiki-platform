@@ -243,7 +243,7 @@ public class DefaultResetPasswordManagerTest
         PasswordClass passwordClass = mock(PasswordClass.class);
         when(baseClass.get(DefaultResetPasswordManager.VERIFICATION_PROPERTY)).thenReturn(passwordClass);
         when(passwordClass.getEquivalentPassword(encodedVerificationCode, verificationCode))
-            .thenReturn(verificationCode);
+            .thenReturn(encodedVerificationCode);
         String newVerificationCode = "foobartest";
         when(xWiki.generateRandomString(30)).thenReturn(newVerificationCode);
         String saveComment = "Save new verification code";

@@ -240,7 +240,16 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         String serializedUserReference = this.referenceSerializer.serialize(userReference);
 
         // FIXME: this should be provided as part of the User API.
-        String formattedName = String.format("%s %s", userProperties.getFirstName(), userProperties.getLastName());
+        String formattedName = "";
+        if (!StringUtils.isBlank(userProperties.getFirstName())) {
+            formattedName += userProperties.getFirstName();
+        }
+        if (!StringUtils.isBlank(userProperties.getLastName())) {
+            if (!StringUtils.isBlank(formattedName)) {
+                formattedName += " ";
+            }
+            formattedName += userProperties.getLastName();
+        }
         if (StringUtils.isBlank(formattedName)) {
             formattedName = serializedUserReference;
         }
@@ -303,7 +312,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
             context.getWiki().saveDocument(userDocument, saveComment, true, context);
 
-            if (!verificationCode.equals(equivalentPassword)) {
+            if (!storedVerificationCode.equals(equivalentPassword)) {
                 throw new ResetPasswordException(exceptionMessage);
             }
 

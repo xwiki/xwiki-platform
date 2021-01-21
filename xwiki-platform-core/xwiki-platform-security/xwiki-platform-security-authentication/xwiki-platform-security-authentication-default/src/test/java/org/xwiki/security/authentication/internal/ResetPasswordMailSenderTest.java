@@ -37,6 +37,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -45,11 +46,16 @@ import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.SessionFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authentication.api.ResetPasswordException;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -83,10 +89,10 @@ public class ResetPasswordMailSenderTest
     private MimeMessageFactory<MimeMessage> mimeMessageFactory;
 
     @MockComponent
-    private MailSender mailSender;
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
 
     @MockComponent
-    @Named("database")
+    private MailSender mailSender;
     private MailListener mailListener;
 
     @MockComponent
@@ -100,11 +106,25 @@ public class ResetPasswordMailSenderTest
 
     private XWikiContext xWikiContext;
 
+    private DocumentReference templateDocumentReference;
+
+    @BeforeComponent
+    void setupComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
+
     @BeforeEach
-    void setup()
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         this.xWikiContext = mock(XWikiContext.class);
         when(contextProvider.get()).thenReturn(xWikiContext);
+
+        this.templateDocumentReference = mock(DocumentReference.class);
+        when(this.documentReferenceResolver.resolve(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE))
+            .thenReturn(templateDocumentReference);
+
+        this.mailListener = componentManager.registerMockComponent(MailListener.class, "database");
     }
 
     @Test
@@ -130,7 +150,8 @@ public class ResetPasswordMailSenderTest
         Session session = Session.getInstance(new Properties());
         when(this.sessionFactory.create(Collections.emptyMap())).thenReturn(session);
         MimeMessage message = mock(MimeMessage.class);
-        when(this.mimeMessageFactory.createMessage(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE, parameters))
+
+        when(this.mimeMessageFactory.createMessage(templateDocumentReference, parameters))
             .thenReturn(message);
         MailStatusResult mailStatusResult = mock(MailStatusResult.class);
         when(this.mailListener.getMailStatusResult()).thenReturn(mailStatusResult);
@@ -162,7 +183,7 @@ public class ResetPasswordMailSenderTest
         parameters.put("velocityVariables", velocityVariables);
 
         MessagingException messagingException = new MessagingException("Error with this template");
-        when(this.mimeMessageFactory.createMessage(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE, parameters))
+        when(this.mimeMessageFactory.createMessage(templateDocumentReference, parameters))
             .thenThrow(messagingException);
         when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.emailFailed"))
             .thenReturn("Cannot send this email");
@@ -197,7 +218,7 @@ public class ResetPasswordMailSenderTest
         Session session = Session.getInstance(new Properties());
         when(this.sessionFactory.create(Collections.emptyMap())).thenReturn(session);
         MimeMessage message = mock(MimeMessage.class);
-        when(this.mimeMessageFactory.createMessage(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE, parameters))
+        when(this.mimeMessageFactory.createMessage(templateDocumentReference, parameters))
             .thenReturn(message);
         MailStatusResult mailStatusResult = mock(MailStatusResult.class);
         when(this.mailListener.getMailStatusResult()).thenReturn(mailStatusResult);

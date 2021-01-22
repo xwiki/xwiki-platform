@@ -171,7 +171,7 @@
     "actions": [
       {"id": "view", "allowProperty": "doc.viewable", "urlProperty": "doc.url"},
       {"id": "edit", "allowProperty": "doc.hasedit", "urlProperty": "doc.edit_url"},
-      {"id": "copy", "allowProperty": "doc.hascopy", "urlProperty": "doc.hascopy"},
+      {"id": "copy", "allowProperty": "doc.hascopy", "urlProperty": "doc.copy_url"},
       {"id": "rename", "allowProperty": "doc.hasrename", "urlProperty": "doc.rename_url"},
       {"id": "rights", "allowProperty": "doc.hasrights", "urlProperty": "doc.rights_url"},
       {"id": "delete", "allowProperty": "doc.hasdelete", "urlProperty": "doc.delete_url"}

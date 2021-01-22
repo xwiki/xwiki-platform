@@ -19,8 +19,8 @@
  */
 require.config({
   paths: {
-    'prototype': 'js/prototype/prototype',
-    'xwiki-events-bridge': 'js/xwiki/eventsBridge'
+    'prototype': 'js/prototype/prototype.min',
+    'xwiki-events-bridge': 'js/xwiki/eventsBridge.min'
   },
   shim: {
     'prototype': {

@@ -19,9 +19,6 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
-import java.lang.reflect.Method;
-
-import org.openqa.selenium.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
@@ -95,12 +92,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("Test resource path mapped: On Host [{}], in Docker: [{}]",
                 getTestResourcePathOnHost(), browser.getTestResourcesPath());
-            // Since TC 1.15.0 this method has been made private, see https://bit.ly/353ajfw. Thus we have to call
-            // using reflection for now.
-            Method method = BrowserWebDriverContainer.class.getDeclaredMethod("getImageForCapabilities",
-                Capabilities.class, String.class);
-            method.setAccessible(true);
-            LOGGER.info("Docker image used: [{}]", method.invoke(null,
+            LOGGER.info("Docker image used: [{}]", BrowserWebDriverContainer.getDockerImageForCapabilities(
                 this.testConfiguration.getBrowser().getCapabilities(),
                 SeleniumUtils.determineClasspathSeleniumVersion()));
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));

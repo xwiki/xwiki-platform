@@ -35,6 +35,9 @@ XWiki.DocumentLock = Class.create({
 
     // Unlock when we leave the page.
     var unlock = this.unlock.bind(this);
+    // We may need to look into 'visibilitychange' event in the future, as per
+    // https://www.igvita.com/2015/11/20/dont-lose-user-and-app-state-use-page-visibility/
+    // in order to cover the mobile usage, but then we need to decide what to do when the user switches browser tabs.
     Event.observe(window, 'unload', unlock);
     Event.observe(window, 'pagehide', unlock);
 
@@ -61,12 +64,17 @@ XWiki.DocumentLock = Class.create({
   unlock: function() {
     if (this._locked) {
       this._locked = false;
-      new Ajax.Request(this._getURL('cancel'), {
-        method: 'get',
-        // Keep the request synchronous because otherwise the page can unload before the request is sent.
-        // See https://developer.mozilla.org/en/DOM/XMLHttpRequest/Synchronous_and_Asynchronous_Requests#Irreplaceability_of_the_synchronous_use
-        asynchronous: false
-      });
+      if (typeof navigator.sendBeacon === 'function') {
+        navigator.sendBeacon(this._getURL('cancel'));
+      } else {
+        // Synchronous XHR is deprecated. We keep this for browsers that don't support the Beacon API.
+        new Ajax.Request(this._getURL('cancel'), {
+          method: 'get',
+          // Keep the request synchronous because otherwise the page can unload before the request is sent.
+          // See https://developer.mozilla.org/en/DOM/XMLHttpRequest/Synchronous_and_Asynchronous_Requests#Irreplaceability_of_the_synchronous_use
+          asynchronous: false
+        });
+      }
     }
   },
 

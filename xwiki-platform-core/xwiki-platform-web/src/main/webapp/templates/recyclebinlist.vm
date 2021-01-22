@@ -61,7 +61,7 @@
        #foreach($dd in $list)
         <tr>
          <td>$xwiki.getUserName($dd.getDeleter())</td>
-         <td><a href="$doc.getURL('viewrev', $escapetool.url({'rev' : "deleted:${dd.getId()}"}))">$xwiki.formatDate($dd.getDate())</a></td>
+         <td><a href="$doc.getURL('view', $escapetool.url({'rev' : "deleted:${dd.getId()}"}))">$xwiki.formatDate($dd.getDate())</a></td>
          #if ($canRestore)
            <td><a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a></td>
          #end

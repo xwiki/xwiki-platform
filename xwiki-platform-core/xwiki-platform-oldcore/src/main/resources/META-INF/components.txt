@@ -251,4 +251,3 @@ com.xpn.xwiki.web.UnknownAction
 com.xpn.xwiki.web.UploadAction
 com.xpn.xwiki.web.ViewAction
 com.xpn.xwiki.web.ViewAttachRevAction
-com.xpn.xwiki.web.ViewrevAction

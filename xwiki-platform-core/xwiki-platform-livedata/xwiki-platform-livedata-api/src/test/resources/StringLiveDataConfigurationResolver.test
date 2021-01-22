@@ -1,4 +1,10 @@
 ##
+## Invalid configuration
+##
+123
+---
+{}
+##
 ## Empty configuration
 ##
 {}
@@ -148,7 +154,7 @@
   }
 }
 ##
-## Icon, displayer and filter as string
+## Icon, displayer, filter and action as string
 ##
 {
   "meta":{
@@ -163,7 +169,8 @@
       {
         "visible":false
       }
-    ]
+    ],
+    "actions":["edit"]
   }
 }
 ---
@@ -184,6 +191,9 @@
       {
         "visible":false
       }
+    ],
+    "actions":[
+      {"id":"edit"}
     ]
   }
 }

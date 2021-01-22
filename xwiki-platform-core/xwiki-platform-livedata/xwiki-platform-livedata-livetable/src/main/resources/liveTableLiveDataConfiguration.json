@@ -1,0 +1,180 @@
+{
+  "query": {
+    "source": {
+      "id": "liveTable",
+      "queryFilters": "currentlanguage,hidden"
+    }
+  },
+  "meta": {
+    "entryDescriptor": {
+      "idProperty": "doc.fullName"
+    },
+
+    "propertyDescriptors": [
+      {"id": "doc.name", "type": "String", "displayer": "link"},
+      {"id": "doc.title", "type": "String", "displayer": "link"},
+      {"id": "doc.space", "type": "String", "displayer": {"id": "link", "propertyHref": "doc.space_url"}},
+      {"id": "doc.location", "type": "String", "displayer": "html"},
+      {"id": "doc.fullName", "type": "String", "displayer": "link"},
+      {"id": "doc.creationDate", "type": "Date", "displayer": "text"},
+      {"id": "doc.date", "type": "Date", "displayer": "text"},
+      {"id": "doc.creator", "type": "Users", "displayer": "text"},
+      {"id": "doc.author", "type": "Users", "displayer": {"id": "link", "propertyHref": "doc.author_url"}},
+      {"id": "doc.objectCount", "type": "Number", "sortable":false, "filterable":false},
+      {"id": "_images", "displayer": "html"},
+      {"id": "_attachments", "displayer": "html"},
+      {"id": "_actions", "displayer": {"id": "actions", "actions": ["edit", "delete"]}},
+      {"id": "_avatar", "displayer": "html"}
+    ],
+
+    "propertyTypes": [
+      {
+        "id": "Boolean",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "boolean",
+        "filter": "boolean"
+      },
+      {
+        "id": "ComputedField",
+        "sortable": false,
+        "filterable": false,
+        "editable": false,
+        "displayer": "html"
+      },
+      {
+        "id": "DBList",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "suggest"
+      },
+      {
+        "id": "DBTreeList",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "suggest"
+      },
+      {
+        "id": "Date",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "date",
+        "filter": "date"
+      },
+      {
+        "id": "Email",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "html",
+        "filter": "text"
+      },
+      {
+        "id": "Groups",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "html",
+        "filter": "suggest"
+      },
+      {
+        "id": "Levels",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "list"
+      },
+      {
+        "id": "Number",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "number",
+        "filter": "number"
+      },
+      {
+        "id": "Page",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "html",
+        "filter": "suggest"
+      },
+      {
+        "id": "Password",
+        "sortable": false,
+        "filterable": false,
+        "editable": false
+      },
+      {
+        "id": "StaticList",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "list"
+      },
+      {
+        "id": "String",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "text"
+      },
+      {
+        "id": "TextArea",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "html",
+        "filter": "text"
+      },
+      {
+        "id": "Timezone",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "filter": "text"
+      },
+      {
+        "id": "Users",
+        "sortable": true,
+        "filterable": true,
+        "editable": true,
+        "displayer": "html",
+        "filter": "suggest"
+      }
+    ],
+
+    "displayers": [
+      {"id": "link", "propertyHref": "doc.url"}
+    ],
+
+    "filters": [
+      {
+        "id": "text",
+        "operators": ["contains", "startsWith", "equals"]
+      },
+      {
+        "id": "number",
+        "operators": ["equals"]
+      }
+    ],
+
+    "pagination": {
+      "showPageSizeDropdown": true
+    },
+
+    "actions": [
+      {"id": "view", "allowProperty": "doc.viewable", "urlProperty": "doc.url"},
+      {"id": "edit", "allowProperty": "doc.hasedit", "urlProperty": "doc.edit_url"},
+      {"id": "copy", "allowProperty": "doc.hascopy", "urlProperty": "doc.hascopy"},
+      {"id": "rename", "allowProperty": "doc.hasrename", "urlProperty": "doc.rename_url"},
+      {"id": "rights", "allowProperty": "doc.hasrights", "urlProperty": "doc.rights_url"},
+      {"id": "delete", "allowProperty": "doc.hasdelete", "urlProperty": "doc.delete_url"}
+    ]
+  }
+}

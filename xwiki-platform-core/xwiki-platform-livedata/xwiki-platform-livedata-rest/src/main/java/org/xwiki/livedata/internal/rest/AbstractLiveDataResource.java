@@ -31,6 +31,9 @@ import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSourceManager;
@@ -63,6 +66,17 @@ public abstract class AbstractLiveDataResource extends XWikiResource
 
     @Inject
     protected LiveDataSourceManager liveDataSourceManager;
+
+    @Inject
+    protected LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigResolver;
+
+    protected LiveDataConfiguration getLiveDataConfig(String sourceId) throws LiveDataException
+    {
+        LiveDataConfiguration config = new LiveDataConfiguration();
+        config.setQuery(new LiveDataQuery());
+        config.getQuery().setSource(getLiveDataQuerySource(sourceId));
+        return this.defaultLiveDataConfigResolver.resolve(config);
+    }
 
     protected LiveDataQuery.Source getLiveDataQuerySource(String sourceId)
     {

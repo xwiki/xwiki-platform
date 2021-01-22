@@ -46,6 +46,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- The scheduler UI need programming right -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=xwiki:Scheduler\.WebHome</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <dependency>

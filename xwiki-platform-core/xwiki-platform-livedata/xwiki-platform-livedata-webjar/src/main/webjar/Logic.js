@@ -185,15 +185,6 @@ define([
 
 
     /**
-     * Return whether the specified property id is valid (i.e. the property has a descriptor)
-     * @param {String} propertyId
-     */
-    isValidPropertyId (propertyId) {
-      return this.data.query.properties.includes(propertyId);
-    },
-
-
-    /**
      * Return the id of the given entry
      * @param {Object} entry
      * @returns {String}
@@ -327,7 +318,6 @@ define([
      * @returns {Object}
      */
     getDisplayerDescriptor (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
@@ -360,7 +350,6 @@ define([
      * @returns {Object}
      */
     getFilterDescriptor (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
       const propertyDescriptorFilter = propertyDescriptor.filter || {};
@@ -454,9 +443,8 @@ define([
     isPropertyEditable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.editable !== undefined ?
-        propertyDescriptor.editable :
-        propertyTypeDescriptor.editable;
+      return propertyDescriptor && (propertyDescriptor.editable !== undefined ? propertyDescriptor.editable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.editable));
     },
 
     /**
@@ -682,12 +670,11 @@ define([
       if (typeof from === "number") {
         fromIndex = from;
       } else if (typeof from === "string") {
-        if (!this.isValidPropertyId(from)) { return; }
         fromIndex = this.data.query.properties.indexOf(from);
       } else {
         return;
       }
-      if (fromIndex <= -1 || toIndex <= -1) { return; }
+      if (fromIndex < 0 || toIndex < 0) { return; }
       this.data.query.properties.splice(toIndex, 0, this.data.query.properties.splice(fromIndex, 1)[0]);
     },
 
@@ -838,19 +825,18 @@ define([
     isPropertySortable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.sortable !== undefined ?
-      propertyDescriptor.sortable :
-      propertyTypeDescriptor.sortable;
+      return propertyDescriptor && (propertyDescriptor.sortable !== undefined ? propertyDescriptor.sortable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.sortable));
     },
 
 
     /**
-     * Returns the property descriptors of sortable properties
+     * Returns the sortable properties from the live data query.
+     *
      * @returns {Array}
      */
-    getSortablePropertyDescriptors () {
-      return this.data.meta.propertyDescriptors
-        .filter(propertyDescriptor => this.isPropertySortable(propertyDescriptor.id));
+    getSortableProperties () {
+      return this.data.query.properties.filter(property => this.isPropertySortable(property));
     },
 
 
@@ -859,7 +845,6 @@ define([
      * @param {String} propertyId
      */
     getQuerySort (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
       return this.data.query.sort.find(sort => sort.property === propertyId);
     },
 
@@ -876,7 +861,6 @@ define([
     sort (property, level, descending) {
       const err = new Error("Property `" + property + "` is not sortable");
       return new Promise ((resolve, reject) => {
-        if (!this.isValidPropertyId(property)) { return void reject(err); }
         if (!this.isPropertySortable(property)) { return void reject(err); }
         // find property current sort level
         const currentLevel = this.data.query.sort.findIndex(sortObject => sortObject.property === property);
@@ -948,9 +932,8 @@ define([
     reorderSort (propertyId, toIndex) {
       const err = new Error("Property `" + propertyId + "` is not sortable");
       return new Promise ((resolve, reject) => {
-        if (!this.isValidPropertyId(propertyId)) { return void reject(err); }
         const fromIndex = this.data.query.sort.findIndex(querySort => querySort.property === propertyId);
-        if (fromIndex <= -1 || toIndex <= -1) { return void reject(err); }
+        if (fromIndex < 0 || toIndex < 0) { return void reject(err); }
         this.data.query.sort.splice(toIndex, 0, this.data.query.sort.splice(fromIndex, 1)[0]);
 
         // dispatch events
@@ -981,19 +964,18 @@ define([
     isPropertyFilterable (propertyId) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       const propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
-      return propertyDescriptor.filterable !== undefined ?
-        propertyDescriptor.filterable :
-        propertyTypeDescriptor.filterable;
+      return propertyDescriptor && (propertyDescriptor.filterable !== undefined ? propertyDescriptor.filterable :
+        (propertyTypeDescriptor && propertyTypeDescriptor.filterable));
     },
 
 
     /**
-     * Returns the property descriptors of filterable properties
+     * Returns the filterable properties from the live data query.
+     *
      * @returns {Array}
      */
-    getFilterablePropertyDescriptors () {
-      return this.data.meta.propertyDescriptors
-        .filter(propertyDescriptor => this.isPropertyFilterable(propertyDescriptor.id));
+    getFilterableProperties () {
+      return this.data.query.properties.filter(property => this.isPropertyFilterable(property));
     },
 
 
@@ -1003,7 +985,6 @@ define([
      * @returns {Object}
      */
     getQueryFilterGroup (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
       return this.data.query.filters.find(filter => filter.property === propertyId);
     },
 
@@ -1014,7 +995,6 @@ define([
      * @returns {Array} The constraints array of the filter group, or empty array if it does not exist
      */
     getQueryFilters (propertyId) {
-      if (!this.isValidPropertyId(propertyId)) { return; }
       const queryFilterGroup = this.getQueryFilterGroup(propertyId);
       return queryFilterGroup && queryFilterGroup.constraints || [];
     },
@@ -1055,7 +1035,6 @@ define([
      *  with oldEntry / newEntry being {property, index, operator, value}
      */
     _computeFilterEntries (property, index, filterEntry) {
-      if (!this.isValidPropertyId(property)) { return; }
       if (!this.isPropertyFilterable(property)) { return; }
       // default indexes
       index = index || 0;
@@ -1213,10 +1192,9 @@ define([
      */
     removeAllFilters (property) {
       return new Promise ((resolve, reject) => {
-        if (!this.isValidPropertyId(property)) { return; }
         const filterIndex = this.data.query.filters
           .findIndex(filterGroup => filterGroup.property === property);
-        if (filterIndex === -1) { return void reject(); }
+        if (filterIndex < 0) { return void reject(); }
         const removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
         // Reset the offset whenever the filters are updated.
         this.data.query.offset = 0;

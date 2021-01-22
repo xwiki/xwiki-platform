@@ -86,7 +86,10 @@ public class NotificationsTrayPage extends ViewPage
      */
     public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread)
     {
-        waitOnNotificationCount(userId, wiki, expectedUnread, getUtil().getDriver().getTimeout());
+        // TODO: Wait twice the default timeout since it seems that the REST endpoint for notifications count can take
+        // a lot of time on slow CI agents, leading to flickers. We need to check if there's a performance issue at
+        // heart.
+        waitOnNotificationCount(userId, wiki, expectedUnread, getUtil().getDriver().getTimeout() * 2);
     }
 
     /**
@@ -130,7 +133,7 @@ public class NotificationsTrayPage extends ViewPage
                 }
             }
             throw new TimeoutException(String.format(
-                "Timeout while waiting [%s] sec on notification count. Expected: [%s] - Latest result: [%s].",
+                "Timeout while waiting [%s] sec on notification count. Expected: [%s] - Latest value received: [%s].",
                 timeout, expectedUnread, latestResponse), e);
         }
         // Ensure to refresh the page after calling this wait, so the notification tray is updated.

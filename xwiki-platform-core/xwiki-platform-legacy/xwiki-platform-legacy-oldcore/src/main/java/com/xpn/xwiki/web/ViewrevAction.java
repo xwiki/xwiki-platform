@@ -27,6 +27,10 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * @version $Id$
+ * @deprecated since 13.0, it's redundant with {@link ViewAction} which should be preferred
+ */
 @Component
 @Named("viewrev")
 @Singleton
@@ -55,6 +59,7 @@ public class ViewrevAction extends XWikiAction
                 throw e;
             }
         }
+
         return "view";
     }
 }

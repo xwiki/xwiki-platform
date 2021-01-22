@@ -26,6 +26,10 @@
         ]
       },
       {
+        "id": "boolean",
+        "operators": ["equals"]
+      },
+      {
         "id": "date",
         "operators": ["isBetween", "contains"]
       },
@@ -61,6 +65,13 @@
       "enabled": false
     },
 
-    "actions": []
+    "actions": [
+      {"id": "view", "icon": "eye"},
+      {"id": "edit", "icon": "pencil"},
+      {"id": "delete", "icon": "cross"},
+      {"id": "copy", "icon": "copy"},
+      {"id": "rename", "icon": "move"},
+      {"id": "rights", "icon": "lock"}
+    ]
   }
 }

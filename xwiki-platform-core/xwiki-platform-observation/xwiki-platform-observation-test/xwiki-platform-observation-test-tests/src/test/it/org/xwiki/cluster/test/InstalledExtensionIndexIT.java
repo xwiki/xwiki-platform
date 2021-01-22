@@ -111,7 +111,7 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
         AbstractTest.getUtil().switchExecutor(0);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), null));
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId.getId(), null));
         installRequest.setInteractive(false);
         installRequest.addExtension(extensionId);
 
@@ -143,7 +143,7 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
 
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest
-            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), null));
+            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId.getId(), null));
         uninstallRequest.setInteractive(false);
         uninstallRequest.addExtension(extensionId);
 

@@ -108,6 +108,11 @@
           </execution>
         </executions>
       </plugin>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
   <profiles>

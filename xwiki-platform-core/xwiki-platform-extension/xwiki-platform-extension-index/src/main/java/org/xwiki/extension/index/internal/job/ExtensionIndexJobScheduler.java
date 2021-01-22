@@ -77,6 +77,8 @@ public class ExtensionIndexJobScheduler implements Disposable
 
     private boolean extensionAdded;
 
+    private volatile boolean disposed;
+
     /**
      * Indicate that the instance is starting.
      */
@@ -210,23 +212,27 @@ public class ExtensionIndexJobScheduler implements Disposable
         // Run the first job
         runScheduledJob();
 
-        // Disable local extension loading (it will be done dynamically)
-        this.scheduledRequest.setLocalExtensionsEnabled(false);
+        if (!this.disposed) {
+            // Disable local extension loading (it will be done dynamically)
+            this.scheduledRequest.setLocalExtensionsEnabled(false);
 
-        // Start scheduling following jobs
-        this.scheduler.scheduleWithFixedDelay(this::runScheduledJob, this.configuration.getIndexInterval(),
-            this.configuration.getIndexInterval(), TimeUnit.SECONDS);
+            // Start scheduling following jobs
+            this.scheduler.scheduleWithFixedDelay(this::runScheduledJob, this.configuration.getIndexInterval(),
+                this.configuration.getIndexInterval(), TimeUnit.SECONDS);
+        }
     }
 
     private void runScheduledJob()
     {
-        Job job = runJob(this.scheduledRequest);
+        if (!this.disposed) {
+            Job job = runJob(this.scheduledRequest);
 
-        if (job != null) {
-            ExtensionIndexStatus status = (ExtensionIndexStatus) job.getStatus();
+            if (job != null) {
+                ExtensionIndexStatus status = (ExtensionIndexStatus) job.getStatus();
 
-            // Remember updates
-            this.extensionAdded |= status.isExtensionAdded();
+                // Remember updates
+                this.extensionAdded |= status.isExtensionAdded();
+            }
         }
     }
 
@@ -240,7 +246,10 @@ public class ExtensionIndexJobScheduler implements Disposable
 
             return job;
         } catch (Exception e) {
-            this.logger.error("Failed to execute job", e);
+            // Ignore the error if the scheduler was disposed (we assume it's a consequence of the shutdown)
+            if (!this.disposed) {
+                this.logger.error("Failed to execute job", e);
+            }
         } finally {
             this.currentRequest = null;
         }
@@ -251,6 +260,8 @@ public class ExtensionIndexJobScheduler implements Disposable
     @Override
     public void dispose() throws ComponentLifecycleException
     {
+        this.disposed = true;
+
         // Stop the scheduling
         this.scheduler.shutdownNow();
     }

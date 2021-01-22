@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ConfigurableClass" locale="">
+<xwikidoc version="1.4" reference="XWiki.ConfigurableClass" locale="">
   <web>XWiki</web>
   <name>ConfigurableClass</name>
   <language/>
@@ -87,10 +87,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
 #end
 #set($currentSpace = $xwiki.getDocument($currentDoc).getSpace())
-##
-## This application should not run with programming rights because it evaluates code which may not be trustworthy.
-## Removing the next line will open a security hole.
-$doc.dropPermissions()##
 ##
 ##------------------------------------------------------------------------------------------------------------
 ## If $section exists then we are viewing the admin page for a particular section.
@@ -198,16 +194,26 @@ $doc.dropPermissions()##
         #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
         #set($escapedAppName = $escapetool.xml($app.getFullName()))
         #foreach($configurableObj in $configurableObjs)
+          ## Execute the content code if any
+          ## FIXME: we have to do that before the title before of the dropPermissions
+          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          #if($codeToExecute != '')
+            #set($codeToExecuteResult = $configurableObj.display('codeToExecute', 'view', false))
+          #end
           ## Display the header if one exists.
           #set($heading = $app.getValue('heading', $configurableObj))
           #if($heading &amp;&amp; $heading != '')
+            ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
+            ## Removing the next line will open a security hole.
+            ## Can't use $configurableObj.display('heading', 'view', false) to have proper heading id (because of the html macro)
+            ## FIXME: find a cleaner solution
+            #set($void = $doc.dropPermissions())
             == #evaluate($heading) ==
           #end
-          ##
-          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          ## Display code to execute
           #if($codeToExecute != '')
             (%class="codeToExecute"%)(((##
-              #evaluate($codeToExecute)##
+              $codeToExecuteResult
             )))
           #end
           ##
@@ -458,6 +464,7 @@ $doc.dropPermissions()##
     <categoryIcon>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>categoryIcon</name>
       <number>11</number>
       <picker>0</picker>
@@ -469,9 +476,11 @@ $doc.dropPermissions()##
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </categoryIcon>
     <codeToExecute>
+      <contenttype>VelocityWiki</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>Text</editor>
+      <editor>---</editor>
+      <hint/>
       <name>codeToExecute</name>
       <number>7</number>
       <picker>0</picker>
@@ -487,19 +496,22 @@ $doc.dropPermissions()##
       <cache>0</cache>
       <classname/>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
       <hint/>
       <idField/>
+      <largeStorage>0</largeStorage>
       <multiSelect>0</multiSelect>
       <name>configurationClass</name>
       <number>3</number>
       <picker>1</picker>
       <prettyName>configurationClass</prettyName>
-      <size>30</size>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators/>
+      <size>30</size>
       <sort>none</sort>
       <sql/>
       <unmodifiable>0</unmodifiable>
@@ -514,6 +526,7 @@ $doc.dropPermissions()##
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>configureGlobally</name>
       <number>4</number>
       <prettyName>configureGlobally</prettyName>
@@ -525,6 +538,7 @@ $doc.dropPermissions()##
     <displayBeforeCategory>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayBeforeCategory</name>
       <number>10</number>
       <picker>0</picker>
@@ -538,6 +552,7 @@ $doc.dropPermissions()##
     <displayInCategory>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayInCategory</name>
       <number>9</number>
       <picker>0</picker>
@@ -551,6 +566,7 @@ $doc.dropPermissions()##
     <displayInSection>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>displayInSection</name>
       <number>1</number>
       <picker>0</picker>
@@ -564,6 +580,7 @@ $doc.dropPermissions()##
     <heading>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>heading</name>
       <number>2</number>
       <picker>0</picker>
@@ -577,6 +594,7 @@ $doc.dropPermissions()##
     <iconAttachment>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>iconAttachment</name>
       <number>8</number>
       <picker>0</picker>
@@ -590,6 +608,7 @@ $doc.dropPermissions()##
     <linkPrefix>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>linkPrefix</name>
       <number>5</number>
       <picker>0</picker>
@@ -603,8 +622,12 @@ $doc.dropPermissions()##
     <propertiesToShow>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>propertiesToShow</name>
       <number>6</number>
@@ -624,6 +647,7 @@ $doc.dropPermissions()##
     <sectionOrder>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>sectionOrder</name>
       <number>12</number>
       <numberType>integer</numberType>
@@ -651,8 +675,11 @@ $doc.dropPermissions()##
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -700,6 +727,8 @@ $doc.dropPermissions()##
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

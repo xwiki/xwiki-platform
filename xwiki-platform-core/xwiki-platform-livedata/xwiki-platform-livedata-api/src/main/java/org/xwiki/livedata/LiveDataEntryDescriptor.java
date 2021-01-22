@@ -35,8 +35,6 @@ public class LiveDataEntryDescriptor
 {
     private String idProperty;
 
-    private String allowEditProperty;
-
     /**
      * @return the name of the property that identifies the live data entry
      */
@@ -53,28 +51,6 @@ public class LiveDataEntryDescriptor
     public void setIdProperty(String idProperty)
     {
         this.idProperty = idProperty;
-    }
-
-    /**
-     * @return the name of the property that should be used to check if a live data entry can be edited
-     * @since 12.10.1
-     * @since 13.0RC1
-     */
-    public String getAllowEditProperty()
-    {
-        return allowEditProperty;
-    }
-
-    /**
-     * Sets the name of the property that specifies whether a live data entry can be edited or not.
-     * 
-     * @param allowEditProperty the name of a property of a live data entry
-     * @since 12.10.1
-     * @since 13.0RC1
-     */
-    public void setAllowEditProperty(String allowEditProperty)
-    {
-        this.allowEditProperty = allowEditProperty;
     }
 
     /**

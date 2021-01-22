@@ -38,7 +38,7 @@ import org.apache.commons.io.IOUtils;
  * Implement a {@link FileItem} based on a {@link Part}.
  * 
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.0
  */
 public class PartFileItem implements FileItem
 {

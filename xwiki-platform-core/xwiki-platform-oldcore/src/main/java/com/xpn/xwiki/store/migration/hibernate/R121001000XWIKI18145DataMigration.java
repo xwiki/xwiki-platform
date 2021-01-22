@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
@@ -108,8 +109,20 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
         // Nothing to do here, everything's done as part of Liquibase update
     }
 
-    private DatabaseInformation retrieveDatabaseInformation(Database database, Namespace.Name namespaceName)
-        throws DataMigrationException
+    /**
+     * Prepare all the information to retrieve the database information.
+     * This method returns both the requested Database information, but also the translation isolator: this one must be
+     * used to release the connection.
+     *
+     * @param database the database for which to retrieve the information.
+     * @param namespaceName the name of the database.
+     * @return a pair containing the requested database information and the transaction isolator to release
+     *          the connection
+     * @throws DataMigrationException if the {@link ServiceRegistry} provided by the database is not an instance
+     *                                of {@link ServiceRegistryImplementor}. In theory this should never happen.
+     */
+    private Pair<DatabaseInformation, DdlTransactionIsolator>
+        retrieveDatabaseInformation(Database database, Namespace.Name namespaceName) throws DataMigrationException
     {
         ServiceRegistry serviceRegistry = database.getServiceRegistry();
         // We need the serviceRegistry to be a ServiceRegistryImplementor so that we can inject it
@@ -133,7 +146,9 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
         // Code inspired by org.hibernate.tool.schema.internal.Helper
         JdbcEnvironment jdbcEnvironment = serviceRegistry.getService(JdbcEnvironment.class);
         try {
-            return new DatabaseInformationImpl(serviceRegistry, jdbcEnvironment, ddlTransactionIsolator, namespaceName);
+            return Pair.of(
+                new DatabaseInformationImpl(serviceRegistry, jdbcEnvironment, ddlTransactionIsolator, namespaceName),
+                ddlTransactionIsolator);
         } catch (SQLException e) {
             throw new DataMigrationException("Cannot retrieve DatabaseInformation", e);
         }
@@ -273,37 +288,47 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
         // retrieve tables information from the schema.
         Collection<Table> tables = database.getDefaultNamespace().getTables();
 
-
         Namespace.Name namespaceName = retrieveNamespaceName(identifierHelper);
 
-        // retrieve database information from the current DB.
-        DatabaseInformation databaseInformation = this.retrieveDatabaseInformation(database, namespaceName);
-
+        DdlTransactionIsolator transactionIsolator = null;
         boolean hasChanges = false;
         StringBuilder changes = new StringBuilder();
+        try {
+            // retrieve database information from the current DB.
+            Pair<DatabaseInformation, DdlTransactionIsolator> dbInfoAndIsolator =
+                this.retrieveDatabaseInformation(database, namespaceName);
 
-        // We iterating over all tables of the schema first
-        for (Table table : tables) {
+            DatabaseInformation databaseInformation = dbInfoAndIsolator.getLeft();
+            transactionIsolator = dbInfoAndIsolator.getRight();
 
-            TableInformation tableInformation =
-                databaseInformation.getTableInformation(namespaceName, table.getNameIdentifier());
+            // We iterate over all tables of the schema first
+            for (Table table : tables) {
 
-            // if the table doesn't exist yet in the database, we're safe.
-            if (tableInformation != null) {
-                // And over all foreign keys for each table
-                for (Iterator<ForeignKey> it = table.getForeignKeyIterator(); it.hasNext();) {
-                    ForeignKey foreignKey = it.next();
+                TableInformation tableInformation =
+                    databaseInformation.getTableInformation(namespaceName, table.getNameIdentifier());
 
-                    ForeignKeyInformation conflictingForeignKey =
-                        getConflictingForeignKey(foreignKey, tableInformation, identifierHelper);
+                // if the table doesn't exist yet in the database, we're safe.
+                if (tableInformation != null) {
+                    // And over all foreign keys for each table
+                    for (Iterator<ForeignKey> it = table.getForeignKeyIterator(); it.hasNext();) {
+                        ForeignKey foreignKey = it.next();
 
-                    // We found a conflicting foreign key: it means that the name changed so we need to drop the
-                    // currently existing foreign key so that hibernate is able to recreate it back just after.
-                    if (conflictingForeignKey != null) {
-                        this.writeChanges(changes, table, foreignKey, conflictingForeignKey);
-                        hasChanges = true;
+                        ForeignKeyInformation conflictingForeignKey =
+                            getConflictingForeignKey(foreignKey, tableInformation, identifierHelper);
+
+                        // We found a conflicting foreign key: it means that the name changed so we need to drop the
+                        // currently existing foreign key so that hibernate is able to recreate it back just after.
+                        if (conflictingForeignKey != null) {
+                            this.writeChanges(changes, table, foreignKey, conflictingForeignKey);
+                            hasChanges = true;
+                        }
                     }
                 }
+            }
+        } finally {
+            // Ensure to close the connection.
+            if (transactionIsolator != null) {
+                transactionIsolator.release();
             }
         }
         String result = "";

@@ -227,7 +227,7 @@ public class MailIT
 
         // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
         // two other users (however since they're part of the group they'll receive only one mail each, we thus test
-        // deduplicatio!).
+        // deduplication!).
         sendTemplateMailToUsersAndGroup(setup, requestURLPrefix);
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for

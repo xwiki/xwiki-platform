@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata.internal.macro;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -28,6 +29,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataQuery;
+import org.xwiki.livedata.LiveDataQuery.Filter;
+import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.renderer.html5.HTML5Renderer;
@@ -64,6 +68,9 @@ class LiveDataMacroTest
     @MockComponent
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver;
 
+    @MockComponent
+    private LiveDataConfigurationResolver<String> stringConfigResolver;
+
     private PrintRendererFactory rendererFactory;
 
     @BeforeEach
@@ -80,6 +87,8 @@ class LiveDataMacroTest
                     return invocation.getArgument(0);
                 }
             });
+
+        when(this.stringConfigResolver.resolve("{}")).thenReturn(new LiveDataConfiguration());
     }
 
     @Test
@@ -141,6 +150,52 @@ class LiveDataMacroTest
         parameters.setPageSizes("15, 25, 50");
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, null, null);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithContent() throws Exception
+    {
+        LiveDataMacroParameters parameters = new LiveDataMacroParameters();
+        parameters.setId("test");
+        parameters.setSource("users");
+        parameters.setProperties("avatar, firstName, lastName, position");
+        parameters.setSort("firstName");
+        parameters.setLimit(10);
+
+        LiveDataConfiguration advancedConfig = new LiveDataConfiguration();
+        advancedConfig.setQuery(new LiveDataQuery());
+        advancedConfig.getQuery().setFilters(new ArrayList<>());
+        advancedConfig.getQuery().getFilters().add(new Filter("position", "R&D"));
+        advancedConfig.getQuery().setSort(new ArrayList<>());
+        advancedConfig.getQuery().getSort().add(new SortEntry("lastName", true));
+        advancedConfig.getQuery().setLimit(15);
+
+        when(this.stringConfigResolver.resolve("{...}")).thenReturn(advancedConfig);
+
+        StringBuilder expectedConfig = new StringBuilder();
+        expectedConfig.append("{");
+        expectedConfig.append("  'id':'test',".trim());
+        expectedConfig.append("  'query':{".trim());
+        expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
+        expectedConfig.append("    'source':{'id':'users'},".trim());
+        expectedConfig.append("    'filters':[".trim());
+        expectedConfig.append("      {'property':'position','constraints':[{'value':'R&D'}]}".trim());
+        expectedConfig.append("    ],".trim());
+        expectedConfig.append("    'sort':[".trim());
+        expectedConfig.append("      {'property':'firstName'}".trim());
+        expectedConfig.append("    ],".trim());
+        expectedConfig.append("    'limit':10".trim());
+        expectedConfig.append("  },".trim());
+        expectedConfig.append("  'meta':{".trim());
+        expectedConfig.append("    'pagination':{}".trim());
+        expectedConfig.append("  }".trim());
+        expectedConfig.append("}");
+
+        String expected = "<div class=\"liveData\" id=\"test\" data-config=\""
+            + escapeXML(json(expectedConfig.toString())) + "\"></div>";
+
+        List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", null);
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 

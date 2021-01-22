@@ -7,8 +7,10 @@ set -e
 # Rights
 #########################
 
-## Make sure tomcat is able to write in the data folder
-chown -R tomcat8.tomcat8 /var/lib/xwiki/data
+## Make sure Tomcat is able to write in the data folder
+if [ ! 'tomcat8' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R tomcat8.tomcat8 /var/lib/xwiki/data
+fi
 
 #########################
 # Configuration

@@ -139,7 +139,7 @@ public class EditIT
         wep.clickSaveAndView();
 
         // Verify that the revision exists by navigating to it and by asserting its content
-        setup.gotoPage(reference, "viewrev", "rev=2.1");
+        setup.gotoPage(reference, "view", "rev=2.1");
 
         vp = new ViewPage();
         assertEquals("version=2.1", vp.getContent());
@@ -150,7 +150,7 @@ public class EditIT
         wep.clickSaveAndView();
 
         // Verify that the minor revision exists by navigating to it and by asserting its content
-        setup.gotoPage(reference, "viewrev", "rev=2.2");
+        setup.gotoPage(reference, "view", "rev=2.2");
         vp = new ViewPage();
         assertEquals("version=2.2", vp.getContent());
     }

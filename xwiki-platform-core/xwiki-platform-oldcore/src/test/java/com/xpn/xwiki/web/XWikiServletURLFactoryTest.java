@@ -697,10 +697,9 @@ public class XWikiServletURLFactoryTest
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.put("rev", "1.0");
-        xwikiContext.setAction("viewrev");
         xwikiContext.setDoc(new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage")));
-        URL url = this.urlFactory.createAttachmentURL("file", "space", "page", "viewrev", null, xwikiContext);
-        assertEquals("http://127.0.0.1/xwiki/bin/viewrev/space/page/file", url.toString());
+        URL url = this.urlFactory.createAttachmentURL("file", "space", "page", "download", null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/space/page/file", url.toString());
     }
 
     @Test
@@ -709,7 +708,6 @@ public class XWikiServletURLFactoryTest
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.put("rev", "1.0");
-        xwikiContext.setAction("viewrev");
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage"));
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
@@ -718,7 +716,7 @@ public class XWikiServletURLFactoryTest
         xwikiContext.setWikiId("currentwiki");
 
         URL url =
-            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "viewrev", null, xwikiContext);
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null, xwikiContext);
         assertEquals("http://127.0.0.1/xwiki/bin/viewattachrev/currentspace/currentpage/file", url.toString());
     }
 

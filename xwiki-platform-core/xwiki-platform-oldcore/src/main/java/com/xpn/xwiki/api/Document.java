@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -69,6 +70,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
@@ -132,6 +134,8 @@ public class Document extends Api
 
     private DocumentRevisionProvider documentRevisionProvider;
 
+    private ConfigurationSource configuration;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -177,6 +181,15 @@ public class Document extends Api
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private ConfigurationSource getConfiguration()
+    {
+        if (this.configuration == null) {
+            this.configuration = Utils.getComponent(ConfigurationSource.class);
+        }
+
+        return this.configuration;
     }
 
     /**
@@ -2535,9 +2548,15 @@ public class Document extends Api
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
-            saveDocument(comment, minorEdit);
+            // If the current author does not have PR don't let it set current user as author of the saved document
+            // since it can lead to right escalation
+            if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
+                saveDocument(comment, minorEdit);
+            } else {
+                saveAsAuthor(comment, minorEdit);
+            }
         } else {
-            java.lang.Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
+            java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2586,8 +2605,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
@@ -2598,8 +2617,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
@@ -2611,8 +2630,8 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
-     * permission to do so. The author of this document is also set to the said content author.
+     * Save the document if the current author of the script calling this method has permission to do so. The author of
+     * this document is also set to the said author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next

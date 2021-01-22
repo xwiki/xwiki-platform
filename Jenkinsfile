@@ -34,6 +34,16 @@ def builds = [
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
   },
+  // Can be used to manually trigger the main build with integration tests on the CI.
+  'Main with Integration Tests' : {
+    build(
+      name: 'Main with Integration Tests',
+      profiles: 'legacy,integration-tests,snapshot',
+      properties:
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+    )
+  },
   'Distribution' : {
     build(
       name: 'Distribution',

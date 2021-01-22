@@ -247,7 +247,7 @@ public class LiveDataMeta
     /**
      * @return the descriptors of supported live data actions
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public Collection<LiveDataActionDescriptor> getActions()
     {
@@ -259,7 +259,7 @@ public class LiveDataMeta
      * 
      * @param actions the descriptors for the supported actions
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public void setActions(Collection<LiveDataActionDescriptor> actions)
     {
@@ -269,7 +269,7 @@ public class LiveDataMeta
     /**
      * @return the live data entry selection
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public LiveDataSelectionConfiguration getSelection()
     {
@@ -281,7 +281,7 @@ public class LiveDataMeta
      * 
      * @param selection the new live data entry selection
      * @since 12.10.1
-     * @since 13.0RC1
+     * @since 13.0
      */
     public void setSelection(LiveDataSelectionConfiguration selection)
     {

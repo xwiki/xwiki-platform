@@ -30,6 +30,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
@@ -55,10 +56,10 @@ public class DefaultLiveDataPropertyTypesResource extends AbstractLiveDataResour
     @Override
     public Types getTypes(String sourceId, String namespace) throws Exception
     {
-        LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
-        Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
+        LiveDataConfiguration config = getLiveDataConfig(sourceId);
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
         if (source.isPresent()) {
-            return createPropertyTypes(source.get().getPropertyTypes().get(), querySource, namespace);
+            return createPropertyTypes(config.getMeta().getPropertyTypes(), config.getQuery().getSource(), namespace);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

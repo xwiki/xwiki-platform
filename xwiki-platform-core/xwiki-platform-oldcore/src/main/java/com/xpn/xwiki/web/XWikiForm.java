@@ -44,7 +44,7 @@ public abstract class XWikiForm
      * Reset all properties to their default values.
      *
      * @param request The servlet request we are processing
-     * @since 13.0RC1
+     * @since 13.0
      */
     @Unstable
     public void reset(HttpServletRequest request)
@@ -57,7 +57,7 @@ public abstract class XWikiForm
      * Reset all properties to their default values.
      *
      * @param request The servlet request we are processing
-     * @since 13.0RC1
+     * @since 13.0
      */
     @Unstable
     public void reset(XWikiRequest request)

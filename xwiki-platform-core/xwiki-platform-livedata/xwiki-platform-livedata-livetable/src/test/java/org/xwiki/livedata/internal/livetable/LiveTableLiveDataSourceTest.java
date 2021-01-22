@@ -28,7 +28,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
@@ -48,18 +47,8 @@ public class LiveTableLiveDataSourceTest
     private LiveDataEntryStore entryStore;
 
     @MockComponent
-    @Named("liveTable/property")
+    @Named("liveTable")
     private LiveDataPropertyDescriptorStore propertyStore;
-
-    @MockComponent
-    @Named("liveTable/propertyType")
-    private LiveDataPropertyDescriptorStore propertyTypeStore;
-
-    @Test
-    void getParametersDefaultValues()
-    {
-        assertEquals("currentlanguage,hidden", this.liveTableSource.getParameters().get("queryFilters"));
-    }
 
     @Test
     void getEntries()
@@ -71,11 +60,5 @@ public class LiveTableLiveDataSourceTest
     void getProperties()
     {
         assertSame(this.propertyStore, this.liveTableSource.getProperties());
-    }
-
-    @Test
-    void getPropertyTypes()
-    {
-        assertSame(this.propertyTypeStore, this.liveTableSource.getPropertyTypes());
     }
 }

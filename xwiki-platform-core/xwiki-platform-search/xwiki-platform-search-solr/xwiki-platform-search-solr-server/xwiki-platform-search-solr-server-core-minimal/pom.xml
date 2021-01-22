@@ -28,7 +28,7 @@
     <version>13.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-  <name>XWiki Plarform - Search - SOLR - Server - Minimal Core</name>
+  <name>XWiki Platform - Search - SOLR - Server - Minimal Core</name>
   <packaging>pom</packaging>
   <description>A package containing a SOLR core which the minimum things, mostly used for custom cores</description>
   <build>

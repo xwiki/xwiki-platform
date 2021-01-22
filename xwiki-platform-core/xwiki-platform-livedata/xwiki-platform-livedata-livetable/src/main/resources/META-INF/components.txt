@@ -1,7 +1,8 @@
+org.xwiki.livedata.internal.livetable.DefaultLiveDataConfigurationProvider
+org.xwiki.livedata.internal.livetable.DefaultLiveDataConfigurationResolver
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataConfigurationResolver
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataEntryStore
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataPropertyStore
-org.xwiki.livedata.internal.livetable.LiveTableLiveDataPropertyTypeStore
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataSource
 org.xwiki.livedata.internal.livetable.LiveTableRequestHandler
 org.xwiki.livedata.internal.livetable.PropertyTypeSupplier

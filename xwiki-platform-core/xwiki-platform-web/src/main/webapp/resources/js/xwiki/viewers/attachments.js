@@ -17,8 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-var XWiki = (function (XWiki) {
-// Start XWiki augmentation.
+/*!
+#set ($l10nKeys = [
+  'core.viewers.attachments.upload.addFileInput',
+  'core.viewers.attachments.upload.removeFileInput',
+  'core.viewers.attachments.upload.removeFileInput.title',
+  'core.viewers.attachments.delete.inProgress',
+  'core.viewers.attachments.delete.done',
+  'core.viewers.attachments.delete.failed',
+  ['docextra.extranb', '__number__'],
+  'docextra.attachments'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($params = $key.subList(1, $key.size()))
+  #if ($params)
+    #set ($discard = $l10n.put($key[0], $services.localization.render($key[0], $params)))
+  #else
+    #set ($discard = $l10n.put($key, $services.localization.render($key)))
+  #end
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(l10n) {
+  "use strict";
+
+window.XWiki = window.XWiki || {};
 var viewers = XWiki.viewers = XWiki.viewers || {};
 /**
  * Enhancements for the Attachment upload area: adding and removing file fields, resetting with the Cancel button,
@@ -76,7 +100,7 @@ viewers.Attachments = Class.create({
   addAddButton : function() {
     var addButton = new Element("input", {
       type: "button",
-      value: "$services.localization.render('core.viewers.attachments.upload.addFileInput')",
+      value: l10n['core.viewers.attachments.upload.addFileInput'],
       className: "attachmentActionButton add-file-input"
     });
     this.addDiv = new Element("div");
@@ -119,8 +143,8 @@ viewers.Attachments = Class.create({
   createRemoveButton : function() {
     var removeButton = new Element("input", {
       type: "button",
-      value: "$services.localization.render('core.viewers.attachments.upload.removeFileInput')",
-      title: "$services.localization.render('core.viewers.attachments.upload.removeFileInput.title')",
+      value: l10n['core.viewers.attachments.upload.removeFileInput'],
+      title: l10n['core.viewers.attachments.upload.removeFileInput.title'],
       className: "attachmentActionButton remove-file-input"
     });
     Event.observe(removeButton, "click", this.removeField.bindAsEventListener(this));
@@ -168,10 +192,6 @@ viewers.Attachments = Class.create({
 (XWiki.domIsLoaded && new viewers.Attachments())
 || document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
 
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
-
 /**
  * Delete attachments from AttachmentsTab.
  */
@@ -198,22 +218,19 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       url : button.prop('href'),
       beforeSend : function() {
         button.prop('disabled', true);
-        notification = new XWiki.widgets.Notification(
-          "$services.localization.render('core.viewers.attachments.delete.inProgress')", 'inprogress');
+        notification = new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.inProgress'], 'inprogress');
       },
       success : function() {
         var attachment = button.closest('.attachment');
         // Remove the corresponding HTML element from the UI and update the attachment count.
         attachment.remove();
         updateCount();
-        notification.replace(new XWiki.widgets.Notification(
-          "$services.localization.render('core.viewers.attachments.delete.done')", 'done'));
+        notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
       error: function() {
         // The button is enabled in case of error.
         button.prop('disabled', false);
-        notification.replace(new XWiki.widgets.Notification(
-          "$services.localization.render('core.viewers.attachments.delete.failed')", 'error'));
+        notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.failed'], 'error'));
       }
     })
   });
@@ -224,14 +241,13 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var itemCount = $('#Attachmentstab').find('.itemCount');
     var attachmentsNumber = $("#Attachmentspane .attachment").size();
     if(itemCount) {
-      itemCount.text(
-        "$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", attachmentsNumber));
+      itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
     };
     if($('#tmAttachments').length) {
       // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
       $('#tmAttachments')[0].normalize();
-      var attachmentsLabel = " $services.localization.render('docextra.attachments') ";
-      var label = attachmentsLabel + "$services.localization.render('docextra.extranb', ['__number__'])";
+      var attachmentsLabel = ' ' + l10n['docextra.attachments'] + ' ';
+      var label = attachmentsLabel + l10n['docextra.extranb'];
       label = label.replace("__number__", attachmentsNumber);
       $('#tmAttachments').contents().last()[0].nodeValue=label;
     }
@@ -243,3 +259,6 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     updateCount();
   });
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$l10n]));

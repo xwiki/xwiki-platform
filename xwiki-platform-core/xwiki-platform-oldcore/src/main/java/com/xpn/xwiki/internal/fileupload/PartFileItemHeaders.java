@@ -29,7 +29,7 @@ import org.apache.commons.fileupload.FileItemHeaders;
  * Implement a {@link FileItemHeaders} based on a {@link Part}.
  * 
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.0
  */
 public class PartFileItemHeaders implements FileItemHeaders
 {

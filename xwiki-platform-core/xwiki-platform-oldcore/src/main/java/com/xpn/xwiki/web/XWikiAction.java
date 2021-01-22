@@ -174,7 +174,7 @@ public abstract class XWikiAction implements LegacyAction
 
     /**
      * @return the class of the XWikiForm in charge of parsing the request
-     * @since 13.0RC1
+     * @since 13.0
      */
     @Unstable
     protected Class<? extends XWikiForm> getFormClass()
@@ -751,7 +751,7 @@ public abstract class XWikiAction implements LegacyAction
 
     /**
      * @return the name to put in the {@link XWikiContext}, by default the component role hint is used
-     * @since 13.0RC1
+     * @since 13.0
      */
     @Unstable
     protected String getName()

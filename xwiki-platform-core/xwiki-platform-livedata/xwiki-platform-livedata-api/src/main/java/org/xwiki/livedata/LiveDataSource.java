@@ -33,17 +33,12 @@ import org.xwiki.stability.Unstable;
 public interface LiveDataSource
 {
     /**
-     * @return the entry store
+     * @return the entry store, used to add, retrieve, update and delete live data entries
      */
     LiveDataEntryStore getEntries();
 
     /**
-     * @return the property store
+     * @return the property store, used to add, retrieve, update and delete live data properties
      */
     LiveDataPropertyDescriptorStore getProperties();
-
-    /**
-     * @return the property type store
-     */
-    LiveDataPropertyDescriptorStore getPropertyTypes();
 }

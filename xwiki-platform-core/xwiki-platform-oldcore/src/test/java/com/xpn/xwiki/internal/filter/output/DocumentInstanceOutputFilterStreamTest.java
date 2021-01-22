@@ -43,12 +43,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -166,8 +168,7 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
-    void importDocument1WithDeletePreviousAndPreserveVersion()
-        throws FilterException, XWikiException, ParseException
+    void importDocument1WithDeletePreviousAndPreserveVersion() throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -499,7 +500,37 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
-    void importAttachmentWithRevisions() throws FilterException, XWikiException, ParseException, IOException
+    void documentwithobjectwithinconsistentclasses() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithobjectwithinconsistentclasses", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
+        assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        assertEquals(0, documentObject.getNumber());
+        assertEquals(4, documentObject.getFieldList().size());
+        assertEquals("propvalue", documentObject.getStringValue("prop"));
+        assertEquals("42", ((BaseProperty) documentObject.get("prop2")).getValue());
+        assertEquals("", ((BaseProperty) documentObject.get("missingprop1")).getValue());
+        assertEquals("", ((BaseProperty) documentObject.get("missingprop2")).getValue());
+    }
+
+    @Test
+    void importAttachmentWithRevisions() throws FilterException, XWikiException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 

@@ -4,15 +4,7 @@
   <wiki name="wiki">
     <wikiSpace name="space">
       <wikiDocument name="page">
-        <wikiObject name="space.document">
-          <p>
-            <parameters>
-              <entry>
-                <string>class_reference</string>
-                <string>missingspace.missingclass</string>
-              </entry>
-            </parameters>
-          </p>
+        <wikiObject name="missingspace.missingclass">
           <wikiClass>
             <wikiClassProperty name="prop" type="String"/>
             <wikiClassProperty name="missingprop" type="String"/>

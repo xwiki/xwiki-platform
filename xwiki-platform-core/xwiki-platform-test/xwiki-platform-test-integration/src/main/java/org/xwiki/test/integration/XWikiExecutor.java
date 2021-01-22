@@ -275,7 +275,7 @@ public class XWikiExecutor
         CommandLine command = CommandLine.parse(commandLine);
 
         // Execute the process asynchronously so that we don't block.
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+        DefaultExecuteResultHandler resultHandler = new XWikiDefaultExecuteResultHandler(commandLine);
 
         // Send Process output and error streams to our logger.
         PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream());
@@ -298,11 +298,7 @@ public class XWikiExecutor
         Map<String, String> newEnvironment = EnvironmentUtils.getProcEnvironment();
         newEnvironment.putAll(this.environment);
 
-        try {
-            executor.execute(command, newEnvironment, resultHandler);
-        } catch (Exception e) {
-            throw new Exception(String.format("Failed to execute command [%s]", commandLine), e);
-        }
+        executor.execute(command, newEnvironment, resultHandler);
 
         return resultHandler;
     }

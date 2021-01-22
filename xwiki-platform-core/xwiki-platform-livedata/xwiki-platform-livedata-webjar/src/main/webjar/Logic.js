@@ -843,12 +843,12 @@ define([
 
 
     /**
-     * Returns the property descriptors of sortable properties
+     * Returns the sortable properties from the live data query.
+     *
      * @returns {Array}
      */
-    getSortablePropertyDescriptors () {
-      return this.data.meta.propertyDescriptors
-        .filter(propertyDescriptor => this.isPropertySortable(propertyDescriptor.id));
+    getSortableProperties () {
+      return this.data.query.properties.filter(property => this.isPropertySortable(property));
     },
 
 
@@ -985,12 +985,12 @@ define([
 
 
     /**
-     * Returns the property descriptors of filterable properties
+     * Returns the filterable properties from the live data query.
+     *
      * @returns {Array}
      */
-    getFilterablePropertyDescriptors () {
-      return this.data.meta.propertyDescriptors
-        .filter(propertyDescriptor => this.isPropertyFilterable(propertyDescriptor.id));
+    getFilterableProperties () {
+      return this.data.query.properties.filter(property => this.isPropertyFilterable(property));
     },
 
 

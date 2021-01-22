@@ -155,10 +155,11 @@ export default {
   computed: {
     data () { return this.logic.data; },
 
-    // Property descriptors that does not have a sort entry in Livedata config
+    // The sortable properties that don't have a sort entry in the live data query.
     unsortedProperties () {
-      return this.logic.getSortablePropertyDescriptors()
-        .filter(propertyDescriptor => !this.logic.getQuerySort(propertyDescriptor.id));
+      return this.logic.getSortableProperties()
+        .filter(property => !this.logic.getQuerySort(property))
+        .map(property => this.logic.getPropertyDescriptor(property));
     },
   },
 

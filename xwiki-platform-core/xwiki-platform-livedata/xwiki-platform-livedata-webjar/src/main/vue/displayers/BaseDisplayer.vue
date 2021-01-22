@@ -91,6 +91,14 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
+
+  props: {
+    viewOnly: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
   data () {
     return {
       // Whether the displayer is in view or edit mode

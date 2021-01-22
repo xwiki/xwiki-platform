@@ -120,4 +120,9 @@ export default {
 
 <style>
 
+.livedata-filter.filter-suggest .selectize-input {
+  height: 100%;
+  vertical-align: middle;
+}
+
 </style>

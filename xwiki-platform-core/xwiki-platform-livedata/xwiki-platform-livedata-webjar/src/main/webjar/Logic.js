@@ -410,17 +410,17 @@ define([
       // TODO: Ensure property is valid (need other current PR)
 
       // Check if the edit entry action is available.
-      if (!this.data.meta.actions.find(action => action.id === 'editEntry')) {
+      if (!this.data.meta.actions.find(action => action.id === "editEntry")) {
         return false;
       }
 
       // Check if we are allowed to edit the given entry.
-      if (entry && !isEntryEditable(entry)) {
+      if (entry && !this.isEntryEditable(entry)) {
         return false;
       }
 
       // Check if the specified property is editable.
-      return !propertyId || isPropertyEditable(propertyId);
+      return !propertyId || this.isPropertyEditable(propertyId);
     },
 
     /**
@@ -428,7 +428,7 @@ define([
      *
      * @param {Object} entry
      * @returns {Boolean}
-     */    
+     */
     isEntryEditable (entry) {
       const allowEditProperty = this.data.meta.entryDescriptor.allowEditProperty || "allowEdit";
       return entry[allowEditProperty];
@@ -468,7 +468,7 @@ define([
      */
     canAddEntry () {
       // Check if the add entry action is available.
-      return this.data.meta.actions.find(action => action.id === 'addEntry');
+      return this.data.meta.actions.find(action => action.id === "addEntry");
     },
 
     addEntry () {
@@ -478,10 +478,10 @@ define([
       Promise.resolve({ /* MOCK DATA */
         "doc_url": mockNewUrl(),
         "doc_name": undefined,
-        "doc_date": "2020/03/27 13:23",
+        "doc_date": "1585311660000",
         "doc_title": undefined,
         "doc_author": "Author 1",
-        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creationDate": "1585311660000",
         "doc_creator": "Creator 1",
         "age": undefined,
         "tags": undefined,

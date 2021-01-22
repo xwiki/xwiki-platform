@@ -27,7 +27,7 @@ define({
   id: "LD0",
 
   query: {
-    properties: ["doc_date", "doc_title", "age", "country", "tags", "other"],
+    properties: ["doc_date", "doc_title", "age", "country", "tags", "other", "_actions"],
 
     source: {
       id: "...",
@@ -63,12 +63,12 @@ define({
       {
         id: "table",
         name: "Table",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-table'},
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-table"},
       },
       {
         id: "cards",
         name: "Cards",
-        icon: {iconSetName: 'Font Awesome', cssClass: 'fa fa-th'},
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-th"},
         titleProperty: "doc_title",
       },
     ],
@@ -79,9 +79,7 @@ define({
         name: "Date",
         type: "date",
         visible: true,
-        displayer: {
-          id: 'date',
-        },
+        editable: false,
       },
       {
         id: "doc_title",
@@ -89,7 +87,7 @@ define({
         type: "string",
         visible: true,
         displayer: {
-          id: 'link',
+          id: "link",
           propertyHref: "doc_url",
         },
       },
@@ -126,60 +124,80 @@ define({
         sortable: false,
         filterable: false,
       },
+      {
+        id: "_actions",
+        name: "Actions",
+        type: "_actions",
+        visible: true,
+      },
     ],
 
     propertyTypes: [
       {
-        id: 'string',
-        name: 'String',
+        id: "string",
+        name: "String",
         displayer: {
-          id: 'text',
+          id: "text",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'text'
+          id: "text"
         },
+        editable: true,
       },
       {
-        id: 'number',
-        name: 'Number',
+        id: "number",
+        name: "Number",
         displayer: {
-          id: 'number',
+          id: "number",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'number'
+          id: "number"
         },
+        editable: true,
       },
       {
-        id: 'list',
-        name: 'List',
+        id: "list",
+        name: "List",
         displayer: {
-          id: 'list',
+          id: "list",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'list'
+          id: "list"
         },
+        editable: true,
       },
       {
-        id: 'date',
-        name: 'Date',
+        id: "date",
+        name: "Date",
         displayer: {
-          id: 'date',
+          id: "date",
         },
         sortable: true,
         filterable: true,
         filter: {
-          id: 'date'
+          id: "date"
         },
+        editable: true,
+      },
+      {
+        id: "_actions",
+        name: "Actions",
+        displayer: {
+          id: "actions",
+        },
+        sortable: false,
+        filterable: false,
+        editable: false,
       },
     ],
 
-    defaultFilter: 'text',
+    defaultFilter: "text",
 
     filters: [
       {
@@ -230,7 +248,7 @@ define({
       },
     ],
 
-    defaultDisplayer: 'text',
+    defaultDisplayer: "text",
 
     displayers: [
       {
@@ -244,6 +262,9 @@ define({
       },
       {
         id: "date",
+      },
+      {
+        id: "_actions",
       },
     ],
 
@@ -261,6 +282,43 @@ define({
     entryDescriptor: {
       idProperty: "doc_url",
       propertySaveHref: "save_url",
+      allowEditProperty: "editable",
+    },
+
+    actions: [
+      {
+        id: "viewEntry",
+        name: "View entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-eye"},
+        propertyHref: "doc_url",
+      },
+      {
+        id: "editEntry",
+        name: "Edit entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-pencil"},
+        propertyHref: "doc_edit_url",
+      },
+      {
+        id: "editRights",
+        name: "Edit rights",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-lock"},
+        propertyHref: "doc_rights_url",
+      },
+      {
+        id: "deleteEntry",
+        name: "Delete entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-trash"},
+        propertyHref: "doc_delete_url",
+      },
+      {
+        id: "addEntry",
+        name: "Add entry",
+        icon: {iconSetName: "Font Awesome", cssClass: "fa fa-th"},
+      },
+    ],
+
+    selection: {
+      enabled: true,
     },
 
   },
@@ -275,52 +333,56 @@ define({
       {
         "doc_url": "#link1",
         "doc_name": "Name1",
-        "doc_date": "2020/03/27 13:23",
+        "doc_date": "1585311780000",
         "doc_title": "Title 1",
         "doc_author": "Author 1",
-        "doc_creationDate": "2020/03/27 13:21",
+        "doc_creationDate": "1585311660000",
         "doc_creator": "Creator 1",
         "age": 48,
         "tags": "Tag 1",
         "country": "France",
         "other": "<em>lorem ipsum<em>",
+        "editable": false,
       },
       {
         "doc_url": "#link2",
         "doc_name": "Name2",
-        "doc_date": "2020/04/22 14:07",
+        "doc_date": "1587557220000",
         "doc_title": "Title 2",
         "doc_author": "Author 2",
-        "doc_creationDate": "2020/04/22 14:06",
+        "doc_creationDate": "1587557160000",
         "doc_creator": "Creator 2",
         "age": 24,
         "tags": "Tag 2",
         "country": "France",
         "other": "<strong>dorol sit amet<strong>",
+        "editable": true,
       },
       {
         "doc_url": "#link3",
         "doc_name": "Name3",
-        "doc_date": "2020/03/27 14:34",
+        "doc_date": "1585316040000",
         "doc_title": "Title 3",
         "doc_author": "Author 3",
-        "doc_creationDate": "2020/03/27 14:34",
+        "doc_creationDate": "1585316040000",
         "doc_creator": "Creator 3",
         "age": 12,
         "tags": "Tag 3",
         "country": "Romania",
         "other": "<span style='color:red'>consequtir</span>",
+        "editable": true,
       },
       {
         "doc_url": "#link4",
         "doc_name": "Name4",
-        "doc_date": "2020/03/27 14:34",
+        "doc_date": "1585316040000",
         "doc_title": "Title 4",
         "doc_author": "Author 4",
-        "doc_creationDate": "2020/03/27 14:34",
+        "doc_creationDate": "1585316040000",
         "doc_creator": "Creator 4",
         "age": 52,
         "country": "Romania",
+        "editable": true,
       },
     ],
 

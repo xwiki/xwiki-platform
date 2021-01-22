@@ -31,7 +31,7 @@
     ref="filterDate"
     type="text"
     size="1"
-    :value="filterEntry.value"
+    :value="valueFormatted"
   />
 </template>
 
@@ -51,6 +51,13 @@ export default {
 
 
   computed: {
+
+    valueFormatted () {
+      if (this.filterEntry.value === undefined) { return; }
+      return this.filterEntry.value.split("-")
+        .map(date => moment(+date).format(this.format))
+        .join(" - ");
+    },
 
     operator () {
       return this.filterEntry.operator;
@@ -119,7 +126,11 @@ export default {
 
     applyDate () {
       const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
-      this.applyFilter(this.getValue(daterangepicker));
+      const value = this.getValue(daterangepicker);
+      const valueTimestamps = value.split(" - ")
+        .map(date => +moment(date, this.format))
+        .join("-");
+      this.applyFilter(valueTimestamps);
     },
   },
 
@@ -132,7 +143,7 @@ export default {
           this.filterConfig,
         );
         $(filterDate).on('apply.daterangepicker', (e) => {
-            this.applyDate();
+          this.applyDate();
         });
         // Fix prototypejs prototype pollution
         $(filterDate).on('hide.daterangepicker', (e) => {

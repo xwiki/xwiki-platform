@@ -60,6 +60,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private BaseObject externalEntity;
 
+    private BaseClass databaseXClass;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -175,9 +177,9 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
         XWikiContext xcontext = this.xcontextProvider.get();
         if (xcontext != null && xcontext.getWiki() != null) {
             try {
-                BaseClass databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
-                if (!databaseXClass.getOwnerDocument().isNew()) {
-                    setCurrentXClass(databaseXClass);
+                this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
+                if (!this.databaseXClass.getOwnerDocument().isNew()) {
+                    setCurrentXClass(this.databaseXClass);
                 }
             } catch (XWikiException e) {
                 // TODO: log something ?
@@ -189,13 +191,13 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     public void endWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
         // Add missing properties from the class
-        BaseClass xclass = getCurrentXClass();
-        if (this.entity != null && xclass != null) {
-            for (String key : xclass.getPropertyList()) {
-                if (this.entity.safeget(key) == null) {
-                    PropertyClass classProperty = (PropertyClass) xclass.getField(key);
-                    this.entity.safeput(key, classProperty.newProperty());
-                }
+        if (this.entity != null) {
+            BaseClass xclass = getCurrentXClass();
+            if (xclass != null) {
+                addMissingProperties(xclass);
+            }
+            if (this.databaseXClass != xclass) {
+                addMissingProperties(this.databaseXClass);
             }
         }
 
@@ -205,6 +207,16 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
         getBaseClassOutputFilterStream().disable();
     }
 
+    private void addMissingProperties(BaseClass xclass)
+    {        
+        for (String key : xclass.getPropertyList()) {
+            if (this.entity.safeget(key) == null) {
+                PropertyClass classProperty = (PropertyClass) xclass.getField(key);
+                this.entity.safeput(key, classProperty.newProperty());
+            }
+        }
+    }
+    
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="otherspace">
+      <wikiDocument name="otherclass">
+        <wikiClass>
+          <wikiClassProperty name="prop" type="String"/>
+          <wikiClassProperty name="prop2" type="Number"/>
+          <wikiClassProperty name="missingprop1" type="String"/>
+        </wikiClass>
+      </wikiDocument>
+    </wikiSpace>
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiObject name="otherspace.otherclass">
+          <wikiClass>
+            <wikiClassProperty name="prop" type="String"/>
+            <wikiClassProperty name="prop2" type="String"/>
+            <wikiClassProperty name="missingprop2" type="String"/>
+          </wikiClass>
+          <wikiObjectProperty name="prop" value="propvalue"/>
+          <wikiObjectProperty name="prop2" value="42"/>
+        </wikiObject>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

@@ -42,10 +42,11 @@
         <a
           v-for="action in actions"
           :key="action.id"
-          :title="action.name"
-          :href="entry[action.propertyHref] || '#'"
+          :class="'action action_' + action.id"
+          :title="action.description"
+          :href="entry[action.urlProperty] || '#'"
         >
-          <XWikiIcon :iconDescriptor="action.icon" />
+          <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>
       </div>
     </template>
@@ -81,16 +82,13 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
-  props: {
-    visibleActions: {
-      type: Array,
-      default: () => ["viewEntry", "editEntry", "editRights", "deleteEntry"],
-    },
-  },
-
   computed: {
     actions () {
-      return this.data.meta.actions.filter(action => this.visibleActions.includes(action.id));
+      // The list of actions can be overwritten from the displayer configuration.
+      return (this.config.actions || this.data.meta.actions)
+        // Show only the actions that are allowed for the current live data entry.
+        .filter(action => this.logic.isActionAllowed(action, this.entry))
+        .map(action => this.logic.getActionDescriptor(action));
     },
   },
 
@@ -100,51 +98,17 @@ export default {
 
 <style>
 
-.displayer-actions .actions-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-.displayer-actions .actions-container a {
-  display: block;
-  padding: 0 0.8rem;
+.displayer-actions .action {
+  color: #777;
   white-space: nowrap;
 }
 
-
-/*
-  We use a grid layout instead of flex so that wrapping items continue to be
-  positioned in a nice grid pattern.
-  However, IE11 does not support a lot grid layouts, but does not support
-  the `@supports` at-rule either, so only browser which support this at-rule
-  and "display: grid" will use the following styles
-*/
-@supports (display: grid) {
-
-  .displayer-actions .actions-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 2.2rem);
-    justify-content: start;
-    align-content: start;
-    justify-items: stretch;
-    align-items: stretch;
-    grid-row-gap: 0.5rem;
-  }
-
-  .displayer-actions .actions-container a {
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
+.displayer-actions .action + .action {
+  margin-left: .5em;
 }
 
+.displayer-actions .action-name {
+  margin-left: .25em;
+}
 
 </style>

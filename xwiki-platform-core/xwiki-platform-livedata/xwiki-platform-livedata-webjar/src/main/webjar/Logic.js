@@ -430,8 +430,7 @@ define([
      * @returns {Boolean}
      */
     isEntryEditable (entry) {
-      const allowEditProperty = this.data.meta.entryDescriptor.allowEditProperty || "allowEdit";
-      return entry[allowEditProperty];
+      return this.isActionAllowed('editEntry', entry);
     },
 
     /**
@@ -683,7 +682,7 @@ define([
 
     /**
      * ---------------------------------------------------------------
-     * ACTIONS
+     * SELECTION
      */
 
 
@@ -809,6 +808,33 @@ define([
     },
 
 
+
+    /**
+     * ---------------------------------------------------------------
+     * ACTIONS
+     */
+
+
+    /**
+     * @param {String|Object} specifies the action
+     * @returns {Object} the descriptor of the specified live data action
+     */
+    getActionDescriptor(action) {
+      const descriptor = typeof action === 'string' ? {id: action} : action;
+      const baseDescriptor = this.data.meta.actions.find(baseDescriptor => baseDescriptor.id === descriptor.id);
+      return Object.assign({}, baseDescriptor, descriptor);
+    },
+
+
+    /**
+     * @param {String|Object} specifies the action
+     * @param {Object} the live data entry that is the target of the action
+     * @returns {Boolean} whether the specified action is allowed to target the specified live data entry
+     */
+    isActionAllowed(action, entry) {
+      const actionDescriptor = this.getActionDescriptor(action);
+      return !actionDescriptor.allowProperty || entry[actionDescriptor.allowProperty];
+    },
 
 
     /**

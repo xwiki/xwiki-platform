@@ -21,6 +21,7 @@ package org.xwiki.livedata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
@@ -296,22 +297,22 @@ public class LiveDataMeta
         if (this.layouts == null) {
             this.layouts = new ArrayList<>();
         }
-        this.layouts.forEach(LiveDataLayoutDescriptor::initialize);
+        this.layouts.stream().filter(Objects::nonNull).forEach(LiveDataLayoutDescriptor::initialize);
 
         if (this.propertyDescriptors == null) {
             this.propertyDescriptors = new ArrayList<>();
         }
-        this.propertyDescriptors.forEach(LiveDataPropertyDescriptor::initialize);
+        this.propertyDescriptors.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
 
         if (this.propertyTypes == null) {
             this.propertyTypes = new ArrayList<>();
         }
-        this.propertyTypes.forEach(LiveDataPropertyDescriptor::initialize);
+        this.propertyTypes.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
 
         if (this.filters == null) {
             this.filters = new ArrayList<>();
         }
-        this.filters.forEach(FilterDescriptor::initialize);
+        this.filters.stream().filter(Objects::nonNull).forEach(FilterDescriptor::initialize);
 
         if (this.displayers == null) {
             this.displayers = new ArrayList<>();
@@ -330,7 +331,7 @@ public class LiveDataMeta
         if (this.actions == null) {
             this.actions = new ArrayList<>();
         }
-        this.actions.forEach(LiveDataActionDescriptor::initialize);
+        this.actions.stream().filter(Objects::nonNull).forEach(LiveDataActionDescriptor::initialize);
 
         if (this.selection == null) {
             this.selection = new LiveDataSelectionConfiguration();

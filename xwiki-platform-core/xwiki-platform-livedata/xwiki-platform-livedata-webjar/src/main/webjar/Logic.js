@@ -841,6 +841,16 @@ define([
 
 
     /**
+     * Returns the sortable properties that don't have a sort entry in the live data query.
+     *
+     * @returns {Array}
+     */
+    getUnsortedProperties () {
+      return this.getSortableProperties().filter(property => !this.getQuerySort(property));
+    },
+
+
+    /**
      * Get the sort query associated to a property id
      * @param {String} propertyId
      */
@@ -976,6 +986,19 @@ define([
      */
     getFilterableProperties () {
       return this.data.query.properties.filter(property => this.isPropertyFilterable(property));
+    },
+
+
+    /**
+     * Returns the filterable properties that don't have constraints in the live data query.
+     *
+     * @returns {Array}
+     */
+    getUnfilteredProperties () {
+      return this.getFilterableProperties().filter(property => {
+        const filter = this.getQueryFilterGroup(property);
+        return !filter || filter.constraints.length === 0;
+      });
     },
 
 

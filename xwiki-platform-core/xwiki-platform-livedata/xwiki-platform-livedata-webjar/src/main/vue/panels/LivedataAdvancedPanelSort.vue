@@ -157,9 +157,7 @@ export default {
 
     // The sortable properties that don't have a sort entry in the live data query.
     unsortedProperties () {
-      return this.logic.getSortableProperties()
-        .filter(property => !this.logic.getQuerySort(property))
-        .map(property => this.logic.getPropertyDescriptor(property));
+      return this.logic.getUnsortedProperties().map(property => this.logic.getPropertyDescriptor(property));
     },
   },
 

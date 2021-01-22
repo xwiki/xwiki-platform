@@ -191,10 +191,7 @@ export default {
 
     // The filterable properties that don't have a filter group in the live data query.
     unfilteredProperties () {
-      return this.logic.getFilterableProperties().filter(property => {
-        const filter = this.logic.getQueryFilterGroup(property);
-        return !filter || filter.constraints.length === 0;
-      }).map(property => this.logic.getPropertyDescriptor(property));
+      return this.logic.getUnfilteredProperties().map(property => this.logic.getPropertyDescriptor(property));
     },
 
   },

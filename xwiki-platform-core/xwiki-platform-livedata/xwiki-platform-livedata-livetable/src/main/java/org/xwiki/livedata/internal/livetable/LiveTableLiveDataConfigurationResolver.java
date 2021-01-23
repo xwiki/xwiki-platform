@@ -77,6 +77,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String CLASS_NAME = "className";
 
+    private static final String QUERY_FILTERS = "queryFilters";
+
     @SuppressWarnings("serial")
     private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
     {
@@ -143,10 +145,21 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         Source source = new Source();
         source.setId("liveTable");
-        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", "queryFilters", "translationPrefix")) {
+        for (String parameter : Arrays.asList(CLASS_NAME, "resultPage", "translationPrefix")) {
             if (options.path(parameter).isTextual()) {
                 source.setParameter(parameter, options.path(parameter).asText());
             }
+        }
+
+        // We handle the query filters separately because they can be specified either as a string (comma-separated) or
+        // as an array.
+        JsonNode queryFilters = options.path(QUERY_FILTERS);
+        if (queryFilters.isTextual()) {
+            source.setParameter(QUERY_FILTERS, queryFilters.asText());
+        } else if (queryFilters.isArray()) {
+            List<String> values = new ArrayList<>();
+            queryFilters.forEach(queryFilter -> values.add(queryFilter.asText()));
+            source.setParameter(QUERY_FILTERS, StringUtils.join(values, ','));
         }
 
         JsonNode urlNode = options.path("url");

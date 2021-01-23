@@ -21,6 +21,7 @@
     "translationPrefix": "notifications.settings.filters.preferences.table.",
     "extraParams": "eventTypes=&format=&eventTypes=mention&user=xwiki%3AXWiki.mflorea&user=xwiki%3AXWiki.cdesableau",
     "outputOnlyHtml": true,
+    "queryFilters": ["unique","test"],
     "pageSize": false
   }
 }
@@ -34,6 +35,7 @@
       "resultPage":"XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults",
       "translationPrefix":"notifications.settings.filters.preferences.table.",
       "format":"",
+      "queryFilters":"unique,test",
       "user":["xwiki:XWiki.mflorea","xwiki:XWiki.cdesableau"]
     },
     "filters":[

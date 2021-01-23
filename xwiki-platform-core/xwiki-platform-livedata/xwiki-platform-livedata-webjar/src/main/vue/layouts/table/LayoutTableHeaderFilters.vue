@@ -80,8 +80,7 @@ export default {
 <style>
 
 .layout-table .column-filters th {
-  padding-left: 0;
-  padding-right: 0;
+  padding: 2px;
   font-weight: normal;
   vertical-align: middle;
   /*
@@ -94,10 +93,6 @@ export default {
 }
 .layout-table .column-filters th.entry-selector {
   width: 0;
-}
-
-.layout-table tbody > tr:first-child td {
-  border-top: unset;
 }
 
 </style>

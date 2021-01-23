@@ -159,6 +159,8 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
         return this.liveTableRequestHandler.getLiveTableResults(query, () -> {
             try {
+                // The live table results page may use "global" variables.
+                this.templateManager.render("xwikivars.vm");
                 XWikiContext xcontext = this.xcontextProvider.get();
                 return xcontext.getWiki().getDocument(documentReference, xcontext).getRenderedContent(Syntax.PLAIN_1_0,
                     xcontext);

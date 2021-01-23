@@ -86,18 +86,13 @@ export default {
 
 <style>
 
-.layout-table .livedata-entry-selector {
-  align-items: flex-start;
-  padding: 10px 2rem;
-}
-
 .layout-table .cell {
-  padding: 0;
   height: 100%;
 }
 
-.layout-table .cell .livedata-displayer.view {
-  padding: 8px 12px;
+.layout-table .livedata-entry-selector {
+  align-items: flex-start;
+  padding: 10px 2rem;
 }
 
 .layout-table .entry-selector {

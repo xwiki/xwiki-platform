@@ -35,7 +35,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiContextInitializer;

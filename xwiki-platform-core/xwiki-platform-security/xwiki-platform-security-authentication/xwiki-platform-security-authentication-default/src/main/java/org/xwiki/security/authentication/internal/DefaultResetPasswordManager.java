@@ -28,8 +28,6 @@ import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,9 +36,11 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
-import org.xwiki.security.authentication.api.ResetPasswordManager;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
@@ -103,71 +103,6 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
     @Inject
     private ResetPasswordMailSender resetPasswordMailSender;
-
-    /**
-     * Default implementation of the {@link ResetPasswordManager.ResetPasswordRequestResponse}.
-     *
-     * @version $Id$
-     * @since 13.1RC1
-     */
-    static final class DefaultResetPasswordRequestResponse implements ResetPasswordRequestResponse
-    {
-        private final UserReference userReference;
-        private final InternetAddress userEmail;
-        private final String verificationCode;
-
-        DefaultResetPasswordRequestResponse(UserReference reference, InternetAddress userEmail, String verificationCode)
-        {
-            this.userReference = reference;
-            this.userEmail = userEmail;
-            this.verificationCode = verificationCode;
-        }
-
-        public UserReference getUserReference()
-        {
-            return userReference;
-        }
-
-        public InternetAddress getUserEmail()
-        {
-            return userEmail;
-        }
-
-        public String getVerificationCode()
-        {
-            return verificationCode;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            DefaultResetPasswordRequestResponse that = (DefaultResetPasswordRequestResponse) o;
-
-            return new EqualsBuilder()
-                .append(userReference, that.userReference)
-                .append(userEmail, that.userEmail)
-                .append(verificationCode, that.verificationCode)
-                .isEquals();
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return new HashCodeBuilder(17, 37)
-                .append(userReference)
-                .append(userEmail)
-                .append(verificationCode)
-                .toHashCode();
-        }
-    }
 
     private void checkUserReference(UserReference userReference) throws ResetPasswordException
     {
@@ -232,8 +167,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         throws ResetPasswordException
     {
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(
-                AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
+            new AuthenticationResourceReference(AuthenticationAction.RESET_PASSWORD);
 
         UserReference userReference = requestResponse.getUserReference();
         UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);

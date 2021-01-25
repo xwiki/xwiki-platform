@@ -35,7 +35,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
@@ -48,7 +47,7 @@ import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordException;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -91,6 +90,10 @@ public class ResetPasswordMailSender
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    @Named("database")
+    private Provider<MailListener> mailListenerProvider;
+
     /**
      * Send the reset password information by email.
      *
@@ -129,23 +132,19 @@ public class ResetPasswordMailSender
         } catch (MessagingException e) {
             throw new ResetPasswordException(localizedError, e);
         }
-        try {
-            MailListener mailListener = this.componentManager.getInstance(MailListener.class, "database");
-            this.mailSender.sendAsynchronously(Collections.singleton(message),
-                this.sessionFactory.create(Collections.emptyMap()),
-                mailListener);
+        MailListener mailListener = this.mailListenerProvider.get();
+        this.mailSender.sendAsynchronously(Collections.singleton(message),
+            this.sessionFactory.create(Collections.emptyMap()),
+            mailListener);
 
-            MailStatusResult mailStatusResult = mailListener.getMailStatusResult();
-            mailStatusResult.waitTillProcessed(30L);
-            Iterator<MailStatus> mailErrors = mailStatusResult.getAllErrors();
+        MailStatusResult mailStatusResult = mailListener.getMailStatusResult();
+        mailStatusResult.waitTillProcessed(30L);
+        Iterator<MailStatus> mailErrors = mailStatusResult.getAllErrors();
 
-            if (mailErrors != null && mailErrors.hasNext()) {
-                MailStatus lastError = mailErrors.next();
-                throw new ResetPasswordException(
-                    String.format("%s - %s", localizedError, lastError.getErrorDescription()));
-            }
-        } catch (ComponentLookupException e) {
-            throw new ResetPasswordException("Cannot find an instance of mail listener.", e);
+        if (mailErrors != null && mailErrors.hasNext()) {
+            MailStatus lastError = mailErrors.next();
+            throw new ResetPasswordException(
+                String.format("%s - %s", localizedError, lastError.getErrorDescription()));
         }
     }
 }

@@ -50,7 +50,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -73,7 +73,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class ResetPasswordMailSenderTest
+class ResetPasswordMailSenderTest
 {
     @InjectMockComponents
     private ResetPasswordMailSender resetPasswordMailSender;
@@ -93,7 +93,10 @@ public class ResetPasswordMailSenderTest
 
     @MockComponent
     private MailSender mailSender;
-    private MailListener mailListener;
+
+    @MockComponent
+    @Named("database")
+    private Provider<MailListener> mailListenerProvider;
 
     @MockComponent
     private ContextualLocalizationManager localizationManager;
@@ -107,6 +110,8 @@ public class ResetPasswordMailSenderTest
     private XWikiContext xWikiContext;
 
     private DocumentReference templateDocumentReference;
+
+    private MailListener mailListener;
 
     @BeforeComponent
     void setupComponent(MockitoComponentManager componentManager) throws Exception
@@ -124,7 +129,8 @@ public class ResetPasswordMailSenderTest
         when(this.documentReferenceResolver.resolve(RESET_PASSWORD_MAIL_TEMPLATE_REFERENCE))
             .thenReturn(templateDocumentReference);
 
-        this.mailListener = componentManager.registerMockComponent(MailListener.class, "database");
+        this.mailListener = mock(MailListener.class);
+        when(this.mailListenerProvider.get()).thenReturn(this.mailListener);
     }
 
     @Test

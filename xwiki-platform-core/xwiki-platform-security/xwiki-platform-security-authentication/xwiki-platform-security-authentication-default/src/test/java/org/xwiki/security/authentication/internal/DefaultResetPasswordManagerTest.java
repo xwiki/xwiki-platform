@@ -31,9 +31,11 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
-import org.xwiki.security.authentication.api.ResetPasswordManager;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -65,7 +67,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultResetPasswordManagerTest
+class DefaultResetPasswordManagerTest
 {
 
     @InjectMockComponents
@@ -132,8 +134,8 @@ public class DefaultResetPasswordManagerTest
         when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.versionComment"))
             .thenReturn("Save verification code 42");
 
-        ResetPasswordManager.ResetPasswordRequestResponse expectedResult =
-            new DefaultResetPasswordManager.DefaultResetPasswordRequestResponse(this.userReference, email,
+        ResetPasswordRequestResponse expectedResult =
+            new DefaultResetPasswordRequestResponse(this.userReference, email,
                 verificationCode);
         assertEquals(expectedResult, this.resetPasswordManager.requestResetPassword(this.userReference));
         verify(xObject).set(DefaultResetPasswordManager.VERIFICATION_PROPERTY, verificationCode, context);
@@ -203,8 +205,7 @@ public class DefaultResetPasswordManagerTest
         when(this.userProperties.getLastName()).thenReturn("Bar");
 
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(
-                AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
+            new AuthenticationResourceReference(AuthenticationAction.RESET_PASSWORD);
 
         String verificationCode = "foobar4242";
         resourceReference.addParameter("u", "user:Foobar");
@@ -216,8 +217,8 @@ public class DefaultResetPasswordManagerTest
         when(urlFactory.getServerURL(this.context)).thenReturn(new URL("http://xwiki.org"));
 
         InternetAddress email = new InternetAddress("foobar@xwiki.org");
-        DefaultResetPasswordManager.DefaultResetPasswordRequestResponse requestResponse =
-            new DefaultResetPasswordManager.DefaultResetPasswordRequestResponse(this.userReference, email,
+        DefaultResetPasswordRequestResponse requestResponse =
+            new DefaultResetPasswordRequestResponse(this.userReference, email,
                 verificationCode);
         this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
         verify(this.resetPasswordMailSender).sendResetPasswordEmail("Foo Bar", email,
@@ -250,8 +251,8 @@ public class DefaultResetPasswordManagerTest
         when(this.localizationManager
             .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey"))
             .thenReturn(saveComment);
-        DefaultResetPasswordManager.DefaultResetPasswordRequestResponse expected =
-            new DefaultResetPasswordManager.DefaultResetPasswordRequestResponse(this.userReference, email,
+        DefaultResetPasswordRequestResponse expected =
+            new DefaultResetPasswordRequestResponse(this.userReference, email,
                 newVerificationCode);
 
         assertEquals(expected, this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));

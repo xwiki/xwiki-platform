@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.XWikiContext;

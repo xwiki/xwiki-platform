@@ -29,13 +29,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractResourceReferenceResolver;
 
 /**
  * Default resolver for {@link AuthenticationResourceReference}.
- * This resolver looks for the {@link AuthenticationResourceReference.AuthenticationAction} request parameter and build
+ * This resolver looks for the {@link AuthenticationAction} request parameter and build
  * a {@link AuthenticationResourceReference} with it.
  *
  * @version $Id$
@@ -55,8 +56,7 @@ public class AuthenticationResourceReferenceResolver extends AbstractResourceRef
         if (segments.size() == 1) {
             String actionName = segments.get(0);
             try {
-                AuthenticationResourceReference.AuthenticationAction authenticationAction =
-                    AuthenticationResourceReference.AuthenticationAction.getFromRequestParameter(actionName);
+                AuthenticationAction authenticationAction = AuthenticationAction.getFromRequestParameter(actionName);
                 result = new AuthenticationResourceReference(authenticationAction);
                 copyParameters(representation, result);
                 return result;

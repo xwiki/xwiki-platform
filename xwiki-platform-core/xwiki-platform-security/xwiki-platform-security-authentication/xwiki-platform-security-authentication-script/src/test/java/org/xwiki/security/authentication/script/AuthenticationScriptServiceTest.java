@@ -31,15 +31,18 @@ import javax.mail.internet.InternetAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
-import org.xwiki.security.authentication.api.ResetPasswordManager;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -53,6 +56,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -67,7 +71,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AuthenticationScriptServiceTest
+class AuthenticationScriptServiceTest
 {
     @InjectMockComponents
     private AuthenticationScriptService scriptService;
@@ -86,6 +90,9 @@ public class AuthenticationScriptServiceTest
 
     @MockComponent
     private ResetPasswordManager resetPasswordManager;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -144,13 +151,13 @@ public class AuthenticationScriptServiceTest
     @Test
     void getAuthenticationURL() throws Exception
     {
-        String action = AuthenticationResourceReference.AuthenticationAction.FORGOT_USERNAME.getRequestParameter();
+        String action = AuthenticationAction.FORGOT_USERNAME.getRequestParameter();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("u", "foo");
         parameters.put("v", "bar");
 
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationResourceReference.AuthenticationAction.FORGOT_USERNAME);
+            new AuthenticationResourceReference(AuthenticationAction.FORGOT_USERNAME);
         resourceReference.addParameter("u", "foo");
         resourceReference.addParameter("v", "bar");
 
@@ -164,9 +171,9 @@ public class AuthenticationScriptServiceTest
     @Test
     void requestResetPassword() throws Exception
     {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
         UserReference userReference = mock(UserReference.class);
-        ResetPasswordManager.ResetPasswordRequestResponse requestResponse = mock(
-            ResetPasswordManager.ResetPasswordRequestResponse.class);
+        ResetPasswordRequestResponse requestResponse = mock(ResetPasswordRequestResponse.class);
         when(this.resetPasswordManager.requestResetPassword(userReference)).thenReturn(requestResponse);
         InternetAddress userEmail = new InternetAddress("acme@xwiki.org");
         when(requestResponse.getUserEmail()).thenReturn(userEmail);
@@ -176,12 +183,21 @@ public class AuthenticationScriptServiceTest
     }
 
     @Test
+    void requestResetPasswordWithoutPR() throws Exception
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+
+        assertNull(this.scriptService.requestResetPassword(mock(UserReference.class)));
+        verify(this.resetPasswordManager, never()).requestResetPassword(any());
+        verify(this.resetPasswordManager, never()).sendResetPasswordEmailRequest(any());
+    }
+
+    @Test
     void checkVerificationCode() throws Exception
     {
         UserReference userReference = mock(UserReference.class);
         String verificationCode = "verificationCode";
-        ResetPasswordManager.ResetPasswordRequestResponse requestResponse = mock(
-            ResetPasswordManager.ResetPasswordRequestResponse.class);
+        ResetPasswordRequestResponse requestResponse = mock(ResetPasswordRequestResponse.class);
         String newVerificationCode = "4242";
         when(this.resetPasswordManager.checkVerificationCode(userReference, verificationCode))
             .thenReturn(requestResponse);

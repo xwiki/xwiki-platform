@@ -31,7 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -50,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AuthenticationResourceReferenceSerializerTest
+class AuthenticationResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private AuthenticationResourceReferenceSerializer serializer;
@@ -71,7 +72,7 @@ public class AuthenticationResourceReferenceSerializerTest
     void serialize() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-            AuthenticationResourceReference.AuthenticationAction.FORGOT_USERNAME);
+            AuthenticationAction.FORGOT_USERNAME);
         resourceReference.addParameter("key1", "value1");
         resourceReference.addParameter("key2", Arrays.asList("value2_a", "value2_b"));
 

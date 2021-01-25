@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication.internal.resource;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
@@ -28,19 +27,15 @@ import javax.servlet.ServletOutputStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.container.Container;
-import org.xwiki.container.Response;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
-import org.xwiki.resource.ResourceReferenceHandlerException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
-import org.xwiki.template.TemplateManager;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.rometools.rome.io.impl.PluginManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiContextInitializer;
@@ -63,7 +58,7 @@ import static org.mockito.Mockito.when;
  * @since 13.0RC1
  */
 @ComponentTest
-public class AuthenticationResourceReferenceHandlerTest
+class AuthenticationResourceReferenceHandlerTest
 {
     @InjectMockComponents
     private AuthenticationResourceReferenceHandler resourceReferenceHandler;
@@ -113,7 +108,7 @@ public class AuthenticationResourceReferenceHandlerTest
     void handleResetPassword() throws Exception
     {
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-            AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
+            AuthenticationAction.RESET_PASSWORD);
 
         when(this.xwiki.evaluateTemplate("resetpassword.vm", xWikiContext)).thenReturn("Reset password content");
 
@@ -130,7 +125,7 @@ public class AuthenticationResourceReferenceHandlerTest
     void handleForgotUsername() throws Exception
     {
         AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
-            AuthenticationResourceReference.AuthenticationAction.FORGOT_USERNAME);
+            AuthenticationAction.FORGOT_USERNAME);
 
         when(this.xwiki.evaluateTemplate("forgotusername.vm", xWikiContext)).thenReturn("Forgot user name content");
 

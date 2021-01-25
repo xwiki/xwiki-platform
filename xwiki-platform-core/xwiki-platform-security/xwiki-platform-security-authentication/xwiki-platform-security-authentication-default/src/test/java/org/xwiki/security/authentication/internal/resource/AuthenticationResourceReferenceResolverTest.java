@@ -22,13 +22,13 @@ package org.xwiki.security.authentication.internal.resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.url.ExtendedURL;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  */
 @ComponentTest
-public class AuthenticationResourceReferenceResolverTest
+class AuthenticationResourceReferenceResolverTest
 {
     @InjectMockComponents
     private AuthenticationResourceReferenceResolver resolver;
@@ -60,7 +60,7 @@ public class AuthenticationResourceReferenceResolverTest
             this.resolver.resolve(extendedURL, AuthenticationResourceReference.TYPE, parameters);
 
         AuthenticationResourceReference expectedReference = new AuthenticationResourceReference(
-            AuthenticationResourceReference.AuthenticationAction.RESET_PASSWORD);
+            AuthenticationAction.RESET_PASSWORD);
         expectedReference.addParameter("key1", Collections.singletonList("value1"));
         expectedReference.addParameter("key2", Arrays.asList("value2_a", "value2_b"));
 

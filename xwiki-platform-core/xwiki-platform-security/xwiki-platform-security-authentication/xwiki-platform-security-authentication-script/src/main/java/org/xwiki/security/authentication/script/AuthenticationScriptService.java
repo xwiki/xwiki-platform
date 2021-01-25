@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -39,14 +38,16 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authentication.AuthenticationAction;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.ResetPasswordException;
+import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authentication.api.AuthenticationResourceReference;
-import org.xwiki.security.authentication.api.ResetPasswordException;
-import org.xwiki.security.authentication.api.ResetPasswordManager;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
@@ -148,19 +149,18 @@ public class AuthenticationScriptService implements ScriptService
 
     /**
      * Compute a relative URL for an {@link AuthenticationResourceReference} based on the given action string.
-     * See {@link AuthenticationResourceReference.AuthenticationAction} for more information.
+     * See {@link AuthenticationAction} for more information.
      *
      * @param action the authentication action from which to build the right URL.
      * @param params the query string parameters of the URL.
-     * @return a relative URL for the current wiki.
+     * @return a relative URL for the current wiki or {@code null} if an error occurs.
      * @since 13.1RC1
      */
     @Unstable
     public String getAuthenticationURL(String action, Map<String, Object> params)
     {
         try {
-            AuthenticationResourceReference.AuthenticationAction authenticationAction =
-                AuthenticationResourceReference.AuthenticationAction.getFromRequestParameter(action);
+            AuthenticationAction authenticationAction = AuthenticationAction.getFromRequestParameter(action);
 
             AuthenticationResourceReference resourceReference =
                 new AuthenticationResourceReference(authenticationAction);
@@ -172,9 +172,9 @@ public class AuthenticationScriptService implements ScriptService
             ExtendedURL extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
             return extendedURL.serialize();
         } catch (IllegalArgumentException | SerializeResourceReferenceException
-            | UnsupportedResourceReferenceException e) {
-            logger.error("Error while getting authentication URL for action [{}]: [{}]", action,
-                ExceptionUtils.getRootCauseMessage(e));
+            | UnsupportedResourceReferenceException e)
+        {
+            logger.error("Error while getting authentication URL for action [{}].", action, e);
             return null;
         }
     }
@@ -185,17 +185,22 @@ public class AuthenticationScriptService implements ScriptService
      * This method returns the email address used, so that we can display it to the user.
      *
      * @param user the user for which to perform a reset password request.
-     * @return the email address used to send the verification code.
+     * @return the email address used to send the verification code or {@code null} if the user calling this method
+     *         doesn't have programming rights.
      * @throws ResetPasswordException if any error occurs for performing the reset password request.
      * @since 13.1RC1
      */
     @Unstable
     public InternetAddress requestResetPassword(UserReference user) throws ResetPasswordException
     {
-        ResetPasswordManager.ResetPasswordRequestResponse resetPasswordRequestResponse =
-            this.resetPasswordManager.requestResetPassword(user);
-        this.resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
-        return resetPasswordRequestResponse.getUserEmail();
+        if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
+            ResetPasswordRequestResponse resetPasswordRequestResponse =
+                this.resetPasswordManager.requestResetPassword(user);
+            this.resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
+            return resetPasswordRequestResponse.getUserEmail();
+        } else {
+            return null;
+        }
     }
 
     /**

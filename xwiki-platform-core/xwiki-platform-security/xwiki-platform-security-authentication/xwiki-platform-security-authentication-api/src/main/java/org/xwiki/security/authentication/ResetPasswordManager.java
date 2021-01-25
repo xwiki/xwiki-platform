@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authentication.api;
-
-import javax.mail.internet.InternetAddress;
+package org.xwiki.security.authentication;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -40,31 +38,6 @@ import org.xwiki.user.UserReference;
 @Unstable
 public interface ResetPasswordManager
 {
-    /**
-     * Dedicated response interface for the first reset password request.
-     *
-     * @version $Id$
-     * @since 13.1RC1
-     */
-    @Unstable
-    interface ResetPasswordRequestResponse
-    {
-        /**
-         * @return the reference of the user for whom the reset password request have been performed.
-         */
-        UserReference getUserReference();
-
-        /**
-         * @return the email address of the user for whom the reset password request have been performed.
-         */
-        InternetAddress getUserEmail();
-
-        /**
-         * @return the verification code to be send to the user.
-         */
-        String getVerificationCode();
-    }
-
     /**
      * Perform a reset password request and return the information to send to the user.
      * Note that the implementation of this method might have some side effect like modifying the user information.

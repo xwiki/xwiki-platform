@@ -180,6 +180,8 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
                 this.databaseXClass = xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext);
                 if (!this.databaseXClass.getOwnerDocument().isNew()) {
                     setCurrentXClass(this.databaseXClass);
+                } else {
+                    this.databaseXClass = null;
                 }
             } catch (XWikiException e) {
                 // TODO: log something ?
@@ -196,7 +198,7 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
             if (xclass != null) {
                 addMissingProperties(xclass);
             }
-            if (this.databaseXClass != xclass) {
+            if (this.databaseXClass != null && this.databaseXClass != xclass) {
                 addMissingProperties(this.databaseXClass);
             }
         }

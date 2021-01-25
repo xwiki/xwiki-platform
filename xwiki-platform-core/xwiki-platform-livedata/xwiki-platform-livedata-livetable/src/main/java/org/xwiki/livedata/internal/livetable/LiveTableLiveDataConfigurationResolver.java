@@ -102,6 +102,9 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     @Inject
     private PropertyTypeSupplier propertyTypeSupplier;
 
+    @Inject
+    private LiveTableResultsURLDocumentReferenceResolver urlDocumentReferenceResolver;
+
     private URLQueryStringParser urlQueryStringParser = new URLQueryStringParser();
 
     @Override
@@ -182,6 +185,10 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         List<String> xpage = parameters.remove("xpage");
         if (xpage != null && !xpage.isEmpty() && !StringUtils.isEmpty(xpage.get(0)) && !"plain".equals(xpage.get(0))) {
             source.setParameter("template", xpage.get(0) + ".vm");
+            String documentReference = this.urlDocumentReferenceResolver.resolve(url);
+            if (documentReference != null) {
+                source.setParameter("$doc", documentReference);
+            }
             for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                 if (entry.getValue().size() > 1) {
                     source.setParameter(entry.getKey(), entry.getValue());

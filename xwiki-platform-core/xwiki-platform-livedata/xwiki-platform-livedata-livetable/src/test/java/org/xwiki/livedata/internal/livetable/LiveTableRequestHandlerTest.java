@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,17 +37,22 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,6 +72,10 @@ public class LiveTableRequestHandlerTest
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
+    @Named("current")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
     @Mock
     private XWikiContext xcontext;
 
@@ -82,6 +92,9 @@ public class LiveTableRequestHandlerTest
         when(this.xcontext.getRequest()).thenReturn(this.originalRequest);
         when(this.xcontext.getResponse()).thenReturn(this.originalResponse);
         when(this.xcontext.getAction()).thenReturn("view");
+
+        XWiki wiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(wiki);
     }
 
     @Test
@@ -96,6 +109,7 @@ public class LiveTableRequestHandlerTest
         query.getSource().setParameter("template", "getdocuments");
         query.getSource().setParameter("resultPage", "Panels.LiveTableResults");
         query.getSource().setParameter("className", "Panels.PanelClass");
+        query.getSource().setParameter("$doc", "Path.To.Page");
         query.getSource().setParameter("childrenOf", "Test");
         query.getSource().setParameter("queryFilters", "unique");
         query.getSource().setParameter("translationPrefix", "core.restore.batch.");
@@ -122,6 +136,14 @@ public class LiveTableRequestHandlerTest
         expectedRequestParams.put("doc.author_match", new String[] {"partial"});
         expectedRequestParams.put("doc.author/join_mode", new String[] {"OR"});
 
+        XWikiDocument originalContextDoc = mock(XWikiDocument.class, "original");
+        when(this.xcontext.getDoc()).thenReturn(originalContextDoc);
+
+        XWikiDocument contextDoc = mock(XWikiDocument.class, "$doc");
+        DocumentReference contextDocRef = new DocumentReference("xwiki", Arrays.asList("Path", "To"), "Page");
+        when(this.currentDocumentReferenceResolver.resolve("Path.To.Page")).thenReturn(contextDocRef);
+        when(this.xcontext.getWiki().getDocument(contextDocRef, this.xcontext)).thenReturn(contextDoc);
+
         when(this.xcontext.isFinished()).thenReturn(true);
 
         //
@@ -137,6 +159,10 @@ public class LiveTableRequestHandlerTest
         ArgumentCaptor<String> actionCaptor = ArgumentCaptor.forClass(String.class);
         verify(this.xcontext, times(2)).setAction(actionCaptor.capture());
         assertEquals(Arrays.asList("get", "view"), actionCaptor.getAllValues());
+
+        ArgumentCaptor<XWikiDocument> contextDocCaptor = ArgumentCaptor.forClass(XWikiDocument.class);
+        verify(this.xcontext, times(2)).setDoc(contextDocCaptor.capture());
+        assertEquals(Arrays.asList(contextDoc, originalContextDoc), contextDocCaptor.getAllValues());
 
         ArgumentCaptor<XWikiRequest> requestCaptor = ArgumentCaptor.forClass(XWikiRequest.class);
         verify(this.xcontext, times(2)).setRequest(requestCaptor.capture());

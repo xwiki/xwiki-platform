@@ -62,6 +62,9 @@ class LiveTableLiveDataConfigurationResolverTest
     @MockComponent
     @Named("liveTable")
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultConfigResolver;
+    
+    @MockComponent
+    private LiveTableResultsURLDocumentReferenceResolver urlDocumentReferenceResolver;
 
     @BeforeEach
     void configure() throws Exception
@@ -72,6 +75,10 @@ class LiveTableLiveDataConfigurationResolverTest
             "XWiki.Notifications.Code.ToggleableFilterPreferenceClass")).thenReturn("Boolean");
         when(this.propertyTypeSupplier.getPropertyType("name", "Panels.PanelClass")).thenReturn("String");
         when(this.propertyTypeSupplier.getPropertyType("type", "Panels.PanelClass")).thenReturn("StaticList");
+
+        when(this.urlDocumentReferenceResolver.resolve(
+            "/xwiki/bin/get/Test/WebHome?xpage=getdeleteddocuments&doc.batchId=2872cd20-6cbf-4dad-af1d-77a30ba52ce8"))
+                .thenReturn("xwiki:Test.WebHome");
     }
 
     @ParameterizedTest

@@ -25,7 +25,10 @@
   The LivedataFilter is bind to the first filter found in the property filter list.
 -->
 <template>
-  <tr class="column-filters">
+  <tr
+    v-if="isFilteringEnabled"
+    class="column-filters"
+  >
 
     <!--
       We need to create an empty cell for the entry selector
@@ -70,7 +73,14 @@ export default {
   computed: {
     data () { return this.logic.data; },
     properties () { return this.logic.getPropertyDescriptors(); },
-    isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
+
+    isSelectionEnabled () {
+      return this.logic.isSelectionEnabled();
+    },
+
+    isFilteringEnabled () {
+      return this.logic.getFilterableProperties()?.length !== 0;
+    }
   },
 
 };

@@ -34,10 +34,10 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
-
-import com.xpn.xwiki.util.Programming;
 
 /**
  * Security Authentication Script service.
@@ -64,6 +64,9 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
 
     @Inject
     private Logger logger;
@@ -113,9 +116,10 @@ public class AuthenticationScriptService implements ScriptService
      * Reset the authentication failure record for the given username.
      * @param username the username for which to remove the record.
      */
-    @Programming
     public void resetAuthenticationFailureCounter(String username)
     {
-        this.authenticationFailureManager.resetAuthenticationFailureCounter(username);
+        if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
+            this.authenticationFailureManager.resetAuthenticationFailureCounter(username);
+        }
     }
 }

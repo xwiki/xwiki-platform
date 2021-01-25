@@ -155,7 +155,15 @@
               </item>
             </revapi.ignore>
             -->
-            
+            <revapi.ignore>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>method void org.xwiki.security.authentication.script.AuthenticationScriptService::resetAuthenticationFailureCounter(java.lang.String)</old>
+                <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::resetAuthenticationFailureCounter(java.lang.String)</new>
+                <annotation>@com.xpn.xwiki.util.Programming</annotation>
+                <justification>Not breaking: this annotation should not be used anymore.</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

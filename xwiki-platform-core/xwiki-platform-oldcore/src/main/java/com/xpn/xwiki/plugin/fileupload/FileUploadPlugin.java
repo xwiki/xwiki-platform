@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -59,7 +60,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * The context name of the uploaded file list. It can be used to retrieve the list of uploaded files from the
-     * context.
+     * context. Note that the order of the list is not guaranteed and might depend of the servlet engine used.
      */
     public static final String FILE_LIST_KEY = "fileuploadlist";
 
@@ -208,8 +209,14 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             return;
         }
 
-        List<FileItem> items = new ArrayList<>(
-            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest()));
+        Collection<FileItem> fileItems =
+            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest());
+        List<FileItem> items;
+        if (fileItems instanceof List) {
+            items = (List<FileItem>) fileItems;
+        } else {
+            items = new ArrayList<>(fileItems);
+        }
 
         // We store the file list in the context
         context.put(FILE_LIST_KEY, items);

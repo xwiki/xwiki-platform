@@ -79,7 +79,7 @@ export default {
     },
 
     isFilteringEnabled () {
-      return this.logic.getFilterableProperties()?.length !== 0;
+      return this.logic.getFilterableProperties().length !== 0;
     }
   },
 

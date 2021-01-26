@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jodconverter.document.DocumentFormat;
+import org.jodconverter.core.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;

@@ -25,12 +25,12 @@ import java.io.InputStream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jodconverter.LocalConverter;
-import org.jodconverter.document.JsonDocumentFormatRegistry;
-import org.jodconverter.filter.text.LinkedImagesEmbedderFilter;
-import org.jodconverter.office.ExternalOfficeManager;
-import org.jodconverter.office.LocalOfficeManager;
-import org.jodconverter.office.OfficeManager;
+import org.jodconverter.core.document.JsonDocumentFormatRegistry;
+import org.jodconverter.core.office.OfficeManager;
+import org.jodconverter.local.LocalConverter;
+import org.jodconverter.local.filter.text.LinkedImagesEmbedderFilter;
+import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.LocalOfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -135,9 +135,7 @@ public class DefaultOfficeServer implements OfficeServer
             }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
             ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
-            if (this.config.getServerPorts().length > 0) {
-                externalProcessOfficeManager.portNumber(this.config.getServerPorts()[0]);
-            }
+            externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
             externalProcessOfficeManager.connectOnStart(true);
             this.jodManager = externalProcessOfficeManager.build();
         } else {

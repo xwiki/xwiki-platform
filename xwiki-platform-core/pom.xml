@@ -264,6 +264,12 @@
                 <annotation>@com.xpn.xwiki.util.Programming</annotation>
                 <justification>Not breaking: this annotation should not be used anymore.</justification>
               </item>
+              <item>
+                <code>java.method.returnTypeChanged</code>
+                <old>method org.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()</old>
+                <new>method org.jodconverter.core.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()</new>
+                <justification>Change related to the upgrade to Jodconverter 4.4.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

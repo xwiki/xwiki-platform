@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.jodconverter.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;

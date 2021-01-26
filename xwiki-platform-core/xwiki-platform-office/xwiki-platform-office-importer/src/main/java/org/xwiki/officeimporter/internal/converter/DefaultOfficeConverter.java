@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.jodconverter.LocalConverter;
-import org.jodconverter.document.DocumentFormatRegistry;
+import org.jodconverter.core.document.DocumentFormatRegistry;
+import org.jodconverter.local.LocalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;

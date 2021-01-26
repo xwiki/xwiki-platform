@@ -28,10 +28,10 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import org.jodconverter.LocalConverter;
-import org.jodconverter.job.ConversionJobWithOptionalSourceFormatUnspecified;
-import org.jodconverter.job.ConversionJobWithOptionalTargetFormatUnspecified;
-import org.jodconverter.office.OfficeException;
+import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
+import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
+import org.jodconverter.core.office.OfficeException;
+import org.jodconverter.local.LocalConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

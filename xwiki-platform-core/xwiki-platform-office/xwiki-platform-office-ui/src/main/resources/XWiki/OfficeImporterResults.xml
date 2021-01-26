@@ -52,7 +52,12 @@
     {{error}}$services.localization.render('xe.officeimporter.results.missingfile', [$goBack]){{/error}}
   #else
     #set ($discard = $fileUpload.loadFileList())
-    #set ($officeFileStream = $fileUpload.fileItems.get(0).inputStream)
+    #foreach ($fileItem in $fileUpload.fileItems)
+      #if ($fileItem.fieldName == "filePath")
+        #set ($officeFileStream = $fileItem.inputStream)
+        #break
+      #end
+    #end
   #end
 ###########################
 ## Validate Target       ##

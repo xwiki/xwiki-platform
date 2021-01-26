@@ -208,8 +208,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             return;
         }
 
-        List<FileItem> items =
-            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest());
+        List<FileItem> items = new ArrayList<>(
+            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest()));
 
         // We store the file list in the context
         context.put(FILE_LIST_KEY, items);
@@ -217,7 +217,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Allows to retrieve the current list of uploaded files, as a list of {@link FileItem}s.
-     * {@link #loadFileList(XWikiContext)} needs to be called beforehand
+     * {@link #loadFileList(XWikiContext)} needs to be called beforehand. Note that the order of this list is not
+     * guaranteed and might be different depending on the servlet engine used.
      *
      * @param context Context of the request.
      * @return A list of FileItem elements.

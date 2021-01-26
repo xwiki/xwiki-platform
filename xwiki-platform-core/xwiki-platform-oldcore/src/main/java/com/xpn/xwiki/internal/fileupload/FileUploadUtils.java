@@ -61,16 +61,17 @@ public final class FileUploadUtils
 
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
+     * Note that the order of the result is not guaranteed and might be different depending on the servlet engine used.
      *
      * @param uploadMaxSize Maximum size of the uploaded files.
      * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @param request the request to parse.
-     * @return the parts found in the request as a list of {@link FileItem}
+     * @return the parts found in the request as a collection of {@link FileItem}
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
-    public static List<FileItem> getFileItems(long uploadMaxSize, int uploadSizeThreshold, String tempdir,
+    public static Collection<FileItem> getFileItems(long uploadMaxSize, int uploadSizeThreshold, String tempdir,
         HttpServletRequest request) throws XWikiException
     {
         // The request multi-part content is automatically consumed by the application server when multi part support is

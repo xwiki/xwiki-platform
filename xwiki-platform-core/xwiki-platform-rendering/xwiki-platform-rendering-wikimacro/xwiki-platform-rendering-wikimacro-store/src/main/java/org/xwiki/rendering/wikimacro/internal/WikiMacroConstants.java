@@ -128,6 +128,13 @@ public interface WikiMacroConstants
     String MACRO_CODE_PROPERTY = "code";
 
     /**
+     * Constant for representing macro priority property.
+     * 
+     * @since 13.1RC1
+     */
+    String MACRO_PRIORITY_PROPERTY = "priority";
+
+    /**
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class space name.
      */
     String WIKI_MACRO_PARAMETER_CLASS_SPACE = "XWiki";

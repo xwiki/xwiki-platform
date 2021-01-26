@@ -58,6 +58,8 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
      */
     private final MacroDescriptor descriptor;
 
+    private final int macroPriority;
+
     /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
@@ -74,6 +76,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         super(baseObject, Macro.class, descriptor.getId().getId(), componentManager);
 
         this.descriptor = descriptor;
+        this.macroPriority = baseObject.getIntValue(MACRO_PRIORITY_PROPERTY, 1000);
     }
 
     @Override
@@ -156,7 +159,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     @Override
     public int getPriority()
     {
-        return 1000;
+        return this.macroPriority;
     }
 
     @Override

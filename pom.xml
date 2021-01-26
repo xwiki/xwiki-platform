@@ -96,7 +96,7 @@
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.22</mysql.version>
+    <mysql.version>8.0.23</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>2.7.1</mariadb.version>

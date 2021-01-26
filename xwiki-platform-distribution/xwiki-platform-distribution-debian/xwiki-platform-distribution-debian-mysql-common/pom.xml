@@ -33,8 +33,8 @@
   <description>XWiki MySQL common package</description>
   <properties>
     <xwiki.db>mysql</xwiki.db>
-    <!-- Set current timezone explicitly to workaround a bug in the MySQL 8.x connector -->
-    <xwiki.db.connection.url>jdbc:mysql://_DBC_DBSERVER_/_DBC_DBNAME_?useSSL=false&amp;amp;serverTimezone=${timezone}&amp;amp;allowPublicKeyRetrieval=true</xwiki.db.connection.url>
+    <!-- Set use the local timezone to workaround a bug in the MySQL 8.x which often does not understand the server timezone and crash -->
+    <xwiki.db.connection.url>jdbc:mysql://_DBC_DBSERVER_/_DBC_DBNAME_?useSSL=false&amp;amp;connectionTimeZone=LOCAL&amp;amp;allowPublicKeyRetrieval=true</xwiki.db.connection.url>
     <xwiki.db.connection.username>_DBC_DBUSER_</xwiki.db.connection.username>
     <xwiki.db.connection.password>_DBC_DBPASS_</xwiki.db.connection.password>
     <xwiki.db.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.connection.driver_class>

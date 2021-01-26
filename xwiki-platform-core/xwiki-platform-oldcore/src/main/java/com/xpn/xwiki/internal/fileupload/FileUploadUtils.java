@@ -93,11 +93,8 @@ public final class FileUploadUtils
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                         XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "File size too big");
                 }
-                // Returns parts contained all information about the form, not only the file upload data, so we need
-                // to filter out the parts that only concerns a file: we use the submitted file name for that purpose.
-                if (part.getSubmittedFileName() != null) {
-                    items.add(new PartFileItem(part));
-                }
+
+                items.add(new PartFileItem(part));
             }
 
             return items;

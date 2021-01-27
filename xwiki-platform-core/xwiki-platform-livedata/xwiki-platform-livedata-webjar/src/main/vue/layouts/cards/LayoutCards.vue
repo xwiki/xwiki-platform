@@ -36,12 +36,12 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataDropdownMenu/>
-        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
-        <LivedataRefreshButton/>
+        <LivedataPagination/>
       </template>
       <template #right>
-        <LivedataPagination/>
+        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
+        <LivedataRefreshButton/>
+        <LivedataDropdownMenu/>
       </template>
     </LivedataTopbar>
 

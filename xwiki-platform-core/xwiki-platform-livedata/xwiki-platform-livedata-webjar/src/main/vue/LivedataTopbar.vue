@@ -73,7 +73,7 @@ export default {
 }
 
 .livedata-dropdown-menu {
-  margin-right: 1rem;
+  margin-left: 1rem;
 }
 
 

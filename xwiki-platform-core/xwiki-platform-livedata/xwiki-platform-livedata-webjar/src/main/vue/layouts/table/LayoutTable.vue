@@ -35,11 +35,11 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataDropdownMenu/>
-        <LivedataRefreshButton/>
+        <LivedataPagination/>
       </template>
       <template #right>
-        <LivedataPagination/>
+        <LivedataRefreshButton/>
+        <LivedataDropdownMenu/>
       </template>
     </LivedataTopbar>
 

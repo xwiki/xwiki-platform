@@ -54,16 +54,24 @@ public class XWikiTransformationManager extends DefaultTransformationManager
         // - If the query string contains a "transformations" parameter, use it.
         // - Otherwise, get the list from XWiki's configuration.
         List<String> transformationNames;
-        String transformationNamesString = null;
-        Object object = this.container.getRequest().getProperty("transformations");
-        if (object instanceof String) {
-            transformationNamesString = (String) object;
-        }
+        String transformationNamesString = getTransformationsRequestProperty();
         if (transformationNamesString != null) {
             transformationNames = Arrays.asList(StringUtils.split(transformationNamesString, ","));
         } else {
             transformationNames = this.configuration.getTransformationNames();
         }
         return getTransformations(transformationNames);
+    }
+
+    private String getTransformationsRequestProperty()
+    {
+        String transformationNamesString = null;
+        if (this.container.getRequest() != null) {
+            Object object = this.container.getRequest().getProperty("transformations");
+            if (object instanceof String) {
+                transformationNamesString = (String) object;
+            }
+        }
+        return transformationNamesString;
     }
 }

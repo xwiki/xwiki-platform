@@ -31,7 +31,7 @@
   <name>XWiki Platform - Rendering - Transformations - API</name>
   <description>Platform-specific implementation for Transformations</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.22</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

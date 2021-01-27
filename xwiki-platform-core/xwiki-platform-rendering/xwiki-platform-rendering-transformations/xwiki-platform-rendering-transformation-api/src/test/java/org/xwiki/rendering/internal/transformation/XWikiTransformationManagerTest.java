@@ -115,4 +115,13 @@ class XWikiTransformationManagerTest
         assertEquals(1, transformations.size());
         assertSame(tx1, transformations.get(0));
     }
+
+    @Test
+    void getTransformationsWhenNoRequest()
+    {
+        when(this.container.getRequest()).thenReturn(null);
+
+        List<Transformation> transformations = this.transformationManager.getTransformations();
+        assertEquals(0, transformations.size());
+    }
 }

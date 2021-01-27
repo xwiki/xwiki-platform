@@ -53,7 +53,8 @@ import static org.mockito.Mockito.when;
  * Page test of the ratings.
  *
  * @version $Id$
- * @since 13.0RC1
+ * @since 13.1RC1
+ * @since 12.10.4
  */
 @XWikiSyntax21ComponentList
 @XHTML10ComponentList

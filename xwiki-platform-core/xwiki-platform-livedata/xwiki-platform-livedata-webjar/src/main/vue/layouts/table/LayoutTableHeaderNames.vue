@@ -67,9 +67,7 @@
           <span class="fa fa-ellipsis-v"></span>
         </div>
         <!-- Property Name -->
-        <span>{{ property.name }}</span>
-        <!-- Spacer between the property name and the sort icon -->
-        <span class="flex-spacer"></span>
+        <span class="property-name">{{ property.name }}</span>
         <!--
           Sort icon
           Only show the icon for the first-level sort property
@@ -189,8 +187,8 @@ th.draggable-item {
   vertical-align: middle;
 }
 
-.layout-table .column-name .flex-spacer {
-  flex-grow: 1;
+.layout-table .property-name {
+  margin-right: 10px;
 }
 
 .layout-table .sort-icon {

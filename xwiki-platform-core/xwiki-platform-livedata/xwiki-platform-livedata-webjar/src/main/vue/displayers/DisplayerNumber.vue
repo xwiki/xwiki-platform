@@ -16,13 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ -->
 
 
 <!--
-  DisplayerLink is a custom displayer that displays the entry value as link.
-  It uses the `propertyHref` proprety of the displayer descriptor,
-  which refers to the property in the entries holding the displayer href
+  DisplayerNumber is a custom displayer that displays the entry value as numbers.
+  As this is very simple, it uses the BaseDisplayer default widgets
 -->
 <template>
   <!--
@@ -30,29 +29,13 @@
     all the displayer default behavior
   -->
   <BaseDisplayer
-    class="displayer-link"
+    class="displayer-number"
     :property-id="propertyId"
     :entry="entry"
   >
 
-    <!-- Provide the Link Viewer widget to the `viewer` slot -->
-    <template #viewer>
-        <a
-          :href="href"
-        >
-          {{ value }}
-          <!--
-            If there is no value but still a link
-            the user should still be able to click the link
-            so we create an explicit "no value" message in that case
-          -->
-          <span
-            class="explicit-empty-value"
-            v-if="!value"
-          >(no value)</span>
-        </a>
-    </template>
-
+    <!-- Keep the default Viewer widget -->
+    <template #viewer></template>
 
     <!-- Keep the default Editor widget -->
     <template #editor></template>
@@ -62,12 +45,13 @@
 
 
 <script>
+
 import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
 
 export default {
 
-  name: "displayer-link",
+  name: "displayer-number",
 
   components: {
     BaseDisplayer,
@@ -76,22 +60,14 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
-  computed: {
-    // The link href taken from the propertyHref property of the entry
-    href () {
-      return this.config.propertyHref && this.entry[this.config.propertyHref] || "#";
-    },
-  },
-
 };
 </script>
 
 
 <style>
 
-.livedata-displayer.displayer-link .explicit-empty-value {
-  font-style: italic;
-  color: grey;
+.livedata-displayer.displayer-number {
+  text-align: right;
 }
 
 </style>

@@ -66,7 +66,7 @@ public class AuthenticationResourceReferenceResolver extends AbstractResourceRef
             }
         } else {
             throw new CreateResourceReferenceException(
-                String.format("Invalid Authentication URL format: [%s]", resourceType.toString()));
+                String.format("Invalid Authentication URL format: [%s]", representation.toString()));
         }
     }
 }

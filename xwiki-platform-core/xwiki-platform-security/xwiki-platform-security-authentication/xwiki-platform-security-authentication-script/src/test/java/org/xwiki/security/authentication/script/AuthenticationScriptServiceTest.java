@@ -144,8 +144,18 @@ class AuthenticationScriptServiceTest
     void resetAuthenticationFailureCounter()
     {
         String username = "foobar";
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
         this.scriptService.resetAuthenticationFailureCounter(username);
         verify(this.authenticationFailureManager).resetAuthenticationFailureCounter(username);
+    }
+
+    @Test
+    void resetAuthenticationFailureCounterWithoutPR()
+    {
+        String username = "foobar";
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+        this.scriptService.resetAuthenticationFailureCounter(username);
+        verify(this.authenticationFailureManager, never()).resetAuthenticationFailureCounter(username);
     }
 
     @Test

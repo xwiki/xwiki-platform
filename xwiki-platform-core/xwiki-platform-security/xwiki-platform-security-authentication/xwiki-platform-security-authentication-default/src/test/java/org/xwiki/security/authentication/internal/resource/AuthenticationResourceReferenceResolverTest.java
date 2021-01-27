@@ -82,12 +82,12 @@ class AuthenticationResourceReferenceResolverTest
     @Test
     void resolveBadURL()
     {
-        ExtendedURL extendedURL = new ExtendedURL(Collections.emptyList());
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("authenticate", "foobar"));
         CreateResourceReferenceException createResourceReferenceException =
             assertThrows(CreateResourceReferenceException.class,
                 () -> this.resolver.resolve(extendedURL, AuthenticationResourceReference.TYPE, Collections.emptyMap()));
 
-        assertEquals("Invalid Authentication URL format: [authenticate]",
+        assertEquals("Invalid Authentication URL format: [/authenticate/foobar]",
             createResourceReferenceException.getMessage());
     }
 }

@@ -19,9 +19,9 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -30,13 +30,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.properties.converter.Converter;
 import org.xwiki.ratings.AverageRating;
+import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.events.UpdatedAverageRatingEvent;
+import org.xwiki.ratings.events.UpdatingAverageRatingEvent;
 import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -47,12 +54,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.model.EntityType.DOCUMENT;
 
 /**
  * Tests for {@link XObjectAverageRatingManager}.
@@ -77,6 +87,12 @@ public class XObjectAverageRatingManagerTest
     @MockComponent
     private Provider<XWikiContext> contextProvider;
 
+    @MockComponent
+    private ObservationManager observationManager;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @Mock
     private RatingsManager ratingsManager;
 
@@ -99,7 +115,7 @@ public class XObjectAverageRatingManagerTest
         BaseObject averageRating2 = mock(BaseObject.class);
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
-            .thenReturn(Arrays.asList(averageRating1, averageRating2));
+            .thenReturn(asList(averageRating1, averageRating2));
         when(averageRating1.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName()))
             .thenReturn("something");
         when(averageRating2.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName()))
@@ -136,7 +152,7 @@ public class XObjectAverageRatingManagerTest
             .setUpdatedAt(expectedUpdateDate);
         assertEquals(expectedAverageRating, this.averageRatingManager.getAverageRating(reference));
     }
-    
+
     @Test
     void getAverageRatingNotExisting() throws Exception
     {
@@ -150,7 +166,7 @@ public class XObjectAverageRatingManagerTest
         BaseObject averageRating2 = mock(BaseObject.class);
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
-            .thenReturn(Arrays.asList(averageRating1, averageRating2));
+            .thenReturn(asList(averageRating1, averageRating2));
         // Wrong identifier
         when(averageRating1.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName()))
             .thenReturn("something");
@@ -221,6 +237,9 @@ public class XObjectAverageRatingManagerTest
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
 
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("Update average rating");
+
         this.averageRatingManager.saveAverageRating(averageRating);
 
         verify(xObject).setStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName(), expectedManagerID);
@@ -247,7 +266,7 @@ public class XObjectAverageRatingManagerTest
         when(this.ratingsManager.getIdentifier()).thenReturn(expectedManagerID);
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
-            .thenReturn(Arrays.asList(matchingAverageRating, anotherAverageRating));
+            .thenReturn(asList(matchingAverageRating, anotherAverageRating));
         // Wrong identifier
         when(anotherAverageRating.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName()))
             .thenReturn("something");
@@ -274,6 +293,9 @@ public class XObjectAverageRatingManagerTest
 
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
+
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("Update average rating");
 
         this.averageRatingManager.saveAverageRating(averageRating);
 
@@ -325,7 +347,7 @@ public class XObjectAverageRatingManagerTest
         when(this.ratingsManager.getIdentifier()).thenReturn(expectedManagerID);
 
         when(xWikiDocument.getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
-            .thenReturn(Arrays.asList(matchingAverageRating, anotherAverageRating));
+            .thenReturn(asList(matchingAverageRating, anotherAverageRating));
         // Wrong identifier
         when(anotherAverageRating.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName()))
             .thenReturn("something");
@@ -338,8 +360,151 @@ public class XObjectAverageRatingManagerTest
         when(this.contextProvider.get()).thenReturn(context);
         XWiki xWiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xWiki);
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.remove.comment"))
+            .thenReturn("Remove average rating");
+
         assertEquals(1, this.averageRatingManager.removeAverageRatings(reference));
+
         verify(xWikiDocument).removeXObject(matchingAverageRating);
         verify(xWiki).saveDocument(xWikiDocument, "Remove average rating", true, context);
+    }
+
+    @Test
+    void moveAverageRatingsOldNull()
+    {
+        RatingsException ratingsException =
+            assertThrows(RatingsException.class, () -> this.averageRatingManager.moveAverageRatings(
+                new DocumentReference("xwiki", "XWiki", "Old"), null));
+
+        assertEquals("Impossible to move the average ratings from [xwiki:XWiki.Old] to [null].",
+            ratingsException.getMessage());
+    }
+
+    @Test
+    void moveAverageRatingsNewNull()
+    {
+        RatingsException ratingsException =
+            assertThrows(RatingsException.class, () -> this.averageRatingManager.moveAverageRatings(null,
+                new DocumentReference("xwiki",
+                    "XWiki", "New")));
+        assertEquals("Impossible to move the average ratings from [null] to [xwiki:XWiki.New].",
+            ratingsException.getMessage());
+    }
+
+    @Test
+    void moveAverageRatingsOldWrongType()
+    {
+        RatingsException ratingsException =
+            assertThrows(RatingsException.class,
+                () -> this.averageRatingManager.moveAverageRatings(new SpaceReference("xwiki", "Space"),
+                    new DocumentReference("xwiki",
+                        "XWiki", "New")));
+        assertEquals("Impossible to move the average ratings from [Space xwiki:Space] to [xwiki:XWiki.New].",
+            ratingsException.getMessage());
+    }
+
+    @Test
+    void moveAverageRatingsNewWrongType()
+    {
+        RatingsException ratingsException =
+            assertThrows(RatingsException.class,
+                () -> this.averageRatingManager.moveAverageRatings(new DocumentReference("xwiki",
+                        "XWiki", "Old"),
+                    new SpaceReference("xwiki", "Space")));
+        assertEquals("Impossible to move the average ratings from [xwiki:XWiki.Old] to [Space xwiki:Space].",
+            ratingsException.getMessage());
+    }
+
+    @Test
+    void moveAverageRatings() throws Exception
+    {
+        EntityReference oldReference = new EntityReference("xwiki:XWiki.Old", EntityType.DOCUMENT);
+        EntityReference newReference = new EntityReference("xwiki:XWiki.New", EntityType.DOCUMENT);
+        XWikiContext context = mock(XWikiContext.class);
+        XWikiDocument actualDoc = mock(XWikiDocument.class);
+        // Skipped because wrong manager
+        BaseObject ratings1 = mock(BaseObject.class);
+        // Skiped because wrong entity
+        BaseObject ratings2 = mock(BaseObject.class);
+        // Pass because references Old
+        BaseObject ratings3 = mock(BaseObject.class);
+        // Pass because references a child of Old
+        BaseObject ratings4 = mock(BaseObject.class);
+        String expectedManager = "expectedManager";
+        XWiki xWiki = mock(XWiki.class);
+        Date r3UpdateDate = new Date();
+        Date r4UpdateDate = new Date();
+        EntityReference oldObjectEntityReference = new EntityReference("XWiki.Object", EntityType.OBJECT, oldReference);
+        EntityReference newObjectEntityReference = new EntityReference("XWiki.Object", EntityType.OBJECT, newReference);
+
+        when(this.contextProvider.get()).thenReturn(context);
+        when(context.getWiki()).thenReturn(xWiki);
+        when(this.documentAccessBridge.getDocumentInstance(newReference)).thenReturn(actualDoc);
+        when(actualDoc
+            .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE))
+            .thenReturn(asList(ratings1, ratings2, ratings3, ratings4));
+
+        when(ratings1.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName()))
+            .thenReturn("ratings1EntityReference");
+        when(ratings1.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName())).thenReturn("wrongManager");
+
+        when(ratings2.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName())).thenReturn(expectedManager);
+        when(ratings2.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName()))
+            .thenReturn("xwiki:XWiki.Unknown");
+
+        when(ratings3.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName())).thenReturn(expectedManager);
+        when(ratings3.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName()))
+            .thenReturn("xwiki:XWiki.Old");
+        when(ratings3.getFloatValue(AverageRatingQueryField.AVERAGE_VOTE.getFieldName())).thenReturn(10f);
+        when(ratings3.getDateValue(AverageRatingQueryField.UPDATED_AT.getFieldName())).thenReturn(r3UpdateDate);
+        when(ratings3.getIntValue(AverageRatingQueryField.SCALE.getFieldName(), 5)).thenReturn(9);
+
+        when(ratings4.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName())).thenReturn(expectedManager);
+        when(ratings4.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName()))
+            .thenReturn("xwiki:XWiki.Old^XWiki.Object");
+        when(ratings4.getFloatValue(AverageRatingQueryField.AVERAGE_VOTE.getFieldName())).thenReturn(20f);
+        when(ratings4.getDateValue(AverageRatingQueryField.UPDATED_AT.getFieldName())).thenReturn(r4UpdateDate);
+        when(ratings4.getIntValue(AverageRatingQueryField.SCALE.getFieldName(), 5)).thenReturn(2);
+
+        when(this.ratingsManager.getIdentifier()).thenReturn(expectedManager);
+        when(this.entityReferenceConverter.convert(EntityReference.class, "xwiki:XWiki.Unknown"))
+            .thenReturn(new EntityReference("xwiki:XWiki.Unknown", EntityType.DOCUMENT));
+        when(this.entityReferenceConverter.convert(EntityReference.class, "xwiki:XWiki.Old"))
+            .thenReturn(oldReference);
+        when(this.entityReferenceConverter.convert(EntityReference.class, "xwiki:XWiki.Old^XWiki.Object"))
+            .thenReturn(oldObjectEntityReference);
+        when(this.entityReferenceConverter.convert(String.class, newReference)).thenReturn("xwiki:XWiki.New");
+        when(this.entityReferenceConverter.convert(String.class, newObjectEntityReference))
+            .thenReturn("xwiki:XWiki.Old^XWiki.Object");
+
+        when(this.stringEntityReferenceSerializer.serialize(newReference.extractReference(DOCUMENT))).thenReturn(
+            "xwiki:XWiki.New");
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.move.comment"))
+            .thenReturn("Move average ratings XObjects");
+
+        long count = this.averageRatingManager.moveAverageRatings(oldReference, newReference);
+
+        assertEquals(2, count);
+        verify(ratings3).setStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            "xwiki:XWiki.New");
+        verify(ratings4).setStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
+            "xwiki:XWiki.Old^XWiki.Object");
+        verify(xWiki).saveDocument(actualDoc, "Move average ratings XObjects", true, context);
+        List<DefaultAverageRating> ratingsList = asList(
+            new DefaultAverageRating("xwiki:XWiki.New_1593976669")
+                .setManagerId("expectedManager")
+                .setReference(newReference)
+                .setAverageVote(10f)
+                .setUpdatedAt(r3UpdateDate)
+                .setScaleUpperBound(9),
+            new DefaultAverageRating("xwiki:XWiki.New_-989039879")
+                .setManagerId("expectedManager")
+                .setReference(newObjectEntityReference)
+                .setAverageVote(20f)
+                .setUpdatedAt(r4UpdateDate)
+                .setScaleUpperBound(2)
+        );
+        verify(this.observationManager).notify(new UpdatingAverageRatingEvent(), expectedManager, ratingsList);
+        verify(this.observationManager).notify(new UpdatedAverageRatingEvent(), expectedManager, ratingsList);
     }
 }

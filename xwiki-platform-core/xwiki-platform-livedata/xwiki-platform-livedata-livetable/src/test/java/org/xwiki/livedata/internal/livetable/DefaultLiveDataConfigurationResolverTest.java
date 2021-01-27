@@ -85,14 +85,40 @@ class DefaultLiveDataConfigurationResolverTest
     @Test
     void setDefaultSort() throws Exception
     {
-        this.config.getQuery().setProperties(Arrays.asList("_one", "two", "three"));
+        LiveDataPropertyDescriptor aliceDescriptor = new LiveDataPropertyDescriptor();
+        aliceDescriptor.setId("_alice");
+        aliceDescriptor.setSortable(true);
+        this.config.getMeta().getPropertyDescriptors().add(aliceDescriptor);
+
+        LiveDataPropertyDescriptor bobDescriptor = new LiveDataPropertyDescriptor();
+        bobDescriptor.setId("bob");
+        bobDescriptor.setSortable(false);
+        this.config.getMeta().getPropertyDescriptors().add(bobDescriptor);
+
+        LiveDataPropertyDescriptor carolDescriptor = new LiveDataPropertyDescriptor();
+        carolDescriptor.setId("carol");
+        carolDescriptor.setType("User");
+        this.config.getMeta().getPropertyDescriptors().add(carolDescriptor);
+
+        LiveDataPropertyDescriptor userDescriptor = new LiveDataPropertyDescriptor();
+        userDescriptor.setId("User");
+        userDescriptor.setSortable(true);
+        this.config.getMeta().getPropertyTypes().add(userDescriptor);
 
         // Verify when no sort is set.
         this.config.getQuery().setSort(null);
+
+        this.config.getQuery().setProperties(Arrays.asList("_alice", "bob", "carol"));
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
+        // Because the live table skips properties that start with underscore..
+        assertTrue(actualConfig.getQuery().getSort().isEmpty());
+
+        this.config.getQuery().setProperties(Arrays.asList("_alice", "carol"));
+        actualConfig = this.resolver.resolve(this.config);
+
         SortEntry sortEntry = actualConfig.getQuery().getSort().get(0);
-        assertEquals("two", sortEntry.getProperty());
+        assertEquals("carol", sortEntry.getProperty());
         assertFalse(sortEntry.isDescending());
 
         // Verify when only the sort order is set.
@@ -100,7 +126,7 @@ class DefaultLiveDataConfigurationResolverTest
         actualConfig = this.resolver.resolve(this.config);
 
         sortEntry = actualConfig.getQuery().getSort().get(0);
-        assertEquals("two", sortEntry.getProperty());
+        assertEquals("carol", sortEntry.getProperty());
         assertTrue(sortEntry.isDescending());
 
         // Verify when no properties are specified.

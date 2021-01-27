@@ -1115,7 +1115,7 @@ define([
         newEntry.operator = self.getFilterDefaultOperator(newEntry.property);
       }
       // If operator has changed, reset value
-      if (oldEntry.operator !== newEntry.operator) {
+      if (oldEntry.operator && oldEntry.operator !== newEntry.operator) {
         newEntry.value = undefined;
       }
       return {

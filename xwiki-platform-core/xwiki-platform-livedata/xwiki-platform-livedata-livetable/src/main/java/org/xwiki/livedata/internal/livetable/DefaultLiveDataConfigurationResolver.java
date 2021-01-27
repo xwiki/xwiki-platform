@@ -32,10 +32,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery;
@@ -92,7 +94,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         // merge automatically (the sort entry doesn't have an "id" property). We need to do the merge manually because
         // the given configuration can have a sort entry that specifies only the sort order and not the sort property
         // (e.g. when you want to sort on the default property using a specified sort order).
-        setDefaultSort(mergedConfig.getQuery());
+        setDefaultSort(mergedConfig);
 
         // Translate using the context locale.
         return translate(mergedConfig);
@@ -116,13 +118,16 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return defaultConfig;
     }
 
-    private void setDefaultSort(LiveDataQuery query)
+    private void setDefaultSort(LiveDataConfiguration config)
     {
+        LiveDataQuery query = config.getQuery();
         if (query.getProperties() != null) {
-            // Sort by default using the first non-special property (replicate the live table behavior).
+            // Replicate the current live table behavior: look for the first non-special property (whose name doesn't
+            // start with underscore) and use it if its descriptor says we can sort on it.
             Optional<String> firstNonSpecialProperty = query.getProperties().stream().filter(Objects::nonNull)
                 .filter(property -> !property.startsWith("_")).findFirst();
-            if (firstNonSpecialProperty.isPresent()) {
+            if (firstNonSpecialProperty.isPresent()
+                && isPropertySortable(firstNonSpecialProperty.get(), config.getMeta())) {
                 if (query.getSort() == null) {
                     query.setSort(new ArrayList<SortEntry>());
                 }
@@ -139,7 +144,23 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         if (query.getSort() != null) {
             // Remove the sort entry if we couldn't find a default sort property.
             query.setSort(query.getSort().stream().filter(Objects::nonNull)
-                .filter(sortEntry -> sortEntry.getProperty() != null).collect(Collectors.toList()));
+                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).collect(Collectors.toList()));
+        }
+    }
+
+    private boolean isPropertySortable(String property, LiveDataMeta meta)
+    {
+        Optional<LiveDataPropertyDescriptor> propertyDescriptor = meta.getPropertyDescriptors().stream()
+            .filter(descriptor -> Objects.equals(property, descriptor.getId())).findFirst();
+        if (!propertyDescriptor.isPresent()) {
+            return false;
+        } else if (propertyDescriptor.get().isSortable() != null) {
+            return propertyDescriptor.get().isSortable();
+        } else {
+            String propertyType = propertyDescriptor.get().getType();
+            Optional<LiveDataPropertyDescriptor> propertyTypeDescriptor = meta.getPropertyTypes().stream()
+                .filter(descriptor -> Objects.equals(descriptor.getId(), propertyType)).findFirst();
+            return propertyTypeDescriptor.isPresent() && Boolean.TRUE.equals(propertyTypeDescriptor.get().isSortable());
         }
     }
 

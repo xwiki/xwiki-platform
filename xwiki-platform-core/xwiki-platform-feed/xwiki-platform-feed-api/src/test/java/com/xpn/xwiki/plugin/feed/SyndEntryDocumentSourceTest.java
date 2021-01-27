@@ -36,8 +36,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
-import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
@@ -50,7 +48,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -70,9 +67,6 @@ class SyndEntryDocumentSourceTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
-
-    @InjectComponentManager
-    private MockitoComponentManager componentManager;
 
     public static final String INCONSISTENCY = "Inconsistency!";
 
@@ -165,13 +159,6 @@ class SyndEntryDocumentSourceTest
                 return new Boolean(user.length() % 2 == 0);
             }
         });
-
-        // TODO: Right now MockitoOldCore#before() method both creates a new XWikiContext and initializes the
-        // XWikiStubContextProvider with it, setting a null XWikiRequest in the context. We need to redo the
-        // initialization here to set a non-null request in the context. This is needed
-        XWikiStubContextProvider stubContextProvider =
-            this.componentManager.getInstance(XWikiStubContextProvider.class);
-        stubContextProvider.initialize(context);
     }
 
     protected BaseClass initArticleClass() throws XWikiException

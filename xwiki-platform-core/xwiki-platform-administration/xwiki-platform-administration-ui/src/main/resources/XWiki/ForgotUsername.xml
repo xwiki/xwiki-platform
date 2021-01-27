@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ForgotUsername" locale="">
+<xwikidoc version="1.4" reference="XWiki.ForgotUsername" locale="">
   <web>XWiki</web>
   <name>ForgotUsername</name>
   <language/>
@@ -37,40 +37,9 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($email = "$!request.get('e')")
-#if($email == '')
-{{translation key="xe.admin.forgotUsername.instructions"/}}
-
-{{html}}
-  &lt;form method="post" action="$doc.getURL()" class="xformInline"&gt;
-    &lt;div&gt;&lt;label for="e"&gt;$services.localization.render('xe.admin.forgotUsername.email.label')&lt;/label&gt; &lt;input type="text" id="e" name="e"/&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;
-  &lt;/form&gt;
-{{/html}}
-
-#else
-  #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = :email").bindValue('email', $email.toLowerCase()))
-  #set($results = $query.execute())
-  ## If local user does not exist check global user
-  #if($results.size() == 0 &amp;&amp; ${xcontext.database} != ${xcontext.mainWikiName})
-    #set($results = $query.setWiki("${xcontext.mainWikiName}").execute())
-  #end
-  #if($results.size() == 0)
-    {{translation key="xe.admin.forgotUsername.error.noAccount"/}}
-
-    [[{{translation key="xe.admin.forgotUsername.error.retry"/}}&gt;&gt;$doc.fullName]] | [[{{translation key="xe.admin.forgotUsername.login"/}}&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
-  #elseif($results.size() == 1)
-    $services.localization.render('xe.admin.forgotUsername.result', ["**${results.get(0).substring($results.get(0).indexOf('.')).substring(1)}**"])
-
-    [[{{translation key="xe.admin.forgotUsername.login"/}}&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
-  #else
-    {{translation key="xe.admin.forgotUsername.multipleResults"/}}
-    #foreach($item in $results)
-      * **${item.substring($item.indexOf('.')).substring(1)}**
-    #end
-
-    [[{{translation key="xe.admin.forgotUsername.login"/}}&gt;&gt;path:${xwiki.getURL('XWiki.XWikiLogin', 'login')}]]
-  #end
-#end
+#set ($newUrl = $services.security.authentication.getAuthenticationURL('forgot', $request.parameterMap))
+#set ($discard = $logtool.warn("The page [XWiki.ForgotUsername] should not be used anymore in favor of the new forgot Action."));
+#set ($discard = $response.sendRedirect($newUrl))
 {{/velocity}}</content>
   <object>
     <name>XWiki.ForgotUsername</name>
@@ -233,6 +202,9 @@
     </property>
     <property>
       <levels>edit</levels>
+    </property>
+    <property>
+      <users/>
     </property>
   </object>
   <object>

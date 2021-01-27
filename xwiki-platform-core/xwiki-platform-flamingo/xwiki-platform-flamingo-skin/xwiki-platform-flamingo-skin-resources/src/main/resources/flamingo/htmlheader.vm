@@ -33,29 +33,32 @@
 ## Compute all the meta attributes to add to the HTML tag.
 ## ---------------------------------------------------------------------------------------------------------------
 #set ($metaAttributes = [])
-## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
-## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
-#addMetaAttribute($metaAttributes, 'reference', $services.model.serialize($doc.documentReference, 'default'))
-#addMetaAttribute($metaAttributes, 'document', $doc.fullName)##deprecated, use 'reference' instead
-#addMetaAttribute($metaAttributes, 'wiki', $doc.wiki)##deprecated, use 'reference' instead
-#addMetaAttribute($metaAttributes, 'space', $doc.space)##deprecated, use 'reference' instead
-#addMetaAttribute($metaAttributes, 'page', $doc.documentReference.name)##deprecated, use 'reference' instead
-#addMetaAttribute($metaAttributes, 'isnew', $tdoc.isNew())
-## If tdoc is a new document, its version when checking for conflict will be the original doc version.
-## This fix XWIKI-16299.
-#if ($tdoc.isNew())
-  #set ($version = $doc.version)
-#else
-  #set ($version = $tdoc.version)
+#if("$!doc" != "" && "$!tdoc" != "")
+  ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
+  ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
+  #addMetaAttribute($metaAttributes, 'reference', $services.model.serialize($doc.documentReference, 'default'))
+  #addMetaAttribute($metaAttributes, 'document', $doc.fullName)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'wiki', $doc.wiki)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'space', $doc.space)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'page', $doc.documentReference.name)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'isnew', $tdoc.isNew())
+  ## If tdoc is a new document, its version when checking for conflict will be the original doc version.
+  ## This fix XWIKI-16299.
+  #if ($tdoc.isNew())
+    #set ($version = $doc.version)
+  #else
+    #set ($version = $tdoc.version)
+  #end
+  #addMetaAttribute($metaAttributes, 'version', $version)
+  #addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
+  #addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
 #end
-#addMetaAttribute($metaAttributes, 'version', $version)
-#addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
 #addMetaAttribute($metaAttributes, 'form-token', "$!{services.csrf.token}")
 ## Don't put any user-reference tag when the user is not logged in
 #if ("$!xcontext.userReference" != '')
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
-#addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
+
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale" $stringtool.join($metaAttributes, ' ')>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------

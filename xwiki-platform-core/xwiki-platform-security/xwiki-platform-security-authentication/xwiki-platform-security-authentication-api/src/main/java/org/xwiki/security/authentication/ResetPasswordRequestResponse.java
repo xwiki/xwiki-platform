@@ -17,40 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.security.authentication;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import javax.mail.internet.InternetAddress;
+
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
- * Represents the ForgotUsername page.
+ * Dedicated response interface for the first reset password request.
  *
  * @version $Id$
- * @since 11.10
+ * @since 13.1RC1
  */
-public class ForgotUsernamePage extends ViewPage
+@Unstable
+public interface ResetPasswordRequestResponse
 {
-    @FindBy(id = "e")
-    private WebElement emailField;
+    /**
+     * @return the reference of the user for whom the reset password request have been performed.
+     */
+    UserReference getUserReference();
 
-    @FindBy(css = "#forgotUsernameForm input[type='submit']")
-    private WebElement submitButton;
+    /**
+     * @return the email address of the user for whom the reset password request have been performed.
+     */
+    InternetAddress getUserEmail();
 
-    public static ForgotUsernamePage gotoPage()
-    {
-        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/forgot");
-        return new ForgotUsernamePage();
-    }
-
-    public void setEmail(String email)
-    {
-        this.emailField.sendKeys(email);
-    }
-
-    public ForgotUsernameCompletePage clickRetrieveUsername()
-    {
-        this.submitButton.click();
-        return new ForgotUsernameCompletePage();
-    }
+    /**
+     * @return the verification code to be send to the user.
+     */
+    String getVerificationCode();
 }

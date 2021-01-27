@@ -17,40 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.security.authentication;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.stability.Unstable;
 
 /**
- * Represents the ForgotUsername page.
+ * This class aims at holding any exception that might occur during a reset password process.
  *
  * @version $Id$
- * @since 11.10
+ * @since 13.1RC1
  */
-public class ForgotUsernamePage extends ViewPage
+@Unstable
+public class ResetPasswordException extends Exception
 {
-    @FindBy(id = "e")
-    private WebElement emailField;
-
-    @FindBy(css = "#forgotUsernameForm input[type='submit']")
-    private WebElement submitButton;
-
-    public static ForgotUsernamePage gotoPage()
+    /**
+     * Default constructor.
+     *
+     * @param message end-user message about the problem.
+     */
+    public ResetPasswordException(String message)
     {
-        getUtil().gotoPage(getUtil().getBaseURL() + "authenticate/forgot");
-        return new ForgotUsernamePage();
+        super(message);
     }
 
-    public void setEmail(String email)
+    /**
+     * Constructor in case of parent exception.
+     *
+     * @param message end-user message about the problem.
+     * @param throwable parent exception.
+     */
+    public ResetPasswordException(String message, Throwable throwable)
     {
-        this.emailField.sendKeys(email);
-    }
-
-    public ForgotUsernameCompletePage clickRetrieveUsername()
-    {
-        this.submitButton.click();
-        return new ForgotUsernameCompletePage();
+        super(message, throwable);
     }
 }

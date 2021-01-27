@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.converter;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.jodconverter.core.document.DocumentFormatRegistry;
+import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to convert documents between various office formats.
@@ -51,7 +51,54 @@ public interface OfficeConverter
         throws OfficeConverterException;
 
     /**
-     * @return the registry of document formats known by this converter
+     * @param officeFileName the office file name to recognize
+     * @return true if the file name / extension represents an office presentation format
+     * @since 13.1RC1
      */
-    DocumentFormatRegistry getFormatRegistry();
+    @Unstable
+    default boolean isPresentation(String officeFileName)
+    {
+        return false;
+    }
+
+    /**
+     * Retrieve the office document format based on the given file name.
+     * @param officeFileName the name of an office document.
+     * @return the office document format associated with the given file extension.
+     * @since 13.1RC1
+     */
+    @Unstable
+    default OfficeDocumentFormat getDocumentFormat(String officeFileName)
+    {
+        return null;
+    }
+
+    /**
+     * Checks if the office documents with the specified media type can be converted by this converter.
+     *
+     * @param mediaType a media type
+     * @return {@code true} if the specified media type is supported, {@code false} otherwise
+     * @since 13.1RC1
+     */
+    @Unstable
+    default boolean isMediaTypeSupported(String mediaType)
+    {
+        return false;
+    }
+
+    /**
+     * Use this method to check if the unidirectional conversion from a document format (input media type) to another
+     * document format (output media type) is supported by this converter.
+     *
+     * @param inputMediaType the media type of the input document
+     * @param outputMediaType the media type of the output document
+     * @return {@code true} if a document can be converted from the input media type to the output media type,
+     *         {@code false} otherwise
+     * @since 13.1RC1
+     */
+    @Unstable
+    default boolean isConversionSupported(String inputMediaType, String outputMediaType)
+    {
+        return false;
+    }
 }

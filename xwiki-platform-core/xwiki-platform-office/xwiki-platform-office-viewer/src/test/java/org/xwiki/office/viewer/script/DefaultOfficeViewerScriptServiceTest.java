@@ -19,113 +19,125 @@
  */
 package org.xwiki.office.viewer.script;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
-import org.junit.Assert;
+import javax.inject.Named;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.office.viewer.OfficeViewer;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeResourceViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 /**
  * Unit tests for {@link org.xwiki.office.viewer.script.DefaultOfficeViewerScriptService}.
  * 
  * @version $Id$
  */
-public class DefaultOfficeViewerScriptServiceTest
+@ComponentTest
+class DefaultOfficeViewerScriptServiceTest
 {
-    /**
-     * A component manager that automatically mocks all dependencies of {@link org.xwiki.office.viewer.script.DefaultOfficeViewerScriptService}.
-     */
-    @Rule
-    public MockitoComponentMockingRule<OfficeViewerScriptService> mocker =
-        new MockitoComponentMockingRule<OfficeViewerScriptService>(DefaultOfficeViewerScriptService.class,
-            ScriptService.class, "officeviewer");
+    @InjectMockComponents(role = OfficeViewerScriptService.class)
+    private DefaultOfficeViewerScriptService scriptService;
+
+    @MockComponent
+    private OfficeServer officeServer;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
+    @MockComponent
+    private OfficeResourceViewer officeResourceViewer;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    @Named("xhtml/1.0")
+    private BlockRenderer blockRenderer;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void isMimeTypeSupported() throws Exception
+    void isMimeTypeSupported() throws Exception
     {
-        OfficeServer officeServer = mocker.getInstance(OfficeServer.class);
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);
-        when(officeConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
-
-        for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
-            "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",
-            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel")) {
-            Assert.assertTrue(mocker.getComponentUnderTest().isMimeTypeSupported(mediaType));
-        }
-        for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
-            Assert.assertFalse(mocker.getComponentUnderTest().isMimeTypeSupported(mediaType));
-        }
+        when(officeConverter.isConversionSupported("foo/bar", "text/html")).thenReturn(true);
+        assertTrue(this.scriptService.isMimeTypeSupported("foo/bar"));
+        verify(officeConverter).isConversionSupported("foo/bar", "text/html");
     }
 
     @Test
-    public void view() throws Exception
+    void view() throws Exception
     {
-        Execution execution = mocker.getInstance(Execution.class);
         when(execution.getContext()).thenReturn(new ExecutionContext());
 
         AttachmentReference attachmentReference =
             new AttachmentReference("file.odt", new DocumentReference("wiki", "Space", "Page"));
+        when(this.entityReferenceSerializer.serialize(attachmentReference)).thenReturn("attachment:file.odt");
+
         DocumentModelBridge document = mock(DocumentModelBridge.class);
-        DocumentAccessBridge documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         when(documentAccessBridge.isDocumentViewable(attachmentReference.getDocumentReference())).thenReturn(true);
         when(documentAccessBridge.getTranslatedDocumentInstance(attachmentReference.getDocumentReference()))
             .thenReturn(document);
         when(document.getSyntax()).thenReturn(Syntax.TEX_1_0);
 
         XDOM xdom = new XDOM(Collections.<Block> emptyList());
-        OfficeViewer viewer = mocker.getInstance(OfficeViewer.class);
-        when(viewer.createView(attachmentReference, Collections.<String, String> emptyMap())).thenReturn(xdom);
+        when(this.officeResourceViewer.createView(new ResourceReference("attachment:file.odt", ResourceType.ATTACHMENT),
+            Collections.<String, String> emptyMap())).thenReturn(xdom);
 
-        BlockRenderer xhtmlRenderer = mocker.registerMockComponent(BlockRenderer.class, "xhtml/1.0");
+        assertEquals("", scriptService.view(attachmentReference));
+        verify(transformationManager).performTransformations(eq(xdom), any(TransformationContext.class));
 
-        Assert.assertEquals("", mocker.getComponentUnderTest().view(attachmentReference));
-
-        TransformationManager transformationManager = mocker.getInstance(TransformationManager.class);
-        verify(transformationManager).performTransformations(eq(xdom), notNull(TransformationContext.class));
-
-        verify(xhtmlRenderer).render(eq(xdom), notNull(WikiPrinter.class));
+        verify(this.blockRenderer).render(eq(xdom), any(WikiPrinter.class));
     }
 
     @Test
-    public void viewThrowingException() throws Exception
+    void viewThrowingException()
     {
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty("officeView.caughtException", "before");
 
-        Execution execution = mocker.getInstance(Execution.class);
         when(execution.getContext()).thenReturn(executionContext);
+        assertNull(scriptService.view(null));
 
-        Assert.assertNull(mocker.getComponentUnderTest().view(null));
-
-        Exception e = mocker.getComponentUnderTest().getCaughtException();
-        Assert.assertTrue(e instanceof NullPointerException);
-
-        verify(mocker.getMockedLogger()).error("Failed to view office document: null", e);
+        assertEquals("Failed to view office document: null", this.logCapture.getMessage(0));
     }
 }

@@ -39,7 +39,6 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.internal.converter.OfficeImporterRecognizer;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
@@ -129,9 +128,6 @@ public class OfficeImporterScriptService implements ScriptService
     @Inject
     private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
-    @Inject
-    private OfficeImporterRecognizer officeImporterRecognizer;
-
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
      * 
@@ -216,7 +212,7 @@ public class OfficeImporterScriptService implements ScriptService
     {
         try {
             assertConnected();
-            if (this.officeImporterRecognizer.isPresentation(officeFileName)) {
+            if (this.officeServer.getConverter().isPresentation(officeFileName)) {
                 return this.presentationBuilder.build(officeFileStream, officeFileName, targetDocumentReference);
             } else {
                 return this.xdomBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);

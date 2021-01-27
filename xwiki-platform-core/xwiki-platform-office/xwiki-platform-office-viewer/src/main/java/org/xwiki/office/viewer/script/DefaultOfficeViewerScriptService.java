@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.jodconverter.core.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -34,11 +33,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.office.viewer.OfficeViewer;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeResourceViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -66,7 +68,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
      * The component used to view office documents.
      */
     @Inject
-    private OfficeViewer officeViewer;
+    private OfficeResourceViewer officeViewer;
 
     /**
      * The component used to retrieve the office document converter, which knows the supported media types.
@@ -100,6 +102,9 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
     @Inject
     private TransformationManager transformationManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     /**
      * The logger to log.
      */
@@ -131,10 +136,12 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
                 throw new RuntimeException("Inadequate privileges.");
             }
 
+            ResourceReference resourceReference = new ResourceReference(
+                this.entityReferenceSerializer.serialize(attachmentReference), ResourceType.ATTACHMENT);
             // Create the view and render the result.
             Syntax fromSyntax = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference).getSyntax();
             Syntax toSyntax = Syntax.XHTML_1_0;
-            return render(this.officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
+            return render(this.officeViewer.createView(resourceReference, parameters), fromSyntax, toSyntax);
         } catch (Exception e) {
             // Save caught exception.
             this.execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
@@ -162,10 +169,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
     {
         OfficeConverter converter = this.officeServer.getConverter();
         if (converter != null) {
-            DocumentFormat inputFormat = converter.getFormatRegistry().getFormatByMediaType(inputMediaType);
-            DocumentFormat outputFormat = converter.getFormatRegistry().getFormatByMediaType(outputMediaType);
-            return inputFormat != null && outputFormat != null
-                && outputFormat.getStoreProperties(inputFormat.getInputFamily()) != null;
+            return converter.isConversionSupported(inputMediaType, outputMediaType);
         } else {
             return false;
         }

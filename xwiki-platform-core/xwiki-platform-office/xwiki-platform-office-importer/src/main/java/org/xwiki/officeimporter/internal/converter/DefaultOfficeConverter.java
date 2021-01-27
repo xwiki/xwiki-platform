@@ -27,12 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.jodconverter.core.document.DocumentFormatRegistry;
+import org.jodconverter.core.document.DocumentFamily;
+import org.jodconverter.core.document.DocumentFormat;
 import org.jodconverter.local.LocalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
+import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 
 /**
  * Default {@link OfficeConverter} implementation.
@@ -124,8 +126,34 @@ public class DefaultOfficeConverter implements OfficeConverter
     }
 
     @Override
-    public DocumentFormatRegistry getFormatRegistry()
+    public boolean isPresentation(String officeFileName)
     {
-        return converter.getFormatRegistry();
+        String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
+
+        DocumentFormat format = this.converter.getFormatRegistry().getFormatByExtension(extension);
+        return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+    }
+
+    @Override
+    public boolean isMediaTypeSupported(String mediaType)
+    {
+        return this.converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
+    }
+
+    @Override
+    public boolean isConversionSupported(String inputMediaType, String outputMediaType)
+    {
+        DocumentFormat inputFormat = converter.getFormatRegistry().getFormatByMediaType(inputMediaType);
+        DocumentFormat outputFormat = converter.getFormatRegistry().getFormatByMediaType(outputMediaType);
+        return inputFormat != null && outputFormat != null
+            && outputFormat.getStoreProperties(inputFormat.getInputFamily()) != null;
+    }
+
+    @Override
+    public OfficeDocumentFormat getDocumentFormat(String officeFileName)
+    {
+        String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
+        DocumentFormat format = this.converter.getFormatRegistry().getFormatByExtension(extension);
+        return new DefaultOfficeDocumentFormat(format);
     }
 }

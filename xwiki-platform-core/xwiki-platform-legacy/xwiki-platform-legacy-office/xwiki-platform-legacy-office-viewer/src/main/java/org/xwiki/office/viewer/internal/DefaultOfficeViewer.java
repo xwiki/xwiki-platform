@@ -33,7 +33,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 
 /**
- * Default implementation of {@link org.xwiki.office.viewer.OfficeViewer}.
+ * Default implementation of {@link OfficeViewer}.
  * 
  * @since 2.5M2
  * @version $Id$

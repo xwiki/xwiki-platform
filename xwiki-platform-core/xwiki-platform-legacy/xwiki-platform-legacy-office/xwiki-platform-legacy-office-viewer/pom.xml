@@ -24,53 +24,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy</artifactId>
+    <artifactId>xwiki-platform-legacy-office</artifactId>
     <version>13.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-legacy-office-importer</artifactId>
-  <name>XWiki Platform - Legacy - Office Importer</name>
+  <artifactId>xwiki-platform-legacy-office-viewer</artifactId>
+  <name>XWiki Platform - Legacy - Office Viewer</name>
   <packaging>jar</packaging>
-  <description>Repackages xwiki-platform-office-importer including the legacy code/APIs</description>
+  <description>Repackages xwiki-platform-office-viewer including the legacy code/APIs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
     <!-- The features provided by this module so that it's found when resolving extension -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-viewer</xwiki.extension.features>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-office-importer dependencies (but without xwiki-platform-office-importer jar itself) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-office-importer</artifactId>
+      <artifactId>xwiki-platform-office-viewer</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-office-importer</artifactId>
+      <artifactId>xwiki-platform-office-viewer</artifactId>
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it. -->
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
     </dependency>
     <!-- Build dependencies -->
     <dependency>
       <!-- Needed for backward compatibility Aspects -->
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-    </dependency>
-
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -87,7 +72,7 @@
               <weaveDependencies>
                 <weaveDependency>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-office-importer</artifactId>
+                  <artifactId>xwiki-platform-office-viewer</artifactId>
                 </weaveDependency>
               </weaveDependencies>
             </configuration>

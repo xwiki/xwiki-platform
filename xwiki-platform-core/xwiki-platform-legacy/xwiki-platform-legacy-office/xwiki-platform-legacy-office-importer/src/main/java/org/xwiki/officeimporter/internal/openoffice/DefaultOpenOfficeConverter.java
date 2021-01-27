@@ -19,13 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
-import org.xwiki.officeimporter.internal.converter.DefaultOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 
@@ -66,6 +64,6 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
     @Override
     public boolean isMediaTypeSupported(String mediaType)
     {
-        return this.converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
+        return this.converter.isMediaTypeSupported(mediaType);
     }
 }

@@ -19,41 +19,52 @@
  */
 package org.xwiki.officeimporter.internal.converter;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.List;
 
-import org.jodconverter.core.document.DocumentFamily;
 import org.jodconverter.core.document.DocumentFormat;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 
 /**
- * Recognizes office formats.
+ * Default implementation for {@link OfficeDocumentFormat} based on Jodconverter's {@link DocumentFormat}.
  *
  * @version $Id$
- * @since 11.0
- * @since 10.11.9
+ * @since 13.1RC1
  */
-@Component
-@Singleton
-public class DefaultOfficeImporterRecognizer implements OfficeImporterRecognizer
+public class DefaultOfficeDocumentFormat implements OfficeDocumentFormat
 {
+    private DocumentFormat documentFormat;
+
     /**
-     * Used to query office server status.
+     * Default constructor.
+     *
+     * @param documentFormat Jodconverter's format.
      */
-    @Inject
-    private OfficeServer officeServer;
+    public DefaultOfficeDocumentFormat(DocumentFormat documentFormat)
+    {
+        this.documentFormat = documentFormat;
+    }
 
     @Override
-    public boolean isPresentation(String officeFileName)
+    public String getName()
     {
-        String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
-        OfficeConverter officeConverter = this.officeServer.getConverter();
-        if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
-        }
-        return false;
+        return this.documentFormat.getName();
+    }
+
+    @Override
+    public String getMediaType()
+    {
+        return this.documentFormat.getMediaType();
+    }
+
+    @Override
+    public List<String> getExtensions()
+    {
+        return this.documentFormat.getExtensions();
+    }
+
+    @Override
+    public String getExtension()
+    {
+        return this.documentFormat.getExtension();
     }
 }

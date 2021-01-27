@@ -45,7 +45,7 @@
     <module>xwiki-platform-legacy-model-api</module>
     <module>xwiki-platform-legacy-notification-activitymacro</module>
     <module>xwiki-platform-legacy-observation</module>
-    <module>xwiki-platform-legacy-office-importer</module>
+    <module>xwiki-platform-legacy-office</module>
     <module>xwiki-platform-legacy-oldcore</module>
     <module>xwiki-platform-legacy-rendering</module>
     <module>xwiki-platform-legacy-url</module>

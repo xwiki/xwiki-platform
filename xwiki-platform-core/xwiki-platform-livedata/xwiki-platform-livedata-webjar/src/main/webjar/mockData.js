@@ -237,13 +237,12 @@ define({
       },
       {
         id: "date",
-        defaultOperator: "equals",
+        defaultOperator: "isBetween",
         operators: [
-          { id: "equals", name: "Equals", },
-          { id: "nequals", name: "Not Equals", },
+          { id: "isBetween", name: "Is between", },
           { id: "before", name: "Before", },
           { id: "after", name: "After", },
-          { id: "isBetween", name: "Is between", },
+          { id: "contains", name: "Contains", },
         ],
       },
     ],

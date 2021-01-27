@@ -50,6 +50,10 @@ export default {
     filterEntry () {
       return (this.filterGroup.constraints || [])[this.index] || {};
     },
+    // The operator used, or default one if none specified
+    operator () {
+      return this.filterEntry.operator || this.logic.getFilterDefaultOperator(this.propertyId);
+    },
     // The property descriptor of `this.propetyId`
     propertyDescriptor () {
       return this.logic.getPropertyDescriptor(this.propertyId);
@@ -68,7 +72,7 @@ export default {
     // This method should be used to apply filter
     // As only the newValue has to be specified it is less error prone
     applyFilter (newValue) {
-      this.logic.filter(this.propertyId, this.index, {value: newValue});
+      this.logic.filter(this.propertyId, this.index, { value: newValue });
     },
 
     // Call applyFilter method, but using a delay

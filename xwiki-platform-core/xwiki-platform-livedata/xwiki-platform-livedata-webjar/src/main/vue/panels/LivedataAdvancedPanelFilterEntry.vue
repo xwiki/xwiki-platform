@@ -107,6 +107,17 @@ export default {
   width: 100%;
 }
 
+.livedata-filter-container .operator-select {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.livedata-filter-container .livedata-filter {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  overflow: hidden;
+}
+
 .livedata-filter-container .delete-filter {
   display: inline-block;
   visibility: hidden;

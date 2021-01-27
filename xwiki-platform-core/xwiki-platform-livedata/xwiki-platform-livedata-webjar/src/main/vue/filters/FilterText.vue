@@ -53,7 +53,7 @@ export default {
 <style>
 
 .livedata-filter .filter-text {
-  width: 100%;
+  border: none;
 }
 
 </style>

@@ -54,7 +54,7 @@ export default {
 <style>
 
 .livedata-filter .filter-number {
-  width: 100%;
+  border: none;
 }
 
 </style>

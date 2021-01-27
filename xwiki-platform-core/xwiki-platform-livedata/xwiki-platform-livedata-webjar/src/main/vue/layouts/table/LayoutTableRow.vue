@@ -90,6 +90,10 @@ export default {
   height: 100%;
 }
 
+.layout-table tbody tr:first-child .cell {
+  border: none;
+}
+
 .layout-table .livedata-entry-selector {
   align-items: flex-start;
   padding: 10px 2rem;

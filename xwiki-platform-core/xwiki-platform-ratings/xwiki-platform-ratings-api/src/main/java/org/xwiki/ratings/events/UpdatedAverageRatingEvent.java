@@ -40,7 +40,8 @@ public class UpdatedAverageRatingEvent extends AbstractAverageRatingEvent implem
     /**
      * Default constructor.
      *
-     * @since 13.0RC1
+     * @since 13.1RC1
+     * @since 12.10.4
      */
     @Unstable
     public UpdatedAverageRatingEvent()

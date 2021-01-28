@@ -30,6 +30,10 @@
   <packaging>jar</packaging>
   <name>XWiki Platform - Security - Authentication - API</name>
   <description>XWiki Platform - Security - Authentication - API contains the API related to authentication</description>
+  <properties>
+    <!-- Skipping revapi since xwiki-platform-legacy-security-authentication-api wraps this module and runs checks on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -63,6 +67,10 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
 

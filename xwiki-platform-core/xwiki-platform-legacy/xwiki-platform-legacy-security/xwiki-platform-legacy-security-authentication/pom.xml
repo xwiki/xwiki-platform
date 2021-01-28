@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,41 +18,22 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.security.authentication.api;
+-->
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.observation.event.Event;
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-legacy-security</artifactId>
+    <version>13.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-legacy-security-authentication</artifactId>
+  <name>XWiki Platform - Legacy - Security - Authentication</name>
+  <packaging>pom</packaging>
+  <description>Legacy package for xwiki-platform-security-authentication</description>
+  <modules>
+    <!-- Ordered Alphabetically -->
+    <module>xwiki-platform-legacy-security-authentication-api</module>
+  </modules>
+</project>
 
-/**
- * This event is triggered every time an authentication failure occurs.
- * <p>
- * The event also send the following parameters:
- * </p>
- * <ul>
- * <li>source: the username (as a {java.lang.String}) used for the authentication.</li>
- * </ul>
- *
- * @version $Id$
- * @since 11.6RC1
- */
-public class AuthenticationFailureEvent implements Event
-{
-    @Override
-    public boolean matches(Object otherEvent)
-    {
-        return otherEvent instanceof AuthenticationFailureEvent;
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        return other instanceof AuthenticationFailureEvent;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(39, 41).hashCode();
-    }
-}

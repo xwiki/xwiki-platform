@@ -49,11 +49,11 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.security.authentication.api.AuthenticationConfiguration;
-import org.xwiki.security.authentication.api.AuthenticationFailureEvent;
-import org.xwiki.security.authentication.api.AuthenticationFailureLimitReachedEvent;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
-import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.security.authentication.AuthenticationConfiguration;
+import org.xwiki.security.authentication.AuthenticationFailureEvent;
+import org.xwiki.security.authentication.AuthenticationFailureLimitReachedEvent;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;

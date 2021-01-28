@@ -17,60 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authentication.internal;
+package org.xwiki.security.authentication.api.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.security.authentication.AuthenticationConfiguration;
+import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 
 /**
- * Default implementation for {@link AuthenticationConfiguration}.
+ * Default implementation of {@link AuthenticationConfiguration} that relies on
+ * {@link org.xwiki.security.authentication.AuthenticationConfiguration}.
  *
  * @version $Id$
- * @since 11.6RC1
+ * @since 13.1RC1
+ * @deprecated Since 13.1RC1. This component is only provided to allow injecting the deprecated role,
+ * but should not be used.
  */
+@Deprecated
 @Component
 @Singleton
-public class DefaultAuthenticationConfiguration implements AuthenticationConfiguration
+public class LegacyAuthenticationConfiguration implements AuthenticationConfiguration
 {
-    /**
-     * Defines from where to read the Resource configuration data.
-     */
     @Inject
-    @Named("authentication")
-    private ConfigurationSource configuration;
+    private org.xwiki.security.authentication.AuthenticationConfiguration authenticationConfiguration;
 
     @Override
     public int getMaxAuthorizedAttempts()
     {
-        return configuration.getProperty("maxAuthorizedAttempts", 3);
+        return this.authenticationConfiguration.getMaxAuthorizedAttempts();
     }
 
     @Override
     public int getTimeWindow()
     {
-        return configuration.getProperty("timeWindowAttempts", 300);
+        return this.authenticationConfiguration.getTimeWindow();
     }
 
     @Override
     public String[] getFailureStrategies()
     {
-        String strategies = configuration.getProperty("failureStrategy", "");
-        if (!StringUtils.isEmpty(strategies)) {
-            return strategies.split(",");
-        } else {
-            return new String[0];
-        }
+        return this.authenticationConfiguration.getFailureStrategies();
     }
 
     @Override
     public boolean isAuthenticationSecurityEnabled()
     {
-        return configuration.getProperty("isAuthenticationSecurityEnabled", true);
+        return this.authenticationConfiguration.isAuthenticationSecurityEnabled();
     }
 }

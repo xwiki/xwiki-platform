@@ -17,43 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authentication.internal;
+package org.xwiki.security.authentication.api;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.AbstractEventListener;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authentication.AuthenticationFailureEvent;
 
 /**
- * Logger listener for {@link AuthenticationFailureEvent} that warn about the authentication failures.
+ * This event is triggered every time an authentication failure occurs.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the username (as a {java.lang.String}) used for the authentication.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 11.6RC1
+ * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationFailureEvent}.
  */
-@Component
-@Singleton
-@Named("org.xwiki.security.authentication.internal.AuthenticationFailureLoggerListener")
-public class AuthenticationFailureLoggerListener extends AbstractEventListener
+@Deprecated
+public class AuthenticationFailureEvent implements Event
 {
-    @Inject
-    private Logger logger;
-
-    /**
-     * Default constructor.
-     */
-    public AuthenticationFailureLoggerListener()
+    @Override
+    public boolean matches(Object otherEvent)
     {
-        super(AuthenticationFailureLoggerListener.class.getName(), new AuthenticationFailureEvent());
+        return otherEvent instanceof AuthenticationFailureEvent;
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public boolean equals(Object other)
     {
-        logger.warn("Authentication failure with login [{}]", source);
+        return other instanceof AuthenticationFailureEvent;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(39, 41).hashCode();
     }
 }

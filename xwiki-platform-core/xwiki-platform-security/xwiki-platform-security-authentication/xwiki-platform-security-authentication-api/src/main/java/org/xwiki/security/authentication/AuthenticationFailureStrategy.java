@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authentication.api;
+package org.xwiki.security.authentication;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Describes a strategy to perform in case the limit of authentication failures is reached.
@@ -35,8 +37,9 @@ import org.xwiki.component.annotation.Role;
  * In this case if the CAPTCHA is displayed, we should use it also to prevent attacking the other user.
  *
  * @version $Id$
- * @since 11.6RC1
+ * @since 13.1RC1
  */
+@Unstable
 @Role
 public interface AuthenticationFailureStrategy
 {

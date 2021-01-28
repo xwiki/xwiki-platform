@@ -29,7 +29,9 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @since 11.6RC1
+ * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationFailureManager}.
  */
+@Deprecated
 @Role
 public interface AuthenticationFailureManager
 {

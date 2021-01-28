@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-legacy-security-authentication</artifactId>
+    <version>13.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-legacy-security-authentication-api</artifactId>
+  <name>XWiki Platform - Legacy - Security Authentication API</name>
+  <packaging>jar</packaging>
+  <description>Repackages xwiki-platform-security-authentication-api including the legacy code/APIs</description>
+  <properties>
+    <!-- The features provided by this module so that it's found when resolving extension -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-security-authentication-api</xwiki.extension.features>
+  </properties>
+  <dependencies>
+    <!-- Trigger xwiki-platform-security-authentication-api dependencies (but without xwiki-platform-security-authentication-api jar itself) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <!-- We need this dependency so that the wrapped module is built before this one -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
+      <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it. -->
+      <scope>provided</scope>
+    </dependency>
+    <!-- Build dependencies -->
+    <dependency>
+      <!-- Needed for backward compatibility Aspects -->
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Apply Backward compatibility Aspects using the strategy described at
+        http://blogs.sonatype.com/john/2007/11/09/1194630418546.html -->
+      <plugin>
+        <groupId>com.nickwongdev</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>backward-compatibility-aspects</id>
+            <configuration>
+              <weaveDependencies>
+                <weaveDependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-security-authentication-api</artifactId>
+                </weaveDependency>
+              </weaveDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <!-- Make sure we run the tests only with the aspectified JARs since otherwise components will be registered
+           twice for example. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-security-authentication-api:jar</classpathDependencyExcludes>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Skip foreign declaration checks since we merge the components.txt -->
+                      <name>skipForeignDeclarations</name>
+                      <value>true</value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

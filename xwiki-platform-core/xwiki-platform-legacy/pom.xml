@@ -48,6 +48,7 @@
     <module>xwiki-platform-legacy-office</module>
     <module>xwiki-platform-legacy-oldcore</module>
     <module>xwiki-platform-legacy-rendering</module>
+    <module>xwiki-platform-legacy-security</module>
     <module>xwiki-platform-legacy-url</module>
     <module>xwiki-platform-legacy-web</module>
     <module>xwiki-platform-legacy-refactoring</module>

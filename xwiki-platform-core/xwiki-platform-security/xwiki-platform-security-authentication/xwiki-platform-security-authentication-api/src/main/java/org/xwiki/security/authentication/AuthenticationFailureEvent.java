@@ -17,41 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authentication.api;
+package org.xwiki.security.authentication;
 
-import org.xwiki.component.annotation.Role;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.observation.event.Event;
+import org.xwiki.stability.Unstable;
 
 /**
- * Configuration of the authentication properties.
+ * This event is triggered every time an authentication failure occurs.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the username (as a {java.lang.String}) used for the authentication.</li>
+ * </ul>
  *
- * @since 11.6RC1
  * @version $Id$
+ * @since 13.1RC1
  */
-@Role
-public interface AuthenticationConfiguration
+@Unstable
+public class AuthenticationFailureEvent implements Event
 {
-    /**
-     * @return the number of authorized authentication failure before the strategies are activated.
-     */
-    int getMaxAuthorizedAttempts();
-
-    /**
-     * @return the time window in seconds during which the authentication failures should occur to activate
-     *         the failure strategy.
-     */
-    int getTimeWindow();
-
-    /**
-     * @return the names of the {@link AuthenticationFailureStrategy} to activate, each name is a strategy hint.
-     */
-    String[] getFailureStrategies();
-
-    /**
-     * @return {@code true} if the authentication security mechanism is enabled.
-     * @since 11.10
-     */
-    default boolean isAuthenticationSecurityEnabled()
+    @Override
+    public boolean matches(Object otherEvent)
     {
-        return true;
+        return otherEvent instanceof AuthenticationFailureEvent;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        return other instanceof AuthenticationFailureEvent;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(39, 41).hashCode();
     }
 }

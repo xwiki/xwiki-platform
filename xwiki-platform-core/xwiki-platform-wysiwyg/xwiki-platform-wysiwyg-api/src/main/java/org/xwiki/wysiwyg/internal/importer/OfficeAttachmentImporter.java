@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
@@ -153,10 +151,8 @@ public class OfficeAttachmentImporter implements AttachmentImporter
      */
     private boolean isPresentation(String fileName)
     {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         if (officeServer.getConverter() != null) {
-            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+            return officeServer.getConverter().isPresentation(fileName);
         }
         return false;
     }

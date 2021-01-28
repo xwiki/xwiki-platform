@@ -19,28 +19,28 @@
  */
 package org.xwiki.officeimporter.internal.converter;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.jodconverter.LocalConverter;
-import org.jodconverter.job.ConversionJobWithOptionalSourceFormatUnspecified;
-import org.jodconverter.job.ConversionJobWithOptionalTargetFormatUnspecified;
-import org.jodconverter.office.OfficeException;
+import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
+import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
+import org.jodconverter.core.office.OfficeException;
+import org.jodconverter.local.LocalConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.test.junit5.XWikiTempDir;
-import org.xwiki.test.junit5.mockito.ComponentTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -105,6 +105,19 @@ public class DefaultOfficeConverterTest
         assertEquals("myOutputFile", argument.getValue().getName());
 
         verify(jobTarget).execute();
+    }
 
+    @Test
+    public void isConversionSupported() throws Exception
+    {
+        when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
+        for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
+            "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",
+            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel")) {
+            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+        }
+        for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
+            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+        }
     }
 }

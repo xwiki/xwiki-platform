@@ -36,8 +36,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
@@ -102,7 +100,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     @Inject
     @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTemporaryResourceReferenceSerializer;
+    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
+        urlTemporaryResourceReferenceSerializer;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -298,11 +297,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      */
     private boolean isPresentation(String fileName)
     {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         OfficeConverter officeConverter = this.officeServer.getConverter();
         if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
+            return officeConverter.isPresentation(fileName);
         }
 
         return false;

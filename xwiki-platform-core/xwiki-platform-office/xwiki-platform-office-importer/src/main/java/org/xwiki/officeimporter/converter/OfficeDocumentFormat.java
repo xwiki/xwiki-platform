@@ -17,23 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.converter;
+package org.xwiki.officeimporter.converter;
 
-import org.xwiki.component.annotation.Role;
+import java.util.List;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * Recognizes office formats.
+ * Representation of an OfficeDocumentFormat.
  *
  * @version $Id$
- * @since 11.0
- * @since 10.11.9
+ * @since 13.1RC1
  */
-@Role
-public interface OfficeImporterRecognizer
+@Unstable
+public interface OfficeDocumentFormat
 {
     /**
-     * @param officeFileName the office file name to recognize
-     * @return true if the file name / extension represents an office presentation format
+     * @return the name of the document format.
      */
-    boolean isPresentation(String officeFileName);
+    String getName();
+
+    /**
+     * @return the media content type corresponding to this format.
+     */
+    String getMediaType();
+
+    /**
+     * @return the list of known file extensions associated with this format.
+     */
+    List<String> getExtensions();
+
+    /**
+     * @return the first file extension associated with this format.
+     */
+    String getExtension();
 }

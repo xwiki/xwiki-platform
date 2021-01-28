@@ -17,43 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.converter;
+package org.xwiki.office.viewer.internal;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.office.viewer.OfficeViewer;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 
 /**
- * Recognizes office formats.
- *
+ * Default implementation of {@link OfficeViewer}.
+ * 
+ * @since 2.5M2
  * @version $Id$
- * @since 11.0
- * @since 10.11.9
  */
 @Component
 @Singleton
-public class DefaultOfficeImporterRecognizer implements OfficeImporterRecognizer
+public class DefaultOfficeViewer implements OfficeViewer
 {
-    /**
-     * Used to query office server status.
-     */
     @Inject
-    private OfficeServer officeServer;
+    private OfficeResourceViewer officeViewer;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public boolean isPresentation(String officeFileName)
+    public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
-        String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
-        OfficeConverter officeConverter = this.officeServer.getConverter();
-        if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
-        }
-        return false;
+        String reference = this.serializer.serialize(attachmentReference);
+
+        return this.officeViewer.createView(new AttachmentResourceReference(reference), parameters);
     }
 }

@@ -126,7 +126,13 @@
               </item>
             </revapi.ignore>
             -->
-            
+            <revapi.ignore>
+              <item>
+                <code>java.method.removed</code>
+                <old>method org.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()</old>
+                <justification>This API has been removed to avoid future issues with the exposure of Jodconverter classes when upgrading. Some API have been introduced that should cover most of the usecases.</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

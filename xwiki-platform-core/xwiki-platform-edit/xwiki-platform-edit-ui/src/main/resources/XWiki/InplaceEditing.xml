@@ -212,11 +212,18 @@ define('xwiki-document-api', ['jquery'], function($) {
       var queryString = {
         xpage: 'get',
         outputTitle: true,
-        outputSyntax: forView ? null : 'annotatedxhtml',
         language: this.getRealLocale(),
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       };
+      if (!forView) {
+        // We need the annotated XHTML when editing in order to be able to protect the rendering transformations and to
+        // be able to recreate the wiki syntax.
+        queryString.outputSyntax = 'annotatedxhtml';
+        // Currently, only the macro transformations are protected and thus can be edited.
+        // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
+        queryString.transformations = 'macro';
+      }
       var thisXWikiDocument = this;
       return $.get(this.getURL('view'), queryString).fail(function() {
         new XWiki.widgets.Notification(

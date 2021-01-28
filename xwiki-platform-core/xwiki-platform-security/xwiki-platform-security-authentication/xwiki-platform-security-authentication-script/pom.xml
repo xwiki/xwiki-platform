@@ -31,8 +31,11 @@
   <name>XWiki Platform - Security - Authentication - Script</name>
   <description>XWiki Platform - Security - Authentication - Script contains the script service related to authentication</description>
 
-  <dependencies>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
+  </properties>
 
+  <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>
@@ -52,6 +55,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

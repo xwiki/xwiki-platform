@@ -23,6 +23,7 @@
     "source":{
       "id":"liveTable",
       "template":"getdeleteddocuments.vm",
+      "$doc":"xwiki:Test.WebHome",
       "translationPrefix":"core.restore.batch.",
       "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
     },

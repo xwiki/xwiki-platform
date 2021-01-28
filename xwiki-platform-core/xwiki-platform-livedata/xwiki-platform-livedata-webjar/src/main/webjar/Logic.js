@@ -897,7 +897,10 @@ define([
     sort (property, level, descending) {
       const err = new Error("Property `" + property + "` is not sortable");
       return new Promise ((resolve, reject) => {
-        if (!this.isPropertySortable(property)) { return void reject(err); }
+        // Allow the user to remove a sort entry (level < 0) even if the property is not sortable.
+        if (!(level < 0 || this.isPropertySortable(property))) {
+          return void reject(err);
+        }
         // find property current sort level
         const currentLevel = this.data.query.sort.findIndex(sortObject => sortObject.property === property);
         // default level

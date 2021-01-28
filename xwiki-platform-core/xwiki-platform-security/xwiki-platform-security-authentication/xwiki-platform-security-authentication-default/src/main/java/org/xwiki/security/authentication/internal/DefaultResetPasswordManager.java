@@ -102,7 +102,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     private UserReferenceSerializer<String> referenceSerializer;
 
     @Inject
-    private ResetPasswordMailSender resetPasswordMailSender;
+    private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
 
     private void checkUserReference(UserReference userReference) throws ResetPasswordException
     {
@@ -198,8 +198,8 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
             URL serverURL = context.getURLFactory().getServerURL(context);
             URL externalVerificationURL = new URL(serverURL, extendedURL.serialize());
 
-            this.resetPasswordMailSender.sendResetPasswordEmail(formattedName, requestResponse.getUserEmail(),
-                externalVerificationURL);
+            this.resetPasswordMailSenderProvider.get()
+                .sendResetPasswordEmail(formattedName, requestResponse.getUserEmail(), externalVerificationURL);
         } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException | MalformedURLException e)
         {
             throw new ResetPasswordException("Error when processing information for creating the email.", e);

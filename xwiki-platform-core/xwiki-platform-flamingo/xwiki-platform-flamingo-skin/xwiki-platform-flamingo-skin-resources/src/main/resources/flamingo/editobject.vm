@@ -35,7 +35,7 @@
  * Display an object
  * NOTE: the $document.display*(something, ...) methods are very difficult to use correctly, because they sometimes generate (unescaped) HTML
  *#
-#macro(displayObject $obj $class $props $firstField)
+#macro(displayObject $obj $class $props $firstField $isNew)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
@@ -46,8 +46,17 @@
         #end
     </h3>
   </div>
-  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
-    <dl>
+  <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content">
+  #if ($isNew == "true")
+    #displayObjectContent($obj $class $props)
+  #end
+  </div>## xobject-content
+  </div>## xobject
+#end
+
+#macro(displayObjectContent $obj $class $props)
+<div>
+  <dl>
     #if ($hasCustomField)
       #set ($properties = [])
       #foreach ($propName in $customField.split(','))
@@ -59,32 +68,31 @@
     #foreach ($prop in $properties)
       <dt#if ($prop.isDisabled()) class="disabled"#end>
         <label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}"
-          >$escapetool.xml($prop.translatedPrettyName)</label>
+        >$escapetool.xml($prop.translatedPrettyName)</label>
         <span class="xHint">$!escapetool.xml($prop.hint)</span>
       </dt>
       <dd#if ($prop.isDisabled()) class="disabled"#end>
         $doc.display($prop.name, 'edit', $obj)
       </dd>
     #end
-    </dl>
-    #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
-    #if ($deprecatedProperties.size() > 0)
+  </dl>
+  #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
+  #if ($deprecatedProperties.size() > 0)
     <div class="box warningmessage deprecatedProperties">
       <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
-      #foreach ($prop in $deprecatedProperties)
-        <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-        <dd class="disabled">${escapetool.xml($prop.value)}</dd>
-      #end
+        #foreach ($prop in $deprecatedProperties)
+          <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
+          <dd class="disabled">${escapetool.xml($prop.value)}</dd>
+        #end
       </dl>
       <div>
         <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
            title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.link')</a>
       </div>
     </div>
-    #end
-  </div></div>## xobject-content
-  </div>## xobject
+  #end
+</div>
 #end
 ##
 #*
@@ -151,14 +159,16 @@
       ## display the other objects coming from the server since they are supposed to be deleted in the editor.
       #if ("$!newObject" != "")
         #set ($objects = [$newObject])
+        #set ($isNew = "true")
       #else
         #set ($objects = $doc.getObjects($class.name))
+        #set ($isNew = "")
       #end
       #set ($objectCount = $objects.size())
       <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
       <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
       #foreach ($object in $objects)
-        #displayObject($object $class $props $titleField)
+        #displayObject($object $class $props $titleField $isNew)
       #end
       #displayAddObject($class)
       </div></div>
@@ -273,7 +283,7 @@
         #displayClass($class $newobj)
       #else
         #getTitleField($props)
-        #displayObject($newobj $class $props $titleField)
+        #displayObject($newobj $class $props $titleField "true")
       #end ## is new class
     #end ## xredirect
   #end ## class exists
@@ -281,6 +291,18 @@
 ##
 ##
 ##
+#elseif ("$!{request.xaction}" == 'loadObject')
+  #set ($classname = ${request.classname})
+  #set ($objectNumber = $request.objectNumber)
+  #set ($class = $xwiki.getClass($classname))
+  #set ($props = $class.getProperties())
+  #set ($obj = $doc.getObject($classname, $objectNumber))
+  ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
+  ## The object editor will move these 'includes' (link/script tags) in the head of the HTML page.
+  ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
+  <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
+  #skinExtensionHooks
+  #displayObjectContent($obj $class $props)
 #elseif ("$!request.xpage" == 'editobject')
   ## Old (pre 1.0) way of using this template
   $response.sendRedirect($doc.getURL('edit', 'editor=object'))

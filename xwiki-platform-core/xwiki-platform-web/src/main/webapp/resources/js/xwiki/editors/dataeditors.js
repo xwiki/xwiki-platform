@@ -652,15 +652,60 @@ editors.XDataEditors = Class.create({
   // ------------------------------------
   // Expand/collapse objects and object properties
   expandCollapseObject : function(object) {
-    var totalItems = $$('#xwikiobjects .xobject').size();
     object.addClassName('collapsable');
-    if (totalItems > 1) {
-      object.toggleClassName('collapsed');
+    var objectContent = object.down('.xobject-content');
+
+    if (objectContent.childElementCount === 0) {
+      object.addClassName('collapsed');
     }
     var objectTitle = object.down('.xobject-title');
+    var xclassName = this.getXClassNameFromXObjectId(object.id);
+    var xObjectNumber = this.getXObjectNumberFromXObjectId(object.id);
     objectTitle.observe('click', function(event) {
-      objectTitle.up().toggleClassName('collapsed');
-    }.bindAsEventListener());
+      var isAlreadyLoaded = objectContent.childElementCount > 0;
+      if (!isAlreadyLoaded) {
+        var editURL = this.editedDocument.getURL('edit', Object.toQueryString({
+          xpage: 'editobject',
+          xaction: 'loadObject',
+          classname: xclassName,
+          objectNumber: xObjectNumber
+        }));
+        new Ajax.Request(
+          /* Ajax request URL */
+          editURL,
+          /* Ajax request parameters */
+          {
+            onCreate : function() {
+              object.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.inProgress')", "inprogress");
+            },
+            onSuccess : function(response) {
+              var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
+              objectContent.insertBefore(responseDocumentFragment, null);
+              document.fire('xwiki:dom:updated', {elements: [objectContent.firstChild]});
+              objectTitle.up().toggleClassName('collapsed');
+              object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
+            }.bind(this),
+            onFailure : function(response) {
+              var failureReason = response.statusText;
+              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                failureReason = 'Server not responding';
+              }
+              object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.failed') " + failureReason, "error"));
+            },
+            // IE converts 204 status code into 1223...
+            on1223 : function(response) {
+              response.request.options.onSuccess(response);
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            }
+          }
+        );
+      } else {
+        objectTitle.up().toggleClassName('collapsed');
+      }
+    }.bindAsEventListener(this));
   },
   // ------------------------------------
   //  Expand/collapse classes

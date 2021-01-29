@@ -85,7 +85,45 @@ export default {
       this._applyFilterTimeoutId = setTimeout(() => {
         this.applyFilter(newValue);
       }, timeoutDelay);
+    },
+
+    // This method is automatically called by the widget when the operator change
+    // It allow to decide what to do with the current value,
+    // according to the new chosen operator
+    // and the rules defined in the data function of the widget
+    _operatorChangeHandler (oldOperator, newOperator) {
+      if (!this.rules) { return; }
+      // We reverse the rules so that the last ones take precedence over the first ones
+      this.rules.slice().reverse().some(rule => {
+        // Transform everything to array
+        if (!(rule.from instanceof Array)) { rule.from = [rule.from]; }
+        if (!(rule.to instanceof Array)) { rule.to = [rule.to]; }
+        // Try to see if rule matches
+        if (!rule.from.includes(oldOperator)) { return; }
+        if (!rule.to.includes(newOperator)) { return; }
+        // Rule matches the `from` and `to` operator criterias
+        const newValue = rule.getValue({
+          oldValue: this.filterEntry.value,
+          oldOperator,
+          newOperator,
+        });
+        this.applyFilter(newValue);
+      })
     }
+  },
+
+  created () {
+    // Whenever the filter operator changes
+    // Update the filter value according to the rules defined in the filter widget
+    this.logic.onEventWhere("filter", {
+      type: "modify",
+      oldEntry: { property: this.propertyId, index: this.index }
+    }, e => {
+      if (e.detail.oldEntry.operator === e.detail.newEntry.operator) { return; }
+      // We don't want the other filter widget to call the hanlder the same value
+      e.stopImmediatePropagation();
+      this._operatorChangeHandler(e.detail.oldEntry.operator, e.detail.newEntry.operator);
+    });
   },
 
 };

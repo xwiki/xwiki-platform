@@ -64,6 +64,30 @@ export default {
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
 
+  data () {
+    return {
+      rules: [
+        {
+          from: "contains",
+          to: ["before", "after", "isBetween"],
+          getValue: ({ oldValue, oldOperator, newOperator }) => {
+            return "";
+          },
+        },
+        {
+          from: ["before", "after", "isBetween"],
+          to: "contains",
+          getValue: ({ oldValue, oldOperator, newOperator }) => {
+            if (!oldValue) { return ""; }
+            const newValue = moment(+oldValue.split("-")[0]);
+            if (!newValue.isValid()) { return ""; }
+            return newValue.format(this.format);
+          },
+        },
+      ],
+    };
+  },
+
 
   computed: {
 

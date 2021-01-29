@@ -131,12 +131,12 @@ define([
     /**
      * Listen for custom events
      * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
-     * @param {Function} callback Function to call we the event is triggered
+     * @param {Function} callback Function to call we the event is triggered: e => { ... }
      */
     onEvent (eventName, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
-        callback(e.detail);
+        callback(e);
       });
     },
 
@@ -147,22 +147,26 @@ define([
      * @param {Object|Function} condition The condition to execute the callback
      *  if Object, values of object properties must match e.detail properties values
      *  if Function, the function must return true. e.detail is passed as argument
-     * @param {Function} callback Function to call we the event is triggered
+     * @param {Function} callback Function to call we the event is triggered: e => { ... }
      */
     onEventWhere (eventName, condition, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
         // Object check
         if (typeof condition === "object") {
-          const every = Object.keys(condition).every(key => condition[key] === e.detail[key]);
-          if (!every) { return; }
+          const isDetailMatching = (data, detail) => Object.keys(data).every(key => {
+            return typeof data[key] === "object"
+              ? isDetailMatching(data[key], detail?.[key])
+              : Object.is(data[key], detail?.[key]);
+          });
+          if (!isDetailMatching(condition, e.detail)) { return; }
         }
         // Function check
         if (typeof condition === "function") {
           if (!condition(e.detail)) { return; }
         }
         // call callback
-        callback(e.detail);
+        callback(e);
       });
     },
 
@@ -1113,10 +1117,6 @@ define([
         .some(operator => operator.id === newEntry.operator);
       if (!newEntryValidOperator) {
         newEntry.operator = self.getFilterDefaultOperator(newEntry.property);
-      }
-      // If operator has changed, reset value
-      if (oldEntry.operator && oldEntry.operator !== newEntry.operator) {
-        newEntry.value = undefined;
       }
       return {
         oldEntry: oldEntry,

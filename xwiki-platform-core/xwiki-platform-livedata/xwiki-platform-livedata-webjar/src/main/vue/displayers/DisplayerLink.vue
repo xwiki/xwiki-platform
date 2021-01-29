@@ -79,7 +79,14 @@ export default {
   computed: {
     // The link href taken from the propertyHref property of the entry
     href () {
-      return this.config.propertyHref && this.entry[this.config.propertyHref] || "#";
+      // propertyHref can have multiple values, in which case we use the first that is set on the live data entry.
+      let values = this.config.propertyHref;
+      if (typeof values === 'string') {
+        values = [values];
+      } else if (!Array.isArray(values)) {
+        values = [];
+      }
+      return values.map(value => this.entry[value]).find(value => value) || '#';
     },
   },
 

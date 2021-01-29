@@ -61,11 +61,11 @@
           <slot
             name="option"
             :value="option.value"
-            :label="option.name"
+            :label="option.label"
             :checked="isSelected(option)"
             :toggle="toggleSelect"
           >
-            {{ option.name }}
+            {{ option.label }}
           </slot>
         </a>
       </li>
@@ -107,16 +107,10 @@ export default {
 
   computed: {
     optionsValues () {
-      console.log("optionsValues", this.options.map(option => option.value));
-      console.log("this.options", this.options);
-      console.log("this", this);
       return this.options.map(option => option.value);
     },
 
     selected () {
-      console.log("selected", this.selectedValues.map(value => this.options.find(option => option.value === value)));
-      console.log("this.selectedValues", this.selectedValues);
-      console.log("this", this);
       return this.selectedValues.map(value => this.options.find(option => option.value === value));
     },
   },
@@ -133,7 +127,6 @@ export default {
     select (option) {
       if (!this.isValidOption(option)) { return; }
       if (this.isSelected(option)) { return; }
-      console.log("select", this.select);
       const _selected = this.multiple ? this.selectedValues.slice() : [];
       _selected.push(option.value);
       this.sortSelected(_selected);
@@ -141,7 +134,6 @@ export default {
     },
 
     deselect (option) {
-      if (!this.isValidOption(option)) { return; }
       const index = this.selectedValues.indexOf(option.value);
       if (index === -1) { return; }
       const _selected = this.selectedValues.slice();

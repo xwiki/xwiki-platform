@@ -36,7 +36,7 @@
     :selected-values="values"
     :multiple="true"
     :sort="true"
-    @change="applyFilter($event.toString())"
+    @change="applyListFilter"
   >
 
     <!--
@@ -95,10 +95,28 @@ export default {
     // but if no Array is found, the string is parsed as a singleton
     // so that it always return an array
     values () {
-      if (this.filterEntry.value) {
-        return this.filterEntry.value.split(",");
+      try {
+        // Try to parse the string as an array
+        const values = JSON.parse(this.filterEntry.value);
+        return values;
+      } catch (err) {
+        if (!this.filterEntry.value) {
+          return [];
+        } else {
+          return [this.filterEntry.value];
+        }
+      }
+    },
+  },
+
+  methods: {
+    applyListFilter (values) {
+      if (values.length === 0) {
+        this.applyFilter("");
+      } else if (values.length === 1) {
+        this.applyFilter(values[0]);
       } else {
-        return [];
+        this.applyFilter(JSON.stringify(values));
       }
     },
   },

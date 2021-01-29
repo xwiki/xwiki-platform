@@ -316,23 +316,27 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
             displayerConfig.setParameter(ACTIONS, columnProperties.get(ACTIONS));
         } else if (columnProperties.path(LINK).isTextual()) {
             displayerConfig.setId(LINK);
-            Map<String, String[]> propertyHref = new HashMap<>();
-            String docURL = "doc.url";
-            String columnURL = column + "_url";
-            propertyHref.put("auto", new String[] {columnURL, docURL});
-            propertyHref.put("field", new String[] {columnURL});
-            propertyHref.put("author", new String[] {"doc.author_url"});
-            propertyHref.put("space", new String[] {"doc.space_url"});
-            propertyHref.put("wiki", new String[] {"doc.wiki_url"});
-            String linkType = columnProperties.get(LINK).asText();
-            String[] values = propertyHref.getOrDefault(linkType, new String[] {docURL});
-            displayerConfig.setParameter("propertyHref", values[0]);
+            displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
         } else if (columnProperties.path(HTML).booleanValue()) {
             displayerConfig.setId(HTML);
         } else {
             displayerConfig = null;
         }
         return displayerConfig;
+    }
+
+    private Object getLinkTarget(String column, String linkType)
+    {
+        String docURL = "doc.url";
+        String columnURL = column + "_url";
+        if ("auto".equals(linkType)) {
+            return new String[] {columnURL, docURL};
+        } else if ("field".equals(linkType)) {
+            return columnURL;
+        } else {
+            String linkTypeURL = String.format("doc.%s_url", linkType);
+            return new String[] {linkTypeURL, docURL};
+        }
     }
 
     private FilterDescriptor getFilterConfig(ObjectNode columnProperties)

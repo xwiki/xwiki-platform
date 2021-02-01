@@ -226,12 +226,14 @@ public class ObjectEditorIT
         assertEquals(2, numberObjects.size());
 
         number1 = numberObjects.get(0);
+        number1.loadObject();
         assertEquals(0, number1.getObjectNumber());
         assertTrue(number1.isDeleteLinkDisplayed());
         assertTrue(number1.isEditLinkDisplayed());
         assertEquals("24", number1.getFieldValue(number1.byPropertyName("number")));
 
         number2 = numberObjects.get(1);
+        number2.loadObject();
         assertEquals(1, number2.getObjectNumber());
         assertTrue(number2.isDeleteLinkDisplayed());
         assertTrue(number2.isEditLinkDisplayed());

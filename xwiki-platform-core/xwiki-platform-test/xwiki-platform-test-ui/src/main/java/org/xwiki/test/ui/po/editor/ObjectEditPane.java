@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -73,6 +74,21 @@ public class ObjectEditPane extends FormContainerElement
 
         this.className = className;
         this.objectNumber = objectNumber;
+    }
+
+    /**
+     * Click on the xobject div to expand it, and waits until the information are loaded.
+     * Note that this method should not be used if the xobject has just been added since information are already
+     * expanded and the click will collapse them.
+     *
+     * @since 13.1RC1
+     */
+    @Unstable
+    public void loadObject()
+    {
+        String xobjectId = String.format("xobject_%s_%s", this.className, this.objectNumber);
+        getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();
+        this.waitForNotificationSuccessMessage("Object loaded");
     }
 
     /**

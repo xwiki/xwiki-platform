@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,6 +31,7 @@ import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 /**
  * Test XClass editing.
@@ -104,6 +107,9 @@ public class EditClassTest extends AbstractTest
         Assert.assertEquals("this is the content: /testing value 2/testing value 1", vp.getContent());
 
         ObjectEditPage oep = vp.editObjects();
+        List<ObjectEditPane> objectsOfClass = oep.getObjectsOfClass("Test.EditObjectsTestClass");
+        Assert.assertEquals(1, objectsOfClass.size());
+        objectsOfClass.get(0).loadObject();
         Assert.assertNotNull(getDriver().findElement(By.className("deprecatedProperties")));
         Assert.assertNotNull(getDriver().findElement(By.cssSelector(".deprecatedProperties label")));
         Assert.assertEquals("prop1:", getDriver().findElement(By.cssSelector(".deprecatedProperties label")).getText());

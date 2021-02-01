@@ -442,6 +442,11 @@
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
+        <artifactId>jempbox</artifactId>
+        <version>${pdfbox.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox-tools</artifactId>
         <version>${pdfbox.version}</version>
       </dependency>

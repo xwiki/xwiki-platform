@@ -105,7 +105,8 @@ public class LikeScriptService implements ScriptService
     }
 
     /**
-     * Check if the display button should be displayed: should be {@code true} if current user is authorized to use like
+     * Check if the display button should be displayed: should be {@code true} if the like feature is enabled
+     * (see {@link LikeConfiguration#isEnabled()}) and if current user is authorized to use like
      * (see {@link #isAuthorized(EntityReference)}) or if the configuration is set to always display it
      * (see {@link LikeConfiguration#alwaysDisplayButton()}).
      *
@@ -114,7 +115,18 @@ public class LikeScriptService implements ScriptService
      */
     public boolean displayButton(EntityReference entityReference)
     {
-        return this.likeConfiguration.alwaysDisplayButton() || this.isAuthorized(entityReference);
+        return this.likeConfiguration.isEnabled()
+            && (this.likeConfiguration.alwaysDisplayButton() || this.isAuthorized(entityReference));
+    }
+
+    /**
+     * @return {@code true} if the Like feature is enabled.
+     * @since 13.1RC1
+     */
+    @Unstable
+    public boolean isEnabled()
+    {
+        return this.likeConfiguration.isEnabled();
     }
 
     /**

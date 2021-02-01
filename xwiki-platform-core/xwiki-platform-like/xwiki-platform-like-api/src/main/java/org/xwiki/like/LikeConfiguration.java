@@ -42,4 +42,14 @@ public interface LikeConfiguration
      * @return the maximum number of like information to keep in cache.
      */
     int getLikeCacheCapacity();
+
+    /**
+     * @return {@code true} if the like feature is enabled.
+     * @since 13.1RC1
+     */
+    @Unstable
+    default boolean isEnabled()
+    {
+        return true;
+    }
 }

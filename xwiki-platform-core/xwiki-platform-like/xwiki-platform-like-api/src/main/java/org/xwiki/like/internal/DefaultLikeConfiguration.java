@@ -52,4 +52,10 @@ public class DefaultLikeConfiguration implements LikeConfiguration
     {
         return this.configurationSource.getProperty("cacheCapacity", 500);
     }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return this.configurationSource.getProperty("enabled", true);
+    }
 }

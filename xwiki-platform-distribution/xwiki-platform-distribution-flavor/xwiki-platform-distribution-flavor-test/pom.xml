@@ -281,6 +281,9 @@
                     templates/xpart\.vm <!-- avoid recursive include -->
                     templates/init\.vm <!-- escaping does not like it but it does not take any parameter anyway -->
                     templates/xml\.vm <!-- it's not escaping test job to validate XML format -->
+                    <!-- Those pages are deprecated and triggers a log warning -->
+                    XWiki/ResetPassword\.xml
+                    XWiki/ForgotUsername\.xml
                 </value>
               </property>
               <property>

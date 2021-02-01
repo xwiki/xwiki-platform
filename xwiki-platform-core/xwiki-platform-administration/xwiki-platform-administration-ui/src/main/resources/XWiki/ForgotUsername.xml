@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($newUrl = $services.security.authentication.getAuthenticationURL('forgot', $request.parameterMap))
-#set ($discard = $logtool.warn("The page [XWiki.ForgotUsername] should not be used anymore in favor of the new forgot Action."));
+#set ($discard = $logtool.warn("The page [XWiki.ForgotUsername] should not be used anymore in favor of the new 'authenticate/forgot' URL."));
 #set ($discard = $response.sendRedirect($newUrl))
 {{/velocity}}</content>
   <object>

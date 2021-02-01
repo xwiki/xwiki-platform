@@ -106,7 +106,6 @@ El formato completo para una imagen es **##image~: (referencia)##** o **##~[~[im
 ** **URL**: Cualquier URL a una imagen con la forma **##protocolo:~/~/ruta/nombreDeImagen##**. Ejemplo: ##http:~/~/dominio.org/ruta/img.png##
 ** Referencia a un **adjunto** con la forma **##~{~{~{nombreDeWiki:} listaDeNombresDeEspacio.} nombreDePágina@} (nombreDeImagen)##**
 *** **##nombreDeWiki##**: Una cadena de texto opcional que contiene el nombre de una wiki virtual. La referencia a la imagen apuntará a una imagen adjuntada a una página dentro de esa wiki virtual. Si no se especifica ninguna wiki, se utilizará la wiki actual. Ejemplo: miwiki
-*** **##espacio##**: Un nombre de espacio wiki opcional. Si no se especifica un nombre de espacio, se utiliza el espacio en curso. Ejemplo: Inicio
 *** **##listaDeNombresDeEspacio##**: Una lista opcional de nombres de espacio wiki separada por puntos. Si no se especifica ningún espacio, se utiliza el espacio en curso. Ejemplos: ##Inicio##, ##A.B##, ##A.B.C##
 *** **##nombreDePágina##**: Una cadena de texto opcional que contiene el nombre la página wiki a la que está adjuntada la imagen referenciada. Ejemplo: ##Bienvenido##
 *** **##nombreDeImagen##**: Una cadena de texto obligatoria que contiene el nombre e la imagen adjuntada a una página como se almacena en la wiki. Ejemplo: ##miImagen.png##
@@ -119,7 +118,7 @@ El formato completo para una imagen es **##image~: (referencia)##** o **##~[~[im
 * **##parámetros##**: Una lista opcional de parámetros separados por espacios que se pasa a la imagen. Ejemplo: ##width="800" height="600" alt="img.png" title="Mi preciosa imagen"##
 ** **Atributos HTML**: Todos los atributos definidos en el estándar HTML se añadirán a la etiqueta HTML ##&lt;img&gt;## renderizada.
 *** **##style##**: Información de estilo CSS que se debería aplicar a la imagen. Ejemplos: ##style="float:right;height:50"## (imagen en el lado derecho, altura 50 pixeles), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (imagen centrada, anchura 80% de la anchura del bloque), ##style="vertical-align:bottom"## (el texto comienza en la parte inferior de la imagen)
-*** **##height##**: Un parámetro que define la altura de la imagen visualizada.   El valor debe estar en pixeles (ejemplo: ##height="80"##) o en pixeles relativos a la altura del bloque que contiene la imagen (ejemplo: ##height="40%"##).
+*** **##height##**: Un parámetro que define la altura de la imagen visualizada. El valor debe estar en pixeles (ejemplo: ##height="80"##) o en pixeles relativos a la altura del bloque que contiene la imagen (ejemplo: ##height="40%"##).
 *** **##width##**: Un parámetro que define la anchura de la imagen visualizada. El valor debe estar en pixeles (ejemplo: ##width="80"##) o en pixeles relativos a la anchura del bloque que contiene la imagen (ejemplo: ##width="40%"##).
 *** **##title##**: Un parámetro que define el título de la imagen visualizada que será visible al pasar el puntero del ratón sobre la imagen, por ejemplo. Ejemplo: ##title="Mi preciosa imagen"##
 *** **##alt##**: Un parámetro que define el texto que se debería visualizar si el navegador no puede visualizar la imagen. Como este es un atributo HTML obligatorio XWiki empleará el nombre de fichero en lugar del parámetro ##alt## si no se define. Ejemplo: ##alt="img.png"##

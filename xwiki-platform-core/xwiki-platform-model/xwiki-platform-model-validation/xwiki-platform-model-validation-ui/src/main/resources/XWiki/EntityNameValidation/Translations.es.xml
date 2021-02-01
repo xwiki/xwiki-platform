@@ -62,7 +62,7 @@ entitynamevalidation.replacementCharacter.newReplacementCharacter.label=Carácte
 entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=Este carácter reemplazará el carácter prohibido en los nombres de página. Si no se especifica, se eliminará el carácter prohibido de los nombres de página.
 entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Teclea aquí el carácter de reemplazo nuevo o déjalo vacío
 entitynamevalidation.replacementCharacter.create.inProgress=Se está añadiendo un carácter prohibido nuevo...
-entitynamevalidation.replacementCharacter.create.done=El carácter prohibido nuevo  ha sido añadido satisfactoriamente.
+entitynamevalidation.replacementCharacter.create.done=El carácter prohibido nuevo ha sido añadido satisfactoriamente.
 entitynamevalidation.replacementCharacter.create.failed=Error al añadir el carácter prohibido nuevo.
 entitynamevalidation.replacementCharacter.removeCharacter=Borrado de un carácter prohibido
 entitynamevalidation.replacementCharacter.removeCharacter.warning=¿Estás seguro de querer borrar el carácter prohibido?
@@ -71,6 +71,7 @@ entitynamevalidation.replacementCharacter.remove.inProgress=El carácter prohibi
 entitynamevalidation.replacementCharacter.remove.done=Se ha borrado el carácter prohibido.
 entitynamevalidation.replacementCharacter.remove.failed=Error al borrar el carácter prohibido.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Ninguno
-### Missing: entitynamevalidation.admin.heading=Name Strategies</content>
+entitynamevalidation.admin.heading=Estrategias de nomenclatura
+</content>
   
 </xwikidoc>

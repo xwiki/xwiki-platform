@@ -51,7 +51,7 @@
 
 = Bienvenido a tu wiki =
 
-XWiki es la mejor herramienta para organizar tu conocimiento ("knowledge"). Una //wiki// está organizada como una jerarquía de //páginas//.   Puedes crear múltiples wikis, cada una de ellas con su propio conjunto de páginas.
+XWiki es la mejor herramienta para organizar tu conocimiento ("knowledge"). Una //wiki// está organizada como una jerarquía de //páginas//. Puedes crear múltiples wikis, cada una de ellas con su propio conjunto de páginas.
 
 XWiki se puede utilizar como base de conocimiento (soporte, documentación, ventas, etc.), para espacios de trabajo colaborativo o incluso como una intranet completa.
 
@@ -63,7 +63,7 @@ Utiliza el botón {{velocity}}$services.icon.render('pencil'){{/velocity}} de ar
 
 Utiliza el botón {{velocity}}$services.icon.render('add'){{/velocity}} de arriba para //añadir// más páginas a tu wiki y crear así la //jerarquía// que en la que mejor se organice tu contenido.
 
-Utiliza las {{velocity}}$services.icon.render('home'){{/velocity}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro desde tus páginas.   Sin ellas, es fácil perderse en una wiki grande.
+Utiliza las {{velocity}}$services.icon.render('home'){{/velocity}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro desde tus páginas. Sin ellas, es fácil perderse en una wiki grande.
 
 Además, puedes acceder a la [[Zona de Pruebas&gt;&gt;Sandbox.WebHome]] para ver ejemplos de uso de la wiki y, en general, como un lugar donde experimentar con sus funcionalidades.
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -49,7 +49,7 @@ help.applications.create.description=Define la estructura de tus datos, adáptal
 help.applications.create.tip={0}Aplicación en cuestión de minutos{1} te ayuda a construir aplicaciones sin tener conocimientos técnicos.
 help.applications.create.title=Crear tu aplicación
 help.applications.description=Las aplicaciones permiten agrupar páginas estructuras relacionadas.
-help.applications.description1=¿Necesitas ayuda o estás confundido con alguna de nuestras aplicaciones?  Consulta su documentación y descubre más detalles de su funcionalidad.
+help.applications.description1=¿Necesitas ayuda o estás confundido con alguna de nuestras aplicaciones? Consulta su documentación y descubre más detalles de su funcionalidad.
 help.applications.fileManager.description=El Administrador de Ficheros gestiona tus ficheros, proporciona un visor de ficheros soportados, nube de etiquetas y permite filtrar.
 help.applications.fileManager.title=Administardor de Ficheros
 help.applications.forum.description=La aplicación Forum te permite crear categorías nuevas con temas de debate.
@@ -67,7 +67,7 @@ help.applications.title1=Ejemplos
 help.browse.label=Examinar
 help.description1=XWiki ofrece una amplia variedad de funcionalidades potentes que te permitirán crear, organizar y encontrar el contenido. Esta sección te mostrará como utilizar las funcionalidades básicas XWiki.
 help.description2=Felicitaciones por adquirir tu instancia de XWiki. XWiki es muy versátil y puede usarse para crear bases de conocimiento, intranets o cualquier tipo de aplicación comercial que desees. Esto se puede lograr gracias al poder de personalización de XWiki, que comienza en el nivel de página, desde un uso sencillo hasta un uso más avanzado.
-help.edit.description=Utiliza un potente editor de contenido {0}WYSIWYG{1}  o {2}syntáxis{1} para crear páginas wiki complejas.
+help.edit.description=Utiliza un potente editor de contenido {0}WYSIWYG{1} o {2}syntáxis{1} para crear páginas wiki complejas.
 help.edit.title=Edición de página
 help.example.label=Ver ejemplos
 help.history.description=Ver versiones anteriores de la página, comparar versiones distintas o volver a cualquier versión antigua.
@@ -195,6 +195,7 @@ help.videos.videoCard5.topic2=Aprende como utilizar tu aplicación
 help.videos.videoCard6.title=Añadir / Eliminar extensiones
 help.videos.videoCard6.topic1=Descubre como añadir/eliminar extensiones utilizando el Administrador de extensiones
 help.videos.videoCard6.topic2=Descubre la interfaz usuario de la Administración de XWiki
-help.videos.watch=Seguir</content>
+help.videos.watch=Seguir
+</content>
   
 </xwikidoc>

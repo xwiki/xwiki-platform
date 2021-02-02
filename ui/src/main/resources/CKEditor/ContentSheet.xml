@@ -216,6 +216,20 @@ a[data-linktype="create"]::after {
   display: block;
 }
 
+/* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by
+  applying the styles directly for the text-decoration values that are commonly used.
+  See CKEDITOR-282: Strikethrough not displayed for macros */
+ins span.cke_widget_inline {
+  text-decoration-line: underline;
+}
+del span.cke_widget_inline {
+  text-decoration-line: line-through;
+}
+ins del span.cke_widget_inline,
+del ins span.cke_widget_inline {
+  text-decoration-line: underline line-through;
+}
+
 /* Prevent the horizontal scroll bar on IE11. We already limit the image width from the skin (in order to have
   responsive images) but this is not enough for IE11 because the image element has a wrapper.
   See CKEDITOR-143: Horizontal scroll bar displayed when inserting a large image on IE11 */

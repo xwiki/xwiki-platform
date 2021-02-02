@@ -62,6 +62,6 @@ XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Afficher le bouton m�
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacité du Cache
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Nombre d'information J'aime à conserver dans le cache. Notez que vous devrez redémarrer XWiki pour que cette option soit prise en compte.
 XWiki.Like.LikeConfigurationClass_enabled=Activer la fonctionnalité "J'aime"
-### Missing: XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+XWiki.Like.LikeConfigurationClass_enabled.hint=Décocher pour désactiver la fonctionnalité "J'aime" et masquer les informations liées.
 </content>
 </xwikidoc>

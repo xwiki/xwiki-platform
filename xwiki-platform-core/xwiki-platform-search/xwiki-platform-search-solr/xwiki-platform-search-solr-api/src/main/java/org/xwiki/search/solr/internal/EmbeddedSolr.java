@@ -47,7 +47,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
-import org.apache.solr.core.SolrResourceLoader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
@@ -133,8 +132,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private CoreContainer createCoreContainer() throws SolrServerException
     {
-        CoreContainer coreContainer = new CoreContainer(new SolrResourceLoader(this.solrHomePath));
-        coreContainer.load();
+        CoreContainer coreContainer = CoreContainer.createAndLoad(this.solrHomePath);
         if (coreContainer.getCores().isEmpty()) {
             throw new SolrServerException(
                 "Failed to initialize the Solr core. Please check the configuration and log messages.");

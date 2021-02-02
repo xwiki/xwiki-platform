@@ -32,7 +32,7 @@
   <name>XWiki Platform - Search - Solr - Parent POM</name>
   <description>Parent project for the Solr search engine.</description>
   <properties>
-    <solr.version>8.5.1</solr.version>
+    <solr.version>8.8.0</solr.version>
   </properties>
   <dependencyManagement>
     <dependencies>

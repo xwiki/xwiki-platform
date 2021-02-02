@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables a TLS(SSL) Connector on the server.
@@ -58,7 +58,7 @@ basehome:modules/ssl/keystore|etc/keystore
 # jetty.ssl.selectors=-1
 
 ## ServerSocketChannel backlog (0 picks platform default)
-# jetty.ssl.acceptorQueueSize=0
+# jetty.ssl.acceptQueueSize=0
 
 ## Thread priority delta to give to acceptor threads
 # jetty.ssl.acceptorPriorityDelta=0
@@ -98,7 +98,7 @@ basehome:modules/ssl/keystore|etc/keystore
 
 ### SslContextFactory Configuration
 ## Note that OBF passwords are not secure, just protected from casual observation
-## See http://www.eclipse.org/jetty/documentation/current/configuring-security-secure-passwords.html
+## See https://eclipse.org/jetty/documentation/current/configuring-security-secure-passwords.html
 
 ## The Endpoint Identification Algorithm
 ## Same as javax.net.ssl.SSLParameters#setEndpointIdentificationAlgorithm(String)
@@ -107,26 +107,30 @@ basehome:modules/ssl/keystore|etc/keystore
 ## SSL JSSE Provider
 # jetty.sslContext.provider=
 
-## Keystore file path (relative to $jetty.base)
+## KeyStore file path (relative to $jetty.base)
 # jetty.sslContext.keyStorePath=etc/keystore
+## KeyStore absolute file path
+# jetty.sslContext.keyStoreAbsolutePath=${jetty.base}/etc/keystore
 
-## Truststore file path (relative to $jetty.base)
+## TrustStore file path (relative to $jetty.base)
 # jetty.sslContext.trustStorePath=etc/keystore
+## TrustStore absolute file path
+# jetty.sslContext.trustStoreAbsolutePath=${jetty.base}/etc/keystore
 
-## Keystore password
+## KeyStore password
 # jetty.sslContext.keyStorePassword=OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4
 
-## Keystore type and provider
+## KeyStore type and provider
 # jetty.sslContext.keyStoreType=JKS
 # jetty.sslContext.keyStoreProvider=
 
 ## KeyManager password
 # jetty.sslContext.keyManagerPassword=OBF:1u2u1wml1z7s1z7a1wnl1u2g
 
-## Truststore password
+## TrustStore password
 # jetty.sslContext.trustStorePassword=OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4
 
-## Truststore type and provider
+## TrustStore type and provider
 # jetty.sslContext.trustStoreType=JKS
 # jetty.sslContext.trustStoreProvider=
 

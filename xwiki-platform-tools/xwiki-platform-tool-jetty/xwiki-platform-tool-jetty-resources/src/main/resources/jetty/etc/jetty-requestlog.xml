@@ -33,12 +33,14 @@
   <!-- =========================================================== -->
   <Set name="RequestLog">
     <New id="RequestLog" class="org.eclipse.jetty.server.AsyncNCSARequestLog">
+      <!-- XWIKI begin -->
       <!-- Set the request logs inside the xwiki permanent directory -->
       <Set name="filename"><Property name="xwiki.data.dir" default="." />/<Property>
-        <Name>jetty.requestlog.filePath</Name>
-        <Deprecated>requestlog.filename</Deprecated>
-        <Default><Property name="jetty.requestlog.dir" default="logs"/>/yyyy_mm_dd.request.log</Default>
-      </Property>
+      <!-- XWIKI end -->
+          <Name>jetty.requestlog.filePath</Name>
+          <Deprecated>requestlog.filename</Deprecated>
+          <Default><Property name="jetty.requestlog.dir" default="logs"/>/yyyy_mm_dd.request.log</Default>
+        </Property>
       </Set>
       <Set name="filenameDateFormat"><Property name="jetty.requestlog.filenameDateFormat" deprecated="requestlog.filenameDateFormat" default="yyyy_MM_dd"/></Set>
       <Set name="retainDays"><Property name="jetty.requestlog.retainDays" deprecated="requestlog.retain" default="90"/></Set>

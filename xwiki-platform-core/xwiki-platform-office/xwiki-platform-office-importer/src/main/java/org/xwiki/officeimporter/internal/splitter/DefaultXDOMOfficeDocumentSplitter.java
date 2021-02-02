@@ -19,9 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.splitter;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -124,10 +126,11 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
             }
 
             // Rewire artifacts.
-            Map<String, byte[]> artifacts = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
+            Set<File> artifactsFiles = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
 
             // Create the resulting XDOMOfficeDocument.
-            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifacts, this.componentManager);
+            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles,
+                this.componentManager, officeDocument.getConverterResult());
             result.put(targetDocumentDescriptor, splitDocument);
         }
 

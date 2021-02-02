@@ -21,10 +21,12 @@ package org.xwiki.office.viewer.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -173,50 +175,60 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
-    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, DocumentReference ownerDocumentReference,
+    private Set<File> processImages(XDOM xdom, Set<File> artifactFiles, DocumentReference ownerDocumentReference,
         String resourceReference, Map<String, ?> parameters)
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<File>();
         List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
-        for (ImageBlock imgBlock : imgBlocks) {
-            String imageReference = imgBlock.getReference().getReference();
+        if (!imgBlocks.isEmpty()) {
+            Map<String, File> fileMap = new HashMap<>();
+            for (File file : artifactFiles) {
+                fileMap.put(file.getName(), file);
+            }
 
-            // Check whether there is a corresponding artifact.
-            if (artifacts.containsKey(imageReference)) {
-                try {
-                    List<String> resourcePath = Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
-                    TemporaryResourceReference temporaryResourceReference =
-                        new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
+            for (ImageBlock imgBlock : imgBlocks) {
+                String imageReference = imgBlock.getReference().getReference();
 
-                    // Write the image into a temporary file.
-                    File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
-                        new ByteArrayInputStream(artifacts.get(imageReference)));
+                // Check whether there is a corresponding artifact.
+                if (fileMap.containsKey(imageReference)) {
+                    try {
+                        List<String> resourcePath =
+                            Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
+                        TemporaryResourceReference temporaryResourceReference =
+                            new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
 
-                    // Create a URL image reference which links to above temporary image file.
-                    String temporaryResourceURL =
-                        this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference).serialize();
-                    ResourceReference urlImageReference =
-                        new ResourceReference(temporaryResourceURL, ResourceType.PATH);
-                    urlImageReference.setTyped(true);
+                        // Write the image into a temporary file.
+                        File artifact = fileMap.get(imageReference);
 
-                    // Replace the old image block with a new one that uses the above URL image reference.
-                    Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
-                    imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
+                        File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
+                            new FileInputStream(artifact));
 
-                    // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
-                    // support relative path resource references (we use relative paths to refer the temporary files).
-                    maybeFixExpandedMacroAncestor(newImgBlock);
+                        // Create a URL image reference which links to above temporary image file.
+                        String temporaryResourceURL =
+                            this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)
+                                .serialize();
+                        ResourceReference urlImageReference =
+                            new ResourceReference(temporaryResourceURL, ResourceType.PATH);
+                        urlImageReference.setTyped(true);
 
-                    // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
-                    temporaryFiles.add(tempFile);
-                } catch (Exception ex) {
-                    String message = "Error while processing artifact image [%s].";
-                    this.logger.error(String.format(message, imageReference), ex);
+                        // Replace the old image block with a new one that uses the above URL image reference.
+                        Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
+                        imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
+
+                        // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
+                        // support relative path resource references (we use relative paths to refer the temporary files).
+                        maybeFixExpandedMacroAncestor(newImgBlock);
+
+                        // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
+                        temporaryFiles.add(tempFile);
+                    } catch (Exception ex) {
+                        String message = "Error while processing artifact image [%s].";
+                        this.logger.error(String.format(message, imageReference), ex);
+                    }
                 }
             }
         }
-
         return temporaryFiles;
     }
 
@@ -355,8 +367,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             // the owner document reference. This way we ensure the path to the temporary files doesn't contain
             // redundant information and so it remains as small as possible (considering that the path length is limited
             // on some environments).
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(),
+            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
                 attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
+            xdomOfficeDocument.cleanupArtifacts();
             view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
                 temporaryFiles);
 
@@ -381,8 +394,9 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         if (view == null) {
             XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters);
             XDOM xdom = xdomOfficeDocument.getContentDocument();
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument,
+            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
                 serializedResourceReference, parameters);
+            xdomOfficeDocument.cleanupArtifacts();
             view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
             this.externalCache.set(cacheKey, view);

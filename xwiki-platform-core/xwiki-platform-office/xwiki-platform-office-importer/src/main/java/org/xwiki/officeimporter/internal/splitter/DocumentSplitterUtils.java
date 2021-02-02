@@ -19,9 +19,12 @@
  */
 package org.xwiki.officeimporter.internal.splitter;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -83,15 +86,22 @@ public final class DocumentSplitterUtils
      * @param officeDocument the office document being splitted into wiki documents
      * @return the relocated artifacts
      */
-    public static Map<String, byte[]> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
+    public static Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
     {
-        Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
+        Set<File> artifacts = officeDocument.getArtifactsFiles();
+        Set<File> result = new HashSet<>();
         List<ImageBlock> imageBlocks =
             sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
-        for (ImageBlock imageBlock : imageBlocks) {
-            String imageReference = imageBlock.getReference().getReference();
-            artifacts.put(imageReference, officeDocument.getArtifacts().remove(imageReference));
+        if (!imageBlocks.isEmpty()) {
+            Map<String, File> fileMap = new HashMap<>();
+            artifacts.forEach(item -> fileMap.put(item.getName(), item));
+            for (ImageBlock imageBlock : imageBlocks) {
+                String imageReference = imageBlock.getReference().getReference();
+                File file = fileMap.get(imageReference);
+                result.add(file);
+                artifacts.remove(file);
+            }
         }
-        return artifacts;
+        return result;
     }
 }

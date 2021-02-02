@@ -35,7 +35,29 @@ public interface OfficeConverter
     /**
      * Attempts to convert the input document identified by <b>inputStreams</b> and <b>inputFileName</b> arguments into
      * the format identified by <b>outputFileName</b> argument.
+     * Note that this method does not perform a cleanup of the generated files so they can be read in the further steps.
+     * Don't forget to call {@link OfficeConverterResult#cleanup()} to not keep remaining files.
      * 
+     * @param inputStreams input streams corresponding to the input document; it's possible that some document types
+     *            (e.g. HTML) consists of more than one input stream corresponding to different artifacts embedded
+     *            within document content
+     * @param inputFileName name of the main input file within <b>inputStreams</b> map; this argument is used to
+     *            determine the format of the input document
+     * @param outputFileName name of the main output file; an entry corresponding to this name will be available in the
+     *            results map if the conversion succeeds; This argument is used to determine the format of the output
+     *            document
+     * @return a result containing the paths of the files created during the conversion.
+     * @throws OfficeConverterException if an error occurs during the conversion
+     * @since 13.1RC1
+     */
+    @Unstable
+    OfficeConverterResult convertDocument(Map<String, InputStream> inputStreams, String inputFileName,
+        String outputFileName) throws OfficeConverterException;
+
+    /**
+     * Attempts to convert the input document identified by <b>inputStreams</b> and <b>inputFileName</b> arguments into
+     * the format identified by <b>outputFileName</b> argument.
+     *
      * @param inputStreams input streams corresponding to the input document; it's possible that some document types
      *            (e.g. HTML) consists of more than one input stream corresponding to different artifacts embedded
      *            within document content
@@ -46,7 +68,9 @@ public interface OfficeConverter
      *            document
      * @return map of file names to file contents resulting from the conversion
      * @throws OfficeConverterException if an error occurs during the conversion
+     * @deprecated Since 13.1RC1 use {@link #convertDocument(Map, String, String)}.
      */
+    @Deprecated
     Map<String, byte[]> convert(Map<String, InputStream> inputStreams, String inputFileName, String outputFileName)
         throws OfficeConverterException;
 

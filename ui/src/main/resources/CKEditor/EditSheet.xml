@@ -303,6 +303,7 @@ define('xwiki-ckeditor', [
     sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
     var config = {
       allowedContent: allowedContentBySyntax[sourceDocument.syntax],
+      editorplaceholder: $jsontool.serialize($services.localization.render('ckeditor.content.placeholder')),
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',

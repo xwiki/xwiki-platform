@@ -52,6 +52,8 @@ CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are
 CKEditor.ConfigClass_advanced=Advanced Configuration
 CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
 
+ckeditor.content.placeholder=Start typing here...
+
 ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
 ckeditor.admin.reset=Reset
 ckeditor.admin.reset.hint=Restore the default configuration

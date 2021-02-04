@@ -20,14 +20,8 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -59,32 +53,12 @@ public class XDOMOfficeDocument implements OfficeDocument
      */
     private Set<File> artifactFiles;
 
-    @Deprecated
-    private Map<String, byte[]> artifacts;
-
     /**
      * {@link ComponentManager} used to lookup for various renderers.
      */
     private ComponentManager componentManager;
 
     private OfficeConverterResult converterResult;
-
-    /**
-     * Creates a new {@link XDOMOfficeDocument}.
-     * 
-     * @param xdom {@link XDOM} corresponding to office document content.
-     * @param artifacts artifacts for this office document.
-     * @param componentManager {@link ComponentManager} used to lookup for various renderers.
-     * @deprecated Since 13.1RC1 use {@link #XDOMOfficeDocument(XDOM, Set, ComponentManager, OfficeConverterResult)}.
-     */
-    @Deprecated
-    public XDOMOfficeDocument(XDOM xdom, Map<String, byte[]> artifacts, ComponentManager componentManager)
-    {
-        this.xdom = xdom;
-        this.artifacts = artifacts;
-        this.componentManager = componentManager;
-        this.artifactFiles = Collections.emptySet();
-    }
 
     /**
      * Creates a new {@link XDOMOfficeDocument}.
@@ -134,28 +108,6 @@ public class XDOMOfficeDocument implements OfficeDocument
             // Nothing to do here.
         }
         return null;
-    }
-
-    @Override
-    public Map<String, byte[]> getArtifacts()
-    {
-        if (this.artifacts == null) {
-            this.artifacts = new HashMap<>();
-            FileInputStream fis = null;
-
-            for (File file : this.artifactFiles) {
-                try {
-                    fis = new FileInputStream(file);
-                    this.artifacts.put(file.getName(), IOUtils.toByteArray(fis));
-                } catch (IOException e) {
-                    // FIXME
-                    e.printStackTrace();
-                } finally {
-                    IOUtils.closeQuietly(fis);
-                }
-            }
-        }
-        return this.artifacts;
     }
 
     @Override

@@ -20,7 +20,7 @@
 package org.xwiki.officeimporter.internal.splitter;
 
 import java.io.StringReader;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
 
         // Create xdom office document.
         XDOMOfficeDocument officeDocument =
-            new XDOMOfficeDocument(xdom, new HashMap<>(), this.componentManager);
+            new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
         final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
         // Add expectations to mock document name serializer.

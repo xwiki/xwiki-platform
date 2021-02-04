@@ -263,7 +263,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), componentManager);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -337,7 +337,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), componentManager);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);

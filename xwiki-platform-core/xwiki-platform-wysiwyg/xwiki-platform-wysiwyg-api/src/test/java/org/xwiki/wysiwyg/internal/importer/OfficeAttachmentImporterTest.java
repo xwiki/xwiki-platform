@@ -141,7 +141,7 @@ public class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
         when(documentBuilder.build(attachmentContent, "my.doc", attachmentReference.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifacts()).thenReturn(Collections.emptyMap());
+        when(xdomOfficeDocument.getArtifactsFiles()).thenReturn(Collections.emptySet());
         when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
 
         Map<String, Object> parameters = Collections.singletonMap("filterStyles", "true");

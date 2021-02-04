@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.document;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
@@ -50,18 +49,6 @@ public interface OfficeDocument
      * @return content of this document as a string.
      */
     String getContentAsString();
-
-    /**
-     * Returns all the artifacts for this office document. Artifacts are generated during the import operation if the
-     * original office document contains embedded non-textual elements. Also, some office formats (like presentations)
-     * result in multiple output files when converted into html. In this case all these output files will be considered
-     * as artifacts.
-     * 
-     * @return a map containing artifacts for this document.
-     * @deprecated Since 13.1RC1 use {@link #getArtifactsFiles()}.
-     */
-    @Deprecated
-    Map<String, byte[]> getArtifacts();
 
     /**
      * Returns the files corresponding to all the artifacts for this office document, except the conversion of the

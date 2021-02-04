@@ -35,6 +35,9 @@
     <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
     <!-- The features provided by this module so that it's found when resolving extension -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
+    <!-- Skipping spoon since the inspection of DefaultOpenOfficeConverter is causing troubles because of the method
+         converter -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-office-importer dependencies (but without xwiki-platform-office-importer jar itself) -->

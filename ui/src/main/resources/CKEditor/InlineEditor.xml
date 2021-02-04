@@ -175,7 +175,6 @@
 
   var createEditor = function(ckeditor, element, config, instanceConfig) {
     var deferred = $.Deferred();
-    $(element).prop('contenteditable', true);
     var editor = ckeditor.inline(element, $.extend({
       // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
       // we implemented the maximize feature for the in-line editor.
@@ -189,7 +188,12 @@
         }
       });
     }
-    editor.once('instanceReady', $.proxy(deferred, 'resolve', editor));
+    editor.once('instanceReady', function() {
+      deferred.resolve(editor);
+      // Make the content editable after the editor is ready and visible.
+      // See CKEDITOR-390: The inline editor loads as read-only in Safari
+      editor.setReadOnly(false);
+    });
     editor.once('reload', function(event) {
       $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
       event.data.promise = event.data.promise.then($.proxy(createEditor, null, ckeditor, element, config));

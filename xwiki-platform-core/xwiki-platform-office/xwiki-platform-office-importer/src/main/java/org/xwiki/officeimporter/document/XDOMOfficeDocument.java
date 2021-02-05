@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -177,10 +178,10 @@ public class XDOMOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public void cleanupArtifacts()
+    public void close() throws IOException
     {
         if (this.converterResult != null) {
-            this.converterResult.cleanup();
+            this.converterResult.close();
         }
     }
 

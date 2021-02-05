@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import org.w3c.dom.Document;
@@ -82,10 +83,10 @@ public class XHTMLOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public void cleanupArtifacts()
+    public void close() throws IOException
     {
         if (this.converterResult != null) {
-            this.converterResult.cleanup();
+            this.converterResult.close();
         }
     }
 

@@ -82,7 +82,7 @@ public class DefaultOfficeConverterResult implements OfficeConverterResult
     }
 
     @Override
-    public void cleanup()
+    public void close()
     {
         this.fileStorage.cleanUp();
     }

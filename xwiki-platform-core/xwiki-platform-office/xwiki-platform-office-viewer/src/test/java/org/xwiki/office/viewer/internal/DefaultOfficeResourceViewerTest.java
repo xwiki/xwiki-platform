@@ -405,6 +405,6 @@ class DefaultOfficeResourceViewerTest
             ((MetaDataBlock) galleryMacro.getParent()).getMetaData().getMetaData(MetaData.SYNTAX));
 
         verify(this.temporaryResourceStore).createTemporaryFile(eq(temporaryResourceReference), any(InputStream.class));
-        verify(converterResult).cleanup();
+        verify(converterResult).close();
     }
 }

@@ -149,7 +149,7 @@ public class OfficeAttachmentImporter implements AttachmentImporter
             }
         }
         String result = xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
-        xdomOfficeDocument.cleanupArtifacts();
+        xdomOfficeDocument.close();
         return result;
     }
 

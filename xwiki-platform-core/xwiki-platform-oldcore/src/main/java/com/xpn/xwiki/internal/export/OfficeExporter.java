@@ -92,16 +92,15 @@ public class OfficeExporter extends PdfExportImpl
         addEmbeddedObjects(inputStreams, context);
 
         OfficeConverter officeConverter = this.officeServer.getConverter();
-        try {
-            OfficeConverterResult officeConverterResult =
-                officeConverter.convertDocument(inputStreams, inputFileName, outputFileName);
+        try (OfficeConverterResult officeConverterResult =
+                officeConverter.convertDocument(inputStreams, inputFileName, outputFileName))
+        {
 
             for (File file : officeConverterResult.getAllFiles()) {
                 try (FileInputStream fis = new FileInputStream(file)) {
                     IOUtils.write(IOUtils.toByteArray(fis), out);
                 }
             }
-            officeConverterResult.cleanup();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, String.format(

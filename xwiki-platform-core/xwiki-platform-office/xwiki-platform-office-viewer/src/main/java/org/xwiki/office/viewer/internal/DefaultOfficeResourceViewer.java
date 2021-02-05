@@ -166,8 +166,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * images that are view artifacts.
      * 
      * @param xdom the XDOM whose image blocks are to be processed
-     * @param artifacts specify which of the image blocks should be processed; only the image blocks that were generated
-     *            during the office import process should be processed
+     * @param artifactFiles specify which of the image blocks should be processed; only the image blocks
+     *          that were generated during the office import process should be processed
      * @param ownerDocumentReference specifies the document that owns the office file
      * @param resourceReference a reference to the office file that is being viewed; this reference is used to compute
      *            the path to the temporary directory holding the image artifacts
@@ -360,20 +360,20 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // If a view in not available, build one and cache it.
         if (view == null) {
-            XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
-            String attachmentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
-            XDOM xdom = xdomOfficeDocument.getContentDocument();
-            // We use only the file name from the resource reference because the rest of the information is specified by
-            // the owner document reference. This way we ensure the path to the temporary files doesn't contain
-            // redundant information and so it remains as small as possible (considering that the path length is limited
-            // on some environments).
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
-                attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
-            xdomOfficeDocument.cleanupArtifacts();
-            view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
-                temporaryFiles);
+            try (XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters)) {
+                String attachmentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
+                XDOM xdom = xdomOfficeDocument.getContentDocument();
+                // We use only the file name from the resource reference because the rest of the information is specified by
+                // the owner document reference. This way we ensure the path to the temporary files doesn't contain
+                // redundant information and so it remains as small as possible (considering that the path length is limited
+                // on some environments).
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
+                    attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
+                view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
+                    temporaryFiles);
 
-            this.attachmentCache.set(cacheKey, view);
+                this.attachmentCache.set(cacheKey, view);
+            }
         }
 
         // We have to clone the cached XDOM to protect it from the rendering transformations. For instance, macro
@@ -392,14 +392,15 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // If a view in not available, build one and cache it.
         if (view == null) {
-            XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters);
-            XDOM xdom = xdomOfficeDocument.getContentDocument();
-            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
-                serializedResourceReference, parameters);
-            xdomOfficeDocument.cleanupArtifacts();
-            view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
+            try (XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters))
+            {
+                XDOM xdom = xdomOfficeDocument.getContentDocument();
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
+                    serializedResourceReference, parameters);
+                view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
-            this.externalCache.set(cacheKey, view);
+                this.externalCache.set(cacheKey, view);
+            }
         }
 
         return view;

@@ -19,7 +19,9 @@
  */
 package org.xwiki.officeimporter.document;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 2.1M1
  */
-public interface OfficeDocument
+public interface OfficeDocument extends Closeable
 {
     /**
      * Returns the content of this office document. Content document type may vary depending on the implementation. For
@@ -56,7 +58,6 @@ public interface OfficeDocument
      * Artifacts are generated during the import operation if the original office document contains embedded
      * non-textual elements. Also, some office formats (like presentations) result in multiple output files when
      * converted into html. In this case all these output files will be considered as artifacts.
-     * Note that those files might be deleted when {@link OfficeConverterResult#cleanup()} has been called.
      *
      * @return the set of artifacts related to this office document.
      * @since 13.1RC1
@@ -68,17 +69,6 @@ public interface OfficeDocument
     }
 
     /**
-     * Cleanup all the artifact files from the server.
-     *
-     * @since 13.1RC1
-     */
-    @Unstable
-    default void cleanupArtifacts()
-    {
-        // do nothing
-    }
-
-    /**
      * @return the converter result.
      * @since 13.1RC1
      */
@@ -86,5 +76,10 @@ public interface OfficeDocument
     default OfficeConverterResult getConverterResult()
     {
         return null;
+    }
+
+    @Override
+    default void close() throws IOException
+    {
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.officeimporter.converter;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Set;
 
@@ -26,14 +27,14 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Provide the result of an office file conversion.
- * This interface mainly returns the paths of the various files created during the conversion, but it also allows to
- * cleanup all files created.
+ * This interface mainly returns the paths of the various files created during the conversion.
+ * It extends {@link Closeable} to allow cleaning the artifacts whenever {@link Closeable#close()} is called.
  *
  * @version $Id$
  * @since 13.1RC1
  */
 @Unstable
-public interface OfficeConverterResult
+public interface OfficeConverterResult extends Closeable
 {
     /**
      * @return the output file of the conversion.
@@ -49,9 +50,4 @@ public interface OfficeConverterResult
      * @return all files created during the conversion, including {@link #getOutputFile()}.
      */
     Set<File> getAllFiles();
-
-    /**
-     * Allows to completely delete {@link #getOutputDirectory()}.
-     */
-    void cleanup();
 }

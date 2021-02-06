@@ -36,7 +36,7 @@
 <script>
 import filterMixin from "./filterMixin.js";
 import $ from "jquery";
-import xwikiSelectize from "xwiki-selectize";
+import "xwiki-selectize";
 
 export default {
 
@@ -98,7 +98,7 @@ export default {
   // Watch for filter entry value changes
   // When any, update the suggest picker to match corresponding value
   watch: {
-    value (newValue, oldValue) {
+    value (newValue) {
       $(this.$refs.filterSuggest).val(newValue).trigger('change');
     },
   },

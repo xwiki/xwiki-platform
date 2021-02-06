@@ -19,10 +19,11 @@
  */
 
 
-define([
+define('xwiki-livedata', [
   "Vue",
-  "xwiki-livedata",
-  "liveDataSource"
+  "xwiki-livedata-vue",
+  "xwiki-livedata-source",
+  "xwiki-livedata-polyfills"
 ], function (
   Vue,
   XWikiLivedata,

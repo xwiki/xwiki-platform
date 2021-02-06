@@ -62,7 +62,7 @@
 
 import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
-import daterangepicker from "daterangepicker";
+import "daterangepicker";
 import moment from "moment";
 import $ from "jquery";
 
@@ -115,13 +115,13 @@ export default {
       $(editorDate).daterangepicker(
         this.editorConfig,
       );
-      $(editorDate).on('apply.daterangepicker', (e) => {
+      $(editorDate).on('apply.daterangepicker', () => {
         this.applyDate();
       });
-      $(editorDate).on('cancel.daterangepicker', (e) => {
+      $(editorDate).on('cancel.daterangepicker', () => {
         this.cancelEdit();
       });
-      $(editorDate).on('hide.daterangepicker', (e) => {
+      $(editorDate).on('hide.daterangepicker', () => {
         this.cancelEdit();
       });
       // Fix prototypejs prototype pollution

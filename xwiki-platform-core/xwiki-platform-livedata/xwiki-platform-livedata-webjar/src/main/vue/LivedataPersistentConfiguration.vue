@@ -73,7 +73,7 @@ export default {
     // They also have setters so that it can easily be set
     // and update the current config on load
 
-    /* eslint camelcase: ["error", { allow: ["^\$_"] }] */
+    /* eslint camelcase: ["error", { allow: ["^\\$_"] }] */
 
     // Filters
     $_filters: {

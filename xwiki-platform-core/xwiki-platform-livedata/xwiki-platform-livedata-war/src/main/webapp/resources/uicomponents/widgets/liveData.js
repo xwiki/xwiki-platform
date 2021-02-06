@@ -18,15 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($liveDataEntry = 'xwiki-livedata.umd.min')
+#set ($liveDataEntry = 'xwiki-livedata.min')
 #set ($liveDataPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', $liveDataEntry))
 #set ($paths = {
   'js': {
-    'Logic': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'Logic.min'),
-    'liveDataSource': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'liveDataSource.min.js', {'evaluate': true}),
-    'Vue': $services.webjars.url('vue', 'vue.min'),
     'xwiki-livedata': $liveDataPath,
+    'xwiki-livedata-vue': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'xwiki-livedata-vue.umd.min'),
+    'Vue': $services.webjars.url('vue', 'vue.min'),
     'moment': $services.webjars.url('momentjs', 'moment.js'),
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js'),
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
@@ -38,7 +37,8 @@
       $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.css', true)
     ]
   },
-  'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry)
+  'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry),
+  'contextPath': $request.contextPath
 })
 #[[*/
 // Start JavaScript-only code.
@@ -57,6 +57,11 @@ require.config({
     },
     'xwiki-selectize-with-css': {
       'xwiki-selectize': 'xwiki-selectize'
+    }
+  },
+  config: {
+    'xwiki-livedata-source': {
+      contextPath: paths.contextPath
     }
   }
 });
@@ -88,7 +93,7 @@ define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(load
 
 window.liveDataBaseURL = paths.liveDataBasePath;
 
-require(['jquery', 'Logic'], function($, LiveData) {
+require(['jquery', 'xwiki-livedata'], function($, LiveData) {
   $.fn.liveData = function(config) {
     return this.each(function() {
       if (!$(this).data('liveData')) {

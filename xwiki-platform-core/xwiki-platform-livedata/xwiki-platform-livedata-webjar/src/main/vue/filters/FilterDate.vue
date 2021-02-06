@@ -38,7 +38,7 @@
 
 <script>
 import filterMixin from "./filterMixin.js";
-import daterangepicker from "daterangepicker";
+import "daterangepicker";
 import moment from "moment";
 import $ from "jquery";
 
@@ -53,7 +53,7 @@ export default {
   computed: {
 
     valueFormatted () {
-      if (this.filterEntry.value === undefined) { return; }
+      if (this.filterEntry.value === undefined) { return; }
       return this.filterEntry.value.split("-")
         .map(date => moment(+date).format(this.format))
         .join(" - ");
@@ -142,7 +142,7 @@ export default {
         $(filterDate).daterangepicker(
           this.filterConfig,
         );
-        $(filterDate).on('apply.daterangepicker', (e) => {
+        $(filterDate).on('apply.daterangepicker', () => {
           this.applyDate();
         });
         // Fix prototypejs prototype pollution

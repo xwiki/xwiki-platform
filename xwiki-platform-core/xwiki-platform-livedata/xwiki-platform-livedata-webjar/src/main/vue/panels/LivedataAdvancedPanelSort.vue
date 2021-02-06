@@ -157,6 +157,8 @@ export default {
 
     // The sortable properties that don't have a sort entry in the live data query.
     unsortedProperties () {
+      // Disable no-side-effects-in-computed-properties because it fails just because the method name contains "sort".
+      /* eslint vue/no-side-effects-in-computed-properties: "off" -- false positive */
       return this.logic.getUnsortedProperties().map(property => this.logic.getPropertyDescriptor(property));
     },
   },

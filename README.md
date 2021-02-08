@@ -7,7 +7,7 @@ A collection of templates that can be used in the Creation step. They will be co
 * [Issue Tracker](http://jira.xwiki.org/browse/TEMPLATES)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists>), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 7.4.4
+* Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1+
 * [Translations](http://l10n.xwiki.org/xwiki/bin/view/Contrib/TemplatesApplication)
 * Sonar Dashboard: N/A

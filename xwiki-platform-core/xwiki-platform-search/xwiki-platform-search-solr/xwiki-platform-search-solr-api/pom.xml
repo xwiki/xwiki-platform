@@ -52,6 +52,16 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
     </dependency>
+    <!-- Solr core depende on a different verison of Jetty which we exclude and thus we need to
+      pull the right version here. -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-java-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-http-client-transport</artifactId>
+    </dependency>    
     <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
       pull the right version here. -->
     <dependency>

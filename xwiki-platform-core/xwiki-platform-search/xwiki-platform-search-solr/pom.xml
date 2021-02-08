@@ -46,6 +46,18 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
+          <!--
+            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by XWiki.
+            The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
+          -->
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>

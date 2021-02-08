@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Enables webapplication deployment from the webapps directory.
@@ -50,4 +50,3 @@ etc/jetty-deploy.xml
 
 # Whether to extract *.war files
 # jetty.deploy.extractWars=true
-

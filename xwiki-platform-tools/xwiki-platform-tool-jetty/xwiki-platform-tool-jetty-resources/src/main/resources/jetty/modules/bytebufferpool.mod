@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Configures the ByteBufferPool used by ServerConnectors.
@@ -45,4 +45,3 @@ etc/jetty-bytebufferpool.xml
 
 ## Maximum direct memory retainable by the pool (-1 for unlimited)
 #jetty.byteBufferPool.maxDirectMemory=-1
-

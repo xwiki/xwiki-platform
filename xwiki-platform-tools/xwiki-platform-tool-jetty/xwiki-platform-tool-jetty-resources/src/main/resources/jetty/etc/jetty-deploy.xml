@@ -37,7 +37,6 @@
         <Set name="contexts">
           <Ref refid="Contexts" />
         </Set>
-        <!-- XWIKI begin -->
         <!-- Note: We don't need to define a "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern" attribute
              since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
              tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
@@ -48,22 +47,6 @@
           <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
           <Arg>somethingnotmatching.jar</Arg>
         </Call>
-        <!-- XWIKI end -->
-
-        <!-- Add a customize step to the deployment lifecycle -->
-        <!-- uncomment and replace DebugBinding with your extended AppLifeCycle.Binding class
-        <Call name="insertLifeCycleNode">
-          <Arg>deployed</Arg>
-          <Arg>starting</Arg>
-          <Arg>customise</Arg>
-        </Call>
-        <Call name="addLifeCycleBinding">
-          <Arg>
-            <New class="org.eclipse.jetty.deploy.bindings.DebugBinding">
-              <Arg>customise</Arg>
-            </New>
-          </Arg>
-        </Call> -->
 
         <Call id="webappprovider" name="addAppProvider">
           <Arg>
@@ -72,11 +55,9 @@
                 <Property>
                   <Name>jetty.deploy.monitoredPath</Name>
                   <Default>
-                    <!-- XWIKI begin -->
                     <!-- We deploy XWiki and the Root webapp with defined context xml files rather than based on
                          webapps/ monitoring -->
                     <Property name="jetty.home" default="." />/<Property name="jetty.deploy.monitoredDir" deprecated="jetty.deploy.monitoredDirName" default="contexts"/>
-                    <!-- XWIKI end -->
                   </Default>
                 </Property>
               </Set>
@@ -92,12 +73,6 @@
               <Set name="extractWars"><Property name="jetty.deploy.extractWars" default="true"/></Set>
               <Set name="configurationManager">
                 <New class="org.eclipse.jetty.deploy.PropertiesConfigurationManager">
-                  <!-- file of context configuration properties
-                  <Set name="file"><SystemProperty name="jetty.base"/>/etc/some.properties</Set>
-                  -->
-                  <!-- set a context configuration property
-                  <Call name="put"><Arg>name</Arg><Arg>value</Arg></Call>
-                  -->
                 </New>
               </Set>
             </New>

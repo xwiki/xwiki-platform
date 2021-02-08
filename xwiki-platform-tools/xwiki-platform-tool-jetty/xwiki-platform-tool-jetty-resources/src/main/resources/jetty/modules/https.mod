@@ -38,4 +38,3 @@ http-forwarded
 
 [xml]
 etc/jetty-https.xml
-

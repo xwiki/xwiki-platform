@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
 [description]
 Adds the Jetty JNDI implementation to the classpath.
@@ -30,4 +30,3 @@ mail
 [lib]
 lib/jetty-jndi-${jetty.version}.jar
 lib/jndi/*.jar
-

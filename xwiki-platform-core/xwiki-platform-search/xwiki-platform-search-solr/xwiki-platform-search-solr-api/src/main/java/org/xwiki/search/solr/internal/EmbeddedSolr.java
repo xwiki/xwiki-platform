@@ -132,7 +132,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private CoreContainer createCoreContainer() throws SolrServerException
     {
-        CoreContainer coreContainer = CoreContainer.createAndLoad(this.solrHomePath);
+        CoreContainer coreContainer = XWikiCoreContainer.createAndLoad(this.solrHomePath);
         if (coreContainer.getCores().isEmpty()) {
             throw new SolrServerException(
                 "Failed to initialize the Solr core. Please check the configuration and log messages.");

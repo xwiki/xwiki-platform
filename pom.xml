@@ -31,7 +31,7 @@
   </parent>
   <groupId>org.xwiki.contrib.templates</groupId>
   <artifactId>application-templates</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
+  <version>1.0.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Templates Application - Parent POM</name>
   <description>A collection of content templates</description>

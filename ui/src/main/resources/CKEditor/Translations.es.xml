@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -51,24 +51,21 @@ CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Cargar extensiones JavaScript 
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Algunas macros de renderizado se muestran utilizando código JavaScript. Cargar el código JavaScript mejora la presentación WYSIWYG del editor pero puede provocar problemas si el código JavaScript interfiere con el código del CKEditor o si cambia contenido fuera de los límites de salida de la macro.
 CKEditor.ConfigClass_advanced=Configuración avanzada
 CKEditor.ConfigClass_advanced.hint=Puedes escribir un fragmento de código JavaScript para modificar la configuración del objeto directamente. Clica la {0}documentación de CKEditor{1} para la lista de propiedades de configuración disponibles.
-
+ckeditor.content.placeholder=Comienza a teclear aquí...
 ckeditor.admin.saveComment=Configuración de CKEditor actualizada desde la Administración
 ckeditor.admin.reset=Reiniciar
 ckeditor.admin.reset.hint=Restablecer la configuración predeterminada
 ckeditor.admin.reset.confirmation=¿Estás seguro de querer restablecer la configuración predeterminada? Perderás todos tus cambios.
-
 ckeditor.plugin.link.options=Opciones
 ckeditor.plugin.link.anchor=Ancla
 ckeditor.plugin.link.queryString=Cadena de consulta
 ckeditor.plugin.link.defaultLabel=teclea la etiqueta del enlace
 ckeditor.plugin.link.openInNewTab=Abrir el enlace en una pestaña nueva
-
 ckeditor.plugin.macro.placeholder=macro:{0}
 ckeditor.plugin.macro.buttonHint=Macro de XWiki
 ckeditor.plugin.macro.editButtonHint=Editar la macro
 ckeditor.plugin.macro.refreshFailed=Error al refrescar el contenido editado.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insertar la macro {0}
-
 ckeditor.plugin.office.importer.title=Importar fichero de Office
 ckeditor.plugin.office.importer.filePath=Ruta del fichero
 ckeditor.plugin.office.importer.filePath.hint=Escoge el fichero Office a importar. Se subirá y adjuntará el fichero esta página y su contenido será insertado en el contenido de la página.
@@ -83,12 +80,10 @@ ckeditor.plugin.office.importer.done=Fichero Office importado con éxito.
 ckeditor.plugin.office.importer.fail=Error de importación Office.
 ckeditor.plugin.office.importer.noUploadURL=La URL de subida del fichero no está configurada.
 ckeditor.plugin.office.importer.failedToLoadForm=Error al cargar el formulario.
-
 ckeditor.plugin.resource.notSpecified=No se especifica el {0}.
 ckeditor.plugin.save.leaveConfirmationMessage=Hay cambios sin guardar. ¿Quieres descartarlos?
 ckeditor.plugin.save.failed=No se puede guardar el contenido por un error interno de CKEditor. Deberías intentar copiar tus cambios importantes y recargar el editor.
 ckeditor.plugin.source.conversionFailed=Error al ejecutar la conversión.
-
 ckeditor.plugin.toolbar.basicStyles=Estilos básicos
 ckeditor.plugin.toolbar.lists=Listas
 ckeditor.plugin.toolbar.bulletedlist=Lista con viñetas
@@ -104,18 +99,14 @@ ckeditor.plugin.toolbar.toc=Tabla de contenidos
 ckeditor.plugin.toolbar.include=Incluir
 ckeditor.plugin.toolbar.code=Fragmento de código
 ckeditor.plugin.toolbar.otherMacros=Otras macros
-
 ckeditor.plugin.syntax.update.inProgress=Actualizando el editor WYSIWYG
 ckeditor.plugin.syntax.update.done=Editor WYSIWYG actualizado
 ckeditor.plugin.syntax.update.failed=Error al actualizar el editor WYSIWYG
 ckeditor.plugin.syntax.wysiwygModeUnsupported=La sintaxis {0} no soporta el modo de edición WYSIWYG .
-
 ckeditor.inline.failedToInit=Error al inicializar CKEditor.
-
 modal.ok=OK
 modal.cancel=Cancelar
 modal.close=Cerrar
-
 resource.attach.label=Adjunto
 resource.attach.placeholder=Ruta.A.La.Página@adjunto.png
 resource.data.label=Data URI
@@ -133,31 +124,27 @@ resource.url.label=URL
 resource.url.placeholder=http://www.example.org/imagen.png
 resource.user.label=Usuario
 resource.user.placeholder=alias
-
 resourcePicker.attach.hint=Seleccionar un adjunto
 resourcePicker.doc.hint=Seleccionar una página
-
 entityResourceSuggester.doc.placeholder=Encontrar una página...
 entityResourceSuggester.attach.placeholder=Encontrar un adjunto...
-
 entityResourcePicker.select=Seleccionar
 entityResourcePicker.doc.title=Seleccionar página
 entityResourcePicker.attach.title=Seleccionar adjunto
-
 macroSelector.title=Seleccionar macro
 macroSelector.filter.text.placeholder=Teclea para filtrar
 macroSelector.filter.category.all=Todas las macros
 macroSelector.filter.category.other=Otras
 macroSelector.failedToRetrieveMacros=Error al recuperar la lista de macros disponibles.
 macroSelector.select=Seleccionar
-
 macroEditor.title=Editar macro
 macroEditor.more=Más
 macroEditor.changeMacro=Cambiar macro
 macroEditor.submit=Enviar
 macroEditor.content=Contenido
 macroEditor.noParameters=Esta macro no tiene parámetros.
-macroEditor.descriptorRequestFailed=Error al recuperar el descriptor de la macro {0}.</content>
+macroEditor.descriptorRequestFailed=Error al recuperar el descriptor de la macro {0}.
+</content>
   
   
 </xwikidoc>

@@ -24,12 +24,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.Validator;
 
@@ -60,6 +64,11 @@ public class DefaultValidationTest extends AbstractValidationTest
     protected PrintStream stderr;
 
     /**
+     * This map contains the warning logs that are expected during the test.
+     */
+    protected Map<Target, List<String>> expectedWarningLogs;
+
+    /**
      * The new stderr stream we're using to replace the default console output.
      */
     protected ByteArrayOutputStream err;
@@ -70,6 +79,28 @@ public class DefaultValidationTest extends AbstractValidationTest
         super("testDocumentValidity", target, client, credentials);
 
         this.validator = validator;
+        this.expectedWarningLogs = new HashMap<>();
+        this.initializeExpectedWarningLogs();
+    }
+
+    private void initializeExpectedWarningLogs()
+    {
+        Target resetPassword = new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPassword"));
+        this.expectedWarningLogs.put(resetPassword,
+            Collections.singletonList("[DEPRECATED] The page [XWiki.ResetPassword] should not be used anymore in favor "
+                + "of the new 'authenticate/reset' URL."));
+
+        Target resetPasswordComplete =
+            new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ResetPasswordComplete"));
+        this.expectedWarningLogs.put(resetPasswordComplete,
+            Collections.singletonList("The page [XWiki.ResetPasswordComplete] should not be used anymore in favor of "
+                + "the new 'authenticate/reset' URL."));
+
+        Target forgotUsername =
+            new DocumentReferenceTarget(new DocumentReference("xwiki", "XWiki", "ForgotUsername"));
+        this.expectedWarningLogs.put(forgotUsername,
+            Collections.singletonList("The page [XWiki.ForgotUsername] should not be used anymore in favor of the "
+                + "new 'authenticate/forgot' URL."));
     }
 
     @Override
@@ -135,11 +166,15 @@ public class DefaultValidationTest extends AbstractValidationTest
         boolean hasError = false;
         for (ValidationError error : errors) {
             if (error.getType() == ValidationError.Type.WARNING) {
-                if (error.getLine() >= 0) {
-                    System.out
-                        .println("Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
-                } else {
-                    System.out.println("Warning " + error.getMessage());
+                List<String> expectedLogs = this.expectedWarningLogs.getOrDefault(this.target, Collections.emptyList());
+                if (!expectedLogs.contains(error.getMessage())) {
+                    if (error.getLine() >= 0) {
+                        System.out
+                            .println(
+                                "Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
+                    } else {
+                        System.out.println("Warning " + error.getMessage());
+                    }
                 }
             } else {
                 if (error.getLine() >= 0) {

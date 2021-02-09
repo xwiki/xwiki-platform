@@ -245,6 +245,19 @@ public class EditIT
         try {
             // Prevent from leaving the page so that we can check the UI before moving out of the page
             setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+
+            // Change the default timeout of done event so that we can see it.
+            setup.getDriver()
+                .executeJavascript("XWiki.widgets.Notification.prototype.defaultOptions.done.timeout = 30");
+
+            // For new timeouts to be taken into account we need to reset the listeners:
+            // first we stop observing save event, it will remove the existing listeners
+            setup.getDriver()
+                .executeJavascript("document.stopObserving('xwiki:actions:save')");
+            // then we create back the AjaxSaveAndContinue instance, it will create back the messages with the right
+            // timeout, and will also create the listener.
+            setup.getDriver().executeJavascript("new XWiki.actionButtons.AjaxSaveAndContinue()");
+
             editWiki.clickSaveAndView(false);
 
             // An alert should appear to ask the user if he wants to leave the page.

@@ -20,10 +20,8 @@
 package org.xwiki.officeimporter.internal.converter;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -44,6 +42,8 @@ import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
  */
 public class DefaultOfficeConverter implements OfficeConverter
 {
+    private static final String CONVERSION_ERROR_MESSAGE = "Error while performing conversion.";
+
     /**
      * The logger to log.
      */
@@ -71,30 +71,32 @@ public class DefaultOfficeConverter implements OfficeConverter
         this.workDir = workDir;
     }
 
-    @Override
-    public Map<String, byte[]> convert(Map<String, InputStream> inputStreams, String inputFileName,
-        String outputFileName) throws OfficeConverterException
+    private void checkInputStream(Map<String, InputStream> inputStreams, String inputFileName)
+        throws OfficeConverterException
     {
         // Verify whether an input stream is present for the main input file.
         if (null == inputStreams.get(inputFileName)) {
             String message = "No input stream specified for main input file [%s].";
             throw new OfficeConverterException(String.format(message, inputFileName));
         }
+    }
 
-        OfficeConverterFileStorage storage = null;
+    @Override
+    public DefaultOfficeConverterResult convertDocument(Map<String, InputStream> inputStreams, String inputFileName,
+        String outputFileName) throws OfficeConverterException
+    {
+        this.checkInputStream(inputStreams, inputFileName);
+
         try {
             // Prepare temporary storage.
-            storage = new OfficeConverterFileStorage(this.workDir, inputFileName, outputFileName);
+            OfficeConverterFileStorage storage = new OfficeConverterFileStorage(this.workDir, inputFileName,
+                outputFileName);
 
             // Write out all the input streams.
-            FileOutputStream fos = null;
             for (Map.Entry<String, InputStream> entry : inputStreams.entrySet()) {
-                try {
-                    File temp = new File(storage.getInputDir(), entry.getKey());
-                    fos = new FileOutputStream(temp);
+                File temp = new File(storage.getInputDir(), entry.getKey());
+                try (FileOutputStream fos = new FileOutputStream(temp)) {
                     IOUtils.copy(entry.getValue(), fos);
-                } finally {
-                    IOUtils.closeQuietly(fos);
                 }
             }
 
@@ -103,25 +105,9 @@ public class DefaultOfficeConverter implements OfficeConverter
                 .to(storage.getOutputFile())
                 .execute();
 
-            // Collect all the output artifacts.
-            Map<String, byte[]> result = new HashMap<String, byte[]>();
-            FileInputStream fis = null;
-            for (File file : storage.getOutputDir().listFiles()) {
-                try {
-                    fis = new FileInputStream(file);
-                    result.put(file.getName(), IOUtils.toByteArray(fis));
-                } finally {
-                    IOUtils.closeQuietly(fis);
-                }
-            }
-
-            return result;
+            return new DefaultOfficeConverterResult(storage);
         } catch (Exception ex) {
-            throw new OfficeConverterException("Error while performing conversion.", ex);
-        } finally {
-            if (!storage.cleanUp()) {
-                LOGGER.error("Could not cleanup temporary storage after conversion.");
-            }
+            throw new OfficeConverterException(CONVERSION_ERROR_MESSAGE, ex);
         }
     }
 

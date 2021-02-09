@@ -20,13 +20,19 @@
 package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -42,6 +48,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
@@ -51,6 +58,7 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -99,6 +107,9 @@ public class DefaultPresentationBuilderTest
     @MockComponent
     private OfficeServer officeServer;
 
+    @XWikiTempDir
+    private File outputDirectory;
+
     @BeforeEach
     public void configure() throws Exception
     {
@@ -117,17 +128,30 @@ public class DefaultPresentationBuilderTest
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         InputStream officeFileStream = new ByteArrayInputStream("Presentation content".getBytes());
-        Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
-        byte[] firstSlide = "first slide".getBytes();
-        byte[] secondSlide = "second slide".getBytes();
-        artifacts.put("img0.jpg", firstSlide);
-        artifacts.put("img0.html", new byte[0]);
-        artifacts.put("text0.html", new byte[0]);
-        artifacts.put("img1.jpg", secondSlide);
-        artifacts.put("img1.html", new byte[0]);
-        artifacts.put("text1.html", new byte[0]);
-        when(this.officeConverter.convert(Collections.singletonMap("file.odp", officeFileStream), "file.odp",
-            "img0.html")).thenReturn(artifacts);
+
+        OfficeConverterResult officeConverterResult = mock(OfficeConverterResult.class);
+        when(officeConverterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
+        File firstSlide = new File(this.outputDirectory, "img0.html");
+        File secondSlide = new File(this.outputDirectory, "img1.html");
+        when(officeConverterResult.getOutputFile()).thenReturn(firstSlide);
+        Set<File> allFiles = new HashSet<>();
+        // list of files usually created by jodconverter for a presentation
+        allFiles.add(firstSlide);
+        allFiles.add(new File(this.outputDirectory, "img0.jpg"));
+        allFiles.add(new File(this.outputDirectory, "text0.html"));
+        allFiles.add(secondSlide);
+        allFiles.add(new File(this.outputDirectory, "img1.jpg"));
+        allFiles.add(new File(this.outputDirectory, "text1.html"));
+
+        // We create the files since some IO operations will happen on them
+        for (File file : allFiles) {
+            Files.createFile(file.toPath());
+        }
+
+        when(officeConverterResult.getAllFiles()).thenReturn(allFiles);
+
+        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odp", officeFileStream), "file.odp",
+            "img0.html")).thenReturn(officeConverterResult);
 
         HTMLCleanerConfiguration config = mock(HTMLCleanerConfiguration.class);
         when(this.officeHTMLCleaner.getDefaultConfiguration()).thenReturn(config);
@@ -144,11 +168,10 @@ public class DefaultPresentationBuilderTest
         XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
-
-        Map<String, byte[]> expectedArtifacts = new HashMap<String, byte[]>();
-        expectedArtifacts.put("file-slide0.jpg", firstSlide);
-        expectedArtifacts.put("file-slide1.jpg", secondSlide);
-        assertEquals(expectedArtifacts, result.getArtifacts());
+        Set<File> expectedArtifacts = new HashSet<>();
+        expectedArtifacts.add(new File(this.outputDirectory, "file-slide0.jpg"));
+        expectedArtifacts.add(new File(this.outputDirectory, "file-slide1.jpg"));
+        assertEquals(expectedArtifacts, result.getArtifactsFiles());
 
         assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 

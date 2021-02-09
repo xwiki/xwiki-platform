@@ -19,11 +19,14 @@
  */
 package org.xwiki.officeimporter.document;
 
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SectionBlock;
@@ -31,6 +34,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.stability.Unstable;
 
 /**
  * An {@link OfficeDocument} backed by an {@link XDOM} document.
@@ -48,25 +52,32 @@ public class XDOMOfficeDocument implements OfficeDocument
     /**
      * Artifacts for this office document.
      */
-    private Map<String, byte[]> artifacts;
+    private Set<File> artifactFiles;
 
     /**
      * {@link ComponentManager} used to lookup for various renderers.
      */
     private ComponentManager componentManager;
 
+    private OfficeConverterResult converterResult;
+
     /**
      * Creates a new {@link XDOMOfficeDocument}.
-     * 
+     *
      * @param xdom {@link XDOM} corresponding to office document content.
-     * @param artifacts artifacts for this office document.
+     * @param artifactFiles artifacts for this office document.
      * @param componentManager {@link ComponentManager} used to lookup for various renderers.
+     * @param converterResult the {@link OfficeConverterResult} used to build that object.
+     * @since 13.1RC1
      */
-    public XDOMOfficeDocument(XDOM xdom, Map<String, byte[]> artifacts, ComponentManager componentManager)
+    @Unstable
+    public XDOMOfficeDocument(XDOM xdom, Set<File> artifactFiles, ComponentManager componentManager,
+        OfficeConverterResult converterResult)
     {
         this.xdom = xdom;
-        this.artifacts = artifacts;
+        this.artifactFiles = artifactFiles;
         this.componentManager = componentManager;
+        this.converterResult = converterResult;
     }
 
     @Override
@@ -101,9 +112,9 @@ public class XDOMOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public Map<String, byte[]> getArtifacts()
+    public Set<File> getArtifactsFiles()
     {
-        return this.artifacts;
+        return this.artifactFiles;
     }
 
     /**
@@ -164,5 +175,19 @@ public class XDOMOfficeDocument implements OfficeDocument
             // Ignore.
         }
         return null;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        if (this.converterResult != null) {
+            this.converterResult.close();
+        }
+    }
+
+    @Override
+    public OfficeConverterResult getConverterResult()
+    {
+        return this.converterResult;
     }
 }

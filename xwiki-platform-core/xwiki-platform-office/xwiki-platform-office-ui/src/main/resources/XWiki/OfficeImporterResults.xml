@@ -127,6 +127,7 @@
           {{error}}$services.officeimporter.errorMessage{{/error}}
         #end
       #end
+      #set ($discard = $xdomOfficeDoc.close())
     #else
       {{error}}$services.officeimporter.errorMessage{{/error}}
     #end

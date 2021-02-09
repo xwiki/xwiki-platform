@@ -21,6 +21,7 @@ package org.xwiki.office.viewer.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -45,6 +47,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
@@ -64,6 +67,7 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -177,6 +181,9 @@ class DefaultOfficeResourceViewerTest
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
 
+    @XWikiTempDir
+    private File tempDir;
+
     /**
      * The mock {@link Cache} instance used in tests.
      */
@@ -256,7 +263,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), componentManager);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -330,7 +337,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(), componentManager);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -367,8 +374,13 @@ class DefaultOfficeResourceViewerTest
         galleryMacro.addChild(new ImageBlock(imageReference, true));
         XDOM xdom = new XDOM(Collections.<Block>singletonList(galleryMacro));
 
-        Map<String, byte[]> artifacts = Collections.singletonMap("slide0.png", new byte[8]);
-        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, artifacts, componentManager);
+        File artifact = new File(this.tempDir, "slide0.png");
+        try (FileOutputStream fos = new FileOutputStream(artifact)) {
+            IOUtils.write(new byte[8], fos);
+        }
+        OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
+        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, Collections.singleton(artifact),
+            componentManager, converterResult);
 
         when(presentationBuilder.build(attachmentContent, attachmentReference.getName(), documentReference))
             .thenReturn(xdomOfficeDocument);
@@ -393,5 +405,6 @@ class DefaultOfficeResourceViewerTest
             ((MetaDataBlock) galleryMacro.getParent()).getMetaData().getMetaData(MetaData.SYNTAX));
 
         verify(this.temporaryResourceStore).createTemporaryFile(eq(temporaryResourceReference), any(InputStream.class));
+        verify(converterResult).close();
     }
 }

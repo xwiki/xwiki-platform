@@ -23,9 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
@@ -34,10 +36,12 @@ import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.local.LocalConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -53,6 +57,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ExtendWith(XWikiTempDirExtension.class)
 public class DefaultOfficeConverterTest
 {
     private LocalConverter localConverter;
@@ -70,10 +75,10 @@ public class DefaultOfficeConverterTest
     }
 
     @Test
-    public void convert() throws IOException, OfficeException, OfficeConverterException
+    public void convertDocument() throws IOException, OfficeException, OfficeConverterException
     {
         OfficeConverterException officeConverterException = assertThrows(OfficeConverterException.class,
-            () -> this.defaultOfficeConverter.convert(Collections.emptyMap(), "myFile", "myOutputFile"));
+            () -> this.defaultOfficeConverter.convertDocument(Collections.emptyMap(), "myFile", "myOutputFile"));
         assertEquals("No input stream specified for main input file [myFile].", officeConverterException.getMessage());
 
         String content = "my content";
@@ -87,14 +92,29 @@ public class DefaultOfficeConverterTest
 
         ConversionJobWithOptionalTargetFormatUnspecified jobTarget =
             mock(ConversionJobWithOptionalTargetFormatUnspecified.class);
-        when(jobSource.to(any(File.class))).thenReturn(jobTarget);
+        when(jobSource.to(any(File.class))).thenAnswer(invocationOnMock -> {
+            // We create the output file and a mock artifact file next to it.
+            File outputFile = invocationOnMock.getArgument(0);
+            Files.createFile(outputFile.toPath());
+            File otherArtifact = new File(outputFile.getParentFile(), "artifact.test");
+            Files.createFile(otherArtifact.toPath());
+            return jobTarget;
+        });
 
-        Map<String, byte[]> obtainedResult =
-            this.defaultOfficeConverter.convert(inputStreamMap, "myFile", "myOutputFile");
+        OfficeConverterResult result =
+            this.defaultOfficeConverter.convertDocument(inputStreamMap, "myFile", "myOutputFile");
 
-        // We obtain an empty result since the list of files is null.
-        // And we cannot guess name of files since it's generated with UUID. 
-        assertTrue(obtainedResult.isEmpty());
+        assertEquals("myOutputFile", result.getOutputFile().getName());
+        File outputDirectory = result.getOutputDirectory();
+
+        // path of the outputDirectory is: tmpDir / UUID / output
+        // We cannot guess the UUID so we're checking the other parts
+        assertEquals("output", outputDirectory.getName());
+        assertEquals(this.tmpDir, outputDirectory.getParentFile().getParentFile());
+        Set<File> allFiles = result.getAllFiles();
+        assertEquals(2, allFiles.size());
+        assertTrue(allFiles.contains(new File(outputDirectory, "myOutputFile")));
+        assertTrue(allFiles.contains(new File(outputDirectory, "artifact.test")));
 
         ArgumentCaptor<File> argument = ArgumentCaptor.forClass(File.class);
         verify(this.localConverter).convert(argument.capture());

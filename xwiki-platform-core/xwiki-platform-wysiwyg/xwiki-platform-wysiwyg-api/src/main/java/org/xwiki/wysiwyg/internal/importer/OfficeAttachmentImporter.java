@@ -19,6 +19,8 @@
  */
 package org.xwiki.wysiwyg.internal.importer;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
@@ -138,11 +141,16 @@ public class OfficeAttachmentImporter implements AttachmentImporter
             xdomOfficeDocument = documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
         }
         // Attach the images extracted from the imported office document to the target wiki document.
-        for (Map.Entry<String, byte[]> artifact : xdomOfficeDocument.getArtifacts().entrySet()) {
-            AttachmentReference artifactReference = new AttachmentReference(artifact.getKey(), targetDocRef);
-            documentAccessBridge.setAttachmentContent(artifactReference, artifact.getValue());
+        for (File artifact : xdomOfficeDocument.getArtifactsFiles()) {
+
+            AttachmentReference artifactReference = new AttachmentReference(artifact.getName(), targetDocRef);
+            try (FileInputStream fis = new FileInputStream(artifact)) {
+                documentAccessBridge.setAttachmentContent(artifactReference, IOUtils.toByteArray(fis));
+            }
         }
-        return xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+        String result = xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+        xdomOfficeDocument.close();
+        return result;
     }
 
     /**

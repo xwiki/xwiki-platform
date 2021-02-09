@@ -27,9 +27,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 import org.xwiki.officeimporter.server.OfficeServer;
 
@@ -89,10 +92,15 @@ public class OfficeExporter extends PdfExportImpl
         addEmbeddedObjects(inputStreams, context);
 
         OfficeConverter officeConverter = this.officeServer.getConverter();
-        try {
-            Map<String, byte[]> ouput = officeConverter.convert(inputStreams, inputFileName, outputFileName);
+        try (OfficeConverterResult officeConverterResult =
+                officeConverter.convertDocument(inputStreams, inputFileName, outputFileName))
+        {
 
-            out.write(ouput.values().iterator().next());
+            for (File file : officeConverterResult.getAllFiles()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    IOUtils.write(IOUtils.toByteArray(fis), out);
+                }
+            }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, String.format(

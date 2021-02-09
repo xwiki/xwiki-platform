@@ -243,6 +243,7 @@ public class ObjectEditorIT
         assertEquals(1, stringObjects.size());
 
         string1 = stringObjects.get(0);
+        string1.loadObject();
         assertEquals(0, string1.getObjectNumber());
         assertTrue(string1.isDeleteLinkDisplayed());
         assertTrue(string1.isEditLinkDisplayed());
@@ -261,6 +262,7 @@ public class ObjectEditorIT
         numberObjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS);
         assertEquals(1, numberObjects.size());
         number1 = numberObjects.get(0);
+        number1.loadObject();
         assertEquals(0, number1.getObjectNumber());
         assertTrue(number1.isDeleteLinkDisplayed());
         assertTrue(number1.isEditLinkDisplayed());
@@ -270,12 +272,14 @@ public class ObjectEditorIT
         assertEquals(2, stringObjects.size());
 
         string1 = stringObjects.get(0);
+        string1.loadObject();
         assertEquals(0, string1.getObjectNumber());
         assertTrue(string1.isDeleteLinkDisplayed());
         assertTrue(string1.isEditLinkDisplayed());
         assertEquals("foobar", string1.getFieldValue(string1.byPropertyName("string")));
 
         string2 = stringObjects.get(1);
+        string2.loadObject();
         assertEquals(1, string2.getObjectNumber());
         assertTrue(string2.isDeleteLinkDisplayed());
         assertTrue(string2.isEditLinkDisplayed());
@@ -337,7 +341,9 @@ public class ObjectEditorIT
 
         // Select a second document in the DB list select field.
         oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        objectEditPane.loadObject();
+        objectEditPane.setFieldValue(
             By.id(String.format("%s_0_prop", testClassFullName)),
             String.format("%s.%s", dedicatedSpace, testObjectPage));
         vp = oep.clickSaveAndView();
@@ -383,8 +389,9 @@ public class ObjectEditorIT
 
         // Verify conversion
         oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
-            By.id(propertyClassId), "2.5");
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        objectEditPane.loadObject();
+        objectEditPane.setFieldValue(By.id(propertyClassId), "2.5");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: 2.5", vp.getContent());
 
@@ -441,10 +448,10 @@ public class ObjectEditorIT
 
         // Verify conversion
         oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
-            By.id(propertyClassId), "choice 3");
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
-            By.id(propertyClassId), "choice 4");
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        objectEditPane.loadObject();
+        objectEditPane.setFieldValue(By.id(propertyClassId), "choice 3");
+        objectEditPane.setFieldValue(By.id(propertyClassId), "choice 4");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: choice 3 choice 4", vp.getContent());
     }
@@ -490,7 +497,9 @@ public class ObjectEditorIT
 
         // Make sure we can still edit the object.
         oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        objectEditPane.loadObject();
+        objectEditPane.setFieldValue(
             By.id(propertyClassId), "this|other");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: this other", vp.getContent());
@@ -503,7 +512,9 @@ public class ObjectEditorIT
 
         // Make sure we can still edit the object.
         oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        oep.getObjectsOfClass(testClassFullName).get(0).setFieldValue(
+        objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        objectEditPane.loadObject();
+        objectEditPane.setFieldValue(
             By.id(propertyClassId), "that|other");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: that other", vp.getContent());
@@ -536,7 +547,9 @@ public class ObjectEditorIT
         oep = oep.clickSaveAndView().editObjects();
         List<ObjectEditPane> xwikiStringsForms = oep.getObjectsOfClass(STRING_CLASS);
         assertEquals(1, xwikiStringsForms.size());
-        assertEquals("John", xwikiStringsForms.get(0).getFieldValue(By.id(String.format(property, 0))));
+        ObjectEditPane objectEditPane = xwikiStringsForms.get(0);
+        objectEditPane.loadObject();
+        assertEquals("John", objectEditPane.getFieldValue(By.id(String.format(property, 0))));
     }
 
     @Test
@@ -578,6 +591,7 @@ public class ObjectEditorIT
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(testClassFullName).get(0);
+        object.loadObject();
         BootstrapDateTimePicker datePicker = object.openDatePicker("date");
         assertEquals("15", datePicker.getSelectedDay());
         datePicker.close();

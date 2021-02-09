@@ -180,12 +180,7 @@ public class ObjectEditPage extends EditPage
         List<WebElement> elements =
             classElement.findElements(By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
-        for (int i = 0; i < elements.size(); i++) {
-            WebElement element = elements.get(i);
-            // Make sure all forms are displayed otherwise we can't interact with them.
-            if (!element.isDisplayed()) {
-                titles.get(i).click();
-            }
+        for (WebElement element : elements) {
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);
             objects.add(new ObjectEditPane(By.id(element.getAttribute("id")), className, objectNumber));
         }

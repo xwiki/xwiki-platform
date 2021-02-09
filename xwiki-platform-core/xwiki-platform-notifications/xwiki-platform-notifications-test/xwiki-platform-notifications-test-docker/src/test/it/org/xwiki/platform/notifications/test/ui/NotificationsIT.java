@@ -41,6 +41,7 @@ import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -309,8 +310,10 @@ public class NotificationsIT
             ObjectEditPage editObjects = setup.editObjects(testReference.getLastSpaceReference().getName(),
                 "NotificationDisplayerClassTest");
             editObjects.addObject("XWiki.Notifications.Code.NotificationDisplayerClass");
-            editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass")
-                .get(0).fillFieldsByName(notificationDisplayerParameters);
+            ObjectEditPane objectEditPane =
+                editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass").get(0);
+            objectEditPane.loadObject();
+            objectEditPane.fillFieldsByName(notificationDisplayerParameters);
             editObjects.clickSaveAndContinue(true);
 
             // Login as first user, and enable notifications on document updates

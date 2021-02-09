@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import com.xpn.xwiki.XWikiException;
 
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link TagParamUtils}.
@@ -38,37 +39,39 @@ public class TagParamUtilsTest
     @Test
     public void spacesParameterToList() throws Exception
     {
-        Assert.assertThat(TagParamUtils.spacesParameterToList("'Space1','Space2'"),
-                Matchers.contains("Space1", "Space2"));
-        Assert.assertThat(TagParamUtils.spacesParameterToList("'Space1', 'Space 2',  'Apo''strophe'"),
-                Matchers.contains("Space1", "Space 2", "Apo'strophe"));
-        Assert.assertThat(TagParamUtils.spacesParameterToList("'single space'"),
-                Matchers.contains("single space"));
-        Assert.assertThat(TagParamUtils.spacesParameterToList(""),
-                Matchers.empty());
+        assertThat(TagParamUtils.spacesParameterToList("'Space1','Space2'"),
+            Matchers.contains("Space1", "Space2"));
+        assertThat(TagParamUtils.spacesParameterToList("'Space1', 'Space 2',  'Apo''strophe'"),
+            Matchers.contains("Space1", "Space 2", "Apo'strophe"));
+        assertThat(TagParamUtils.spacesParameterToList("'single space'"),
+            Matchers.contains("single space"));
+        assertThat(TagParamUtils.spacesParameterToList(""),
+            Matchers.empty());
     }
 
     @Test
     public void spacesParameterToListExceptions() throws XWikiException
     {
-	try {
-	    TagParamUtils.spacesParameterToList(null);
-	    Assert.fail("npe expected");
-	} catch (IllegalArgumentException expected) {}
+        try {
+            TagParamUtils.spacesParameterToList(null);
+            fail("npe expected");
+        } catch (IllegalArgumentException expected) {
+        }
 
-	try {
-	    TagParamUtils.spacesParameterToList("'space1','space2");
-	    Assert.fail("XWikiException expected");
-	} catch (XWikiException expected) {}
-	try {
-	    TagParamUtils.spacesParameterToList("'space1','space2',");
-	    Assert.fail("XWikiException expected");
-	} catch (XWikiException expected) {}
-	try {
-	    TagParamUtils.spacesParameterToList("'space1', or 'space2'");
-	    Assert.fail("XWikiException expected");
-	} catch (XWikiException expected) {}
+        try {
+            TagParamUtils.spacesParameterToList("'space1','space2");
+            fail("XWikiException expected");
+        } catch (XWikiException expected) {
+        }
+        try {
+            TagParamUtils.spacesParameterToList("'space1','space2',");
+            fail("XWikiException expected");
+        } catch (XWikiException expected) {
+        }
+        try {
+            TagParamUtils.spacesParameterToList("'space1', or 'space2'");
+            fail("XWikiException expected");
+        } catch (XWikiException expected) {
+        }
     }
-
-
 }

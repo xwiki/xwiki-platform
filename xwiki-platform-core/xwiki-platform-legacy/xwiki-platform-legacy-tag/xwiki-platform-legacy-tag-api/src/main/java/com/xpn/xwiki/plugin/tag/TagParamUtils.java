@@ -29,7 +29,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @since 8.2M1
+ * @deprecated since 13.1RC1
  */
+@Deprecated
 public final class TagParamUtils
 {
     /**

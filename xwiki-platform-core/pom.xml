@@ -138,6 +138,31 @@
                 <new>method org.xwiki.security.authentication.AuthenticationConfiguration org.xwiki.security.authentication.script.AuthenticationScriptService::getAuthenticationConfiguration()</new>
                 <justification>AuthenticationConfiguration has only been moved to a new package, so it should not be breaking for people using this API in scripts.</justification>
               </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>enum com.xpn.xwiki.plugin.tag.TagOperationResult</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagParamUtils</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagPlugin</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagPluginApi</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagQueryUtils</old>
+                <justification>Moved to legacy.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

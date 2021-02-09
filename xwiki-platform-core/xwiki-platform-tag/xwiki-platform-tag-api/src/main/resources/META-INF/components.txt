@@ -1,0 +1,8 @@
+org.xwiki.tag.TagScriptService
+org.xwiki.tag.internal.TagDocumentManager
+org.xwiki.tag.internal.TagQueryManager
+org.xwiki.tag.internal.livedata.TaggedDocumentLiveDataEntryStore
+org.xwiki.tag.internal.livedata.TaggedDocumentLiveDataPropertyDescriptorStore
+org.xwiki.tag.internal.livedata.TaggedDocumentLiveDataSource
+org.xwiki.tag.internal.livedata.TaggedDocumentLiveDataConfigurationResolver
+org.xwiki.tag.internal.livedata.TaggedDocumentLiveDataConfigurationProvider

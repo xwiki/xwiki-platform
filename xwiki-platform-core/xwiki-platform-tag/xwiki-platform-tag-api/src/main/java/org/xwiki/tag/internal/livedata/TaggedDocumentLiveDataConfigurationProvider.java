@@ -17,25 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.tag.internal.livedata;
 
-package com.xpn.xwiki.plugin.tag;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataQuery;
 
 /**
- * The result of a {@link TagPlugin} operation.
- * 
+ * Live data configuration for the tag.
+ *
  * @version $Id$
+ * @since 13.1RC1
  */
-public enum TagOperationResult
+@Component
+@Named("taggedDocument")
+@Singleton
+public class TaggedDocumentLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
-    /** The operation was successful, and data changes occurred. */
-    OK,
-
-    /** The operation did not change any data. */
-    NO_EFFECT,
-
-    /** The current user does not have permission to perform the operation. */
-    NOT_ALLOWED,
-
-    /** The operation failed with an exception. */
-    FAILED
+    @Override
+    public LiveDataConfiguration get()
+    {
+        LiveDataConfiguration liveDataConfiguration = new LiveDataConfiguration();
+        LiveDataQuery query = new LiveDataQuery();
+        LiveDataQuery.Source source = new LiveDataQuery.Source();
+        source.setId("tag");
+        query.setSource(source);
+        liveDataConfiguration.setQuery(query);
+        return liveDataConfiguration;
+    }
 }

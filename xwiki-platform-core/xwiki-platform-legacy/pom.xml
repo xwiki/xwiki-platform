@@ -52,6 +52,7 @@
     <module>xwiki-platform-legacy-url</module>
     <module>xwiki-platform-legacy-web</module>
     <module>xwiki-platform-legacy-refactoring</module>
+    <module>xwiki-platform-legacy-tag</module>
   </modules>
   <build>
     <pluginManagement>

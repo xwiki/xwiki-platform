@@ -47,27 +47,21 @@ import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.velocity.tools.RegexTool;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.tag.TagPluginApi;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@code LiveTableResults} page.
- * 
+ *
  * @version $Id$
  */
 @XWikiSyntax20ComponentList
-public class LiveTableResultsTest extends PageTest
+class LiveTableResultsTest extends PageTest
 {
     private QueryManagerScriptService queryService;
 
@@ -97,21 +91,17 @@ public class LiveTableResultsTest extends PageTest
         // The LiveTableResultsMacros page expects that the HTTP query is done with the "get" action and asking for
         // plain output.
         setOutputSyntax(Syntax.PLAIN_1_0);
-        request.put("outputSyntax", "plain");
-        request.put("xpage", "plain");
-        oldcore.getXWikiContext().setAction("get");
+        this.request.put("outputSyntax", "plain");
+        this.request.put("xpage", "plain");
+        this.oldcore.getXWikiContext().setAction("get");
 
         // Prepare mock Query Service so that tests can control what the DB returns.
-        queryService = mock(QueryManagerScriptService.class);
-        oldcore.getMocker().registerComponent(ScriptService.class, "query", queryService);
+        this.queryService = mock(QueryManagerScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
 
         // Prepare mock ModelScriptService so that tests can control what the model returns.
-        modelService = mock(ModelScriptService.class);
-        oldcore.getMocker().registerComponent(ScriptService.class, "model", modelService);
-
-        // The LiveTableResultsMacros page uses the tag plugin for the LT tag cloud feature
-        TagPluginApi tagPluginApi = mock(TagPluginApi.class);
-        doReturn(tagPluginApi).when(oldcore.getSpyXWiki()).getPluginApi(eq("tag"), any(XWikiContext.class));
+        this.modelService = mock(ModelScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "model", this.modelService);
 
         // Register velocity tools used by the LiveTableResultsMacros page
         registerVelocityTool("stringtool", new StringUtils());
@@ -124,7 +114,7 @@ public class LiveTableResultsTest extends PageTest
     }
 
     @Test
-    public void plainPageResults() throws Exception
+    void plainPageResults() throws Exception
     {
         setColumns("doc.name", "doc.date");
         setSort("doc.date", false);
@@ -134,7 +124,7 @@ public class LiveTableResultsTest extends PageTest
         setLimit(7);
 
         ScriptQuery query = mock(ScriptQuery.class);
-        when(queryService.hql("  where 1=1    order by doc.date desc")).thenReturn(query);
+        when(this.queryService.hql("  where 1=1    order by doc.date desc")).thenReturn(query);
         when(query.addFilter("currentlanguage")).thenReturn(query);
         when(query.addFilter("hidden")).thenReturn(query);
         when(query.setLimit(7)).thenReturn(query);
@@ -146,12 +136,12 @@ public class LiveTableResultsTest extends PageTest
         when(query.execute()).thenReturn(Arrays.asList("A.B", "X.Y"));
 
         DocumentReference abReference = new DocumentReference("wiki", "A", "B");
-        when(modelService.resolveDocument("A.B")).thenReturn(abReference);
-        when(modelService.serialize(abReference.getParent(), "local")).thenReturn("A");
+        when(this.modelService.resolveDocument("A.B")).thenReturn(abReference);
+        when(this.modelService.serialize(abReference.getParent(), "local")).thenReturn("A");
 
         DocumentReference xyReference = new DocumentReference("wiki", "X", "Y");
-        when(modelService.resolveDocument("X.Y")).thenReturn(xyReference);
-        when(modelService.serialize(xyReference.getParent(), "local")).thenReturn("X");
+        when(this.modelService.resolveDocument("X.Y")).thenReturn(xyReference);
+        when(this.modelService.serialize(xyReference.getParent(), "local")).thenReturn("X");
 
         renderPage();
 
@@ -175,7 +165,7 @@ public class LiveTableResultsTest extends PageTest
      * @see "XWIKI-12803: Class attribute not escaped in Live Tables"
      */
     @Test
-    public void sqlReservedKeywordAsPropertyName() throws Exception
+    void sqlReservedKeywordAsPropertyName() throws Exception
     {
         setColumns("where");
         setSort("where", true);
@@ -183,7 +173,7 @@ public class LiveTableResultsTest extends PageTest
 
         renderPage();
 
-        verify(queryService).hql(
+        verify(this.queryService).hql(
             ", BaseObject as obj , StringProperty prop_where  "
                 + "where obj.name=doc.fullName and obj.className = :className and "
                 + "doc.fullName not in (:classTemplate1, :classTemplate2)  "
@@ -195,21 +185,21 @@ public class LiveTableResultsTest extends PageTest
      * @see "XWIKI-12855: Unable to sort the Location column in Page Index"
      */
     @Test
-    public void orderByLocation() throws Exception
+    void orderByLocation() throws Exception
     {
         setSort("doc.location", false);
 
         renderPage();
 
-        verify(queryService).hql("  where 1=1    order by lower(doc.fullName) desc, doc.fullName desc");
+        verify(this.queryService).hql("  where 1=1    order by lower(doc.fullName) desc, doc.fullName desc");
     }
 
     /**
-     * Verify we can restrict pages by using a location filter and that we can also filter by doc.location
-     * at the same time. See <a href="https://jira.xwiki.org/browse/XWIKI-17463">XWIKI-17463</a>.
+     * Verify we can restrict pages by using a location filter and that we can also filter by doc.location at the same
+     * time. See <a href="https://jira.xwiki.org/browse/XWIKI-17463">XWIKI-17463</a>.
      */
     @Test
-    public void restrictLocationAndFilterByDocLocation() throws Exception
+    void restrictLocationAndFilterByDocLocation() throws Exception
     {
         // Simulate the following type of URL:
         // http://localhost:8080/xwiki/bin/get/XWiki/LiveTableResults?outputSyntax=plain&collist=doc.location
@@ -219,7 +209,7 @@ public class LiveTableResultsTest extends PageTest
         setFilter("doc.location", "test");
 
         Query query = mock(Query.class);
-        when(queryService.hql(any(String.class))).thenReturn(query);
+        when(this.queryService.hql(any(String.class))).thenReturn(query);
         when(query.setLimit(anyInt())).thenReturn(query);
         when(query.setOffset(anyInt())).thenReturn(query);
         when(query.bindValues(anyMap())).thenReturn(query);
@@ -259,45 +249,45 @@ public class LiveTableResultsTest extends PageTest
 
     private void setClassName(String className)
     {
-        request.put("classname", className);
+        this.request.put("classname", className);
     }
 
     private void setColumns(String... columns)
     {
-        request.put("collist", StringUtils.join(columns, ','));
+        this.request.put("collist", StringUtils.join(columns, ','));
     }
 
     private void setLocation(String location)
     {
-        request.put("location", location);
+        this.request.put("location", location);
     }
 
     private void setOffset(int offset)
     {
-        request.put("offset", String.valueOf(offset));
+        this.request.put("offset", String.valueOf(offset));
     }
 
     private void setLimit(int limit)
     {
-        request.put("limit", String.valueOf(limit));
+        this.request.put("limit", String.valueOf(limit));
     }
 
     private void setSort(String column, Boolean ascending)
     {
-        request.put("sort", column);
+        this.request.put("sort", column);
         if (ascending != null) {
-            request.put("dir", ascending ? "asc" : "desc");
+            this.request.put("dir", ascending ? "asc" : "desc");
         }
     }
 
     private void setFilter(String column, String value)
     {
-        request.put(column, value);
+        this.request.put(column, value);
     }
 
     private void setQueryFilters(String... filters)
     {
-        request.put("queryFilters", StringUtils.join(filters, ','));
+        this.request.put("queryFilters", StringUtils.join(filters, ','));
     }
 
     private Object getTotalRowCount()

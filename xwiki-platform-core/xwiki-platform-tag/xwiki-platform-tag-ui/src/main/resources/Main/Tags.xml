@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Main.Tags" locale="">
+<xwikidoc version="1.4" reference="Main.Tags" locale="">
   <web>Main</web>
   <name>Tags</name>
   <language/>
@@ -77,22 +77,25 @@ $xwiki.ssx.use('Main.Tags')##
     {{info}}$services.localization.render('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
 
   #end
-  #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
+
   {{container layoutStyle="columns"}}
+    #set ($pagesCount = $services.tag.countDocumentsWithTag($request.tag))
     (((
       (% class="xapp" %)
       === $services.localization.render('xe.tag.alldocs', ["//${tag}//"]) ===
 
-      #if ($list.size()&gt; 0)
-        {{html}}#displayDocumentList($list false $blacklistedSpaces){{/html}}
-      #else
-        (% class='noitems' %)$services.localization.render('xe.tag.notags')
+      #if ($pagesCount &gt; 0)
+      {{liveData id="taggedPagesLiveData" properties="page" showPageSizeDropdown="false" source="taggedDocument"
+       sourceParameters="tag=$request.tag"}}{{/liveData}}
       #end
     )))
     (((
       (% class="xapp" %)
       === $services.localization.render('xe.tag.activity', ["//${tag}//"]) ===
+
+      #if ($pagesCount &gt; 0)
       {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$tag" displayRSSLink="true" /}}
+      #end
     )))
   {{/container}}
 #elseif ($do == 'prepareRename')
@@ -117,7 +120,7 @@ $xwiki.ssx.use('Main.Tags')##
   #set ($renameTo = "$!{request.get('renameTo')}")
   #set ($success = false)
   #if ($renameTo != '')
-    #set ($success = $xwiki.tag.renameTag($tag, $renameTo))
+    #set ($success = $services.tag.renameTag($tag, $renameTo))
   #end
   #if ($success == true || $success == 'OK')
    #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
@@ -144,7 +147,7 @@ $xwiki.ssx.use('Main.Tags')##
   ##
   ## Delete tag
   ##
-  #set ($success = $xwiki.tag.deleteTag($tag))
+  #set ($success = $services.tag.deleteTag($tag))
   #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
   #else
@@ -179,11 +182,14 @@ $xwiki.ssx.use('Main.Tags')##
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -194,9 +200,11 @@ $xwiki.ssx.use('Main.Tags')##
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -207,9 +215,11 @@ $xwiki.ssx.use('Main.Tags')##
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -222,7 +232,7 @@ $xwiki.ssx.use('Main.Tags')##
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -233,7 +243,7 @@ $xwiki.ssx.use('Main.Tags')##
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -242,9 +252,11 @@ $xwiki.ssx.use('Main.Tags')##
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -309,6 +321,9 @@ h1.xapp .button:hover {
   text-decoration: none;
 }
 </code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name/>

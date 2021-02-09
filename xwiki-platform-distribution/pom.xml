@@ -105,7 +105,6 @@
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-  com.xpn.xwiki.plugin.tag.TagPlugin,\
   com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>
     <!-- Legacy plugin list -->

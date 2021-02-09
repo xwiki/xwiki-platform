@@ -44,7 +44,7 @@
 #
 # This contains the translations of the module in the default language
 # (generally English).
-#
+# 
 # Translation key syntax:
 #   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
 #   where:
@@ -59,7 +59,7 @@
 #   translate it by adding a comment before it. To make sure a comment is not
 #   assigned to the following key use at least three sharps (###) for the comment
 #   or after it.
-#
+# 
 # Deprecated keys:
 #   * when deleting a key it should be moved to deprecated section at the end
 #     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
@@ -188,7 +188,7 @@ WikiManager.WikiUserClass_userScope_local_only=Esta wiki solo puede tener usuari
 WikiManager.WikiUserClass_userScope_global_only=Esta wiki solo puede tener usuarios globales
 WikiManager.WikiUserClass_userScope_local_and_global=Tanto los usuarios globales como los locales están disponibles en la wiki
 platform.wiki.prop.wikiname=Identificador de la wiki
-platform.wiki.prop.wikiprettyname=Nombre  elegante
+platform.wiki.prop.wikiprettyname=Nombre elegante
 platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Descripción
 platform.wiki.prop.owner=Propietario
@@ -219,7 +219,7 @@ platform.wiki.create.wizard.userScope.label=Ámbito de usuario
 platform.wiki.create.wizard.userScope.hint=Selecciona qué tipo de usuarios pueden acceder a la wiki
 platform.wiki.create.wizard.template.label=Plantilla
 platform.wiki.create.wizard.flavortemplate.label=Edición / Plantilla
-platform.wiki.create.wizard.flavortemplate.hint=Edición o Plantilla a utilizar como  contenido inicial de la nueva wiki
+platform.wiki.create.wizard.flavortemplate.hint=Edición o Plantilla a utilizar como contenido inicial de la nueva wiki
 platform.wiki.create.wizard.flavortemplate.flavorTab=Edición
 platform.wiki.create.wizard.flavortemplate.templateTab=Plantilla
 platform.wiki.create.wizard.step.dw=Después de clicar en el botón "Crear", se creará la wiki y se iniciará el Asistente de Distribución para ayudarte a inicializar tu wiki. Si omites el asistente, tu wiki estará vacía.
@@ -255,7 +255,7 @@ platform.wiki.sheet.desc.iswikitemplate=Indica si esta wiki se puede utilizar co
 platform.wiki.sheet.desc.server=El alias usado para acceder a la wiki.
 platform.wiki.sheet.desc.description=Una descripción breve de la wiki.
 platform.wiki.sheet.desc.homepage=La página principal de la wiki.
-platform.wiki.sheet.prop.wikiprettyname=Nombre  elegante
+platform.wiki.sheet.prop.wikiprettyname=Nombre elegante
 platform.wiki.sheet.prop.owner=Propietario
 platform.wiki.sheet.prop.secure=Seguro (SSL)
 platform.wiki.sheet.prop.port=Puerto

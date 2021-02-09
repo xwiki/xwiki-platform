@@ -31,6 +31,9 @@
   <name>XWiki Platform - Logging - Script</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Logging - Script</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -51,6 +54,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

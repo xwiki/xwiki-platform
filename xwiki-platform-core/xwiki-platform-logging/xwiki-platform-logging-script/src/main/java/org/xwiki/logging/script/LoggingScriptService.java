@@ -35,11 +35,13 @@ import org.xwiki.localization.Translation;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogTree;
 import org.xwiki.logging.LogUtils;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide logging related script oriented APIs.
@@ -57,6 +59,9 @@ public class LoggingScriptService implements ScriptService
      */
     @Inject
     private LoggerManager loggerManager;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     /**
      * Used to check rights.
@@ -161,5 +166,21 @@ public class LoggingScriptService implements ScriptService
         }
 
         return logEvent;
+    }
+
+    /**
+     * Log a deprecated message, only if the {@link LoggerConfiguration#isDeprecatedLogEnabled()} is {@code true}.
+     * Note that the deprecated message is displayed as a warning with the {@code [DEPRECATED]} suffix.
+     *
+     * @param loggerName the name of the logger to be used for the deprecated message.
+     * @param message the message to be displayed for explaining the deprecation.
+     * @since 13.1RC1
+     */
+    @Unstable
+    public void deprecate(String loggerName, String message)
+    {
+        if (this.loggerConfiguration.isDeprecatedLogEnabled()) {
+            this.getLogger(loggerName).warn("[DEPRECATED] " + message);
+        }
     }
 }

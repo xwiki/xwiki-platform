@@ -82,5 +82,4 @@
           #xwikimessageboxend()
       #end
   </div>## mainContentArea
-</div>## main
 #template("endpage.vm")

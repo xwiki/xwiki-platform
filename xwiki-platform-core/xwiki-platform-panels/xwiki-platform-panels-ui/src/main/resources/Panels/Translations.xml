@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Panels.Translations" locale="">
+<xwikidoc version="1.4" reference="Panels.Translations" locale="">
   <web>Panels</web>
   <name>Translations</name>
   <language/>
@@ -45,6 +45,7 @@ panels._actions=Actions
 panels.emptyvalue=
 panels.children.title=Child Pages
 panels.siblings.title=Sibling Pages
+panels.orphanedPages.tree.more=more
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -75,6 +76,8 @@ panels.documentInformation.failedSyntaxConversion=Failed to convert to the selec
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

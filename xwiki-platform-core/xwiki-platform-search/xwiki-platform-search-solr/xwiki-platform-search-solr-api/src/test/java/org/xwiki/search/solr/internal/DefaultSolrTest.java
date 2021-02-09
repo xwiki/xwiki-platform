@@ -44,6 +44,7 @@ import org.xwiki.properties.internal.converter.LocaleConverter;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -107,7 +108,7 @@ class DefaultSolrTest
     // Tests
 
     @Test
-    void getXWikiClient() throws Exception
+    void searchClient() throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class);
 
@@ -115,11 +116,23 @@ class DefaultSolrTest
 
         assertNotNull(client);
 
-        client.add(new SolrInputDocument("id", "42"));
+        client.add(new SolrInputDocument("id", "0"));
 
-        SolrDocument storedDocument = client.getById("42");
+        SolrDocument storedDocument = client.getById("0");
 
         assertNotNull(storedDocument);
+
+        SolrInputDocument inputDocument = new SolrInputDocument("id", "1");
+
+        inputDocument.setField(FieldUtils.NAME, "name");
+        inputDocument.setField(FieldUtils.DOCUMENT_LOCALE, "");
+
+        client.add(inputDocument);
+
+        storedDocument = client.getById("1");
+
+        assertEquals("name", storedDocument.get(FieldUtils.NAME));
+        assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
     }
 
     @Test

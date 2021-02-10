@@ -132,6 +132,9 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
 
     protected SymbolScheme getSymbolScheme()
     {
+        if (this.symbolScheme == null) {
+            this.symbolScheme = new DefaultSymbolScheme();
+        }
         return this.symbolScheme;
     }
 }

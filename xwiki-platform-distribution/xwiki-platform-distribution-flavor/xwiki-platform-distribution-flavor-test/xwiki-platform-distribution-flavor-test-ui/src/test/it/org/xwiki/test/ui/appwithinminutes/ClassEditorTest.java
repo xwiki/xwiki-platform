@@ -117,7 +117,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         String className = String.format("%s.%s", getTestClassName(), getTestMethodName());
         List<ObjectEditPane> objectsOfClass = objectEditor.getObjectsOfClass(className);
         Assert.assertEquals(1, objectsOfClass.size());
-        objectsOfClass.get(0).loadObject();
+        objectsOfClass.get(0).displayObject();
         Assert.assertTrue(objectEditor.isPropertyDeprecated(className, "boolean1"));
         Assert.assertFalse(objectEditor.isPropertyDeprecated(className, "date1"));
     }

@@ -312,7 +312,7 @@ public class NotificationsIT
             editObjects.addObject("XWiki.Notifications.Code.NotificationDisplayerClass");
             ObjectEditPane objectEditPane =
                 editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass").get(0);
-            objectEditPane.loadObject();
+            objectEditPane.displayObject();
             objectEditPane.fillFieldsByName(notificationDisplayerParameters);
             editObjects.clickSaveAndContinue(true);
 

@@ -109,7 +109,7 @@ public class EditClassTest extends AbstractTest
         ObjectEditPage oep = vp.editObjects();
         List<ObjectEditPane> objectsOfClass = oep.getObjectsOfClass("Test.EditObjectsTestClass");
         Assert.assertEquals(1, objectsOfClass.size());
-        objectsOfClass.get(0).loadObject();
+        objectsOfClass.get(0).displayObject();
         Assert.assertNotNull(getDriver().findElement(By.className("deprecatedProperties")));
         Assert.assertNotNull(getDriver().findElement(By.cssSelector(".deprecatedProperties label")));
         Assert.assertEquals("prop1:", getDriver().findElement(By.cssSelector(".deprecatedProperties label")).getText());

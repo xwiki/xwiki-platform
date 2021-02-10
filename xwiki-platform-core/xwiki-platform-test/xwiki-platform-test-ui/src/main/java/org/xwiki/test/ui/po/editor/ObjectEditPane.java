@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.Optional;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -77,18 +79,47 @@ public class ObjectEditPane extends FormContainerElement
     }
 
     /**
-     * Click on the xobject div to expand it, and waits until the information are loaded.
-     * Note that this method should not be used if the xobject has just been added since information are already
-     * expanded and the click will collapse them.
+     * Helper to retrieve the xobject content div. This method returns an empty optional if the information have not
+     * been loaded.
+     */
+    private Optional<WebElement> getObjectContent()
+    {
+        String xobjectContentId = String.format("xobject_%s_%s_content", this.className, this.objectNumber);
+        try {
+            return Optional.of(getDriver().findElementWithoutWaiting(By.id(xobjectContentId)));
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Checks if the information are loaded and displayed.
+     *
+     * @return {@code true} if the object information are displayed (i.e. the object is expanded)
+     * @since 13.1RC1
+     */
+    @Unstable
+    public boolean isObjectDisplayed()
+    {
+        Optional<WebElement> objectContent = getObjectContent();
+        return objectContent.map(WebElement::isDisplayed).orElse(false);
+    }
+
+    /**
+     * Click on the xobject div to expand it, and waits until the information are loaded and displayed.
+     * This method checks if the information are already displayed to avoid collapsing them if it's already the case.
      *
      * @since 13.1RC1
      */
     @Unstable
-    public void loadObject()
+    public void displayObject()
     {
         String xobjectId = String.format("xobject_%s_%s", this.className, this.objectNumber);
-        getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();
-        this.waitForNotificationSuccessMessage("Object loaded");
+
+        if (!isObjectDisplayed()) {
+            getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();
+            getDriver().waitUntilCondition(driver -> isObjectDisplayed());
+        }
     }
 
     /**

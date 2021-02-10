@@ -165,6 +165,7 @@ public class LegacyEventStatusManager implements EventStatusManager
     }
 
     @Override
+    @Deprecated
     public void deleteEventStatus(EventStatus eventStatus) throws Exception
     {
         LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
@@ -227,6 +228,7 @@ public class LegacyEventStatusManager implements EventStatusManager
     }
 
     @Override
+    @Deprecated
     public void deleteAllForEntity(Date startDate, String entityId) throws Exception
     {
         boolean isSavedOnMainStore = false;

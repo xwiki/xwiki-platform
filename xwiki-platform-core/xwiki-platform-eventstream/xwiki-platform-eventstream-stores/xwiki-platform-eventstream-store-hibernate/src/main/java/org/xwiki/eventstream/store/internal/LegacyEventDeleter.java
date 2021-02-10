@@ -79,7 +79,7 @@ public class LegacyEventDeleter
                 hasBeenDeletedOnMainStore = wikiDescriptorManager.isMainWiki(legacyEvent.getWiki());
             }
         } catch (Exception e) {
-            logger.error("Failed to delete the event [%s] in the local store.", event.getId(), e);
+            this.logger.error("Failed to delete the event [{}] in the local store.", event.getId(), e);
         }
 
         if (configuration.useMainStore() && !hasBeenDeletedOnMainStore) {
@@ -87,7 +87,7 @@ public class LegacyEventDeleter
             try {
                 deleteLegacyEvent(legacyEvent, wikiDescriptorManager.getMainWikiId());
             } catch (Exception e) {
-                logger.error("Failed to delete the event [%s] in the main store.", event.getId(), e);
+                this.logger.error("Failed to delete the event [{}] in the main store.", event.getId(), e);
             }
         }
     }

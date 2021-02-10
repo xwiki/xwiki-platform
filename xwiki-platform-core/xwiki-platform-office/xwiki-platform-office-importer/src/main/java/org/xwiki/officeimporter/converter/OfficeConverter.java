@@ -36,7 +36,7 @@ public interface OfficeConverter
      * Attempts to convert the input document identified by <b>inputStreams</b> and <b>inputFileName</b> arguments into
      * the format identified by <b>outputFileName</b> argument.
      * Note that this method does not perform a cleanup of the generated files so they can be read in the further steps.
-     * Don't forget to call {@link OfficeConverterResult#cleanup()} to not keep remaining files.
+     * Don't forget to call {@link OfficeConverterResult#close()} to not keep remaining files.
      * 
      * @param inputStreams input streams corresponding to the input document; it's possible that some document types
      *            (e.g. HTML) consists of more than one input stream corresponding to different artifacts embedded

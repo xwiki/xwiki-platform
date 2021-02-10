@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -46,6 +47,9 @@ public class LegacyEventDeleter
 {
     @Inject
     private LegacyEventConverter eventConverter;
+
+    @Inject
+    private EventStatusManager statusManager;
 
     @Inject
     private LegacyEventStreamStoreConfiguration configuration;
@@ -103,6 +107,12 @@ public class LegacyEventDeleter
                 hibernateStore.checkHibernate(context);
                 bTransaction = hibernateStore.beginTransaction(context);
                 Session session = hibernateStore.getSession(context);
+
+                // Make sure to delete all associated statuses first
+                if (this.statusManager instanceof LegacyEventStatusManager) {
+                    ((LegacyEventStatusManager) this.statusManager).deleteAllForEventInStore(session,
+                        event.getEventId());
+                }
 
                 session.delete(event);
 

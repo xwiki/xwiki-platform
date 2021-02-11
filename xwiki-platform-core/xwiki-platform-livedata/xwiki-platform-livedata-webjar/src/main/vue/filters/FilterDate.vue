@@ -25,14 +25,29 @@
   or match a date range
 -->
 <template>
-  <!-- A simple text input that will be upgraded to have a date picker -->
-  <input
-    class="filter-date"
-    ref="filterDate"
-    type="text"
-    size="1"
-    :value="valueFormatted"
-  />
+  <div>
+    <!-- A simple text input that will be upgraded to have a date picker -->
+    <input
+      v-if="showDateInput"
+      class="filter-date"
+      ref="filterDate"
+      key="filterDate"
+      type="text"
+      size="1"
+      :value="valueFormatted"
+    />
+    <!-- A simple text input to filter date with text -->
+    <input
+      v-else
+      class="filter-date"
+      ref="containsInput"
+      key="containsInput"
+      type="text"
+      size="1"
+      :value="filterEntry.value"
+      @input="applyFilterFromText"
+    />
+  </div>
 </template>
 
 
@@ -49,18 +64,42 @@ export default {
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
 
+  data () {
+    return {
+      rules: [
+        {
+          from: "contains",
+          to: ["before", "after", "isBetween"],
+          getValue: ({ oldValue, oldOperator, newOperator }) => {
+            return "";
+          },
+        },
+        {
+          from: ["before", "after", "isBetween"],
+          to: "contains",
+          getValue: ({ oldValue, oldOperator, newOperator }) => {
+            if (!oldValue) { return ""; }
+            const newValue = moment(+oldValue.split("-")[0]);
+            if (!newValue.isValid()) { return ""; }
+            return newValue.format(this.format);
+          },
+        },
+      ],
+    };
+  },
+
 
   computed: {
 
     valueFormatted () {
-      if (this.filterEntry.value === undefined) { return; }
+      if (!this.filterEntry.value) { return; }
       return this.filterEntry.value.split("-")
         .map(date => moment(+date).format(this.format))
         .join(" - ");
     },
 
-    operator () {
-      return this.filterEntry.operator;
+    showDateInput () {
+      return this.operator !== "contains";
     },
 
     format () {
@@ -116,7 +155,9 @@ export default {
   },
 
   methods: {
-    getValue (daterangepicker) {
+    // Get date filter value from input element
+    getDateValue () {
+      const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
       if (this.operator === "isBetween") {
         return `${daterangepicker.startDate.valueOf()}-${daterangepicker.endDate.valueOf()}`
       } else {
@@ -124,13 +165,14 @@ export default {
       }
     },
 
-    applyDate () {
-      const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
-      const value = this.getValue(daterangepicker);
-      const valueTimestamps = value.split(" - ")
-        .map(date => +moment(date, this.format))
-        .join("-");
-      this.applyFilter(valueTimestamps);
+    applyFilterFromDate () {
+      const value = this.getDateValue();
+      this.applyFilter(value);
+    },
+
+    applyFilterFromText (e) {
+      const value = $(this.$refs.containsInput).val();
+      this.applyFilterWithDelay(value);
     },
   },
 
@@ -143,7 +185,7 @@ export default {
           this.filterConfig,
         );
         $(filterDate).on('apply.daterangepicker', () => {
-          this.applyDate();
+          this.applyFilterFromDate();
         });
         // Fix prototypejs prototype pollution
         $(filterDate).on('hide.daterangepicker', (e) => {
@@ -168,5 +210,10 @@ export default {
 
 
 <style>
+
+.livedata-filter .filter-date {
+  width: 100%;
+  height: 100%;
+}
 
 </style>

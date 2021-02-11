@@ -29,7 +29,11 @@
       <div class="panel-heading">
         <div class="panel-title">$services.localization.render('xe.admin.forgotUsername.title')</div>
       </div>
-    <div class="panel-body">
+        <div class="panel-body">
+#end
+#macro(forgotUsernameBoxEnd)
+        </div> ##panel-body
+    </div> ## xwikimessage
 #end
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -46,6 +50,7 @@
           </span>
         </div>
         </form>
+        #forgotUsernameBoxEnd()
       #else
           #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = :email").bindValue('email', $email.toLowerCase()))
           #set($results = $query.execute())
@@ -60,6 +65,7 @@
               <a href="$services.security.authentication.getAuthenticationURL('forgot', $NULL)">$services.localization.render('xe.admin.forgotUsername.error.retry')</a> |
               <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
             </div>
+            #forgotUsernameBoxEnd()
           #elseif($results.size() == 1)
               #forgotUsernameBoxStart("success")
               $services.localization.render('xe.admin.forgotUsername.result', ["<strong>${results.get(0).substring($results.get(0).indexOf('.')).substring(1)}</strong>"])
@@ -67,6 +73,7 @@
                 <div>
                   <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
                 </div>
+              #forgotUsernameBoxEnd()
           #else
             #forgotUsernameBoxStart("success")
             $services.localization.render('xe.admin.forgotUsername.multipleResults')
@@ -78,8 +85,9 @@
             <div>
               <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
             </div>
+            #forgotUsernameBoxEnd()
           #end
-          #xwikimessageboxend()
       #end
   </div>## mainContentArea
+</div>## main
 #template("endpage.vm")

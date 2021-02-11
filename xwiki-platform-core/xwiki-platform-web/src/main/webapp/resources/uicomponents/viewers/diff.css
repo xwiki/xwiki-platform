@@ -27,7 +27,7 @@
   border: 1px solid $theme.borderColor;
   font-family: Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
-  overflow: auto;
+  overflow: visible;
 }
 
 .diff-container table {
@@ -55,10 +55,9 @@ td.diff-line {
   white-space: pre-wrap;
 }
 
-/*
-Prevent the code formatting for diff lines containing a decision form as it breaks the display of the form.
-The code formatting and long line wrapping is instead applied on the proposed decisions preview contained in the line. 
-*/
+/* Prevent the code formatting for diff lines containing a decision form as it breaks the display of the form.
+   The code formatting and long line wrapping is instead applied on the proposed decisions preview contained in the 
+   line. */
 td.diff-line.diff-line-decision {
   white-space: normal;
   padding: 0.5em;

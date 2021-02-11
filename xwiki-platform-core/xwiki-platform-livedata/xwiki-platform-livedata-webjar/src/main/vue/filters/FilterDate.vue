@@ -70,14 +70,14 @@ export default {
         {
           from: "contains",
           to: ["before", "after", "isBetween"],
-          getValue: ({ oldValue, oldOperator, newOperator }) => {
+          getValue: () => {
             return "";
           },
         },
         {
           from: ["before", "after", "isBetween"],
           to: "contains",
-          getValue: ({ oldValue, oldOperator, newOperator }) => {
+          getValue: ({ oldValue }) => {
             if (!oldValue) { return ""; }
             const newValue = moment(+oldValue.split("-")[0]);
             if (!newValue.isValid()) { return ""; }
@@ -92,7 +92,7 @@ export default {
   computed: {
 
     valueFormatted () {
-      if (!this.filterEntry.value) { return; }
+      if (!this.filterEntry.value) { return; }
       return this.filterEntry.value.split("-")
         .map(date => moment(+date).format(this.format))
         .join(" - ");
@@ -170,7 +170,7 @@ export default {
       this.applyFilter(value);
     },
 
-    applyFilterFromText (e) {
+    applyFilterFromText () {
       const value = $(this.$refs.containsInput).val();
       this.applyFilterWithDelay(value);
     },

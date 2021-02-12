@@ -21,10 +21,9 @@ package org.xwiki.tag.internal.livedata;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
@@ -37,7 +36,7 @@ import org.xwiki.livedata.LiveDataSource;
  */
 @Component
 @Named(TaggedDocumentLiveDataSource.HINT)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Singleton
 public class TaggedDocumentLiveDataSource implements LiveDataSource
 {
     /**
@@ -52,7 +51,6 @@ public class TaggedDocumentLiveDataSource implements LiveDataSource
     @Inject
     @Named("taggedDocument")
     private LiveDataPropertyDescriptorStore propertyStore;
-
 
     @Override
     public LiveDataEntryStore getEntries()

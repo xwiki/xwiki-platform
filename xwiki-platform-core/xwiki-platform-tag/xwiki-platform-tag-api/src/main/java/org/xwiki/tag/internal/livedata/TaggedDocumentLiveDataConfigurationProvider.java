@@ -19,13 +19,19 @@
  */
 package org.xwiki.tag.internal.livedata;
 
+import java.util.Collections;
+
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
+
+import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 
 /**
  * Live data configuration for the tag.
@@ -47,6 +53,25 @@ public class TaggedDocumentLiveDataConfigurationProvider implements Provider<Liv
         source.setId("tag");
         query.setSource(source);
         liveDataConfiguration.setQuery(query);
+
+        LiveDataPropertyDescriptor liveDataPropertyDescriptor = new LiveDataPropertyDescriptor();
+        liveDataPropertyDescriptor.setId("page");
+        DisplayerDescriptor linkDisplayer = new DisplayerDescriptor("link");
+        linkDisplayer.setParameter("propertyHref", "page_link");
+        liveDataPropertyDescriptor.setDisplayer(linkDisplayer);
+        liveDataPropertyDescriptor.setSortable(false);
+        liveDataPropertyDescriptor.setEditable(false);
+        liveDataPropertyDescriptor.setVisible(true);
+        liveDataPropertyDescriptor.setFilterable(false);
+        liveDataPropertyDescriptor.setName("Page");
+        liveDataPropertyDescriptor.setType("document");
+
+        LiveDataMeta meta = new LiveDataMeta();
+        liveDataConfiguration.setMeta(meta);
+        meta.setPropertyDescriptors(Collections.singletonList(
+            liveDataPropertyDescriptor
+        ));
+
         return liveDataConfiguration;
     }
 }

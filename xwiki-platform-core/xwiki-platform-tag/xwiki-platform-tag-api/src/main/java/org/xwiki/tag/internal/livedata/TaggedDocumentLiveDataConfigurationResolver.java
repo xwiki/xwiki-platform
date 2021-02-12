@@ -19,8 +19,6 @@
  */
 package org.xwiki.tag.internal.livedata;
 
-import java.util.Arrays;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -30,10 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.LiveDataMeta;
-import org.xwiki.livedata.LiveDataPropertyDescriptor;
-
-import static org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
+import org.xwiki.livedata.internal.JSONMerge;
 
 /**
  * Provides the tag live data configuration.
@@ -58,27 +53,6 @@ public class TaggedDocumentLiveDataConfigurationResolver implements LiveDataConf
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
     {
-        LiveDataConfiguration liveDataConfiguration = this.defaultConfigProvider.get();
-        liveDataConfiguration.setQuery(input.getQuery());
-
-        LiveDataPropertyDescriptor liveDataPropertyDescriptor = new LiveDataPropertyDescriptor();
-        liveDataPropertyDescriptor.setId("page");
-        DisplayerDescriptor linkDisplayer = new DisplayerDescriptor("link");
-        linkDisplayer.setParameter("propertyHref", "page_link");
-        liveDataPropertyDescriptor.setDisplayer(linkDisplayer);
-        liveDataPropertyDescriptor.setSortable(false);
-        liveDataPropertyDescriptor.setEditable(false);
-        liveDataPropertyDescriptor.setVisible(true);
-        liveDataPropertyDescriptor.setFilterable(false);
-        liveDataPropertyDescriptor.setName("Page");
-        liveDataPropertyDescriptor.setType("document");
-
-        LiveDataMeta meta = new LiveDataMeta();
-        liveDataConfiguration.setMeta(meta);
-        meta.setPropertyDescriptors(Arrays.asList(
-            liveDataPropertyDescriptor
-        ));
-
-        return liveDataConfiguration;
+        return new JSONMerge().merge(this.defaultConfigProvider.get(), input);
     }
 }

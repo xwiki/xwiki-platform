@@ -20,13 +20,14 @@
 package org.xwiki.tag.internal.livedata;
 
 import java.util.Collection;
-import java.util.Collections;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
@@ -38,13 +39,22 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
  * @since 13.0RC1
  */
 @Component
-@Named("taggedDocument")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Named(TaggedDocumentLiveDataPropertyDescriptorStore.HINT)
+@Singleton
 public class TaggedDocumentLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
 {
+    /**
+     * This component's hint.
+     */
+    public static final String HINT = "taggedDocument";
+
+    @Inject
+    @Named(HINT)
+    private Provider<LiveDataConfiguration> defaultConfigProvider;
+    
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
-        return Collections.emptyList();
+        return this.defaultConfigProvider.get().getMeta().getPropertyDescriptors();
     }
 }

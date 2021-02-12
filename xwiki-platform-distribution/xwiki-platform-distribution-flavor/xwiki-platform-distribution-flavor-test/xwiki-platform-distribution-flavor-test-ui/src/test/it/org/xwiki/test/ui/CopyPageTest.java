@@ -60,6 +60,7 @@ public class CopyPageTest extends AbstractTest
     @BeforeClass
     public static void setup()
     {
+        getUtil().loginAsAdmin();
         // The reference hierarchy mode is the default one, but it might be modified by others tests and not properly
         // set back. In particular it's redefined in CompareVersionsTest. This is needed since we are checking the
         // breadcrumb in this test.

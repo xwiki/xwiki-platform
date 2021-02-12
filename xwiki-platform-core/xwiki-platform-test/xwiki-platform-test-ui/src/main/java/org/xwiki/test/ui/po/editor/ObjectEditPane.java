@@ -114,7 +114,7 @@ public class ObjectEditPane extends FormContainerElement
     @Unstable
     public void displayObject()
     {
-        String xobjectId = String.format("xobject_%s_%s", this.className, this.objectNumber);
+        String xobjectId = String.format("xobject_%s_%s_title", this.className, this.objectNumber);
 
         if (!isObjectDisplayed()) {
             getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();

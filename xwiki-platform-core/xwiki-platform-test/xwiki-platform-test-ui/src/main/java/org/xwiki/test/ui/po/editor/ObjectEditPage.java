@@ -188,12 +188,11 @@ public class ObjectEditPage extends EditPage
     {
         WebElement classElement;
         try {
-            classElement = getDriver().findElement(By.id("xclass_" + className));
+            classElement = getDriver().findElementWithoutWaiting(By.id("xclass_" + className));
         } catch (NoSuchElementException e) {
             // if we cannot find the class elements it means there's no object of this class.
             return Collections.emptyList();
         }
-        List<WebElement> titles = classElement.findElements(By.className("xobject-title"));
         List<WebElement> elements =
             classElement.findElements(By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());

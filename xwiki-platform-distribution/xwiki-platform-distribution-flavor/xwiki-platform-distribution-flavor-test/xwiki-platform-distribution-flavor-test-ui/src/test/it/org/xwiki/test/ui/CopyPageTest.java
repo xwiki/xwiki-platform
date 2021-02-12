@@ -22,6 +22,7 @@ package org.xwiki.test.ui;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
@@ -55,6 +56,15 @@ public class CopyPageTest extends AbstractTest
 
     private static final String OVERWRITE_PROMPT2 =
         " already exists. Are you sure you want to overwrite it (all its content would be lost)?";
+
+    @BeforeClass
+    public static void setup()
+    {
+        // The reference hierarchy mode is the default one, but it might be modified by others tests and not properly
+        // set back. In particular it's redefined in CompareVersionsTest. This is needed since we are checking the
+        // breadcrumb in this test.
+        getUtil().setHierarchyMode("reference");
+    }
 
     @Test
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146")

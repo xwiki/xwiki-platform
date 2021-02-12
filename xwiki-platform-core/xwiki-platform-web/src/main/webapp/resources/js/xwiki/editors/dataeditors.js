@@ -663,7 +663,8 @@ editors.XDataEditors = Class.create({
     var xObjectNumber = this.getXObjectNumberFromXObjectId(object.id);
     objectTitle.observe('click', function(event) {
       var isAlreadyLoaded = objectContent.childElementCount > 0;
-      if (!isAlreadyLoaded) {
+      if (!isAlreadyLoaded && !object.hasClassName('loading')) {
+        object.addClassName('loading');
         var editURL = this.editedDocument.getURL('edit', Object.toQueryString({
           xpage: 'editobject',
           xaction: 'loadObject',
@@ -679,10 +680,13 @@ editors.XDataEditors = Class.create({
               object.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.inProgress')", "inprogress");
             },
             onSuccess : function(response) {
+              // We don't use Prototype API here because we wan't to move the CSS/JavaScript includes to the page head.
               var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
+              // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment.
               objectContent.insertBefore(responseDocumentFragment, null);
-              document.fire('xwiki:dom:updated', {elements: [objectContent.firstChild]});
-              objectTitle.up().toggleClassName('collapsed');
+              document.fire('xwiki:dom:updated', {elements: [objectContent]});
+              object.toggleClassName('collapsed');
+              object.removeClassName('loading');
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
             }.bind(this),
             onFailure : function(response) {
@@ -690,6 +694,7 @@ editors.XDataEditors = Class.create({
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
+              object.removeClassName('loading');
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.failed') " + failureReason, "error"));
             },
             // IE converts 204 status code into 1223...
@@ -703,7 +708,7 @@ editors.XDataEditors = Class.create({
           }
         );
       } else {
-        objectTitle.up().toggleClassName('collapsed');
+        object.toggleClassName('collapsed');
       }
     }.bindAsEventListener(this));
   },

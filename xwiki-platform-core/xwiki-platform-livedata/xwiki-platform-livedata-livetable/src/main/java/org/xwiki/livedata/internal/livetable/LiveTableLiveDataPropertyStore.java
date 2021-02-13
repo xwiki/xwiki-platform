@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -48,6 +49,7 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -139,6 +141,12 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
             // database column).
             descriptor.setFilter(new FilterDescriptor());
             descriptor.getFilter().setOperators(Collections.singletonList(new OperatorDescriptor("equals", null)));
+        } else if (xproperty instanceof DateClass) {
+            String dateFormat = ((DateClass) xproperty).getDateFormat();
+            if (!StringUtils.isEmpty(dateFormat)) {
+                descriptor.setFilter(new FilterDescriptor("date"));
+                descriptor.getFilter().setParameter("dateFormat", dateFormat);
+            }
         }
         return descriptor;
     }

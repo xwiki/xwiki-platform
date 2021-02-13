@@ -253,6 +253,10 @@ export default {
   display: inline-block;
 }
 
+.livedata-advanced-panel-filter .draggable-item {
+  margin-bottom: .5em;
+}
+
 .livedata-advanced-panel-filter .draggable-item .handle {
   width: 3rem;
 }

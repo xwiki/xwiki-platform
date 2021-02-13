@@ -669,6 +669,8 @@
     #set ($filterValue = "$!request.getParameter($colName)")
     #if ("$!filterValue" != '')
       #set ($discard = $tablelist.add($colName))
+      ## Specifies how the filter value should be matched against the stored value.
+      #set ($matchType = $request.getParameter("${colname}_match"))
       #if ($colName.startsWith('doc.'))
         #if ($colName == 'doc.location')
           #set ($safeColName = 'doc.fullName')
@@ -726,8 +728,6 @@
   #end
   #set ($whereSql = "$whereSql and $joinObjectTable")
   ##
-  ## Specifies how the filter value should be matched against the stored value.
-  #set ($matchType = $request.getParameter("${colname}_match"))
   ## We determine the default match type (when not specified) based on the property meta class (e.g. DateClass).
   #set ($propMetaClass = $NULL)
   #if ($propClass &amp;&amp; $propClass.getPropertyNames().contains($colname))
@@ -797,26 +797,63 @@
   #else
     #set ($dateProperty = "${safe_tableAlias}.value")
   #end
-  #set($safeDateProperty = $dateProperty.replace('.', '_'))
-  #set ($timestamps = $filterValue.split('-'))
-  #if ($timestamps.size() == 2)
-    #if ($whereParams.entrySet())
-      #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${safeDateProperty}1 and $dateProperty &lt;= :${safeDateProperty}2")
-      #set ($discard = $whereParams.put("${safeDateProperty}1", $datetool.toDate($numbertool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.put("${safeDateProperty}2", $datetool.toDate($numbertool.toNumber($timestamps[1]))))
-    #else
-      #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
-      #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+  #set ($safeDateProperty = $dateProperty.replace('.', '_'))
+  #set ($dateRange = {})
+  #parseDateRange($matchType $filterValue $dateRange)
+  #if ($dateRange.start || $dateRange.end)
+    ## Date range.
+    #if ($dateRange.start)
+      #if ($whereParams.entrySet())
+        #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${safeDateProperty}1")
+        #set ($discard = $whereParams.put("${safeDateProperty}1", $dateRange.start))
+      #else
+        #set ($whereSql = "${whereSql} and $dateProperty &gt;= ?")
+        #set ($discard = $whereParams.add($dateRange.start))
+      #end
+    #end
+    #if ($dateRange.end)
+      #if ($whereParams.entrySet())
+        #set ($whereSql = "${whereSql} and $dateProperty &lt;= :${safeDateProperty}2")
+        #set ($discard = $whereParams.put("${safeDateProperty}2", $dateRange.end))
+      #else
+        #set ($whereSql = "${whereSql} and $dateProperty &lt;= ?")
+        #set ($discard = $whereParams.add($dateRange.end))
+      #end
     #end
   #else
-    ## Fall back to the older string matching
+    ## String matching (contains).
     #if ($whereParams.entrySet())
       #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(:$safeDateProperty)")
       #set ($discard = $whereParams.put($safeDateProperty, "%$filterValue%"))
     #else
       #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
       #set ($discard = $whereParams.add("%$filterValue%"))
+    #end
+  #end
+#end
+
+
+#macro (parseDateRange $matchType $filterValue $dateRange)
+  ## Transform the filter value into a date range if needed.
+  #if ($matchType == 'after')
+    #set ($dateRangeString = "$filterValue/")
+  #elseif ($matchType == 'before')
+    #set ($dateRangeString = "/$filterValue")
+  #else
+    #set ($dateRangeString = $filterValue)
+  #end
+  ## Try to parse as ISO 8601 time interval (see https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
+  #set ($parts = $dateRangeString.split('/', -1))
+  #if ($parts.size() == 2)
+    #set ($dateRange.start = $datetool.toDate('iso_tz', $parts[0]))
+    #set ($dateRange.end = $datetool.toDate('iso_tz', $parts[1]))
+  #end
+  #if (!$dateRange.start &amp;&amp; !$dateRange.end)
+    ## Try to parse as timestamp range. Note that this doesn't handle well negative timestamps.
+    #set ($parts = $dateRangeString.split('-', -1))
+    #if ($parts.size() == 2)
+      #set ($dateRange.start = $datetool.toDate($numbertool.toNumber($parts[0])))
+      #set ($dateRange.end = $datetool.toDate($numbertool.toNumber($parts[1])))
     #end
   #end
 #end

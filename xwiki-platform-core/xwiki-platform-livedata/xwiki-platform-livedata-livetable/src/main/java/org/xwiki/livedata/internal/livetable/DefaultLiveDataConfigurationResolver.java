@@ -42,6 +42,8 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.LiveDataQuery.Source;
+import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.internal.JSONMerge;
 import org.xwiki.localization.ContextualLocalizationManager;
 
@@ -69,7 +71,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
      */
     @Inject
     @Named("liveTable")
-    private LiveDataPropertyDescriptorStore propertyStore;
+    private Provider<LiveDataPropertyDescriptorStore> propertyStoreProvider;
 
     @Inject
     @Named("liveTable")
@@ -107,7 +109,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         // We overwrite the property descriptors from the default configuration because they don't include the class
         // properties which are dynamic (retrieved from the database). The property store returns both the static
         // document properties and the dynamic class properties.
-        defaultConfig.getMeta().setPropertyDescriptors(this.propertyStore.get());
+        defaultConfig.getMeta().setPropertyDescriptors(getPropertyStore(config.getQuery().getSource()).get());
 
         List<String> properties = config.getQuery().getProperties();
         if (properties != null) {
@@ -116,6 +118,15 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         }
 
         return defaultConfig;
+    }
+
+    private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
+    {
+        LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
+        if (propertyStore instanceof WithParameters && sourceConfig != null) {
+            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        }
+        return propertyStore;
     }
 
     private void setDefaultSort(LiveDataConfiguration config)

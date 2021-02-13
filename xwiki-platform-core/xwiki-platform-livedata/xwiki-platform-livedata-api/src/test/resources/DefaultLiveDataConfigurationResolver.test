@@ -116,8 +116,8 @@
         "operators":[
           {"id":"equals","name":"="},
           {"id":"notEquals","name":"≠"},
-          {"id":"isLower","name":"<"},
-          {"id":"isGreater","name":">"}
+          {"id":"lower","name":"<"},
+          {"id":"greater","name":">"}
         ]
       },
       {
@@ -129,9 +129,12 @@
       {
         "id":"date",
         "operators":[
-          {"id":"isBetween","name":"isBetween"},
+          {"id":"between","name":"between"},
+          {"id":"before","name":"before"},
+          {"id":"after","name":"after"},
           {"id":"contains","name":"contains"}
-        ]
+        ],
+        "dateFormat":"yyyy/MM/dd HH:mm"
       },
       {
         "id":"list",

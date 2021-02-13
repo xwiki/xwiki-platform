@@ -161,7 +161,8 @@
       {
         "id": "number",
         "operators": ["equals"]
-      }
+      },
+      "date"
     ],
 
     "pagination": {

@@ -134,6 +134,7 @@ class LiveTableLiveDataPropertyStoreTest
         when(dateField.getTranslatedPrettyName(this.xcontext)).thenReturn("Birthdate");
         when(dateField.getHint()).thenReturn("The date when you were born.");
         when(dateField.getClassType()).thenReturn("Date");
+        when(dateField.getDateFormat()).thenReturn("h:mm a");
 
         StaticListClass listField = mock(StaticListClass.class);
         when(listField.getName()).thenReturn("status");
@@ -147,7 +148,7 @@ class LiveTableLiveDataPropertyStoreTest
 
         StringBuilder expectedClassProps = new StringBuilder();
         expectedClassProps.append("{'id':'birthdate','name':'Birthdate','description':'The date when you were born.'"
-            + ",'type':'Date','displayer':{'id':'html'}},");
+            + ",'type':'Date','displayer':{'id':'html'},'filter':{'id':'date','dateFormat':'h:mm a'}},");
         expectedClassProps.append("{'id':'total','name':'Total','description':'The computed total amount.',"
             + "'type':'Computed','displayer':{'id':'html'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"

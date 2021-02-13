@@ -55,6 +55,7 @@
 import filterMixin from "./filterMixin.js";
 import "daterangepicker";
 import moment from "moment";
+import "moment-jdateformatparser";
 import $ from "jquery";
 
 export default {
@@ -69,19 +70,40 @@ export default {
       rules: [
         {
           from: "contains",
-          to: ["before", "after", "isBetween"],
+          to: ["before", "after", "between"],
           getValue: () => {
             return "";
           },
         },
         {
-          from: ["before", "after", "isBetween"],
+          from: ["before", "after", "between"],
           to: "contains",
           getValue: ({ oldValue }) => {
-            if (!oldValue) { return ""; }
-            const newValue = moment(+oldValue.split("-")[0]);
-            if (!newValue.isValid()) { return ""; }
-            return newValue.format(this.format);
+            const date = moment((oldValue + "").split("/")[0]);
+            return date.isValid() ? date.format(this.format) : oldValue;
+          },
+        },
+        {
+          // between x and y => after x and before y
+          from: "between",
+          to: "before",
+          getValue: ({ oldValue }) => {
+            return (oldValue + "").split("/")[1] || oldValue;
+          },
+        },
+        {
+          from: "between",
+          to: "after",
+          getValue: ({ oldValue }) => {
+            return typeof oldValue === 'string' ? oldValue.split("/")[0] : oldValue;
+          },
+        },
+        {
+          from: ["before", "after"],
+          to: "between",
+          getValue: ({ oldValue }) => {
+            const date = moment(oldValue + "");
+            return date.isValid() ? (oldValue + "/" + oldValue) : oldValue;
           },
         },
       ],
@@ -92,10 +114,16 @@ export default {
   computed: {
 
     valueFormatted () {
-      if (!this.filterEntry.value) { return; }
-      return this.filterEntry.value.split("-")
-        .map(date => moment(+date).format(this.format))
-        .join(" - ");
+      if (typeof this.filterEntry.value === 'string' && this.filterEntry.value.length) {
+        const range = this.filterEntry.value.split("/");
+        if (range.length <= 2) {
+          return range.map(dateString => {
+            const date = moment(dateString);
+            return date.isValid() ? date.format(this.format) : dateString;
+          }).join(" - ");
+        }
+      }
+      return this.filterEntry.value;
     },
 
     showDateInput () {
@@ -103,7 +131,8 @@ export default {
     },
 
     format () {
-      return "YYYY/MM/DD HH:mm";
+      const javaDateFormat = this.config.dateFormat;
+      return javaDateFormat ? moment().toMomentFormatString(javaDateFormat) : "YYYY/MM/DD HH:mm";
     },
 
     ranges () {
@@ -130,19 +159,19 @@ export default {
         autoUpdateInput: false,
         autoApply: false,
         singleDatePicker: true,
-        showDropdowns: true,
-        timePicker: true,
+        timePicker: /[Hhkms]/.test(this.format),
         timePicker24Hour: true,
         showCustomRangeLabel: true,
         alwaysShowCalendars: true,
         locale: {
           format: this.format,
+          cancelLabel: 'Clear',
         },
       };
     },
 
     filterConfig () {
-      if (this.operator === "isBetween") {
+      if (this.operator === "between") {
         return Object.assign({}, this.defaultFilterConfig, {
           singleDatePicker: false,
           ranges: this.ranges,
@@ -158,9 +187,15 @@ export default {
     // Get date filter value from input element
     getDateValue () {
       const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
-      if (this.operator === "isBetween") {
-        return `${daterangepicker.startDate.valueOf()}-${daterangepicker.endDate.valueOf()}`
+      if (this.operator === "between") {
+        // Serialize the date range as a ISO 8601 time interval, without fractional seconds.
+        // See https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.format()}`
+      } else if (this.operator === 'before' || this.operator === 'after') {
+        // Use the ISO 8601 representation, without fractional seconds.
+        return daterangepicker.startDate.format();
       } else {
+        // Use the formatted date.
         return daterangepicker.startDate.format(this.format);
       }
     },
@@ -186,6 +221,9 @@ export default {
         );
         $(filterDate).on('apply.daterangepicker', () => {
           this.applyFilterFromDate();
+        });
+        $(filterDate).on('cancel.daterangepicker', () => {
+          this.applyFilter('');
         });
         // Fix prototypejs prototype pollution
         $(filterDate).on('hide.daterangepicker', (e) => {

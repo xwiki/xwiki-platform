@@ -20,8 +20,7 @@
 /*!
 #set ($paths = {
   'moment': $services.webjars.url('momentjs', 'min/moment.min'),
-  'moment-jdateformatparser': $services.webjars.url('org.webjars.bower:moment-jdateformatparser',
-    'moment-jdateformatparser'),
+  'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
   'bootstrap-datetimepicker': $services.webjars.url('Eonasdan-bootstrap-datetimepicker',
     'js/bootstrap-datetimepicker.min')
 })
@@ -30,27 +29,16 @@
 (function(paths) {
   "use strict";
 
-require.config({
-  paths,
-  shim: {
-    // This has been fixed in the latest version of moment-jdateformatparser.
-    'moment-jdateformatparser': ['moment']
-  }
-});
+  require.config({paths});
 
-// Workaround for bug in moment-jdateformatparser (remove after upgrading to the latest version).
-var module = module || false;
-
-// Hack for a limitation in moment-jdateformatparser that should be fixed in the latest version.
-require(['moment'], function(moment) {
-  window.moment = moment;
   require([
     'jquery',
+    'moment',
+    'moment-jdateformatparser',
     'bootstrap',
     'bootstrap-datetimepicker',
-    'moment-jdateformatparser',
     'xwiki-events-bridge'
-  ], function($) {
+  ], function($, moment) {
     var init = function(event, data) {
       var container = $((data && data.elements) || document);
       container.find('input.datetime').each(function() {
@@ -101,7 +89,6 @@ require(['moment'], function(moment) {
     $(document).on('xwiki:dom:updated', init);
     return XWiki.domIsLoaded && init();
   });
-});
 
 // End JavaScript-only code.
 }).apply(']]#', $jsontool.serialize([$paths]));

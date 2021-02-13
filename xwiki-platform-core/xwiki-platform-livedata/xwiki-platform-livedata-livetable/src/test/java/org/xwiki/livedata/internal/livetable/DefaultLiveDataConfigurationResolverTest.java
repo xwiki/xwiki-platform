@@ -21,16 +21,20 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.WithParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -60,7 +64,10 @@ class DefaultLiveDataConfigurationResolverTest
 
     @MockComponent
     @Named("liveTable")
-    private LiveDataPropertyDescriptorStore propertyStore;
+    private Provider<LiveDataPropertyDescriptorStore> propertyStoreProvider;
+
+    @Mock(extraInterfaces = {LiveDataPropertyDescriptorStore.class})
+    private WithParameters propertyStore;
 
     @MockComponent
     @Named("liveTable")
@@ -75,6 +82,8 @@ class DefaultLiveDataConfigurationResolverTest
     @BeforeEach
     void configure()
     {
+        when(this.propertyStoreProvider.get()).thenReturn((LiveDataPropertyDescriptorStore) this.propertyStore);
+
         this.defaultConfig.initialize();
         when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);
 
@@ -147,7 +156,10 @@ class DefaultLiveDataConfigurationResolverTest
         docTitle.setId("doc.title");
         LiveDataPropertyDescriptor count = new LiveDataPropertyDescriptor();
         count.setId("count");
-        when(this.propertyStore.get()).thenReturn(Arrays.asList(docTitle, count));
+        when(((LiveDataPropertyDescriptorStore) this.propertyStore).get()).thenReturn(Arrays.asList(docTitle, count));
+
+        Map<String, Object> propertyStoreParams = new HashMap<>();
+        when(this.propertyStore.getParameters()).thenReturn(propertyStoreParams);
 
         LiveDataPropertyDescriptor docName = new LiveDataPropertyDescriptor();
         docName.setId("doc.name");
@@ -185,5 +197,7 @@ class DefaultLiveDataConfigurationResolverTest
         String expectedJSON = expectedProps.toString().replace('\'', '"');
         assertEquals(expectedJSON,
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
+
+        assertEquals("test.liveData.", propertyStoreParams.get("translationPrefix"));
     }
 }

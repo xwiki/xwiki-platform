@@ -188,6 +188,7 @@ export default {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  margin-bottom: .5em;
 }
 
 .livedata-advanced-panel-sort .draggable-item .handle {

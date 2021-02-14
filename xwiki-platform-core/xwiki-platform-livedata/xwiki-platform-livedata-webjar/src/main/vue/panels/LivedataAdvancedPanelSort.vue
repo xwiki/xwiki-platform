@@ -43,6 +43,12 @@
 
     <!-- Define panel content inside the `body` slot -->
     <template #body>
+
+      <!-- Explain why the panel might be empty. -->
+      <div v-show="!logic.getSortableProperties().length" class="text-muted">
+        None of the displayed properties is sortable.
+      </div>
+
       <!--
         The sort entries are wrapped inside a XWikiDraggable component
         in order to allow the user to reorder them easily

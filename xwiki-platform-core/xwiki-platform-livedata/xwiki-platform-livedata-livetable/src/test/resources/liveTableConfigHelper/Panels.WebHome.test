@@ -2,7 +2,7 @@
   "id": "panels",
   "columns": ["name", "description", "type", "category", "_actions"],
   "columnProperties": {
-    "name": {"type": "text", "link": "field"},
+    "name": {"type": "text", "link": "field", "html": true},
     "description": {"type": "text", "html": "true"},
     "type": {"type": "list", "match": "exact"},
     "category": {"type": "list", "link": "auto"},
@@ -43,7 +43,8 @@
         "filterable":true,
         "displayer":{
           "id":"link",
-          "propertyHref":"name_url"
+          "propertyHref":"name_url",
+          "html":true
         },
         "filter":{"id":"text"}
       },
@@ -72,7 +73,8 @@
         "filterable":true,
         "displayer":{
           "id":"link",
-          "propertyHref":["category_url","doc.url"]
+          "propertyHref":["category_url","doc.url"],
+          "html":false
         },
         "filter":{"id":"list"}
       },

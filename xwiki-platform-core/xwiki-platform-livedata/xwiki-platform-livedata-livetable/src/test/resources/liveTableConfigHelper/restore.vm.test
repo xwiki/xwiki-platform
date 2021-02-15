@@ -40,7 +40,8 @@
         "filterable":false,
         "displayer":{
           "id":"link",
-          "propertyHref":["doc.view_url","doc.url"]
+          "propertyHref":["doc.view_url","doc.url"],
+          "html":false
         }
       },
       {

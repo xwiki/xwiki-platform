@@ -37,20 +37,9 @@
 
     <!-- Provide the Link Viewer widget to the `viewer` slot -->
     <template #viewer>
-        <a
-          :href="href"
-        >
-          {{ value }}
-          <!--
-            If there is no value but still a link
-            the user should still be able to click the link
-            so we create an explicit "no value" message in that case
-          -->
-          <span
-            class="explicit-empty-value"
-            v-if="!value"
-          >(no value)</span>
-        </a>
+      <!-- If there is no value but still a link the user should still be able to click the link so we create an
+        explicit "no value" message in that case. -->
+      <a :href="href" :class="{'explicit-empty-value': !htmlValue}" v-html="htmlValue || '(no value)'"></a>
     </template>
 
 
@@ -88,6 +77,18 @@ export default {
       }
       return values.map(value => this.entry[value]).find(value => value) || '#';
     },
+
+    htmlValue() {
+      const container = document.createElement('div');
+      container[this.config.html ? 'innerHTML' : 'textContent'] = this.value;
+      // Remove the interactive content because it isn't allowed inside an anchor element.
+      // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#properties
+      // See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#interactive_content
+      const interactiveContent = 'a, button, details, embed, iframe, keygen, label, select, textarea, audio[controls],'
+        + 'img[usemap], input, menu[type=toolbar], object[usemap], video[controls]';
+      [...container.querySelectorAll(interactiveContent)].forEach(node => node.parentNode.removeChild(node));
+      return container.innerHTML.trim();
+    }
   },
 
 };

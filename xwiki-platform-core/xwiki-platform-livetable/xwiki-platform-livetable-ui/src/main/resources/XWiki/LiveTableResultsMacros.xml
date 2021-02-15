@@ -643,7 +643,7 @@
  * Generate the HTML code for a user avatar.
  *#
 #macro(livetable_getAvatar $itemDoc)
-  #set ($avatar = "#largeUserAvatar($itemDoc.fullName)")
+  #set ($avatar = "#mediumUserAvatar($itemDoc.fullName)")
   #set ($avatar = $avatar.trim())
 #end
 

@@ -317,6 +317,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         } else if (columnProperties.path(LINK).isTextual()) {
             displayerConfig.setId(LINK);
             displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
+            displayerConfig.setParameter(HTML, columnProperties.path(HTML).booleanValue());
         } else if (columnProperties.path(HTML).booleanValue()) {
             displayerConfig.setId(HTML);
         } else {

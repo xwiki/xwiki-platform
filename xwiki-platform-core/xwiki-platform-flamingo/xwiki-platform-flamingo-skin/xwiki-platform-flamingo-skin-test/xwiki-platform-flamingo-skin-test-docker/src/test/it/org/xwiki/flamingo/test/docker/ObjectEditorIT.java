@@ -222,7 +222,7 @@ public class ObjectEditorIT
 
         // check the state of the editor when we come back to it
         objectEditPage = viewPage.editObjects();
-        List<ObjectEditPane> numberObjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS);
+        List<ObjectEditPane> numberObjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS, false);
         assertEquals(2, numberObjects.size());
 
         number1 = numberObjects.get(0);

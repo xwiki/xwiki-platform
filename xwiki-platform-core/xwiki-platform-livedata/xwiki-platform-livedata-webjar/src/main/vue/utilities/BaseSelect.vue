@@ -29,7 +29,7 @@
       <span class="title">
         <slot
           name="title"
-          :selected="selected"
+          :selected-values="selectedValues"
         >
           Select value
         </slot>
@@ -54,17 +54,18 @@
 
       <li
         v-for="option in options"
-        :key="option"
+        :key="option.value"
       >
         <a href="#"
           @click.prevent.stop="toggleSelect(option)">
           <slot
             name="option"
-            :value="option"
+            :value="option.value"
+            :label="option.label"
             :checked="isSelected(option)"
             :toggle="toggleSelect"
           >
-            {{ option }}
+            {{ option.label }}
           </slot>
         </a>
       </li>
@@ -90,7 +91,7 @@ export default {
       type: Array,
       default () { return []; },
     },
-    selected: {
+    selectedValues: {
       type: Array,
       default () { return []; },
     },
@@ -101,30 +102,43 @@ export default {
     sort: {
       type: Boolean,
       default: false,
-    }
+    },
+  },
+
+  computed: {
+    optionsValues () {
+      return this.options.map(option => option.value);
+    },
+
+    selected () {
+      return this.selectedValues.map(value => this.options.find(option => option.value === value));
+    },
   },
 
   methods: {
+    isValidOption (option) {
+      return this.optionsValues.includes(option.value);
+    },
+
     isSelected (option) {
-      return this.selected.includes(option);
+      return this.selectedValues.includes(option.value);
     },
 
     select (option) {
-      if (!this.options.includes(option)) { return; }
+      if (!this.isValidOption(option)) { return; }
       if (this.isSelected(option)) { return; }
-      let _selected = this.selected.slice()
-      _selected.push(option);
-      this.formatSelected(_selected);
+      const _selected = this.multiple ? this.selectedValues.slice() : [];
+      _selected.push(option.value);
+      this.sortSelected(_selected);
       this.$emit("change", _selected);
     },
 
     deselect (option) {
-      if (!this.options.includes(option)) { return; }
-      const index = this.selected.indexOf(option);
+      const index = this.selectedValues.indexOf(option.value);
       if (index === -1) { return; }
-      let _selected = this.selected.slice();
+      const _selected = this.selectedValues.slice();
       _selected.splice(index, 1);
-      this.formatSelected(_selected);
+      this.sortSelected(_selected);
       this.$emit("change", _selected);
     },
 
@@ -137,16 +151,16 @@ export default {
     },
 
     selectAll () {
-      this.$emit("change", this.options.slice());
+      this.$emit("change", this.optionsValues);
     },
 
     selectNone () {
       this.$emit("change", []);
     },
 
-    formatSelected (selected) {
+    sortSelected (selected) {
       if (this.sort) {
-        selected.sort((a, b) => this.options.indexOf(a) - this.options.indexOf(b));
+        selected.sort((a, b) => this.optionsValues.indexOf(a) - this.optionsValues.indexOf(b));
       }
       return selected;
     },

@@ -33,22 +33,22 @@
   <BaseSelect
     class="filter-list"
     :options="options"
-    :selected="values"
+    :selected-values="values"
     :multiple="true"
     :sort="true"
-    @change="applyFilter(JSON.stringify($event))"
+    @change="applyListFilter"
   >
 
     <!--
       Provide a title for the select
       List the selected options, or display "Select Values" if none is selected
     -->
-    <template #title=data>
-      <div v-if="data.selected.length === 0">
+    <template #title="data">
+      <div v-if="data.selectedValues.length === 0">
         Select Values
       </div>
       <div v-else class="selected-enum">
-        {{ data.selected.join(", ") }}
+        {{ data.selectedValues.join(", ") }}
       </div>
     </template>
 
@@ -56,14 +56,14 @@
       Provide the options template for the select
       Display a checkbox along the option value
     -->
-    <template #option=option>
+    <template #option="option">
       <input
         type="checkbox"
         :checked="option.checked"
         @click.stop="option.toggle(option.value)"
         tabindex="-1"
       />
-      {{ option.value }}
+      {{ option.label }}
     </template>
 
   </BaseSelect>
@@ -97,15 +97,26 @@ export default {
     values () {
       try {
         // Try to parse the string as an array
-        const values = JSON.parse(this.filterEntry.value || "[]");
-        if (values instanceof Array) {
-          return values;
-        } else {
-          return [values];
-        }
+        const values = JSON.parse(this.filterEntry.value);
+        return values;
       } catch (err) {
-        console.warn(err);
-        return [];
+        if (!this.filterEntry.value) {
+          return [];
+        } else {
+          return [this.filterEntry.value];
+        }
+      }
+    },
+  },
+
+  methods: {
+    applyListFilter (values) {
+      if (values.length === 0) {
+        this.applyFilter("");
+      } else if (values.length === 1) {
+        this.applyFilter(values[0]);
+      } else {
+        this.applyFilter(JSON.stringify(values));
       }
     },
   },
@@ -116,12 +127,12 @@ export default {
 
 <style>
 
-.livedata-filter .filter-list .selected-enum {
+.livedata-filter.filter-list .selected-enum {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.livedata-filter .filter-list input[type="checkbox"] {
+.livedata-filter.filter-list input[type="checkbox"] {
   margin-right: 1rem;
 }
 

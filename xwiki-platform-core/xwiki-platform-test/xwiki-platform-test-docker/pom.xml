@@ -33,7 +33,7 @@
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <testcontainers.version>1.15.1</testcontainers.version>
+    <testcontainers.version>1.15.2</testcontainers.version>
     <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>

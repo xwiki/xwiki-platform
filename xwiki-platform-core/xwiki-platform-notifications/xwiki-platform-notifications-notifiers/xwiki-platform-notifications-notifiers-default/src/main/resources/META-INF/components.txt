@@ -16,3 +16,4 @@ org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererCo
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererDocumentInitializer
 org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.live.DefaultPrefilteringLiveMimeMessageIterator
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailEventFilter

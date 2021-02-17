@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -239,14 +238,11 @@ public class LiveTableRequestHandler
             requestParams.put(filter.getProperty(), values.toArray(new String[values.size()]));
             requestParams.put(filter.getProperty() + "/join_mode", new String[] {filter.isMatchAll() ? "AND" : "OR"});
 
-            // The default live table results page supports a single filter operator (match type) per column.
-            Set<String> operators = filter.getConstraints().stream().filter(Objects::nonNull)
-                .map(Constraint::getOperator).filter(Objects::nonNull).collect(Collectors.toSet());
-            if (operators.size() == 1) {
-                String operator = operators.iterator().next();
-                String matchType = MATCH_TYPE.getOrDefault(operator, operator);
-                requestParams.put(filter.getProperty() + "_match", new String[] {matchType});
-            }
+            List<String> matchType = filter.getConstraints().stream()
+                .map(constraint -> constraint == null ? null : constraint.getOperator())
+                .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
+                .collect(Collectors.toList());
+            requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
         }
     }
 }

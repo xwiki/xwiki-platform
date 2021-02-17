@@ -58,11 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.4M2
  */
-@UITest(sshPorts = {
-    // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
-    // by GreenMail running on the host.
-    3025
-},
+@UITest(
+    sshPorts = {
+        // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
+        // by GreenMail running on the host.
+        3025
+    },
     properties = {
         // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",

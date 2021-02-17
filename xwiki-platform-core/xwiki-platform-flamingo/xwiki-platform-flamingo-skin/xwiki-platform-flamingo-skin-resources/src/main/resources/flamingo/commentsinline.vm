@@ -338,7 +338,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <div class="modal-body">
           <div class="input-group">
             <div class="input-group-addon">$services.icon.renderHTML('link')</div>
-            <input type="text" class="form-control"/>
+            <input type="text" class="form-control" title="Permalink"/>
           </div>
         </div>
         <div class="modal-footer">

@@ -23,11 +23,13 @@ define('xwiki-livedata', [
   "Vue",
   "xwiki-livedata-vue",
   "xwiki-livedata-source",
+  "xwiki-json-merge",
   "xwiki-livedata-polyfills"
 ], function (
   Vue,
   XWikiLivedata,
-  liveDataSource
+  liveDataSource,
+  jsonMerge
 ) {
 
   /**
@@ -323,29 +325,17 @@ define('xwiki-livedata', [
      * @returns {Object}
      */
     getDisplayerDescriptor (propertyId) {
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
-      // merge property and/or type displayer descriptors
-      let highLevelDisplayer;
-      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
-        highLevelDisplayer = Object.assign({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
-      } else {
-        highLevelDisplayer = Object.assign({}, propertyDescriptorDisplayer);
-      }
-      // displayer config
-      const displayerId = highLevelDisplayer.id;
-      const displayer = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
-      // merge displayers
-      if (highLevelDisplayer.id) {
-        return Object.assign({}, displayer, highLevelDisplayer);
-      } else {
-        // default displayer
-        return { id: this.data.meta.defaultDisplayer };
-      }
+      // Property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      // Property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      // Merge the property and type displayer descriptors.
+      const customDisplayerDescriptor = jsonMerge({}, typeDescriptor?.displayer, propertyDescriptor?.displayer);
+      // Get the default displayer descriptor.
+      const displayerId = customDisplayerDescriptor.id || this.data.meta.defaultDisplayer;
+      const defaultDisplayerDescriptor = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
+      // Merge displayer descriptors.
+      return jsonMerge({}, defaultDisplayerDescriptor, customDisplayerDescriptor);
     },
 
 
@@ -355,29 +345,17 @@ define('xwiki-livedata', [
      * @returns {Object}
      */
     getFilterDescriptor (propertyId) {
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorFilter = propertyDescriptor.filter || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorFilter = typeDescriptor.filter || {};
-      // merge property and/or type filter descriptors
-      let highLevelFilter;
-      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
-        highLevelFilter = Object.assign({}, typeDescriptorFilter, propertyDescriptorFilter);
-      } else {
-        highLevelFilter = Object.assign({}, propertyDescriptorFilter);
-      }
-      // filter filter config
-      const filterId = highLevelFilter.id;
-      const filter = this.data.meta.filters.find(filter => filter.id === filterId);
-      // merge filters
-      if (highLevelFilter.id) {
-        return Object.assign({}, filter, highLevelFilter);
-      } else {
-        // default filter
-        return { id: this.data.meta.defaultFilter };
-      }
+      // Property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      // Property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      // Merge the property and type filter descriptors.
+      const customFilterDescriptor = jsonMerge({}, typeDescriptor?.filter, propertyDescriptor?.filter);
+      // Get the default filter descriptor.
+      const filterId = customFilterDescriptor.id || this.data.meta.defaultFilter;
+      const defaultFilterDescriptor = this.data.meta.filters.find(filter => filter.id === filterId);
+      // Merge filter descriptors.
+      return jsonMerge({}, defaultFilterDescriptor, customFilterDescriptor);
     },
 
 
@@ -827,7 +805,7 @@ define('xwiki-livedata', [
     getActionDescriptor(action) {
       const descriptor = typeof action === 'string' ? {id: action} : action;
       const baseDescriptor = this.data.meta.actions.find(baseDescriptor => baseDescriptor.id === descriptor.id);
-      return Object.assign({}, baseDescriptor, descriptor);
+      return jsonMerge({}, baseDescriptor, descriptor);
     },
 
 
@@ -1182,7 +1160,9 @@ define('xwiki-livedata', [
           if (!this.getQueryFilterGroup(newEntry.property)) {
             this.data.query.filters.push({
               property: newEntry.property,
-              matchAll: true,
+              // We use by default AND between filter groups (different properties) and OR inside a filter group (same
+              // property)
+              matchAll: false,
               constraints: [],
             });
           }

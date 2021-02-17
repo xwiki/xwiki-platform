@@ -22,10 +22,12 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -174,6 +177,10 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
+            // In order to work around issue https://jira.xwiki.org/browse/XWIKI-18335 with Jetty 10+, we replace
+            // jetty-web.xml with an overridden version when we're deploying on Jetty 10+
+            handleJetty10(webInfDirectory);
+
             // Mark it as having been built successfully
             touchMarkerFile();
         }
@@ -181,6 +188,40 @@ public class WARBuilder
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
         this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+    }
+
+    private void handleJetty10(File webInfDirectory) throws Exception
+    {
+        ServletEngine engine = this.testConfiguration.getServletEngine();
+        String tag = this.testConfiguration.getServletEngineTag();
+        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) >= 10) {
+            // Override the jetty-web.xml
+            copyJettyWebFile(webInfDirectory);
+        }
+    }
+
+    private void copyJettyWebFile(File webInfDirectory) throws Exception
+    {
+        File outputFile = new File(webInfDirectory, "jetty-web.xml");
+        if (this.testConfiguration.isVerbose()) {
+            LOGGER.info("... Override jetty-web.xml since Jetty version is >= 10");
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty10-web.xml");
+            IOUtils.copy(is, fos);
+        }
+    }
+
+    private int extractJettyVersionFromDockerTag(String tag)
+    {
+        int result;
+        // TODO: Latest is currently 9.4.x for Jetty. Change this when it's no longer the case.
+        if (this.testConfiguration.getServletEngineTag() == null) {
+            result = 9;
+        } else {
+            result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
+        }
+        return result;
     }
 
     private void copyClasses(File webInfClassesDirectory) throws Exception

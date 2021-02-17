@@ -14,14 +14,13 @@
     "filters": [
       {
         "id": "text",
-        "operators": ["contains", "startsWith", "equals", "notEquals"]
+        "operators": ["contains", "startsWith", "equals"]
       },
       {
         "id": "number",
         "operators": [
           {"id": "equals", "name": "="},
-          {"id": "notEquals", "name": "≠"},
-          {"id": "lower", "name": "<"},
+          {"id": "less", "name": "<"},
           {"id": "greater", "name": ">"}
         ]
       },
@@ -36,10 +35,6 @@
       },
       {
         "id": "list",
-        "operators": ["equals", "startsWith", "contains"]
-      },
-      {
-        "id": "suggest",
         "operators": ["equals", "startsWith", "contains"]
       }
     ],

@@ -107,16 +107,14 @@
         "operators":[
           {"id":"contains","name":"contains"},
           {"id":"startsWith","name":"startsWith"},
-          {"id":"equals","name":"Equals"},
-          {"id":"notEquals","name":"notEquals"}
+          {"id":"equals","name":"Equals"}
         ]
       },
       {
         "id":"number",
         "operators":[
           {"id":"equals","name":"="},
-          {"id":"notEquals","name":"≠"},
-          {"id":"lower","name":"<"},
+          {"id":"less","name":"<"},
           {"id":"greater","name":">"}
         ]
       },
@@ -138,14 +136,6 @@
       },
       {
         "id":"list",
-        "operators":[
-          {"id":"equals","name":"Equals"},
-          {"id":"startsWith","name":"startsWith"},
-          {"id":"contains","name":"contains"}
-        ]
-      },
-      {
-        "id":"suggest",
         "operators":[
           {"id":"equals","name":"Equals"},
           {"id":"startsWith","name":"startsWith"},

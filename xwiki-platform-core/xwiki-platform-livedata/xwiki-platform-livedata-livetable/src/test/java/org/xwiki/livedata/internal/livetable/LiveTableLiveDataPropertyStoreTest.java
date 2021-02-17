@@ -32,6 +32,7 @@ import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -47,7 +48,9 @@ import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.LevelsClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -81,6 +84,10 @@ class LiveTableLiveDataPropertyStoreTest
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
     @Mock
     private XWikiContext xcontext;
 
@@ -94,6 +101,10 @@ class LiveTableLiveDataPropertyStoreTest
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(this.xcontext.getRequest()).thenReturn(request);
+        when(request.getContextPath()).thenReturn("/xwiki");
 
         this.objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
         this.propertyStore.getParameters().clear();
@@ -115,6 +126,7 @@ class LiveTableLiveDataPropertyStoreTest
 
         DocumentReference classReference = new DocumentReference("wiki", "Some", "Class");
         when(this.currentDocumentReferenceResolver.resolve("Some.Class")).thenReturn(classReference);
+        when(this.localEntityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
         when(this.authorization.hasAccess(Right.VIEW, classReference)).thenReturn(true);
 
         XWikiDocument classDocument = mock(XWikiDocument.class);
@@ -122,6 +134,7 @@ class LiveTableLiveDataPropertyStoreTest
 
         BaseClass xclass = mock(BaseClass.class);
         when(classDocument.getXClass()).thenReturn(xclass);
+        when(xclass.getDocumentReference()).thenReturn(classReference);
 
         ComputedFieldClass computedField = mock(ComputedFieldClass.class);
         when(computedField.getName()).thenReturn("total");
@@ -143,8 +156,14 @@ class LiveTableLiveDataPropertyStoreTest
         when(listField.getClassType()).thenReturn("List");
         when(listField.newProperty()).thenReturn(new StringListProperty());
         when(listField.isMultiSelect()).thenReturn(true);
+        when(listField.getObject()).thenReturn(xclass);
 
-        when(xclass.getEnabledProperties()).thenReturn(Arrays.asList(dateField, computedField, listField));
+        LevelsClass levelsField = mock(LevelsClass.class);
+        when(levelsField.getName()).thenReturn("levels");
+        when(levelsField.getClassType()).thenReturn("Levels");
+        when(levelsField.getList(this.xcontext)).thenReturn(Arrays.asList("edit", "delete"));
+
+        when(xclass.getEnabledProperties()).thenReturn(Arrays.asList(dateField, computedField, listField, levelsField));
 
         StringBuilder expectedClassProps = new StringBuilder();
         expectedClassProps.append("{'id':'birthdate','name':'Birthdate','description':'The date when you were born.'"
@@ -153,7 +172,10 @@ class LiveTableLiveDataPropertyStoreTest
             + "'type':'Computed','displayer':{'id':'html'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
             + "'type':'List','sortable':false,'displayer':{'id':'html'},"
-            + "'filter':{'operators':[{'id':'equals'}]}}");
+            + "'filter':{'id':'list','operators':[{'id':'equals'}],"
+            + "'searchURL':'/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}'}},");
+        expectedClassProps.append("{'id':'levels','type':'Levels','displayer':{'id':'html'},"
+            + "'filter':{'id':'list','options':['edit','delete']}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 

@@ -133,7 +133,7 @@ public class LiveTableRequestHandlerTest
         expectedRequestParams.put("childrenOf", new String[] {"Test"});
         expectedRequestParams.put("transprefix", new String[] {"core.restore.batch."});
         expectedRequestParams.put("doc.author", new String[] {"mflorea", "tmortagne"});
-        expectedRequestParams.put("doc.author_match", new String[] {"partial"});
+        expectedRequestParams.put("doc.author_match", new String[] {"partial", "partial"});
         expectedRequestParams.put("doc.author/join_mode", new String[] {"OR"});
 
         XWikiDocument originalContextDoc = mock(XWikiDocument.class, "original");

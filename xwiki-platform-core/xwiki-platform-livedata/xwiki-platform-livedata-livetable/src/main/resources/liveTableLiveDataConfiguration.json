@@ -11,16 +11,26 @@
     },
 
     "propertyDescriptors": [
-      {"id": "doc.name", "type": "String", "displayer": "link"},
+      {"id": "doc.name", "type": "String", "editable": false, "displayer": "link"},
       {"id": "doc.title", "type": "String", "displayer": "link"},
-      {"id": "doc.space", "type": "String", "displayer": {"id": "link", "propertyHref": "doc.space_url"}},
-      {"id": "doc.location", "type": "String", "displayer": "html"},
-      {"id": "doc.fullName", "type": "String", "displayer": "link"},
-      {"id": "doc.creationDate", "type": "Date", "displayer": "text"},
-      {"id": "doc.date", "type": "Date", "displayer": "text"},
-      {"id": "doc.creator", "type": "Users", "displayer": "text"},
-      {"id": "doc.author", "type": "Users", "displayer": {"id": "link", "propertyHref": "doc.author_url"}},
-      {"id": "doc.objectCount", "type": "Number", "sortable":false, "filterable":false},
+      {
+        "id": "doc.space",
+        "type": "String",
+        "editable": false,
+        "displayer": {"id": "link", "propertyHref": "doc.space_url"}
+      },
+      {"id": "doc.location", "type": "String", "editable": false, "displayer": "html"},
+      {"id": "doc.fullName", "type": "String", "editable": false, "displayer": "link"},
+      {"id": "doc.creationDate", "type": "Date", "editable": false, "displayer": "text"},
+      {"id": "doc.date", "type": "Date", "editable": false, "displayer": "text"},
+      {"id": "doc.creator", "type": "Users", "editable": false, "displayer": "text"},
+      {
+        "id": "doc.author",
+        "type": "Users",
+        "editable": false,
+        "displayer": {"id": "link", "propertyHref": "doc.author_url"}
+      },
+      {"id": "doc.objectCount", "type": "Number", "sortable": false, "filterable": false, "editable": false},
       {"id": "_images", "displayer": "html"},
       {"id": "_attachments", "displayer": "html"},
       {"id": "_actions", "displayer": {"id": "actions", "actions": ["edit", "delete"]}},
@@ -48,14 +58,14 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "filter": "suggest"
+        "filter": "list"
       },
       {
         "id": "DBTreeList",
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "filter": "suggest"
+        "filter": "list"
       },
       {
         "id": "Date",
@@ -79,7 +89,7 @@
         "filterable": true,
         "editable": true,
         "displayer": "html",
-        "filter": "suggest"
+        "filter": "list"
       },
       {
         "id": "Levels",
@@ -102,7 +112,7 @@
         "filterable": true,
         "editable": true,
         "displayer": "html",
-        "filter": "suggest"
+        "filter": "list"
       },
       {
         "id": "Password",
@@ -145,7 +155,7 @@
         "filterable": true,
         "editable": true,
         "displayer": "html",
-        "filter": "suggest"
+        "filter": "list"
       }
     ],
 
@@ -154,10 +164,6 @@
     ],
 
     "filters": [
-      {
-        "id": "text",
-        "operators": ["contains", "startsWith", "equals"]
-      },
       {
         "id": "number",
         "operators": ["equals"]

@@ -19,7 +19,10 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +46,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -50,6 +54,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.LevelsClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -78,6 +83,10 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
     @Inject
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
@@ -135,12 +144,19 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         }
         // The returned property value is the displayer output.
         descriptor.setDisplayer(new DisplayerDescriptor("html"));
-        if (xproperty.newProperty() instanceof StringListProperty) {
-            // The default live table results page currently supports only exact matching for list properties with
-            // multiple selection and no relational storage (selected values are stored concatenated on a single
-            // database column).
-            descriptor.setFilter(new FilterDescriptor());
-            descriptor.getFilter().setOperators(Collections.singletonList(new OperatorDescriptor("equals", null)));
+        if (xproperty instanceof ListClass) {
+            descriptor.setFilter(new FilterDescriptor("list"));
+            if (xproperty instanceof LevelsClass) {
+                descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext));
+            } else {
+                descriptor.getFilter().setParameter("searchURL", getSearchURL(xproperty));
+            }
+            if (xproperty.newProperty() instanceof StringListProperty) {
+                // The default live table results page currently supports only exact matching for list properties with
+                // multiple selection and no relational storage (selected values are stored concatenated on a single
+                // database column).
+                descriptor.getFilter().setOperators(Collections.singletonList(new OperatorDescriptor("equals", null)));
+            }
         } else if (xproperty instanceof DateClass) {
             String dateFormat = ((DateClass) xproperty).getDateFormat();
             if (!StringUtils.isEmpty(dateFormat)) {
@@ -149,5 +165,23 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
             }
         }
         return descriptor;
+    }
+
+    private String getSearchURL(PropertyClass xproperty)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference xclassReference = xproperty.getObject().getDocumentReference();
+        List<String> pathElements = Arrays.asList("rest", "wikis", xclassReference.getWikiReference().getName(),
+            "classes", this.localEntityReferenceSerializer.serialize(xclassReference), "properties",
+            xproperty.getName(), "values");
+        String path = pathElements.stream().map(element -> {
+            try {
+                return URLEncoder.encode(element, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // This shouldn't happen.
+                return element;
+            }
+        }).collect(Collectors.joining("/"));
+        return xcontext.getRequest().getContextPath() + '/' + path + "?fp={encodedQuery}";
     }
 }

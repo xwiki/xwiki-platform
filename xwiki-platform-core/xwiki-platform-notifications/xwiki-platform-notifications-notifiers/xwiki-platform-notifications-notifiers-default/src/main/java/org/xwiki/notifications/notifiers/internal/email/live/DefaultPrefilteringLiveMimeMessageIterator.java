@@ -33,8 +33,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation for {@link PrefilteringMimeMessageIterator}.
@@ -48,9 +46,8 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     implements PrefilteringMimeMessageIterator
 {
     @Inject
-    private AuthorizationManager authorizationManager;
+    private LiveNotificationEmailEventFilter eventFilter;
 
-    @Inject
     private Map<DocumentReference, CompositeEvent> events;
 
     @Override
@@ -71,16 +68,10 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     {
         CompositeEvent event = this.events.get(user);
 
-        if (canAccessEvent(user, event)) {
+        if (this.eventFilter.canAccessEvent(user, event)) {
             return Collections.singletonList(event);
         }
 
         return Collections.emptyList();
-    }
-
-    private boolean canAccessEvent(DocumentReference user, CompositeEvent event)
-    {
-        DocumentReference document = event.getDocument();
-        return (document != null && authorizationManager.hasAccess(Right.VIEW, user, document));
     }
 }

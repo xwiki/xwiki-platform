@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
     "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
 })
-public class UserChangePasswordIT
+class UserChangePasswordIT
 {
     private static final String DEFAULT_PASSWORD = "testtest";
 
@@ -75,7 +75,7 @@ public class UserChangePasswordIT
     /** Functionality check: changing the password. */
     @Test
     @Order(1)
-    public void changePassword(TestUtils setup, TestReference testReference)
+    void changePassword(TestUtils setup, TestReference testReference)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         // Change the password
@@ -106,7 +106,7 @@ public class UserChangePasswordIT
 
     @Test
     @Order(2)
-    public void changePasswordWithTwoDifferentPasswords()
+    void changePasswordWithTwoDifferentPasswords()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -118,7 +118,7 @@ public class UserChangePasswordIT
 
     @Test
     @Order(3)
-    public void changePasswordWithoutEnteringPasswords()
+    void changePasswordWithoutEnteringPasswords()
     {
         ChangePasswordPage changePasswordPage = ProfileUserProfilePage.gotoPage(this.userName)
             .switchToPreferences().changePassword();
@@ -128,7 +128,7 @@ public class UserChangePasswordIT
 
     @Test
     @Order(4)
-    public void changePasswordOfAnotherUserWithTwoDifferentPasswords(TestUtils setup)
+    void changePasswordOfAnotherUserWithTwoDifferentPasswords(TestUtils setup)
     {
         // Login as superadmin (to have Admin rights) and change the password of another user.
         setup.loginAsSuperAdmin();
@@ -143,7 +143,7 @@ public class UserChangePasswordIT
 
     @Test
     @Order(5)
-    public void changePasswordWithWrongOriginalPassword()
+    void changePasswordWithWrongOriginalPassword()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -155,7 +155,7 @@ public class UserChangePasswordIT
 
     @Test
     @Order(6)
-    public void changePasswordWhenPolicyIsLength8AndNumberMandatory(TestUtils setup)
+    void changePasswordWhenPolicyIsLength8AndNumberMandatory(TestUtils setup)
     {
         // Update password policy to enforce password with 8 characters and a mandatory number in it
         setup.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,

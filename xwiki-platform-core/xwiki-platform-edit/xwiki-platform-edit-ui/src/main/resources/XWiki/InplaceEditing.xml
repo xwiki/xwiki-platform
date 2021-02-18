@@ -419,7 +419,11 @@ define('editInPlace', [
       // Then unlock the document both when the edit ended with success and with a failure.
       .then(unlock, unlock)
       // Finally view the document both when the edit ended with success and with a failure.
-      .then(view, view);
+      .then(view, view)
+      .always(function(xwikiDocument) {
+        // Update the current document for the next edit session.
+        currentXWikiDocument = xwikiDocument;
+      });
   };
 
   var lock = function(xwikiDocument) {
@@ -723,18 +727,23 @@ define('editInPlace', [
         delete xwikiDocument.majorVersion;
         delete xwikiDocument.minorVersion;
         $('#document-title-input').focus().select();
-        var message = $jsontool.serialize($services.localization.render('edit.inplace.page.translation',
-          ['__locale__']));
-        new XWiki.widgets.Notification(
-          message.replace('__locale__', uiLocale),
-          'info'
-        );
+        // Let the user know that they are now editing the translation of this page in the current locale.
+        $('#document-title-input').popover({
+          content: $(this).find('a').data('contentAfter'),
+          placement: 'bottom',
+          trigger: 'manual'
+        }).popover('show').one('blur', function() {
+          // Hide the popover when the title input loses the focus.
+          $(this).popover('hide');
+        });
       }).removeClass('hidden');
-      var message = $jsontool.serialize($services.localization.render('edit.inplace.page.original', ['__locale__']));
-      new XWiki.widgets.Notification(
-        message.replace('__locale__', xwikiDocumentLocale),
-        'info'
-      );
+      // Let the user know that they are editing the original version of the page and not the translation corresponding
+      // to the current locale because there isn't one created yet.
+      $('#tmTranslate a').popover('show');
+      // Hide the popover on the next click. The user can still see the message by hovering the translate button.
+      $(document).one('click', function() {
+        $('#tmTranslate a').popover('hide');
+      });
     }
   };
 
@@ -1503,9 +1512,17 @@ input#document-title-input:focus,
   #set ($url = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
   #set ($hint = $services.localization.render('edit.inplace.page.translate.hint',
     [$xcontext.locale.getDisplayName($xcontext.locale)]))
+  #set ($messageBefore = $services.localization.render('edit.inplace.page.translate.messageBefore', [
+    $doc.realLocale.getDisplayName($xcontext.locale),
+    $xcontext.locale.getDisplayName($xcontext.locale)
+  ]))
+  #set ($messageAfter = $services.localization.render('edit.inplace.page.translate.messageAfter',
+    [$xcontext.locale.getDisplayName($xcontext.locale)]))
   ## We show the translate button only while editing in-place.
   &lt;div class="btn-group hidden" id="tmTranslate"&gt;
-    &lt;a class="btn btn-default" href="$url" role="button" title="$escapetool.xml($hint)"&gt;
+    &lt;a class="btn btn-default" href="$url" role="button" tabindex="0" title="$escapetool.xml($hint)"
+        data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"
+        data-content="$escapetool.xml($messageBefore)" data-content-after="$escapetool.xml($messageAfter)"&gt;
       $services.icon.renderHTML('translate')
       &lt;span class="btn-label"&gt;$escapetool.xml($services.localization.render('edit.inplace.page.translate'))&lt;/span&gt;
     &lt;/a&gt;

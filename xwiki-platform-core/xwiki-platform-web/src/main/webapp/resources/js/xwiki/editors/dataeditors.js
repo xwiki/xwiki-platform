@@ -267,7 +267,8 @@ editors.XDataEditors = Class.create({
             xpage: 'editobject',
             xaction: 'addObject',
             classname: classNameVal,
-            objectNumber: this.getNewObjectNumber(classNameVal)
+            objectNumber: this.getNewObjectNumber(classNameVal),
+            form_token: $$('input[name=form_token]')[0].value
           }));
         }
         if (!item.disabled && validClassName) {
@@ -669,7 +670,8 @@ editors.XDataEditors = Class.create({
           xpage: 'editobject',
           xaction: 'loadObject',
           classname: xclassName,
-          objectNumber: xObjectNumber
+          objectNumber: xObjectNumber,
+          form_token: $$('input[name=form_token]')[0].value
         }));
         new Ajax.Request(
           /* Ajax request URL */

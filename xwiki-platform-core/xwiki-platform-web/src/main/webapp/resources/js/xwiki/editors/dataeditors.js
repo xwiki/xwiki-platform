@@ -684,8 +684,10 @@ editors.XDataEditors = Class.create({
               var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
               // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment.
               objectContent.insertBefore(responseDocumentFragment, null);
-              document.fire('xwiki:dom:updated', {elements: [objectContent]});
+
+              // display the elements before firing the event to be sure they are visible.
               object.toggleClassName('collapsed');
+              document.fire('xwiki:dom:updated', {elements: [objectContent]});
               object.removeClassName('loading');
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
             }.bind(this),

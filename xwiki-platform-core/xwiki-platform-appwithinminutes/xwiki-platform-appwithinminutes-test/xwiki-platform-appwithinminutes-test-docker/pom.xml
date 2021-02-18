@@ -47,6 +47,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Required by AddEntryIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

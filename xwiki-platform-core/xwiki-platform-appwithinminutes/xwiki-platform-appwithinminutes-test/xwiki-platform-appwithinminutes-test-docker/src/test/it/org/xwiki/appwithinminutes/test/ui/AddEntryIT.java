@@ -17,65 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomeEditPage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.AdminAuthenticationRule;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the process of adding new application entries.
- * 
+ *
  * @version $Id$
- * @since 4.0M1
+ * @since 13.2RC1
+ * @since 12.10.5
  */
-public class AddEntryTest extends AbstractTest
+@UITest
+class AddEntryIT
 {
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
-
-    /**
-     * The page being tested.
-     */
-    private ApplicationHomePage homePage;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
-        Map<String, String> editQueryStringParameters = new HashMap<String, String>();
-        editQueryStringParameters.put("editor", "inline");
-        editQueryStringParameters.put("template", "AppWithinMinutes.LiveTableTemplate");
-        editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_class", "Panels.PanelClass");
-        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", editQueryStringParameters);
-        // Wait for the page to load before clicking on the save button to make sure the page layout is stable.
-        homePage = new ApplicationHomeEditPage().waitUntilPageIsLoaded().clickSaveAndView();
-    }
+    private static final String DATE_COLUMN_TITLE = "panel.livetable.doc.date";
 
     /**
      * Tests that entry name is URL encoded.
      */
     @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testEntryNameWithURLSpecialCharacters()
+    @Order(1)
+    void entryNameWithURLSpecialCharacters(TestReference testReference, TestUtils testUtils)
     {
+        // Fixture
+        testUtils.loginAsSuperAdmin();
+
+        testUtils.deletePage(testReference);
+
+        Map<String, String> editQueryStringParameters = new HashMap<>();
+        editQueryStringParameters.put("editor", "inline");
+        editQueryStringParameters.put("template", "AppWithinMinutes.LiveTableTemplate");
+        editQueryStringParameters.put("AppWithinMinutes.LiveTableClass_0_class", "Panels.PanelClass");
+        testUtils.gotoPage(testReference, "edit", editQueryStringParameters);
+        // Wait for the page to load before clicking on the save button to make sure the page layout is stable.
+        // The page being tested.
+        ApplicationHomePage homePage = new ApplicationHomeEditPage().waitUntilPageIsLoaded().clickSaveAndView();
+
+        // Test
         EntryNamePane entryNamePane = homePage.clickAddNewEntry();
         String entryName = "A?b=c&d#" + RandomStringUtils.randomAlphanumeric(3);
         entryNamePane.setName(entryName);
@@ -83,11 +77,15 @@ public class AddEntryTest extends AbstractTest
         entryEditPage.setValue("description", "This is a test panel.");
         entryEditPage.clickSaveAndView();
 
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        testUtils.gotoPage(testReference);
         homePage = new ApplicationHomePage();
         LiveTableElement entriesLiveTable = homePage.getEntriesLiveTable();
         entriesLiveTable.waitUntilReady();
+        // Makes sure the test entry is displayed at the top of the first page by sorting the date twice (descending
+        // order).
+        entriesLiveTable.sortBy(DATE_COLUMN_TITLE);
+        entriesLiveTable.sortBy(DATE_COLUMN_TITLE);
         // The column header is not translated because we haven't generated the document translation bundle.
-        Assert.assertTrue(entriesLiveTable.hasRow("panel.livetable.doc.title", entryName));
+        assertTrue(entriesLiveTable.hasRow("panel.livetable.doc.title", entryName));
     }
 }

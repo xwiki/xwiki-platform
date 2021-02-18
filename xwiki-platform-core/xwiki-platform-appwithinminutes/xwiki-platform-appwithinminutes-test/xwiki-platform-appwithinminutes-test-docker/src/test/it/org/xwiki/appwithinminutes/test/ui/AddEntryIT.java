@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 13.2RC1
  * @since 12.10.5
+ * @since 12.6.8
  */
 @UITest
 class AddEntryIT

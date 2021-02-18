@@ -55,4 +55,10 @@ public class AllITs
     class NestedLiveTableGeneratorIT extends LiveTableGeneratorIT
     {
     }
+
+    @Nested
+    @DisplayName("Add entry test")
+    class NestedAddEntryIT extends AddEntryIT
+    {
+    }
 }

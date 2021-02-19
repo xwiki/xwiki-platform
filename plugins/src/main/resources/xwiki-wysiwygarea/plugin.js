@@ -103,6 +103,22 @@
           // Set the outermost element. This is needed in order to compute correctly the position where the notification
           // messages are shown.
           editor.container = editor.ui.contentsElement = contentsSpace;
+          // When an edit mode is unloaded its editable is detached and this:
+          // * clears only the event listeners registered with attachListener() on the editable
+          // * clears only some of the custom data set on the editable
+          // * fires the contentDomUnload event
+          // Unfortunately some of the event listeners are registered using on() and these are not removed when the
+          // editable is detached. This is the case with the clipboard plugin (addPasteListenersToEditable) which
+          // probably assumes the editable element is recreated each time the edit mode is loaded. It's not the case for
+          // the in-line editor where we want to reuse the editable element. As a result we get duplicated paste
+          // listeners that duplicate the content on paste.
+          // At the same time, some of the custom data set on the editable element is not cleared. The focus manager
+          // custom data is an example. If we don't clear it then the focus and blur listeners will misbehave when we
+          // come back from Source mode.
+          editor.once('contentDomUnload', function() {
+            // This removes both the event listeners and the custom data set on the editable.
+            editor.editable().clearCustomData();
+          });
         } else {
           // Preserve the height of the contents space while switching modes in order to prevent UI flickering.
           contentsSpace = editor.ui.space('contents');
@@ -123,11 +139,13 @@
         // The editable itself is the outermost element. This is needed in order to compute correctly the position where
         // the notification messages are shown.
         editor.container = editor.ui.contentsElement = editor.element;
+        // Notify the others that the editable is ready so they can register their event listeners. Note that the event
+        // listeners are removed along with any custom data each time the edit mode is unloaded. This line ensures that
+        // the editable is re-initialized whenever we switch (back) to WYSIWYG mode.
+        editor.fire('contentDom');
         // Note that we trigger the callback without setting the editor data because this is done later by our source
         // plugin after converting the source wiki syntax to HTML.
         callback();
-        // Add selection change listeners (so that the tool bar state is synchronized with the current selection).
-        editor.fire('contentDom');
       });
 
       editor.on('modeReady', function() {

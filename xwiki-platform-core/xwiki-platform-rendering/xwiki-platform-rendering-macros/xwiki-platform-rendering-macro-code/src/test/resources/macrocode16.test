@@ -2,8 +2,8 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .# Validates that the code macro accurately identifies the language used in the code macro when not specified.
-.# Pygments 2.4.2, and 2.0.8 identify the sample below as Tera Term macro, presenting an acceptable highlight of
-.# the code, whereas version 2.5.x to 2.7.0 identified this sample as MIME, consequently proposing a degraded 
+.# Pygments 2.4.2, and 2.0.8 identify the sample below as Tera Term macro syntax, presenting an acceptable highlight of
+.# the code, whereas version 2.5.1 to 2.7.0 identifies this sample as MIME syntax, consequently proposing a degraded 
 .# highlighting where the text is in black and each line is framed by a red line.
 .#-----------------------------------------------------
 {{code}}

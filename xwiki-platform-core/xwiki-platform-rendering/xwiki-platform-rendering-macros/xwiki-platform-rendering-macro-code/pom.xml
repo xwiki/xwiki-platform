@@ -49,10 +49,13 @@
       <groupId>org.python</groupId>
       <artifactId>jython-slim</artifactId>
     </dependency>
-
-    <!-- Pygments must stay in version < 2.5.x because this version and above have issues with the auto-detection of 
-         the language of the code (MIME and SQL are too often detected). Pygments 2.8.0+ present a fix, but is only 
-         compatible with Python 3.0, which we do not support for now. 
+    <!-- We can't upgrade to version higher than 2.4.2 for two reasons:
+         - 2.5.1 and above presents and issue with the auto-detection of the language of the code (MIME and SQL 
+         syntaxes are too often detected).
+         - Pygments 2.6.0+ requires Python 3. 
+         Pygments 2.8.0 presents a fix, but requires Python 3.0.
+         And upgrade to Pygments 2.5.2 is possible by backporting the fix from 
+         Pygments 2.8.0 (https://jira.xwiki.org/browse/XWIKI-18369).   
          See https://jira.xwiki.org/browse/XWIKI-18363 -->
     <dependency>
       <groupId>org.pygments</groupId>

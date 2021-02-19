@@ -219,7 +219,13 @@ public class WARBuilder
         if (this.testConfiguration.getServletEngineTag() == null) {
             result = 9;
         } else {
-            result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
+            try {
+                result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
+            } catch (Exception e) {
+                // This can happen for example if we have "9-jre11" since "9-" will raise a NumberFormatException.
+                // In this case consider we're on 9.
+                result = 9;
+            }
         }
         return result;
     }

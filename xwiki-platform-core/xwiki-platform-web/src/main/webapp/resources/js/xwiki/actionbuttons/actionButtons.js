@@ -185,7 +185,11 @@ var XWiki = (function(XWiki) {
       // We check both the current event and the original event in order to preserve backwards compatibility with older
       // code that may prevent default behavior only for the original event. We recommend calling preventDefault() only
       // on the current event because most of the listeners shouldn't be aware of the original event.
-      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented;
+      // Note that the check on isPrevented is a hack to support IE11: even if the event called preventDefault in the
+      // event listener, the returned event will have defaultPrevented set to false on IE11.
+      // We are artificially setting isPrevented to true in onSave.
+      // See for more information: https://stackoverflow.com/questions/23349191/event-preventdefault-is-not-working-in-ie-11-for-custom-events
+      var defaultPrevented = event.defaultPrevented || originalEvent.defaultPrevented || event.isPrevented;
       // Stop the original event if the current event has been stopped. Also, in Internet Explorer the original event
       // can't be stopped from the current event's handlers, so in case some old code has tried to stop the original
       // event we must stop it again here.
@@ -264,6 +268,11 @@ var XWiki = (function(XWiki) {
 
       // Prevent the default form submit behavior.
       event.preventDefault();
+      // This is a hack to support IE11: event.defaultPrevented is set to true, but the event returned by
+      // element#fire won't have the value set to true, apparently because IE11 badly supports it.
+      // See also: https://stackoverflow.com/questions/23349191/event-preventdefault-is-not-working-in-ie-11-for-custom-events
+      // So we provide a custom property to be sure to get it on IE11. You can see it handled in notify() method above.
+      event.isPrevented = true;
 
       // Show the right notification message.
       if (isCreateFromTemplate) {

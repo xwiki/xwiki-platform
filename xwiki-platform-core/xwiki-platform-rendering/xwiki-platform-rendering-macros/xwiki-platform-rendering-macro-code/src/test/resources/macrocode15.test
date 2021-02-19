@@ -2,31 +2,30 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .# Validates that the code macro accurately identifies the language used in the code macro when not specified.
+.# Pygments 2.4.2 identifies the sample below as SQL, and Pygments 2.8.0 as ECL, both presenting an highlight of the 
+.# values, whereas Pygments 2.5.x to 2.7.0 identified this sample as MIME, consequently proposing a degraded 
+.# highlighting where the text is in black and each line is framed by a red line.
 .#-----------------------------------------------------
 {{code}}
-    <!-- disable to use ajp connector instead
-    <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               URIEncoding="UTF-8"
-               redirectPort="8443" />
-    -->
+<!-- disable to use ajp connector instead
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           URIEncoding="UTF-8"
+           redirectPort="8443" />
+-->
 {{/code}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [] [    <!-- disable to use ajp connector instead
-    <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               URIEncoding="UTF-8"
-               redirectPort="8443" />
-    -->]
+beginMacroMarkerStandalone [code] [] [<!-- disable to use ajp connector instead
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           URIEncoding="UTF-8"
+           redirectPort="8443" />
+-->]
 beginGroup [[class]=[box]]
 beginGroup [[class]=[code]]
-onSpace
-onSpace
-onSpace
-onSpace
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 onSpecialSymbol [!]
@@ -48,10 +47,6 @@ onSpace
 onWord [instead]
 onNewLine
 endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
-onSpace
-onSpace
-onSpace
-onSpace
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 endFormat [NONE] [[style]=[color: #666666; ]]
@@ -92,10 +87,6 @@ onSpace
 onSpace
 onSpace
 onSpace
-onSpace
-onSpace
-onSpace
-onSpace
 onWord [connectionTimeout]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [=]
@@ -106,10 +97,6 @@ onWord [20000]
 onSpecialSymbol ["]
 endFormat [NONE] [[style]=[color: #19177C; ]]
 onNewLine
-onSpace
-onSpace
-onSpace
-onSpace
 onSpace
 onSpace
 onSpace
@@ -144,10 +131,6 @@ onSpace
 onSpace
 onSpace
 onSpace
-onSpace
-onSpace
-onSpace
-onSpace
 onWord [redirectPort]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [=]
@@ -163,10 +146,6 @@ onSpecialSymbol [/]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[color: #666666; ]]
 onNewLine
-onSpace
-onSpace
-onSpace
-onSpace
 beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 onSpecialSymbol [-]
 onSpecialSymbol [-]
@@ -175,10 +154,10 @@ onNewLine
 endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
 endGroup [[class]=[code]]
 endGroup [[class]=[box]]
-endMacroMarkerStandalone [code] [] [    <!-- disable to use ajp connector instead
-    <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               URIEncoding="UTF-8"
-               redirectPort="8443" />
-    -->]
+endMacroMarkerStandalone [code] [] [<!-- disable to use ajp connector instead
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           URIEncoding="UTF-8"
+           redirectPort="8443" />
+-->]
 endDocument

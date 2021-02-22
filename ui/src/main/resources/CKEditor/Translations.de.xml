@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -51,24 +51,21 @@ CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Lade JavaScript-Skin-Erweiteru
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Einige Rendering-Makros werden mit JavaScript-Code angezeigt. Das Laden des JavaScript-Codes verbessert den WYSIWYG-Aspekt des Editors, kann aber zu Problemen führen, wenn der JavaScript-Code den CKEditor-Code stört oder wenn er Inhalte außerhalb der Makroausgabegrenzen ändert.
 CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
 CKEditor.ConfigClass_advanced.hint=Sie können ein JavaScript-Schnipsel schreiben, um direkt das Konfigurationsobjekt zu ändern. Die Liste der verfügbaren Konfigurationseigenschaften finden Sie in der {0}CKEditor Dokumentation{1}.
-
+ckeditor.content.placeholder=Beginnen Sie hier zu tippen...
 ckeditor.admin.saveComment=CKEditor Konfiguration in Administration aktualisiert
 ckeditor.admin.reset=Zurücksetzen
 ckeditor.admin.reset.hint=Wiederherstellen der Standard-Konfiguration
 ckeditor.admin.reset.confirmation=Sind Sie sicher, dass Sie die Standard-Konfiguration wiederherstellen möchten? Alle Änderungen werden verloren gehen.
-
 ckeditor.plugin.link.options=Optionen
 ckeditor.plugin.link.anchor=Anker
 ckeditor.plugin.link.queryString=Query Zeichenfolge
 ckeditor.plugin.link.defaultLabel=Link-Text eingeben
 ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
-
 ckeditor.plugin.macro.placeholder=Makro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Makro
 ckeditor.plugin.macro.editButtonHint=Makro bearbeiten
 ckeditor.plugin.macro.refreshFailed=Fehler beim Aktualisieren des bearbeiteten Inhalts.
 ckeditor.plugin.macro.dedicatedInsertButtonHint={0} Makro einfügen
-
 ckeditor.plugin.office.importer.title=Office-Datei importieren
 ckeditor.plugin.office.importer.filePath=Dateipfad
 ckeditor.plugin.office.importer.filePath.hint=Wählen Sie die zu importierende Office-Datei. Die Datei wird hochgeladen und an diese Seite anhängt und ihr Inhalt wird in den Inhalt der Seite eingefügt.
@@ -83,12 +80,10 @@ ckeditor.plugin.office.importer.done=Office-Datei wurde erfolgreich importiert.
 ckeditor.plugin.office.importer.fail=Office Import fehlgeschlagen.
 ckeditor.plugin.office.importer.noUploadURL=Datei-Upload-URL ist nicht konfiguriert.
 ckeditor.plugin.office.importer.failedToLoadForm=Fehler beim Laden des Formulars.
-
 ckeditor.plugin.resource.notSpecified={0} ist nicht angegeben.
 ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Änderungen. Wollen Sie diese verwerfen?
 ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
-
 ckeditor.plugin.toolbar.basicStyles=Einfache Stile
 ckeditor.plugin.toolbar.lists=Listen
 ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen
@@ -104,18 +99,14 @@ ckeditor.plugin.toolbar.toc=Inhaltsverzeichnis
 ckeditor.plugin.toolbar.include=Enthalten
 ckeditor.plugin.toolbar.code=Codeausschnitt
 ckeditor.plugin.toolbar.otherMacros=Andere Makros
-
 ckeditor.plugin.syntax.update.inProgress=Aktualisieren des WYSIWYG-Editors
 ckeditor.plugin.syntax.update.done=WYSIWYG-Editor aktualisiert
 ckeditor.plugin.syntax.update.failed=Fehler beim Aktualisieren des WYSIWYG-Editors
 ckeditor.plugin.syntax.wysiwygModeUnsupported=Der WYSIWYG-Bearbeitungsmodus wird von der {0}-Syntax nicht unterstützt.
-
 ckeditor.inline.failedToInit=Der Editor konnte nicht initialisiert werden.
-
 modal.ok=OK
 modal.cancel=Abbrechen
 modal.close=Schließen
-
 resource.attach.label=Anhang
 resource.attach.placeholder=Pfad.zur.Seite@Anhang.png
 resource.data.label=Daten-URI
@@ -133,29 +124,25 @@ resource.url.label=URL
 resource.url.placeholder=http://www.example.org/bild.png
 resource.user.label=Benutzer
 resource.user.placeholder=Alias
-
 resourcePicker.attach.hint=Wählen Sie einen Anhang
 resourcePicker.doc.hint=Wählen Sie eine Seite
-
 entityResourceSuggester.doc.placeholder=Eine Seite zu finden…
 entityResourceSuggester.attach.placeholder=Einen Anhang finden…
-
 entityResourcePicker.select=Auswählen
 entityResourcePicker.doc.title=Seite auswählen
 entityResourcePicker.attach.title=Anhang auswählen
-
 macroSelector.title=Makro auswählen
 macroSelector.filter.text.placeholder=Zum Filtern tippen
 macroSelector.filter.category.all=Alle Makros
 macroSelector.filter.category.other=Andere
 macroSelector.failedToRetrieveMacros=Fehler beim Abrufen der Liste verfügbarer Makros.
 macroSelector.select=Auswählen
-
 macroEditor.title=Makro bearbeiten
 macroEditor.more=Mehr
 macroEditor.changeMacro=Makro ändern
 macroEditor.submit=Übernehmen
 macroEditor.content=Inhalt
 macroEditor.noParameters=Dieses Makro hat keine Parameter.
-macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.</content>
+macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.
+</content>
 </xwikidoc>

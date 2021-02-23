@@ -342,6 +342,28 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
+    void documentwithshortusers() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithshortusers", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+        assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
+    }
+
+    @Test
     void documentwithoutauthorandcreator() throws FilterException, XWikiException
     {
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");

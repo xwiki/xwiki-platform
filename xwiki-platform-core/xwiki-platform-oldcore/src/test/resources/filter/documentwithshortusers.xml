@@ -1,0 +1,51 @@
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiDocumentLocale>
+          <p>
+            <parameters>
+              <entry>
+                <string>creation_author</string>
+                <string>creator</string>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.42</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocumentRevision revision="1.42">
+            <p>
+              <parameters>
+                <entry>
+                  <string>revision_author</string>
+                  <string>author</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string>comment</string>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>contentAuthor</string>
+                </entry>
+              </parameters>
+            </p>
+            <wikiAttachment name="attachment.txt" size="10">
+              <p>
+                <content>AAECAwQFBgcICQ==</content>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>attachmentAuthor</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachment>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

@@ -273,9 +273,12 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
         if (reference != null && !(reference instanceof DocumentReference)) {
             if (reference instanceof EntityReference) {
                 userReference =
-                    this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference);
+                    this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference != null
+                        ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
             } else {
-                userReference = this.userStringResolver.resolve(reference.toString(), this.currentEntityReference);
+                userReference =
+                    this.userStringResolver.resolve(reference.toString(), this.currentEntityReference != null
+                        ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
             }
         }
 

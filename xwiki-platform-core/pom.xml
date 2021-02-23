@@ -126,26 +126,7 @@
               </item>
             </revapi.ignore>
             -->
-            <revapi.ignore>
-              <item>
-                <code>java.method.removed</code>
-                <old>method org.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()</old>
-                <justification>This API has been removed to avoid future issues with the exposure of Jodconverter classes when upgrading. Some API have been introduced that should cover most of the usecases.</justification>
-              </item>
-              <item>
-                <code>java.method.returnTypeChanged</code>
-                <old>method org.xwiki.security.authentication.api.AuthenticationConfiguration org.xwiki.security.authentication.script.AuthenticationScriptService::getAuthenticationConfiguration()</old>
-                <new>method org.xwiki.security.authentication.AuthenticationConfiguration org.xwiki.security.authentication.script.AuthenticationScriptService::getAuthenticationConfiguration()</new>
-                <justification>AuthenticationConfiguration has only been moved to a new package, so it should not be breaking for people using this API in scripts.</justification>
-              </item>
-              <item>
-                <code>java.annotation.removed</code>
-                <old>class com.xpn.xwiki.web.LegacyActionServlet</old>
-                <new>class com.xpn.xwiki.web.LegacyActionServlet</new>
-                <annotation>@javax.servlet.annotation.MultipartConfig</annotation>
-                <justification>Not a breakage. Annotation has been replaced by an entry in web.xml.</justification>
-              </item>
-            </revapi.ignore>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

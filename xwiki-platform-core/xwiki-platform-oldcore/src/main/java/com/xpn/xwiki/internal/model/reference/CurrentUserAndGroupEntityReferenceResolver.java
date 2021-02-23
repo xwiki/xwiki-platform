@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.resolver;
+package com.xpn.xwiki.internal.model.reference;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -27,23 +28,24 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.security.internal.XWikiConstants;
+
+import com.xpn.xwiki.XWiki;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver<String>} which ensure the proper
- * space is used to find user documents and allow overwriting the wiki only.
+ * Resolve a String representing an user or group Entity Reference into an
+ * {@link org.xwiki.model.reference.EntityReference} object. The difference with
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider} is that the default space is
+ * always {@link XWiki#SYSTEM_SPACE_REFERENCE}.
  * 
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {"user", "group"})
+@Component(hints = {"user/current", "group/current"})
 @Singleton
-public class UserAndGroupEntityReferenceResolver extends AbstractStringEntityReferenceResolver
+public class CurrentUserAndGroupEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
-    /**
-     * Entity reference value provider used to provide default value.
-     */
     @Inject
+    @Named("current")
     private EntityReferenceProvider provider;
 
     @Override
@@ -61,7 +63,7 @@ public class UserAndGroupEntityReferenceResolver extends AbstractStringEntityRef
     protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
         if (type == EntityType.SPACE) {
-            return XWikiConstants.XWIKI_SPACE_REFERENCE;
+            return XWiki.SYSTEM_SPACE_REFERENCE;
         } else {
             return this.provider.getDefaultReference(type);
         }

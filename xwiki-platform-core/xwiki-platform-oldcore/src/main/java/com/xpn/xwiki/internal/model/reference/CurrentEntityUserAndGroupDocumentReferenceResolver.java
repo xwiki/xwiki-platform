@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.resolver;
+package com.xpn.xwiki.internal.model.reference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,23 +31,23 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.DocumentReferenceResolver<String>} which ensure the proper
- * space is used to find user documents and allow overwriting the wiki only. The default wiki is the standard default
- * wiki.
- *
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
+ * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentUserAndGroupEntityReferenceResolver}.
+ * 
  * @version $Id$
- * @since 4.0M2
+ * @since 13.2RC1
  */
-@Component(hints = {"user", "group" })
+@Component(hints = {"user/current", "group/current"})
 @Singleton
-public class UserAndGroupDocumentReferenceResolver implements DocumentReferenceResolver<String>
+public class CurrentEntityUserAndGroupDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
     @Inject
-    @Named("user")
-    private EntityReferenceResolver<String> entityReferenceResolver;
+    @Named("user/current")
+    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Override
-    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
+    public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
         EntityReference entityReference =
             this.entityReferenceResolver.resolve(documentReferenceRepresentation, EntityType.DOCUMENT, parameters);

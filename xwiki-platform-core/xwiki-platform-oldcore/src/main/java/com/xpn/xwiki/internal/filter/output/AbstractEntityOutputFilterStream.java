@@ -75,8 +75,16 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     protected DocumentReferenceResolver<EntityReference> documentEntityResolver;
 
     @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<EntityReference> userEntityResolver;
+
+    @Inject
     @Named("current")
     protected DocumentReferenceResolver<String> documentStringResolver;
+
+    @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<String> userStringResolver;
 
     @Inject
     protected ConverterManager converter;
@@ -258,7 +266,18 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
 
     protected DocumentReference getUserReference(String key, FilterEventParameters parameters, DocumentReference def)
     {
-        DocumentReference userReference = getDocumentReference(key, parameters, def);
+        DocumentReference userReference = def;
+
+        Object reference = get(Object.class, key, parameters, def, false, false);
+
+        if (reference != null && !(reference instanceof DocumentReference)) {
+            if (reference instanceof EntityReference) {
+                userReference =
+                    this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference);
+            } else {
+                userReference = this.userStringResolver.resolve(reference.toString(), this.currentEntityReference);
+            }
+        }
 
         if (userReference != null && userReference.getName().equals(XWikiRightService.GUEST_USER)) {
             userReference = null;

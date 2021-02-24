@@ -37,8 +37,7 @@
 
    <cache-container name="xwiki" statistics="true" default-cache="the-default-cache" shutdown-hook="DEFAULT">
 
-     <!-- Expose Infinispan caches in the JMX server -->
-     <jmx enabled="true" domain="org.xwiki.infinispan" />
+     <jmx domain="org.xwiki.infinispan" />
 
      <!--
          ******************************************************************************************************************

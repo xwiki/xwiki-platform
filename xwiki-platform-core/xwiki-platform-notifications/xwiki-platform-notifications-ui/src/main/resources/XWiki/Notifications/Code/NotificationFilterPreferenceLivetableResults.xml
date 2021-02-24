@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationFilterPreferenceLivetableResults</name>
   <language/>
@@ -62,7 +62,7 @@
 ## We display them first because we don't want them to be hidden by thousands of page filters the autowatch option
 ## might have created. It would be not good to have to go to the last page of the livetable to find out these commonly
 ## used filters.
-#set ($filters = $services.notification.filters.getToggleableNotificationFilters())
+#set ($filters = $services.notification.filters.getToggleableNotificationFilters($request.user))
 #foreach ($filter in $filters)
   #set ($index = $index + 1)
   ## Optimization to render only displayed rows (between $offset and $limitOffset)
@@ -97,12 +97,12 @@
 #set ($elements = $collectiontool.sort($elements, ['name']))
 ## Also get the list of available filters for the user
 #set ($filters = $collectiontool.arrayList)
-#set ($discard = $filters.addAll($services.notification.filters.filters))
+#set ($discard = $filters.addAll($services.notification.filters.getFilters($request.user)))
 #set ($filters = $collectiontool.sort($filters, ['name']))
 #set ($displayHiddenDocument = "$xwiki.getUserPreference('displayHiddenDocuments')" == '1')
 #foreach ($filter in $filters)
   #set ($filtersPreferences = $collectiontool.arrayList)
-  #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter)))
+  #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter, $request.user)))
   #set ($filtersPreferences = $collectiontool.sort($filtersPreferences, ['id']))
   #foreach ($preference in $filtersPreferences)
     #set ($page = $preference.pageOnly)

@@ -140,6 +140,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for checking categories -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- A wrapper to javax.mail much easier to use -->
     <dependency>
       <groupId>org.simplejavamail</groupId>

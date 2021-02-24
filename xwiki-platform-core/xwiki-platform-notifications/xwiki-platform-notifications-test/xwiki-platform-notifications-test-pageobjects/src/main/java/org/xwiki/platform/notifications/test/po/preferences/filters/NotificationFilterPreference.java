@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ConfirmationBox;
@@ -40,7 +40,7 @@ public class NotificationFilterPreference
 {
     private static final String LIST_HTML_TAG = "li";
 
-    private NotificationsUserProfilePage parentPage;
+    private AbstractNotificationsSettingsPage parentPage;
 
     private WebElement livetableRow;
 
@@ -60,7 +60,7 @@ public class NotificationFilterPreference
      * @param webElement the livetable row
      * @param driver the current webdriver in used
      */
-    public NotificationFilterPreference(NotificationsUserProfilePage parentPage, WebElement webElement,
+    public NotificationFilterPreference(AbstractNotificationsSettingsPage parentPage, WebElement webElement,
             XWikiWebDriver driver)
     {
         this.parentPage = parentPage;

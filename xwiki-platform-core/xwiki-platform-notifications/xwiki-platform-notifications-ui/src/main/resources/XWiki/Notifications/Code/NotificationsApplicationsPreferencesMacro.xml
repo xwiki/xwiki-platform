@@ -184,11 +184,18 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
           }
         }
       }
+      var target = $('.notifPreferences').attr('data-target');
+      var targetUser = "";
+      if (target == 'user') {
+        var targetUser = XWiki.Model.serialize(new XWiki.Document().getDocumentReference())
+      }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {
         action: 'savePreferences',
         target: $('.notifPreferences').attr('data-target'),
-        json: JSON.stringify(data)
+        user: targetUser,
+        json: JSON.stringify(data),
+        csrf: xm.form_token
       }).done(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
@@ -771,7 +778,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -784,14 +791,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -800,7 +807,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -905,6 +912,16 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -947,13 +964,21 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
-#if (!$xcontext.userReference &amp;&amp; $xcontext.macro.params.target == 'user')
+#if (!$xcontext.userReference &amp;&amp; $wikimacro.parameters.target == 'user')
   {{info}}
     {{translation key="notifications.settings.applications.forGuest" /}}
   {{/info}}
-#elseif ($xcontext.macro.params.target == 'wiki' &amp;&amp; !$services.security.authorization.hasAccess('admin', $services.model.createWikiReference($services.wiki.currentWikiId)))
+#elseif ($wikimacro.parameters.target == 'wiki' &amp;&amp; !$services.security.authorization.hasAccess('admin', $services.model.createWikiReference($services.wiki.currentWikiId)))
   {{error}}
     {{translation key="notifications.settings.error.notAdmin" /}}
+  {{/error}}
+#elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != ""  &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
+  {{error}}
+    {{translation key="notifications.settings.error.userReferenceNotSupported" /}}
+  {{/error}}
+#elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
+  {{error}}
+    {{translation key="notifications.settings.error.userReferenceAdminForbidden" /}}
   {{/error}}
 #else
 ######################################################
@@ -966,14 +991,21 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 ######################################################
 ### GLOBALS
 ######################################################
-#set ($userDoc = $xwiki.getDocument($xcontext.userReference))
+#if ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.target == 'user')
+  #set ($targetUser = $wikimacro.parameters.user.reference)
+  #set ($targetUserReference = $wikimacro.parameters.user)
+#else
+  #set ($targetUser = $xcontext.userReference)
+  #set ($targetUserReference = $services.user.currentUserReference)
+#end
+#set ($userDoc = $xwiki.getDocument($targetUser))
 ######################################################
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($xcontext.macro.params.target)"&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
@@ -1056,8 +1088,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 #macro(displayPreference $type $format)
   #set ($checked = '')
   #set ($preference = '')
-  #if (($xcontext.macro.params.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
-    ($xcontext.macro.params.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format)))
+  #if (($wikimacro.parameters.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
+    ($wikimacro.parameters.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $targetUserReference)))
     #set ($checked = 'checked="checked"')
   #end
   &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-filter="${type.filter}"&gt;
@@ -1090,6 +1122,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <name>Notifications Applications Preferences</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -1174,6 +1209,84 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>79c9b6f0-e62f-493d-9be6-49a58adc9e8d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>User reference of the user for which to display and manipulate the application preferences. This parameter is optional, only used if the target parameter is set to ##user## and default value is the context user. Note that for using this parameter, the context user needs administrator right on the given user reference.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>user</name>
+    </property>
+    <property>
+      <type>org.xwiki.user.UserReference</type>
     </property>
   </object>
 </xwikidoc>

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>XWikiUserNotificationsSheet</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -83,6 +86,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -118,6 +123,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -189,11 +196,11 @@
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -296,7 +303,7 @@
       (((
       (% id="Hnotifications.settings.email.title" %)
       = {{translation key="notifications.settings.email.title" /}} =
-      {{notificationsEmailPreferences /}}
+      {{notificationsEmailPreferences user="$doc.documentReference" /}}
       )))
       #end
       ######################################################
@@ -307,7 +314,7 @@
       (((
       (% id="Hnotifications.settings.watch.title" %)
       = {{translation key="notifications.settings.watch.title" /}} =
-      {{notificationsAutoWatchPreferences /}}
+      {{notificationsAutoWatchPreferences user="$doc.documentReference" /}}
       )))
       #end
       ######################################################
@@ -317,7 +324,7 @@
       (((
       (% id="Hnotifications.settings.applications.title" %)
       = {{translation key="notifications.settings.applications.title" /}} =
-      {{notificationsApplicationsPreferences /}}
+      {{notificationsApplicationsPreferences user="$doc.documentReference" /}}
       )))
       ######################################################
       ### FILTERS
@@ -331,7 +338,7 @@
 (((
   (% id="Hnotifications.settings.filters.preferences.title" %)
   = {{translation key="notifications.settings.filters.preferences.title" /}} =
-  {{notificationsFiltersPreferences /}}
+  {{notificationsFiltersPreferences user="$doc.documentReference" /}}
 )))
 #end
       {{/velocity}}
@@ -346,8 +353,8 @@
     <property>
       <parameters>id=notifications
 icon=bell
-# isActive: The user is seeing her own profile
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end
+# isActive: The user is seeing her own profile or can administrate the current document
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $services.security.authorization.hasAccess('admin', $doc.documentReference))true#{else}false#end
 priority=60</parameters>
     </property>
     <property>

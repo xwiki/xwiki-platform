@@ -308,6 +308,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
 
       var params = {
         action: 'createScopeFilterPreference',
+        target: 'user',
+        user: self.modal.data('user'),
         filterType: self.filterTypeSelector.val(),
         filterFormats: self.notificationFormatSelector.val().join(','),
         eventTypes: self.eventTypeSelector.val().join(','),
@@ -634,6 +636,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
   var userURL = $('.filterPreferences').attr('data-user-url');
+  var targetUser = $('.filterPreferences').attr('data-user');
 
   // Callback on livetable row printing
   $(document).on('xwiki:livetable:notificationFilterPreferencesLiveTable:newrow', function(event, data) {
@@ -645,6 +648,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.inProgress'))", 'inprogress');
           $.post(serviceURL, {
             action: 'deleteFilterPreference',
+            target: 'user',
+            user: targetUser,
             filterPreferenceId: data.data.filterPreferenceId,
             csrf: xm.form_token
           }).done(function() {
@@ -665,6 +670,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       $.post(serviceURL, {
         action: 'setFilterPreferenceEnabled',
         filterPreferenceId: data.data.filterPreferenceId,
+        target: 'user',
+        user: targetUser,
         enabled: state,
         csrf: xm.form_token
       }).done(function() {
@@ -842,7 +849,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -855,14 +862,14 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -871,7 +878,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -976,6 +983,16 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1024,7 +1041,23 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   {{info}}
     {{translation key="notifications.settings.filters.preferences.forGuest" /}}
   {{/info}}
+## FIXME: This check should not be needed with a proper API able to check rights on UserReference.
+## This should be improved later with such API.
+#elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
+  {{error}}
+    This macro only allows to handle DocumentUserReference references and you specified a $wikimacro.parameters.user.class.simpleName reference.
+  {{/error}}
+#elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
+  {{error}}
+    You don't have administration right on  $wikimacro.parameters.user.
+  {{/error}}
 #else
+## TODO: We should actually manipulate only UserReferences here.
+#if ("$!wikimacro.parameters.user" != "")
+  #set ($targetUser = $wikimacro.parameters.user.reference)
+#else
+  #set ($targetUser = $xcontext.userReference)
+#end
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
@@ -1036,7 +1069,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="filterPreferences xform" data-user-url="$escapetool.xml($services.rest.url($xcontext.userReference))"&gt;
+&lt;div class="filterPreferences xform" data-user-url="$escapetool.xml($services.rest.url($targetUser))" data-user="$services.model.serialize($targetUser)"&gt;
   &lt;div class="row"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))
@@ -1061,7 +1094,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     'rowCount'          : 10,
     'description'       : 'This table lists every filter registered for the current user.',
     'translationPrefix' : 'notifications.settings.filters.preferences.table.',
-    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($xcontext.userReference, 'default')}",
+    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($targetUser, 'default')}",
     'outputOnlyHtml'    : true
   })
 
@@ -1070,7 +1103,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
 ######################################################
 ### ADD FILTER MODAL
 ######################################################
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference"&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference" data-user="$services.model.serialize($targetUser)"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
@@ -1167,10 +1200,91 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       <name>Notifications Filters Preferences</name>
     </property>
     <property>
+      <priority/>
+    </property>
+    <property>
       <supportsInlineMode>0</supportsInlineMode>
     </property>
     <property>
       <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsFiltersPreferencesMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>38b562b3-61ed-40bf-8ab1-088260b579bc</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>User reference of the user for which to display and manipulate the filter preferences. This parameter is optional, default value is the context user. Note that for using this parameter, the context user needs administrator right on the given user reference.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>user</name>
+    </property>
+    <property>
+      <type>org.xwiki.user.UserReference</type>
     </property>
   </object>
 </xwikidoc>

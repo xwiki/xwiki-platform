@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsAutoWatchPreferencesMacro</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -102,6 +105,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -128,8 +133,10 @@
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {
-        action: target == 'user' ? 'setAutoWatchMode' : 'setDefaultAutoWatchMode',
+        action: 'setAutoWatchMode',
         mode: $(this).val(),
+        target: target,
+        user: input.data('user'),
         csrf: xm.form_token
       }).done(function() {
         notification.hide();
@@ -167,11 +174,51 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
@@ -183,21 +230,43 @@
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <prettyName>Macro content type</prettyName>
+        <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
@@ -245,6 +314,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -259,6 +338,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
@@ -273,9 +354,50 @@
       </visibility>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <code>{{velocity}}
-#if ($services.notification.watch.isEnabled() &amp;&amp; $xcontext.userReference &amp;&amp; ($xcontext.macro.params.target == 'user' || $hasAdmin))
+#if (!$services.notification.watch.isEnabled())
+  {{warning}}
+    {{localization key="notifications.settings.watch.disabled" /}}
+  {{warning}}
+#elseif (!$xcontext.userReference)
+  {{info}}
+    {{translation key="notifications.settings.watch.forGuest" /}}
+  {{/info}}
+#elseif ($wikimacro.parameters.target == 'wiki' &amp;&amp; !$hasAdmin)
+  {{error}}
+    {{translation key="notifications.settings.error.notAdmin" /}}
+  {{/error}}
+#elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
+  {{error}}
+    {{translation key="notifications.settings.error.userReferenceNotSupported" /}}
+  {{/error}}
+#elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
+  {{error}}
+    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="$wikimacro.parameters.user" /}}
+  {{/error}}
+#else
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro'))
+#if ("$!wikimacro.parameters.user" != "")
+    #set ($targetUser = $wikimacro.parameters.user.reference)
+#else
+    #set ($targetUser = $xcontext.userReference)
+#end
+#set ($dataUser = "")
+#if ($wikimacro.parameters.target == 'user')
+  #set ($mode = $services.notification.watch.getAutomaticWatchMode($targetUser))
+  #set ($dataUser = "data-user=""$services.model.serialize($targetUser)""")
+#else
+  #set ($mode = $services.notification.watch.defaultAutomaticWatchMode)
+#end
 {{html clean="false"}}
   &lt;div class="xform"&gt;
     &lt;dl&gt;
@@ -283,12 +405,7 @@
       &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        #if ($xcontext.macro.params.target == 'user')
-          #set ($mode = $services.notification.watch.automaticWatchMode)
-        #else
-          #set ($mode = $services.notification.watch.defaultAutomaticWatchMode)
-        #end
-        &lt;select class="notificationAutoWatchMode" data-target="$escapetool.xml($xcontext.macro.params.target)"&gt;
+        &lt;select class="notificationAutoWatchMode" data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;
           &lt;option value="NONE" #if($mode == 'NONE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE'))&lt;/option&gt;
           &lt;option value="ALL"  #if($mode == 'ALL')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL'))&lt;/option&gt;
           &lt;option value="MAJOR" #if($mode == 'MAJOR')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR'))&lt;/option&gt;
@@ -298,23 +415,14 @@
     &lt;/dl&gt;
   &lt;/div&gt;
 {{/html}}
-#elseif($xcontext.macro.params.target == 'wiki' &amp;&amp; !$hasAdmin)
-  {{error}}
-    {{translation key="notifications.settings.error.notAdmin" /}}
-  {{/error}}
-#elseif($xcontext.userReference)
-  {{warning}}
-    {{localization key="notifications.settings.watch.disabled" /}}
-  {{warning}}
-#else
-  {{info}}
-    {{translation key="notifications.settings.watch.forGuest" /}}
-  {{/info}}
 #end
 {{/velocity}}</code>
     </property>
     <property>
       <contentDescription/>
+    </property>
+    <property>
+      <contentJavaType/>
     </property>
     <property>
       <contentType>No content</contentType>
@@ -330,6 +438,9 @@
     </property>
     <property>
       <name>Notifications Auto Watch Preferences</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -390,18 +501,108 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>user</defaultValue>
     </property>
     <property>
-      <description> </description>
+      <description/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>target</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d9ad825d-7241-4cc5-8ea9-3e4fc008b8a6</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>User reference of the user for which to display and manipulate the autowatch preferences. This parameter is optional, only used if the target parameter is set to ##user## and default value is the context user. Note that for using this parameter, the context user needs administrator right on the given user reference.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>user</name>
+    </property>
+    <property>
+      <type>org.xwiki.user.UserReference</type>
     </property>
   </object>
 </xwikidoc>

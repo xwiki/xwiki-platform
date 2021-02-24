@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -42,6 +43,10 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 /**
  * Script service for the notification filters.
@@ -68,6 +73,35 @@ public class NotificationFiltersScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * Utility method to convert a given {@link UserReference} to {@link DocumentReference}.
+     * This conversion is only possible if the given UserReference is a DocumentUserReference, or the instance of
+     * {@link CurrentUserReference}. In other cases this will throw an exception.
+     * This method should be removed once all APIs will use {@link UserReference}.
+     * @param userReference the reference for which to retrieve a DocumentReference.
+     * @return the context document reference if the user reference is null or the current user reference, else
+     *         return the document reference contains in the DocumentUserReference.
+     * @throws NotificationException if the user reference is not an instance of DocumentUserReference and not the
+     *                               CurrentUserReference.
+     * @deprecated Since 13.2RC1: the various API using DocumentReference for users should be refactored
+     *              to use UserReference directly.
+     */
+    @Deprecated
+    private DocumentReference convertReference(UserReference userReference) throws NotificationException
+    {
+        DocumentReference result;
+        if (userReference == null || userReference == CurrentUserReference.INSTANCE) {
+            result = documentAccessBridge.getCurrentUserReference();
+        } else if (userReference instanceof DocumentUserReference) {
+            result = ((DocumentUserReference) userReference).getReference();
+        } else {
+            throw new NotificationException(
+                String.format("This should only be used with DocumentUserReference, "
+                    + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
+        }
+        return result;
+    }
+
+    /**
      * Get a set of notification filters that can be toggled by the current user.
      *
      * @return a set of notification filters that are toggleable
@@ -75,9 +109,24 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public Set<NotificationFilter> getToggleableNotificationFilters() throws NotificationException
     {
+        return getToggleableNotificationFilters(CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Get a set of notification filters that can be toggled by the given user.
+     *
+     * @param userReference the user for which to retrieve the notification filters.
+     * @return a set of notification filters that are toggleable
+     * @throws NotificationException if an error occurs
+     * @since 13.2RC1
+     */
+    @Unstable
+    public Set<NotificationFilter> getToggleableNotificationFilters(UserReference userReference)
+        throws NotificationException
+    {
         return notificationFilterManager.getToggleableFilters(
-                notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference(), false)).collect(
-                Collectors.toSet());
+            notificationFilterManager.getAllFilters(this.convertReference(userReference), false)).collect(
+            Collectors.toSet());
     }
 
     /**
@@ -88,7 +137,19 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public Collection<NotificationFilter> getFilters() throws NotificationException
     {
-        return notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference(), false);
+        return getFilters(CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * @param userReference the user for which to retrieve the filters.
+     * @return a collection of every {@link NotificationFilter} available for the given user.
+     * @throws NotificationException if the reference is not correct or if an error happens when retrieving the filters
+     * @since 13.2RC1
+     */
+    @Unstable
+    public Collection<NotificationFilter> getFilters(UserReference userReference) throws NotificationException
+    {
+        return notificationFilterManager.getAllFilters(convertReference(userReference), false);
     }
 
     /**
@@ -104,10 +165,26 @@ public class NotificationFiltersScriptService implements ScriptService
     public Set<NotificationFilterPreference> getFilterPreferences(NotificationFilter filter)
             throws NotificationException
     {
+        return getFilterPreferences(filter, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Get a collection of notification filters preferences that are available for the given user and that corresponds
+     * to the given filter.
+     *
+     * @param filter the filter associated to the preferences
+     * @param userReference the user for which to retrieve the filter
+     * @return a set of {@link NotificationFilterPreference}
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.2RC1
+     */
+    @Unstable
+    public Set<NotificationFilterPreference> getFilterPreferences(NotificationFilter filter,
+        UserReference userReference) throws NotificationException
+    {
         return notificationFilterPreferenceManager.getFilterPreferences(
-                notificationFilterPreferenceManager.getFilterPreferences(
-                        documentAccessBridge.getCurrentUserReference()),
-                filter
+            notificationFilterPreferenceManager.getFilterPreferences(convertReference(userReference)), filter
         ).collect(Collectors.toSet());
     }
 
@@ -136,8 +213,23 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void deleteFilterPreference(String filterPreferenceId) throws NotificationException
     {
-        notificationFilterPreferenceManager.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(),
-                filterPreferenceId);
+        deleteFilterPreference(filterPreferenceId, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Delete a filter preference for the given user.
+     * @param filterPreferenceId name of the filter preference
+     * @param userReference the user for which to delete the filter preference.
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.2RC1
+     */
+    @Unstable
+    public void deleteFilterPreference(String filterPreferenceId, UserReference userReference)
+        throws NotificationException
+    {
+        notificationFilterPreferenceManager.deleteFilterPreference(convertReference(userReference),
+            filterPreferenceId);
     }
 
     /**
@@ -150,8 +242,24 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled) throws NotificationException
     {
-        notificationFilterPreferenceManager.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
-                filterPreferenceId, enabled);
+        this.setFilterPreferenceEnabled(filterPreferenceId, enabled, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Enable or disable a filter preference.
+     * @param filterPreferenceId id of the filter preference
+     * @param enabled either or not the filter preference should be enabled
+     * @param userReference the user for which to enable or disable a filter.
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.2RC1
+     */
+    @Unstable
+    public void setFilterPreferenceEnabled(String filterPreferenceId, boolean enabled, UserReference userReference)
+        throws NotificationException
+    {
+        notificationFilterPreferenceManager.setFilterPreferenceEnabled(convertReference(userReference),
+            filterPreferenceId, enabled);
     }
 
     /**
@@ -166,9 +274,22 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void setStartDate(Date startDate) throws NotificationException
     {
-        notificationFilterPreferenceManager.setStartDateForUser(
-                documentAccessBridge.getCurrentUserReference(), startDate
-        );
+        this.setStartDate(startDate, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Update the start date for every filter preference that given user has.
+     *
+     * @param startDate the new start date
+     * @param userReference the user for which to set the start date
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.2RC1
+     */
+    @Unstable
+    public void setStartDate(Date startDate, UserReference userReference) throws NotificationException
+    {
+        notificationFilterPreferenceManager.setStartDateForUser(convertReference(userReference), startDate);
     }
 
     /**
@@ -186,7 +307,26 @@ public class NotificationFiltersScriptService implements ScriptService
     public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
             List<String> eventTypes, EntityReference reference) throws NotificationException
     {
-        cachedModelBridge.createScopeFilterPreference(documentAccessBridge.getCurrentUserReference(),
-                type, formats, eventTypes, reference);
+        createScopeFilterPreference(type, formats, eventTypes, reference, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Create a scope notification filter preference for the given user.
+     *
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventTypes the event types concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @param userReference the user for which to create the filter
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.2RC1
+     */
+    @Unstable
+    public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
+        List<String> eventTypes, EntityReference reference, UserReference userReference) throws NotificationException
+    {
+        cachedModelBridge.createScopeFilterPreference(convertReference(userReference), type, formats, eventTypes,
+            reference);
     }
 }

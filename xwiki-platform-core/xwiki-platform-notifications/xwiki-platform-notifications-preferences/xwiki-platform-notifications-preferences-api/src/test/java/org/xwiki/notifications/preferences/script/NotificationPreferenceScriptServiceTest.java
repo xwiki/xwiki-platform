@@ -29,13 +29,12 @@ import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -47,17 +46,27 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -66,33 +75,33 @@ import static org.mockito.Mockito.when;
  * @since 9.7RC1
  * @version $Id$
  */
-// @formatter:off
 @ComponentList({
-    TargetableNotificationPreferenceBuilder.class
+    DefaultTargetableNotificationPreferenceBuilder.class
 })
-// @formatter:on
-public class NotificationPreferenceScriptServiceTest
+@ComponentTest
+class NotificationPreferenceScriptServiceTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<NotificationPreferenceScriptService> mocker =
-            new MockitoComponentMockingRule<>(NotificationPreferenceScriptService.class);
+    @InjectMockComponents
+    private NotificationPreferenceScriptService scriptService;
 
+    @MockComponent
     private NotificationPreferenceManager notificationPreferenceManager;
+
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
     private ContextualAuthorizationManager authorizationManager;
+
+    @MockComponent
     private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
-        notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        authorizationManager = mocker.getInstance(ContextualAuthorizationManager.class);
-        targetableNotificationPreferenceBuilderProvider = mock(Provider.class);
+
         when(targetableNotificationPreferenceBuilderProvider.get())
-                .thenReturn(new DefaultTargetableNotificationPreferenceBuilder());
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class,
-                TargetableNotificationPreferenceBuilder.class), targetableNotificationPreferenceBuilderProvider);
+            .thenReturn(componentManager.getInstance(TargetableNotificationPreferenceBuilder.class));
     }
 
     private class NotificationPreferenceImpl extends AbstractNotificationPreference
@@ -106,7 +115,7 @@ public class NotificationPreferenceScriptServiceTest
     }
 
     @Test
-    public void saveNotificationPreferences() throws Exception
+    void saveNotificationPreferences() throws Exception
     {
         DocumentReference userRef = new DocumentReference("xwiki", "XWiki", "UserA");
 
@@ -135,20 +144,21 @@ public class NotificationPreferenceScriptServiceTest
                 return true;
         }).when(notificationPreferenceManager).savePreferences(any(List.class));
 
-        mocker.getComponentUnderTest().saveNotificationPreferences(
+        this.scriptService.saveNotificationPreferences(
                 IOUtils.toString(getClass().getResourceAsStream("/preferences.json")), userRef);
 
         assertTrue(isOk.booleanValue());
     }
 
     @Test
-    public void isEventTypeEnabled() throws Exception
+    void isEventTypeEnabled() throws Exception
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(user);
+        DocumentUserReference documentUserReference = new DocumentUserReference(user, null);
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
-        assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.ALERT));
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, documentUserReference));
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
@@ -165,17 +175,40 @@ public class NotificationPreferenceScriptServiceTest
         when(pref2.isNotificationEnabled()).thenReturn(true);
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Arrays.asList(pref1, pref2));
-        assertTrue(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.EMAIL));
+
+        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, documentUserReference));
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL, documentUserReference));
+        verify(this.documentAccessBridge, never()).getCurrentUserReference();
+
+        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
+            CurrentUserReference.INSTANCE));
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL,
+            CurrentUserReference.INSTANCE));
+
+        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT));
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL));
+        verify(this.documentAccessBridge, times(4)).getCurrentUserReference();
+
+        NotificationException notificationException = assertThrows(NotificationException.class,
+            () -> this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, new UserReference()
+            {
+                @Override
+                public boolean isGlobal()
+                {
+                    return false;
+                }
+            }));
+        assertEquals("The method isEventTypeEnabled should only be used with DocumentUserReference, "
+            + "the given reference was a []", notificationException.getMessage());
     }
 
     @Test
-    public void isEventTypeEnabledForWiki() throws Exception
+    void isEventTypeEnabledForWiki() throws Exception
     {
         WikiReference wiki = new WikiReference("whatever");
 
         when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(Collections.emptyList());
-        assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.ALERT,
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
                 wiki.getName()));
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
@@ -193,14 +226,14 @@ public class NotificationPreferenceScriptServiceTest
         when(pref2.isNotificationEnabled()).thenReturn(true);
 
         when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(Arrays.asList(pref1, pref2));
-        assertTrue(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.ALERT,
+        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
                 wiki.getName()));
-        assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.EMAIL,
+        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL,
                 wiki.getName()));
     }
 
     @Test
-    public void saveNotificationPreferencesForCurrentWikiWithoutRight() throws Exception
+    void saveNotificationPreferencesForCurrentWikiWithoutRight() throws Exception
     {
         when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(
                 new DocumentReference("wikiA", "SpaceA", "PageA"));
@@ -210,7 +243,7 @@ public class NotificationPreferenceScriptServiceTest
         String json = "";
         Exception caughtException = null;
         try {
-            mocker.getComponentUnderTest().saveNotificationPreferencesForCurrentWiki(json);
+            this.scriptService.saveNotificationPreferencesForCurrentWiki(json);
         } catch (Exception ex) {
             caughtException = ex;
         }
@@ -220,7 +253,7 @@ public class NotificationPreferenceScriptServiceTest
     }
 
     @Test
-    public void saveNotificationPreferencesWithoutRight() throws Exception
+    void saveNotificationPreferencesWithoutRight() throws Exception
     {
         DocumentReference userDoc = new DocumentReference("wikiA", "SpaceA", "UserA");
         AccessDeniedException e = mock(AccessDeniedException.class);
@@ -229,7 +262,7 @@ public class NotificationPreferenceScriptServiceTest
         String json = "";
         Exception caughtException = null;
         try {
-            mocker.getComponentUnderTest().saveNotificationPreferences(json, userDoc);
+            this.scriptService.saveNotificationPreferences(json, userDoc);
         } catch (Exception ex) {
             caughtException = ex;
         }

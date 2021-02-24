@@ -32,7 +32,8 @@
   <description>Handle notifications user preferences</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
-    </properties>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -45,6 +46,13 @@
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
+    </dependency>
+    <!-- FIXME: This should be removed once NotificationPreferenceScriptService doesn't use
+    DocumentUserReference anymore -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

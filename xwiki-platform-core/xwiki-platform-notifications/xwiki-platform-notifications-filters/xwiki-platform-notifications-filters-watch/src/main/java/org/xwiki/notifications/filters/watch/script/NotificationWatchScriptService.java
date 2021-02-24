@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
@@ -35,6 +36,9 @@ import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 /**
  * Script Service to handle the watched entities. We call `Watched Entities` the locations or the users for that we
@@ -167,6 +171,35 @@ public class NotificationWatchScriptService implements ScriptService
     }
 
     /**
+     * Utility method to convert a given {@link UserReference} to {@link DocumentReference}.
+     * This conversion is only possible if the given UserReference is a DocumentUserReference, or the instance of
+     * {@link CurrentUserReference}. In other cases this will throw an exception.
+     * This method should be removed once all APIs will use {@link UserReference}.
+     * @param userReference the reference for which to retrieve a DocumentReference.
+     * @return the context document reference if the user reference is null or the current user reference, else
+     *         return the document reference contains in the DocumentUserReference.
+     * @throws NotificationException if the user reference is not an instance of DocumentUserReference and not the
+     *                               CurrentUserReference.
+     * @deprecated Since 13.2RC1: the various API using DocumentReference for users should be refactored
+     *              to use UserReference directly.
+     */
+    @Deprecated
+    private DocumentReference convertReference(UserReference userReference) throws NotificationException
+    {
+        DocumentReference result;
+        if (userReference == null || userReference == CurrentUserReference.INSTANCE) {
+            result = documentAccessBridge.getCurrentUserReference();
+        } else if (userReference instanceof DocumentUserReference) {
+            result = ((DocumentUserReference) userReference).getReference();
+        } else {
+            throw new NotificationException(
+                String.format("This should only be used with DocumentUserReference, "
+                    + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
+        }
+        return result;
+    }
+
+    /**
      * @return the automatic watch mode configured for the current user
      * @since 9.9RC1
      * @since 9.8.2
@@ -174,6 +207,18 @@ public class NotificationWatchScriptService implements ScriptService
     public AutomaticWatchMode getAutomaticWatchMode()
     {
         return configuration.getAutomaticWatchMode(documentAccessBridge.getCurrentUserReference());
+    }
+
+    /**
+     * @param userReference the user for which to retrieve the watch mode
+     * @return the automatic watch mode configured for the given user
+     * @since 13.2RC1
+     */
+    @Unstable
+    public AutomaticWatchMode getAutomaticWatchMode(UserReference userReference)
+        throws NotificationException
+    {
+        return configuration.getAutomaticWatchMode(this.convertReference(userReference));
     }
 
     /**

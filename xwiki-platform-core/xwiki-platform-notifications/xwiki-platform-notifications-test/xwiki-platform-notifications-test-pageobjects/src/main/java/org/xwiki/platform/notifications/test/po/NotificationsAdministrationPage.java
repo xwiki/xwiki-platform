@@ -1,6 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,35 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.platform.notifications.test.po;
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.WebHome" locale="">
-  <web>XWiki.Notifications.Code</web>
-  <name>WebHome</name>
-  <language/>
-  <defaultLanguage/>
-  <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Notifications.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <version>1.1</version>
-  <title/>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
-  <content>{{documentTree root="document:XWiki.Notifications.Code.WebHome" filterHiddenDocuments="false"/}}</content>
-</xwikidoc>
+import org.xwiki.stability.Unstable;
+
+/**
+ * Represents the Notifications preferences in administration.
+ *
+ * @version $Id$
+ * @since 13.2R1
+ */
+@Unstable
+public class NotificationsAdministrationPage extends AbstractNotificationsSettingsPage
+{
+    /**
+     * Default constructor.
+     */
+    public NotificationsAdministrationPage()
+    {
+        this.initializeApplications();
+    }
+
+    /**
+     * Go to the administration page related to notifications and create the appropriate instance.
+     * @return the appropriate instance of {@link NotificationsAdministrationPage}.
+     */
+    public static NotificationsAdministrationPage gotoPage()
+    {
+        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin", "section=Notifications");
+        return new NotificationsAdministrationPage();
+    }
+}

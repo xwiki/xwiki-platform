@@ -22,13 +22,9 @@ package org.xwiki.wiki.internal.descriptor.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -63,7 +59,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class DefaultWikiDescriptorBuilderTest
+class DefaultWikiDescriptorBuilderTest
 {
     @RegisterExtension
     public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
@@ -72,17 +68,13 @@ public class DefaultWikiDescriptorBuilderTest
     private MockitoOldcore oldcore;
 
     @MockComponent
-    @Named("user")
-    private DocumentReferenceResolver<String> userReferenceResolver;
-
-    @MockComponent
     private WikiPropertyGroupManager wikiPropertyGroupManager;
 
     @InjectMockComponents
     private DefaultWikiDescriptorBuilder builder;
 
     @Test
-    public void buildDescriptorObject() throws Exception
+    void buildDescriptorObject() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();
@@ -113,9 +105,6 @@ public class DefaultWikiDescriptorBuilderTest
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)).thenReturn("myOwner");
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).thenReturn("myDescription");
 
-        DocumentReference ownerRef = new DocumentReference("subwiki1", "XWiki", "myOwner");
-        when(userReferenceResolver.resolve("myOwner", new WikiReference("subwiki1"))).thenReturn(ownerRef);
-
         // Test
         WikiDescriptor result = this.builder.buildDescriptorObject(objects, document);
 
@@ -134,7 +123,7 @@ public class DefaultWikiDescriptorBuilderTest
     }
 
     @Test
-    public void buildDescriptorObjectWhenInvalidWiki() throws Exception
+    void buildDescriptorObjectWhenInvalidWiki() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();
@@ -150,7 +139,7 @@ public class DefaultWikiDescriptorBuilderTest
     }
 
     @Test
-    public void buildDescriptorObjectWhenException() throws Exception
+    void buildDescriptorObjectWhenException() throws Exception
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();

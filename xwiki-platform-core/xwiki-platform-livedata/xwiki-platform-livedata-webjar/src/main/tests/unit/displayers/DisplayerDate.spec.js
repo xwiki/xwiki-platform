@@ -18,11 +18,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+jest.mock("daterangepicker", function () {
+  console.log(arguments)
+});
+
+jest.mock("moment", function () {
+  return function () {
+    return {
+      format() {
+        return "formated date"
+      }
+    }
+  }
+});
+
+jest.mock("jquery", function () {
+  console.log(arguments)
+});
+
 import {mount} from '@vue/test-utils'
-import BaseDisplayer from "../../../displayers/BaseDisplayer";
+import DisplayerDate from "../../../displayers/DisplayerDate";
 
 function initWrapper(mockLogic, props) {
-  const wrapper = mount(BaseDisplayer, {
+  return mount(DisplayerDate, {
     propsData: Object.assign({
       viewOnly: false,
       isView: true,
@@ -33,11 +51,10 @@ function initWrapper(mockLogic, props) {
       }
     }, props || {}),
     provide: {logic: mockLogic}
-  })
-  return wrapper;
+  });
 }
 
-describe('BaseDisplayer.vue', () => {
+describe('DisplayerDate.vue', () => {
   it('Renders an entry in view mode', () => {
     const mockLogic = {
       isEditable() {
@@ -45,36 +62,20 @@ describe('BaseDisplayer.vue', () => {
       }
     };
     const wrapper = initWrapper(mockLogic);
-
-    expect(wrapper.text()).toMatch('entryA1')
+    expect(wrapper.text()).toMatch('formated date')
   })
 
-  it('Send event on double click', async () => {
+  it('Switch to edit when double click', async () => {
     const mockLogic = {
       isEditable() {
         return true;
       }
     };
-
     const wrapper = initWrapper(mockLogic);
 
-    await wrapper.trigger('dblclick');
+    await wrapper.trigger('dblclick')
 
-    expect(wrapper.emitted()).toEqual({"update:isView": [[false]]})
+    const input = wrapper.find('.editor-date');
+    expect(input.element.value).toMatch('formated date')
   })
-
-  it('Renders an entry in edit mode', () => {
-    const mockLogic = {
-      isEditable() {
-        return true;
-      }
-    };
-
-    const wrapper = initWrapper(mockLogic, {
-      isView: false
-    });
-
-    expect(wrapper.find('input').element.value).toMatch('entryA1')
-  })
-
 })

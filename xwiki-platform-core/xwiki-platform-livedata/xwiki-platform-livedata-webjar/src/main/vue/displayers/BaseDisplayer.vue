@@ -28,10 +28,10 @@
 -->
 <template>
   <div
-    :class="isView ? 'view' : 'edit'"
-    @dblclick="edit"
-    @keypress.self.enter="edit"
-    :tabindex="isEditable ? 0 : ''"
+      :class="isView ? 'view' : 'edit'"
+      @dblclick="toggleEdit"
+      @keypress.self.enter="toggleEdit"
+      :tabindex="isEditable ? 0 : ''"
   >
     <!--
       The base displayer contains two slots: `viewer` and `editor`.
@@ -40,8 +40,8 @@
 
     <!-- The slot containing the displayer Viewer widget -->
     <slot
-      name="viewer"
-      v-if="isView"
+        name="viewer"
+        v-if="isView"
     >
       <!--
         Default Viewer widget
@@ -55,8 +55,8 @@
 
     <!-- The slot containing the displayer Editor widget -->
     <slot
-      name="editor"
-      v-if="!isView"
+        name="editor"
+        v-if="!isView"
     >
       <!--
         Default Editor widget
@@ -66,14 +66,14 @@
         its Viewer widget, as a default Editor widget would still be provided
       -->
       <input
-        class="default-input"
-        type="text"
-        size="1"
-        v-autofocus
-        :value="value"
-        @focusout="applyEdit($event.target.value)"
-        @keypress.enter="applyEdit($event.target.value)"
-        @keydown.esc="cancelEdit"
+          class="default-input"
+          type="text"
+          size="1"
+          v-autofocus
+          :value="value"
+          @focusout="applyEdit($event.target.value)"
+          @keypress.enter="applyEdit($event.target.value)"
+          @keydown.esc="cancelEdit"
       />
     </slot>
 
@@ -97,17 +97,14 @@ export default {
       type: Boolean,
       default: false,
     },
-  },
-
-  data () {
-    return {
-      // Whether the displayer is in view or edit mode
-      isView: true,
-    };
+    isView: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {
-    isEditable () {
+    isEditable() {
       return this.logic.isEditable({
         entry: this.entry,
         propertyId: this.propertyId,
@@ -119,26 +116,50 @@ export default {
   // The methods for specific displayers can be found in the displayerMixin
   methods: {
 
+    toggleEdit() {
+      this.$emit('update:isView', false);
+    },
+    
+    toggleView() {
+      this.$emit('update:isView', true);
+    },
+    
     // Trigger View mode (switch from Editor widget to Viewer widget)
     // This should rarely be used directly as it does not validate modified data
     // Used the `applyEdit` method instead (found in the displayerMixin)
     // which call this view function after validating data
-    view () {
-      if (this.isView) { return; }
-      this.isView = true;
+    view() {
+      if (this.isView) {
+        return;
+      }
       this.$el.focus();
     },
 
-    // Trigger Edit mode (switch from Editor widget to Viewer widget)
-    // This function is only used for the baseDisplayer logic
-    // and should not be used inside a specific displayer
-    edit () {
-      if (!this.isEditable) { return; }
-      if (!this.isView) { return; }
-      this.isView = false;
+    // This method should be used to apply edit and go back to view mode
+    // It validate the entered value, ensuring that is is valid for the server
+    applyEdit (newValue) {
+      this.logic.setValue({
+        entry: this.entry,
+        propertyId: this.propertyId,
+        value: newValue
+      });
+      // Go back to view mode
+      this.toggleView();
     },
 
+    // This method should be used to cancel edit and go back to view mode
+    // This is like applyEdit but it does not save the entered value
+    cancelEdit () {
+      // Go back to view mode
+      this.toggleView();
+    },
   },
+
+  watch: {
+    isView: function(newIsView) {
+      if(newIsView) this.view();
+    }
+  }
 
 };
 

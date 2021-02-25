@@ -18,7 +18,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-module.exports = {
-  preset: '@vue/cli-plugin-unit-jest/presets/no-babel',
-  modulePaths: ['tests/mocks']
-}
+import {mount} from '@vue/test-utils'
+import DisplayerText from "../../../displayers/DisplayerText";
+
+describe('DisplayerText.vue', () => {
+  it('Renders an entry in view mode', () => {
+    const mockLogic = {
+      isEditable() {
+        return true;
+      }
+    };
+
+    const wrapper = mount(DisplayerText, {
+      propsData: {
+        viewOnly: false,
+        isView: true,
+        propertyId: 'propertyIdTest',
+        entry: {
+          propertyIdTest: 'entryA1',
+          propertyIdTest2: 'entryB1'
+        }
+      },
+      provide: {logic: mockLogic}
+    })
+    expect(wrapper.text()).toMatch('entryA1')
+  })
+})

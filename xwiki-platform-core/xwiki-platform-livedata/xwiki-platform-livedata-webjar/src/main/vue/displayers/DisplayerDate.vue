@@ -32,6 +32,7 @@
     class="displayer-date"
     :property-id="propertyId"
     :entry="entry"
+    :is-view.sync="isView"
   >
 
     <!-- Provide the Date Viewer widget to the `viewer` slot -->
@@ -77,6 +78,11 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
+  data() {
+    return {
+      isView: true
+    }
+  },
 
   computed: {
     format () {

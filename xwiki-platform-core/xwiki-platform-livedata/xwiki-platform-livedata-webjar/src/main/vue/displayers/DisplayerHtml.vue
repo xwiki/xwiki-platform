@@ -31,17 +31,18 @@
     all the displayer default behavior
   -->
   <BaseDisplayer
-    class="displayer-html"
-    :property-id="propertyId"
-    :entry="entry"
+      class="displayer-html"
+      :property-id="propertyId"
+      :entry="entry"
+      :is-view.sync="isView"
   >
 
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-        <div
-            class="html-wrapper"
-            v-html="value"
-        ></div>
+      <div
+          class="html-wrapper"
+          v-html="value"
+      ></div>
     </template>
 
     <!-- Provide the Html Editor widget to the `editor` slot -->
@@ -63,6 +64,12 @@ export default {
 
   components: {
     BaseDisplayer,
+  },
+
+  data() {
+    return {
+      isView: true
+    }
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component

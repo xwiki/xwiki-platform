@@ -72,28 +72,6 @@ export default {
     },
   },
 
-  methods: {
-    // This method should be used to apply edit and go back to view mode
-    // It validate the entered value, ensuring that is is valid for the server
-    applyEdit (newValue) {
-      this.logic.setValue({
-        entry: this.entry,
-        propertyId: this.propertyId,
-        value: newValue
-      });
-      // Go back to view mode
-      // (there might be a cleaner way to do this)
-      this.$el.__vue__.view();
-    },
-
-    // This method should be used to cancel edit and go back to view mode
-    // This is like applyEdit but it does not save the entered value
-    cancelEdit () {
-      // Go back to view mode
-      // (there might be a cleaner way to do this)
-      this.$el.__vue__.view();
-    },
-
-  },
+  methods: {},
 
 };

@@ -30,9 +30,10 @@
     all the displayer default behavior
   -->
   <BaseDisplayer
-    class="displayer-link"
-    :property-id="propertyId"
-    :entry="entry"
+      class="displayer-link"
+      :property-id="propertyId"
+      :entry="entry"
+      :is-view.sync="isView"
   >
 
     <!-- Provide the Link Viewer widget to the `viewer` slot -->
@@ -62,12 +63,18 @@ export default {
     BaseDisplayer,
   },
 
+  data() {
+    return {
+      isView: true
+    }
+  },
+
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
   computed: {
     // The link href taken from the propertyHref property of the entry
-    href () {
+    href() {
       // propertyHref can have multiple values, in which case we use the first that is set on the live data entry.
       let values = this.config.propertyHref;
       if (typeof values === 'string') {
@@ -85,7 +92,7 @@ export default {
       // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#properties
       // See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#interactive_content
       const interactiveContent = 'a, button, details, embed, iframe, keygen, label, select, textarea, audio[controls],'
-        + 'img[usemap], input, menu[type=toolbar], object[usemap], video[controls]';
+          + 'img[usemap], input, menu[type=toolbar], object[usemap], video[controls]';
       [...container.querySelectorAll(interactiveContent)].forEach(node => node.parentNode.removeChild(node));
       return container.innerHTML.trim();
     }

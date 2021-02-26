@@ -27,12 +27,15 @@
   border: 1px solid $theme.borderColor;
   font-family: Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
-  overflow: visible;
+  overflow: auto;
 }
 
 .diff-container table {
   /* Prevent scroll bars when the table fills the entire width. */
   margin: 0;
+  /* Having a table size of 100% leads to the display of an horizontal scroll bar when a td has a border. A 99.99% width
+     is visually indistinguishable but prevent this overflow. */
+  width: 99.99%
 }
 
 .diff-container td {

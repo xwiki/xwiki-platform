@@ -114,7 +114,9 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
         itemsEditor.add("", "XWiki");
 
         // Change the label of the last added item.
-        itemsEditor.setLabel("XWiki", "XWiki Enterprise");
+        // The label of this item must be short, otherwise the call to moveBefore below fails to move this item in 
+        // first position when the screen width is small (see XWIKI-18343).
+        itemsEditor.setLabel("XWiki", "XS");
 
         // Move the last item before the first.
         itemsEditor.moveBefore("XWiki", "value1");

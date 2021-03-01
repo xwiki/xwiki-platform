@@ -48,13 +48,24 @@ public abstract class AbstractRegistrationPage extends BasePage
         fillRegisterForm("John", "Smith", "JohnSmith", "WeakPassword", "WeakPassword", "johnsmith@xwiki.org");
     }
 
+    /**
+     * Fill the registration form for the creation of a new user with the provided parameters. When a parameter is
+     * {@code null}, the corresponding field stays unchanged.
+     *
+     * @param firstName the first name of the new user
+     * @param lastName the last name of the new user
+     * @param username the username of the new user
+     * @param password the password of the new user
+     * @param confirmPassword the confirmation password of the new user
+     * @param email the email of the new user
+     */
     public void fillRegisterForm(final String firstName, final String lastName, final String username,
         final String password, final String confirmPassword, final String email)
     {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         // remove the onfocus on login, to avoid any problem to put the value.
-        getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
-            "}catch(err){}");
+        getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " 
+            + "}catch(err){}");
         if (firstName != null) {
             map.put("register_first_name", firstName);
         }

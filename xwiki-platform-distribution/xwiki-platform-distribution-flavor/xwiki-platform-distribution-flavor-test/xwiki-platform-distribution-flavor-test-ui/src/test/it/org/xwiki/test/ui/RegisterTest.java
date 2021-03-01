@@ -88,12 +88,13 @@ public class RegisterTest extends AbstractTest
 
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testRegisterExistingUser()
     {
-        // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value filled from the previously run test).
+        // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value
+        // filled from the previously run test).
         this.registrationPage.fillRegisterForm("", "", "Admin", "password", "password", "");
         // Can't use validateAndRegister here because user existence is not checked by LiveValidation.
         Assert.assertFalse(tryToRegister());

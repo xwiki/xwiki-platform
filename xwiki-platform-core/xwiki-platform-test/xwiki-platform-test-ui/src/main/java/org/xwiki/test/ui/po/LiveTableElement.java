@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -31,6 +32,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents the actions possible on a livetable.
@@ -304,11 +306,73 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        String xpath = String.format("//table[@id = '%s']//th[contains(@class, 'xwiki-livetable-display-header-text')"
-            + " and contains(@class, 'sortable') and normalize-space(.) = '%s']", this.livetableId, columnTitle);
-        getDriver().findElement(By.xpath(xpath)).click();
+        getHeaderByColumnTitle(columnTitle).click();
 
         waitUntilReady();
+    }
+
+    /**
+     * Sorts the live table on the specified column, by ascending order.
+     *
+     * @param columnTitle the column to sort on
+     * @since 13.2RC1
+     * @since 12.10.5
+     * @since 12.6.8
+     */
+    @Unstable
+    public void sortAscending(String columnTitle)
+    {
+        WebElement element = getHeaderByColumnTitle(columnTitle);
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        boolean isSelected = strings.contains("selected");
+        boolean isAsc = strings.contains("asc");
+
+        /*
+         * isSelected indicates if the column is the one currently sorted.
+         * If the column is the one currently sorted, and is in ascending order, we do nothing.
+         * If the column is already sorted in descending order, or if it is not the one currently sorted, but was
+         * previously sorted in ascending order, we sort only once.
+         * If the column is not already sorted, and was previously sorted in descending order, clicking sorting twice
+         * is required to sort in ascending order.
+         */
+        if (isSelected && !isAsc || (!isSelected && isAsc)) {
+            sortBy(columnTitle);
+        } else if (!isSelected) {
+            sortBy(columnTitle);
+            sortBy(columnTitle);
+        }
+    }
+
+    /**
+     * Sorts the live table on the specified column, by ascending order.
+     *
+     * @param columnTitle the column to sort on
+     * @since 13.2RC1
+     * @since 12.10.5
+     * @since 12.6.8
+     */
+    @Unstable
+    public void sortDescending(String columnTitle)
+    {
+        WebElement element = getHeaderByColumnTitle(columnTitle);
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        boolean isSelected = strings.contains("selected");
+        boolean isDesc = strings.contains("desc");
+
+        /*
+         * isSelected indicates if the column is the one currently sorted.
+         * If the column is the one currently sorted, and is in descending order, we do nothing.
+         * If the column is already sorted in ascending order, or if it is not the one currently sorted, but was
+         * previously sorted in descending order, we sort only once.
+         * If the column is not already sorted, and was previously sorted in ascending order, clicking sorting twice
+         * is required to sort in descending order.
+         */
+        if (isSelected && !isDesc || (!isSelected && isDesc)) {
+            sortBy(columnTitle);
+        } else if (!isSelected) {
+            sortBy(columnTitle);
+            sortBy(columnTitle);
+        }
     }
 
     /**
@@ -322,5 +386,12 @@ public class LiveTableElement extends BaseElement
     {
         WebElement rowElement = getRow(rowNumber);
         rowElement.findElement(By.xpath("td/form//input[@name = '" + actionName + "']")).click();
+    }
+
+    private WebElement getHeaderByColumnTitle(String columnTitle)
+    {
+        String xpath = String.format("//table[@id = '%s']//th[contains(@class, 'xwiki-livetable-display-header-text')"
+            + " and contains(@class, 'sortable') and normalize-space(.) = '%s']", this.livetableId, columnTitle);
+        return getDriver().findElement(By.xpath(xpath));
     }
 }

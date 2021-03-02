@@ -82,10 +82,9 @@ class AddEntryIT
         homePage = new ApplicationHomePage();
         LiveTableElement entriesLiveTable = homePage.getEntriesLiveTable();
         entriesLiveTable.waitUntilReady();
-        // Makes sure the test entry is displayed at the top of the first page by sorting the date twice (descending
-        // order).
-        entriesLiveTable.sortBy(DATE_COLUMN_TITLE);
-        entriesLiveTable.sortBy(DATE_COLUMN_TITLE);
+        // Makes sure the test entry is displayed at the top of the first page by sorting the date column by descending
+        // order.
+        entriesLiveTable.sortDescending(DATE_COLUMN_TITLE);
         // The column header is not translated because we haven't generated the document translation bundle.
         assertTrue(entriesLiveTable.hasRow("panel.livetable.doc.title", entryName));
     }

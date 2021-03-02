@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.UnhandledAlertException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -54,19 +56,25 @@ import static org.junit.jupiter.api.Assertions.fail;
 @UITest
 public class ObjectEditorIT
 {
-    private final static String NUMBER_CLASS = "ObjectEditorIT.NumberClass";
-    private final static String STRING_CLASS = "ObjectEditorIT.StringClass";
+    // We're using classes with a nested space to ensure class names with multiple dots are not causing problems.
+    private final static String NUMBER_CLASS = "ObjectEditorIT.NestedSpace.NumberClass";
+    private final static String STRING_CLASS = "ObjectEditorIT.NestedSpace.StringClass";
 
     @BeforeAll
     public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
-        setup.createPage("ObjectEditorIT", "NumberClass", "", "NumberClass");
-        setup.addClassProperty("ObjectEditorIT", "NumberClass", "number", "Number");
+        DocumentReference numberClassReference =
+            new DocumentReference("xwiki", Arrays.asList("ObjectEditorIT","NestedSpace"), "NumberClass");
+        DocumentReference stringClassReference =
+            new DocumentReference("xwiki", Arrays.asList("ObjectEditorIT","NestedSpace"), "StringClass");
 
-        setup.createPage("ObjectEditorIT", "StringClass", "", "StringClass");
-        setup.addClassProperty("ObjectEditorIT", "StringClass", "string", "String");
+        setup.createPage(numberClassReference, "", "NumberClass");
+        setup.addClassProperty(numberClassReference, "number", "Number");
+
+        setup.createPage(stringClassReference, "", "StringClass");
+        setup.addClassProperty(stringClassReference, "string", "String");
     }
 
     @Order(1)

@@ -136,7 +136,23 @@ editors.XDataEditors = Class.create({
    * Returns the xobject DOM element for the given class and number.
    */
   getXObject : function (xclassName, objectNumber) {
-    return $$('#xobject_' + xclassName.replace('.','\\.')+'_'+objectNumber)[0];
+    var expectedId = 'xobject_' + xclassName + '_' + objectNumber;
+    var possibleObjects = $$('.xobject');
+    for (var i = 0; i < possibleObjects.length; i++) {
+      if (possibleObjects[i].id === expectedId) {
+        return possibleObjects[i];
+      }
+    }
+  },
+
+  getDeletedXObject : function (xclassName, objectNumber) {
+    var expectedId = 'deletedObject_' + xclassName + '_' + objectNumber;
+    var possibleObjects = $$('input[name=deletedObjects]');
+    for (var i = 0; i < possibleObjects.length; i++) {
+      if (possibleObjects[i].id === expectedId) {
+        return possibleObjects[i];
+      }
+    }
   },
   /**
    * Helper to remove an element from an array if and only if it was already in the array.
@@ -166,7 +182,7 @@ editors.XDataEditors = Class.create({
     // if an object with this number was already deleted, we remove the info from deleted objects.
     var deletedArray = this.editorStatus.deletedXObjects[xclassName];
     if (deletedArray !== undefined && deletedArray.indexOf(objectNumberVal) !== -1) {
-      $$('#deletedObject_' + xclassName.replace('.','\\.') + '_' + objectNumberVal)[0].remove();
+      this.getDeletedXObject(xclassName, objectNumberVal).remove();
       this.removeElementFromArray(deletedArray, objectNumberVal);
       if (deletedArray.length === 0) {
         delete this.editorStatus.deletedXObjects[xclassName];
@@ -313,7 +329,7 @@ editors.XDataEditors = Class.create({
                         // be sure to remove the requested object number from the array first.
                         if (deletionArray.indexOf(objectNumberVal) !== -1) {
                           this.removeElementFromArray(deletionArray, objectNumberVal);
-                          insertedElement.up('form').down('#deletedObject_'+xclassName.replace('.','\\.')+'_'+objectNumberVal).remove();
+                          this.getDeletedXObject(xclassName, objectNumberVal).remove();
                         }
                         if (deletionArray.length === 0) {
                           delete this.editorStatus.deletedXObjects[xclassName];

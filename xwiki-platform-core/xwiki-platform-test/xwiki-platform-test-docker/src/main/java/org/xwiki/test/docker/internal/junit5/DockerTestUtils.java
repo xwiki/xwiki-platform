@@ -44,8 +44,6 @@ import org.testcontainers.utility.DockerLoggerFactory;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
-import com.github.dockerjava.api.command.PullImageCmd;
-import com.github.dockerjava.api.command.PullImageResultCallback;
 
 import ch.qos.logback.classic.Level;
 
@@ -69,6 +67,8 @@ public final class DockerTestUtils
     private static final char DASH = '-';
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
+
+    private static final long DAY = 1000L * 60L * 60L * 24L;
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -147,11 +147,8 @@ public final class DockerTestUtils
         if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
             && !(container instanceof XWikiLocalGenericContainer))
         {
-            LOGGER.info("Pulling image [{}]", dockerImageName);
-            PullImageCmd command = container.getDockerClient().pullImageCmd(dockerImageName);
-            PullImageResultCallback response = new PullImageResultCallback();
-            response = command.exec(response);
-            response.awaitCompletion();
+            // Pull images once every day (to avoid the 200 pull rate limit of dockerhub when authenticated).
+            container.withImagePullPolicy(new DurationImagePullPolicy(DAY));
             pulledImages.add(dockerImageName);
         }
 

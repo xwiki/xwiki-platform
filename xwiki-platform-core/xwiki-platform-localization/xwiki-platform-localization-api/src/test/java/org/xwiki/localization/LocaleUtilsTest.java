@@ -42,7 +42,7 @@ public class LocaleUtilsTest
     @Test
     public void toLocale()
     {
-        Assert.assertEquals(null, LocaleUtils.toLocale(null));
+        Assert.assertEquals(null, LocaleUtils.toLocale((String) null));
         Assert.assertEquals(Locale.ROOT, LocaleUtils.toLocale(""));
         Assert.assertEquals(Locale.ENGLISH, LocaleUtils.toLocale("en"));
         Assert.assertEquals(Locale.US, LocaleUtils.toLocale("en_US"));

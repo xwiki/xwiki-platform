@@ -138,7 +138,11 @@ public class ResetPasswordIT
         // Actually reset the user's password
         resetPasswordPage = ResetPasswordPage.gotoPage();
         resetPasswordPage.setUserName(userName);
-        resetPasswordPage.clickResetPassword();
+        ResetPasswordPage newResetPasswordPage = resetPasswordPage.clickResetPassword();
+        assertTrue(newResetPasswordPage.getMessage().contains("An e-mail was sent"),
+            "Actual message: " + newResetPasswordPage.getMessage());
+        assertFalse(newResetPasswordPage.getMessage().contains("foo@bar.com"),
+            "Actual message: " + newResetPasswordPage.getMessage());
 
         // Check the result
         assertTrue(resetPasswordPage.isResetPasswordSent());

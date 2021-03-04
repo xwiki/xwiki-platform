@@ -54,16 +54,16 @@ Mail.SendMailConfigClass_bcc.hint=邮件的默认密送（BCC）地址列表，�
 Mail.SendMailConfigClass_host=电子邮件服务器
 Mail.SendMailConfigClass_host.hint=发送邮件使用的SMTP服务器地址，留空则为默认值（localhost）
 Mail.SendMailConfigClass_port=电子邮件服务器的端口号
-### Missing: Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
+Mail.SendMailConfigClass_port.hint=SMTP服务器的端口，留空则为默认值25
 ### Missing: Mail.SendMailConfigClass_username=Email Server Username
-### Missing: Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
+Mail.SendMailConfigClass_username.hint=访问SMTP服务器需要的用户名，留空则为无需认证
 ### Missing: Mail.SendMailConfigClass_password=Email Server Password
-### Missing: Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
-### Missing: Mail.SendMailConfigClass_properties=Additional Properties
-### Missing: Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
+Mail.SendMailConfigClass_password.hint=访问SMTP服务器需要的密码，留空则为无需认证
+Mail.SendMailConfigClass_properties=技术配置
+Mail.SendMailConfigClass_properties.hint=上文没有定义的其他JavaMail属性，例如此语句将启用tls选项：mail.smtp.starttls.enable=true
 ### Missing: Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
 ### Missing: Mail.SendMailConfigClass_sendWaitTime.hint=The delay between each mail being sent, in milliseconds (defaults to 8 seconds)
-### Missing: Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
+Mail.SendMailConfigClass_discardSuccessStatuses=忽略成功发送的邮件
 ### Missing: Mail.SendMailConfigClass_discardSuccessStatuses.hint=No matter whether mail statuses are kept or not for mail that has been sent successfully (defaults to true)
 ### Missing: Mail.SendMailStatus_livetable.date=Date
 ### Missing: Mail.SendMailStatus_livetable.batchId=Batch ID

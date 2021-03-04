@@ -251,7 +251,6 @@
             <exclude>src/**/xwiki/accordion/accordion.js</exclude>
             <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
             <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>
-            <exclude>src/**/uicomponents/widgets/datepicker/simpleDateFormat.js</exclude>
             <exclude>src/**/uicomponents/widgets/validation/livevalidation_prototype.js</exclude>
             <exclude>src/**/uicomponents/widgets/colorpicker/procolor.js</exclude>
           </excludes>

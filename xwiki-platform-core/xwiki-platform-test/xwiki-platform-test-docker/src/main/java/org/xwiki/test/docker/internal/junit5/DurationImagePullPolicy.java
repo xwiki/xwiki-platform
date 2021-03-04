@@ -43,7 +43,7 @@ public class DurationImagePullPolicy implements ImagePullPolicy
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DurationImagePullPolicy.class);
 
-    private static final Path PATH = Paths.get(System.getProperty("user.home"), ".testcontainers.durations");
+    private static final Path PATH = Paths.get(System.getProperty("user.home"), ".xwiki", "pulledImageCache");
 
     private static Map<String, Long> durationCache;
 
@@ -125,9 +125,13 @@ public class DurationImagePullPolicy implements ImagePullPolicy
 
     private void writeFile()
     {
-        try (BufferedWriter writer = Files.newBufferedWriter(this.path)) {
-            durationCache.entrySet().stream().forEach(entry ->
-                writeToFile(writer, entry.getKey(), entry.getValue()));
+        try {
+            // Make sure the directories exist
+            Files.createDirectories(this.path.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(this.path)) {
+                durationCache.entrySet().stream().forEach(entry ->
+                    writeToFile(writer, entry.getKey(), entry.getValue()));
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to write persistence data for DurationImagePullPolicy", e);
         }

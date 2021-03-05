@@ -21,11 +21,7 @@ require.config({
   paths: {
     'export-tree': 'uicomponents/exporter/exporter.min',
     'export-tree-filter': 'uicomponents/exporter/exporter.min',
-    'entityReference': 'uicomponents/model/entityReference.min',
-    'prototype': 'js/prototype/prototype.min'
-  },
-  shim: {
-    entityReference: ['prototype']
+    'xwiki-entityReference': 'uicomponents/model/entityReference.min',
   }
 });
 
@@ -37,7 +33,7 @@ var $paths = {};
 var $l10n = {};
 var $icons = {};
 
-define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], function($) {
+define(['jquery', 'xwiki-entityReference', 'export-tree', 'export-tree-filter'], function($) {
   var dataURLPrefix = 'data:application/json';
 
   // Ignore parameters when data URI is used.

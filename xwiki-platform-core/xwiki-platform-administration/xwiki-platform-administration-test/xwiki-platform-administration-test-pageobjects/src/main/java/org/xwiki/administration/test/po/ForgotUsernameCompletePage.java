@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -36,13 +37,46 @@ public class ForgotUsernameCompletePage extends ViewPage
     @FindBy(css = ".xwikimessage")
     private WebElement messageBox;
 
+    /**
+     * @deprecated since 12.10.5 and 13.2RC1 this message is no longer displayed.
+     */
+    @Deprecated
     public boolean isUsernameRetrieved(String username)
     {
         return messageBox.getText().contains(username);
     }
 
+    /**
+     * @deprecated since 12.10.5 and 13.2RC1 this message is no longer displayed.
+     */
+    @Deprecated
     public boolean isAccountNotFound()
     {
         return messageBox.getText().contains("No account is registered using this email address");
+    }
+
+    /**
+     * @return the text content of the message box.
+     * @since 12.10.5
+     * @since 13.2RC1
+     */
+    @Unstable
+    public String getMessage()
+    {
+        return this.messageBox.getText();
+    }
+
+    /**
+     * @return {@code true} if the forgot username query was successfully sent (without any error).
+     * @since 12.10.5
+     * @since 13.2RC1
+     */
+    @Unstable
+    public boolean isForgotUsernameQuerySent()
+    {
+        // If there is no form and we see an info box, then the request was sent.
+        return !getDriver().hasElementWithoutWaiting(By.cssSelector("#forgotUsernameForm"))
+            && messageBox.getText().contains("If an account is registered with this email, "
+            + "you will receive the account information on");
     }
 }

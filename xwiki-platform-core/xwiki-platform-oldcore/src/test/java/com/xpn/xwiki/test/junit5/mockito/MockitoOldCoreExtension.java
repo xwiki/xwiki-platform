@@ -85,8 +85,7 @@ import com.xpn.xwiki.test.MockitoOldcore;
  */
 public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
 {
-    private static final ExtensionContext.Namespace NAMESPACE =
-        ExtensionContext.Namespace.create(MockitoOldCoreExtension.class);
+    private static final String MOCKITO_OLDCORE = "mockitoOldcore";
 
     @Override
     protected void initializeMockitoComponentManager(Object testInstance, MockitoComponentManager mcm,
@@ -157,15 +156,13 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
     private void saveMockitoOldcore(ExtensionContext context, MockitoOldcore oldcore)
     {
         ExtensionContext.Store store = getStore(context);
-        Class<?> testClass = context.getRequiredTestClass();
-        store.put(testClass, oldcore);
+        store.put(MOCKITO_OLDCORE, oldcore);
     }
 
     private MockitoOldcore loadMockitoOldcore(ExtensionContext context)
     {
         ExtensionContext.Store store = getStore(context);
-        Class<?> testClass = context.getRequiredTestClass();
-        return store.get(testClass, MockitoOldcore.class);
+        return store.get(MOCKITO_OLDCORE, MockitoOldcore.class);
     }
 
     private void removeMockitoOldcore(ExtensionContext context)
@@ -173,10 +170,5 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
         ExtensionContext.Store store = getStore(context);
         Class<?> testClass = context.getRequiredTestClass();
         store.remove(testClass);
-    }
-
-    private static ExtensionContext.Store getStore(ExtensionContext context)
-    {
-        return context.getRoot().getStore(NAMESPACE);
     }
 }

@@ -27,8 +27,6 @@ import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.test.po.NavigationPanel;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
-import org.xwiki.panels.test.po.PageLayoutTabContent;
-import org.xwiki.panels.test.po.PanelsAdministrationPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -45,15 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class NavigationPanelIT
 {
     @BeforeAll
-    public void setup(TestUtils setup)
+    public void setup(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
 
-        // Activate the Navigation Panel.
-        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
-        PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();
-        pageLayoutTabContent.selectRightColumnLayout().setRightPanels("Panels.Navigation");
-        panelsAdminPage.clickSave();
+        // Activate the Navigation Panel in the right column
+        setup.setWikiPreference("rightPanels", "Panels.Navigation");
     }
 
     /**

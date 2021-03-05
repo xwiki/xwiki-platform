@@ -104,16 +104,6 @@
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
-      <artifactId>respond</artifactId>
-      <version>1.4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>html5shiv</artifactId>
-      <version>3.7.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
       <artifactId>drawer</artifactId>
       <version>2.4.0</version>
     </dependency>

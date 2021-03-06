@@ -19,7 +19,6 @@
  */
 require.config({
   paths: {
-    'xwiki-entityReference': 'uicomponents/model/entityReference.min',
     'xwiki': 'js/xwiki/xwiki.min'
   },
   shim: {

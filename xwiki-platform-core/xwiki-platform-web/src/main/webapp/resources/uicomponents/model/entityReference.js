@@ -17,7 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-entityReference', function() {
+// We cannot make this a RequireJS module yet because it has to be loaded (synchronously) before xwiki.js which doesn't
+// use RequireJS. We tried various things, like using the synchronous require('xwiki-entityReferene') call, but it did
+// not work because the define('xwiki-entityReference') call is queued and thus the module is not available right away.
+// See https://github.com/requirejs/requirejs/issues/241 .
+var XWiki = (function (XWiki) {
 'use strict';
 
 var ordinal = 0;
@@ -32,9 +36,9 @@ const EntityType = {
 };
 
 const entityTypeNames = [];
-Object.entries(EntityType).forEach(([entityType, index]) => {
+Object.keys(EntityType).forEach(entityType => {
   const parts = entityType.toLowerCase().split('_');
-  entityTypeNames[index] = [parts[0]]
+  entityTypeNames[EntityType[entityType]] = [parts[0]]
     // Capitalize all parts except for the first one.
     .concat(parts.slice(1).map(part => part.substr(0, 1).toUpperCase() + part.substr(1)))
     .join('');
@@ -43,7 +47,13 @@ EntityType.getName = function(entityType) {
   return entityTypeNames[entityType];
 };
 EntityType.byName = function(name) {
-  return entityTypeNames.findIndex(entityTypeName => entityTypeName.toLowerCase() === name.toLowerCase());
+  var lowerName = name.toLowerCase();
+  for(var index = 0; index < entityTypeNames.length; index++) {
+    if (entityTypeNames[index].toLowerCase() === lowerName) {
+      return index;
+    }
+  }
+  return -1;
 };
 
 class EntityReference {
@@ -584,7 +594,7 @@ const Model = {
   }
 };
 
-return {
+const api = {
   EntityType,
   EntityReference,
   WikiReference,
@@ -598,8 +608,8 @@ return {
   Model
 };
 
-});
+// Extend the XWiki API with the Entity Reference API.
+Object.keys(api).forEach(key => XWiki[key] = api[key]);
 
-require(['xwiki-entityReference'], function(entityReference) {
-  window.XWiki = Object.assign(window.XWiki || {}, entityReference);
-});
+return XWiki;
+}(window.XWiki || {}));

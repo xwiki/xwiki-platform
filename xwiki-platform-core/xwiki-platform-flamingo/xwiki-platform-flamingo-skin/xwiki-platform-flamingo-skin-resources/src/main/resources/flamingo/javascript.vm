@@ -29,13 +29,13 @@
   data-wysiwyg="true"></script>
 ##
 $xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
+## Required by xwiki.js but we have to load it ourselves because xwiki.js doesn't use Require.js
+$xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
 ## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
 ## page. In order to help debugging we provide/bundle the individual files also and you can load them instead of the
 ## aggregated files by passing 'minify=false' in the request query string or setting debug.minify property in
 ## xwiki.properties file.
 #if (!$services.debug.minify)
-  ## entityReferences.js should be loaded first because it is used by xwiki.js
-  $xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
   $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
   $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
@@ -120,6 +120,7 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
@@ -128,7 +129,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   },
   'shim': {
     'bootstrap' : ['jquery'],
-    'drawer': ['jquery', 'iscroll']
+    'drawer': ['jquery', 'iscroll'],
+    'xwiki-entityReference': {
+      'exports': 'XWiki'
+    }
   },
   'bundles': {},
   'config': {}

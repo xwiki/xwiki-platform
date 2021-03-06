@@ -111,7 +111,6 @@
                 <exclude>**/scriptaculous/dragdrop.js</exclude>
                 <exclude>**/panelWizard.js</exclude>
               </excludes>
-              <closureRewritePolyfills>true</closureRewritePolyfills>
             </configuration>
           </execution>
           <!-- Some JavaScript files cannot run in strict mode so we minify them separately. -->
@@ -143,8 +142,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- entityReference.js is added first because it is used by xwiki.js -->
-                <include>**/entityReference.js</include>
                 <include>**/xwiki.js</include>
                 <include>**/modalPopup.js</include>
                 <include>**/jumpToPage.js</include>

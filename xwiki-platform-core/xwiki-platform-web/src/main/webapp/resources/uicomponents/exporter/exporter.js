@@ -43,7 +43,7 @@
 /**
  * Export Tree
  */
-define('export-tree', ['jquery', 'tree'], function($) {
+define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], function($) {
   var selectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     selectNodes(tree, parentNode.children);
@@ -314,7 +314,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
 /**
  * Export Tree Filter
  */
-define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($) {
+define('xwiki-export-tree-filter', ['jquery', 'bootstrap', 'xwiki-export-tree'], function($) {
   var filterRegex = /filters=(\w*)/;
   var getCurrentFilter = function(url) {
     var result = filterRegex.exec(url);
@@ -499,7 +499,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   // Load the export tree.
   //
 
-  require(['export-tree', 'export-tree-filter'], function () {
+  require(['xwiki-export-tree', 'xwiki-export-tree-filter'], function () {
     $('.export-tree').exportTree();
   });
 });

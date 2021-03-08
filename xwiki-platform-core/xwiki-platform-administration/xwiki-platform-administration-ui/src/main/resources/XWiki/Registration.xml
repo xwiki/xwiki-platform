@@ -366,12 +366,12 @@
           #if ($request.xpage == 'registerinline')
             #skinExtensionHooks
           #end
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
           #if ($xwiki.exists($userDirectoryReference))
             &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
           #end
         &lt;/div&gt;
+        ## Note that the macro inject the form_token field.
         #generateHtml($fields, $request)
         &lt;p class="buttons"&gt;
           &lt;span class="buttonwrapper"&gt;

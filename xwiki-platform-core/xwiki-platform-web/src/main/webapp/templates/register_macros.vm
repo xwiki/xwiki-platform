@@ -172,7 +172,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #end
   #end
   </dl>
-  <input type="hidden" name="form_token" value="$services.csrf.getToken()" ∕>
+  <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
   #generateJavascript($fields)
 #end
 ##

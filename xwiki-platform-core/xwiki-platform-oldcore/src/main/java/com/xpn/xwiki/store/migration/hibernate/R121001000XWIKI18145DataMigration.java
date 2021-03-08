@@ -37,6 +37,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jdbc.env.spi.IdentifierHelper;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
@@ -239,7 +240,7 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
     }
 
     private void writeChanges(StringBuilder changes, Table table, ForeignKey foreignKey,
-        ForeignKeyInformation conflictingForeignKey)
+        ForeignKeyInformation conflictingForeignKey, Dialect dialect)
     {
         StringBuilder foreignKeyName = new StringBuilder();
         changes.append("<dropForeignKeyConstraint ");
@@ -254,7 +255,7 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
         this.addXmlProperty("baseTableName", table.getName(), changes);
         this.buildLoggerForeignKeyName(foreignKeyName, table.getName(), false);
 
-        String constraintName = conflictingForeignKey.getForeignKeyIdentifier().getCanonicalName();
+        String constraintName = conflictingForeignKey.getForeignKeyIdentifier().render(dialect);
         this.addXmlProperty("constraintName", constraintName, changes);
         this.buildLoggerForeignKeyName(foreignKeyName, constraintName, true);
 
@@ -319,7 +320,7 @@ public class R121001000XWIKI18145DataMigration extends AbstractHibernateDataMigr
                         // We found a conflicting foreign key: it means that the name changed so we need to drop the
                         // currently existing foreign key so that hibernate is able to recreate it back just after.
                         if (conflictingForeignKey != null) {
-                            this.writeChanges(changes, table, foreignKey, conflictingForeignKey);
+                            this.writeChanges(changes, table, foreignKey, conflictingForeignKey, database.getDialect());
                             hasChanges = true;
                         }
                     }

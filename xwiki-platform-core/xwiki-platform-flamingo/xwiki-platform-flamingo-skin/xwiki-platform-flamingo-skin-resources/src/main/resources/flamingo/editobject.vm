@@ -298,7 +298,7 @@
   #end ## parameters
 #elseif ("$!{request.xaction}" == 'loadObject')
   #set ($classname = ${request.classname})
-  #set ($objectNumber = $numbertool.toNumber($request.objectNumber))
+  #set ($objectNumber = $numbertool.toNumber($request.objectNumber).intValue())
   #if ("$!classname" == "" || "$!objectNumber" == "")
     $response.setStatus(400)
     #error($services.localization.render('core.editors.object.badParameters'))

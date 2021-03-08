@@ -76,9 +76,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Filtro de notific
 notifications.filters.preferences.scopeNotificationFilter.page=Solo página
 notifications.filters.preferences.scopeNotificationFilter.space=Página e hijos
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
 notifications.filters.preferences.allEvents=-
-
 notifications.filters.preferences.addPreference.filterType.inclusive=Inclusivo
 notifications.filters.preferences.addPreference.filterType.exclusive=No inclusivo
 notifications.filters.preferences.addPreference.notificationFormat.label=Formato de notificación
@@ -113,7 +111,6 @@ notifications.settings.filters.preferences.table.eventTypes=Eventos
 notifications.settings.filters.preferences.table.notificationFormats=Formatos
 notifications.settings.filters.preferences.table.isEnabled=¿Está activado?
 notifications.settings.filters.preferences.table._actions=Acciones
-
 notifications.menu.header=Notificaciones
 notifications.menu.header.settings=Configuración
 notifications.menu.clear=Limpiar todo
@@ -182,6 +179,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Cada vez
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Cada vez que hago una modificación principal
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Sólo cuando creo una nueva página
 
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=La referencia de usuario dada no está soportada, solo se soportan DocumentUserReference por ahora.
+notifications.settings.error.userReferenceAdminForbidden=No tienes derechos administrativos para el usuario dado: {0}.
+notifications.settings.error.badCSRF=Token CSRF erróneo.
+notifications.settings.badParameters=Parámetros de solicitud erróneos.
+
 ## User profile
 notifications.userprofile.following=Siguiendo
 notifications.userprofile.notfollowing=No siguiendo
@@ -196,7 +199,6 @@ rendering.macro.notificationsApplicationsPreferences.name=Configuración de noti
 rendering.macro.notificationsApplicationsPreferences.description=Muestra las preferencias del usuario actual sobre las notificaciones de las aplicaciones.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Objetivo
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Objetivo de la macro (puede ser "user" para el usuario actual o "wiki" para el wiki actual)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Preferencias de notificaciones de autovigilancia
 rendering.macro.notificationsAutoWatchPreferences.description=Mostrar las preferencias del usuario en curso sobre las páginas vistas automáticamente.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Objetivo
@@ -212,5 +214,6 @@ notifications.switches.tooltip.page=Ver esta página
 notifications.switches.tooltip.pageAndChildren=Ver esta página y sus hijos
 notifications.switches.tooltip.space=Ver la página padre y sus hijos
 notifications.switches.tooltip.wiki=Ver esta wiki
-notifications.switches.changeStatusError=Error al cambiar el estado de las notificaciones.</content>
+notifications.switches.changeStatusError=Error al cambiar el estado de las notificaciones.
+</content>
 </xwikidoc>

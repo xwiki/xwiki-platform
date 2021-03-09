@@ -38,7 +38,7 @@
 <div class="main layoutsubsection">
   <div id="mainContentArea">
       #set($email = "$!request.get('e')")
-      #if($email == '')
+      #if($email == '' || !$services.csrf.isTokenValid($request.form_token))
         #forgotUsernameBoxStart("default")
         $services.localization.render('xe.admin.forgotUsername.instructions')
         <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" id="forgotUsernameForm" class="xformInline">
@@ -48,6 +48,7 @@
           <span class="buttonwrapper">
             <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/>
           </span>
+          <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
         </div>
         </form>
         #forgotUsernameBoxEnd()

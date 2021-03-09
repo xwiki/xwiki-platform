@@ -38,12 +38,19 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set($email = "$!request.get('e')")
-#if($email == '')
+#if($email == '' || !$services.csrf.isTokenValid($request.form_token))
 {{translation key="xe.admin.forgotUsername.instructions"/}}
 
 {{html}}
   &lt;form method="post" action="$doc.getURL()" class="xformInline"&gt;
-    &lt;div&gt;&lt;label for="e"&gt;$services.localization.render('xe.admin.forgotUsername.email.label')&lt;/label&gt; &lt;input type="text" id="e" name="e"/&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div&gt;
+      &lt;label for="e"&gt;$services.localization.render('xe.admin.forgotUsername.email.label')&lt;/label&gt;
+      &lt;input type="text" id="e" name="e"/&gt;
+      &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()"/&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
 

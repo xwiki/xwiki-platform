@@ -42,6 +42,10 @@
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
     >
+      <!-- Property Name (for responsive mode) -->
+      <div class="property-name">{{ property.name }}</div>
+
+      <!-- Value Displayer-->
       <LivedataDisplayer
         :property-id="property.id"
         :entry="entry"
@@ -99,6 +103,35 @@ export default {
   padding: 0;
   height: 100%;
   width: 0;
+}
+
+.layout-table .cell .property-name {
+  display: none;
+  font-weight: bold;
+}
+
+/* Table responsive mode */
+@media screen and (max-width: 767px) {
+  .layout-table table tr td {
+    border-top: none;
+  }
+  .layout-table table tr td:first-child {
+    border-top: 1px solid #ddd;
+  }
+
+  .layout-table .cell {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .livedata-displayer, .livedata-displayer > * {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .layout-table .cell .property-name {
+    display: block;
+  }
 }
 
 </style>

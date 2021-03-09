@@ -74,4 +74,12 @@ export default {
 
 <style>
 
+/*
+ * Fix styles of xwiki html widgets when needed
+ * So that it renders best as displayer
+ */
+.xwiki-livedata .displayer-html .breadcrumb {
+  margin-bottom: 0;
+}
+
 </style>

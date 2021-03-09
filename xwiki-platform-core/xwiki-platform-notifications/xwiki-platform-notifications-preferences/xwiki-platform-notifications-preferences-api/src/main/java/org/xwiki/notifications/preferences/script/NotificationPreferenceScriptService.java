@@ -315,7 +315,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format) throws NotificationException
     {
-        return this.isEventTypeEnabled(eventType, format, CurrentUserReference.INSTANCE);
+        return this.isEventTypeEnabledForUser(eventType, format, CurrentUserReference.INSTANCE);
     }
 
     /**
@@ -327,7 +327,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @since 13.2RC1
      */
     @Unstable
-    public boolean isEventTypeEnabled(String eventType, NotificationFormat format, UserReference userReference)
+    public boolean isEventTypeEnabledForUser(String eventType, NotificationFormat format, UserReference userReference)
         throws NotificationException
     {
         DocumentReference userDocumentReference;
@@ -337,7 +337,7 @@ public class NotificationPreferenceScriptService implements ScriptService
             userDocumentReference = ((DocumentUserReference) userReference).getReference();
         } else {
             throw new NotificationException(
-                String.format("The method isEventTypeEnabled should only be used with DocumentUserReference, "
+                String.format("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "
                     + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
         }
         List<NotificationPreference> allPreferences =

@@ -151,14 +151,15 @@ class NotificationPreferenceScriptServiceTest
     }
 
     @Test
-    void isEventTypeEnabled() throws Exception
+    void isEventTypeEnabledForUser() throws Exception
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(user);
         DocumentUserReference documentUserReference = new DocumentUserReference(user, null);
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
-        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, documentUserReference));
+        assertFalse(this.scriptService
+            .isEventTypeEnabledForUser("update", NotificationFormat.ALERT, documentUserReference));
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
@@ -176,13 +177,15 @@ class NotificationPreferenceScriptServiceTest
 
         when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Arrays.asList(pref1, pref2));
 
-        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, documentUserReference));
-        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL, documentUserReference));
+        assertTrue(this.scriptService
+            .isEventTypeEnabledForUser("update", NotificationFormat.ALERT, documentUserReference));
+        assertFalse(this.scriptService
+            .isEventTypeEnabledForUser("update", NotificationFormat.EMAIL, documentUserReference));
         verify(this.documentAccessBridge, never()).getCurrentUserReference();
 
-        assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
+        assertTrue(this.scriptService.isEventTypeEnabledForUser("update", NotificationFormat.ALERT,
             CurrentUserReference.INSTANCE));
-        assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL,
+        assertFalse(this.scriptService.isEventTypeEnabledForUser("update", NotificationFormat.EMAIL,
             CurrentUserReference.INSTANCE));
 
         assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT));
@@ -190,7 +193,7 @@ class NotificationPreferenceScriptServiceTest
         verify(this.documentAccessBridge, times(4)).getCurrentUserReference();
 
         NotificationException notificationException = assertThrows(NotificationException.class,
-            () -> this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT, new UserReference()
+            () -> this.scriptService.isEventTypeEnabledForUser("update", NotificationFormat.ALERT, new UserReference()
             {
                 @Override
                 public boolean isGlobal()
@@ -198,7 +201,7 @@ class NotificationPreferenceScriptServiceTest
                     return false;
                 }
             }));
-        assertEquals("The method isEventTypeEnabled should only be used with DocumentUserReference, "
+        assertEquals("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "
             + "the given reference was a []", notificationException.getMessage());
     }
 

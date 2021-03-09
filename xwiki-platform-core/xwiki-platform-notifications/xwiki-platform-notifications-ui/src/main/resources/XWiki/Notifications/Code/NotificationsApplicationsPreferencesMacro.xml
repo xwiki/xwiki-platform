@@ -1089,7 +1089,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
   #set ($checked = '')
   #set ($preference = '')
   #if (($wikimacro.parameters.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
-    ($wikimacro.parameters.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $targetUserReference)))
+    ($wikimacro.parameters.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabledForUser($type.eventType, $format, $targetUserReference)))
     #set ($checked = 'checked="checked"')
   #end
   &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-filter="${type.filter}"&gt;

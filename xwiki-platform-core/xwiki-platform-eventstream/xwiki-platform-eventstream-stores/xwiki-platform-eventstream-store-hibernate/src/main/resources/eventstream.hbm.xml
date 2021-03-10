@@ -35,10 +35,10 @@
     <property name="priority" type="integer" column="ase_priority" index="EVENT_PRIORITY" />
     <property name="type" type="string" column="ase_type" length="255" index="EVENT_TYPE" />
     <property name="application" type="string" column="ase_application" length="255" index="EVENT_APP" />
-    <property name="user" type="string" column="ase_user" length="255" index="EVENT_USER" />
+    <property name="user" type="string" column="ase_user" length="768" index="EVENT_USER" />
     <property name="wiki" type="string" column="ase_wiki" length="255" index="EVENT_WIKI" />
-    <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
-    <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
+    <property name="space" type="string" column="ase_space" length="768" index="EVENT_SPACE" />
+    <property name="page" type="string" column="ase_page" length="768" index="EVENT_PAGE" />
     <property name="hidden" type="boolean" column="ase_hidden" index="EVENT_HIDDEN" />
     <property name="url" type="text" column="ase_url" length="2000" />
     <property name="title" type="text" column="ase_title" length="2000" />

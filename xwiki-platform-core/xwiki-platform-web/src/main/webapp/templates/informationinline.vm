@@ -18,6 +18,16 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('display_macros.vm')
+#macro(docTranslationLink $locale $fragment)
+  #set ($localeName = $locale.getDisplayName($xcontext.locale))
+  #set ($translationURL = $doc.getURL('view', $escapetool.url({
+    'language': $locale
+  })))
+  #if ($fragment)
+    #set ($translationURL = $translationURL + '#' + $escapetool.url($fragment))
+  #end
+  <a href="$translationURL">$escapetool.xml($localeName)</a>
+#end
 $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
 $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
@@ -77,24 +87,14 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
             </dt>
             #set ($output = [])
             #foreach ($supportedLocale in $supportedLocales)
-              #set ($supportedLocaleName = $supportedLocale.getDisplayName($xcontext.locale))
               #if ($existingTranslations.contains($supportedLocale))
-                ## Link to view the existing translation.
-                #set ($supportedLocaleURL = $doc.getURL('view', $escapetool.url({
-                  'language': $supportedLocale
-                })))
-                #set ($discard = $output.add("<a href='$supportedLocaleURL'>$escapetool.xml($supportedLocaleName)</a>"))
+                #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale)")))
               #else
-                ## Link to create the missing translation.
-                #set ($action = 'view')
-                #if ($hasEdit)
-                  #set ($action = 'edit')
-                #end
-                #set ($supportedLocaleURL = $doc.getURL($action, $escapetool.url({
-                  'language': $supportedLocale
-                })))
-                #set ($discard = $output.add("<span class='wikicreatelink skipCreatePagePopup'><a" +
-                  " href='$supportedLocaleURL'>$escapetool.xml($supportedLocaleName)</a></span>"))
+                #set ($discard = $output.add(
+                  "<span class='wikicreatelink skipCreatePagePopup'>" +
+                    $stringtool.trim("#docTranslationLink($supportedLocale 'translate')") +
+                  "</span>"
+                ))
               #end
             #end
             <dd>$stringtool.join($output, ', ')</dd>

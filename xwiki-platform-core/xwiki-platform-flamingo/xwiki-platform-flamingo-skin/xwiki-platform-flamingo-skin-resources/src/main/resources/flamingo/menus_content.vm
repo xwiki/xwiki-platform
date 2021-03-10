@@ -50,6 +50,28 @@
   ##
   #set ($topStaticExtensions = [])
   ##
+  ## TRANSLATE menu
+  ##
+  #define ($translateMenu)
+    ## Output the translate menu if all the following conditions are met:
+    ## * multilingual is on
+    ## * the user can edit the current document
+    ## * the user is viewing the original document version
+    ## * the document is translatable (either has a default locale specified or it has existing translations)
+    ## * the current UI locale doesn't match the original document locale
+    #if (
+      $displayTranslateMenu &&
+      $xwiki.isMultiLingual() &&
+      $hasEdit && !$isReadOnly &&
+      $xcontext.action == 'view' && $tdoc.realLocale == $doc.realLocale &&
+      ("$!doc.realLocale" != '' || !$doc.translationLocales.isEmpty()) &&
+      $doc.realLocale != $xcontext.locale
+    )
+      #displayTranslateMenu()
+    #end
+  #end
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!translateMenu", 'order': 5000}))
+  ##
   ## EDIT menu
   ##
   #define ($editMenu)
@@ -207,6 +229,23 @@
  *#
 #macro(displayCreateButton)
   #displayMenu('tmCreate', 'add', '', 'core.menu.create', true, $doc.getURL('create'), $extraAttributes)
+#end
+
+#**
+ * Display the Translate button used to translate the current document in the current locale.
+ *#
+#macro(displayTranslateMenu)
+  #set ($translateHint = $services.localization.render('core.menu.translate.hint',
+    [$xcontext.locale.getDisplayName($xcontext.locale)]))
+  #set ($translateDetails = $services.localization.render('core.menu.translate.details', [
+    $doc.realLocale.getDisplayName($xcontext.locale),
+    $xcontext.locale.getDisplayName($xcontext.locale)
+  ]))
+  #set ($translateAttrs = "$!extraAttributes tabindex='0' data-toggle='popover' data-trigger='hover' " +
+    "data-container='body' data-placement='bottom' data-title='$escapetool.xml($translateHint)' " +
+    "data-content='$escapetool.xml($translateDetails)'")
+  #set ($translateURL = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
+  #displayMenu('tmTranslate', 'translate', '', 'core.menu.translate', true, $translateURL, $translateAttrs)
 #end
 
 #**

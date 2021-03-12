@@ -1021,12 +1021,13 @@ require(['jquery'], function($) {
     editButton.add(translateButton).addClass('disabled');
     $('#xwikicontent').children(':header').children('.edit_section').addClass('hidden');
     event.preventDefault();
-    const data = event.data?.beforeEdit?.(event);
+    const handler = event.data;
+    const data = handler.beforeEdit?.(event);
     // Load the code needed to edit in place only when the edit button is clicked.
     require(['editInPlace', wysiwygEditorModule], function(editInPlace) {
       // Re-enable the translate button because it can be used while editing to create the missing translation.
       translateButton.removeClass('disabled');
-      event.data.edit(editInPlace, data).always(function() {
+      handler.edit(editInPlace, data).always(function() {
         // Restore only the edit button at the end because:
         // * the translate button is restored (if needed) by the editInPlace module
         // * the section edit links are restored when the document is rendered for view

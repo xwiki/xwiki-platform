@@ -80,6 +80,8 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
@@ -162,6 +164,10 @@ public abstract class XWikiAction extends Action
 
     private EntityReferenceSerializer<String> localSerializer;
 
+    private DocumentReferenceResolver<String> currentmixedReferenceResolver;
+
+    private ContextualAuthorizationManager autorization;
+
     protected ContextualLocalizationManager getLocalization()
     {
         if (this.localization == null) {
@@ -169,6 +175,33 @@ public abstract class XWikiAction extends Action
         }
 
         return this.localization;
+    }
+
+    /**
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    protected DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentmixedReferenceResolver == null) {
+            this.currentmixedReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentmixedReferenceResolver;
+    }
+
+    /**
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    protected ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        if (this.autorization == null) {
+            this.autorization = Utils.getComponent(ContextualAuthorizationManager.class);
+        }
+
+        return this.autorization;
     }
 
     protected String localizePlainOrKey(String key, Object... parameters)
@@ -1112,5 +1145,54 @@ public abstract class XWikiAction extends Action
     {
         // Set the content length in the response
         response.setContentLengthLong(length);
+    }
+
+    /**
+     * Helper used resolve the template passed to the action if the current user have access to it.
+     * 
+     * @param template the template to copy
+     * @return the reference of the template if not empty and the current user have access to it
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    protected DocumentReference resolveTemplate(String template)
+    {
+        if (StringUtils.isNotBlank(template)) {
+            DocumentReference templateReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
+
+            // Make sure the current user have access to the template document before copying it
+            if (getContextualAuthorizationManager().hasAccess(Right.VIEW, templateReference)) {
+                return templateReference;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Helper used by various actions to initialize a document by copying a template to it.
+     * 
+     * @param document the document to update
+     * @param template the template to copy
+     * @param context the XWiki context
+     * @return true if the document was updated, false otherwise (for example when the current user does not have view
+     *         right on the template document)
+     * @throws XWikiException when failing to copy the template
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    @Unstable
+    protected boolean readFromTemplate(XWikiDocument document, String template, XWikiContext context)
+        throws XWikiException
+    {
+        DocumentReference templateReference = resolveTemplate(template);
+
+        if (templateReference != null) {
+            document.readFromTemplate(templateReference, context);
+
+            return true;
+        }
+
+        return false;
     }
 }

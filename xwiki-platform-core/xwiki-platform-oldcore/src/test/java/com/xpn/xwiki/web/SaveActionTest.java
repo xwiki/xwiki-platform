@@ -24,18 +24,27 @@ import java.util.Date;
 
 import javax.inject.Named;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
+import org.xwiki.refactoring.job.CreateRequest;
+import org.xwiki.refactoring.script.RefactoringScriptService;
+import org.xwiki.refactoring.script.RequestFactory;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -54,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,12 +75,15 @@ import static org.mockito.Mockito.when;
 @ComponentList
 @ReferenceComponentList
 @OldcoreTest(mockXWiki = false)
-public class SaveActionTest
+class SaveActionTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "FooBar");
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @MockComponent
     private EntityNameValidationManager entityNameValidationManager;
@@ -84,6 +97,9 @@ public class SaveActionTest
     @MockComponent
     @Named("xwikiproperties")
     private ConfigurationSource propertiesConf;
+
+    @MockComponent
+    private ContextualAuthorizationManager autorization;
 
     @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
@@ -109,28 +125,28 @@ public class SaveActionTest
     {
         this.saveAction = new SaveAction();
 
-        context = oldcore.getXWikiContext();
+        this.context = this.oldcore.getXWikiContext();
 
-        xWiki = mock(XWiki.class);
-        context.setWiki(this.xWiki);
+        this.xWiki = mock(XWiki.class);
+        this.context.setWiki(this.xWiki);
 
-        mockRequest = mock(XWikiRequest.class);
-        context.setRequest(mockRequest);
+        this.mockRequest = mock(XWikiRequest.class);
+        this.context.setRequest(this.mockRequest);
 
-        mockResponse = mock(XWikiResponse.class);
-        context.setResponse(mockResponse);
+        this.mockResponse = mock(XWikiResponse.class);
+        this.context.setResponse(this.mockResponse);
 
-        mockDocument = mock(XWikiDocument.class);
-        context.setDoc(mockDocument);
+        this.mockDocument = mock(XWikiDocument.class);
+        this.context.setDoc(this.mockDocument);
 
-        mockClonedDocument = mock(XWikiDocument.class);
-        when(mockDocument.clone()).thenReturn(mockClonedDocument);
+        this.mockClonedDocument = mock(XWikiDocument.class);
+        when(this.mockDocument.clone()).thenReturn(this.mockClonedDocument);
 
-        mockForm = mock(EditForm.class);
-        context.setForm(mockForm);
+        this.mockForm = mock(EditForm.class);
+        this.context.setForm(this.mockForm);
         when(this.entityNameValidationConfiguration.useValidation()).thenReturn(false);
 
-        context.setUserReference(USER_REFERENCE);
+        this.context.setUserReference(USER_REFERENCE);
     }
 
     @Test
@@ -146,7 +162,7 @@ public class SaveActionTest
 
         assertTrue(saveAction.save(this.context));
         assertEquals("entitynamevalidation.create.invalidname", context.get("message"));
-        assertArrayEquals(new Object[] { "Foo.Bar" }, (Object[]) context.get("messageParameters"));
+        assertArrayEquals(new Object[] {"Foo.Bar"}, (Object[]) context.get("messageParameters"));
     }
 
     @Test
@@ -159,7 +175,6 @@ public class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).readFromTemplate("", this.context);
         verify(mockClonedDocument).setAuthor("XWiki.FooBar");
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
@@ -181,8 +196,8 @@ public class SaveActionTest
         when(mockRequest.getParameter("isNew")).thenReturn("true");
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.1"), this.context.get("SaveAction.savedObjectVersion"));
-        verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""),
-            eq(false), eq(this.context));
+        verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""), eq(false),
+            eq(this.context));
         verify(this.xWiki).saveDocument(any(XWikiDocument.class), eq(""), eq(false), eq(this.context));
     }
 
@@ -210,8 +225,8 @@ public class SaveActionTest
     }
 
     /**
-     * This tests aims at checking the usecase when uploading an image in the WYSIWYG editor before the first save
-     * and saving afterwards.
+     * This tests aims at checking the usecase when uploading an image in the WYSIWYG editor before the first save and
+     * saving afterwards.
      */
     @Test
     void validSaveRequestImageUploadAndConflictCheck() throws Exception
@@ -237,12 +252,38 @@ public class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(mockClonedDocument).readFromTemplate("", this.context);
         verify(mockClonedDocument).setAuthor("XWiki.FooBar");
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
         verify(mockClonedDocument).removeLock(this.context);
+    }
 
+    @Test
+    void saveFromTemplate() throws Exception
+    {
+        when(this.mockForm.getTemplate()).thenReturn("TemplateSpace.TemplateDocument");
+        DocumentReference templateReference =
+            new DocumentReference(context.getWikiId(), "TemplateSpace", "TemplateDocument");
+
+        when(this.autorization.hasAccess(Right.VIEW, templateReference)).thenReturn(false);
+
+        assertFalse(this.saveAction.save(this.context));
+
+        verify(this.mockClonedDocument, never()).readFromTemplate(templateReference, this.context);
+
+        when(this.autorization.hasAccess(Right.VIEW, templateReference)).thenReturn(true);
+        RefactoringScriptService refactoring = mock(RefactoringScriptService.class);
+        RequestFactory requestFactory = mock(RequestFactory.class);
+        when(refactoring.getRequestFactory()).thenReturn(requestFactory);
+        CreateRequest request = mock(CreateRequest.class);
+        when(requestFactory.createCreateRequest(any())).thenReturn(request);
+        Job job = mock(Job.class);
+        when(refactoring.create(request)).thenReturn(job);
+        this.componentManager.registerComponent(ScriptService.class, "refactoring", refactoring);
+
+        assertFalse(this.saveAction.save(this.context));
+
+        verify(this.mockClonedDocument).readFromTemplate(templateReference, this.context);
     }
 }

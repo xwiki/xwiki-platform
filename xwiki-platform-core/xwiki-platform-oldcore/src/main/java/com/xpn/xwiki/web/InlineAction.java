@@ -82,7 +82,7 @@ public class InlineAction extends XWikiAction
                 doc2.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
             }
             try {
-                doc2.readFromTemplate(peform, context);
+                readFromTemplate(doc2, peform.getTemplate(), context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     return "docalreadyexists";
@@ -93,7 +93,7 @@ public class InlineAction extends XWikiAction
                 context.put("cdoc", doc2);
             } else {
                 XWikiDocument cdoc2 = cdoc.clone();
-                cdoc2.readFromTemplate(peform, context);
+                readFromTemplate(cdoc2, peform.getTemplate(), context);
                 context.put("cdoc", cdoc2);
             }
 

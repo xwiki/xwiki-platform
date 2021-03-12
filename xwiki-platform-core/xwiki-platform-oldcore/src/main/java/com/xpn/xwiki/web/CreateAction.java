@@ -299,7 +299,6 @@ public class CreateAction extends XWikiAction
         String parent) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        DocumentReferenceResolver<String> resolver = getCurrentMixedDocumentReferenceResolver();
 
         // Set the locale and default locale, considering that we're creating the original version of the document
         // (not a translation).
@@ -309,12 +308,11 @@ public class CreateAction extends XWikiAction
         }
 
         // Copy the template.
-        DocumentReference templateReference = resolver.resolve(template);
-        newDocument.readFromTemplate(templateReference, context);
+        readFromTemplate(newDocument, template, context);
 
         // Set the parent field.
         if (!StringUtils.isEmpty(parent)) {
-            DocumentReference parentReference = resolver.resolve(parent);
+            DocumentReference parentReference = this.currentmixedReferenceResolver.resolve(parent);
             newDocument.setParentReference(parentReference);
         }
 

@@ -129,7 +129,7 @@ public class AdminAction extends XWikiAction
             }
             context.put("tdoc", tdoc2);
             try {
-                tdoc2.readFromTemplate(peform, context);
+                readFromTemplate(tdoc2, peform.getTemplate(), context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     context.put("exception", e);

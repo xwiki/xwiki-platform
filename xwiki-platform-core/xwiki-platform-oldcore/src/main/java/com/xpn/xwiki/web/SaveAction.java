@@ -193,7 +193,7 @@ public class SaveAction extends PreviewAction
         }
 
         try {
-            tdoc.readFromTemplate(form.getTemplate(), context);
+            readFromTemplate(tdoc, form.getTemplate(), context);
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                 context.put("exception", e);
@@ -569,7 +569,9 @@ public class SaveAction extends PreviewAction
 
     private Job startCreateJob(EntityReference entityReference, EditForm editForm) throws XWikiException
     {
-        if (StringUtils.isBlank(editForm.getTemplate())) {
+        DocumentReference templateReference = resolveTemplate(editForm.getTemplate());
+
+        if (templateReference == null) {
             // No template specified, nothing more to do.
             return null;
         }
@@ -585,9 +587,6 @@ public class SaveAction extends PreviewAction
         // Set the target document.
         request.setEntityReferences(Arrays.asList(entityReference));
         // Set the template to use.
-        DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        EntityReference templateReference = resolver.resolve(editForm.getTemplate());
         request.setTemplateReference(templateReference);
         // We`ve already created and populated the fields of the target document, focus only on the remaining children
         // specified in the template.

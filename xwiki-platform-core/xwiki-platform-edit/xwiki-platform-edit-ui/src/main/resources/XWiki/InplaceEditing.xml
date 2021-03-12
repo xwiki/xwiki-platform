@@ -683,6 +683,10 @@ define('editInPlace', [
     }
     // Remove the action events scope.
     form.removeClass('form');
+    // Update the URL.
+    if (window.location.hash === '#edit' || window.location.hash === '#translate') {
+      window.location.hash = '';
+    }
     return $.Deferred().resolve(xwikiDocument).promise();
   };
 
@@ -1042,6 +1046,9 @@ require(['jquery'], function($) {
 
   var editButton = $('#tmEdit &gt; a');
   editButton.on('click.inPlaceEditing', {
+    beforeEdit: function() {
+      window.location.hash = '#edit';
+    },
     edit: function(editInPlace) {
       return editInPlace.editPage();
     }
@@ -1050,6 +1057,7 @@ require(['jquery'], function($) {
   var translateButton = $('#tmTranslate &gt; a');
   translateButton.on('click.inPlaceEditing', {
     beforeEdit: function() {
+      window.location.hash = '#translate';
       translateButton.parent().addClass('hidden');
     },
     edit: function(editInPlace) {
@@ -1069,6 +1077,12 @@ require(['jquery'], function($) {
       return editInPlace.editSection(sectionId);
     }
   }, onInPlaceEditing);
+
+  if (window.location.hash === '#edit') {
+    editButton.click();
+  } else if (window.location.hash === '#translate') {
+    translateButton.click();
+  }
 });
 
 })(JSON.parse(document.querySelector('[data-inplace-editing-config]')?.getAttribute('data-inplace-editing-config')) ||

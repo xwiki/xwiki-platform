@@ -46,20 +46,8 @@ require(['jquery', 'bootstrap'], function($) {
       $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
 
-    // Activate the popover on the Translate button.
+    // Activate the popover when hovering the Translate button.
     var translateButton = $('#tmTranslate [data-toggle="popover"]');
-    translateButton.attr('title', translateButton.attr('data-title'));
-    if (window.location.hash === '#translate') {
-      // Let the user know that they are viewing the original version of the page and not the translation corresponding
-      // to the current locale because there isn't one created yet.
-      translateButton.popover('show');
-      // Hide the popover on the next click. The user can still see the message by hovering the translate button.
-      $(document).one('click', function() {
-        translateButton.popover('hide');
-      });
-    } else {
-      // Show the popover when hovering the Translate button.
-      translateButton.popover();
-    }
+    translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });

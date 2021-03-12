@@ -662,7 +662,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
           }).done(function() {
             notif.hide();
             new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
-            window.livetable_notificationFilterPreferencesLiveTable.refresh();
+            window.livetable_notificationCustomFilterPreferencesLiveTable.refresh();
           }).fail(function() {
             notif.hide();
             new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');

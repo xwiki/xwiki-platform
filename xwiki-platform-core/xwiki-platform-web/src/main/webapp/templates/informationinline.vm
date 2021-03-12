@@ -18,9 +18,9 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('display_macros.vm')
-#macro(docTranslationLink $locale $fragment)
+#macro(docTranslationLink $locale $action $fragment)
   #set ($localeName = $locale.getDisplayName($xcontext.locale))
-  #set ($translationURL = $doc.getURL('view', $escapetool.url({
+  #set ($translationURL = $doc.getURL($action, $escapetool.url({
     'language': $locale
   })))
   #if ($fragment)
@@ -88,11 +88,22 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
             #set ($output = [])
             #foreach ($supportedLocale in $supportedLocales)
               #if ($existingTranslations.contains($supportedLocale))
-                #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale)")))
-              #else
+                #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale 'view')")))
+              #elseif ($hasEdit)
+                ## Show the link to create the missing translation if the current user can edit the page. Use the
+                ## preferred edit mode (in-place versus stand-alone) depending on the user preferences, in order to
+                ## replicate the behavior of the Translate button.
+                #set ($action = 'edit')
+                #set ($fragment = $NULL)
+                #getDefaultDocumentEditor($defaultEditMode)
+                #if ($services.edit.document.inPlaceEditingEnabled() && $defaultEditMode == 'wysiwyg')
+                  ## Link to the in-place page editor which currently uses the view action.
+                  #set ($action = 'view')
+                  #set ($fragment = 'translate')
+                #end
                 #set ($discard = $output.add(
                   "<span class='wikicreatelink skipCreatePagePopup'>" +
-                    $stringtool.trim("#docTranslationLink($supportedLocale 'translate')") +
+                    $stringtool.trim("#docTranslationLink($supportedLocale $action $fragment)") +
                   "</span>"
                 ))
               #end

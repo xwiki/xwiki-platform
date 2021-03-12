@@ -19,13 +19,6 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
-
 /**
  * Represents the user profile's Notifications tab.
  * 
@@ -53,21 +46,5 @@ public class NotificationsUserProfilePage extends AbstractNotificationsSettingsP
     {
         getUtil().gotoPage("XWiki", username, "view", "category=notifications");
         return new NotificationsUserProfilePage();
-    }
-
-    /**
-     * @return the notification filter preferences, as they are described in the corresponding livetable
-     *
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public List<NotificationFilterPreference> getNotificationFilterPreferences()
-    {
-
-        List<NotificationFilterPreference> preferences = new ArrayList<>();
-        for (WebElement row : this.notificationFilterPreferencesLivetable.findElements(By.tagName("tr"))) {
-            preferences.add(new NotificationFilterPreference(this, row, this.getDriver()));
-        }
-        return preferences;
     }
 }

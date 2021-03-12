@@ -336,9 +336,15 @@
       #if ($request.xpage != 'edituser')
 (% class="profile-section highlighted-profile-section column full" %)
 (((
-  (% id="Hnotifications.settings.filters.preferences.title" %)
-  = {{translation key="notifications.settings.filters.preferences.title" /}} =
-  {{notificationsFiltersPreferences user="$doc.documentReference" /}}
+  (% id="Hnotifications.settings.filters.preferences.system.title" %)
+  = {{translation key="notifications.settings.filters.preferences.system.title" /}} =
+  {{notificationsSystemFiltersPreferences user="$doc.documentReference" /}}
+)))
+(% class="profile-section highlighted-profile-section column full" %)
+(((
+  (% id="Hnotifications.settings.filters.preferences.custom.title" %)
+  = {{translation key="notifications.settings.filters.preferences.custom.title" /}} =
+  {{notificationsCustomFiltersPreferences user="$doc.documentReference" /}}
 )))
 #end
       {{/velocity}}

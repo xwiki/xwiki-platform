@@ -75,9 +75,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Portée du filtre
 notifications.filters.preferences.scopeNotificationFilter.page=Page seulement
 notifications.filters.preferences.scopeNotificationFilter.space=Page et fils
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
 notifications.filters.preferences.allEvents=-
-
 notifications.filters.preferences.addPreference.filterType.inclusive=Inclusif
 notifications.filters.preferences.addPreference.filterType.exclusive=Exclusif
 notifications.filters.preferences.addPreference.notificationFormat.label=Format de la notification
@@ -112,7 +110,6 @@ notifications.settings.filters.preferences.table.eventTypes=Événements
 notifications.settings.filters.preferences.table.notificationFormats=Formats
 notifications.settings.filters.preferences.table.isEnabled=Est activé ?
 notifications.settings.filters.preferences.table._actions=Actions
-
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Préférences
 notifications.menu.clear=Effacer tout
@@ -181,6 +178,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=A chaque
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=A chaque modification majeure
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Seulement à la création d'une page
 
+## Common notification settings errors
+### Missing: notifications.settings.error.userReferenceNotSupported=The given user reference is not supported, only DocumentUserReference are supported for now.
+notifications.settings.error.userReferenceAdminForbidden=Vous ne disposez pas du droit d''administration de l''utilisateur : {0}.
+notifications.settings.error.badCSRF=Jeton CSRF incorrect.
+notifications.settings.badParameters=Erreur dans les paramètres de la requête.
+
 ## User profile
 notifications.userprofile.following=Suivi
 notifications.userprofile.notfollowing=Non suivi
@@ -195,7 +198,6 @@ rendering.macro.notificationsApplicationsPreferences.name=Préférences de notif
 rendering.macro.notificationsApplicationsPreferences.description=Affiche les préférences de notification de l'utilisateur courant.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Préférences pour les notifications d'abonnement automatique
 rendering.macro.notificationsAutoWatchPreferences.description=Affiche les préférences de l'utilisateur pour les notifications d'abonnement automatique aux pages.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Cible
@@ -211,5 +213,6 @@ notifications.switches.tooltip.page=Suivre cette page
 notifications.switches.tooltip.pageAndChildren=Suivre cette page et ses enfants
 notifications.switches.tooltip.space=Suivre la page parente et ses enfants
 notifications.switches.tooltip.wiki=Suivre ce wiki
-notifications.switches.changeStatusError=Échec lors du chargement du status des notifications.</content>
+notifications.switches.changeStatusError=Échec lors du chargement du status des notifications.
+</content>
 </xwikidoc>

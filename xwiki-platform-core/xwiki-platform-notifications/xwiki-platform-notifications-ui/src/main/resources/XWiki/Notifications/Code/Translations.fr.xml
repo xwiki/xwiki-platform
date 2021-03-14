@@ -97,7 +97,7 @@ notifications.settings.filters.preferences.system.table.isEnabled=Est actif ?
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Filtres personnalisés
-### Missing: notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
+notifications.settings.filters.preferences.custom.hint=Créez des filtres pour définir les notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.custom.table.name=Emplacement
 ### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action

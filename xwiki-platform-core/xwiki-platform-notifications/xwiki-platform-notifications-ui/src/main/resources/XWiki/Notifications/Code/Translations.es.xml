@@ -89,37 +89,37 @@ notifications.filters.preferences.allEvents=-Todos los eventos (deshabilitados i
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=Filtros del sistema
-### Missing: notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
+notifications.settings.filters.preferences.system.hint=Los filtros del sistema que puedes alternar para tener un control más fino de las notificaciones que quieres recibir.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.system.table.name=Name
-### Missing: notifications.settings.filters.preferences.system.table.filterType=Description
-### Missing: notifications.settings.filters.preferences.system.table.notificationFormats=Formats
-### Missing: notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
+notifications.settings.filters.preferences.system.table.name=Nombre
+notifications.settings.filters.preferences.system.table.filterType=Descripción
+notifications.settings.filters.preferences.system.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.system.table.isEnabled=¿Está activado?
 
 ## Custom Filter preferences settings
-### Missing: notifications.settings.filters.preferences.custom.title=Custom Filters
-### Missing: notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
+notifications.settings.filters.preferences.custom.title=Filtros personalizados
+notifications.settings.filters.preferences.custom.hint=Crear filtros para controlar las notificaciones que quiere recibir.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.custom.table.name=Location
-### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
-### Missing: notifications.settings.filters.preferences.custom.table.eventTypes=Events
-### Missing: notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
-### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
-### Missing: notifications.settings.filters.preferences.custom.table._actions=Actions
-### Missing: notifications.filters.type.custom.inclusive=Notify of the event
-### Missing: notifications.filters.type.custom.exclusive=Ignore the event
+notifications.settings.filters.preferences.custom.table.name=Ubicación
+notifications.settings.filters.preferences.custom.table.filterType=Filtro de acción
+notifications.settings.filters.preferences.custom.table.eventTypes=Eventos
+notifications.settings.filters.preferences.custom.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.custom.table.isEnabled=¿Está activado?
+notifications.settings.filters.preferences.custom.table._actions=Acciones
+notifications.filters.type.custom.inclusive=Notificación del evento
+notifications.filters.type.custom.exclusive=Ignorar el evento
 notifications.settings.addFilter=Añadir filtro
-### Missing: notifications.settings.addFilter.hint=Create a custom location filter: this filter applies on events related to specific locations and allow to notify or ignore them based on the event type and the notification format.
-### Missing: notifications.filters.preferences.custom.addFilter.location.label=Location
-### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies when an event is sent from the selected location. Multiple locations can be selected.
-### Missing: notifications.filters.preferences.custom.addFilter.type.label=Action
-### Missing: notifications.filters.preferences.custom.addFilter.type.hint=What the filter should do when a event is sent from the given location? 
-### Missing: notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notify of the event
-### Missing: notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignore the event
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.label=Format
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies when a notification is sent for the selected format. Multiple formats can be selected.
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.label=Event Type
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies when an event of selected type is sent. Multiple types can be selected. If nothing is selected, then the filter will apply for any type.
+notifications.settings.addFilter.hint=Crea un filtro de ubicación personalizado: Este filtro se aplica a eventos relacionados con ubicaciones específicas y permite notificar o ignorar los eventos en función del tipo de evento y el formto de notificación.
+notifications.filters.preferences.custom.addFilter.location.label=Ubicación
+notifications.filters.preferences.custom.addFilter.location.hint=Este filtro se aplica cuando al envíar un evento desde la ubicación seleccionada. Se puede seleccionar múltiples ubicaciones.
+notifications.filters.preferences.custom.addFilter.type.label=Acción
+notifications.filters.preferences.custom.addFilter.type.hint=¿Qué debería hacer el filtro al enviarse un evento desde la ubicación dada? 
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notificación del evento
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignorar el evento
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Formatos
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Este filtro se aplica cuando al envíar un evento desde la ubicación seleccionada. Se puede seleccionar múltiples ubicaciones.
+notifications.filters.preferences.custom.addFilter.eventType.label=Tipo de evento
+notifications.filters.preferences.custom.addFilter.eventType.hint=Este filtro se aplica cuando se envía un evento del tipo seleccionado. Se pueden seleccionar múltiples tipos. Si no se selecciona nada, el filtro se aplicará a cualquier tipo.
 notifications.menu.header=Notificaciones
 notifications.menu.header.settings=Configuración
 notifications.menu.clear=Limpiar todo

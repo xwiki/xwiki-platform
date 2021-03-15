@@ -32,7 +32,9 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -44,6 +46,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -70,6 +73,9 @@ public class DefaultNotificationFilterManagerTest
     @MockComponent
     @Named("cached")
     private ModelBridge modelBridge;
+
+    @MockComponent
+    private ModelContext modelContext;
 
     @MockComponent
     private NotificationConfiguration configuration;
@@ -115,6 +121,29 @@ public class DefaultNotificationFilterManagerTest
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
+    }
+
+    @Test
+    void getAllFiltersForWiki() throws Exception
+    {
+        NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
+        NotificationFilter fakeFilter2 = mock(NotificationFilter.class);
+
+        WikiReference currentWiki = new WikiReference("current");
+        when(wikiDescriptorManager.getCurrentWikiReference()).thenReturn(currentWiki);
+
+        WikiReference argumentWiki = new WikiReference("foo");
+
+        when(componentManager.getInstanceList(NotificationFilter.class))
+            .thenReturn(Arrays.asList(fakeFilter1, fakeFilter2));
+
+        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(argumentWiki);
+
+        assertEquals(2, filters.size());
+        assertTrue(filters.contains(fakeFilter1));
+        assertTrue(filters.contains(fakeFilter2));
+        verify(this.modelContext).setCurrentEntityReference(argumentWiki);
+        verify(this.modelContext).setCurrentEntityReference(currentWiki);
     }
 
     @Test

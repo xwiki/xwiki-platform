@@ -33,6 +33,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -130,6 +131,25 @@ public class NotificationFiltersScriptService implements ScriptService
     }
 
     /**
+     * Get a set of notification filters that can be toggled for the given wiki.
+     * Note: we use a distinct name than {@code getToggleableNotificationFilters} since a WikiReference can be converted
+     * to a UserReference by our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     *
+     * @param wikiReference the wiki for which to retrieve the notification filters.
+     * @return a set of notification filters that are toggleable
+     * @throws NotificationException if an error occurs
+     * @since 13.3RC1
+     */
+    @Unstable
+    public Set<NotificationFilter> getWikiToggleableNotificationFilters(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return notificationFilterManager.getToggleableFilters(
+            notificationFilterManager.getAllFilters(wikiReference)).collect(
+            Collectors.toSet());
+    }
+
+    /**
      * @return a collection of every {@link NotificationFilter} available to the current user.
      * @throws NotificationException if an error happens
      *
@@ -150,6 +170,21 @@ public class NotificationFiltersScriptService implements ScriptService
     public Collection<NotificationFilter> getFilters(UserReference userReference) throws NotificationException
     {
         return notificationFilterManager.getAllFilters(convertReference(userReference), false);
+    }
+
+    /**
+     * Get the filters of the given wiki.
+     * Note: we use a distinct name than {@code getFilters} since a WikiReference can be converted to a UserReference by
+     * our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     * @param wikiReference the wiki for which to retrieve the filters.
+     * @return a collection of every {@link NotificationFilter} available for the given user.
+     * @throws NotificationException if the reference is not correct or if an error happens when retrieving the filters
+     * @since 13.3RC1
+     */
+    @Unstable
+    public Collection<NotificationFilter> getWikiFilters(WikiReference wikiReference) throws NotificationException
+    {
+        return notificationFilterManager.getAllFilters(wikiReference);
     }
 
     /**
@@ -185,6 +220,28 @@ public class NotificationFiltersScriptService implements ScriptService
     {
         return notificationFilterPreferenceManager.getFilterPreferences(
             notificationFilterPreferenceManager.getFilterPreferences(convertReference(userReference)), filter
+        ).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get a collection of notification filters preferences that are available for the given wiki and that corresponds
+     * to the given filter.
+     * Note: we use a distinct name than {@code getFilterPreferences} since a WikiReference can be converted to a
+     * UserReference by our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     *
+     * @param filter the filter associated to the preferences
+     * @param wikiReference the wiki for which to retrieve the filter
+     * @return a set of {@link NotificationFilterPreference}
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    public Set<NotificationFilterPreference> getWikiFilterPreferences(NotificationFilter filter,
+        WikiReference wikiReference) throws NotificationException
+    {
+        return notificationFilterPreferenceManager.getFilterPreferences(
+            notificationFilterPreferenceManager.getFilterPreferences(wikiReference), filter
         ).collect(Collectors.toSet());
     }
 
@@ -233,6 +290,24 @@ public class NotificationFiltersScriptService implements ScriptService
     }
 
     /**
+     * Delete a filter preference for the given wiki.
+     * Note: we use a distinct name than {@code deleteFilterPreference} since a WikiReference can be converted to a
+     * UserReference by our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     * @param filterPreferenceId name of the filter preference
+     * @param wikiReference the wiki for which to delete the filter preference.
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    public void deleteWikiFilterPreference(String filterPreferenceId, WikiReference wikiReference)
+        throws NotificationException
+    {
+        notificationFilterPreferenceManager.deleteFilterPreference(wikiReference,
+            filterPreferenceId);
+    }
+
+    /**
      * Enable or disable a filter preference.
      * @param filterPreferenceId id of the filter preference
      * @param enabled either or not the filter preference should be enabled
@@ -259,6 +334,26 @@ public class NotificationFiltersScriptService implements ScriptService
         throws NotificationException
     {
         notificationFilterPreferenceManager.setFilterPreferenceEnabled(convertReference(userReference),
+            filterPreferenceId, enabled);
+    }
+
+    /**
+     * Enable or disable a filter preference.
+     * Note: we use a distinct name than {@code setFilterPreferenceEnabled} since a WikiReference can be converted to a
+     * UserReference by our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     *
+     * @param filterPreferenceId id of the filter preference
+     * @param enabled either or not the filter preference should be enabled
+     * @param wikiReference the wiki for which to enable or disable a filter.
+     * @throws NotificationException if an error happens
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    public void setWikiFilterPreferenceEnabled(String filterPreferenceId, boolean enabled, WikiReference wikiReference)
+        throws NotificationException
+    {
+        notificationFilterPreferenceManager.setFilterPreferenceEnabled(wikiReference,
             filterPreferenceId, enabled);
     }
 
@@ -327,6 +422,28 @@ public class NotificationFiltersScriptService implements ScriptService
         List<String> eventTypes, EntityReference reference, UserReference userReference) throws NotificationException
     {
         cachedModelBridge.createScopeFilterPreference(convertReference(userReference), type, formats, eventTypes,
+            reference);
+    }
+
+    /**
+     * Create a scope notification filter preference for the given user.
+     * Note: we use a distinct name than {@code createScopeFilterPreference} since a WikiReference can be converted to a
+     * UserReference by our converters, check https://jira.xwiki.org/browse/XWIKI-18496.
+     *
+     * @param type type of the filter preference to create
+     * @param formats formats concerned by the preference
+     * @param eventTypes the event types concerned by the preference
+     * @param reference the reference of the wiki, the space or the page concerned by the preference
+     * @param wikiReference the wiki for which to create the filter
+     * @throws NotificationException if an error occurs
+     *
+     * @since 13.3RC1
+     */
+    @Unstable
+    public void createWikiScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
+        List<String> eventTypes, EntityReference reference, WikiReference wikiReference) throws NotificationException
+    {
+        cachedModelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes,
             reference);
     }
 }

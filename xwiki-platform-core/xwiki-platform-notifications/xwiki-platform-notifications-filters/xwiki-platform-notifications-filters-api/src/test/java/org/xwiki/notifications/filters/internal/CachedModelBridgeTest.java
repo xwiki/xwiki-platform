@@ -19,13 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -34,10 +35,16 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,37 +59,42 @@ import static org.mockito.Mockito.when;
  * @since 10.4
  * @since 9.11.5
  */
+@ComponentTest
 public class CachedModelBridgeTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<CachedModelBridge> mocker =
-            new MockitoComponentMockingRule<>(CachedModelBridge.class);
+    @InjectMockComponents
+    private CachedModelBridge cachedModelBridge;
 
+    @MockComponent
     private ModelBridge modelBridge;
-    private Execution execution;
-    private EntityReferenceSerializer<String> serializer;
-    private ExecutionContext executionContext;
-    private Map<String, Object> executionContextProperties;
-    private CacheManager cacheManager;
-    private Cache cache;
-    private DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
-    @Before
-    public void setUp() throws Exception
+    private Cache cache;
+
+    private Map<String, Object> executionContextProperties;
+
+    private final DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+    private static final String SERIALIZED_USER = "xwiki:XWiki.User";
+
+    private final WikiReference wikiReference = new WikiReference("foo");
+    private final String SERIALIZED_WIKI = "foo";
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
     {
-        modelBridge = mocker.getInstance(ModelBridge.class);
-        execution = mocker.getInstance(Execution.class);
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        cacheManager = mocker.getInstance(CacheManager.class);
+        Execution execution = componentManager.registerMockComponent(Execution.class);
+        EntityReferenceSerializer<String> serializer = componentManager
+            .registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
         CacheFactory factory = mock(CacheFactory.class);
         when(cacheManager.getCacheFactory()).thenReturn(factory);
-        cache = mock(Cache.class);
+        this.cache = mock(Cache.class);
         when(factory.newCache(any(CacheConfiguration.class))).thenReturn(cache);
-        when(serializer.serialize(user)).thenReturn("xwiki:XWiki.User");
+        when(serializer.serialize(user)).thenReturn(SERIALIZED_USER);
+        when(serializer.serialize(wikiReference)).thenReturn(SERIALIZED_WIKI);
 
-        executionContext = mock(ExecutionContext.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
         when(execution.getContext()).thenReturn(executionContext);
-        executionContextProperties = new HashMap<>();
+        this.executionContextProperties = new HashMap<>();
         when(executionContext.getProperties()).thenReturn(executionContextProperties);
         executionContextProperties.put("property1", new Object());
         executionContextProperties.put("userToggleableFilterPreference_property3", new Object());
@@ -94,21 +106,61 @@ public class CachedModelBridgeTest
 
     }
 
-    private void verifyClearCache() throws Exception
+    private void verifyClearCache(String serializedReference) throws Exception
     {
         assertTrue(executionContextProperties.containsKey("property1"));
         assertFalse(executionContextProperties.containsKey("userToggleableFilterPreference_property3"));
 
-        verify(cache).remove(eq("xwiki:XWiki.User"));
+        verify(cache).remove(serializedReference);
     }
 
     @Test
-    public void setStartDateForUser() throws Exception
+    void setStartDateForUser() throws Exception
     {
         Date date = new Date();
-        mocker.getComponentUnderTest().setStartDateForUser(user, date);
+        this.cachedModelBridge.setStartDateForUser(user, date);
 
-        verify(modelBridge).setStartDateForUser(eq(user), eq(date));
-        verifyClearCache();
+        verify(modelBridge).setStartDateForUser(user, date);
+        verifyClearCache(SERIALIZED_USER);
+    }
+
+    @Test
+    void setFilterPreferenceEnabledForUser() throws Exception
+    {
+        this.cachedModelBridge.setFilterPreferenceEnabled(user, "filter1", true);
+        verify(modelBridge).setFilterPreferenceEnabled(user, "filter1", true);
+        verifyClearCache(SERIALIZED_USER);
+    }
+
+    @Test
+    void setFilterPreferenceEnabledForWiki() throws Exception
+    {
+        this.cachedModelBridge.setFilterPreferenceEnabled(wikiReference, "filter2", false);
+        verify(modelBridge).setFilterPreferenceEnabled(wikiReference, "filter2", false);
+        verifyClearCache(SERIALIZED_WIKI);
+    }
+
+    @Test
+    void saveFilterPreferencesForUser() throws Exception
+    {
+        List<NotificationFilterPreference> filterPreferenceList = Arrays.asList(
+            mock(NotificationFilterPreference.class),
+            mock(NotificationFilterPreference.class)
+        );
+        this.cachedModelBridge.saveFilterPreferences(user, filterPreferenceList);
+        verify(modelBridge).saveFilterPreferences(user, filterPreferenceList);
+        verifyClearCache(SERIALIZED_USER);
+    }
+
+    @Test
+    void saveFilterPreferencesForWiki() throws Exception
+    {
+        List<NotificationFilterPreference> filterPreferenceList = Arrays.asList(
+            mock(NotificationFilterPreference.class),
+            mock(NotificationFilterPreference.class)
+        );
+        this.cachedModelBridge.saveFilterPreferences(wikiReference, filterPreferenceList);
+        verify(modelBridge).saveFilterPreferences(wikiReference, filterPreferenceList);
+        verifyClearCache(SERIALIZED_WIKI);
     }
 }

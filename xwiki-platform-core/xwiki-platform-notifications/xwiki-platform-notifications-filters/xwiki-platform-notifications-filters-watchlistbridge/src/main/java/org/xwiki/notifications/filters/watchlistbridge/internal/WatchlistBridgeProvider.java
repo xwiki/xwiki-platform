@@ -62,11 +62,15 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
  *
  * @version $Id$
  * @since 9.8RC1
+ * @deprecated Since 11.10.11, 12.6.5, 12.10, this should not be used and new implementation
+ *              should not be provided here.
  */
 @Component
 @Singleton
 @Named(WatchlistBridgeProvider.PROVIDER_HINT)
 // TODO: migrate watchlist objects to filters instead of dynamically converting them every time
+// (see: https://jira.xwiki.org/browse/XWIKI-17243)
+@Deprecated
 public class WatchlistBridgeProvider implements NotificationFilterPreferenceProvider
 {
     /**

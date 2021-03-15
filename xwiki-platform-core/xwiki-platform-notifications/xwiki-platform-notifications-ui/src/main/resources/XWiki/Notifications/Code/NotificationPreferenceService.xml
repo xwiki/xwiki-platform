@@ -44,6 +44,13 @@
       #set ($targetUser = "XWiki." + $request.user)
     #end
 #end
+#if ("$!request.target" == 'wiki')
+  #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+  #set ($targetRef = $services.wiki.getCurrentWikiReference())
+#elseif ("$!request.target" == 'user')
+  #set ($targetDoc = $xwiki.getDocument($targetUser))
+  #set ($targetRef = $targetUser)
+#end
 #if ("$!request.action" == "" &amp;&amp; $request.method.equalsIgnoreCase('get'))
   This is a technical page for Notifications macro.
 #elseif (!$services.csrf.isTokenValid($request.csrf))
@@ -64,11 +71,6 @@
   #if ("$!request.diffType" == '')
     #set ($discard = $response.sendError(400, $services.localization.render('notifications.settings.error.badParameters')))
   #end
-  #if ("$!request.target" == 'wiki')
-    #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
-  #elseif ("$!request.target" == 'user')
-    #set ($targetDoc = $xwiki.getDocument($targetUser))
-  #end
   #set ($prefObj = $targetDoc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass', true))
   #set ($discard = $prefObj.set('diffType', $request.diffType))
   #set ($discard = $targetDoc.save('Update Notification Email Diff Type'))
@@ -77,7 +79,7 @@
     #if ("$!request.target" == 'wiki')
       $services.notification.preferences.saveNotificationPreferencesForCurrentWiki($request.json)
     #else
-      $services.notification.preferences.saveNotificationPreferences($request.json, $targetUser)
+      $services.notification.preferences.saveNotificationPreferences($request.json, $targetRef)
     #end
   #end
   #if ("$!exception" != '')
@@ -85,14 +87,22 @@
   #end
 #elseif ("$!request.action" == 'deleteFilterPreference')
   #try()
-    $services.notification.filters.deleteFilterPreference($request.filterPreferenceId, $targetUser)
+    #if ("$!request.target" == 'wiki')
+      $services.notification.filters.deleteWikiFilterPreference($request.filterPreferenceId, $targetRef)
+    #else
+      $services.notification.filters.deleteFilterPreference($request.filterPreferenceId, $targetRef)
+    #end
   #end
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
   #end
 #elseif ("$!request.action" == 'setFilterPreferenceEnabled')
   #try()
-    $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceId, $stringtool.equals("$!request.enabled", 'true'), $targetUser)
+    #if ("$!request.target" == 'wiki')
+      $services.notification.filters.setWikiFilterPreferenceEnabled($request.filterPreferenceId, $stringtool.equals("$!request.enabled", 'true'), $targetRef)
+    #else
+      $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceId, $stringtool.equals("$!request.enabled", 'true'), $targetRef)
+    #end
   #end
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
@@ -100,7 +110,11 @@
 #elseif ("$!request.action" == 'createScopeFilterPreference')
   #try()
     #macro (saveScopeFilterPreference $reference)
-      $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference, $targetUser)
+      #if ("$!request.target" == 'wiki')
+        $services.notification.filters.createWikiScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference, $targetRef)
+      #else
+        $services.notification.filters.createScopeFilterPreference($request.filterType, $request.filterFormats.split(','), $request.eventTypes.split(','), $reference, $targetRef)
+      #end
     #end
     #if ("$!request.wiki" != "")
       #foreach ($wikiRequest in $request.getParameterValues('wiki'))
@@ -110,7 +124,6 @@
     #end
     #if ("$!request.space" != "")
       #foreach ($spaceRequest in $request.getParameterValues('space'))
-        SPACE REQUEST: $spaceRequest
         #set ($reference = $services.model.resolveSpace($spaceRequest))
         #saveScopeFilterPreference($reference)
       #end
@@ -127,11 +140,6 @@
   #end
 #elseif ("$!request.action" == 'setAutoWatchMode')
   #try()
-    #if ($request.target == 'user')
-      #set ($targetDoc = $xwiki.getDocument($targetUser))
-    #else
-      #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
-    #end
     #set ($obj = $targetDoc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass', true))
     #set ($discard = $obj.set('automaticWatchMode', $request.mode))
     #set ($discard = $targetDoc.save('Update the automaticWatchMode.'))

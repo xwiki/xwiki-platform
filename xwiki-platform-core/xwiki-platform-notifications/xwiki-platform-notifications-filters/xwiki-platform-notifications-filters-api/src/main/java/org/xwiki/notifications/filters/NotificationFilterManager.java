@@ -20,11 +20,13 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -48,6 +50,19 @@ public interface NotificationFilterManager
      * @since 10.4RC1
      */
     Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException;
+
+    /**
+     * Get all notifications filters from the given wikis.
+     * @param wikiReference include filters from the given wiki.
+     * @return a collection of notification filters
+     * @throws NotificationException if error happens
+     * @since 13.3RC1
+     */
+    @Unstable
+    default Collection<NotificationFilter> getAllFilters(WikiReference wikiReference) throws NotificationException
+    {
+        return Collections.emptyList();
+    }
 
     /**
      * Get all notifications filters that are enabled to the given user.

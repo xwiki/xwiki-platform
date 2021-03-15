@@ -131,6 +131,10 @@
         #else
             ## TODO
         #end
+    #else
+       #if($tags.size() == 0)
+        <div class="tag-tool tag-add"><a>None</a></div>
+       #end    
     #end
 </div>
     #if($tagErrorMessage != '')

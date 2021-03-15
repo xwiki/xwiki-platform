@@ -153,13 +153,6 @@ public abstract class XWikiAction implements LegacyAction
     @Inject
     protected Execution execution;
 
-    @Inject
-    protected ContextualAuthorizationManager autorization;
-
-    @Inject
-    @Named("currentmixed")
-    protected DocumentReferenceResolver<String> currentmixedReferenceResolver;
-
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
@@ -169,6 +162,13 @@ public abstract class XWikiAction implements LegacyAction
      * Indicate if the XWiki.RedirectClass is handled by the action (see handleRedirectObject()).
      */
     protected boolean handleRedirectObject = false;
+
+    @Inject
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> currentmixedReferenceResolver;
+
+    @Inject
+    private ContextualAuthorizationManager autorization;
 
     private ContextualLocalizationManager localization;
 
@@ -199,6 +199,24 @@ public abstract class XWikiAction implements LegacyAction
         }
 
         return this.localization;
+    }
+
+    /**
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    protected DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        return this.currentmixedReferenceResolver;
+    }
+
+    /**
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    protected ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        return this.autorization;
     }
 
     protected String localizePlainOrKey(String key, Object... parameters)
@@ -1158,10 +1176,10 @@ public abstract class XWikiAction implements LegacyAction
     protected DocumentReference resolveTemplate(String template)
     {
         if (StringUtils.isNotBlank(template)) {
-            DocumentReference templateReference = this.currentmixedReferenceResolver.resolve(template);
+            DocumentReference templateReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
 
             // Make sure the current user have access to the template document before copying it
-            if (this.autorization.hasAccess(Right.VIEW, templateReference)) {
+            if (getContextualAuthorizationManager().hasAccess(Right.VIEW, templateReference)) {
                 return templateReference;
             }
         }

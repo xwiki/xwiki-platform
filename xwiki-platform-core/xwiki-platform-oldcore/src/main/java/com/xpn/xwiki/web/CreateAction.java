@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -96,11 +95,6 @@ public class CreateAction extends XWikiAction
      * Local entity reference serializer hint.
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
-
-    /**
-     * Current entity reference resolver hint.
-     */
-    private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
 
     /**
      * The action to perform when creating a new page from a template.
@@ -278,14 +272,6 @@ public class CreateAction extends XWikiAction
     }
 
     /**
-     * @return the resolver uses to resolve references received in request parameters
-     */
-    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
-    {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
-    }
-
-    /**
      * Initialize and save the new document before editing it. Follow the steps done by the Save action.
      * 
      * @param context the XWiki context
@@ -312,7 +298,7 @@ public class CreateAction extends XWikiAction
 
         // Set the parent field.
         if (!StringUtils.isEmpty(parent)) {
-            DocumentReference parentReference = this.currentmixedReferenceResolver.resolve(parent);
+            DocumentReference parentReference = getCurrentMixedDocumentReferenceResolver().resolve(parent);
             newDocument.setParentReference(parentReference);
         }
 

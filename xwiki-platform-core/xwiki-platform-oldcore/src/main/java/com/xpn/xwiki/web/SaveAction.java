@@ -48,7 +48,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
@@ -78,7 +77,7 @@ import com.xpn.xwiki.objects.ObjectDiff;
 @Component
 @Named("save")
 @Singleton
-public class SaveAction extends PreviewAction
+public class SaveAction extends EditAction
 {
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.web.LegacyAction;
 
 /**
  * Action used for saving and returning to the edit page rather than viewing changes.
@@ -69,6 +71,15 @@ public class SaveAndContinueAction extends XWikiAction
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 
+    @Inject
+    @Named("save")
+    private LegacyAction saveAction;
+
+    @Inject
+    @Named("propupdate")
+    private LegacyAction propupdateAction;
+
+    
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -98,7 +109,7 @@ public class SaveAndContinueAction extends XWikiAction
 
         // This will never be true if "back" comes from request.getHeader("referer")
         if (back != null && back.contains("editor=class")) {
-            PropUpdateAction pua = new PropUpdateAction();
+            PropUpdateAction pua = (PropUpdateAction) this.propupdateAction;
 
             if (pua.propUpdate(context)) {
                 if (isAjaxRequest) {
@@ -111,7 +122,7 @@ public class SaveAndContinueAction extends XWikiAction
                 failure = true;
             }
         } else {
-            SaveAction sa = new SaveAction();
+            SaveAction sa = (SaveAction) this.saveAction;
             if (sa.save(context)) {
                 // if it's a 409 we managed the conflict directly inside SaveAction, which explains the return true
                 if (isAjaxRequest && context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {

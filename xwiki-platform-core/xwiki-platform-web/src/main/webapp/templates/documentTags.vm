@@ -132,7 +132,7 @@
             ## TODO
         #end
     #else
-       #if($tags.size() == 0)
+       #if($tags.isEmpty())
         <div class="tag-tool tag-add"><a>None</a></div>
        #end    
     #end

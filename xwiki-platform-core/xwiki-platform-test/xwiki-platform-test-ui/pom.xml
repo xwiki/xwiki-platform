@@ -67,7 +67,7 @@
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>3.7.1</version>
+      <version>4.3.1</version>
     </dependency>
     <!-- Used to build support for phantomjs -->
     <dependency>

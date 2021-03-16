@@ -80,7 +80,7 @@ select[size="0"], select[size="1"] {
       &:first-of-type {
         margin-top: 0;
       }
-      label {
+      .label {
         color: @text-color;
         font-size: 0.85em;
         font-weight: 700;
@@ -95,6 +95,9 @@ select[size="0"], select[size="1"] {
           text-transform: none;
           top: 0;
         }
+      }
+      label {
+        .label;
       }
     }
   }

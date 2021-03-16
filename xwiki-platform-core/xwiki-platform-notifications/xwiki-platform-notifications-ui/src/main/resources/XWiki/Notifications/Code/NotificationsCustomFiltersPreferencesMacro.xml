@@ -1171,7 +1171,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
               &lt;/select&gt;
             &lt;/dd&gt;
             &lt;dt&gt;
-              &lt;label for="notificationFilterNotificationFormatSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.custom.addFilter.notificationFormat.label'))&lt;/label&gt;
+              &lt;span class="label"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.custom.addFilter.notificationFormat.label'))&lt;/span&gt;
               &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.custom.addFilter.notificationFormat.hint'))&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;

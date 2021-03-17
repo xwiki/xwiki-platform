@@ -114,21 +114,21 @@ notifications.filters.type.custom.exclusive=Ignore the event
 
 ## Add filter modal
 notifications.settings.addFilter=Add filter
-notifications.settings.addFilter.hint=Create a custom location filter: this filter applies on events related to specific locations and allow to notify or ignore them based on the event type and the notification format.
+notifications.settings.addFilter.hint=Create a filter for events happening on specific locations. The filter can trigger the sending of a notification or prevent one from being sent, depending on the event and the notification channel.
 
 notifications.filters.preferences.custom.addFilter.location.label=Location
-notifications.filters.preferences.custom.addFilter.location.hint=This filter applies when an event is sent from the selected location. Multiple locations can be selected.
+notifications.filters.preferences.custom.addFilter.location.hint=This filter applies on the events happening on the locations selected here. Select one or more locations.
 
 notifications.filters.preferences.custom.addFilter.type.label=Action
-notifications.filters.preferences.custom.addFilter.type.hint=What the filter should do when a event is sent from the given location? 
+notifications.filters.preferences.custom.addFilter.type.hint=This filter can either notify of or ignore the events happening on the selected locations. Choose the action you want to take for the events.
 notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notify of the event
 notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignore the event
 
-notifications.filters.preferences.custom.addFilter.notificationFormat.label=Format
-notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies when a notification is sent for the selected format. Multiple formats can be selected.
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Channel
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies only to the notifications sent on the communication channels selected below. Choose one or more communication channels.
 
-notifications.filters.preferences.custom.addFilter.eventType.label=Event Type
-notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies when an event of selected type is sent. Multiple types can be selected. If nothing is selected, then the filter will apply for any type.
+notifications.filters.preferences.custom.addFilter.eventType.label=Events
+notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies to the events selected here, in the locations selected above. Choose one or more events.
 
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings

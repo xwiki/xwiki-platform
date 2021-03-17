@@ -20,11 +20,18 @@
 package org.xwiki.ratings.internal;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Named;
 
+import org.apache.ecs.storage.Hash;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -52,6 +59,9 @@ public class DefaultRatingsConfigurationTest
     @Named("ratings")
     private ConfigurationSource configurationSource;
 
+    @MockComponent
+    private EntityReferenceResolver<String> entityReferenceResolver;
+
     @Test
     void defaultValues()
     {
@@ -65,5 +75,25 @@ public class DefaultRatingsConfigurationTest
         assertTrue(configuration.isAverageStored());
         assertTrue(configuration.isEnabled());
         assertEquals(Collections.emptySet(), configuration.getExcludedReferencesFromRatings());
+    }
+
+    @Test
+    void getExcludedReferencesFromRatings()
+    {
+        HashSet<String> references = new HashSet<>();
+        references.add("foo");
+        references.add("bar");
+        when(this.configurationSource.getProperty("excludedReferences", new HashSet<String>())).thenReturn(references);
+
+        EntityReference fooReference = new DocumentReference("xwiki", "Foo", "WebHome");
+        EntityReference barReference = new DocumentReference("xwiki", "Bar", "WebHome");
+        Set<EntityReference> result = new HashSet<>();
+        result.add(fooReference);
+        result.add(barReference);
+
+        when(this.entityReferenceResolver.resolve("foo", EntityType.PAGE)).thenReturn(fooReference);
+        when(this.entityReferenceResolver.resolve("bar", EntityType.PAGE)).thenReturn(barReference);
+
+        assertEquals(result, this.configuration.getExcludedReferencesFromRatings());
     }
 }

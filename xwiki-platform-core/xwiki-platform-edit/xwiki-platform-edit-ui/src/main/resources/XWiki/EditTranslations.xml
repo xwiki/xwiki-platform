@@ -61,12 +61,6 @@ edit.inplace.actionButtons.loadFailed=Failed to load the action buttons.
 edit.inplace.page.original=You''re editing the original page ({0})
 edit.inplace.page.translation=You''re editing the following translation: {0}.
 
-#######################################
-## until 13.2-rc-1
-#######################################
-edit.inplace.page.translate=Translate
-edit.inplace.page.translate.hint=Translate this page in {0}
-
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
   <object>

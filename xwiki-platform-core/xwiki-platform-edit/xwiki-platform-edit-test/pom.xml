@@ -24,23 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>12.10.6-SNAPSHOT</version>
+    <artifactId>xwiki-platform-edit</artifactId>
+    <version>13.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-edit</artifactId>
-  <name>XWiki Platform - Edit</name>
+  <artifactId>xwiki-platform-edit-test</artifactId>
+  <name>XWiki Platform - Edit - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Top level POM for the Edit module</description>
+  <description>Functional tests for the Edit module.</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-edit-api</module>
-    <module>xwiki-platform-edit-default</module>
-    <module>xwiki-platform-edit-ui</module>
+    <module>xwiki-platform-edit-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-edit-test</module>
+        <module>xwiki-platform-edit-test-docker</module>
       </modules>
     </profile>
   </profiles>

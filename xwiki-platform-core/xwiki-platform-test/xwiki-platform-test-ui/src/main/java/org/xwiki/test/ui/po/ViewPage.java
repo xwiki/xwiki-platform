@@ -115,6 +115,22 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return the "Translate" page button; use this only if you expect the button to be present
+     */
+    public WebElement getTranslateButton()
+    {
+        return getDriver().findElement(By.cssSelector("#tmTranslate > a[role='button']"));
+    }
+
+    /**
+     * @return {@code true} if the "Translate" page button is present, {@code false} otherwise
+     */
+    public boolean hasTranslateButton()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("#tmTranslate"));
+    }
+
+    /**
      * Clicks on a wanted link in the page.
      */
     public void clickWantedLink(String spaceName, String pageName, boolean waitForTemplateDisplay)

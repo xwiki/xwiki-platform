@@ -24,24 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>12.10.6-SNAPSHOT</version>
+    <artifactId>xwiki-platform-edit-test</artifactId>
+    <version>13.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-edit</artifactId>
-  <name>XWiki Platform - Edit</name>
-  <packaging>pom</packaging>
-  <description>Top level POM for the Edit module</description>
-  <modules>
-    <module>xwiki-platform-edit-api</module>
-    <module>xwiki-platform-edit-default</module>
-    <module>xwiki-platform-edit-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-edit-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
+  <name>XWiki Platform - Edit - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>Test Page Objects for the Edit module</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

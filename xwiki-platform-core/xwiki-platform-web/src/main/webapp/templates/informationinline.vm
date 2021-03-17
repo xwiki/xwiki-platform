@@ -20,13 +20,16 @@
 #template('display_macros.vm')
 #macro(docTranslationLink $locale $action $fragment)
   #set ($localeName = $locale.getDisplayName($xcontext.locale))
+  #if ("$!localeName" == '')
+    #set ($localeName = $services.localization.render('core.viewers.information.noLocale'))
+  #end
   #set ($translationURL = $doc.getURL($action, $escapetool.url({
     'language': $locale
   })))
   #if ($fragment)
     #set ($translationURL = $translationURL + '#' + $escapetool.url($fragment))
   #end
-  <a href="$translationURL">$escapetool.xml($localeName)</a>
+  <a href="$translationURL" data-locale="$escapetool.xml($locale)">$escapetool.xml($localeName)</a>
 #end
 $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
@@ -49,7 +52,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
           <label>$escapetool.xml($services.localization.render('core.viewers.information.locale'))</label>
         </dt>
         #set ($displayParams = {'value': $tdoc.realLocale})
-        <dd>#displayProperty_locale($displayParams)</dd>
+        <dd data-key="locale">#displayProperty_locale($displayParams)</dd>
         ##
         ## Original Locale
         ##
@@ -57,18 +60,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
           <dt>
             <label>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</label>
           </dt>
-          #set ($originalLocaleName = $doc.realLocale.getDisplayName($xcontext.locale))
-          #set ($styleName = '')
-          #if ("$!originalLocaleName" == '')
-            #set ($originalLocaleName = $services.localization.render('core.viewers.information.noLocale'))
-            #set ($styleName = 'text-muted')
-          #end
-          #set ($originalLocaleURL = $doc.getURL('view', $escapetool.url({
-            'language': $doc.realLocale
-          })))
-          <dd class="$styleName">
-            <a href="$originalLocaleURL">$escapetool.xml($originalLocaleName)</a>
-          </dd>
+          <dd data-key="originalLocale">#docTranslationLink($doc.realLocale 'view')</dd>
         #end
         ##
         ## Translations
@@ -108,7 +100,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
                 ))
               #end
             #end
-            <dd>$stringtool.join($output, ', ')</dd>
+            <dd data-key="translations">$stringtool.join($output, ', ')</dd>
           #end
         #end
         ##

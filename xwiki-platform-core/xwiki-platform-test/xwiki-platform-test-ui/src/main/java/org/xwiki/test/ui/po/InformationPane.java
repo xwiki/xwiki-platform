@@ -19,6 +19,10 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -31,12 +35,92 @@ import org.openqa.selenium.support.FindBy;
  */
 public class InformationPane extends BaseElement
 {
+    private static final By ORIGINAL_LOCALE_SELECTOR = By.cssSelector("dd[data-key='originalLocale']");
+
     @FindBy(id = "informationcontent")
     private WebElement pane;
 
     public boolean isOpened()
     {
         return this.pane.isDisplayed();
+    }
+
+    /**
+     * @return the locale of the current page as shown on the Information tab
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public String getLocale()
+    {
+        return this.pane.findElement(By.cssSelector("dd[data-key='locale']")).getText();
+    }
+
+    /**
+     * @return {@code true} if the Information tab says that the original locale of the current page is currently being
+     *         viewed, {@code false} otherwise
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public boolean isOriginalLocale()
+    {
+        return getDriver().findElementsWithoutWaiting(this.pane, ORIGINAL_LOCALE_SELECTOR).isEmpty();
+    }
+
+    /**
+     * @return the original locale of the current page as shown on the Information tab
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public String getOriginalLocale()
+    {
+        return this.pane.findElement(ORIGINAL_LOCALE_SELECTOR).getText();
+    }
+
+    /**
+     * @return the list of supported locales the current page is translated into, as shown by the Information tab
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public List<String> getAvailableTranslations()
+    {
+        return getDriver().findElementsWithoutWaiting(this.pane, By.cssSelector("dd[data-key='translations'] > a"))
+            .stream().map(link -> link.getText()).collect(Collectors.toList());
+    }
+
+    /**
+     * @return the list of supported locales for which the current page doesn't have a translation yet
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public List<String> getMissingTranslations()
+    {
+        return getDriver()
+            .findElementsWithoutWaiting(this.pane, By.cssSelector("dd[data-key='translations'] .wikicreatelink a"))
+            .stream().map(link -> link.getText()).collect(Collectors.toList());
+    }
+
+    /**
+     * Clicks on the translation link that corresponds to the given locale.
+     * 
+     * @param locale the locale to click on
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public void clickTranslationLink(Locale locale)
+    {
+        this.pane.findElement(By.cssSelector("a[data-locale='" + locale + "']")).click();
+    }
+
+    /**
+     * Clicks on the translation link with the specified label (locale pretty name).
+     * 
+     * @param label the locale pretty name
+     * @since 12.10.6
+     * @since 13.2RC1
+     */
+    public void clickTranslationLink(String label)
+    {
+        this.pane.findElement(By.xpath(".//a[@data-locale and . = '" + label + "']")).click();
     }
 
     public String getSyntax()

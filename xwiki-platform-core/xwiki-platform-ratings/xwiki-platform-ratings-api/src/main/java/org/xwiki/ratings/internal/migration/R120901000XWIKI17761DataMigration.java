@@ -19,6 +19,7 @@
  */
 package org.xwiki.ratings.internal.migration;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -289,6 +292,21 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
             SolrClient likeClient = this.solr.getClient(LIKE_SOLR_CORE);
             // likeClient could be null here if for some reason the core was never initialized or if it has been
             // removed.
+            // In case of a Remote Solr server then the client won't be null, so we check that we can perform a
+            // request to it.
+            if (likeClient != null) {
+                try {
+                    SolrQuery solrQuery = new SolrQuery("*")
+                        .setStart(0)
+                        .setRows(1);
+                    likeClient.query(solrQuery);
+                } catch (SolrServerException | IOException e) {
+                    // in case of exception we consider that the client is null.
+                    likeClient = null;
+                    // and we log a debug message in case it's another issue
+                    this.logger.debug("Solr test connection for Like migration did not went well.", e);
+                }
+            }
             // TODO: Check in case it's a remote Solr core and it has not been created, it could be not null but
             //  still not exist.
             if (likeClient != null) {

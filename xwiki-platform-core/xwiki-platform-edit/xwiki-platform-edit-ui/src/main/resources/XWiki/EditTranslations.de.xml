@@ -45,9 +45,6 @@ edit.inplace.page.renderFailed=Die Seite konnte nicht gerendert werden.
 edit.inplace.page.original=Sie bearbeiten die Originalseite ({0})
 edit.inplace.page.translation=Sie bearbeiten die folgende Übersetzung: {0}.
 
-edit.inplace.page.translate=Übersetzen
-edit.inplace.page.translate.hint=Übersetzen Sie diese Seite in: {0}
 
 edit.inplace.actionButtons.loadFailed=Die Aktionsschaltflächen konnten nicht geladen werden.</content>
-  
 </xwikidoc>

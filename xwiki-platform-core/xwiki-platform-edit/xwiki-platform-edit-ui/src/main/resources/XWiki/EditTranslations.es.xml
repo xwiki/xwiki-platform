@@ -40,8 +40,6 @@
 edit.inplace.page.lockFailed=Error al bloquear la página.
 edit.inplace.page.loadFailed=Error al cargar la página.
 edit.inplace.page.renderFailed=Error al renderizar la página.
-edit.inplace.page.translate=Traducir
-edit.inplace.page.translate.hint=Traducir esta página al {0}
 edit.inplace.page.translate.messageBefore=Estás editando la traducción al {0} de esta página (su versión original) porque la página no se ha traducido todavía al {1} (el lenguage actual).
 edit.inplace.page.translate.messageAfter=Ahora estás editando la traducción al {0}. Comienza traduciendo el título de la página.
 edit.inplace.actionButtons.loadFailed=Error al cargar los botones de acción.
@@ -55,7 +53,5 @@ edit.inplace.page.original=Estás editando la página original ({0})
 edit.inplace.page.translation=Estás editando la traducción siguiente: {0}.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
-  
+#@deprecatedend</content>
 </xwikidoc>

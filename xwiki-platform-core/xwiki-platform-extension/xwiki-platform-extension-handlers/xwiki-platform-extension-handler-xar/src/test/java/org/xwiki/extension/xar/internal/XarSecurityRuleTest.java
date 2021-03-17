@@ -19,16 +19,17 @@
  */
 package org.xwiki.extension.xar.internal;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.extension.xar.internal.security.XarSecurityRule;
 import org.xwiki.extension.xar.internal.security.XarSecurityTool;
 import org.xwiki.security.authorization.Right;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
-public class XarSecurityRuleTest
+class XarSecurityRuleTest
 {
     private XarSecurityTool xarSecurityTool;
 
@@ -37,8 +38,8 @@ public class XarSecurityRuleTest
     private XarSecurityRule commentSimple;
     private XarSecurityRule adminExtended;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         xarSecurityTool = mock(XarSecurityTool.class);
 
@@ -50,30 +51,30 @@ public class XarSecurityRuleTest
     }
 
     @Test
-    public void testEquals()
+    void testEquals()
     {
         // Test the identity
-        Assert.assertEquals(adminSimple, adminSimple);
-        Assert.assertEquals(adminSimple, adminSimple2);
+        assertEquals(adminSimple, adminSimple);
+        assertEquals(adminSimple, adminSimple2);
 
         // Test with different rights
-        Assert.assertNotEquals(adminSimple, commentSimple);
+        assertNotEquals(adminSimple, commentSimple);
 
         // Test with a simple / extended rule
-        Assert.assertNotEquals(adminSimple, adminExtended);
+        assertNotEquals(adminSimple, adminExtended);
     }
 
     @Test
-    public void testHashCode()
+    void testHashCode()
     {
         // Test the identity
-        Assert.assertEquals(adminSimple.hashCode(), adminSimple.hashCode());
-        Assert.assertEquals(adminSimple.hashCode(), adminSimple2.hashCode());
+        assertEquals(adminSimple.hashCode(), adminSimple.hashCode());
+        assertEquals(adminSimple.hashCode(), adminSimple2.hashCode());
 
         // Test with different rights
-        Assert.assertNotEquals(adminSimple.hashCode(), commentSimple.hashCode());
+        assertNotEquals(adminSimple.hashCode(), commentSimple.hashCode());
 
         // Test with a simple / extended rule
-        Assert.assertNotEquals(adminSimple.hashCode(), adminExtended.hashCode());
+        assertNotEquals(adminSimple.hashCode(), adminExtended.hashCode());
     }
 }

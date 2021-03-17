@@ -952,17 +952,15 @@ define('editInPlace', [
       // The content editor is loaded on demand, asynchronously.
       deferred: $.Deferred()
     });
-    var editContentPromise = data.deferred.promise();
-    editContentPromise.done(function() {
+    editContent.trigger('xwiki:actions:edit', data);
+    return data.deferred.done(function() {
       editContent.show();
       viewContent.remove();
       if (withFocus) {
         // Restore the focus when the edit content is ready but make sure we don't scroll the page.
         editContent[0].focus({preventScroll: true});
       }
-    });
-    editContent.trigger('xwiki:actions:edit', data);
-    return editContentPromise;
+    }).promise();
   };
 
   var startRealTimeEditingSession = function(xwikiDocument) {
@@ -1053,7 +1051,7 @@ require(['jquery'], function($) {
     edit: function(editInPlace) {
       return editInPlace.editPage();
     }
-  }, onInPlaceEditing);
+  }, onInPlaceEditing).attr('data-editor', 'inplace');
 
   var translateButton = $('#tmTranslate &gt; a');
   translateButton.on('click.inPlaceEditing', {

@@ -132,9 +132,9 @@
             ## TODO
         #end
     #else
-       #if($tags.isEmpty())
-        <div class="tag-tool tag-add"><a>None</a></div>
-       #end    
+        #if($tags.isEmpty())
+          <div class="tag-tool tag-add"><a>None</a></div>
+        #end    
     #end
 </div>
     #if($tagErrorMessage != '')

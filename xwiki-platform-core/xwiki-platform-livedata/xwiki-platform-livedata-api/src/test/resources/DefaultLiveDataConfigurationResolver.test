@@ -26,7 +26,7 @@
       {
         "id":"String",
         "name":"Small Text",
-        "displayer":"html",
+        "displayer":"xClassProperty",
         "filter":{
           "id":"text",
           "defaultOperator":"prefix",
@@ -93,7 +93,7 @@
         },
         "sortable":true,
         "visible":true,
-        "displayer":{"id":"html"},
+        "displayer":{"id":"xClassProperty"},
         "filter":{
           "id":"text",
           "defaultOperator":"prefix",
@@ -148,7 +148,9 @@
       {"id":"text"},
       {"id":"link"},
       {"id":"html"},
-      {"id":"actions"}
+      {"id":"xClassProperty"},
+      {"id":"actions"},
+      {"id":"boolean"}
     ],
     "defaultDisplayer":"text",
     "pagination":{

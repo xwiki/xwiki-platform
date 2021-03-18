@@ -45,7 +45,11 @@
 -->
 <template>
   <!--
-    This is where the specific displayer component gets injected
+    This is where the specific displayer component gets injected.
+    The timestamp props if an optional and do not have to be declared in the injected component.
+    It can be watched in order to force the upgrade the the component when the content is not passed using the props.
+    For instance, it is used by the DisplayerXClassProperty component in order to fetch an updated view content when
+    the table is refreshed.
   -->
   <component
     class="livedata-displayer"
@@ -53,6 +57,7 @@
     :is="displayerComponent"
     :property-id="propertyId"
     :entry="entry"
+    :timestamp="new Date().getTime()"
   ></component>
 
   <!--
@@ -108,7 +113,7 @@ export default {
     },
 
     // Load the displayer component corresponding to the given displayerId
-    // On success, set `this.displayerComponent` to the retreived component,
+    // On success, set `this.displayerComponent` to the retrieved component,
     // which automatically insert the component in the html
     loadDisplayer (displayerId) {
       return new Promise ((resolve, reject) => {

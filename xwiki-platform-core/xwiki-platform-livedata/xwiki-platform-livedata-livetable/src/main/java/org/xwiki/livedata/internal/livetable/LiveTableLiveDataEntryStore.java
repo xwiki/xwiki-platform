@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -42,6 +43,7 @@ import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
@@ -53,6 +55,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * {@link LiveDataEntryStore} implementation that reuses existing live table data.
@@ -70,6 +73,15 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
      */
     public static final String ROLE_HINT = "liveTable";
 
+    private static final String CLASS_NAME_PARAMETER = "className";
+
+    private static final String DOC_PREFIX = "doc.";
+
+    private static final String UNDEFINED_CLASS_ERROR_MESSAGE =
+        "Can't update a live table with an undefined class name.";
+
+    private static final String ENTRY_ID = "doc.fullName";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -86,10 +98,13 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     @Inject
     private LiveTableRequestHandler liveTableRequestHandler;
 
+    @Inject
+    private XClassPropertyService xClassPropertyService;
+
     @Override
     public Optional<Map<String, Object>> get(Object entryId)
     {
-        throw new UnsupportedOperationException();
+        return Optional.empty();
     }
 
     @Override
@@ -141,7 +156,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         }
     }
 
-    private String getLiveTableResultsFromTemplate(String template, LiveDataQuery query) throws Exception
+    private String getLiveTableResultsFromTemplate(String template, LiveDataQuery query)
     {
         return this.liveTableRequestHandler.getLiveTableResults(query, () -> {
             try {
@@ -182,12 +197,72 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
                 // live data query.
                 Set<String> keysToRename =
                     entry.keySet().stream().filter(key -> key.startsWith("doc_")).collect(Collectors.toSet());
-                keysToRename.forEach(key -> {
-                    entry.put("doc." + key.substring(4), entry.remove(key));
-                });
+                keysToRename.forEach(key -> entry.put(DOC_PREFIX + key.substring(4), entry.remove(key)));
                 entries.add(entry);
             }
         }
         return entries;
     }
+
+    @Override
+    public Optional<Object> update(Object entryId, String property, Object value) throws LiveDataException
+    {
+        String className = (String) this.getParameters().get(CLASS_NAME_PARAMETER);
+
+        // We can't update a class field if the class is undefined.
+        if (className == null && !StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX)) {
+            throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);
+        }
+
+        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve((String) entryId);
+        DocumentReference classReference;
+        if (className != null) {
+            classReference = this.currentDocumentReferenceResolver.resolve(className);
+        } else {
+            classReference = null;
+        }
+        try {
+            return this.xClassPropertyService.update(property, value, documentReference, classReference);
+        } catch (AccessDeniedException | XWikiException | LiveDataException e) {
+            throw new LiveDataException(e);
+        }
+    }
+
+    @Override
+    public Optional<Object> save(Map<String, Object> entries) throws LiveDataException
+    {
+        String className = (String) this.getParameters().get(CLASS_NAME_PARAMETER);
+
+        // We can't update a class field if the class is unknown and one of the entry to update is an XProperty.
+        boolean hasXClassPropertiesToUpdate = entries.keySet()
+            .stream()
+            .anyMatch(it -> !StringUtils.defaultIfEmpty(it, "").startsWith(DOC_PREFIX));
+        if (className == null && hasXClassPropertiesToUpdate) {
+            throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);
+        }
+
+        String fullName = (String) entries.get(ENTRY_ID);
+        if (fullName == null) {
+            throw new LiveDataException(
+                String.format("Entry [%s] missing. Can't load the document to update.", ENTRY_ID));
+        }
+
+        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
+
+        DocumentReference classReference;
+        if (className != null) {
+            classReference = this.currentDocumentReferenceResolver.resolve(className);
+        } else {
+            classReference = null;
+        }
+
+        try {
+            this.xClassPropertyService.updateAll(entries, documentReference, classReference);
+        } catch (AccessDeniedException | XWikiException e) {
+            throw new LiveDataException(e);
+        }
+
+        return Optional.of(fullName);
+    }
+   
 }

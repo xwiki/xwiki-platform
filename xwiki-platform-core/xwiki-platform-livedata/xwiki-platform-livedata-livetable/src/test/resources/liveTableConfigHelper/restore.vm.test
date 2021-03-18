@@ -7,6 +7,7 @@
     "_actions": {"actions": ["restore", "delete"]}
   },
   "options": {
+    "className":"Class.Test.Name",
     "url": "/xwiki/bin/get/Test/WebHome?xpage=getdeleteddocuments&doc.batchId=2872cd20-6cbf-4dad-af1d-77a30ba52ce8",
     "translationPrefix": "core.restore.batch.",
     "outputOnlyHtml": true,
@@ -25,6 +26,7 @@
       "template":"getdeleteddocuments.vm",
       "$doc":"xwiki:Test.WebHome",
       "translationPrefix":"core.restore.batch.",
+      "className":"Class.Test.Name",
       "doc.batchId":"2872cd20-6cbf-4dad-af1d-77a30ba52ce8"
     },
     "sort":[
@@ -50,7 +52,7 @@
         "visible":true,
         "filterable":true,
         "displayer":{
-          "id":"html"
+          "id":"xClassProperty"
         },
         "filter":{
           "id":"text"

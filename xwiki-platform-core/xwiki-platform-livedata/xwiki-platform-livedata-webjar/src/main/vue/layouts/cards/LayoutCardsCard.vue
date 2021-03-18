@@ -27,7 +27,7 @@
 <template>
   <div class="card">
 
-    <!-- Cartd title-->
+    <!-- Card title-->
     <div class="card-title">
       <!-- Entry selector -->
       <LivedataEntrySelector

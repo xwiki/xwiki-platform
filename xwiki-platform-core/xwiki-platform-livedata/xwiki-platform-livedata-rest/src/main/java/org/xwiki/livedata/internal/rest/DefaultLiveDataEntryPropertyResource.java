@@ -28,6 +28,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.LiveDataEntryPropertyResource;
@@ -60,15 +62,28 @@ public class DefaultLiveDataEntryPropertyResource extends AbstractLiveDataResour
     }
 
     @Override
-    public Response setProperty(String sourceId, String namespace, String entryId, String propertyId, Object value)
-        throws Exception
+    public Response setProperty(String sourceId, String namespace, String entryId, String propertyId, String value)
     {
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
-            source.get().getEntries().update(entryId, propertyId, value);
-            Optional<Object> newValue = source.get().getEntries().get(entryId, propertyId);
-            return Response.status(Status.ACCEPTED).entity(newValue).build();
+            try {
+
+                LiveDataSource liveDataSource = source.get();
+                if (!(boolean) liveDataSource.getProperties().get(propertyId)
+                    .map(LiveDataPropertyDescriptor::isEditable)
+                    .orElse(false))
+                {
+                    // Do not update a field that cannot be edited.
+                    return Response.status(Status.BAD_REQUEST).build();
+                }
+
+                liveDataSource.getEntries().update(entryId, propertyId, value);
+                Object newValue = liveDataSource.getEntries().get(entryId, propertyId).orElse(null);
+                return Response.status(Status.ACCEPTED).entity(newValue).build();
+            } catch (LiveDataException e) {
+                return Response.status(Status.BAD_REQUEST).build();
+            }
         }
 
         throw new WebApplicationException(Response.Status.NOT_FOUND);

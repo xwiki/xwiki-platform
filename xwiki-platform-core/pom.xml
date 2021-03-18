@@ -117,16 +117,15 @@
                  cannot be empty.
 
                  Note: you can use regexes by using the syntax: <regex>true</regex>
-                 Don't forget to '\'-escape dots and other special characters in this case ;)
+                 Don't forget to '\'-escape dots and other special characters in this case ;) -->
             <revapi.ignore>
               <item>
-                <code>java.method.addedToInterface</code>
-                <new>method void org.xwiki.ratings.RatingsManager::setIdentifier(java.lang.String)</new>
-                <justification>Young API: fix typo.</justification>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter javax.ws.rs.core.Response org.xwiki.livedata.rest.LiveDataEntryPropertyResource::setProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.Object===) throws java.lang.Exception</old>
+                <new>parameter javax.ws.rs.core.Response org.xwiki.livedata.rest.LiveDataEntryPropertyResource::setProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===) throws java.lang.Exception</new>
+                <justification>Unstable API: Object type for the request body lead to initializing a bytes array.</justification>
               </item>
             </revapi.ignore>
-            -->
-            
           </analysisConfiguration>
         </configuration>
       </plugin>

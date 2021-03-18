@@ -29,7 +29,8 @@
     'moment': $services.webjars.url('momentjs', 'moment.js'),
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js'),
-    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true),
+    'entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.min', true)
   },
   'css': {
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),

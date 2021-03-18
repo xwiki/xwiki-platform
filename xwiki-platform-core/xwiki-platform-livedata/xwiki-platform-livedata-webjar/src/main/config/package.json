@@ -5,7 +5,8 @@
   "scripts": {
     "build": "vue-cli-service build --target lib --formats umd-min XWikiLivedata.vue",
     "inspect": "vue-cli-service inspect > inspection.js",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "vue-cli-service test:unit"
   },
   "dependencies": {
     "vue": "^2.6.12",
@@ -22,6 +23,8 @@
     "eslint-plugin-vue": "^7.5.0",
     "less": "^4.1.1",
     "less-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.12",
+    "@vue/cli-plugin-unit-jest": "~4.5.0",
+    "@vue/test-utils": "^1.0.3"
   }
 }

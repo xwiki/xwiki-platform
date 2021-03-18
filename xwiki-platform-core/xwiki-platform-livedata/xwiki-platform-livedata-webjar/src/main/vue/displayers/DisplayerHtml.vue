@@ -20,58 +20,34 @@
 
 
 <!--
-  DisplayerHtml is a custom displayer that displays the entry value as html
-  It also fetches its Edit widget from the server, returned as an html string.
-  The Edit widget url is given inside the corresponding property descriptor
-  of the displayer
+  DisplayerHtml is a custom displayer that displays the entry value as static html.
+  It only support displaying the entries in view mode.
 -->
 <template>
-  <!--
-    Uses the BaseDisplayer as root element, as it handles for us
-    all the displayer default behavior
-  -->
+  <!-- Uses the BaseDisplayer as root element, as it handles for us all the displayer default behavior. -->
   <BaseDisplayer
     class="displayer-html"
     :property-id="propertyId"
     :entry="entry"
-  >
-
+    is-view
+    view-only>
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-        <div
-            class="html-wrapper"
-            v-html="value"
-        ></div>
+      <div class="html-wrapper" v-html="value"></div>
     </template>
-
-    <!-- Provide the Html Editor widget to the `editor` slot -->
-    <!-- TODO: implemtent the edit widget fetch from the server -->
-    <template #editor></template>
-
   </BaseDisplayer>
 </template>
 
-
 <script>
-
 import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
 
 export default {
-
   name: "displayer-html",
-
-  components: {
-    BaseDisplayer,
-  },
-
-  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin],
-
+  components: {BaseDisplayer,},
+  mixins: [displayerMixin]
 };
 </script>
 
-
 <style>
-
 </style>

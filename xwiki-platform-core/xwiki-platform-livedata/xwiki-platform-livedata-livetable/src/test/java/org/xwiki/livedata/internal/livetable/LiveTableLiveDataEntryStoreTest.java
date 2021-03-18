@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.inject.Named;
@@ -50,12 +51,15 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,13 +90,16 @@ class LiveTableLiveDataEntryStoreTest
     @MockComponent
     private LiveTableRequestHandler liveTableRequestHandler;
 
+    @MockComponent
+    private XClassPropertyService xClassPropertyService;
+
     @Mock
     private XWikiContext xcontext;
 
     @Mock
     private XWiki xwiki;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @SuppressWarnings("unchecked")
     @BeforeEach
@@ -213,5 +220,93 @@ class LiveTableLiveDataEntryStoreTest
         } catch (LiveDataException e) {
             assertEquals("Failed to execute the live data query.", e.getMessage());
         }
+    }
+
+    @Test
+    void updateUndefinedClassName() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "propName";
+        Object value = "theValue";
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.update(entryId, property, value));
+        assertEquals("Can't update a live table with an undefined class name.", liveDataException.getMessage());
+    }
+
+    @Test
+    void updateXClassField() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "propName";
+        Object value = "theValue";
+        String docName = "MyApp.MyClass";
+        DocumentReference documentEntityReference = new DocumentReference("xwiki", "MyApp", "testEntry");
+        DocumentReference documentClassReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        this.entryStore.getParameters().put("className", docName);
+        when(this.currentDocumentReferenceResolver.resolve(entryId)).thenReturn(documentEntityReference);
+        when(this.currentDocumentReferenceResolver.resolve(docName)).thenReturn(documentClassReference);
+
+        this.entryStore.update(entryId, property, value);
+        verify(this.xClassPropertyService).update(property, value, documentEntityReference, documentClassReference);
+    }
+
+    @Test
+    void updateDocField() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "doc.propName";
+        Object value = "theValue";
+        DocumentReference documentEntityReference = new DocumentReference("xwiki", "MyApp", "testEntry");
+
+        when(this.currentDocumentReferenceResolver.resolve(entryId)).thenReturn(documentEntityReference);
+
+        this.entryStore.update(entryId, property, value);
+        verify(this.xClassPropertyService).update(property, value, documentEntityReference, null);
+    }
+
+    @Test
+    void saveXClassUndefined()
+    {
+        Map<String, Object> entries = new HashMap<>();
+        entries.put("doc.hidden", "true");
+        entries.put("myProperty", asList("1", "0"));
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.save(entries));
+        assertEquals("Can't update a live table with an undefined class name.", liveDataException.getMessage());
+    }
+
+    @Test
+    void saveEntryIdUndefined()
+    {
+        Map<String, Object> entries = new HashMap<>();
+        entries.put("doc.hidden", "true");
+        entries.put("myProperty", asList("1", "0"));
+        this.entryStore.getParameters().put("className", "MyTest.MyClass");
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.save(entries));
+        assertEquals("Entry [doc.fullName] missing. Can't load the document to update.",
+            liveDataException.getMessage());
+    }
+
+    @Test
+    void save() throws Exception
+    {
+        Map<String, Object> entries = new HashMap<>();
+        entries.put("doc.hidden", "true");
+        entries.put("myProperty", asList("1", "0"));
+        entries.put("doc.fullName", "MyTest.MyObject");
+        DocumentReference objectDR = new DocumentReference("xwiki", "MyTest", "MyObject");
+        DocumentReference classDR = new DocumentReference("xwiki", "MyTest", "MyClass");
+
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyObject")).thenReturn(objectDR);
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyClass")).thenReturn(classDR);
+
+        this.entryStore.getParameters().put("className", "MyTest.MyClass");
+        Optional<Object> save = this.entryStore.save(entries);
+
+        assertEquals(Optional.of("MyTest.MyObject"), save);
+        verify(this.xClassPropertyService).updateAll(entries, objectDR, classDR);
+
     }
 }

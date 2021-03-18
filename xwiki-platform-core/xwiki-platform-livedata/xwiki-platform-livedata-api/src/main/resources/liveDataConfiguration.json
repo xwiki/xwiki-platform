@@ -45,7 +45,9 @@
       {"id": "text"},
       {"id": "link"},
       {"id": "html"},
-      {"id": "actions"}
+      {"id": "xClassProperty"},
+      {"id": "actions"},
+      {"id": "boolean"}
     ],
 
     "defaultDisplayer": "text",

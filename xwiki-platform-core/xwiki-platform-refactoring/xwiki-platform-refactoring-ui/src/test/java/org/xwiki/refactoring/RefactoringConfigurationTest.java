@@ -20,6 +20,7 @@
 package org.xwiki.refactoring;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,6 +54,7 @@ import static org.mockito.Mockito.when;
  * @since 12.10.6
  */
 @XWikiSyntax21ComponentList
+// TODO: Move all but ControlCharactersFilter to HTML50ComponentList in xwiki-platform-test-page.
 @ComponentList({
     HTMLMacroHTML5Renderer.class,
     HTML5BlockRenderer.class,
@@ -77,19 +79,25 @@ class RefactoringConfigurationTest extends PageTest
     @Test
     void verifyFormXRedirectField() throws Exception
     {
+        // TODO: move as the default output syntax in PageTest         
         setOutputSyntax(Syntax.HTML_5_0);
 
         registerVelocityTool("escapetool", new EscapeTool());
 
-        // Load the environment from the test resources. This is needed to access the 
+        // Load the environment from the test resources. This is needed to access the skins properties.
+        // TODO: move to PageTest initialization.
         Environment environment = this.componentManager.getInstance(Environment.class);
         when(environment.getResource(SKIN_PROPERTIES_PATH)).thenReturn(getClass().getResource(SKIN_PROPERTIES_PATH));
 
-        // Activates the recyclebin feature.
+        // Activates the recyclebin feature, allowing the tested form to be displayed.
         when(this.storeConfiguration.isRecycleBinEnabled()).thenReturn(true);
 
+        // Render and parse the rendered content with Jsoup.
+        // TODO: move to a new method in PageTest.
         String content = renderPage(REFACTORING_CONFIGURATION_REFERENCE);
-        String value = Jsoup.parse(content).getElementsByAttributeValue("name", "xredirect").first().attr("value");
+        Document parse = Jsoup.parse(content);
+        
+        String value = parse.getElementsByAttributeValue("name", "xredirect").first().attr("value");
         // Checks that the xredirect URL is relative.
         assertEquals("/xwiki/bin/Main/WebHome", value);
     }

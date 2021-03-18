@@ -160,6 +160,13 @@ define('xwiki-document-api', ['jquery'], function($) {
 
   return {
     /**
+     * @return this document's plain title
+     */
+    getPlainTitle() {
+      return $('&lt;div/&gt;').html(this.renderedTitle || this.title).text();
+    },
+
+    /**
      * @return this document's real locale
      */
     getRealLocale: function() {
@@ -685,7 +692,7 @@ define('editInPlace', [
     form.removeClass('form');
     // Update the URL.
     if (window.location.hash === '#edit' || window.location.hash === '#translate') {
-      window.location.hash = '';
+      history.replaceState(null, null, '#');
     }
     return $.Deferred().resolve(xwikiDocument).promise();
   };
@@ -1046,7 +1053,7 @@ require(['jquery'], function($) {
   var editButton = $('#tmEdit &gt; a');
   editButton.on('click.inPlaceEditing', {
     beforeEdit: function() {
-      window.location.hash = '#edit';
+      history.replaceState(null, null, '#edit');
     },
     edit: function(editInPlace) {
       return editInPlace.editPage();
@@ -1056,7 +1063,7 @@ require(['jquery'], function($) {
   var translateButton = $('#tmTranslate &gt; a');
   translateButton.on('click.inPlaceEditing', {
     beforeEdit: function() {
-      window.location.hash = '#translate';
+      history.replaceState(null, null, '#translate');
       translateButton.parent().addClass('hidden');
     },
     edit: function(editInPlace) {
@@ -1082,6 +1089,71 @@ require(['jquery'], function($) {
   } else if (window.location.hash === '#translate') {
     translateButton.click();
   }
+});
+
+require(['jquery'], function($) {
+  // Backup the document title before each editing session in order to catch changes.
+  var previousPlainTitle;
+  $('#xwikicontent').on('xwiki:actions:edit', function(event, data) {
+    previousPlainTitle = data.document.getPlainTitle();
+  });
+
+  // Update the UI after each editing session.
+  $(document).on('xwiki:actions:view', function(event, data) {
+    var xwikiDocument = data.document;
+    updateDocAuthorAndDate(xwikiDocument);
+    updateDocExtraTabs(xwikiDocument);
+    if (xwikiDocument.getPlainTitle() !== previousPlainTitle) {
+      updateDocTrees(xwikiDocument);
+      updateLinks(xwikiDocument);
+    }
+  });
+
+  var updateDocAuthorAndDate = function(xwikiDocument) {
+    var urlWithSelector = xwikiDocument.getURL('get', 'xpage=contentheader') + ' .xdocLastModification';
+    $('.xdocLastModification').load(urlWithSelector, function() {
+      // load() replaces the content of the specified container but we want to replace the container itself. We can't do
+      // this from the selector, e.g. by using '.xdocLastModification &gt; *' because we lose the text nodes.
+      $(this).children().unwrap();
+    });
+  };
+
+  var updateDocExtraTabs = function(xwikiDocument) {
+    // Reload the selected tab and force the reload of the hidden tabs next time they are selected.
+    $('#docextrapanes').children().addClass('empty').empty();
+    var selectedTab = $('#docExtraTabs .active[data-template]');
+    if (selectedTab.length) {
+      var docExtraId = selectedTab.attr('id');
+      docExtraId = docExtraId.substring(0, docExtraId.length - 'tab'.length);
+      XWiki.displayDocExtra(docExtraId, selectedTab.data('template'), false);
+    }
+  };
+
+  // Update the document trees (e.g. breadcrumb, navigation) if they have nodes that correspond to the edited document.
+  // Note that we want to update the internal tree data not just the link label. This is especially useful if we're
+  // going to implement refactoring operations (rename) in the document tree.
+  var updateDocTrees = function(xwikiDocument) {
+    var plainTitle = xwikiDocument.getPlainTitle();
+    $('.jstree-xwiki').each(function() {
+      $(this).jstree?.(true)?.set_text?.('document:' + xwikiDocument.id, plainTitle);
+    });
+  };
+
+  // Update the links that target the edited document and whose label matches the document title. Note that this can
+  // update links whose label was not generated dynamically (e.g. with server side scripting) based on the document
+  // title. For instance there could be links with hard-coded labels or with labels generated using a translatin key
+  // (like in the Applications panel). For simplicity we assume that if the link matches the document URL and its
+  // previous title then it needs to be updated, but this happens only at the UI level.
+  var updateLinks = function(xwikiDocument) {
+    var docURL = xwikiDocument.getURL();
+    var newPlainTitle = xwikiDocument.getPlainTitle();
+    // Exclude the links from the document content.
+    // Update the links that contain only text (no child elements) otherwise we can lose UI elements (e.g. icons).
+    $('a').not('#xwikicontent a').not(':has(*)').filter(function() {
+      var linkURL = $(this).attr('href')?.split(/[?#]/, 1)[0];
+      return linkURL === docURL &amp;&amp; $(this).text() === previousPlainTitle;
+    }).text(newPlainTitle);
+  };
 });
 
 })(JSON.parse(document.querySelector('[data-inplace-editing-config]')?.getAttribute('data-inplace-editing-config')) ||

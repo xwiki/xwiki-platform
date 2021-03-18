@@ -67,7 +67,7 @@
         <property name="web" type="string" update="false" insert="false" column="XWD_WEB" length="768" not-null="true" />
         <property name="space" type="string" column="XWD_WEB" length="768" index="DOC_SPACE" not-null="true" />
         <property name="content" type="text" column="XWD_CONTENT" length="200000" not-null="true" />
-        <property name="version" type="string" column="XWD_VERSION" length="768" not-null="true" />
+        <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
         <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="768" not-null="true" />
         <property name="parent" type="string" column="XWD_PARENT" length="511" not-null="true" />
         <property name="xWikiClassXML" type="text" column="XWD_CLASS_XML" length="60000" not-null="false" />
@@ -182,10 +182,10 @@
         </property>
         <!-- Kept for retro compatibility, so that existing queries using att.filesize will still work. -->
         <property name="filesize" type="integer" column="XWA_SIZE"/>
-        <property name="mimeType" type="string" column="XWA_MIMETYPE" length="768"/>
+        <property name="mimeType" type="string" column="XWA_MIMETYPE" length="255"/>
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
         <property name="author" type="string" column="XWA_AUTHOR" length="768" index="ATT_AUTHOR" />
-        <property name="version" type="string" column="XWA_VERSION" length="768" not-null="true" />
+        <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />
         <!-- Align the max comment size with the document max comment size (i.e. XWD_COMMENT) -->
         <property name="comment" type="string" column="XWA_COMMENT" length="1023" />
         <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
@@ -308,7 +308,7 @@
         <property name="number" type="integer" column="XWO_NUMBER" index="OBJ_NUMBER" not-null="false" />
         <property name="name" type="string" column="XWO_NAME" index="OBJ_NAME" not-null="true" length="768" />
         <property name="className" type="string" column="XWO_CLASSNAME" index="OBJ_CLASSNAME" not-null="true" length="768" />
-        <property name="guid" type="string" column="XWO_GUID" not-null="false" length="768" />
+        <property name="guid" type="string" column="XWO_GUID" not-null="false" length="255" />
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
@@ -322,8 +322,8 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWS_CLASSNAME" length="768" />
-        <property name="action" type="string" column="XWS_ACTION" not-null="true" length="768" index="XWDS_ACTION" />
+        <property name="className" type="string" column="XWS_CLASSNAME" length="255" />
+        <property name="action" type="string" column="XWS_ACTION" not-null="true" length="255" index="XWDS_ACTION" />
         <property name="pageViews" type="integer" column="XWS_PAGE_VIEWS" index="XWDS_PAGE_VIEWS" not-null="false" />
         <property name="uniqueVisitors" type="integer" column="XWS_UNIQUE_VISITORS" index="XWDS_UNIQUE_VISITORS" not-null="false" />
         <property name="period" type="integer" column="XWS_PERIOD" index="XWDS_PERIOD" not-null="false" />
@@ -341,7 +341,7 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWR_CLASSNAME" length="768" />
+        <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
         <property name="referer" type="text" column="XWR_REFERER" not-null="true" length="8192" />
         <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
         <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
@@ -358,11 +358,11 @@
              implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
-        <property name="className" type="string" column="XWV_CLASSNAME" length="768" />
-        <property name="IP" type="string" column="XWV_IP" not-null="true" length="768" index="XWVS_IP" />
+        <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
+        <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
         <property name="userAgent" type="text" column="XWV_USER_AGENT" not-null="true" length="8192" />
         <property name="cookie" type="text" column="XWV_COOKIE" not-null="true" length="8192" />
-        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="768" />
+        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
         <property name="downloads" type="integer" column="XWV_DOWNLOADS" index="XWVS_DOWNLOADS" not-null="false" />
@@ -376,24 +376,24 @@
             <column name="XWP_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="language" type="string" column="XWP_LANGUAGE" length="768" />
-        <property name="default_language" type="string" column="XWP_DEFAULT_LANGUAGE" length="768" />
+        <property name="language" type="string" column="XWP_LANGUAGE" length="255" />
+        <property name="default_language" type="string" column="XWP_DEFAULT_LANGUAGE" length="255" />
         <property name="multilingual" type="integer" column="XWP_MULTI_LINGUAL" />
         <property name="authenticate_edit" type="integer" column="XWP_AUTHENTICATE_EDIT" />
         <property name="authenticate_view" type="integer" column="XWP_AUTHENTICATE_VIEW" />
         <property name="auth_active_check" type="integer" column="XWP_AUTH_ACTIVE_CHECK" />
         <property name="backlinks" type="integer" column="XWP_BACKLINKS" />
-        <property name="skin" type="string" column="XWP_SKIN" length="768" />
-        <property name="stylesheet" type="string" column="XWP_STYLESHEET" length="768" />
-        <property name="stylesheets" type="string" column="XWP_STYLESHEETS" length="768" />
-        <property name="editor" type="string" column="XWP_EDITOR" length="768" />
-        <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="768" />
-        <property name="title" type="string" column="XWP_TITLE" length="768" />
-        <property name="version" type="string" column="XWP_VERSION" length="768" />
+        <property name="skin" type="string" column="XWP_SKIN" length="255" />
+        <property name="stylesheet" type="string" column="XWP_STYLESHEET" length="255" />
+        <property name="stylesheets" type="string" column="XWP_STYLESHEETS" length="255" />
+        <property name="editor" type="string" column="XWP_EDITOR" length="255" />
+        <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="255" />
+        <property name="title" type="string" column="XWP_TITLE" length="255" />
+        <property name="version" type="string" column="XWP_VERSION" length="255" />
         <property name="meta" type="text" column="XWP_META" length="30000" />
         <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
-        <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="768" />
-        <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="768" />
+        <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
+        <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
         <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
         <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
         <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
@@ -401,13 +401,13 @@
         <property name="rightPanels" type="text" column="XWP_RIGHT_PANELS" length="2000" />
         <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />
         <property name="showRightPanels" type="integer" column="XWP_SHOW_RIGHT_PANELS" />
-        <property name="languages" type="string" column="XWP_LANGUAGES" length="768" />
-        <property name="registration_anonymous" type="string" column="XWP_REGISTRATION_ANONYMOUS" length="768" />
-        <property name="registration_registered" type="string" column="XWP_REGISTRATION_REGISTERED" length="768" />
-        <property name="edit_anonymous" type="string" column="XWP_EDIT_ANONYMOUS" length="768" />
-        <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="768" />
-        <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="768" />
-        <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="768" />
+        <property name="languages" type="string" column="XWP_LANGUAGES" length="255" />
+        <property name="registration_anonymous" type="string" column="XWP_REGISTRATION_ANONYMOUS" length="255" />
+        <property name="registration_registered" type="string" column="XWP_REGISTRATION_REGISTERED" length="255" />
+        <property name="edit_anonymous" type="string" column="XWP_EDIT_ANONYMOUS" length="255" />
+        <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="255" />
+        <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="255" />
+        <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="255" />
         <property name="documentBundles" type="text" column="XWP_DOCUMENT_BUNDLES" length="2000" />
     </class>
 
@@ -417,7 +417,7 @@
             <column name="XWC_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="author" type="string" column="XWC_AUTHOR" length="768" index="COMMENT_AUTHOR" />
+        <property name="author" type="string" column="XWC_AUTHOR" length="255" index="COMMENT_AUTHOR" />
         <property name="highlight" type="text" column="XWC_HIGHLIGHT" length="60000" />
         <property name="comment" type="text" column="XWC_COMMENT" length="60000" />
         <property name="replyto" type="integer" column="XWP_REPLYTO" index="COMMENT_REPLYTO" />
@@ -431,19 +431,19 @@
             <column name="XWU_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="first_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_FIRST_NAME" length="768" not-null="false" />
-        <property name="last_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_LAST_NAME" length="768" not-null="false" />
+        <property name="first_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_FIRST_NAME" length="255" not-null="false" />
+        <property name="last_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_LAST_NAME" length="255" not-null="false" />
         <property name="email" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_EMAIL" length="50" />
-        <property name="company" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_COMPANY" length="768" />
-        <property name="password" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_PASSWORD" length="768" />
+        <property name="company" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_COMPANY" length="255" />
+        <property name="password" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_PASSWORD" length="255" />
         <property name="validationKey" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never" column="XWU_VALIDATION_KEY" />
-        <property name="skin" type="string" column="XWU_SKIN" length="768" />
+        <property name="skin" type="string" column="XWU_SKIN" length="255" />
         <property name="leftPanels" type="string" column="XWU_LEFT_PANELS" length="2000" />
         <property name="rightPanels" type="string" column="XWU_RIGHT_PANELS" length="2000" />
         <property name="showLeftPanels" type="integer" column="XWU_SHOW_LEFT_PANELS" />
         <property name="showRightPanels" type="integer" column="XWU_SHOW_RIGHT_PANELS" />
-        <property name="pageWidth" type="string" column="XWU_PAGE_WIDTH" length="768" />
-        <property name="avatar" type="string" column="XWU_AVATAR" length="768" />
+        <property name="pageWidth" type="string" column="XWU_PAGE_WIDTH" length="255" />
+        <property name="avatar" type="string" column="XWU_AVATAR" length="255" />
     </class>
     -->
 

@@ -22,25 +22,19 @@ package org.xwiki.ratings;
 import java.util.Arrays;
 import java.util.Optional;
 
-import javax.inject.Named;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.ratings.script.RatingsScriptService;
-import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.tools.EscapeTool;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -57,26 +51,15 @@ import static org.mockito.Mockito.when;
  * @since 12.10.4
  */
 @XWikiSyntax21ComponentList
-@XHTML10ComponentList
+@HTML50ComponentList
+@ComponentList({
+    ControlCharactersFilter.class
+})
 class RatingsTest extends PageTest
 {
-    // Needs to be registered for the ratings macro to be loaded successfully.
-    @MockComponent
-    @Named("template")
-    private Macro templateMacro;
-
-    // Needs to be registered for the ratings macro to be loaded successfully.
-    @MockComponent
-    @Named("controlcharacters")
-    private HTMLFilter htmlFilter;
-
     @Test
     void displayFullRatingEscapesRequestDocRef() throws Exception
     {
-        MacroDescriptor templateMacroDescriptor = mock(MacroDescriptor.class);
-        when(this.templateMacro.getDescriptor()).thenReturn(templateMacroDescriptor);
-        when(templateMacroDescriptor.getParametersBeanClass()).thenReturn((Class) "".getClass());
-
         registerVelocityTool("escapetool", new EscapeTool());
 
         // Initialize the ratings script service to allow displayFullRating to display the blocks to be tested.
@@ -84,7 +67,7 @@ class RatingsTest extends PageTest
         when(ratingsScriptService.getAverageRating(any())).thenReturn(Optional.of(mock(AverageRating.class)));
         this.oldcore.getMocker().registerComponent(ScriptService.class, "ratings", ratingsScriptService);
 
-        setOutputSyntax(Syntax.XHTML_1_0);
+        setOutputSyntax(Syntax.HTML_5_0);
 
         // Initialize a document reference to be used as parameter when calling displayFullRating.
         ModelScriptService modelScriptService = mock(ModelScriptService.class);
@@ -104,10 +87,8 @@ class RatingsTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_0);
         document.setContent(script);
         this.xwiki.saveDocument(document, "registering document", true, this.context);
-        String content = document.getRenderedContent(this.context);
 
-        Document parse = Jsoup.parse(content);
-        Elements elementsByClass = parse.getElementsByClass("rating-wrapper");
+        Elements elementsByClass = renderPageDocument(document).getElementsByClass("rating-wrapper");
         assertEquals(1, elementsByClass.size());
         String attr = elementsByClass.first().attr("data-reference");
         // Verify that the displayFullRating parameter is actually escaped when used.

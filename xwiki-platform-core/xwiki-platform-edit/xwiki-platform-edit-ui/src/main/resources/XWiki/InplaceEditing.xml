@@ -1103,6 +1103,7 @@ require(['jquery'], function($) {
     var xwikiDocument = data.document;
     updateDocAuthorAndDate(xwikiDocument);
     updateDocExtraTabs(xwikiDocument);
+    updateDrawer(xwikiDocument);
     if (xwikiDocument.getPlainTitle() !== previousPlainTitle) {
       updateDocTrees(xwikiDocument);
       updateLinks(xwikiDocument);
@@ -1153,6 +1154,33 @@ require(['jquery'], function($) {
       var linkURL = $(this).attr('href')?.split(/[?#]/, 1)[0];
       return linkURL === docURL &amp;&amp; $(this).text() === previousPlainTitle;
     }).text(newPlainTitle);
+  };
+
+  // Update the list of available document translations in the drawer menu. This is needed for instance when a new
+  // translation is created using the in-place editor.
+  var updateDrawer = function(xwikiDocument) {
+    var languageMenu = $('#tmLanguages_menu');
+    var locale = xwikiDocument.getRealLocale();
+    // Look for the language query string parameter, either inside or at the end.
+    var localeSelector = 'a[href*="language=' + locale + '&amp;"], a[href$="language=' + locale + '"]';
+    // Check if the language menu is present (multilingual is on) and the document locale is not listed.
+    if (languageMenu.length &amp;&amp; !languageMenu.find(localeSelector).length) {
+      // If we get here then it means a new document translation was created and it needs to be listed in the drawer.
+      $('&lt;div/&gt;').load(xwikiDocument.getURL('get', $.param({
+        'xpage': 'xpart',
+        'vm': 'drawer.vm',
+        'useLayoutVars': true
+      // Pass the query string from the current URL so that it gets included in the translation URL.
+      // XWIKI-11314: Changing the current language from the UI does not preserve the query string of the current URL
+      })) + '&amp;' + location.search.substring(1) + ' #tmLanguages_menu', function() {
+        $(this).find('a').each(function() {
+          // Clean the query string.
+          $(this).attr('href', $(this).attr('href').replace(/&amp;?(xpage=xpart|vm=drawer\.vm|useLayoutVars=true)/g, '')
+            .replace('?&amp;', '?'));
+        });
+        languageMenu.replaceWith($(this).children());
+      });
+    }
   };
 });
 

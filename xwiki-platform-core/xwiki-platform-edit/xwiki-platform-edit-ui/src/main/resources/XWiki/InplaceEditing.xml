@@ -47,11 +47,15 @@
     #jsonResponse($editConfirmation)
   #else
     ## Lock the document for editing.
-    #set ($discard = $response.sendRedirect($tdoc.getURL('lock', $escapetool.url({
+    #set ($lockParams = {
       'ajax': 1,
       'action': $request.lockAction,
       'language': $tdoc.realLocale
-    }))))
+    })
+    #if ($request.force == 'true')
+      #set ($lockParams.force = 1)
+    #end
+    #set ($discard = $response.sendRedirect($tdoc.getURL('lock', $escapetool.url($lockParams))))
   #end
 #end
 {{/velocity}}</content>
@@ -456,7 +460,10 @@ define('editInPlace', [
       if (xwikiDocument.lockConfirmation) {
         var confirmation = xwikiDocument.lockConfirmation;
         delete xwikiDocument.lockConfirmation;
-        return maybeForceLock(confirmation).then($.proxy(xwikiDocument, 'lock', 'edit', true));
+        return maybeForceLock(confirmation).then($.proxy(xwikiDocument, 'lock', 'edit', true), function() {
+          // Cancel the edit action.
+          return xwikiDocument;
+        });
       } else {
         new XWiki.widgets.Notification(l10n['edit.inplace.page.lockFailed'], 'error');
         return xwikiDocument;

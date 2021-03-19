@@ -41,7 +41,7 @@ public class LockAction extends XWikiAction
 
         String username = context.getUser();
         XWikiLock lock = tdoc.getLock(context);
-        if ((lock == null) || (username.equals(lock.getUserName()))) {
+        if (lock == null || lock.getUserName().equals(username) || "1".equals(request.getParameter("force"))) {
             if ("inline".equals(request.get("action"))) {
                 doc.setLock(username, context);
             } else {

@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -101,7 +102,8 @@ public class CommentAddAction extends XWikiAction
                 }
                 // We need to make sure the author will fit in a String property, this is mostly a protection against
                 // spammers who try to put large texts in this field
-                author = author.substring(0, Math.min(author.length(), 255));
+                int limit = xwiki.getStore().getLimitSize(context, StringProperty.class, "value");
+                author = author.substring(0, Math.min(author.length(), limit));
                 object.set(AUTHOR_PROPERTY_NAME, author, context);
             } else {
                 // A registered user must always post with his name.

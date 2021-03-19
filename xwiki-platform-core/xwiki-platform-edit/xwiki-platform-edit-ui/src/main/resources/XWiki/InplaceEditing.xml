@@ -175,16 +175,22 @@ define('xwiki-document-api', ['jquery'], function($) {
      */
     getRealLocale: function() {
       var realLocale = this.language;
-      if (typeof realLocale === 'string' &amp;&amp; realLocale !== '') {
-        // This document is a translation.
-      } else if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
-        // This is the original document.
-        realLocale = this.translations['default'];
-      } else {
-        // The document locale is not specified. Use the UI locale.
-        realLocale = $('html').attr('lang');
+      if (typeof realLocale !== 'string' || realLocale === '') {
+        realLocale = this.getDefaultLocale();
       }
       return realLocale;
+    },
+
+    /**
+     * @return this document's default locale
+     */
+    getDefaultLocale: function() {
+      if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
+        return this.translations['default'];
+      } else {
+        // The default locale is not specified. Use the UI locale.
+        return $('html').attr('lang');
+      }
     },
 
     /**
@@ -339,6 +345,9 @@ define('xwiki-document-api', ['jquery'], function($) {
       const uiLocale = $('html').attr('lang');
       if (realLocale &amp;&amp; realLocale !== uiLocale) {
         this.language = uiLocale;
+        // Set the original document locale.
+        this.translations = this.translations || {};
+        this.translations['default'] = realLocale;
         // Update the document fields that are not 'shared' with the original document.
         this.isNew = true;
         delete this.version;
@@ -1115,6 +1124,7 @@ require(['jquery'], function($) {
     updateDocAuthorAndDate(xwikiDocument);
     updateDocExtraTabs(xwikiDocument);
     updateDrawer(xwikiDocument);
+    updateContentMenu(xwikiDocument);
     if (xwikiDocument.getPlainTitle() !== previousPlainTitle) {
       updateDocTrees(xwikiDocument);
       updateLinks(xwikiDocument);
@@ -1190,6 +1200,19 @@ require(['jquery'], function($) {
             .replace('?&amp;', '?'));
         });
         languageMenu.replaceWith($(this).children());
+      });
+    }
+  };
+
+  // Update the links from the content menu to point to the real document locale. This is needed especially when a new
+  // document translation is created in-place.
+  var updateContentMenu = function(xwikiDocument) {
+    var realLocale = xwikiDocument.getRealLocale();
+    var defaultLocale = xwikiDocument.getDefaultLocale();
+    if (realLocale != defaultLocale) {
+      var defaultLocaleRegex = new RegExp('(\\blanguage=)' + defaultLocale + '($|&amp;|#)');
+      $('#contentmenu a[href*="language=' + defaultLocale + '"]').each(function() {
+        $(this).attr('href', $(this).attr('href').replace(defaultLocaleRegex, '$1' + realLocale + '$2'));
       });
     }
   };

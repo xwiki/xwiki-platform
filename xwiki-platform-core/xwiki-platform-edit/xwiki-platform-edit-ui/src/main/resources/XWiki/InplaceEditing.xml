@@ -971,8 +971,12 @@ define('editInPlace', [
       editContent.show();
       viewContent.remove();
       if (withFocus) {
-        // Restore the focus when the edit content is ready but make sure we don't scroll the page.
-        editContent[0].focus({preventScroll: true});
+        // Restore the focus when the edit content is ready but make sure we don't scroll the page. We don't restore the
+        // focus right away because we just made the content visible so it may not be editable yet (e.g. the WYSIWYG
+        // editor can make the content editable only if it is visible).
+        setTimeout(function() {
+          editContent[0].focus({preventScroll: true});
+        }, 0);
       }
     }).promise();
   };

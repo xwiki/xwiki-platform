@@ -228,7 +228,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // the field we just added is multiValued and multiValued fields are not sortable.
         // We don't need to sort on properties that hold large localized texts or large strings (e.g. TextArea).
         if ((type != TypedValue.TEXT && type != TypedValue.STRING)
-            || String.valueOf(value).length() <= SHORT_TEXT_LIMIT) {
+            || String.valueOf(value).length() <= getShortTextLimit()) {
             // Short localized texts are indexed as strings because a sort field is either non-tokenized (i.e. has no
             // Analyzer) or uses an Analyzer that only produces a single Term (i.e. uses the KeywordTokenizer).
             String sortType = "sort" + StringUtils.capitalize(type == TypedValue.TEXT ? TypedValue.STRING : type);

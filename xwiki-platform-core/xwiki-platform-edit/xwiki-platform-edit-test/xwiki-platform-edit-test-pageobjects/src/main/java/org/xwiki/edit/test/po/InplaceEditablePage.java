@@ -142,6 +142,7 @@ public class InplaceEditablePage extends ViewPage
     /**
      * Clicks on the Save button and maybe waits for the save confirmation message.
      * 
+     * @param wait whether to wait or not for the save success confirmation
      * @return this page object
      */
     public InplaceEditablePage save(boolean wait)
@@ -166,6 +167,7 @@ public class InplaceEditablePage extends ViewPage
     /**
      * Clicks on the Save and View button and maybe waits for the page to be rendered in view mode.
      * 
+     * @param wait whether to wait or not for the save success confirmation
      * @return this page object
      */
     public InplaceEditablePage saveAndView(boolean wait)
@@ -179,7 +181,7 @@ public class InplaceEditablePage extends ViewPage
     }
 
     /**
-     * Waits for the page to be rendered in view mode, usually after a Save & View or Cancel operation.
+     * Waits for the page to be rendered in view mode, usually after a Save &amp; View or Cancel operation.
      * 
      * @return this page object
      */

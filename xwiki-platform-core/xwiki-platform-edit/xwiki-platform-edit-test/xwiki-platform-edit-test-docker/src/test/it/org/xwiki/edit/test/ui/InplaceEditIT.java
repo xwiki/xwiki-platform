@@ -37,10 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.2RC1
  */
 @UITest
-public class InplaceEditIT
+class InplaceEditIT
 {
     @BeforeEach
-    public void setup(TestUtils setup, TestReference testReference)
+    void setup(TestUtils setup, TestReference testReference)
     {
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg");
         setup.createPage(testReference, "before\n\n== Section ==\n\nafter", "test title");

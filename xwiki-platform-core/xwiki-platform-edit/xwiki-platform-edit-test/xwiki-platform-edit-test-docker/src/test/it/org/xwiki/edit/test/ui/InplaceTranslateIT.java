@@ -45,10 +45,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.2RC1
  */
 @UITest
-public class InplaceTranslateIT
+class InplaceTranslateIT
 {
     @BeforeEach
-    public void setup(TestUtils setup, TestReference testReference) throws Exception
+    void setup(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("multilingual", "true");
@@ -63,7 +63,7 @@ public class InplaceTranslateIT
     }
 
     @AfterAll
-    public void tearDown(TestUtils setup) throws Exception
+    void tearDown(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("multilingual", "false");

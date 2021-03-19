@@ -116,6 +116,8 @@ public class ViewPage extends BasePage
 
     /**
      * @return the "Translate" page button; use this only if you expect the button to be present
+     * @since 12.10.6
+     * @since 13.2RC1
      */
     public WebElement getTranslateButton()
     {
@@ -124,6 +126,8 @@ public class ViewPage extends BasePage
 
     /**
      * @return {@code true} if the "Translate" page button is present, {@code false} otherwise
+     * @since 12.10.6
+     * @since 13.2RC1
      */
     public boolean hasTranslateButton()
     {

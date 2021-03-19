@@ -31,7 +31,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 13.2RC1
  */
 @UITest
-public class AllITs
+class AllITs
 {
     @Nested
     @DisplayName("In-place edit")

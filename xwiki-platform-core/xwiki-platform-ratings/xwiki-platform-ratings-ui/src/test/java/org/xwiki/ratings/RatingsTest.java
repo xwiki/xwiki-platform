@@ -22,7 +22,6 @@ package org.xwiki.ratings;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -38,7 +37,8 @@ import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -88,10 +88,8 @@ class RatingsTest extends PageTest
         document.setContent(script);
         this.xwiki.saveDocument(document, "registering document", true, this.context);
 
-        Elements elementsByClass = renderPageDocument(document).getElementsByClass("rating-wrapper");
-        assertEquals(1, elementsByClass.size());
-        String attr = elementsByClass.first().attr("data-reference");
         // Verify that the displayFullRating parameter is actually escaped when used.
-        assertEquals("a:b.c\"d", attr);
+        assertThat(renderXMLPage(document).getElementsByClass("rating-wrapper").eachAttr("data-reference"),
+            contains("a:b.c\"d"));
     }
 }

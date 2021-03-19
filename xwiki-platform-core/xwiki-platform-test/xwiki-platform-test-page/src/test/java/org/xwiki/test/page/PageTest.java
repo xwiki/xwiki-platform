@@ -188,7 +188,7 @@ public class PageTest
      * @return the result of the parsing of the rendered result using {@link Jsoup}
      * @throws Exception in case of errors
      */
-    protected Document renderXMLPage(DocumentReference reference) throws Exception
+    protected Document renderHTMLPage(DocumentReference reference) throws Exception
     {
         return Jsoup.parse(renderPage(reference));
     }
@@ -200,7 +200,7 @@ public class PageTest
      * @return the result of the parsing of the rendered result using {@link Jsoup}
      * @throws Exception in case of errors
      */
-    protected Document renderXMLPage(XWikiDocument document) throws Exception
+    protected Document renderHTMLPage(XWikiDocument document) throws Exception
     {
         return Jsoup.parse(document.getRenderedContent(this.context));
     }

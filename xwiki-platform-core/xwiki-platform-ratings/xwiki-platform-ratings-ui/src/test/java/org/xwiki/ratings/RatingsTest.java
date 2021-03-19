@@ -89,7 +89,7 @@ class RatingsTest extends PageTest
         this.xwiki.saveDocument(document, "registering document", true, this.context);
 
         // Verify that the displayFullRating parameter is actually escaped when used.
-        assertThat(renderXMLPage(document).getElementsByClass("rating-wrapper").eachAttr("data-reference"),
+        assertThat(renderHTMLPage(document).getElementsByClass("rating-wrapper").eachAttr("data-reference"),
             contains("a:b.c\"d"));
     }
 }

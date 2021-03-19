@@ -44,6 +44,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @version $Id$
  * @since 13.2RC1
+ * @since 12.10.6
  */
 @Documented
 @Retention(RUNTIME)

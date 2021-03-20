@@ -133,14 +133,13 @@
                 ## TODO
             #end
         </div>
-    #elseif($tags.size() !=0)
+    #elseif(!$tags.isEmpty())
         <div class="doc-tags" id="${tagsId}">
             $services.localization.render('core.tags.list.label')
             #foreach($tag in $tags)
                 #displayTag($tag)
             #end
         </div>
-    #else
     #end
 
     #if($tagErrorMessage != '')

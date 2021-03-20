@@ -387,8 +387,8 @@ public class UpgradeTest extends AbstractTest
         // Upgrade the flavor
         int timeout = getUtil().getDriver().getTimeout();
         try {
-            // 10 minutes should be more than enough to calculate the install plan and do the install
-            getUtil().getDriver().setTimeout(600);
+            // 20 minutes should be more than enough to calculate the install plan and do the install
+            getUtil().getDriver().setTimeout(1200);
 
             // Start upgrade
             upgradeFlavor = upgradeFlavor.upgrade();

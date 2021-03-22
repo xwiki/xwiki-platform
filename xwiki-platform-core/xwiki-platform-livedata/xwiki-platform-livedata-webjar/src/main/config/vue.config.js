@@ -24,6 +24,23 @@ module.exports = {
   // __webpack_public_path__ variable (see https://webpack.js.org/configuration/output/#outputpublicpath).
   publicPath: '',
   filenameHashing: false,
+
+  configureWebpack: config => {
+    // skip less parsing
+    const lessRules = config.module.rules.find(rule => /less/.test(rule.test));
+    lessRules.oneOf.forEach(context => {
+      const loaders = context.use;
+      const lessLoaderIndex = loaders.findIndex(loader => /less-loader/.test(loader.loader));
+      if (lessLoaderIndex !== -1) {
+        loaders.splice(lessLoaderIndex, 1);
+      }
+    });
+    // export style as less files
+    const miniCssExtractPlugin = config.plugins.find(plugin => plugin.constructor.name === "MiniCssExtractPlugin");
+    miniCssExtractPlugin.options.filename = "[name].less";
+    miniCssExtractPlugin.options.chunkFilename = "less/[name].less";
+  },
+
   chainWebpack: config => {
     // Provided dependencies (that shouldn't be bundled).
     config.externals({
@@ -35,6 +52,6 @@ module.exports = {
     })
   },
   css: {
-    extract: false,
+    extract: true,
   },
 };

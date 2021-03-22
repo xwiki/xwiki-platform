@@ -671,7 +671,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             // close session with rollback to avoid further usage
             endTransaction(false);
 
-            Object[] args = { wikiId };
+            Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
                 e, args);
@@ -792,8 +792,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         // Put back legacy feature to the Hibernate session
         if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session,
-                this.loggerConfiguration);
+            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -1120,11 +1119,22 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         if (propertyName != null) {
             Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            columnName = column.getName();
 
-            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-                columnName = columnName.toLowerCase();
-            }
+            return getConfiguredColumnName(column);
+        }
+
+        return columnName;
+    }
+
+    /**
+     * @since 13.2RC1
+     */
+    public String getConfiguredColumnName(Column column)
+    {
+        String columnName = column.getName();
+
+        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
         }
 
         return columnName;

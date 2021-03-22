@@ -46,5 +46,8 @@ require(['jquery', 'bootstrap'], function($) {
       $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
 
+    // Activate the popover when hovering the Translate button.
+    var translateButton = $('#tmTranslate [data-toggle="popover"]');
+    translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });

@@ -47,8 +47,6 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link org.openqa.selenium.WebDriver} instance and adds new APIs useful for XWiki tests.

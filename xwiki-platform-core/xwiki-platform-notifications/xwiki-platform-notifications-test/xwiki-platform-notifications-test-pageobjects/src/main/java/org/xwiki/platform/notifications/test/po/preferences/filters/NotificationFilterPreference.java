@@ -35,10 +35,15 @@ import org.xwiki.test.ui.po.ConfirmationBox;
  * @version $Id$
  * @since 10.8RC1
  * @since 9.11.8
+ * @deprecated Since 13.2RC1: this page object is related to the usage of the deprecated XWiki macro
+ *              {@code NotificationsFiltersPreferences} which was mixing system filters and custom filters. You should
+ *              now use either {@link CustomNotificationFilterPreference} or {@link SystemNotificationFilterPreference}.
  */
+@Deprecated
 public class NotificationFilterPreference
 {
     private static final String LIST_HTML_TAG = "li";
+    private static final String EVENT_TYPES = "eventTypes";
 
     private AbstractNotificationsSettingsPage parentPage;
 
@@ -69,12 +74,15 @@ public class NotificationFilterPreference
         this.filterName = webElement.findElement(By.className("name")).getText();
         this.filterType = webElement.findElement(By.className("filterType")).getText();
 
-        List<WebElement> eventTypeElements = webElement.findElement(By.className("eventTypes")).findElements(
+        // Since the changes performed in 13.2RC1, not all filters LT have the event types.
+        if (driver.hasElement(webElement, By.className(EVENT_TYPES))) {
+            List<WebElement> eventTypeElements = webElement.findElement(By.className(EVENT_TYPES)).findElements(
                 By.tagName(LIST_HTML_TAG));
-        for (WebElement eventType : eventTypeElements) {
-            String text = eventType.getText();
-            if (!"-".equals(text)) {
-                this.eventTypes.add(text);
+            for (WebElement eventType : eventTypeElements) {
+                String text = eventType.getText();
+                if (!"-".equals(text)) {
+                    this.eventTypes.add(text);
+                }
             }
         }
 

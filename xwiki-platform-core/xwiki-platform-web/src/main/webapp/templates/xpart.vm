@@ -18,5 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #set ($vm = $request.vm)
-#template("xwikivars.vm")
+#template('xwikivars.vm')
+#if ($request.useLayoutVars == 'true')
+#template('layoutvars.vm')
+#end
 #template($vm)

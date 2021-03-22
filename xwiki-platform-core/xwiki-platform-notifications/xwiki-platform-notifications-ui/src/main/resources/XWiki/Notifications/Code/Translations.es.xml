@@ -67,30 +67,11 @@ notifications.filters.description.minorEventAlertNotificationFilter=Ocultar noti
 notifications.filters.name.minorEventEmailNotificationFilter=Evento Menor (Correo electrónico)
 notifications.filters.description.minorEventEmailNotificationFilter=Ocultar notificaciones sobre cambios menores en las páginas
 
-## Filter Types
-notifications.filters.type.inclusive=Inclusivo
-notifications.filters.type.exclusive=No inclusivo
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Filtro de notificación del alcance
 notifications.filters.preferences.scopeNotificationFilter.page=Solo página
 notifications.filters.preferences.scopeNotificationFilter.space=Página e hijos
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-notifications.filters.preferences.allEvents=-
-notifications.filters.preferences.addPreference.filterType.inclusive=Inclusivo
-notifications.filters.preferences.addPreference.filterType.exclusive=No inclusivo
-notifications.filters.preferences.addPreference.notificationFormat.label=Formato de notificación
-notifications.filters.preferences.addPreference.notificationFormat.hint=¿En qué formato de notificación debe aplicarse el filtro?
-notifications.filters.preferences.addPreference.eventType.label=Tipo de evento
-notifications.filters.preferences.addPreference.eventType.hint=¿Qué tipo de evento debe ser el objetivo del filtro?
-notifications.filters.preferences.addPreference.location.label=Ámbito del filtro
-notifications.filters.preferences.addPreference.location.hint=¿Qué página debe ser el objetivo del filtro?
-notifications.filters.preferences.delete.inProgress=Eliminando...
-notifications.filters.preferences.delete.done=¡Preferencia del filtro eliminada!
-notifications.filters.preferences.delete.error=No se pudo eliminar la preferencia de filtro
-notifications.filters.preferences.setEnabled.inProgress=Guardando...
-notifications.filters.preferences.setEnabled.done=¡Preferencia de filtro guardada!
-notifications.filters.preferences.setEnabled.error=No se pudo guardar la preferencia del filtro
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Necesita habilitar las notificaciones en su configuración si desea ver estas ubicaciones
@@ -98,19 +79,47 @@ notifications.toggle.disabled.hint=Necesita habilitar las notificaciones en su c
 ## Notifications formats
 notifications.format.alert=Alerta
 notifications.format.email=Correo electrónico
+notifications.filters.preferences.delete.inProgress=Eliminando...
+notifications.filters.preferences.delete.done=¡Preferencia del filtro eliminada!
+notifications.filters.preferences.delete.error=No se pudo eliminar la preferencia de filtro
+notifications.filters.preferences.setEnabled.inProgress=Guardando...
+notifications.filters.preferences.setEnabled.done=¡Preferencia de filtro guardada!
+notifications.filters.preferences.setEnabled.error=No se pudo guardar la preferencia del filtro
+notifications.filters.preferences.allEvents=-Todos los eventos (deshabilitados incluidos)
 
-## Filter preferences settings
-notifications.settings.filters.preferences.title=Filtros
-notifications.settings.filters.preferences.hint=Cree filtros para controlar mejor cuándo los eventos enviarán notificaciones.
-notifications.settings.filters.preferences.forGuest=Inicie sesión o regístrese para gestionar sus filtros de notificación.
-
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Filtros del sistema
+notifications.settings.filters.preferences.system.hint=Los filtros del sistema que puedes alternar para tener un control más fino de las notificaciones que quieres recibir.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Nombre
-notifications.settings.filters.preferences.table.filterType=Tipo de filtro
-notifications.settings.filters.preferences.table.eventTypes=Eventos
-notifications.settings.filters.preferences.table.notificationFormats=Formatos
-notifications.settings.filters.preferences.table.isEnabled=¿Está activado?
-notifications.settings.filters.preferences.table._actions=Acciones
+notifications.settings.filters.preferences.system.table.name=Nombre
+notifications.settings.filters.preferences.system.table.filterType=Descripción
+notifications.settings.filters.preferences.system.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.system.table.isEnabled=¿Está activado?
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Filtros personalizados
+notifications.settings.filters.preferences.custom.hint=Crear filtros para controlar las notificaciones que quiere recibir.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Ubicación
+notifications.settings.filters.preferences.custom.table.filterType=Filtro de acción
+notifications.settings.filters.preferences.custom.table.eventTypes=Eventos
+notifications.settings.filters.preferences.custom.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.custom.table.isEnabled=¿Está activado?
+notifications.settings.filters.preferences.custom.table._actions=Acciones
+notifications.filters.type.custom.inclusive=Notificación del evento
+notifications.filters.type.custom.exclusive=Ignorar el evento
+notifications.settings.addFilter=Añadir filtro
+notifications.settings.addFilter.hint=Crea un filtro de ubicación personalizado: Este filtro se aplica a eventos relacionados con ubicaciones específicas y permite notificar o ignorar los eventos en función del tipo de evento y el formto de notificación.
+notifications.filters.preferences.custom.addFilter.location.label=Ubicación
+notifications.filters.preferences.custom.addFilter.location.hint=Este filtro se aplica cuando al envíar un evento desde la ubicación seleccionada. Se puede seleccionar múltiples ubicaciones.
+notifications.filters.preferences.custom.addFilter.type.label=Acción
+notifications.filters.preferences.custom.addFilter.type.hint=¿Qué debería hacer el filtro al enviarse un evento desde la ubicación dada? 
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notificación del evento
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignorar el evento
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Formatos
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Este filtro se aplica cuando al envíar un evento desde la ubicación seleccionada. Se puede seleccionar múltiples ubicaciones.
+notifications.filters.preferences.custom.addFilter.eventType.label=Tipo de evento
+notifications.filters.preferences.custom.addFilter.eventType.hint=Este filtro se aplica cuando se envía un evento del tipo seleccionado. Se pueden seleccionar múltiples tipos. Si no se selecciona nada, el filtro se aplicará a cualquier tipo.
 notifications.menu.header=Notificaciones
 notifications.menu.header.settings=Configuración
 notifications.menu.clear=Limpiar todo
@@ -132,7 +141,6 @@ notifications.settings.saving=Tus ajustes se están guardando....
 notifications.settings.saved=¡Guardado!
 notifications.settings.savingfailed=No se ha podido guardar la configuración
 notifications.settings.filters=Filtros ({0})
-notifications.settings.addFilter=Añadir filtro
 notifications.settings.errorFilterWiki=Error: debe seleccionar un wiki, no una página
 notifications.settings.preferences=Configuración
 notifications.settings.preferences.hint=Capturar qué eventos están ocurriendo y entregarlos en el flujo de eventos o por correo electrónico.
@@ -215,5 +223,37 @@ notifications.switches.tooltip.pageAndChildren=Ver esta página y sus hijos
 notifications.switches.tooltip.space=Ver la página padre y sus hijos
 notifications.switches.tooltip.wiki=Ver esta wiki
 notifications.switches.changeStatusError=Error al cambiar el estado de las notificaciones.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filtros
+notifications.settings.filters.preferences.hint=Cree filtros para controlar mejor cuándo los eventos enviarán notificaciones.
+notifications.settings.filters.preferences.forGuest=Inicie sesión o regístrese para gestionar sus filtros de notificación.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Nombre
+notifications.settings.filters.preferences.table.filterType=Tipo de filtro
+notifications.settings.filters.preferences.table.eventTypes=Eventos
+notifications.settings.filters.preferences.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.table.isEnabled=¿Está activado?
+notifications.settings.filters.preferences.table._actions=Acciones
+notifications.filters.preferences.addPreference.filterType.inclusive=Inclusivo
+notifications.filters.preferences.addPreference.filterType.exclusive=No inclusivo
+notifications.filters.preferences.addPreference.notificationFormat.label=Formato de notificación
+notifications.filters.preferences.addPreference.notificationFormat.hint=¿En qué formato de notificación debe aplicarse el filtro?
+notifications.filters.preferences.addPreference.eventType.label=Tipo de evento
+notifications.filters.preferences.addPreference.eventType.hint=¿Qué tipo de evento debe ser el objetivo del filtro?
+notifications.filters.preferences.addPreference.location.label=Ámbito del filtro
+notifications.filters.preferences.addPreference.location.hint=¿Qué página debe ser el objetivo del filtro?
+
+## Filter Types
+notifications.filters.type.inclusive=Inclusivo
+notifications.filters.type.exclusive=No inclusivo
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

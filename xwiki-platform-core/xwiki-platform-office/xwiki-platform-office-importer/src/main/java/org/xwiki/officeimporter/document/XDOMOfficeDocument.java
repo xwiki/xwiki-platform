@@ -130,8 +130,9 @@ public class XDOMOfficeDocument implements OfficeDocument
             // Strip line-feed and new-line characters if present.
             title = title.replaceAll("[\n\r]", "");
             // Truncate long titles.
-            if (title.length() > 255) {
-                title = title.substring(0, 255);
+            // TODO: the value should be asked to the store API instead of being hardcoded
+            if (title.length() > 768) {
+                title = title.substring(0, 768);
             }
         }
         return title;

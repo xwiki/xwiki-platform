@@ -1,9 +1,15 @@
+#template('colorThemeInit.vm')
+
 #informationcontent ul.xlist {
   margin: 0 !important;
 }
 
 #informationcontent dl {
   margin-bottom: 0;
+}
+
+#informationcontent a[data-locale=""] {
+  color: $theme.textSecondaryColor;
 }
 
 .reference-group {
@@ -16,6 +22,6 @@
 }
 
 #reference-value {
-  background-color: #fff;
+  background-color: $theme.pageContentBackgroundColor;
   text-overflow: ellipsis;
 }

@@ -142,10 +142,17 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       var intervalSelect = $(this);
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      var target = $('.notifEmailPreferences').attr('data-target');
+      var targetUser = "";
+      if (target == 'user') {
+        var targetUser = $('.notifEmailPreferences').attr('data-user');
+      }
       $.post(serviceURL, {
         'action': 'setInterval',
         'interval': intervalSelect.val(),
-        'csrf': xm.form_token
+        'csrf': xm.form_token,
+        'target': $('.notifEmailPreferences').attr('data-target'),
+        'user': targetUser
       }).done(function (data) {
         notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done'));
       }).fail(function (data) {

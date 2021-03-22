@@ -102,7 +102,7 @@ public class EditAction extends XWikiAction
         EditForm editForm = (EditForm) context.getForm();
 
         // Update the edited document based on the template specified on the request.
-        editedDocument.readFromTemplate(editForm, context);
+        readFromTemplate(editedDocument, editForm.getTemplate(), context);
 
         // The default values from the template can be overwritten by additional request parameters.
         updateDocumentTitleAndContentFromRequest(editedDocument, context);

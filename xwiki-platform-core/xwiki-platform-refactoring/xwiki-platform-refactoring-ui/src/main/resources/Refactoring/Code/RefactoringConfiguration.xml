@@ -57,7 +57,7 @@
         $doc.display('isRecycleBinSkippingActivated', 'edit')
       &lt;/dd&gt;
     &lt;/dl&gt;
-    &lt;input type='hidden' id='Refactoring.Code.RefactoringConfiguration_redirect' name='xredirect' value="$escapetool.url($xwiki.getRequestURL())"&gt;
+    &lt;input type='hidden' id='Refactoring.Code.RefactoringConfiguration_redirect' name='xredirect' value="$escapetool.xml($xwiki.relativeRequestURL)"&gt;
     &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}"&gt;
   &lt;/fieldset&gt;
   &lt;div class='bottombuttons'&gt;

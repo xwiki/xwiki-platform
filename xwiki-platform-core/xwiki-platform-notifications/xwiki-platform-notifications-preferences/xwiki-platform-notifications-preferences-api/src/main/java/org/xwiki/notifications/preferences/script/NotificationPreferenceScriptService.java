@@ -136,6 +136,12 @@ public class NotificationPreferenceScriptService implements ScriptService
             List<Map<String, Object>> preferences = objectMapper.reader().forType(List.class).readValue(json);
             for (Map<String, Object> item : preferences) {
                 String eventType = (String) item.get("eventType");
+                Map<NotificationPreferenceProperty, Object> propertyMap = Collections.emptyMap();
+
+                if (!StringUtils.isEmpty(eventType)) {
+                    propertyMap = Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType);
+                }
+
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
 
@@ -143,7 +149,7 @@ public class NotificationPreferenceScriptService implements ScriptService
                     .setEnabled(enabled)
                     .setFormat(format)
                     .setProviderHint(providerHint)
-                    .setProperties(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType))
+                    .setProperties(propertyMap)
                     .setTarget(target)
                     .setCategory(category)
                     .build();
@@ -315,7 +321,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format) throws NotificationException
     {
-        return this.isEventTypeEnabled(eventType, format, CurrentUserReference.INSTANCE);
+        return this.isEventTypeEnabledForUser(eventType, format, CurrentUserReference.INSTANCE);
     }
 
     /**
@@ -327,7 +333,7 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @since 13.2RC1
      */
     @Unstable
-    public boolean isEventTypeEnabled(String eventType, NotificationFormat format, UserReference userReference)
+    public boolean isEventTypeEnabledForUser(String eventType, NotificationFormat format, UserReference userReference)
         throws NotificationException
     {
         DocumentReference userDocumentReference;
@@ -337,7 +343,7 @@ public class NotificationPreferenceScriptService implements ScriptService
             userDocumentReference = ((DocumentUserReference) userReference).getReference();
         } else {
             throw new NotificationException(
-                String.format("The method isEventTypeEnabled should only be used with DocumentUserReference, "
+                String.format("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "
                     + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
         }
         List<NotificationPreference> allPreferences =

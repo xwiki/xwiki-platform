@@ -45,9 +45,6 @@ edit.inplace.page.renderFailed=渲染页面失败。
 edit.inplace.page.original=您正在编辑原始页面 ({0})
 edit.inplace.page.translation=您正在编辑以下翻译：{0}。
 
-edit.inplace.page.translate=翻译
-edit.inplace.page.translate.hint=将此页面翻译为：{0}
 
 edit.inplace.actionButtons.loadFailed=加载动作按钮失败。</content>
-  
 </xwikidoc>

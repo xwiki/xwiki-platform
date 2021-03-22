@@ -105,7 +105,7 @@
           ## about the users registered on the wiki.
           #if (!$emailError)
             #forgotUsernameBoxStart("success")
-            $services.localization.render('xe.admin.forgotUsername.emailSent', ["$email"])
+            $services.localization.render('xe.admin.forgotUsername.emailSent', ["$escapetool.xml($email)"])
             <div>
                 <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
             </div>

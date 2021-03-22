@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -28,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.web.LegacyAction;
 
 /**
  * <p>
@@ -49,18 +51,24 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class PreviewAction extends EditAction
 {
+    @Inject
+    @Named("save")
+    private LegacyAction saveAction;
+
+    @Inject
+    @Named("cancel")
+    private LegacyAction cancelAction;
+
+    @Inject
+    @Named("saveandcontinue")
+    private LegacyAction saveandcontinueAction;
+
     /**
      * Default constructor.
      */
     public PreviewAction()
     {
         this.waitForXWikiInitialization = true;
-    }
-
-    @Override
-    protected Class<? extends XWikiForm> getFormClass()
-    {
-        return EditForm.class;
     }
 
     /**
@@ -84,25 +92,22 @@ public class PreviewAction extends EditAction
         String formactionsac = request.getParameter("formactionsac");
 
         if (isActionSelected(formactionsave)) {
-            SaveAction sa = new SaveAction();
-            if (sa.action(context)) {
-                sa.render(context);
+            if (((XWikiAction) this.saveAction).action(context)) {
+                ((XWikiAction) this.saveAction).render(context);
             }
             return false;
         }
 
         if (isActionSelected(formactioncancel)) {
-            CancelAction ca = new CancelAction();
-            if (ca.action(context)) {
-                ca.render(context);
+            if (((XWikiAction) this.cancelAction).action(context)) {
+                ((XWikiAction) this.cancelAction).render(context);
             }
             return false;
         }
 
         if (isActionSelected(formactionsac)) {
-            SaveAndContinueAction saca = new SaveAndContinueAction();
-            if (saca.action(context)) {
-                saca.render(context);
+            if (((XWikiAction) this.saveandcontinueAction).action(context)) {
+                ((XWikiAction) this.saveandcontinueAction).render(context);
             }
             return false;
         }

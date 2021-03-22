@@ -693,7 +693,9 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   $(document).ready(function() {
     // This script is usually loaded after the livetable is displayed and so the previous callback is not called.
     // Because of that, we need
-    window.livetable_notificationFilterPreferencesLiveTable.refresh();
+    if (window.livetable_notificationFilterPreferencesLiveTable) {
+      window.livetable_notificationFilterPreferencesLiveTable.refresh();
+    }
   });
 });</code>
     </property>
@@ -1052,6 +1054,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     You don't have administration right on  $wikimacro.parameters.user.
   {{/error}}
 #else
+#set ($discard = $services.logging.deprecate("NotificationsFiltersPreferencesMacro", "This macro should not be used anymore in favor of SystemNotificationsFiltersPreferencesMacro and CustomNotificationsFiltersPreferencesMacro."))
 ## TODO: We should actually manipulate only UserReferences here.
 #if ("$!wikimacro.parameters.user" != "")
   #set ($targetUser = $wikimacro.parameters.user.reference)
@@ -1191,13 +1194,14 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       <defaultCategory>Notifications</defaultCategory>
     </property>
     <property>
-      <description>Display the preferences of the current user about notification filters.</description>
+      <description>Display the preferences of the current user about notification filters.
+This macro is now deprecated in favor of Custom Notifications Filters Preferences or System Notifications Filters Preferences.</description>
     </property>
     <property>
       <id>notificationsFiltersPreferences</id>
     </property>
     <property>
-      <name>Notifications Filters Preferences</name>
+      <name>Notifications Filters Preferences (deprecated)</name>
     </property>
     <property>
       <priority/>

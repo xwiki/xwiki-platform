@@ -186,7 +186,9 @@ public class DefaultModelBridge implements ModelBridge
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
         preference.setFilterType(type);
         preference.setNotificationFormats(formats);
-        preference.setEventTypes(new HashSet<>(eventTypes));
+        if (eventTypes != null && !eventTypes.isEmpty()) {
+            preference.setEventTypes(new HashSet<>(eventTypes));
+        }
         preference.setEnabled(true);
         preference.setActive(false);
         preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);

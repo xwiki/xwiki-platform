@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
-{{include reference="XWiki.RatingsMacros"/}}
+{{include reference="XWiki.Ratings.RatingsMacros"/}}
 
 {{velocity output="false"}}
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
@@ -137,7 +137,7 @@
         |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
       #end
       ##------- Rating --------
-      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference "")
+      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')

@@ -31,7 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
-import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
+import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -109,7 +109,7 @@ public class NotificationsIT
         p = new NotificationsUserProfilePage();
         p.disableAllParameters();
         // Enable own filter
-        p.getNotificationFilterPreferences().get(2).setEnabled(true);
+        p.getSystemNotificationFilterPreferences().get(2).setEnabled(true);
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
@@ -358,7 +358,7 @@ public class NotificationsIT
         DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            List<NotificationFilterPreference> preferences = p.getNotificationFilterPreferences();
+            List<SystemNotificationFilterPreference> preferences = p.getSystemNotificationFilterPreferences();
 
             // Now let's do some changes (own even filter)
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
@@ -375,7 +375,7 @@ public class NotificationsIT
 
             // Go back to enable the own even filter
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = p.getNotificationFilterPreferences();
+            preferences = p.getSystemNotificationFilterPreferences();
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             assertFalse(preferences.get(2).isEnabled());
             preferences.get(2).setEnabled(true);

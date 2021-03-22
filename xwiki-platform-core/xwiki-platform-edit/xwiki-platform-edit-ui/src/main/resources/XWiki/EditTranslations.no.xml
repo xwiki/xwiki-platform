@@ -40,8 +40,6 @@
 edit.inplace.page.lockFailed=Kunne ikke låse siden.
 edit.inplace.page.loadFailed=Kunne ikke laste siden.
 edit.inplace.page.renderFailed=Kunne ikke gjengi siden.
-edit.inplace.page.translate=Oversett
-edit.inplace.page.translate.hint=Oversett denne siden til: {0}
 edit.inplace.page.translate.messageBefore=Du redigerer {0} oversettelsen av denne siden (originalversjonen) fordi denne siden ikke er oversatt til {1} (gjeldende språk) ennå.
 edit.inplace.page.translate.messageAfter=Du redigerer nå {0} oversettelsen. Start med å oversette sidetittelen.
 edit.inplace.actionButtons.loadFailed=Kunne ikke laste inn handlingsknappene.
@@ -55,7 +53,5 @@ edit.inplace.page.original=Du redigerer det opprinnelige dokumentet ({0})
 edit.inplace.page.translation=Du redigerer den følgende oversettelsen: {0}.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
-  
+#@deprecatedend</content>
 </xwikidoc>

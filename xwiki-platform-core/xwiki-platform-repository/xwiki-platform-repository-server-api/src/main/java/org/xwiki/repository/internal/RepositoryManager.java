@@ -101,6 +101,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 
 @Component(roles = RepositoryManager.class)
 @Singleton
@@ -178,6 +179,10 @@ public class RepositoryManager implements Initializable, Disposable
 
     @Inject
     private Logger logger;
+
+    private int maxTitleSize = -1;
+
+    private int maxStringPropertySize = -1;
 
     /**
      * Link extension id to document reference. The tabe contains null if the id link to no extension.
@@ -912,15 +917,40 @@ public class RepositoryManager implements Initializable, Disposable
                     break;
                 }
             }
-            // truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
-            if (summary.length() > 255) {
-                summary = summary.substring(0, 255);
+            // truncated to max title size in case it's too long, TODO: should probably be handled at a lower level)
+            if (summary.length() > getMaxTitleSize()) {
+                summary = summary.substring(0, getMaxTitleSize());
             }
         } else {
             summary = "";
         }
 
         return summary;
+    }
+
+    private int getMaxTitleSize()
+    {
+        if (this.maxTitleSize == -1) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null) {
+                this.maxTitleSize = xcontext.getWiki().getStore().getLimitSize(xcontext, XWikiDocument.class, "title");
+            }
+        }
+
+        return this.maxTitleSize != -1 ? this.maxTitleSize : 768;
+    }
+
+    private int getMaxStringPropertySize()
+    {
+        if (this.maxStringPropertySize == -1) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null) {
+                this.maxStringPropertySize =
+                    xcontext.getWiki().getStore().getLimitSize(xcontext, StringProperty.class, "value");
+            }
+        }
+
+        return this.maxStringPropertySize != -1 ? this.maxStringPropertySize : 768;
     }
 
     private String getDescription(Extension extension)
@@ -1230,9 +1260,9 @@ public class RepositoryManager implements Initializable, Disposable
         List<String> list = new ArrayList<>(map.size());
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             String entryString = entry.getKey() + '=' + entry.getValue();
-            if (entryString.length() > 255) {
+            if (entryString.length() > getMaxStringPropertySize()) {
                 // Protect against properties too big
-                entryString = entryString.substring(0, 255);
+                entryString = entryString.substring(0, getMaxStringPropertySize());
             }
             list.add(entryString);
         }

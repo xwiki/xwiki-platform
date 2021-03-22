@@ -493,16 +493,17 @@ public class ModelFactory
     public Translations toRestTranslations(URI baseUri, Document doc) throws XWikiException
     {
         Translations translations = this.objectFactory.createTranslations();
-        translations.setDefault(doc.getDefaultLocale().toString());
+        Locale defaultLocale = getDefaultLocale(doc);
+        translations.setDefault(defaultLocale.toString());
 
         List<Locale> locales = doc.getTranslationLocales();
 
         List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
 
         // Add the default (original) page translation, if it makes sense.
-        if (!locales.isEmpty() && !Locale.ROOT.equals(doc.getDefaultLocale())) {
+        if (!locales.isEmpty() && !Locale.ROOT.equals(defaultLocale)) {
             Translation translation = this.objectFactory.createTranslation();
-            translation.setLanguage(doc.getDefaultLocale().toString());
+            translation.setLanguage(translations.getDefault());
 
             String pageTranslationUri = Utils
                 .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
@@ -544,6 +545,31 @@ public class ModelFactory
         }
 
         return translations;
+    }
+
+    private Locale getDefaultLocale(Document document)
+    {
+        if (document.isTranslation()) {
+            // The default locale field is not always set on document translations:
+            //
+            // * it is empty for translation pages created by the user because the save action doesn't set it and the
+            // edit form doesn't include this field;
+            // * it may be set for translation pages that are part of an XWiki extension because the XAR Maven plugin
+            // used to build the extension has a rule to enforce it;
+            //
+            // So we should take the default locale from the original document.
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext).getRealLocale();
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to get the default locale from [{}]. Root cause is [{}].",
+                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                // Fall-back on the default locale specified on the translation page, which may not be accurate.
+                return document.getDefaultLocale();
+            }
+        } else {
+            return document.getRealLocale();
+        }
     }
 
     /**

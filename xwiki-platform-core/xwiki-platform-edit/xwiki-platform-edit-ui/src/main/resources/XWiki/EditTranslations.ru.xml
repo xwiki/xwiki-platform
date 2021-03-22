@@ -45,9 +45,6 @@ edit.inplace.page.renderFailed=Не удалось отрисовать стра
 edit.inplace.page.original=Вы редактируете исходную страницу ({0})
 edit.inplace.page.translation=Вы редактируете следующий перевод: {0}.
 
-edit.inplace.page.translate=Перевод
-edit.inplace.page.translate.hint=Перевести эту страницу в: {0}
 
 edit.inplace.actionButtons.loadFailed=Не удалось загрузить кнопки действий.</content>
-  
 </xwikidoc>

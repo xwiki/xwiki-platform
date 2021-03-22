@@ -779,21 +779,27 @@ public class EditIT
     }
 
     /**
-     * Ensure that document can be created with very long titles with more than 255 characters.
+     * Ensure that document can be created with very long titles with more than 768 characters.
      */
     @Test
     @Order(9)
     public void createDocumentLongTitle(TestUtils setup, TestReference reference)
     {
-        String name1 = "Company Presentation Events";
-        String name2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
+        String spaceName1 = "Company Presentation Events";
+        String spaceName2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
             + "the Environmental Responsibility (ICER 2015)";
-        String name3 = "Intervention from the President of the Interdisciplinary Commission for Responsible Development"
-            + " of Alternative Fuels (ICRDA)";
+        String documentName =
+            "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development "
+                + "Intervention from the President of the Interdisciplinary Commission for Responsible Development";
 
         SpaceReference spaceReference = new SpaceReference(reference.getWikiReference().getName(),
-            Arrays.asList(name1, name2));
-        DocumentReference documentReference = new DocumentReference(name3, spaceReference);
+            Arrays.asList(spaceName1, spaceName2));
+        DocumentReference documentReference = new DocumentReference(documentName, spaceReference);
         setup.gotoPage(documentReference, "create");
         CreatePagePage createPagePage = new CreatePagePage();
         createPagePage.waitForErrorMessage();
@@ -843,16 +849,21 @@ public class EditIT
 
     @Test
     @Order(11)
-    public void editTitle255Characters(TestUtils setup, TestConfiguration testConfiguration,
+    public void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
         TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.deletePage(testReference);
 
-        // Title of 300 characters.
-        String veryLongTitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin viverra, erat et "
-            + "placerat hendrerit, tellus eros fermentum tellus, vel laoreet orci ligula sodales augue. Aenean "
-            + "fermentum suscipit magna. Donec erat orci, mollis at ligula molestie, ornare consequat mi. Duis "
-            + "ultrices sed elit ac nullam.";
+        // Title of 800 characters.
+        String veryLongTitle = "Hodor. Hodor hodor, hodor. Hodor hodor hodor hodor hodor. Hodor. Hodor! "
+            + "Hodor hodor, hodor; hodor hodor hodor. Hodor. Hodor hodor; hodor hodor - hodor, hodor, hodor hodor. "
+            + "Hodor, hodor. Hodor. Hodor, hodor hodor hodor; hodor hodor; hodor hodor hodor! Hodor hodor HODOR! "
+            + "Hodor. Hodor hodor, hodor. Hodor hodor hodor hodor hodor. Hodor. Hodor! Hodor hodor, hodor; hodor "
+            + "hodor hodor. Hodor. Hodor hodor; hodor hodor - hodor, hodor, hodor hodor. Hodor, hodor. Hodor. "
+            + "Hodor, hodor hodor hodor; hodor hodor; hodor hodor hodor! Hodor hodor HODOR! Hodor. Hodor hodor, hodor. "
+            + "Hodor hodor hodor hodor hodor. Hodor. Hodor! Hodor hodor, hodor; hodor hodor hodor. Hodor. "
+            + "Hodor hodor; hodor hodor - hodor, hodor, hodor hodor. Hodor, hodor. Hodor. Hodor, hodor hodor hodor "
+            + "hodor hodor hodor hodor hodor Hodor hodor!";
 
         // Right now error messages from the server are different if we are using Save&View or Save&Continue.
         // This needs to be fixed as part of XWIKI-16425.
@@ -885,7 +896,7 @@ public class EditIT
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
 
-        // Logs generated because of the >255 characters title error.
+        // Logs generated because of the >768 characters title error.
         logCaptureConfiguration.registerExpected(
             "JDBCExceptionReporter",
             "Error number 3201 in 3",
@@ -899,9 +910,9 @@ public class EditIT
             "SQL Error: 0, SQLState: 22001",
             "data exception: string data, right truncation",
             "SQL Error: 12899, SQLState: 72000",
-            "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 300, maximum: 255)",
+            "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 800, maximum: 768)",
             // PostgreSQL specific log
-            "value too long for type character varying(255)"
+            "value too long for type character varying(768)"
         );
     }
 

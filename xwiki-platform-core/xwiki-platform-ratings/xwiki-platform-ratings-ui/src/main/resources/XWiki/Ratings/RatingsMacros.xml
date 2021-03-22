@@ -59,7 +59,7 @@
       #set ($message = $services.localization.render("rating.rate"))
       #set ($isLockedClass = "")
     #end
-    &lt;div class="rating-wrapper $isLockedClass" data-reference="${requestDocRef}"&gt;
+    &lt;div class="rating-wrapper $isLockedClass" data-reference="$escapetool.xml($requestDocRef)"&gt;
       &lt;div class="avg-rating"&gt;
         #ratingstars($id "" $message $avgvote $votes $isLocked)
       &lt;/div&gt;

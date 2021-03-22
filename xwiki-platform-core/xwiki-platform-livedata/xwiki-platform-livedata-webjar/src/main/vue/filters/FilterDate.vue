@@ -25,21 +25,37 @@
   or match a date range
 -->
 <template>
-  <!-- A simple text input that will be upgraded to have a date picker -->
-  <input
-    class="filter-date"
-    ref="filterDate"
-    type="text"
-    size="1"
-    :value="valueFormatted"
-  />
+  <div>
+    <!-- A simple text input that will be upgraded to have a date picker -->
+    <input
+      v-if="showDateInput"
+      class="filter-date"
+      ref="filterDate"
+      key="filterDate"
+      type="text"
+      size="1"
+      :value="valueFormatted"
+    />
+    <!-- A simple text input to filter date with text -->
+    <input
+      v-else
+      class="filter-date"
+      ref="containsInput"
+      key="containsInput"
+      type="text"
+      size="1"
+      :value="filterEntry.value"
+      @input="applyFilterFromText"
+    />
+  </div>
 </template>
 
 
 <script>
 import filterMixin from "./filterMixin.js";
-import daterangepicker from "daterangepicker";
+import "daterangepicker";
 import moment from "moment";
+import "moment-jdateformatparser";
 import $ from "jquery";
 
 export default {
@@ -49,22 +65,74 @@ export default {
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
 
+  data () {
+    return {
+      rules: [
+        {
+          from: "contains",
+          to: ["before", "after", "between"],
+          getValue: () => {
+            return "";
+          },
+        },
+        {
+          from: ["before", "after", "between"],
+          to: "contains",
+          getValue: ({ oldValue }) => {
+            const date = moment((oldValue + "").split("/")[0]);
+            return date.isValid() ? date.format(this.format) : oldValue;
+          },
+        },
+        {
+          // between x and y => after x and before y
+          from: "between",
+          to: "before",
+          getValue: ({ oldValue }) => {
+            return (oldValue + "").split("/")[1] || oldValue;
+          },
+        },
+        {
+          from: "between",
+          to: "after",
+          getValue: ({ oldValue }) => {
+            return typeof oldValue === 'string' ? oldValue.split("/")[0] : oldValue;
+          },
+        },
+        {
+          from: ["before", "after"],
+          to: "between",
+          getValue: ({ oldValue }) => {
+            const date = moment(oldValue + "");
+            return date.isValid() ? (oldValue + "/" + oldValue) : oldValue;
+          },
+        },
+      ],
+    };
+  },
+
 
   computed: {
 
     valueFormatted () {
-      if (this.filterEntry.value === undefined) { return; }
-      return this.filterEntry.value.split("-")
-        .map(date => moment(+date).format(this.format))
-        .join(" - ");
+      if (typeof this.filterEntry.value === 'string' && this.filterEntry.value.length) {
+        const range = this.filterEntry.value.split("/");
+        if (range.length <= 2) {
+          return range.map(dateString => {
+            const date = moment(dateString);
+            return date.isValid() ? date.format(this.format) : dateString;
+          }).join(" - ");
+        }
+      }
+      return this.filterEntry.value;
     },
 
-    operator () {
-      return this.filterEntry.operator;
+    showDateInput () {
+      return this.operator !== "contains";
     },
 
     format () {
-      return "YYYY/MM/DD HH:mm";
+      const javaDateFormat = this.config.dateFormat;
+      return javaDateFormat ? moment().toMomentFormatString(javaDateFormat) : "YYYY/MM/DD HH:mm";
     },
 
     ranges () {
@@ -91,19 +159,19 @@ export default {
         autoUpdateInput: false,
         autoApply: false,
         singleDatePicker: true,
-        showDropdowns: true,
-        timePicker: true,
+        timePicker: /[Hhkms]/.test(this.format),
         timePicker24Hour: true,
         showCustomRangeLabel: true,
         alwaysShowCalendars: true,
         locale: {
           format: this.format,
+          cancelLabel: 'Clear',
         },
       };
     },
 
     filterConfig () {
-      if (this.operator === "isBetween") {
+      if (this.operator === "between") {
         return Object.assign({}, this.defaultFilterConfig, {
           singleDatePicker: false,
           ranges: this.ranges,
@@ -116,21 +184,30 @@ export default {
   },
 
   methods: {
-    getValue (daterangepicker) {
-      if (this.operator === "isBetween") {
-        return `${daterangepicker.startDate.valueOf()}-${daterangepicker.endDate.valueOf()}`
+    // Get date filter value from input element
+    getDateValue () {
+      const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
+      if (this.operator === "between") {
+        // Serialize the date range as a ISO 8601 time interval, without fractional seconds.
+        // See https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.format()}`
+      } else if (this.operator === 'before' || this.operator === 'after') {
+        // Use the ISO 8601 representation, without fractional seconds.
+        return daterangepicker.startDate.format();
       } else {
+        // Use the formatted date.
         return daterangepicker.startDate.format(this.format);
       }
     },
 
-    applyDate () {
-      const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
-      const value = this.getValue(daterangepicker);
-      const valueTimestamps = value.split(" - ")
-        .map(date => +moment(date, this.format))
-        .join("-");
-      this.applyFilter(valueTimestamps);
+    applyFilterFromDate () {
+      const value = this.getDateValue();
+      this.applyFilter(value);
+    },
+
+    applyFilterFromText () {
+      const value = $(this.$refs.containsInput).val();
+      this.applyFilterWithDelay(value);
     },
   },
 
@@ -142,8 +219,11 @@ export default {
         $(filterDate).daterangepicker(
           this.filterConfig,
         );
-        $(filterDate).on('apply.daterangepicker', (e) => {
-          this.applyDate();
+        $(filterDate).on('apply.daterangepicker', () => {
+          this.applyFilterFromDate();
+        });
+        $(filterDate).on('cancel.daterangepicker', () => {
+          this.applyFilter('');
         });
         // Fix prototypejs prototype pollution
         $(filterDate).on('hide.daterangepicker', (e) => {
@@ -168,5 +248,10 @@ export default {
 
 
 <style>
+
+.livedata-filter .filter-date {
+  width: 100%;
+  height: 100%;
+}
 
 </style>

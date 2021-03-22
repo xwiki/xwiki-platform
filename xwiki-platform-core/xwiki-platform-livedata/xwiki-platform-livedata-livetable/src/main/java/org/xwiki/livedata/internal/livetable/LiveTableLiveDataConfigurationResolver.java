@@ -102,6 +102,9 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     @Inject
     private PropertyTypeSupplier propertyTypeSupplier;
 
+    @Inject
+    private LiveTableResultsURLDocumentReferenceResolver urlDocumentReferenceResolver;
+
     private URLQueryStringParser urlQueryStringParser = new URLQueryStringParser();
 
     @Override
@@ -182,6 +185,10 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         List<String> xpage = parameters.remove("xpage");
         if (xpage != null && !xpage.isEmpty() && !StringUtils.isEmpty(xpage.get(0)) && !"plain".equals(xpage.get(0))) {
             source.setParameter("template", xpage.get(0) + ".vm");
+            String documentReference = this.urlDocumentReferenceResolver.resolve(url);
+            if (documentReference != null) {
+                source.setParameter("$doc", documentReference);
+            }
             for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                 if (entry.getValue().size() > 1) {
                     source.setParameter(entry.getKey(), entry.getValue());
@@ -309,23 +316,28 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
             displayerConfig.setParameter(ACTIONS, columnProperties.get(ACTIONS));
         } else if (columnProperties.path(LINK).isTextual()) {
             displayerConfig.setId(LINK);
-            Map<String, String[]> propertyHref = new HashMap<>();
-            String docURL = "doc.url";
-            String columnURL = column + "_url";
-            propertyHref.put("auto", new String[] {columnURL, docURL});
-            propertyHref.put("field", new String[] {columnURL});
-            propertyHref.put("author", new String[] {"doc.author_url"});
-            propertyHref.put("space", new String[] {"doc.space_url"});
-            propertyHref.put("wiki", new String[] {"doc.wiki_url"});
-            String linkType = columnProperties.get(LINK).asText();
-            String[] values = propertyHref.getOrDefault(linkType, new String[] {docURL});
-            displayerConfig.setParameter("propertyHref", values[0]);
+            displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
+            displayerConfig.setParameter(HTML, columnProperties.path(HTML).booleanValue());
         } else if (columnProperties.path(HTML).booleanValue()) {
             displayerConfig.setId(HTML);
         } else {
             displayerConfig = null;
         }
         return displayerConfig;
+    }
+
+    private Object getLinkTarget(String column, String linkType)
+    {
+        String docURL = "doc.url";
+        String columnURL = column + "_url";
+        if ("auto".equals(linkType)) {
+            return new String[] {columnURL, docURL};
+        } else if ("field".equals(linkType)) {
+            return columnURL;
+        } else {
+            String linkTypeURL = String.format("doc.%s_url", linkType);
+            return new String[] {linkTypeURL, docURL};
+        }
     }
 
     private FilterDescriptor getFilterConfig(ObjectNode columnProperties)

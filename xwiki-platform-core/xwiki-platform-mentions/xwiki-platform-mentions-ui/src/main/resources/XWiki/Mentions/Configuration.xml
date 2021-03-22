@@ -253,7 +253,7 @@
       <displayInSection>Mentions</displayInSection>
     </property>
     <property>
-      <heading>Mentions Preferences</heading>
+      <heading>$services.localization.render('mentions.configuration.heading')</heading>
     </property>
     <property>
       <iconAttachment/>

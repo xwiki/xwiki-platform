@@ -26,4 +26,5 @@
 
 <suppressions>
   <suppress checks="FanOutComplexity" files="DefaultAuthenticationFailureManager.java"/>
+  <suppress checks="FanOutComplexity" files="DefaultResetPasswordManager.java"/>
 </suppressions>

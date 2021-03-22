@@ -24,27 +24,21 @@ import java.util.Collections;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.job.JobContext;
-import org.xwiki.job.JobStatusStore;
-import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.logging.LoggerManager;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,59 +49,36 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class EventStreamWikiCleanerJobTest
+@ComponentTest
+class EventStreamWikiCleanerJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EventStreamWikiCleanerJob> mocker =
-        new MockitoComponentMockingRule<>(EventStreamWikiCleanerJob.class);
+    @InjectMockComponents
+    private EventStreamWikiCleanerJob job;
 
+    @MockComponent
     private EventStream eventStream;
 
+    @MockComponent
     private QueryManager queryManager;
 
-    private ObservationManager observationManager;
-
-    private LoggerManager loggerManager;
-
-    private JobStatusStore store;
-
+    @MockComponent
     private Provider<Execution> executionProvider;
-
-    private Provider<ExecutionContextManager> executionContextManagerProvider;
-
-    private JobContext jobContext;
-
-    private JobProgressManager progressManager;
 
     private Execution execution = new DefaultExecution();
 
+    @MockComponent
     private ExecutionContextManager executionContextManager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        eventStream = mocker.getInstance(EventStream.class);
-        queryManager = mocker.getInstance(QueryManager.class);
-
-        observationManager = mocker.getInstance(ObservationManager.class);
-        loggerManager = mocker.getInstance(LoggerManager.class);
-        store = mocker.getInstance(JobStatusStore.class);
-        executionProvider = mock(Provider.class);
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class, Execution.class),
-            executionProvider);
         when(executionProvider.get()).thenReturn(execution);
-        executionContextManagerProvider = mock(Provider.class);
-        mocker.registerComponent(new DefaultParameterizedType(null, Provider.class, ExecutionContextManager.class),
-            executionContextManagerProvider);
         executionContextManager = mock(ExecutionContextManager.class);
-        when(executionContextManagerProvider.get()).thenReturn(executionContextManager);
-        jobContext = mocker.getInstance(JobContext.class);
-        progressManager = mocker.getInstance(JobProgressManager.class);
         execution.pushContext(new ExecutionContext());
     }
 
     @Test
-    public void run() throws Exception
+    void run() throws Exception
     {
         Query query = mock(Query.class);
         when(queryManager.createQuery("where event.wiki = :wiki", Query.HQL)).thenReturn(query);
@@ -122,9 +93,8 @@ public class EventStreamWikiCleanerJobTest
 
         // Test
         EventStreamWikiCleanerJobRequest request = new EventStreamWikiCleanerJobRequest("someWiki");
-        EventStreamWikiCleanerJob job = mocker.getComponentUnderTest();
-        job.initialize(request);
-        job.runInternal();
+        this.job.initialize(request);
+        this.job.runInternal();
 
         // Verify
         verify(eventStream).deleteEvent(event1);
@@ -135,8 +105,8 @@ public class EventStreamWikiCleanerJobTest
     }
 
     @Test
-    public void getType() throws Exception
+    void getType() throws Exception
     {
-        assertEquals("EventStreamWikiCleanerJob", mocker.getComponentUnderTest().getType());
+        assertEquals("EventStreamWikiCleanerJob", this.job.getType());
     }
 }

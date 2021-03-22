@@ -21,6 +21,9 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,10 +31,15 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 
 /**
  * Provides the default live data configuration for the live table source.
@@ -45,11 +53,17 @@ import org.xwiki.livedata.LiveDataException;
 @Singleton
 public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
+    private static final List<String> USER_DOC_PROPS = Arrays.asList("doc.creator", "doc.author");
+
     /**
      * Used to parse the default configuration JSON.
      */
     @Inject
     private LiveDataConfigurationResolver<String> stringLiveDataConfigResolver;
+
+    @Inject
+    @Named("wiki")
+    private ConfigurationSource wikiConfig;
 
     /**
      * Cache the static default configuration JSON.
@@ -71,10 +85,39 @@ public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataCo
         }
 
         try {
-            return this.stringLiveDataConfigResolver.resolve(this.defaultConfigJSON);
+            LiveDataConfiguration defaultConfig = this.stringLiveDataConfigResolver.resolve(this.defaultConfigJSON);
+            maybeSetDateFormat(defaultConfig.getMeta());
+            setSearchURLForUserFilter(defaultConfig.getMeta());
+            return defaultConfig;
         } catch (LiveDataException e) {
             throw new RuntimeException("Failed to parse the default live data configuration for the live table source.",
                 e);
         }
+    }
+
+    private void maybeSetDateFormat(LiveDataMeta meta)
+    {
+        String dateFormat = this.wikiConfig.getProperty("dateformat");
+        if (!StringUtils.isEmpty(dateFormat)) {
+            Optional<FilterDescriptor> dateFilter =
+                meta.getFilters().stream().filter(filter -> "date".equals(filter.getId())).findFirst();
+            // We expect the date filter to be present in liveTableLiveDataConfiguration.json
+            dateFilter.get().setParameter("dateFormat", dateFormat);
+        }
+    }
+
+    private void setSearchURLForUserFilter(LiveDataMeta meta)
+    {
+        meta.getPropertyDescriptors().stream().filter(property -> USER_DOC_PROPS.contains(property.getId()))
+            .forEach(this::setSearchURLForUserFilter);
+    }
+
+    private void setSearchURLForUserFilter(LiveDataPropertyDescriptor property)
+    {
+        if (property.getFilter() == null) {
+            property.setFilter(new FilterDescriptor("list"));
+        }
+        // TODO: Take into account the user scope. See suggestUsersAndGroups.js for an example.
+        property.getFilter().setParameter("searchURL", "?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json");
     }
 }

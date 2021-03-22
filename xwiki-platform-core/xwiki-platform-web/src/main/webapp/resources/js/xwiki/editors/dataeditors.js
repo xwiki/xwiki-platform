@@ -136,7 +136,23 @@ editors.XDataEditors = Class.create({
    * Returns the xobject DOM element for the given class and number.
    */
   getXObject : function (xclassName, objectNumber) {
-    return $$('#xobject_' + xclassName.replace('.','\\.')+'_'+objectNumber)[0];
+    var expectedId = 'xobject_' + xclassName + '_' + objectNumber;
+    var possibleObjects = $$('.xobject');
+    for (var i = 0; i < possibleObjects.length; i++) {
+      if (possibleObjects[i].id === expectedId) {
+        return possibleObjects[i];
+      }
+    }
+  },
+
+  getDeletedXObject : function (xclassName, objectNumber) {
+    var expectedId = 'deletedObject_' + xclassName + '_' + objectNumber;
+    var possibleObjects = $$('input[name=deletedObjects]');
+    for (var i = 0; i < possibleObjects.length; i++) {
+      if (possibleObjects[i].id === expectedId) {
+        return possibleObjects[i];
+      }
+    }
   },
   /**
    * Helper to remove an element from an array if and only if it was already in the array.
@@ -166,7 +182,7 @@ editors.XDataEditors = Class.create({
     // if an object with this number was already deleted, we remove the info from deleted objects.
     var deletedArray = this.editorStatus.deletedXObjects[xclassName];
     if (deletedArray !== undefined && deletedArray.indexOf(objectNumberVal) !== -1) {
-      $$('#deletedObject_' + xclassName.replace('.','\\.') + '_' + objectNumberVal)[0].remove();
+      this.getDeletedXObject(xclassName, objectNumberVal).remove();
       this.removeElementFromArray(deletedArray, objectNumberVal);
       if (deletedArray.length === 0) {
         delete this.editorStatus.deletedXObjects[xclassName];
@@ -267,7 +283,8 @@ editors.XDataEditors = Class.create({
             xpage: 'editobject',
             xaction: 'addObject',
             classname: classNameVal,
-            objectNumber: this.getNewObjectNumber(classNameVal)
+            objectNumber: this.getNewObjectNumber(classNameVal),
+            form_token: $$('input[name=form_token]')[0].value
           }));
         }
         if (!item.disabled && validClassName) {
@@ -313,7 +330,7 @@ editors.XDataEditors = Class.create({
                         // be sure to remove the requested object number from the array first.
                         if (deletionArray.indexOf(objectNumberVal) !== -1) {
                           this.removeElementFromArray(deletionArray, objectNumberVal);
-                          insertedElement.up('form').down('#deletedObject_'+xclassName.replace('.','\\.')+'_'+objectNumberVal).remove();
+                          this.getDeletedXObject(xclassName, objectNumberVal).remove();
                         }
                         if (deletionArray.length === 0) {
                           delete this.editorStatus.deletedXObjects[xclassName];
@@ -652,15 +669,68 @@ editors.XDataEditors = Class.create({
   // ------------------------------------
   // Expand/collapse objects and object properties
   expandCollapseObject : function(object) {
-    var totalItems = $$('#xwikiobjects .xobject').size();
     object.addClassName('collapsable');
-    if (totalItems > 1) {
-      object.toggleClassName('collapsed');
+    var objectContent = object.down('.xobject-content');
+
+    if (objectContent.childElementCount === 0) {
+      object.addClassName('collapsed');
     }
     var objectTitle = object.down('.xobject-title');
+    var xclassName = this.getXClassNameFromXObjectId(object.id);
+    var xObjectNumber = this.getXObjectNumberFromXObjectId(object.id);
     objectTitle.observe('click', function(event) {
-      objectTitle.up().toggleClassName('collapsed');
-    }.bindAsEventListener());
+      var isAlreadyLoaded = objectContent.childElementCount > 0;
+      if (!isAlreadyLoaded && !object.hasClassName('loading')) {
+        object.addClassName('loading');
+        var editURL = this.editedDocument.getURL('edit', Object.toQueryString({
+          xpage: 'editobject',
+          xaction: 'loadObject',
+          classname: xclassName,
+          objectNumber: xObjectNumber,
+          form_token: $$('input[name=form_token]')[0].value
+        }));
+        new Ajax.Request(
+          /* Ajax request URL */
+          editURL,
+          /* Ajax request parameters */
+          {
+            onCreate : function() {
+              object.notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.inProgress')", "inprogress");
+            },
+            onSuccess : function(response) {
+              // We don't use Prototype API here because we wan't to move the CSS/JavaScript includes to the page head.
+              var responseDocumentFragment = this._parseHTMLResponse(response.responseText);
+              // Using plain JavaScript here because Prototype doesn't know how to insert a document fragment.
+              objectContent.insertBefore(responseDocumentFragment, null);
+
+              // display the elements before firing the event to be sure they are visible.
+              object.toggleClassName('collapsed');
+              document.fire('xwiki:dom:updated', {elements: [objectContent]});
+              object.removeClassName('loading');
+              object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
+            }.bind(this),
+            onFailure : function(response) {
+              var failureReason = response.statusText;
+              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                failureReason = 'Server not responding';
+              }
+              object.removeClassName('loading');
+              object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.failed') " + failureReason, "error"));
+            },
+            // IE converts 204 status code into 1223...
+            on1223 : function(response) {
+              response.request.options.onSuccess(response);
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            }
+          }
+        );
+      } else {
+        object.toggleClassName('collapsed');
+      }
+    }.bindAsEventListener(this));
   },
   // ------------------------------------
   //  Expand/collapse classes

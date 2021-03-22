@@ -43,6 +43,12 @@
 
     <!-- Define panel content inside the `body` slot -->
     <template #body>
+
+      <!-- Explain why the panel might be empty. -->
+      <div v-show="!logic.getSortableProperties().length" class="text-muted">
+        None of the displayed properties is sortable.
+      </div>
+
       <!--
         The sort entries are wrapped inside a XWikiDraggable component
         in order to allow the user to reorder them easily
@@ -157,6 +163,8 @@ export default {
 
     // The sortable properties that don't have a sort entry in the live data query.
     unsortedProperties () {
+      // Disable no-side-effects-in-computed-properties because it fails just because the method name contains "sort".
+      /* eslint vue/no-side-effects-in-computed-properties: "off" -- false positive */
       return this.logic.getUnsortedProperties().map(property => this.logic.getPropertyDescriptor(property));
     },
   },
@@ -186,6 +194,7 @@ export default {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  margin-bottom: .5em;
 }
 
 .livedata-advanced-panel-sort .draggable-item .handle {

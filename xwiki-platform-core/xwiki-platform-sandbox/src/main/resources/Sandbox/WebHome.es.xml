@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>La Zona de Pruebas ("Sandbox") es una parte de tu wiki que puedes modificar libremente. Está concebida para permitirte practicar la edición.   Descubrirás como funciona la creación y edición de páginas.   Solo tienes que clicar en **Editar** para comenzar.
+  <content>La Zona de Pruebas ("Sandbox") es una parte de tu wiki que puedes modificar libremente. Está concebida para permitirte practicar la edición. Descubrirás como funciona la creación y edición de páginas. Solo tiene clicar en **Editar** para comenzar.
 
 {{info}}
 No se preocupe por sobrescribir o perder contenido al editar la página, siempre puedes volver a la versión inicial de la página desde la pestaña "Historial" al final de la página.
@@ -54,7 +54,7 @@ Sigue una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] que pu
 
 = Encabezados =
 
-XWiki ofrece 6 niveles de encabezado.   Los puedes usar para estructurar tus páginas.
+XWiki ofrece 6 niveles de encabezado. Los puedes usar para estructurar tus páginas.
 
 == Nivel 2 de encabezado ==
 
@@ -142,7 +142,7 @@ Puedes insertar imágenes en tus páginas wiki:
 
 = Macros =
 
-Las macros te permiten mejorar la presentación del contenido wiki y añadir funcionalidades adicionales a tu wiki.    A continuación, dos ejemplos de como utilizar las macros en páginas wiki:
+Las macros te permiten mejorar la presentación del contenido wiki y añadir funcionalidades adicionales a tu wiki. A continuación, dos ejemplos de como utilizar las macros en páginas wiki:
 
 == Macro de Advertencia ==
 

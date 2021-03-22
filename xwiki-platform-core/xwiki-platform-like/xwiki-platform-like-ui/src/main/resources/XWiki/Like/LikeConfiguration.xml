@@ -282,6 +282,21 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <enabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>enabled</name>
+        <number>1</number>
+        <prettyName>enabled</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </enabled>
       <alwaysDisplayButton>
         <customDisplay/>
         <defaultValue/>
@@ -290,7 +305,7 @@
         <displayType/>
         <hint/>
         <name>alwaysDisplayButton</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>alwaysDisplayButton</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -302,7 +317,7 @@
         <disabled>0</disabled>
         <hint/>
         <name>cacheCapacity</name>
-        <number>2</number>
+        <number>3</number>
         <numberType>integer</numberType>
         <prettyName>cacheCapacity</prettyName>
         <size>30</size>
@@ -312,6 +327,9 @@
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </cacheCapacity>
     </class>
+    <property>
+      <enabled>1</enabled>
+    </property>
     <property>
       <alwaysDisplayButton>1</alwaysDisplayButton>
     </property>

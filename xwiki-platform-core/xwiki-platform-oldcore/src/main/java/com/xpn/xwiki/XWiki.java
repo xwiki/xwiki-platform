@@ -274,6 +274,13 @@ public class XWiki implements EventListener
     /** Name of the default system space. */
     public static final String SYSTEM_SPACE = "XWiki";
 
+    /**
+     * Name of the default system space as an EntityReference.
+     * 
+     * @since 13.2RC1
+     */
+    public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
 

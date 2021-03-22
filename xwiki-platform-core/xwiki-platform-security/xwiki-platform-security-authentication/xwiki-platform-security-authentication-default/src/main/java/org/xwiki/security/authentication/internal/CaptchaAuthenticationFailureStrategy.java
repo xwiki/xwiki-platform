@@ -36,7 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 
 /**
  * Captcha Strategy for repeated authentication failures.

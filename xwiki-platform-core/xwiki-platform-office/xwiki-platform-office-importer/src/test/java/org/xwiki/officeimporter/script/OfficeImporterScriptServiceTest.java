@@ -22,8 +22,11 @@ package org.xwiki.officeimporter.script;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -32,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -53,6 +57,9 @@ public class OfficeImporterScriptServiceTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @XWikiTempDir
+    private File tempDir;
+
     @Test
     public void saveWithOverwrite() throws Exception
     {
@@ -64,10 +71,14 @@ public class OfficeImporterScriptServiceTest
         String content = "Office Document Content";
         String fileName = "logo.png";
         byte[] fileContent = new byte[] {65, 82};
+        File artifact = new File(tempDir, fileName);
+        try (FileOutputStream fos = new FileOutputStream(artifact)) {
+            IOUtils.write(fileContent, fos);
+        }
 
         when(documentAccessBridge.isDocumentEditable(documentReference)).thenReturn(true);
         when(doc.getContentAsString(syntaxId)).thenReturn(content);
-        when(doc.getArtifacts()).thenReturn(Collections.singletonMap(fileName, fileContent));
+        when(doc.getArtifactsFiles()).thenReturn(Collections.singleton(artifact));
 
         assertTrue(officeImporterScriptService.save(doc, documentReference, syntaxId, parentReference, title, false));
 

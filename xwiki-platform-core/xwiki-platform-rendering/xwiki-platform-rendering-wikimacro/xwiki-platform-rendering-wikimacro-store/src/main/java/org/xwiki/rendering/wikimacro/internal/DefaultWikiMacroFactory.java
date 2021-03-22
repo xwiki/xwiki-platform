@@ -139,7 +139,6 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
 
-
         // Verify macro description.
         if (StringUtils.isEmpty(macroDescription)) {
             this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);

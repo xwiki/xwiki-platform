@@ -60,7 +60,10 @@ like.configuration.heading=Like Preferences
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.</content>
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
+XWiki.Like.LikeConfigurationClass_enabled=Enable Like feature
+XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+  </content>
   <object>
     <name>XWiki.Like.LikeTranslations</name>
     <number>0</number>

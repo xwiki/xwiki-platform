@@ -76,9 +76,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Omfangsvarslingsf
 notifications.filters.preferences.scopeNotificationFilter.page=Bare side
 notifications.filters.preferences.scopeNotificationFilter.space=Side og undersider
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
 notifications.filters.preferences.allEvents=-
-
 notifications.filters.preferences.addPreference.filterType.inclusive=Inklusive
 notifications.filters.preferences.addPreference.filterType.exclusive=Eksklusiv
 notifications.filters.preferences.addPreference.notificationFormat.label=Varslingsformat
@@ -113,7 +111,6 @@ notifications.settings.filters.preferences.table.eventTypes=Hendelser
 notifications.settings.filters.preferences.table.notificationFormats=Format
 notifications.settings.filters.preferences.table.isEnabled=Er aktivert?
 notifications.settings.filters.preferences.table._actions=Handlinger
-
 notifications.menu.header=Varsler
 notifications.menu.header.settings=Innstillinger
 notifications.menu.clear=Fjern alt
@@ -182,6 +179,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Hver gan
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Hver gang jeg gjør en større endring
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Bare når jeg oppretter en ny side
 
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=Den gitte brukerreferansen støttes ikke, bare DocumentUserReference støttes for nå.
+notifications.settings.error.userReferenceAdminForbidden=Du har ikke administrasjonsrett for den gitte brukeren: {0}.
+notifications.settings.error.badCSRF=Ugyldig CSRF-token.
+notifications.settings.badParameters=Ugyldige parameter i forespørsel.
+
 ## User profile
 notifications.userprofile.following=Følger
 notifications.userprofile.notfollowing=Følger ikke
@@ -196,7 +199,6 @@ rendering.macro.notificationsApplicationsPreferences.name=Innstillinger for appl
 rendering.macro.notificationsApplicationsPreferences.description=Vis innstillingene til gjeldende bruker om varslingsapplikasjoner.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Mål
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Målet for makroen (kan være "bruker" for den nåværende brukeren eller "wiki" for den nåværende wiki)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Varselinnstillinger for automatisk overvåking
 rendering.macro.notificationsAutoWatchPreferences.description=Vis innstillingene til den nåværende brukeren for automatisk overvåkede sider.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Mål
@@ -212,5 +214,6 @@ notifications.switches.tooltip.page=Overvåk denne siden
 notifications.switches.tooltip.pageAndChildren=Overvåk denne siden og dens undersider
 notifications.switches.tooltip.space=Overvåk overliggende side og dens undersider
 notifications.switches.tooltip.wiki=Overvåk Wiki
-notifications.switches.changeStatusError=Kunne ikke endre statusen for varslene.</content>
+notifications.switches.changeStatusError=Kunne ikke endre statusen for varslene.
+</content>
 </xwikidoc>

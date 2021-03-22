@@ -31,7 +31,7 @@ import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

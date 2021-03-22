@@ -42,13 +42,29 @@ edit.inplace.page.lockFailed=Failed to lock the page.
 edit.inplace.page.loadFailed=Failed to load the page.
 edit.inplace.page.renderFailed=Failed to render the page.
 
+edit.inplace.page.translate=Translate
+edit.inplace.page.translate.hint=Translate this page in {0}
+edit.inplace.page.translate.messageBefore=You''re editing the {0} translation of this page (its original version) because this page has not been translated in {1} (the current locale) yet.
+edit.inplace.page.translate.messageAfter=You''re now editing the {0} translation. Start by translating the page title.
+
+edit.inplace.actionButtons.loadFailed=Failed to load the action buttons.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 13.2
+#######################################
 edit.inplace.page.original=You''re editing the original page ({0})
 edit.inplace.page.translation=You''re editing the following translation: {0}.
 
-edit.inplace.page.translate=Translate
-edit.inplace.page.translate.hint=Translate this page in: {0}
-
-edit.inplace.actionButtons.loadFailed=Failed to load the action buttons.</content>
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>XWiki.EditTranslations</name>
     <number>0</number>

@@ -75,6 +75,8 @@ com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentDocumentReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
+com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupDocumentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetPagePageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider
@@ -96,9 +98,13 @@ com.xpn.xwiki.internal.model.reference.CurrentStringPageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentUserAndGroupDocumentReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentUserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentWikiReferenceProvider
 com.xpn.xwiki.internal.model.reference.SpaceReferenceConverter
 com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
+com.xpn.xwiki.internal.model.reference.UserAndGroupDocumentReferenceResolver
+com.xpn.xwiki.internal.model.reference.UserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.namespace.DefaultNamespaceContextExecutor

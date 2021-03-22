@@ -66,5 +66,8 @@ export default {
 
 
 <style>
-
+.livedata-advanced-panels {
+  display: flex;
+  flex-direction: column;
+}
 </style>

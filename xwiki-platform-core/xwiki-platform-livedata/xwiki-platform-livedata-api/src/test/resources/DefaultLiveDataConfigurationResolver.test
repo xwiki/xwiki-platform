@@ -107,17 +107,15 @@
         "operators":[
           {"id":"contains","name":"contains"},
           {"id":"startsWith","name":"startsWith"},
-          {"id":"equals","name":"Equals"},
-          {"id":"notEquals","name":"notEquals"}
+          {"id":"equals","name":"Equals"}
         ]
       },
       {
         "id":"number",
         "operators":[
           {"id":"equals","name":"="},
-          {"id":"notEquals","name":"≠"},
-          {"id":"isLower","name":"<"},
-          {"id":"isGreater","name":">"}
+          {"id":"less","name":"<"},
+          {"id":"greater","name":">"}
         ]
       },
       {
@@ -129,20 +127,15 @@
       {
         "id":"date",
         "operators":[
-          {"id":"isBetween","name":"isBetween"},
+          {"id":"between","name":"between"},
+          {"id":"before","name":"before"},
+          {"id":"after","name":"after"},
           {"id":"contains","name":"contains"}
-        ]
+        ],
+        "dateFormat":"yyyy/MM/dd HH:mm"
       },
       {
         "id":"list",
-        "operators":[
-          {"id":"equals","name":"Equals"},
-          {"id":"startsWith","name":"startsWith"},
-          {"id":"contains","name":"contains"}
-        ]
-      },
-      {
-        "id":"suggest",
         "operators":[
           {"id":"equals","name":"Equals"},
           {"id":"startsWith","name":"startsWith"},

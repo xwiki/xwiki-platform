@@ -33,7 +33,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ResetPasswordCompletePage extends ViewPage
 {
-    @FindBy(css = ".xcontent .box")
+    @FindBy(css = ".xwikimessage")
     private WebElement messageBox;
 
     @FindBy(id = "p")
@@ -42,10 +42,10 @@ public class ResetPasswordCompletePage extends ViewPage
     @FindBy(id = "p2")
     private WebElement newPasswordConfirmationField;
 
-    @FindBy(css = ".xcontent form input[type='submit']")
+    @FindBy(css = "#resetPasswordStep2Form input[type='submit']")
     private WebElement saveButton;
 
-    @FindBy(xpath = "//*[@class='xcontent']//a[contains(@href, 'login')]")
+    @FindBy(xpath = "//*[@class='panel-body']//a[contains(@href, 'login')]")
     private WebElement loginButton;
 
     /**
@@ -56,7 +56,7 @@ public class ResetPasswordCompletePage extends ViewPage
     public boolean isResetLinkValid()
     {
         // If we see the form, the the link is valid.
-        return getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"));
+        return getDriver().hasElementWithoutWaiting(By.id("resetPasswordStep2Form"));
     }
 
     public String getPassowrd()
@@ -88,8 +88,8 @@ public class ResetPasswordCompletePage extends ViewPage
     public boolean isPasswordSuccessfullyReset()
     {
         // success = no form and a message that is not error or warning.
-        return !getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"))
-            && messageBox.getAttribute("class").contains("infomessage");
+        return !getDriver().hasElementWithoutWaiting(By.id("resetPasswordStep2Form"))
+            && messageBox.getAttribute("class").contains("panel-success");
     }
 
     public String getMessage()

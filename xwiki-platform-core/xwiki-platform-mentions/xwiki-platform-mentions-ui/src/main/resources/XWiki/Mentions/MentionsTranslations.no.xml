@@ -41,11 +41,11 @@ rendering.macro.mention.description=Sett inn en brukeromtale.
 rendering.macro.mention.parameter.reference.name=Referanse
 rendering.macro.mention.parameter.reference.description=Omtalte bruker- eller gruppereferanse.
 rendering.macro.mention.parameter.style.name=Visningsstil
-rendering.macro.mention.parameter.style.description=Stilvalget av omtalen (dette støttes bare for brukeromtaler).
+rendering.macro.mention.parameter.style.description=Omtalens visningstype (støttes bare for brukeromtaler).
 rendering.macro.mention.parameter.anchor.name=Anker
-rendering.macro.mention.parameter.anchor.description=Ankeret som skal brukes til å koble til omtalen (dette ankeret skal være unikt for dokumentet så mye som mulig).
+rendering.macro.mention.parameter.anchor.description=Ankeret som skal brukes til å koble til omtalen (dette ankeret skal være unikt for dokumentet).
 rendering.macro.mention.parameter.type.name=Type
-### Missing: rendering.macro.mention.parameter.type.description=The type of the mentioned actor.
+rendering.macro.mention.parameter.type.description=Typen til den omtalte.
 org.xwiki.mentions.DisplayStyle.FULL_NAME=Fullt navn på brukeren
 org.xwiki.mentions.DisplayStyle.FIRST_NAME=Bare brukerens fornavn
 org.xwiki.mentions.DisplayStyle.LOGIN=Brukernavn
@@ -54,6 +54,8 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Fargen på omtalen 
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farge på din egen omtale
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Aktiver sitater
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Definerer om et sitat av teksten rundt en omtale er inkludert i varsler om brukeromtale.
-mentions.tip=Når du redigerer i WYSIWYG, skriver du @ og begynn å skrive bokstaver for å få forslag om å omtale en bruker.</content>
+mentions.tip=Når du redigerer i WYSIWYG, skriver du @ og begynn å skrive bokstaver for å få forslag om å omtale en bruker.
+mentions.configuration.heading=Omtaleinnstillinger
+</content>
   
 </xwikidoc>

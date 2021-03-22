@@ -370,8 +370,16 @@ dl.export-tree-legend dt + dd {
   }
 }
 
+#changes-info-boxes {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
 .changes-info-box {
-  .make-sm-column(6, @main-padding);
+  flex: 1;
+  padding: 0 (@main-padding / 2);
 }
 
 .changes-info-box, #changes-info-comment {
@@ -401,18 +409,8 @@ dl.export-tree-legend dt + dd {
 }
 
 .changes-arrow-left, .changes-arrow-right {
-  position: absolute;
   font-size: 7em;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.changes-arrow-left {
-  left: 30px;
-}
-
-.changes-arrow-right {
-  right: 30px;
+  line-height: 1;
 }
 
 .changes-body > .changes-body-header {

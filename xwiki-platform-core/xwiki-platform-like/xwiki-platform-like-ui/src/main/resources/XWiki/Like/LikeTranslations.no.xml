@@ -60,5 +60,8 @@ like.configuration.heading=Liker-innstillinger
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Vis alltid Liker-knappen
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Vis knappen selv om brukeren ikke har rettigheter til å bruke den. Bruk hvis du alltid vil vise Liker-telleren.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Hurtigbufferkapasitet
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Antall Liker-informasjon som er lagret i hurtigbufferen. Merk at du må starte XWiki på nytt for at dette valget skal aktiveres.</content>
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Antall Liker-informasjon som er lagret i hurtigbufferen. Merk at du må starte XWiki på nytt for at dette valget skal aktiveres.
+XWiki.Like.LikeConfigurationClass_enabled=Aktiver Liker-funksjonen
+XWiki.Like.LikeConfigurationClass_enabled.hint=Fjern merket for å deaktivere Liker-funksjonen og skjule Liker-informasjon.
+</content>
 </xwikidoc>

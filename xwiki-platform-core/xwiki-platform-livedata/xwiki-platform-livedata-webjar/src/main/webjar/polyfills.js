@@ -18,12 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
- define([
-   "promise-polyfill",
-   "url"
-  ], function () {
-
-
+/**
+ * Polyfills that are not yet provided by Closure Compiler.
+ * See https://github.com/google/closure-compiler/blob/master/src/com/google/javascript/jscomp/js/polyfills.txt
+ */
+define('xwiki-livedata-polyfills', function () {
   /**
    * Polyfill for the custom event function for IE 11
    * Taken from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
@@ -38,102 +37,4 @@
     }
     window.CustomEvent = CustomEvent;
   })();
-
-
-  /**
-   * Polyfill for the array.prototype.find method
-   * Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-   */
-  if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-      value: function(predicate) {
-        if (this === null) {
-          throw TypeError('"this" is null or not defined');
-        }
-        var o = Object(this);
-        var len = o.length >>> 0;
-        if (typeof predicate !== 'function') {
-          throw TypeError('predicate must be a function');
-        }
-        var thisArg = arguments[1];
-        var k = 0;
-        while (k < len) {
-          var kValue = o[k];
-          if (predicate.call(thisArg, kValue, k, o)) {
-            return kValue;
-          }
-          k++;
-        }
-        return undefined;
-      },
-      configurable: true,
-      writable: true
-    });
-  }
-
-
-  /**
-   * Polyfill for the array.prototype.findIndex method
-   * Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
-   */
-  if (!Array.prototype.findIndex) {
-    Object.defineProperty(Array.prototype, 'findIndex', {
-      value: function(predicate) {
-        if (this === null) {
-          throw new TypeError('"this" is null or not defined');
-        }
-        var o = Object(this);
-        var len = o.length >>> 0;
-        if (typeof predicate !== 'function') {
-          throw new TypeError('predicate must be a function');
-        }
-        var thisArg = arguments[1];
-        var k = 0;
-        while (k < len) {
-          var kValue = o[k];
-          if (predicate.call(thisArg, kValue, k, o)) {
-            return k;
-          }
-          k++;
-        }
-        return -1;
-      },
-      configurable: true,
-      writable: true
-    });
-  }
-
-
-  /**
-   * Polyfill for the Object.assign method
-   * Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-   */
-  if (typeof Object.assign !== 'function') {
-    Object.defineProperty(Object, "assign", {
-      value: function assign(target, varArgs) {
-        'use strict';
-        if (target === null || target === undefined) {
-          throw new TypeError('Cannot convert undefined or null to object');
-        }
-        var to = Object(target);
-        for (var index = 1; index < arguments.length; index++) {
-          var nextSource = arguments[index];
-          if (nextSource === null || nextSource === undefined) { continue; }
-          for (var nextKey in nextSource) {
-            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-              to[nextKey] = nextSource[nextKey];
-            }
-          }
-        }
-        return to;
-      },
-      writable: true,
-      configurable: true
-    });
-  }
-
-
-
 });
-
-

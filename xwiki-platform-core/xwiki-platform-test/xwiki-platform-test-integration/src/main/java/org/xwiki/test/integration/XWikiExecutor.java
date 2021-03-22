@@ -284,7 +284,9 @@ public class XWikiExecutor
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
 
         // Prevent the process from running indefinitely and kill it after 1 hour...
-        ExecuteWatchdog watchDog = new ExecuteWatchdog(60L * 60L * 1000L);
+        // FIXME: some tests requires XWiki to run more than 1 hour (escaping and webstandards tests)
+        // so increasing this to 2 hours
+        ExecuteWatchdog watchDog = new ExecuteWatchdog(120L * 60L * 1000L);
 
         // The executor to execute the command
         DefaultExecutor executor = new DefaultExecutor();

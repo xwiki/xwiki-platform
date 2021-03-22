@@ -164,7 +164,11 @@ public class LegacyEventLoader
     {
         LegacyEvent legacyEvent = getLegacyEvent(eventId);
 
-        return eventConverter.convertLegacyActivityToEvent(legacyEvent);
+        if (legacyEvent != null) {
+            return eventConverter.convertLegacyActivityToEvent(legacyEvent);
+        }
+
+        return null;
     }
 
     /**

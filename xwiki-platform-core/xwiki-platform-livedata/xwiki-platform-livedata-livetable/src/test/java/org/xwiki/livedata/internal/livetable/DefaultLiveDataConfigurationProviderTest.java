@@ -19,9 +19,16 @@
  */
 package org.xwiki.livedata.internal.livetable;
 
+import java.util.Optional;
+
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -29,6 +36,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultLiveDataConfigurationProvider}.
@@ -45,10 +53,25 @@ class DefaultLiveDataConfigurationProviderTest
     @MockComponent
     private IconManager iconManager;
 
+    @MockComponent
+    @Named("wiki")
+    private ConfigurationSource wikiConfig;
+
     @Test
     void get()
     {
+        when(this.wikiConfig.getProperty("dateformat")).thenReturn("dd/MM/yyyy");
+
         LiveDataConfiguration config = this.provider.get();
         assertEquals("liveTable", config.getQuery().getSource().getId());
+
+        FilterDescriptor dateFilter =
+            config.getMeta().getFilters().stream().filter(filter -> "date".equals(filter.getId())).findFirst().get();
+        assertEquals("dd/MM/yyyy", dateFilter.getParameters().get("dateFormat"));
+
+        Optional<LiveDataPropertyDescriptor> docAuthor = config.getMeta().getPropertyDescriptors().stream()
+            .filter(property -> "doc.author".equals(property.getId())).findFirst();
+        assertEquals("?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json",
+            docAuthor.get().getFilter().getParameters().get("searchURL"));
     }
 }

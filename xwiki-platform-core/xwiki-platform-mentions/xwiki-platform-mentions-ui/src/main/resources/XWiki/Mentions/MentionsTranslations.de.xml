@@ -54,6 +54,8 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Die Farbe der Erwä
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farbe der eigenen Erwähnung
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Zitate aktivieren
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Definiert, ob ein Zitat des Textes, der eine Erwähnung umgibt, in den Benachrichtigungen über Erwähnungen des Benutzers enthalten ist.
-mentions.tip=Im WYSIWYG-Editor können Sie ein @ eingeben und dann mit der Eingabe von Buchstaben beginnen, um Vorschläge zur Nennung eines Benutzers zu erhalten.</content>
+mentions.tip=Im WYSIWYG-Editor können Sie ein @ eingeben und dann mit der Eingabe von Buchstaben beginnen, um Vorschläge zur Nennung eines Benutzers zu erhalten.
+mentions.configuration.heading=Einstellungen für Erwähnungen
+</content>
   
 </xwikidoc>

@@ -28,10 +28,12 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jodconverter.document.DocumentFormat;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 import org.xwiki.officeimporter.server.OfficeServer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -59,14 +61,14 @@ public class OfficeExporter extends PdfExportImpl
     private OfficeServer officeServer = Utils.getComponent(OfficeServer.class);
 
     /**
-     * @param extension the output file name extension, which specifies the export format (e.g. pdf, odt)
+     * @param fileName the output file name, which specifies the export format (e.g. pdf, odt)
      * @return the export type matching the specified format, or {@code null} if the specified format is not supported
      */
-    public ExportType getExportType(String extension)
+    public ExportType getExportType(String fileName)
     {
         if (this.officeServer.getState() == OfficeServer.ServerState.CONNECTED) {
-            DocumentFormat format =
-                this.officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
+            OfficeDocumentFormat format =
+                this.officeServer.getConverter().getDocumentFormat(fileName);
             if (format != null) {
                 return new ExportType(format.getMediaType(), format.getExtension());
             }
@@ -78,28 +80,10 @@ public class OfficeExporter extends PdfExportImpl
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        // We assume the office server is connected. The code calling this method should check the server state.
-        exportXHTML(xhtml, out,
-            this.officeServer.getConverter().getFormatRegistry().getFormatByExtension(type.getExtension()), context);
-    }
-
-    /**
-     * Converts the given XHTML to the specified format and writes the result to the output stream.
-     *
-     * @param xhtml the XHTML to be exported
-     * @param out where to write the export result
-     * @param format the office format to convert the XHTML to
-     * @param context the XWiki context, used to access the mapping between images embedded in the given XHTML and their
-     *            location on the file system
-     * @throws XWikiException if the conversion fails
-     */
-    private void exportXHTML(String xhtml, OutputStream out, DocumentFormat format, XWikiContext context)
-        throws XWikiException
-    {
         String html = applyXSLT(xhtml, getOfficeExportXSLT(context));
 
         String inputFileName = "export_input.html";
-        String outputFileName = "export_output." + format.getExtension();
+        String outputFileName = "export_output." + type.getExtension();
 
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         // We assume that the HTML was generated using the XWiki encoding.
@@ -108,14 +92,19 @@ public class OfficeExporter extends PdfExportImpl
         addEmbeddedObjects(inputStreams, context);
 
         OfficeConverter officeConverter = this.officeServer.getConverter();
-        try {
-            Map<String, byte[]> ouput = officeConverter.convert(inputStreams, inputFileName, outputFileName);
+        try (OfficeConverterResult officeConverterResult =
+                officeConverter.convertDocument(inputStreams, inputFileName, outputFileName))
+        {
 
-            out.write(ouput.values().iterator().next());
+            for (File file : officeConverterResult.getAllFiles()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    IOUtils.write(IOUtils.toByteArray(fis), out);
+                }
+            }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, String.format(
-                    "Exception while exporting to %s (%s).", format.getName(), format.getExtension()), e);
+                    "Exception while exporting to %s (%s).", type.getMimeType(), type.getExtension()), e);
         }
     }
 

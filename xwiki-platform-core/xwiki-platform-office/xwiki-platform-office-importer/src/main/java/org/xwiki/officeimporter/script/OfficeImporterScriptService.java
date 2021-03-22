@@ -19,13 +19,17 @@
  */
 package org.xwiki.officeimporter.script;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -39,7 +43,6 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.internal.converter.OfficeImporterRecognizer;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
@@ -129,9 +132,6 @@ public class OfficeImporterScriptService implements ScriptService
     @Inject
     private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
-    @Inject
-    private OfficeImporterRecognizer officeImporterRecognizer;
-
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
      * 
@@ -216,7 +216,7 @@ public class OfficeImporterScriptService implements ScriptService
     {
         try {
             assertConnected();
-            if (this.officeImporterRecognizer.isPresentation(officeFileName)) {
+            if (this.officeServer.getConverter().isPresentation(officeFileName)) {
                 return this.presentationBuilder.build(officeFileStream, officeFileName, targetDocumentReference);
             } else {
                 return this.xdomBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);
@@ -382,7 +382,7 @@ public class OfficeImporterScriptService implements ScriptService
             }
 
             // Finally attach all the artifacts into target document.
-            attachArtifacts(doc.getArtifacts(), documentReference);
+            attachArtifacts(doc.getArtifactsFiles(), documentReference);
 
             return true;
         } catch (OfficeImporterException ex) {
@@ -463,16 +463,16 @@ public class OfficeImporterScriptService implements ScriptService
     /**
      * Utility method for attaching artifacts into a wiki page.
      * 
-     * @param artifacts map of artifact content against their names
+     * @param artifactFiles set of artifact files.
      * @param targetDocumentReference target wiki page into which artifacts are to be attached
      */
-    private void attachArtifacts(Map<String, byte[]> artifacts, DocumentReference targetDocumentReference)
+    private void attachArtifacts(Set<File> artifactFiles, DocumentReference targetDocumentReference)
     {
-        for (Map.Entry<String, byte[]> artifact : artifacts.entrySet()) {
+        for (File artifact : artifactFiles) {
             AttachmentReference attachmentReference =
-                new AttachmentReference(artifact.getKey(), targetDocumentReference);
-            try {
-                this.docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
+                new AttachmentReference(artifact.getName(), targetDocumentReference);
+            try (FileInputStream fis = new FileInputStream(artifact)) {
+                this.docBridge.setAttachmentContent(attachmentReference, IOUtils.toByteArray(fis));
             } catch (Exception ex) {
                 // Log the error and skip the artifact.
                 logger.error("Error while attaching artifact.", ex);

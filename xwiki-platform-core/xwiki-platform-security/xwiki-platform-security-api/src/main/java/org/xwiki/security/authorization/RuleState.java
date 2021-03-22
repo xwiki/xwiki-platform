@@ -30,9 +30,9 @@ public enum RuleState
     /** Right state undetermined. */
     UNDETERMINED(0x0),
     /** Right is denied. */
-            DENY(0x2),
+    DENY(0x2),
     /** Right is allowed. */
-           ALLOW(0x3);
+    ALLOW(0x3);
 
     /** Value of this rule state. */
     private final int value;

@@ -30,6 +30,7 @@ module.exports = {
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",
       "moment": "moment",
+      "moment-jdateformatparser": "moment-jdateformatparser",
       "xwiki-selectize": "xwiki-selectize",
     })
   },

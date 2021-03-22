@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_9_0.dtd">
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -40,16 +41,8 @@
        Standalone packaging since we create a custom distribution of Jetty and we don't include the Jetty "mail"
        module. However we have the problem in our functional Docker-based tests where we use the official Jetty
        image. -->
-  <!-- Note: Don't use the newer version (see following) which currently makes Jetty fail to start with Jetty 9.2+ and
-       Jetty 9.4+ (Adding here for reference for the future).
-
-         <Get name="systemClasspathPattern">
-           <Call name="add"><Arg>-javax.mail.</Arg></Call>
-         </Get>
-         <Get name="serverClasspathPattern">
-           <Call name="add"><Arg>javax.mail.</Arg></Call>
-         </Get>
-  -->
+  <!-- Note: If you're deploying on Jetty 10+ you must remove the 2 calls to prependSystemClass and
+       prependServerClass, as otherwise XWiki will fail to deploy. -->
   <Call name="prependSystemClass">
     <Arg>-javax.mail.</Arg>
   </Call>

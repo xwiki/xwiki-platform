@@ -19,14 +19,17 @@
  */
 
 
-define([
+define('xwiki-livedata', [
   "Vue",
-  "xwiki-livedata",
-  "liveDataSource"
+  "xwiki-livedata-vue",
+  "xwiki-livedata-source",
+  "xwiki-json-merge",
+  "xwiki-livedata-polyfills"
 ], function (
   Vue,
   XWikiLivedata,
-  liveDataSource
+  liveDataSource,
+  jsonMerge
 ) {
 
   /**
@@ -131,12 +134,12 @@ define([
     /**
      * Listen for custom events
      * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
-     * @param {Function} callback Function to call we the event is triggered
+     * @param {Function} callback Function to call we the event is triggered: e => { ... }
      */
     onEvent (eventName, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
-        callback(e.detail);
+        callback(e);
       });
     },
 
@@ -147,22 +150,26 @@ define([
      * @param {Object|Function} condition The condition to execute the callback
      *  if Object, values of object properties must match e.detail properties values
      *  if Function, the function must return true. e.detail is passed as argument
-     * @param {Function} callback Function to call we the event is triggered
+     * @param {Function} callback Function to call we the event is triggered: e => { ... }
      */
     onEventWhere (eventName, condition, callback) {
       eventName = "xwiki:livedata:" + eventName;
       this.element.addEventListener(eventName, function (e) {
         // Object check
         if (typeof condition === "object") {
-          const every = Object.keys(condition).every(key => condition[key] === e.detail[key]);
-          if (!every) { return; }
+          const isDetailMatching = (data, detail) => Object.keys(data).every(key => {
+            return typeof data[key] === "object"
+              ? isDetailMatching(data[key], detail?.[key])
+              : Object.is(data[key], detail?.[key]);
+          });
+          if (!isDetailMatching(condition, e.detail)) { return; }
         }
         // Function check
         if (typeof condition === "function") {
           if (!condition(e.detail)) { return; }
         }
         // call callback
-        callback(e.detail);
+        callback(e);
       });
     },
 
@@ -318,29 +325,17 @@ define([
      * @returns {Object}
      */
     getDisplayerDescriptor (propertyId) {
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorDisplayer = typeDescriptor.displayer || {};
-      // merge property and/or type displayer descriptors
-      let highLevelDisplayer;
-      if (!propertyDescriptorDisplayer.id || propertyDescriptorDisplayer.id === typeDescriptorDisplayer.id) {
-        highLevelDisplayer = Object.assign({}, typeDescriptorDisplayer, propertyDescriptorDisplayer);
-      } else {
-        highLevelDisplayer = Object.assign({}, propertyDescriptorDisplayer);
-      }
-      // displayer config
-      const displayerId = highLevelDisplayer.id;
-      const displayer = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
-      // merge displayers
-      if (highLevelDisplayer.id) {
-        return Object.assign({}, displayer, highLevelDisplayer);
-      } else {
-        // default displayer
-        return { id: this.data.meta.defaultDisplayer };
-      }
+      // Property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      // Property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      // Merge the property and type displayer descriptors.
+      const customDisplayerDescriptor = jsonMerge({}, typeDescriptor?.displayer, propertyDescriptor?.displayer);
+      // Get the default displayer descriptor.
+      const displayerId = customDisplayerDescriptor.id || this.data.meta.defaultDisplayer;
+      const defaultDisplayerDescriptor = this.data.meta.displayers.find(displayer => displayer.id === displayerId);
+      // Merge displayer descriptors.
+      return jsonMerge({}, defaultDisplayerDescriptor, customDisplayerDescriptor);
     },
 
 
@@ -350,29 +345,17 @@ define([
      * @returns {Object}
      */
     getFilterDescriptor (propertyId) {
-      // property descriptor config
-      const propertyDescriptor = this.getPropertyDescriptor(propertyId) || {};
-      const propertyDescriptorFilter = propertyDescriptor.filter || {};
-      // property type descriptor config
-      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId) || {};
-      const typeDescriptorFilter = typeDescriptor.filter || {};
-      // merge property and/or type filter descriptors
-      let highLevelFilter;
-      if (!propertyDescriptorFilter.id || propertyDescriptorFilter.id === typeDescriptorFilter.id) {
-        highLevelFilter = Object.assign({}, typeDescriptorFilter, propertyDescriptorFilter);
-      } else {
-        highLevelFilter = Object.assign({}, propertyDescriptorFilter);
-      }
-      // filter filter config
-      const filterId = highLevelFilter.id;
-      const filter = this.data.meta.filters.find(filter => filter.id === filterId);
-      // merge filters
-      if (highLevelFilter.id) {
-        return Object.assign({}, filter, highLevelFilter);
-      } else {
-        // default filter
-        return { id: this.data.meta.defaultFilter };
-      }
+      // Property descriptor config
+      const propertyDescriptor = this.getPropertyDescriptor(propertyId);
+      // Property type descriptor config
+      const typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+      // Merge the property and type filter descriptors.
+      const customFilterDescriptor = jsonMerge({}, typeDescriptor?.filter, propertyDescriptor?.filter);
+      // Get the default filter descriptor.
+      const filterId = customFilterDescriptor.id || this.data.meta.defaultFilter;
+      const defaultFilterDescriptor = this.data.meta.filters.find(filter => filter.id === filterId);
+      // Merge filter descriptors.
+      return jsonMerge({}, defaultFilterDescriptor, customFilterDescriptor);
     },
 
 
@@ -822,7 +805,7 @@ define([
     getActionDescriptor(action) {
       const descriptor = typeof action === 'string' ? {id: action} : action;
       const baseDescriptor = this.data.meta.actions.find(baseDescriptor => baseDescriptor.id === descriptor.id);
-      return Object.assign({}, baseDescriptor, descriptor);
+      return jsonMerge({}, baseDescriptor, descriptor);
     },
 
 
@@ -897,7 +880,10 @@ define([
     sort (property, level, descending) {
       const err = new Error("Property `" + property + "` is not sortable");
       return new Promise ((resolve, reject) => {
-        if (!this.isPropertySortable(property)) { return void reject(err); }
+        // Allow the user to remove a sort entry (level < 0) even if the property is not sortable.
+        if (!(level < 0 || this.isPropertySortable(property))) {
+          return void reject(err);
+        }
         // find property current sort level
         const currentLevel = this.data.query.sort.findIndex(sortObject => sortObject.property === property);
         // default level
@@ -1174,7 +1160,9 @@ define([
           if (!this.getQueryFilterGroup(newEntry.property)) {
             this.data.query.filters.push({
               property: newEntry.property,
-              matchAll: true,
+              // We use by default AND between filter groups (different properties) and OR inside a filter group (same
+              // property)
+              matchAll: false,
               constraints: [],
             });
           }

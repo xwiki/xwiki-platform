@@ -31,7 +31,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

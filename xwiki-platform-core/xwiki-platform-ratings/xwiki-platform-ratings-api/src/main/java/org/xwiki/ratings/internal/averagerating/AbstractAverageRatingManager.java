@@ -19,7 +19,9 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -81,18 +83,19 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
     private AverageRating updateAverageRating(AverageRating averageRating, float oldAverageVote, int oldTotalVote)
         throws RatingsException
     {
+        List<AverageRating> averageRatingList = Collections.singletonList(averageRating);
         this.getObservationManager().notify(new UpdatingAverageRatingEvent(averageRating, oldAverageVote, oldTotalVote),
-            this.getIdentifier(), averageRating);
+            this.getIdentifier(), averageRatingList);
         try {
             this.saveAverageRating(averageRating);
             this.getObservationManager().notify(
                 new UpdatedAverageRatingEvent(averageRating, oldAverageVote, oldTotalVote), this.getIdentifier(),
-                averageRating);
+                averageRatingList);
             return averageRating;
         } catch (RatingsException e) {
             this.getObservationManager().notify(
                 new UpdateAverageRatingFailedEvent(averageRating, oldAverageVote, oldTotalVote), this.getIdentifier(),
-                averageRating);
+                averageRatingList);
             throw e;
         }
     }

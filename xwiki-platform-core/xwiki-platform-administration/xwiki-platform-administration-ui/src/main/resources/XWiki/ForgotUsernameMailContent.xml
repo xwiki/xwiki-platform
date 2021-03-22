@@ -1,0 +1,141 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.ForgotUsernameMailContent" locale="">
+  <web>XWiki</web>
+  <name>ForgotUsernameMailContent</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Forgot Username email</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>XWiki.ForgotUsernameMailContent</name>
+    <number>0</number>
+    <className>XWiki.Mail</className>
+    <guid>5940d653-0e58-439f-ad1a-9e1afbecf9dc</guid>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <property>
+      <html>&lt;h2&gt;Hello,&lt;/h2&gt;
+#set ($wikiurl = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+#set ($xwikiLoginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
+#set ($wikiname = $request.serverName)
+#set ($severalUsernames = ($usernames.size() &gt; 0))
+&lt;p&gt;A forgot username request has been performed on &lt;a href="$wikiurl"&gt;$wikiname&lt;/a&gt;.
+If you did not make the request, please ignore this message.&lt;/p&gt;
+&lt;p&gt;We found the following username#if($severalUsernames)s#end related to this email address:
+:&lt;br/&gt;
+#if ($severalUsernames)
+&lt;ul&gt;
+#foreach ($username in $usernames)
+  &lt;li&gt;$username&lt;/li&gt;
+#end
+&lt;/ul&gt;
+#else
+&lt;strong&gt;$usernames.get(0)&lt;/strong&gt;
+#end
+
+&lt;p&gt;
+You can login from this page: &lt;a href="$xwikiLoginURL"&gt;XWiki Login&lt;/a&gt;.
+&lt;/p&gt;
+</html>
+    </property>
+    <property>
+      <language>en</language>
+    </property>
+    <property>
+      <subject>Forgot username on ${request.getServerName()}</subject>
+    </property>
+    <property>
+      <text>Hello,
+
+A forgot username request has been made on ${request.getServerName()}.
+We found the following username(s) related to this email address:
+
+#foreach ($username in $usernames)
+  $usernames
+#end
+
+You can login with this username from this URL: $xwiki.getURL('XWiki.XWikiLogin', 'login').</text>
+    </property>
+  </object>
+</xwikidoc>

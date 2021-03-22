@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.0-SNAPSHOT</version>
+    <version>13.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web</artifactId>
   <name>XWiki Platform - Web Resources</name>
@@ -142,8 +142,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- entityReference.js is added first because it is used by xwiki.js -->
-                <include>**/entityReference.js</include>
                 <include>**/xwiki.js</include>
                 <include>**/modalPopup.js</include>
                 <include>**/jumpToPage.js</include>
@@ -251,9 +249,7 @@
             <exclude>src/**/xwiki/accordion/accordion.js</exclude>
             <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
             <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>
-            <exclude>src/**/uicomponents/widgets/datepicker/simpleDateFormat.js</exclude>
             <exclude>src/**/uicomponents/widgets/validation/livevalidation_prototype.js</exclude>
-            <exclude>src/**/uicomponents/widgets/colorpicker/procolor.js</exclude>
           </excludes>
         </configuration>
       </plugin>

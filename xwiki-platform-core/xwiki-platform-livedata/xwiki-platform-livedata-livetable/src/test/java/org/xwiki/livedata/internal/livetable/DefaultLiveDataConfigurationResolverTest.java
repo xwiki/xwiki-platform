@@ -21,16 +21,20 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.WithParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -60,7 +64,10 @@ class DefaultLiveDataConfigurationResolverTest
 
     @MockComponent
     @Named("liveTable")
-    private LiveDataPropertyDescriptorStore propertyStore;
+    private Provider<LiveDataPropertyDescriptorStore> propertyStoreProvider;
+
+    @Mock(extraInterfaces = {LiveDataPropertyDescriptorStore.class})
+    private WithParameters propertyStore;
 
     @MockComponent
     @Named("liveTable")
@@ -75,6 +82,8 @@ class DefaultLiveDataConfigurationResolverTest
     @BeforeEach
     void configure()
     {
+        when(this.propertyStoreProvider.get()).thenReturn((LiveDataPropertyDescriptorStore) this.propertyStore);
+
         this.defaultConfig.initialize();
         when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);
 
@@ -85,14 +94,40 @@ class DefaultLiveDataConfigurationResolverTest
     @Test
     void setDefaultSort() throws Exception
     {
-        this.config.getQuery().setProperties(Arrays.asList("_one", "two", "three"));
+        LiveDataPropertyDescriptor aliceDescriptor = new LiveDataPropertyDescriptor();
+        aliceDescriptor.setId("_alice");
+        aliceDescriptor.setSortable(true);
+        this.config.getMeta().getPropertyDescriptors().add(aliceDescriptor);
+
+        LiveDataPropertyDescriptor bobDescriptor = new LiveDataPropertyDescriptor();
+        bobDescriptor.setId("bob");
+        bobDescriptor.setSortable(false);
+        this.config.getMeta().getPropertyDescriptors().add(bobDescriptor);
+
+        LiveDataPropertyDescriptor carolDescriptor = new LiveDataPropertyDescriptor();
+        carolDescriptor.setId("carol");
+        carolDescriptor.setType("User");
+        this.config.getMeta().getPropertyDescriptors().add(carolDescriptor);
+
+        LiveDataPropertyDescriptor userDescriptor = new LiveDataPropertyDescriptor();
+        userDescriptor.setId("User");
+        userDescriptor.setSortable(true);
+        this.config.getMeta().getPropertyTypes().add(userDescriptor);
 
         // Verify when no sort is set.
         this.config.getQuery().setSort(null);
+
+        this.config.getQuery().setProperties(Arrays.asList("_alice", "bob", "carol"));
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
+        // Because the live table skips properties that start with underscore..
+        assertTrue(actualConfig.getQuery().getSort().isEmpty());
+
+        this.config.getQuery().setProperties(Arrays.asList("_alice", "carol"));
+        actualConfig = this.resolver.resolve(this.config);
+
         SortEntry sortEntry = actualConfig.getQuery().getSort().get(0);
-        assertEquals("two", sortEntry.getProperty());
+        assertEquals("carol", sortEntry.getProperty());
         assertFalse(sortEntry.isDescending());
 
         // Verify when only the sort order is set.
@@ -100,7 +135,7 @@ class DefaultLiveDataConfigurationResolverTest
         actualConfig = this.resolver.resolve(this.config);
 
         sortEntry = actualConfig.getQuery().getSort().get(0);
-        assertEquals("two", sortEntry.getProperty());
+        assertEquals("carol", sortEntry.getProperty());
         assertTrue(sortEntry.isDescending());
 
         // Verify when no properties are specified.
@@ -121,7 +156,10 @@ class DefaultLiveDataConfigurationResolverTest
         docTitle.setId("doc.title");
         LiveDataPropertyDescriptor count = new LiveDataPropertyDescriptor();
         count.setId("count");
-        when(this.propertyStore.get()).thenReturn(Arrays.asList(docTitle, count));
+        when(((LiveDataPropertyDescriptorStore) this.propertyStore).get()).thenReturn(Arrays.asList(docTitle, count));
+
+        Map<String, Object> propertyStoreParams = new HashMap<>();
+        when(this.propertyStore.getParameters()).thenReturn(propertyStoreParams);
 
         LiveDataPropertyDescriptor docName = new LiveDataPropertyDescriptor();
         docName.setId("doc.name");
@@ -159,5 +197,7 @@ class DefaultLiveDataConfigurationResolverTest
         String expectedJSON = expectedProps.toString().replace('\'', '"');
         assertEquals(expectedJSON,
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
+
+        assertEquals("test.liveData.", propertyStoreParams.get("translationPrefix"));
     }
 }

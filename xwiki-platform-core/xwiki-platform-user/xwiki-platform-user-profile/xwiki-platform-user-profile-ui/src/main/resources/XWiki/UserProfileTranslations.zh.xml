@@ -40,10 +40,10 @@
 XWiki.XWikiUsers_accessibility.hint=额外的可访问性将启用各种视觉增强功能，例如：更大的字体，带下划线的链接等。
 XWiki.XWikiUsers_timezone.hint=使用特定的时区，以便日期反映您的当前位置。
 XWiki.XWikiUsers_editor.hint=选择默认的编辑器，以覆盖全局设置的默认编辑器。如果未定义，则根据要编辑的内容选择默认编辑器。
-XWiki.XWikiUsers_usertype.hint=选择哪种类型的用户将成为默认用户。高级用户将有权使用多种编辑功能，终端页面创建等。
+XWiki.XWikiUsers_usertype.hint=选择哪种类型的用户将成为默认用户。高级用户将有权使用多种编辑功能，例如创建终止页面。
 XWiki.XWikiUsers_extensionConflictSetup.hint=指明是否要扩展管理器要求您确认冲突解决的默认规则（例如，告诉扩展管理器询问您如果wiki中要升级的文档已经被删除该怎么做）。
 userprofile.default=默认
-user.profile.groups.title=组
+user.profile.groups.title=用户组
 user.profile.groups.description=这里列出了您的用户所属的所有组。
 user.profile.groups.table.group=组
 platform.core.profile.category.groups=组
@@ -60,6 +60,7 @@ user.profile.network.saving=保存...
 user.profile.network.error=保存通知设置时出错
 user.profile.status.done=完成
 user.profile.status.saving=保存...
-user.profile.status.error=保存用户状态时出错</content>
+user.profile.status.error=保存用户状态时出错
+</content>
   
 </xwikidoc>

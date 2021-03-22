@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authentication.api.AuthenticationFailureEvent;
+import org.xwiki.security.authentication.AuthenticationFailureEvent;
 
 /**
  * Logger listener for {@link AuthenticationFailureEvent} that warn about the authentication failures.

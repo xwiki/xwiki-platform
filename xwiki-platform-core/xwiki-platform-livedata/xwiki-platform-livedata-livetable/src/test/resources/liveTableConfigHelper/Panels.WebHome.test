@@ -2,10 +2,10 @@
   "id": "panels",
   "columns": ["name", "description", "type", "category", "_actions"],
   "columnProperties": {
-    "name": {"type": "text", "link": "view"},
+    "name": {"type": "text", "link": "field", "html": true},
     "description": {"type": "text", "html": "true"},
     "type": {"type": "list", "match": "exact"},
-    "category": {"type": "list"},
+    "category": {"type": "list", "link": "auto"},
     "_actions": {"html": true, "sortable": false, "actions": ["edit", "delete"]}
   },
   "options": {
@@ -41,7 +41,11 @@
         "sortable":true,
         "visible":true,
         "filterable":true,
-        "displayer":{"id":"link","propertyHref":"doc.url"},
+        "displayer":{
+          "id":"link",
+          "propertyHref":"name_url",
+          "html":true
+        },
         "filter":{"id":"text"}
       },
       {
@@ -67,6 +71,11 @@
         "sortable":true,
         "visible":true,
         "filterable":true,
+        "displayer":{
+          "id":"link",
+          "propertyHref":["category_url","doc.url"],
+          "html":false
+        },
         "filter":{"id":"list"}
       },
       {

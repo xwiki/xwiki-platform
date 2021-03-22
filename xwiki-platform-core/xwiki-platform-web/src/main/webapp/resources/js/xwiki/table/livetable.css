@@ -230,11 +230,6 @@ tbody.xwiki-livetable-display-body td.actions.hide-labels .action-icon {
 tbody.xwiki-livetable-display-body td._images img {
   margin-right: 2px;
 }
-tbody.xwiki-livetable-display-body td._avatar img {
-  border-radius: 4px;
-  max-height: 50px;
-  max-width: 50px;
-}
 /* </ Live Table Body> */
 /* <Tag Cloud & Top Filters>  */
 .xwiki-livetable-topfilters-container,

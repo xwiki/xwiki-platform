@@ -1,27 +1,27 @@
 {
-  "name": "xwiki-livedata",
+  "name": "xwiki-livedata-vue",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build --target lib --formats umd XWikiLivedata.vue",
+    "build": "vue-cli-service build --target lib --formats umd-min XWikiLivedata.vue",
     "inspect": "vue-cli-service inspect > inspection.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "lz-string": "^1.4.4",
     "u-node": "^0.0.2",
-    "vuedraggable": "^2.24.0"
+    "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "less": "^3.0.4",
-    "less-loader": "^5.0.0",
-    "vue-template-compiler": "^2.6.11"
+    "@vue/cli-plugin-babel": "~4.5.11",
+    "@vue/cli-plugin-eslint": "~4.5.11",
+    "@vue/cli-service": "~4.5.11",
+    "@babel/eslint-parser": "^7.12.13",
+    "eslint": "^7.19.0",
+    "eslint-plugin-vue": "^7.5.0",
+    "less": "^4.1.1",
+    "less-loader": "^8.0.0",
+    "vue-template-compiler": "^2.6.12"
   }
 }

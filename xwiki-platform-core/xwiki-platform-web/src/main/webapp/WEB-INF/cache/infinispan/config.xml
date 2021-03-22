@@ -44,7 +44,8 @@
      -->
      <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller"/>
 
-     <jmx domain="org.xwiki.infinispan" />
+     <!-- Expose Infinispan caches in the JMX server -->
+     <jmx enabled="true" domain="org.xwiki.infinispan" />
 
      <!--
          ******************************************************************************************************************

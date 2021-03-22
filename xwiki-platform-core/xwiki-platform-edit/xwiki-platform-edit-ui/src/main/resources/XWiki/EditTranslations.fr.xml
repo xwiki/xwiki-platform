@@ -37,17 +37,25 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>edit.inplace.close=Fermer
-
 edit.inplace.page.lockFailed=Impossible de verrouiller la page.
 edit.inplace.page.loadFailed=Impossible de charger la page.
 edit.inplace.page.renderFailed=Impossible d'afficher la page.
+edit.inplace.page.translate=Traduire
+edit.inplace.page.translate.hint=Traduire cette page en {0}
+edit.inplace.page.translate.messageBefore=Vous modifiez la traduction {0} de cette page (version initiale). En effet cette page n''a pas encore été traduite en {1} (langue courante).
+edit.inplace.page.translate.messageAfter=Vous êtes en train de modifier la traduction {0}. Débutez en traduisant le titre de la page.
+edit.inplace.actionButtons.loadFailed=Impossible de charger les boutons d'action.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
 
 edit.inplace.page.original=Vous modifiez la page originale ({0})
 edit.inplace.page.translation=Vous modifiez la traduction suivante : {0}.
 
-edit.inplace.page.translate=Traduire
-edit.inplace.page.translate.hint=Traduire cette page en : {0}
-
-edit.inplace.actionButtons.loadFailed=Impossible de charger les boutons d'action.</content>
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
   
 </xwikidoc>

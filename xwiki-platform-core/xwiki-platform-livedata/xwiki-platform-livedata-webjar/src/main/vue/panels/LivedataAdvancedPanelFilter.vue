@@ -46,6 +46,11 @@
     <!-- Define panel content inside the `body` slot -->
     <template #body>
 
+      <!-- Explain why the panel might be empty. -->
+      <div v-show="!logic.getFilterableProperties().length" class="text-muted">
+        None of the displayed properties is filterable.
+      </div>
+
       <!--
         Filter Groups
         i.e. Items of the filter array in the Livedata configuration
@@ -251,6 +256,10 @@ export default {
 }
 .livedata-advanced-panel-filter .filter-group-title:hover .delete-filter-group {
   display: inline-block;
+}
+
+.livedata-advanced-panel-filter .draggable-item {
+  margin-bottom: .5em;
 }
 
 .livedata-advanced-panel-filter .draggable-item .handle {

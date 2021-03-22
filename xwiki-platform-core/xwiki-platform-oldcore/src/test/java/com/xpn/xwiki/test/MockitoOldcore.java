@@ -20,6 +20,7 @@
 package com.xpn.xwiki.test;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -94,6 +95,8 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiDocument;
@@ -384,7 +387,23 @@ public class MockitoOldcore
             XWikiStubContextProvider stubContextProvider =
                 this.componentManager.getInstance(XWikiStubContextProvider.class);
             if (!MockUtil.isMock(stubContextProvider)) {
+                // TODO: Since we create the XWikiContext in this method and since we don't set the request in it,
+                // the XWikiStubContextProvider will be initialized with an empty request which will lead to NPE in
+                // ServletRequest for example. Thus we set it here with a non-null value. However this needs to be
+                // refactored to let the test control the context before stubContextProvider.initialize() is called.
+                // Note that setting a non null request also forces us to set a non null URL as otherwise it'll lead
+                // to another NPE...
+                XWikiRequest originalRequest = this.context.getRequest();
+                if (this.context.getRequest() == null) {
+                    this.context.setRequest(new XWikiServletRequestStub());
+                }
+                URL originalURL = this.context.getURL();
+                if (this.context.getURL() == null) {
+                    this.context.setURL(new URL("http://localhost:8080"));
+                }
                 stubContextProvider.initialize(this.context);
+                this.context.setURL(originalURL);
+                this.context.setRequest(originalRequest);
             }
         }
 

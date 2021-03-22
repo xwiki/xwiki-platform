@@ -165,6 +165,7 @@ public class LegacyEventStatusManager implements EventStatusManager
     }
 
     @Override
+    @Deprecated
     public void deleteEventStatus(EventStatus eventStatus) throws Exception
     {
         LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
@@ -227,6 +228,7 @@ public class LegacyEventStatusManager implements EventStatusManager
     }
 
     @Override
+    @Deprecated
     public void deleteAllForEntity(Date startDate, String entityId) throws Exception
     {
         boolean isSavedOnMainStore = false;
@@ -281,5 +283,23 @@ public class LegacyEventStatusManager implements EventStatusManager
         query.executeUpdate();
 
         return null;
+    }
+
+    /**
+     * @param session the Hibernate session
+     * @param eventId the identifier of the event associated with the statuses to remove
+     * @since 13.1RC1
+     * @since 12.10.5
+     * @since 12.6.8
+     */
+    public void deleteAllForEventInStore(Session session, String eventId)
+    {
+        StringBuilder statement =
+            new StringBuilder("delete from LegacyEventStatus status where status.activityEvent.id = :eventId");
+
+        org.hibernate.query.Query query = session.createQuery(statement.toString());
+        query.setParameter("eventId", eventId);
+
+        query.executeUpdate();
     }
 }

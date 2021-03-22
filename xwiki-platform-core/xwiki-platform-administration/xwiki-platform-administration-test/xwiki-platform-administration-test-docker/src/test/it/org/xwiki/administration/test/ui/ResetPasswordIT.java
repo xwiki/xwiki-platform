@@ -138,7 +138,11 @@ public class ResetPasswordIT
         // Actually reset the user's password
         resetPasswordPage = ResetPasswordPage.gotoPage();
         resetPasswordPage.setUserName(userName);
-        resetPasswordPage.clickResetPassword();
+        ResetPasswordPage newResetPasswordPage = resetPasswordPage.clickResetPassword();
+        assertTrue(newResetPasswordPage.getMessage().contains("An e-mail was sent"),
+            "Actual message: " + newResetPasswordPage.getMessage());
+        assertFalse(newResetPasswordPage.getMessage().contains("foo@bar.com"),
+            "Actual message: " + newResetPasswordPage.getMessage());
 
         // Check the result
         assertTrue(resetPasswordPage.isResetPasswordSent());
@@ -221,7 +225,7 @@ public class ResetPasswordIT
         String result = null;
 
         // Use a regex to extract the password reset link
-        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?ResetPasswordComplete\\?u=" + userName + "\\&v=\\w+");
+        Pattern resetLinkPattern = Pattern.compile("http[^\\s]+?authenticate/reset\\?u=" + userName + "\\&v=\\w+");
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {
             result = matcher.group();

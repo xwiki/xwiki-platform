@@ -36,8 +36,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
-import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

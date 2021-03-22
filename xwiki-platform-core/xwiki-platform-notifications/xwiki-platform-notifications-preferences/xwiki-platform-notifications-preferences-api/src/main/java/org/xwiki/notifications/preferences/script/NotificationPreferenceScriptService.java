@@ -52,7 +52,11 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -299,14 +303,8 @@ public class NotificationPreferenceScriptService implements ScriptService
         WikiReference wikiReference = new WikiReference(wiki);
         authorizationManager.checkAccess(Right.ADMIN, wikiReference);
 
-        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(wikiReference)) {
-            Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
-                    && preference.getFormat() == format) {
-                return preference.isNotificationEnabled();
-            }
-        }
-        return false;
+        List<NotificationPreference> allPreferences = notificationPreferenceManager.getAllPreferences(wikiReference);
+        return this.isEventTypeEnabled(eventType, format, allPreferences);
     }
 
     /**
@@ -317,11 +315,43 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public boolean isEventTypeEnabled(String eventType, NotificationFormat format) throws NotificationException
     {
-        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(
-                documentAccessBridge.getCurrentUserReference())) {
+        return this.isEventTypeEnabled(eventType, format, CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * @param eventType an event type
+     * @param format a notification format
+     * @param userReference the reference of the user for which to check the event type
+     * @return either or not the given event type is enabled for the given user in the given format
+     * @throws NotificationException if an error happens
+     * @since 13.2RC1
+     */
+    @Unstable
+    public boolean isEventTypeEnabled(String eventType, NotificationFormat format, UserReference userReference)
+        throws NotificationException
+    {
+        DocumentReference userDocumentReference;
+        if (userReference == CurrentUserReference.INSTANCE) {
+            userDocumentReference = documentAccessBridge.getCurrentUserReference();
+        } else if (userReference instanceof DocumentUserReference) {
+            userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        } else {
+            throw new NotificationException(
+                String.format("The method isEventTypeEnabled should only be used with DocumentUserReference, "
+                    + "the given reference was a [%s]", userReference.getClass().getSimpleName()));
+        }
+        List<NotificationPreference> allPreferences =
+            notificationPreferenceManager.getAllPreferences(userDocumentReference);
+        return this.isEventTypeEnabled(eventType, format, allPreferences);
+    }
+
+    private boolean isEventTypeEnabled(String eventType, NotificationFormat format,
+        List<NotificationPreference> allPreferences)
+    {
+        for (NotificationPreference preference : allPreferences) {
             Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
             if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
-                    && preference.getFormat() == format) {
+                && preference.getFormat() == format) {
                 return preference.isNotificationEnabled();
             }
         }

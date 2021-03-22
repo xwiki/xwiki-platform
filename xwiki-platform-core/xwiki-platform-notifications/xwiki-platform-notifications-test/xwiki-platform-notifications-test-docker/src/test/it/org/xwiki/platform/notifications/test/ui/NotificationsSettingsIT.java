@@ -26,6 +26,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
+import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
@@ -34,6 +36,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
+import org.xwiki.user.test.po.AbstractUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -370,5 +373,157 @@ public class NotificationsSettingsIT
                 preferences = p.getNotificationFilterPreferences();
             }
         }
+    }
+
+    /**
+     * Check global settings behaviour and notification settings for another user.
+     */
+    @Test
+    @Order(4)
+    void globalAndOtherUserSettings(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        // First step: login with first user, and set some notification settings.
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        AbstractNotificationsSettingsPage p =
+            NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        ApplicationPreferences system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+
+        // Check default values
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD, p.getNotificationEmailDiffType());
+        assertEquals(NotificationsUserProfilePage.AutowatchMode.MAJOR, p.getAutoWatchModeValue());
+
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        p.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.NONE);
+
+        // Second step: login with superadmin and set global notification settings.
+        testUtils.loginAsSuperAdmin();
+        p = NotificationsAdministrationPage.gotoPage();
+
+        system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+        
+        // Check default values
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD, p.getNotificationEmailDiffType());
+        assertEquals(NotificationsUserProfilePage.AutowatchMode.MAJOR, p.getAutoWatchModeValue());
+
+        p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        p.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.ALL);
+        p.setNotificationEmailDiffType(NotificationsUserProfilePage.EmailDiffType.NOTHING);
+
+        // Third step: create an user, and check his settings with superadmin and perform some changes on it.
+        String secondUser = testReference.getName() + "Foo";
+        testUtils.deletePage("XWiki", secondUser);
+        testUtils.createUser(secondUser, "foo", null);
+
+        testUtils.gotoPage("XWiki", secondUser);
+        AbstractUserProfilePage profilePage = new AbstractUserProfilePage(secondUser);
+        assertTrue(profilePage.getAvailableCategories().contains("Notifications"));
+
+        p = NotificationsUserProfilePage.gotoPage(secondUser);
+        system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+
+        // All should be false except update alert
+        assertEquals(BootstrapSwitch.State.UNDETERMINED, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        assertEquals(NotificationsUserProfilePage.EmailDiffType.NOTHING, p.getNotificationEmailDiffType());
+        assertEquals(NotificationsUserProfilePage.AutowatchMode.ALL, p.getAutoWatchModeValue());
+
+        // perform some changes with superadmin
+        p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        p.setAutoWatchMode(NotificationsUserProfilePage.AutowatchMode.NEW);
+
+        // Fourth step: still with superadmin, go to first user notification settings, check them and perform changes.
+        testUtils.gotoPage("XWiki", FIRST_USER_NAME);
+        profilePage = new AbstractUserProfilePage(FIRST_USER_NAME);
+        assertTrue(profilePage.getAvailableCategories().contains("Notifications"));
+
+        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+
+        // All should be false except for the create alert, specified in first step.
+        assertEquals(BootstrapSwitch.State.UNDETERMINED, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // We didn't change the email settings value in first step, so we obtain here the global settings until
+        // the user decide which settings she'd want for herself.
+        assertEquals(NotificationsUserProfilePage.EmailDiffType.NOTHING, p.getNotificationEmailDiffType());
+        assertEquals(NotificationsUserProfilePage.AutowatchMode.NONE, p.getAutoWatchModeValue());
+
+        // perform some changes with superadmin
+        p.setEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT, BootstrapSwitch.State.ON);
+        p.setNotificationEmailDiffType(NotificationsUserProfilePage.EmailDiffType.STANDARD);
+
+        // Fifth step: login with first user and check notification settings
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+
+        system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+
+        assertEquals(BootstrapSwitch.State.UNDETERMINED, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.UNDETERMINED, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        assertEquals(NotificationsUserProfilePage.EmailDiffType.STANDARD, p.getNotificationEmailDiffType());
+        assertEquals(NotificationsUserProfilePage.AutowatchMode.NONE, p.getAutoWatchModeValue());
+
+        // sixth step: check if first user can access notification settings of the other user.
+        testUtils.gotoPage("XWiki", secondUser);
+        profilePage = new AbstractUserProfilePage(secondUser);
+        assertFalse(profilePage.getAvailableCategories().contains("Notifications"));
     }
 }

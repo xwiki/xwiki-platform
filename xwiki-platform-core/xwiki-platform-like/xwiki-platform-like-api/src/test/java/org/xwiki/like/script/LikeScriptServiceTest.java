@@ -134,11 +134,15 @@ public class LikeScriptServiceTest
     @Test
     void displayButton()
     {
+        // like enabled and button always displayed -> displayButton returns true
+        when(this.likeConfiguration.isEnabled()).thenReturn(true);
         when(this.likeConfiguration.alwaysDisplayButton()).thenReturn(true);
         assertTrue(this.likeScriptService.displayButton(null));
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Foo");
         assertTrue(this.likeScriptService.displayButton(entityReference));
 
+        // like enabled and button not always displayed -> displayButton returns false when there's no reference
+        // or true when the reference can be accessed with Like right
         when(this.likeConfiguration.alwaysDisplayButton()).thenReturn(false);
         assertFalse(this.likeScriptService.displayButton(null));
 
@@ -146,6 +150,19 @@ public class LikeScriptServiceTest
             .thenReturn(true);
         assertTrue(this.likeScriptService.displayButton(entityReference));
         verify(this.authorizationManager).hasAccess(this.likeRight, this.docUserReference, entityReference);
+
+        // like disabled -> displayButton always return false
+        when(this.likeConfiguration.isEnabled()).thenReturn(false);
+        when(this.likeConfiguration.alwaysDisplayButton()).thenReturn(true);
+        assertFalse(this.likeScriptService.displayButton(null));
+        assertFalse(this.likeScriptService.displayButton(entityReference));
+
+        when(this.likeConfiguration.alwaysDisplayButton()).thenReturn(false);
+        assertFalse(this.likeScriptService.displayButton(null));
+        assertFalse(this.likeScriptService.displayButton(entityReference));
+
+        // check that this one has only be called once.
+        verify(this.authorizationManager, times(1)).hasAccess(this.likeRight, this.docUserReference, entityReference);
     }
 
     @Test

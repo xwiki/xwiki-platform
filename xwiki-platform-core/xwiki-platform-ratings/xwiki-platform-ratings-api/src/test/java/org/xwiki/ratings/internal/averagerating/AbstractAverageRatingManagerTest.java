@@ -19,9 +19,10 @@
  */
 package org.xwiki.ratings.internal.averagerating;
 
+import java.util.Collections;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
@@ -30,14 +31,8 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.events.UpdatedAverageRatingEvent;
 import org.xwiki.ratings.events.UpdatingAverageRatingEvent;
-import org.xwiki.test.annotation.BeforeComponent;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -130,8 +125,10 @@ public class AbstractAverageRatingManagerTest
         assertEquals(this.averageRating, this.averageRatingsManager.addVote(this.entityReference, newVote));
         assertTrue(this.averageRatingsManager.isSaved);
         verify(this.averageRating).addRating(newVote);
-        verify(this.observationManager).notify(expectedEvent1, managerId, this.averageRating);
-        verify(this.observationManager).notify(expectedEvent2, managerId, this.averageRating);
+        verify(this.observationManager)
+            .notify(expectedEvent1, managerId, Collections.singletonList(this.averageRating));
+        verify(this.observationManager)
+            .notify(expectedEvent2, managerId, Collections.singletonList(this.averageRating));
     }
 
     @Test
@@ -152,8 +149,10 @@ public class AbstractAverageRatingManagerTest
         assertEquals(this.averageRating, this.averageRatingsManager.removeVote(this.entityReference, removedVote));
         assertTrue(this.averageRatingsManager.isSaved);
         verify(this.averageRating).removeRating(removedVote);
-        verify(this.observationManager).notify(expectedEvent1, managerId, this.averageRating);
-        verify(this.observationManager).notify(expectedEvent2, managerId, this.averageRating);
+        verify(this.observationManager).notify(expectedEvent1, managerId,
+            Collections.singletonList(this.averageRating));
+        verify(this.observationManager).notify(expectedEvent2, managerId,
+            Collections.singletonList(this.averageRating));
     }
 
     @Test
@@ -175,8 +174,10 @@ public class AbstractAverageRatingManagerTest
         assertEquals(this.averageRating, this.averageRatingsManager.updateVote(this.entityReference, oldVote, newVote));
         assertTrue(this.averageRatingsManager.isSaved);
         verify(this.averageRating).updateRating(oldVote, newVote);
-        verify(this.observationManager).notify(expectedEvent1, managerId, this.averageRating);
-        verify(this.observationManager).notify(expectedEvent2, managerId, this.averageRating);
+        verify(this.observationManager).notify(expectedEvent1, managerId,
+            Collections.singletonList(this.averageRating));
+        verify(this.observationManager).notify(expectedEvent2, managerId,
+            Collections.singletonList(this.averageRating));
     }
 
     @Test
@@ -207,7 +208,9 @@ public class AbstractAverageRatingManagerTest
         expectedAverageRating.setUpdatedAt(averageRating.getUpdatedAt());
         assertEquals(expectedAverageRating, averageRating);
         assertTrue(this.averageRatingsManager.isSaved);
-        verify(this.observationManager).notify(expectedEvent1, managerId, expectedAverageRating);
-        verify(this.observationManager).notify(expectedEvent2, managerId, expectedAverageRating);
+        verify(this.observationManager).notify(expectedEvent1, managerId,
+            Collections.singletonList(expectedAverageRating));
+        verify(this.observationManager).notify(expectedEvent2, managerId,
+            Collections.singletonList(expectedAverageRating));
     }
 }

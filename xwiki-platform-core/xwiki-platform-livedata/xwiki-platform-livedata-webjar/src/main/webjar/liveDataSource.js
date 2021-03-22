@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-define(['jquery'], function($) {
+define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   'use strict';
 
-  var baseURL = '${request.contextPath}/rest/liveData/sources/';
+  var baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
   var getEntries = function(liveDataQuery) {
     var entriesURL = getEntriesURL(liveDataQuery.source);
@@ -50,7 +50,10 @@ define(['jquery'], function($) {
 
   var getEntriesURL = function(source) {
     var entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
-    var parameters = {};
+    var parameters = {
+      // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+      timestamp: new Date().getTime()
+    };
     addSourceParameters(parameters, source);
     return entriesURL + '?' + $.param(parameters, true);
   };

@@ -19,13 +19,8 @@
  */
 require.config({
   paths: {
-    'export-tree': 'uicomponents/exporter/exporter.min',
-    'export-tree-filter': 'uicomponents/exporter/exporter.min',
-    'entityReference': 'uicomponents/model/entityReference.min',
-    'prototype': 'js/prototype/prototype.min'
-  },
-  shim: {
-    entityReference: ['prototype']
+    'xwiki-export-tree': 'uicomponents/exporter/exporter.min',
+    'xwiki-export-tree-filter': 'uicomponents/exporter/exporter.min'
   }
 });
 
@@ -37,7 +32,7 @@ var $paths = {};
 var $l10n = {};
 var $icons = {};
 
-define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], function($) {
+define(['jquery', 'xwiki-export-tree', 'xwiki-export-tree-filter'], function($) {
   var dataURLPrefix = 'data:application/json';
 
   // Ignore parameters when data URI is used.
@@ -444,7 +439,7 @@ define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], funct
               'xwiki:B.D.F.WebHome': [],
               'xwiki:C.%': ['xwiki:C.WebHome']
             });
-            
+
             // Select none again.
             tree.deselect_all();
             tree.open_node('document:xwiki:C.WebHome', function() {
@@ -481,7 +476,7 @@ define(['jquery', 'entityReference', 'export-tree', 'export-tree-filter'], funct
       var filterList = container.find('ul.export-tree-filter');
       $('<li><a href="#"/></li>').appendTo(filterList).find('a').attr('data-filter', filterId).text(filterId);
     });
-    
+
     return createExportTree(data, defaultFilter, container.find('.export-tree'));
   };
 

@@ -59,6 +59,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
@@ -250,6 +251,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     {
         this.configurationMetadata = null;
         this.databaseProductCache = DatabaseProduct.UNKNOWN;
+        this.dialect = null;
     }
 
     /**
@@ -296,7 +298,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
 
         // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(standardServiceRegistry);
+        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
     }
 
     private void disposeInternal()
@@ -610,12 +612,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            if (this.sessionFactory instanceof SessionFactoryImplementor) {
-                this.dialect = ((SessionFactoryImplementor) this.sessionFactory).getJdbcServices().getDialect();
-            } else {
-                // TODO: there is probably a better fallback
-                this.dialect = Dialect.getDialect(getConfiguration().getProperties());
-            }
+            JdbcServices jdbcServices = this.standardServiceRegistry.getService(JdbcServices.class);
+            this.dialect = jdbcServices.getDialect();
         }
 
         return this.dialect;

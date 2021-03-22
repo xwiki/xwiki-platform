@@ -19,9 +19,8 @@
  */
 /*!
 #set ($paths = {
-  'moment': $services.webjars.url('momentjs', 'moment.js'),
-  'jdateformatparser': $services.webjars.url('org.webjars.bower:moment-jdateformatparser',
-    'moment-jdateformatparser.js'),
+  'moment': $services.webjars.url('momentjs', 'min/moment.min'),
+  'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
   'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
 })
 #set ($l10nKeys = ['today', 'yesterday', 'lastSevenDays', 'lastThirtyDays', 'thisMonth', 'lastMonth', 'clear', 'apply',
@@ -37,8 +36,14 @@
 
   require.config({paths});
 
-  require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'], function($) {
-    var bindInputs = function(livetable, moment) {
+  require([
+    'jquery',
+    'moment',
+    'moment-jdateformatparser',
+    'daterangepicker',
+    'xwiki-events-bridge'
+  ], function($, moment) {
+    var bindInputs = function(livetable) {
       $(livetable).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
         var hidden = input.prev('input[type="hidden"]');
@@ -117,16 +122,8 @@
       });
     };
 
-    // jdateformatparser enhances moment using a require callback so we need to wait for it (because when you require a
-    // module the callback is not called immediately even if the module is already loaded; the callback is called on the
-    // next processor cycle).
-    // See XWIKI-14579: The picker to filter on Date types, in LiveTables, doesn't appear on IE 11 and Microsoft Edge 40
-    // See https://github.com/MadMG/moment-jdateformatparser/issues/20 (Loading with Require.js doesn't always work as
-    // expected)
-    require(['moment'], function(moment) {
-      $('.xwiki-livetable').each(function(i, livetable) {
-        bindInputs(livetable, moment);
-      });
+    $('.xwiki-livetable').each(function(i, livetable) {
+      bindInputs(livetable);
     });
   });
 

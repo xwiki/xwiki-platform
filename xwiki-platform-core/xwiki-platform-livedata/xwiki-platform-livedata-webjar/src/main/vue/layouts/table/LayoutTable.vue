@@ -160,6 +160,7 @@ export default {
    * Align the property name with the filter
    * 38px correspond to the height of the filters inputs
    * This is hard coded and not scalable, but I don't have better for IE :(
+   * TODO fix when using color theme
    */
   .layout-table thead tr th {
     height: 38px;

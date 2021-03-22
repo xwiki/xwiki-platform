@@ -79,7 +79,10 @@ export default {
  * So that it renders best as displayer
  */
 .xwiki-livedata .displayer-html .breadcrumb {
-  margin-bottom: 0;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  text-align: right;
 }
 
 </style>

@@ -41,16 +41,13 @@
   <!--
     This is where the specific filter component gets injected
   -->
-  <div
-    v-if="filterComponent"
+  <component
     class="livedata-filter"
-  >
-    <component
-      :is="filterComponent"
-      :property-id="propertyId"
-      :index="index"
-    ></component>
-  </div>
+    v-if="filterComponent"
+    :is="filterComponent"
+    :property-id="propertyId"
+    :index="index"
+  ></component>
 
   <!--
     This loader component is displayed while the filter is being loaded
@@ -159,15 +156,6 @@ export default {
   width: 100% !important;
   height: 100% !important;
   min-height: 1em;
-}
-
-.livedata-filter {
-  border: 1px solid #ddd;
-}
-
-.livedata-filter > * {
-  width: 100% !important;
-  height: 100% !important;
 }
 
 </style>

@@ -169,8 +169,4 @@ export default {
 
 <style>
 
-.livedata-filter .filter-date {
-  border: none;
-}
-
 </style>

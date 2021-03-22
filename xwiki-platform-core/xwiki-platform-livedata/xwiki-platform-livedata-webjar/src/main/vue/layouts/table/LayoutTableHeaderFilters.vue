@@ -80,8 +80,7 @@ export default {
 <style>
 
 .layout-table .column-filters th {
-  padding: 0px;
-  border: none;
+  padding: 2px;
   font-weight: normal;
   vertical-align: middle;
   /*
@@ -92,14 +91,6 @@ export default {
   */
   width: 100vw;
 }
-.layout-table .column-filters th:not(:empty) {
-  border: 1px solid #ddd;
-}
-
-.layout-table .livedata-filter {
-  border: none !important;
-}
-
 .layout-table .column-filters th.entry-selector {
   width: 0;
 }

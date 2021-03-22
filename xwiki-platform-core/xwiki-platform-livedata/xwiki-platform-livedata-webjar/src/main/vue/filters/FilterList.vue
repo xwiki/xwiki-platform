@@ -116,10 +116,6 @@ export default {
 
 <style>
 
-.livedata-filter .filter-list button.dropdown-toggle {
-  border: none !important;
-}
-
 .livedata-filter .filter-list .selected-enum {
   overflow: hidden;
   text-overflow: ellipsis;

@@ -69,8 +69,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests that wishes to unit test wiki page should extend this class and call {@link #renderPage(DocumentReference)}
- * to load and render a page located in the classpath.
+ * Tests that wishes to unit test wiki page should extend this class and call {@link #loadPage} or
+ * {@link #renderPage} to load and render a page located in the classpath.
  *
  * @version $Id$
  * @since 7.3M1

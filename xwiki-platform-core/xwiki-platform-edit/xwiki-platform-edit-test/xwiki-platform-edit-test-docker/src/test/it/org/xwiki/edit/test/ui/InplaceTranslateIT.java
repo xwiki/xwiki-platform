@@ -52,7 +52,7 @@ class InplaceTranslateIT
     {
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("multilingual", "true");
-        setup.setWikiPreference("languages", "de,en,fr,ro");
+        setup.setWikiPreference("languages", "de,en,fr,it");
         setup.setWikiPreference("default_language", "en");
 
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg");
@@ -84,7 +84,7 @@ class InplaceTranslateIT
         assertEquals("English", infoPane.getLocale());
         assertTrue(infoPane.isOriginalLocale());
         assertEquals(Collections.emptyList(), infoPane.getAvailableTranslations());
-        assertEquals(Arrays.asList("German", "French", "Romanian"), infoPane.getMissingTranslations());
+        assertEquals(Arrays.asList("German", "French", "Italian"), infoPane.getMissingTranslations());
 
         //
         // Create translation from the Information tab link.
@@ -110,7 +110,7 @@ class InplaceTranslateIT
         assertEquals("français", infoPane.getLocale());
         assertEquals("anglais", infoPane.getOriginalLocale());
         assertEquals(Collections.emptyList(), infoPane.getAvailableTranslations());
-        assertEquals(Arrays.asList("allemand", "roumain"), infoPane.getMissingTranslations());
+        assertEquals(Arrays.asList("allemand", "italien"), infoPane.getMissingTranslations());
 
         //
         // Create translation from the Translate button.
@@ -136,13 +136,13 @@ class InplaceTranslateIT
         assertEquals("Deutsch", infoPane.getLocale());
         assertEquals("Englisch", infoPane.getOriginalLocale());
         assertEquals(Arrays.asList("Französisch"), infoPane.getAvailableTranslations());
-        assertEquals(Arrays.asList("Rumänisch"), infoPane.getMissingTranslations());
+        assertEquals(Arrays.asList("Italienisch"), infoPane.getMissingTranslations());
 
         //
         // Create translation with Edit + Translate
         //
 
-        infoPane.clickTranslationLink("Rumänisch");
+        infoPane.clickTranslationLink("Italienisch");
         viewPage = new InplaceEditablePage().waitForInplaceEditor().cancel();
         assertEquals("title EN", viewPage.getDocumentTitle());
 
@@ -156,13 +156,13 @@ class InplaceTranslateIT
         viewPage.getTranslateButton().click();
         assertEquals("English Title", viewPage.getDocumentTitle());
 
-        viewPage.setDocumentTitle("title RO").saveAndView();
-        assertEquals("title RO", viewPage.getDocumentTitle());
+        viewPage.setDocumentTitle("title IT").saveAndView();
+        assertEquals("title IT", viewPage.getDocumentTitle());
 
         infoPane = viewPage.openInformationDocExtraPane();
-        assertEquals("română", infoPane.getLocale());
-        assertEquals("engleză", infoPane.getOriginalLocale());
-        assertEquals(Arrays.asList("germană", "franceză"), infoPane.getAvailableTranslations());
+        assertEquals("italiano", infoPane.getLocale());
+        assertEquals("inglese", infoPane.getOriginalLocale());
+        assertEquals(Arrays.asList("tedesco", "francese"), infoPane.getAvailableTranslations());
         assertEquals(Collections.emptyList(), infoPane.getMissingTranslations());
 
         //
@@ -170,7 +170,7 @@ class InplaceTranslateIT
         //
 
         // The links to the available translations should go to view mode.
-        infoPane.clickTranslationLink("germană");
+        infoPane.clickTranslationLink("tedesco");
         viewPage = new InplaceEditablePage();
         assertFalse(viewPage.hasTranslateButton());
         assertEquals("title DE", viewPage.getDocumentTitle());
@@ -197,7 +197,7 @@ class InplaceTranslateIT
         infoPane = viewPage.openInformationDocExtraPane();
         assertEquals("English", infoPane.getLocale());
         assertTrue(infoPane.isOriginalLocale());
-        assertEquals(Arrays.asList("German", "French", "Romanian"), infoPane.getAvailableTranslations());
+        assertEquals(Arrays.asList("German", "French", "Italian"), infoPane.getAvailableTranslations());
         assertEquals(Collections.emptyList(), infoPane.getMissingTranslations());
     }
 }

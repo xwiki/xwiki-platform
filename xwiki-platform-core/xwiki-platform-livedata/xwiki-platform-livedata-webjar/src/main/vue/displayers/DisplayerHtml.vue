@@ -82,7 +82,12 @@ export default {
   margin: 0;
   padding: 0;
   background-color: transparent;
-  text-align: right;
+}
+
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .displayer-html .breadcrumb {
+    text-align: right;
+  }
 }
 
 </style>

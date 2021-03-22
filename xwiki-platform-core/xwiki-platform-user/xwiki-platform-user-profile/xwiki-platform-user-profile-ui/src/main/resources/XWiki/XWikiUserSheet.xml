@@ -555,6 +555,7 @@ div.userDashboard, #dashboardPane .dashboard {
 div.highlighted-profile-section,
 div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
+  border-radius: 4px;
 }
 
 .userInfo {

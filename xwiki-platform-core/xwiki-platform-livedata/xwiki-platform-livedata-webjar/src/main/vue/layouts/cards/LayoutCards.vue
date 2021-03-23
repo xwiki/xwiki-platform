@@ -40,7 +40,6 @@
       </template>
       <template #right>
         <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
-        <LivedataRefreshButton/>
         <LivedataDropdownMenu/>
       </template>
     </LivedataTopbar>
@@ -76,7 +75,6 @@
 import LivedataTopbar from "../../LivedataTopbar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
-import LivedataRefreshButton from "../../LivedataRefreshButton.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
@@ -90,7 +88,6 @@ export default {
     LivedataTopbar,
     LivedataDropdownMenu,
     LivedataEntrySelectorAll,
-    LivedataRefreshButton,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutCardsCard,

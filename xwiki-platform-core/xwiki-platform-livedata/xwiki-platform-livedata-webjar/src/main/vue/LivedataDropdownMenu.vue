@@ -47,7 +47,19 @@
     <!-- Drowpdown body -->
     <ul class="dropdown-menu">
 
+      <!-- Refresh -->
+      <li class="dropdown-header">Actions</li>
+
+      <li>
+        <a href="#" @click.prevent="logic.updateEntries()">
+          <span class="fa fa-repeat"></span> Refresh
+        </a>
+      </li>
+
+
       <!-- Change layout Section -->
+      <li role="separator" class="divider"></li>
+
       <li class="dropdown-header">Change Layout</li>
 
       <!-- Layout options -->

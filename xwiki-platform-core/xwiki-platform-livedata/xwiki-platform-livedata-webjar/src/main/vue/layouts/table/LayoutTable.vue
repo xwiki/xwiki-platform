@@ -38,7 +38,6 @@
         <LivedataPagination/>
       </template>
       <template #right>
-        <LivedataRefreshButton/>
         <LivedataDropdownMenu/>
       </template>
     </LivedataTopbar>
@@ -85,7 +84,6 @@
 <script>
 import LivedataTopbar from "../../LivedataTopbar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataRefreshButton from "../../LivedataRefreshButton.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
@@ -100,7 +98,6 @@ export default {
   components: {
     LivedataTopbar,
     LivedataDropdownMenu,
-    LivedataRefreshButton,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutTableHeaderNames,

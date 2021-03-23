@@ -112,6 +112,12 @@ public class PageTest
     protected MockitoComponentManager componentManager;
 
     /**
+     * Used to ensure that we don't pop the rendering context if we haven't pushed to it. This is to workaround a
+     * limitation of {@link MutableRenderingContext} which doesn't have a {@code peek()} or {@code isEmpty()} method.
+     */
+    private boolean syntaxPushedInRenderingContext;
+
+    /**
      * Set up components before Components declared in {@link org.xwiki.test.annotation.ComponentList} are handled.
      *
      * @param componentManager the component manager to use to register mock components
@@ -215,8 +221,12 @@ public class PageTest
     protected void setOutputSyntax(Syntax syntax) throws Exception
     {
         MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+        if (this.syntaxPushedInRenderingContext) {
+            renderingContext.pop();
+        }
         renderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
             renderingContext.getDefaultSyntax(), "test", renderingContext.isRestricted(), syntax);
+        this.syntaxPushedInRenderingContext = true;
     }
 
     /**
@@ -274,7 +284,9 @@ public class PageTest
     public void tearDown() throws Exception
     {
         MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
-        renderingContext.pop();
+        if (this.syntaxPushedInRenderingContext) {
+            renderingContext.pop();
+        }
     }
 
     /**

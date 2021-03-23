@@ -78,7 +78,6 @@ import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.rendering.velocity.StubVelocityManager;
 import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
@@ -93,6 +92,7 @@ import org.xwiki.xml.internal.html.filter.ListItemFilter;
 
 import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
 import com.xpn.xwiki.internal.localization.XWikiLocalizationContext;
+import com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor;
 import com.xpn.xwiki.internal.sheet.ClassSheetBinder;
 import com.xpn.xwiki.internal.sheet.DefaultModelBridge;
 import com.xpn.xwiki.internal.sheet.DocumentSheetBinder;
@@ -100,11 +100,17 @@ import com.xpn.xwiki.internal.skin.DefaultSkinManager;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
+import com.xpn.xwiki.internal.template.DefaultTemplateManager;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
+import com.xpn.xwiki.internal.template.TemplateAsyncRenderer;
+import com.xpn.xwiki.internal.template.TemplateContext;
+import com.xpn.xwiki.internal.template.VelocityTemplateEvaluator;
 import com.xpn.xwiki.objects.meta.BooleanMetaClass;
 import com.xpn.xwiki.objects.meta.NumberMetaClass;
 import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.objects.meta.StringMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
+import com.xpn.xwiki.render.DefaultVelocityManager;
 import com.xpn.xwiki.render.XWikiScriptContextInitializer;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 
@@ -185,7 +191,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLoggerConfiguration.class,
     DefaultVelocityEngine.class,
     DefaultVelocityContextFactory.class,
-    StubVelocityManager.class,
+    DefaultVelocityManager.class,
+    DefaultAuthorExecutor.class,
 
     // Skin
     DefaultSkinManager.class,
@@ -243,6 +250,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // Macro Resolver/Serializer
     CurrentMacroDocumentReferenceResolver.class,
     CurrentMacroEntityReferenceResolver.class,
+
+    // Template Manager
+    DefaultTemplateManager.class,
+    InternalTemplateManager.class,
+    TemplateContext.class,
+    VelocityTemplateEvaluator.class,
+    TemplateAsyncRenderer.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList

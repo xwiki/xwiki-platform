@@ -65,6 +65,8 @@
       </li>
 
       <!-- Advanced panels Section -->
+      <li role="separator" class="divider"></li>
+
       <li class="dropdown-header">Actions</li>
 
       <!-- Properties Panel -->

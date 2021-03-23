@@ -67,26 +67,26 @@
       <!-- Advanced panels Section -->
       <li role="separator" class="divider"></li>
 
-      <li class="dropdown-header">Actions</li>
+      <li class="dropdown-header">Toggle Advanced Panels</li>
 
       <!-- Properties Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> Advanced Properties
+          <span class="fa fa-list-ul"></span> Properties...
         </a>
       </li>
 
       <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> Advanced Sorting
+          <span class="fa fa-sort"></span> Sort...
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> Advanced Filtering
+          <span class="fa fa-filter"></span> Filter...
         </a>
       </li>
 

@@ -17,39 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.StaticListClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.StaticListItemsEditor;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Special class editor tests that address only the Static List class field type.
- * 
+ *
  * @version $Id$
- * @since 4.0M1
+ * @since 13.2
  */
-public class StaticListClassFieldTest extends AbstractListClassFieldTest
+@UITest
+class StaticListClassFieldIT
 {
-    public StaticListClassFieldTest()
-    {
-        super("Static List");
-    }
+    private final String fieldName = "Static List";
 
     /**
      * Tests that the field preview is properly updated when the display type is changed. Currently selected items must
      * be preserved.
      */
     @Test
-    public void testDisplayType()
+    @Order(1)
+    void displayType(TestUtils testUtils, TestReference testReference)
     {
+        ApplicationClassEditPage editor = goToEditor(testUtils, testReference);
+
         // Add a new static list field.
         StaticListClassFieldEditPane staticListField =
             new StaticListClassFieldEditPane(editor.addField(this.fieldName).getName());
@@ -61,7 +68,7 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
         staticListField.getMultipleSelectionCheckBox().click();
 
         // The size field should be disabled (it can be used only when display type is select).
-        assertTrue(isReadOnly(staticListField.getSizeInput()));
+        assertTrue(staticListField.isReadOnly());
 
         // Select the first and third options.
         staticListField.getItemByValue("value1").click();
@@ -69,7 +76,7 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
 
         // Change the display type to 'select'.
         staticListField.getDisplayTypeSelect().selectByVisibleText("select");
-        assertFalse(isReadOnly(staticListField.getSizeInput()));
+        assertFalse(staticListField.isReadOnly());
         staticListField.closeConfigPanel();
 
         // Assert that the field preview has been updated.
@@ -83,7 +90,7 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
         // Change the display type to 'radio'.
         staticListField.openConfigPanel();
         staticListField.getDisplayTypeSelect().selectByVisibleText("radio");
-        assertTrue(isReadOnly(staticListField.getSizeInput()));
+        assertTrue(staticListField.isReadOnly());
         staticListField.closeConfigPanel();
         // Assert that the field preview has been updated.
         assertEquals("radio", staticListField.getPreviewInputType());
@@ -95,8 +102,11 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
      * Tests the ability to add, edit and remove list items.
      */
     @Test
-    public void testItemsEditor()
+    @Order(2)
+    void itemsEditor(TestUtils testUtils, TestReference testReference)
     {
+        ApplicationClassEditPage editor = goToEditor(testUtils, testReference);
+
         // Add a new static list field.
         StaticListClassFieldEditPane staticListField =
             new StaticListClassFieldEditPane(editor.addField(this.fieldName).getName());
@@ -137,5 +147,13 @@ public class StaticListClassFieldTest extends AbstractListClassFieldTest
         // Assert the order of the items.
         staticListField.getItemByValue("value1").click();
         assertEquals(Arrays.asList("XWiki", "value1"), staticListField.getDefaultSelectedValues());
+    }
+
+    private ApplicationClassEditPage goToEditor(TestUtils testUtils, EntityReference entityReference)
+    {
+        testUtils.gotoPage(entityReference, "edit",
+            "editor", "inline", "template", "AppWithinMinutes.ClassTemplate", "title",
+            entityReference.getName() + " Class");
+        return new ApplicationClassEditPage();
     }
 }

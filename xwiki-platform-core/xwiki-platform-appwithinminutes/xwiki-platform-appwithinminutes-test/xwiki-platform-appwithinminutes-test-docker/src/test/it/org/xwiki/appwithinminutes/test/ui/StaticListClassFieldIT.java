@@ -26,15 +26,14 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.StaticListClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.StaticListItemsEditor;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEditor;
 
 /**
  * Special class editor tests that address only the Static List class field type.
@@ -53,9 +52,9 @@ class StaticListClassFieldIT
      */
     @Test
     @Order(1)
-    void displayType(TestUtils testUtils, TestReference testReference)
+    void displayType(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(testUtils, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
 
         // Add a new static list field.
         StaticListClassFieldEditPane staticListField =
@@ -103,9 +102,9 @@ class StaticListClassFieldIT
      */
     @Test
     @Order(2)
-    void itemsEditor(TestUtils testUtils, TestReference testReference)
+    void itemsEditor(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(testUtils, testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference);
 
         // Add a new static list field.
         StaticListClassFieldEditPane staticListField =
@@ -147,13 +146,5 @@ class StaticListClassFieldIT
         // Assert the order of the items.
         staticListField.getItemByValue("value1").click();
         assertEquals(Arrays.asList("XWiki", "value1"), staticListField.getDefaultSelectedValues());
-    }
-
-    private ApplicationClassEditPage goToEditor(TestUtils testUtils, EntityReference entityReference)
-    {
-        testUtils.gotoPage(entityReference, "edit",
-            "editor", "inline", "template", "AppWithinMinutes.ClassTemplate", "title",
-            entityReference.getName() + " Class");
-        return new ApplicationClassEditPage();
     }
 }

@@ -30,8 +30,8 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.xwiki.appwithinminutes.test.po.ApplicationNameConstants.APP_NAME_USED_WARNING_MESSAGE;
-import static org.xwiki.appwithinminutes.test.po.ApplicationNameConstants.EMPTY_APP_NAME_ERROR_MESSAGE;
+import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.APP_NAME_USED_WARNING_MESSAGE;
+import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.EMPTY_APP_NAME_ERROR_MESSAGE;
 
 /**
  * Tests the first step of the App Within Minutes wizard.

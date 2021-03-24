@@ -38,7 +38,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
-import static org.xwiki.appwithinminutes.test.po.ClassEditorConstants.EMPTY_CANVAS_HINT;
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
 
 /**
  * Tests the application class editor.

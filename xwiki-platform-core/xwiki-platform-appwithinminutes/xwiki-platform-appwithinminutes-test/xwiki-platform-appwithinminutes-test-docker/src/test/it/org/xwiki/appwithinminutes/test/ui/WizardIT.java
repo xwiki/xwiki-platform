@@ -48,8 +48,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.appwithinminutes.test.po.ApplicationNameConstants.APP_NAME_USED_WARNING_MESSAGE;
-import static org.xwiki.appwithinminutes.test.po.ClassEditorConstants.EMPTY_CANVAS_HINT;
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
+import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.APP_NAME_USED_WARNING_MESSAGE;
 
 /**
  * Tests the application wizard.

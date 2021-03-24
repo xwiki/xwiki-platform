@@ -73,6 +73,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <!-- We need this to test the syntax change from the Document Information panel. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${platform.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -84,6 +91,12 @@
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-ckeditor-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
+      <version>${platform.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

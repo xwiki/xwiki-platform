@@ -138,6 +138,10 @@
       contentTypeField.prop('disabled', disabled);
       // Chrome doesn't cache the enabled/disabled state of form fields so we have to cache it separately.
       editor._.xwikiCache[contentTypeField.attr('name')] = !disabled;
+      // Update also the source document syntax.
+      contentTypeField.nextAll().filter(function() {
+        return $(this).attr('name') === contentTypeField.val() + '_syntax';
+      }).val(editor.element.getAttribute('data-sourceDocumentSyntax'));
     },
 
     getContentTypeField: function(editor) {

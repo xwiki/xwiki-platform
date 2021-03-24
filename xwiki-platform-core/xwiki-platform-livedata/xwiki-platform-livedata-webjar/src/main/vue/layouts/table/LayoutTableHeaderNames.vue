@@ -62,8 +62,15 @@
         class="column-name"
         @click="sort(property)"
       >
-        <!-- Specify the handle to drag properties -->
-        <div class="handle">
+        <!--
+          Specify the handle to drag properties.
+          Use the stop propagation modifier on click event
+          to prevent sorting the column unintentionally.
+        -->
+        <div
+          class="handle"
+          @click.stop
+        >
           <span class="fa fa-ellipsis-v"></span>
         </div>
         <!-- Property Name -->
@@ -82,6 +89,17 @@
           ]"
         ></span>
       </div>
+      <!--
+        Resize handle
+        Use the stop propagation modifier on click event
+        to prevent sorting the column unintentionally.
+      -->
+      <div class="resize-handle"
+        v-mousedownmove
+        @mousedownmove="resizeColumn"
+        @click.stop
+        @dblclick="resetColumnSize"
+      ></div>
     </th>
 
   </XWikiDraggable>
@@ -91,6 +109,7 @@
 <script>
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
+import { mousedownmove } from "../../directives.js";
 
 export default {
 
@@ -99,6 +118,10 @@ export default {
   components: {
     LivedataEntrySelectorAll,
     XWikiDraggable,
+  },
+
+  directives: {
+    mousedownmove,
   },
 
   inject: ["logic"],
@@ -140,15 +163,40 @@ export default {
     },
 
     reorderProperty (e) {
-      // As the draggable plugin is taking in account every child it has for d&d
-      // and there is the select-entry-all component as first child
-      // we need to substract 1 to the indexes that the draggable plugin handles
-      // so that it matches the true property order
-      // When selection is disabled (and the select-entry-all component hidden)
-      // we don't need to readjust the offset of the indexes
-      // as Vue handily creates a html comment where the component shoud be
-      // So that it does not messes up with indexes
+      /*
+        As the draggable plugin is taking in account every child it has for d&d
+        and there is the select-entry-all component as first child
+        we need to substract 1 to the indexes that the draggable plugin handles
+        so that it matches the true property order
+        When selection is disabled (and the select-entry-all component hidden)
+        we don't need to readjust the offset of the indexes
+        as Vue handily creates a html comment where the component shoud be
+        So that it does not messes up with indexes
+      */
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
+    },
+
+    resizeColumn (e) {
+      const th = e.currentTarget.closest("th");
+      // Resize left column
+      const leftColumn = th.querySelector(".column-name");
+      const leftColumnRect = leftColumn.getBoundingClientRect();
+      const leftColumnWidth = leftColumnRect.width + e.movementX;
+      leftColumn.style.width = `${leftColumnWidth}px`;
+
+      // Resiez right column
+      const rightColumn = th.nextElementSibling?.querySelector(".column-name");
+      if (rightColumn) {
+        const rightColumnRect = rightColumn.getBoundingClientRect();
+        const rightColumnWidth = rightColumnRect.width - e.movementX;
+        rightColumn.style.width = `${rightColumnWidth}px`;
+      }
+    },
+
+    resetColumnSize (e) {
+      const th = e.currentTarget.closest("th");
+      const column = th.querySelector(".column-name");
+      column.style.width = "unset";
     },
 
   },
@@ -159,8 +207,10 @@ export default {
 
 <style>
 
-th.draggable-item {
+.layout-table th.draggable-item {
   display: table-cell;
+  min-width: 4rem;
+  overflow: hidden;
 }
 
 .layout-table .column-name {
@@ -188,6 +238,9 @@ th.draggable-item {
 }
 
 .layout-table .property-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin-right: 10px;
 }
 
@@ -200,6 +253,23 @@ th.draggable-item {
 }
 .layout-table .column-name:hover .sort-icon:not(.sorted) {
   opacity: 0.5;
+}
+
+.draggable-container.column-header-names .draggable-item {
+  position: relative;
+}
+
+.layout-table .resize-handle {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  transform: translateX(50%);
+  width: 10px;
+  background-color: transparent;
+  cursor: ew-resize;
+  user-select: none;
+  z-index: 100;
 }
 
 </style>

@@ -35,15 +35,15 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination/>
+        <LivedataPagination />
       </template>
       <template #right>
-        <LivedataDropdownMenu/>
+        <LivedataDropdownMenu />
       </template>
     </LivedataTopbar>
 
     <!-- Entry selector info bar -->
-    <LivedataEntrySelectorInfoBar/>
+    <LivedataEntrySelectorInfoBar />
 
 
     <!-- Table layout root -->
@@ -55,10 +55,10 @@
       -->
       <thead>
         <!-- Table property names -->
-        <LayoutTableHeaderNames/>
+        <LayoutTableHeaderNames />
 
         <!-- Table filters -->
-        <LayoutTableHeaderFilters/>
+        <LayoutTableHeaderFilters />
       </thead>
 
 
@@ -119,6 +119,10 @@ export default {
 
 
 <style>
+
+.layout-table {
+  overflow: auto;
+}
 
 .layout-table table {
   height: 100%;

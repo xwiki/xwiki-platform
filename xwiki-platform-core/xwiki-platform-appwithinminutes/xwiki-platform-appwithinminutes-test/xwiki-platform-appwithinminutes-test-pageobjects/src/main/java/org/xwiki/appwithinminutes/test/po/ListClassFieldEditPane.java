@@ -160,4 +160,14 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
         }
         return null;
     }
+
+    /**
+     * @return {@code true} if the field is readonly, {@code false} otherwise
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public boolean isReadOnly()
+    {
+        return getSizeInput().getAttribute("readOnly") != null;
+    }
 }

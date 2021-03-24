@@ -143,6 +143,8 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      *
      * @param reference the location of the document
      * @return the corresponding AWM class editor page object
+     * @since 13.2
+     * @since 12.10.6
      */
     public static ApplicationClassEditPage goToEditor(DocumentReference reference)
     {

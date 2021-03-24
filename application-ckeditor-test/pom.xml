@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.1-rc-1</version>
+    <version>13.2-rc-1</version>
     <!-- By using an empty value we force Maven to resolve the parent from the Maven repositories,
       see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent -->
     <relativePath />
@@ -56,6 +56,10 @@
     <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
       dependencies) -->
     <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <dependencyManagement>
     <!-- Force a newer version in order to pass the RequireUpperBoundDeps enforcer rule -->
@@ -83,13 +87,13 @@
     </dependencies>
   </dependencyManagement>
   <modules>
-    <module>pageobjects</module>
+    <module>application-ckeditor-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
       <id>docker</id>
       <modules>
-        <module>tests</module>
+        <module>application-ckeditor-test-docker</module>
       </modules>
     </profile>
   </profiles>

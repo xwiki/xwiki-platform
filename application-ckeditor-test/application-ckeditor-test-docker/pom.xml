@@ -34,10 +34,6 @@
   <packaging>jar</packaging>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

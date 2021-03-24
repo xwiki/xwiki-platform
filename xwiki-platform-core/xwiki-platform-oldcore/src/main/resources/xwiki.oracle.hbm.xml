@@ -76,8 +76,8 @@
         <property name="parent" type="string" column="XWD_PARENT" length="511" />
         <property name="xWikiClassXML" type="materialized_clob" column="XWD_CLASS_XML" length="60000" not-null="false" />
         <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
-        <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" />
-        <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" />
+        <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" length="768" />
+        <property name="validationScript" type="string" column="XWD_VALIDATION_SCRIPT" length="768" />
         <property name="comment" type="string" column="XWD_COMMENT" length="1023" />
         <property name="minorEdit1" type="boolean" column="XWD_MINOREDIT" index="DOC_MINOREDIT" not-null="true" />
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
@@ -133,7 +133,7 @@
             <property name="language" column="XDD_LANGUAGE" type="string" length="5" index="XDD_LANGUAGE" not-null="false" />
             <property name="date" type="timestamp" column="XDD_DATE" index="XDD_DATE" />
         </natural-id>
-        <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
+        <property name="deleter" type="string" column="XDD_DELETER" length="768" index="XDD_DELETER" />
         <property name="xmlStore" type="string" column="XDD_XMLSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDD_XML" length="1000000000" />
         <property name="batchId" type="string" column="XDD_BATCH_ID" index="XDD_BATCH_ID" />
@@ -150,7 +150,7 @@
             <property name="date" type="timestamp" column="XDA_DATE" index="XDA_DATE" />
         </natural-id>
         <property name="docName" column="XDA_DOC_NAME" type="string" length="768" index="XDA_DOC_NAME" />
-        <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
+        <property name="deleter" type="string" column="XDA_DELETER" length="768" index="XDA_DELETER" />
         <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDA_XML" length="1000000000" />
     </class>
@@ -167,8 +167,8 @@
     <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
         <composite-id unsaved-value="undefined">
             <key-property name="docId" column="XWL_DOC_ID" type="long" />
-            <key-property name="link" type="string" length="768">
-                <column name="XWL_LINK" index="XWLNK_LINK" />
+            <key-property name="link" type="string">
+                <column name="XWL_LINK" index="XWLNK_LINK" length="766" />
             </key-property>
         </composite-id>
         <property name="fullName" type="string" column="XWL_FULLNAME" length="768" />
@@ -306,7 +306,7 @@
                 </key>
                 <index column="XWL_NUMBER" />
                 <element type="string">
-                    <column name="XWL_VALUE" index="XWLI_VALUE" />
+                    <column name="XWL_VALUE" index="XWLI_VALUE" length="768" />
                 </element>
             </list>
         </joined-subclass>
@@ -374,7 +374,7 @@
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
         <property name="userAgent" type="materialized_clob" column="XWV_USER_AGENT" not-null="true" length="8192" />
         <property name="cookie" type="materialized_clob" column="XWV_COOKIE" not-null="true" length="8192" />
-        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
+        <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="768" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
         <property name="downloads" type="integer" column="XWV_DOWNLOADS" index="XWVS_DOWNLOADS" not-null="false" />

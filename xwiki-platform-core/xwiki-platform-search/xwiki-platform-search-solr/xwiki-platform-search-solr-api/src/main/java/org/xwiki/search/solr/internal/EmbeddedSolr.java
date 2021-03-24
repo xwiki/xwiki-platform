@@ -48,6 +48,7 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrResourceLoader;
+import org.apache.solr.core.CoreDescriptor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
@@ -167,8 +168,11 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Indicate the path of the data
         if (initializer.isCache()) {
-            parameters.put("dataDir", getCacheCoreDataDir(corePath, initializer.getCoreName()).toString());
+            parameters.put(CoreDescriptor.CORE_DATADIR, getCacheCoreDataDir(corePath, initializer.getCoreName()).toString());
         }
+
+        // Don't load the core on startup to workaround a possible dead lock during Solr init
+        parameters.put(CoreDescriptor.CORE_LOADONSTARTUP, "false");
 
         // Create the actual core
         SolrCore core = this.container.create(initializer.getCoreName(), parameters);

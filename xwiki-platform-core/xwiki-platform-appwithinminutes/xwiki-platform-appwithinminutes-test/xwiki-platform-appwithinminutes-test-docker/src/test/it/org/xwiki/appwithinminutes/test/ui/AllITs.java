@@ -43,4 +43,10 @@ public class AllITs
     class NestedWizardIT extends WizardIT
     {
     }
+
+    @Nested
+    @DisplayName("StaticListClassField test")
+    class NestedStaticListClassFieldIT extends StaticListClassFieldIT
+    {
+    }
 }

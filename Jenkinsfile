@@ -275,7 +275,7 @@ private void buildStandardAll(builds)
     }
     /* TODO: 27/4/2020: Disable sonar build to check the hypothesis that it's causing kills on agents by using too
        much memory.
-       TODO: 1/2/2021: Also disabled because sonarcloud.io now requires that XWiki be built with Java to work. See
+       TODO: 1/2/2021: Also disabled because sonarcloud.io now requires that XWiki be built with Java 11 to work. See
        https://jira.xwiki.org/browse/XCOMMONS-2120
     ,
     'sonar': {

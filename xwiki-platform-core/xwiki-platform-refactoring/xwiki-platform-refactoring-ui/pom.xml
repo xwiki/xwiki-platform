@@ -31,6 +31,10 @@
   <name>XWiki Platform - Refactoring - UI</name>
   <description>Administration UI for the refactoring operations</description>
   <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Refactoring Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <!-- Test Dependencies -->
     <dependency>

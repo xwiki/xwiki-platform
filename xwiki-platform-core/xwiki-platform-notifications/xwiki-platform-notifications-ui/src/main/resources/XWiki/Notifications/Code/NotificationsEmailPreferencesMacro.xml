@@ -119,54 +119,52 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>'use strict';
-/**
- * Start the real script.
- */
-require(['jquery'], function ($) {
+      <code>require(['jquery'], function ($) {
+  'use strict';
 
   /**
-   * Page initialization
+   * Handle the notification email interval.
    */
-  $(document).ready(function() {
-
-    /**
-     * Handle the notification email interval
-     */
-    $('.notificationEmailInterval').change(function () {
-      var intervalSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      $.post(serviceURL, {
-        'interval': intervalSelect.val()
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      });
+  $(document).off('change.notificationEmailInterval');
+  $(document).on('change.notificationEmailInterval', '.notificationEmailInterval', function() {
+    var intervalSelect = $(this);
+    var notification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+      'notifications.settings.saving')), 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
+      XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    $.post(serviceURL, {
+      'interval': intervalSelect.val()
+    }).done(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.saved')), 'done'));
+    }).fail(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.savingfailed')), 'error'));
     });
-
-    /**
-     * Handle the include diff in email setting
-     */
-    $('.notificationEmailDiffType').change(function () {
-      var diffTypeSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      $.post(serviceURL, {
-        'diffType': diffTypeSelect.val(),
-        'target': $('.notifEmailPreferences').attr('data-target')
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
-    });
-
   });
-});
-</code>
+
+  /**
+   * Handle the include diff in email setting
+   */
+  $(document).off('change.notificationEmailDiffType');
+  $(document).on('change.notificationEmailDiffType', '.notificationEmailDiffType', function() {
+    var diffTypeSelect = $(this);
+    var notification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+      'notifications.settings.saving')), 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
+      XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    $.post(serviceURL, {
+      'diffType': diffTypeSelect.val(),
+      'target': $('.notifEmailPreferences').attr('data-target')
+    }).done(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.saved')), 'done'));
+    }).fail(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.savingfailed')), 'error'));
+    });
+  });
+});</code>
     </property>
     <property>
       <name>JS</name>

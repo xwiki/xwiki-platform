@@ -45,7 +45,7 @@
     </a>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
 
       <!-- Refresh -->
       <li class="dropdown-header">Actions</li>

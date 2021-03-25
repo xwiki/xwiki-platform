@@ -1145,6 +1145,7 @@ public abstract class XWikiAction implements LegacyAction
             context.getResponse().setStatus(status);
             context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
             context.getResponse().getWriter().print(jsonAnswerAsString);
+            context.setResponseSent(true);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);
         }

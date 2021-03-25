@@ -43,6 +43,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -133,6 +134,8 @@ public class XWikiContext extends Hashtable<Object, Object>
     private Execution execution;
 
     private boolean finished = false;
+
+    private boolean responseSent = false;
 
     private XWiki wiki;
 
@@ -736,14 +739,47 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.form = form;
     }
 
+    /**
+     * Define if a response has been already sent or not.
+     * Note that contrary to {@link #isResponseSent()} this method will ensure that the template is executed even if the
+     * result of the execution is not sent. See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
+     * @return {@code true} if the response has been sent and no new reponse should be sent anymore.
+     */
     public boolean isFinished()
     {
         return this.finished;
     }
 
+    /**
+     * See {@link #isFinished()}.
+     * @param finished Set to {@code true} if the response has been sent.
+     */
     public void setFinished(boolean finished)
     {
         this.finished = finished;
+    }
+
+    /**
+     * Define if a response has been already sent or not and if the template parsing should be done.
+     * Note that contrary to {@link #isFinished()} this method will always prevent the execution of the template.
+     * See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
+     * @return {@code true} if the response has been sent, no new reponse should be sent anymore
+     *          and the template should not be parsed.
+     * @since 13.3RC1
+     */
+    @Unstable
+    public boolean isResponseSent()
+    {
+        return this.responseSent;
+    }
+
+    /**
+     * See {@link #isResponseSent()}.
+     * @param responseSent Set to {@code true} if the response has been sent and the template should not be executed.
+     */
+    public void setResponseSent(boolean responseSent)
+    {
+        this.responseSent = responseSent;
     }
 
     public XWikiDocument getWikiServer()

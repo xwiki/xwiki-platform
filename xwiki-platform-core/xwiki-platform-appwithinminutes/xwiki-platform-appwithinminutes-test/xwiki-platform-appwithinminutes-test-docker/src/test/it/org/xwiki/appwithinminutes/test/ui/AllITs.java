@@ -43,4 +43,10 @@ public class AllITs
     class NestedWizardIT extends WizardIT
     {
     }
+    
+    @Nested
+    @DisplayName("LiveTable Generator test")
+    class NestedLiveTableGeneratorIT extends LiveTableGeneratorIT
+    {
+    }
 }

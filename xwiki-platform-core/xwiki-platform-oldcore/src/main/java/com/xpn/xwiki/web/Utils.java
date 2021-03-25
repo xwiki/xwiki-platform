@@ -111,7 +111,7 @@ public class Utils
         // See: http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html#sendRedirect(String)
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
-        if (response.getStatus() == HttpServletResponse.SC_FOUND) {
+        if (response.getStatus() == HttpServletResponse.SC_FOUND || context.isResponseSent()) {
             return;
         }
 

@@ -120,6 +120,20 @@ public class ApplicationHomePage extends ViewPage
         return new ConfirmationPage();
     }
 
+    /**
+     * Returns the filter input id of a column of an AWM application livetable.
+     *
+     * @param columnIndex the column index
+     * @param appName the application name
+     * @return the id of the filter input for the specified column
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public String getFilterInputId(int columnIndex, String appName)
+    {
+        return String.format("xwiki-livetable-%s-filter-%s", appName.toLowerCase(), columnIndex + 1);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends InlinePage> T createInlinePage()

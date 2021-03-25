@@ -139,4 +139,18 @@ public class ApplicationClassEditPage extends ApplicationEditPage
             updateClassSheetCheckbox.click();
         }
     }
+
+    /**
+     * Creates a new application with the given name.
+     * @param appName the application name
+     * @return the corresponding page object
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public static ApplicationClassEditPage createNewApplication(String appName)
+    {
+        ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
+        appCreatePage.setApplicationName(appName);
+        return appCreatePage.clickNextStep();
+    }
 }

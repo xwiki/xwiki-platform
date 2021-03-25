@@ -120,27 +120,27 @@
     </property>
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
-
-  $(document).ready(function() {
-    var input = $('.notificationAutoWatchMode');
-    input.change( function (event) {
-      var target = input.data('target') == 'wiki' ? 'wiki' : 'user';
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
-      $.post(url, {
-        action: target == 'user' ? 'setAutoWatchMode' : 'setDefaultAutoWatchMode',
-        mode: $(this).val(),
-        csrf: xm.form_token
-      }).done(function() {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).error(function() {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
+  // Make sure the change listener is not added twice.
+  $(document).off('change.notificationAutoWatchMode');
+  $(document).on('change.notificationAutoWatchMode', '.notificationAutoWatchMode', function() {
+    var input = $(this);
+    var target = input.data('target') === 'wiki' ? 'wiki' : 'user';
+    var notification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+      'notifications.settings.saving')), 'inprogress');
+    var url = new XWiki.Document('NotificationPreferenceService', 'XWiki.Notifications.Code').getURL('get',
+      'outputSyntax=plain');
+    $.post(url, {
+      action: target === 'user' ? 'setAutoWatchMode' : 'setDefaultAutoWatchMode',
+      mode: input.val(),
+      csrf: xm.form_token
+    }).done(function() {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.saved')), 'done'));
+    }).error(function() {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.savingfailed')), 'error'));
     });
   });
-
 });</code>
     </property>
     <property>

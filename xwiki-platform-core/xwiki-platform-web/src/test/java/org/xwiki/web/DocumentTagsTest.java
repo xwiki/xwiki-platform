@@ -19,15 +19,8 @@
  */
 package org.xwiki.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
-import org.xwiki.environment.Environment;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
 import org.xwiki.security.authorization.script.internal.RightConverter;
@@ -40,12 +33,8 @@ import com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.tag.TagPlugin;
 
-import org.xwiki.test.page.PageTest;
-import org.xwiki.text.StringUtils;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -53,50 +42,19 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-// TODO: This is the first page test really testing a vm template file. This is an experiment that is meant to be moved
-// either in PageTest or better, in a TemplateTest class extending PageTest. The hard part is deciding how to find
-// template files in non platform-web modules (probably needs a dep on the platform-web module and have it in the
-// classpath).
 @ComponentList({
-    // Security SS
+    // Security SS so that $service.security.* calls in the vm work and their behavior controlled.
     SecurityScriptService.class,
     SecurityAuthorizationScriptService.class,
     RightConverter.class,
-    // SKin Extensions
+    // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
     SkinExtensionAsync.class
 })
-class DocumentTagsTest extends PageTest
+class DocumentTagsTest extends TemplateTest
 {
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
-        // Environment resources
-        Environment environment = oldcore.getMocker().getInstance(Environment.class);
-        when(environment.getResource(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String templateName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found load it from src/main/webapp/templates
-                // This is to support the skin.properties template resource coming from the PageTest module.
-                URL url = getClass().getResource(templateName);
-                if (url == null) {
-                    String templatePath = getResourcePath(templateName);
-                    url = new File(templatePath).toURI().toURL();
-                }
-                return url;
-            });
-        when(environment.getResourceAsStream(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String templateName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found load it from src/main/webapp/templates
-                // This is to support the skin.properties template resource coming from the PageTest module.
-                InputStream is = getClass().getResourceAsStream(templateName);
-                if (is == null) {
-                    String templatePath = getResourcePath(templateName);
-                    is = new FileInputStream(templatePath);
-                }
-                return is;
-            });
-
         // Enable the Tag plugin
         oldcore.getSpyXWiki().getPluginManager().addPlugin("tag", TagPlugin.class.getName(), oldcore.getXWikiContext());
 
@@ -136,12 +94,5 @@ class DocumentTagsTest extends PageTest
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
             + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
             + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
-    }
-
-    private String getResourcePath(String templateName)
-    {
-        // Extract the part after the /skins/flamingo/ and look for it in src/main/webapp/templates instead
-        String suffix = StringUtils.substringAfter(templateName, "/skins/flamingo/");
-        return String.format("src/main/webapp/templates/%s", suffix);
     }
 }

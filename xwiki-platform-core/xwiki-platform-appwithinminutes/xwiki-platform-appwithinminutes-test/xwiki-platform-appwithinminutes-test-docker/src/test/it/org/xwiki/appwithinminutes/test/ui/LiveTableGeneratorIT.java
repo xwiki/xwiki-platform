@@ -17,59 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
-import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomeEditPage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.AdminAuthenticationRule;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.createNewApplication;
 
 /**
  * Tests the live table generator used by the AppWithinMinutes wizard.
- * 
+ *
  * @version $Id$
- * @since 4.5RC1
+ * @since 13.2
+ * @since 12.10.6
  */
-public class LiveTableGeneratorTest extends AbstractTest
+@UITest
+class LiveTableGeneratorIT
 {
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
-
-    /**
-     * The second step of the AppWithinMinutes wizard.
-     */
-    private ApplicationClassEditPage classEditPage;
-
-    /**
-     * The name of the application.
-     */
-    private String appName;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(TestUtils testUtils)
     {
-        appName = RandomStringUtils.randomAlphabetic(6);
-        ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
-        appCreatePage.setApplicationName(appName);
-        classEditPage = appCreatePage.clickNextStep();
+        testUtils.loginAsSuperAdmin();
     }
 
     /**
      * @see "XWIKI-8616: Filter a static list in an AWM livetable does not work."
      */
     @Test
-    public void filterStaticList()
+    @Order(1)
+    void filterStaticList(TestUtils testUtils, TestReference testReference)
     {
+        String appName = testReference.getLastSpaceReference().getName() + "App";
+
+        // Cleanup the app space.
+        testUtils.deletePage(new DocumentReference("xwiki", appName, "WebHome"), true);
+
+        ApplicationClassEditPage classEditPage = createNewApplication(appName);
+
         // Create an application that has a Static List field and add a corresponding column to the live table.
         classEditPage.addField("Static List");
         ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
@@ -90,26 +87,35 @@ public class LiveTableGeneratorTest extends AbstractTest
         entryEditPage.clickSaveAndView().clickBreadcrumbLink(appName);
 
         // Filter the Static List column of the live table.
-        LiveTableElement liveTable = new ApplicationHomePage().getEntriesLiveTable();
+        ApplicationHomePage applicationHomePage = new ApplicationHomePage();
+        LiveTableElement liveTable = applicationHomePage.getEntriesLiveTable();
         liveTable.waitUntilReady();
-        Assert.assertEquals(2, liveTable.getRowCount());
-        String filterInputId = getFilterInputId(liveTable.getColumnIndex("Static List"));
+        assertEquals(2, liveTable.getRowCount());
+        String filterInputId = applicationHomePage.getFilterInputId(liveTable.getColumnIndex("Static List"), appName);
         liveTable.filterColumn(filterInputId, "Second Choice");
-        Assert.assertEquals(1, liveTable.getRowCount());
-        Assert.assertTrue(liveTable.hasRow("Page Title", "Bar"));
+        assertEquals(1, liveTable.getRowCount());
+        assertTrue(liveTable.hasRow("Page Title", "Bar"));
         liveTable.filterColumn(filterInputId, "First Choice");
-        Assert.assertEquals(1, liveTable.getRowCount());
-        Assert.assertTrue(liveTable.hasRow("Page Title", "Foo"));
+        assertEquals(1, liveTable.getRowCount());
+        assertTrue(liveTable.hasRow("Page Title", "Foo"));
         liveTable.filterColumn(filterInputId, "All");
-        Assert.assertEquals(2, liveTable.getRowCount());
+        assertEquals(2, liveTable.getRowCount());
     }
 
     /**
      * @see "XWIKI-8728: AWM home page does not list entries when \"Title\" column is set to be the first one"
      */
     @Test
-    public void titleField()
+    @Order(2)
+    void titleField(TestUtils testUtils, TestReference testReference)
     {
+        String appName = testReference.getLastSpaceReference().getName() + "App";
+
+        // Cleanup the app space. 
+        testUtils.deletePage(new DocumentReference("xwiki", appName, "WebHome"), true);
+
+        ApplicationClassEditPage classEditPage = createNewApplication(appName);
+
         // Create an application that has a Title field and add a corresponding column to the live table.
         classEditPage.addField("Title");
         ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
@@ -131,26 +137,18 @@ public class LiveTableGeneratorTest extends AbstractTest
         entryEditPage.clickSaveAndView().clickBreadcrumbLink(appName);
 
         // Filter the Title column of the live table.
-        LiveTableElement liveTable = new ApplicationHomePage().getEntriesLiveTable();
+        ApplicationHomePage applicationHomePage = new ApplicationHomePage();
+        LiveTableElement liveTable = applicationHomePage.getEntriesLiveTable();
         liveTable.waitUntilReady();
-        Assert.assertEquals(2, liveTable.getRowCount());
-        String filterInputId = getFilterInputId(0);
+        assertEquals(2, liveTable.getRowCount());
+        String filterInputId = applicationHomePage.getFilterInputId(0, appName);
         liveTable.filterColumn(filterInputId, "mighty");
-        Assert.assertEquals(1, liveTable.getRowCount());
-        Assert.assertTrue(liveTable.hasRow("Location", appName + "Foo"));
+        assertEquals(1, liveTable.getRowCount());
+        assertTrue(liveTable.hasRow("Location", appName + "Foo"));
         liveTable.filterColumn(filterInputId, "empty");
-        Assert.assertEquals(1, liveTable.getRowCount());
-        Assert.assertTrue(liveTable.hasRow("Location", appName + "Bar"));
+        assertEquals(1, liveTable.getRowCount());
+        assertTrue(liveTable.hasRow("Location", appName + "Bar"));
         liveTable.filterColumn(filterInputId, "");
-        Assert.assertEquals(2, liveTable.getRowCount());
-    }
-
-    /**
-     * @param columnIndex the column index
-     * @return the id of the filter input for the specified column
-     */
-    private String getFilterInputId(int columnIndex)
-    {
-        return String.format("xwiki-livetable-%s-filter-%s", appName.toLowerCase(), columnIndex + 1);
+        assertEquals(2, liveTable.getRowCount());
     }
 }

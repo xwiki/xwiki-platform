@@ -138,6 +138,16 @@ export default {
     },
   },
 
+  mounted () {
+    this.logic.onEvent("beforeentryfetch", () => {
+      this.$el.classList.add("fetch-entries");
+    });
+
+    this.logic.onEvent("afterentryfetch", () => {
+      this.$el.classList.remove("fetch-entries");
+    });
+  }
+
 };
 </script>
 

@@ -47,35 +47,40 @@
 
 
     <!-- Table layout root -->
-    <table class="layout-table-root">
+    <div class="layout-table-wrapper">
+      <table class="layout-table-root">
 
-      <!--
-        Table Header
-        Implement quick sort, filter, and property reorder
-      -->
-      <thead>
-        <!-- Table property names -->
-        <LayoutTableHeaderNames />
+        <!--
+          Table Header
+          Implement quick sort, filter, and property reorder
+        -->
+        <thead>
+          <!-- Table property names -->
+          <LayoutTableHeaderNames />
 
-        <!-- Table filters -->
-        <LayoutTableHeaderFilters />
-      </thead>
+          <!-- Table filters -->
+          <LayoutTableHeaderFilters />
+        </thead>
 
 
-      <!-- Table Body -->
-      <tbody>
-        <!-- The rows (= the entries) -->
-        <LayoutTableRow
-          v-for="entry in entries"
-          :key="logic.getEntryId(entry)"
-          :entry="entry"
-        />
+        <!-- Table Body -->
+        <tbody>
+          <!-- The rows (= the entries) -->
+          <LayoutTableRow
+            v-for="entry in entries"
+            :key="logic.getEntryId(entry)"
+            :entry="entry"
+          />
 
-        <!-- Component to create a new entry -->
-        <LayoutTableNewRow v-if="canAddEntry"/>
-      </tbody>
+          <!-- Component to create a new entry -->
+          <LayoutTableNewRow v-if="canAddEntry"/>
 
-    </table>
+          <!-- Lodaing component -->
+          <XWikiLoader />
+        </tbody>
+
+      </table>
+    </div>
 
   </div>
 </template>
@@ -90,6 +95,7 @@ import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
+import XWikiLoader from "../../utilities/XWikiLoader.vue";
 
 export default {
 
@@ -104,6 +110,7 @@ export default {
     LayoutTableHeaderFilters,
     LayoutTableRow,
     LayoutTableNewRow,
+    XWikiLoader,
   },
 
   inject: ["logic"],
@@ -120,7 +127,7 @@ export default {
 
 <style>
 
-.layout-table {
+.layout-table-wrapper {
   overflow: auto;
 }
 
@@ -137,6 +144,23 @@ export default {
   align-items: center;
   justify-content: flex-start;
   padding-left: 2rem;
+}
+
+
+/* Loading loader */
+
+.layout-table tbody {
+  position: relative;
+}
+
+.layout-table tbody > .xwiki-loader {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+}
+
+.livedata-layout.fetch-entries .layout-table tbody > .xwiki-loader {
+  display: block;
 }
 
 </style>

@@ -368,7 +368,15 @@ define('xwiki-livedata', [
 
 
     fetchEntries () {
-      return liveDataSource.getEntries(this.data.query);
+      // Before fetch event
+      this.triggerEvent("beforeentryfetch");
+      // Fetch entries from data source
+      return liveDataSource.getEntries(this.data.query)
+        .then(data => {
+          // After fetch event
+          this.triggerEvent("afterentryfetch");
+          return data
+        });
     },
 
 

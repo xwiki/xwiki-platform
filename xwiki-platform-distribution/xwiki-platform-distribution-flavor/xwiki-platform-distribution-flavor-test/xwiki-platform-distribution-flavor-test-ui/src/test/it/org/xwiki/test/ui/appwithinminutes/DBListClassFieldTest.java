@@ -44,7 +44,7 @@ public class DBListClassFieldTest extends AbstractClassEditorTest
      * be preserved.
      */
     @Test
-    public void testDisplayType()
+    public void displayType()
     {
         // Add a new database list field.
         DBListClassFieldEditPane dbListField = new DBListClassFieldEditPane(editor.addField(this.fieldName).getName());
@@ -87,7 +87,7 @@ public class DBListClassFieldTest extends AbstractClassEditorTest
      * @since 12.10.6
      */
     @Test
-    public void testMultipleSelect()
+    public void multipleSelect()
     {
         // Add a new list field.
         ListClassFieldEditPane listField = new ListClassFieldEditPane(this.editor.addField(this.fieldName).getName());

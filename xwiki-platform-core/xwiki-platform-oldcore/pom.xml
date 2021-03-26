@@ -827,6 +827,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
+                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,

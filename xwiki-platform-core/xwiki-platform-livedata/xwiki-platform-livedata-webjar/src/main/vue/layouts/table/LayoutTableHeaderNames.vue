@@ -95,7 +95,7 @@
         to prevent sorting the column unintentionally.
       -->
       <div class="resize-handle"
-        v-mousedownmove
+        v-mousedownmove="resizeColumnInit"
         @mousedownmove="resizeColumn"
         @click.stop
         @dblclick="resetColumnSize"
@@ -183,20 +183,24 @@ export default {
       }
     },
 
-    resizeColumn (e) {
+    resizeColumnInit (e) {
       const th = e.currentTarget.closest("th");
+      e.data.leftColumn = th.querySelector(".column-name");
+      e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
+      e.data.rightColumn = this.getNextvisibleProperty(th)?.querySelector(".column-name");
+      e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
+    },
+
+    resizeColumn (e) {
+      const offsetX = e.clientX - e.data.clickEvent.clientX;
       // Resize left column
-      const leftColumn = th.querySelector(".column-name");
-      const leftColumnRect = leftColumn.getBoundingClientRect();
-      const leftColumnWidth = leftColumnRect.width + e.movementX;
-      leftColumn.style.width = `${leftColumnWidth}px`;
+      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
+      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
 
       // Resize right column
-      const rightColumn = this.getNextvisibleProperty(th)?.querySelector(".column-name");
-      if (rightColumn) {
-        const rightColumnRect = rightColumn.getBoundingClientRect();
-        const rightColumnWidth = rightColumnRect.width - e.movementX;
-        rightColumn.style.width = `${rightColumnWidth}px`;
+      if (e.data.rightColumn) {
+        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
+        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
 

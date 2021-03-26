@@ -7851,9 +7851,10 @@ public class XWiki implements EventListener
     private void onJobFinished(JobFinishedEvent event)
     {
         // Skip it if:
+        // * the authenticator was not yet initialized
         // * we are using the standard authenticator
         // * the event is not related to an install job
-        if (this.authService.getClass() == XWikiAuthServiceImpl.class
+        if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
             || !event.getJobType().equals(InstallJob.JOBTYPE)) {
             return;
         }

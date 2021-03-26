@@ -176,6 +176,13 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
 
+    getNextvisibleProperty (th) {
+      while (th.nextElementSibling) {
+        th = th.nextElementSibling;
+        if (th.style.display !== "none") return th;
+      }
+    },
+
     resizeColumn (e) {
       const th = e.currentTarget.closest("th");
       // Resize left column
@@ -184,8 +191,8 @@ export default {
       const leftColumnWidth = leftColumnRect.width + e.movementX;
       leftColumn.style.width = `${leftColumnWidth}px`;
 
-      // Resiez right column
-      const rightColumn = th.nextElementSibling?.querySelector(".column-name");
+      // Resize right column
+      const rightColumn = this.getNextvisibleProperty(th)?.querySelector(".column-name");
       if (rightColumn) {
         const rightColumnRect = rightColumn.getBoundingClientRect();
         const rightColumnWidth = rightColumnRect.width - e.movementX;

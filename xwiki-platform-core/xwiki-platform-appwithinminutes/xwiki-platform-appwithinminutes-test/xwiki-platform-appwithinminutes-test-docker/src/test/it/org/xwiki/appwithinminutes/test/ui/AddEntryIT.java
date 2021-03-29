@@ -40,9 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests the process of adding new application entries.
  *
  * @version $Id$
- * @since 13.2RC1
- * @since 12.10.5
- * @since 12.6.8
+ * @since 13.3RC1
+ * @since 12.10.6
  */
 @UITest
 class AddEntryIT

@@ -315,9 +315,8 @@ public class LiveTableElement extends BaseElement
      * Sorts the live table on the specified column, by ascending order.
      *
      * @param columnTitle the column to sort on
-     * @since 13.2RC1
-     * @since 12.10.5
-     * @since 12.6.8
+     * @since 13.3RC1
+     * @since 12.10.6
      */
     @Unstable
     public void sortAscending(String columnTitle)
@@ -347,9 +346,8 @@ public class LiveTableElement extends BaseElement
      * Sorts the live table on the specified column, by ascending order.
      *
      * @param columnTitle the column to sort on
-     * @since 13.2RC1
-     * @since 12.10.5
-     * @since 12.6.8
+     * @since 13.3RC1
+     * @since 12.10.6
      */
     @Unstable
     public void sortDescending(String columnTitle)

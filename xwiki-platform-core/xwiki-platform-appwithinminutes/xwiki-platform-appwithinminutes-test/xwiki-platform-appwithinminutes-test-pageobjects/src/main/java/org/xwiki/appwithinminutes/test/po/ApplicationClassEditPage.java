@@ -38,7 +38,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 {
     /**
      * The message displayed when the canvas is empty.
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     public static final String EMPTY_CANVAS_HINT = "Drag fields from the palette and drop them in this area.";

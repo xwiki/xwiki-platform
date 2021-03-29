@@ -120,7 +120,7 @@ class WizardIT
 
     /**
      * Tests the application creation process from start to end.
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     @Test
@@ -305,7 +305,7 @@ class WizardIT
 
     /**
      * @see "XWIKI-7380: Cannot go back from step 2 to step 1"
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     @Test

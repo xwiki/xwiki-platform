@@ -41,7 +41,7 @@ public class ApplicationCreatePage extends ViewPage
     /**
      * The error message displayed when we try to create an application with an empty name.
      * 
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     public static final String EMPTY_APP_NAME_ERROR_MESSAGE = "Please enter the application name.";
@@ -49,7 +49,7 @@ public class ApplicationCreatePage extends ViewPage
     /**
      * The warning message displayed when we input the name of an existing application.
      * 
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     public static final String APP_NAME_USED_WARNING_MESSAGE = "This application already exists.";

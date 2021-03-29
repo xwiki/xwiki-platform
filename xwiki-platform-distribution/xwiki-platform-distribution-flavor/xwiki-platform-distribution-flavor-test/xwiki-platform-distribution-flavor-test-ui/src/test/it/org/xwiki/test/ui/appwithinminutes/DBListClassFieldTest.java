@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.xwiki.appwithinminutes.test.po.DBListClassFieldEditPane;
+import org.xwiki.appwithinminutes.test.po.ListClassFieldEditPane;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,23 +31,20 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Special class editor tests that address only the Database List class field type.
- * 
+ *
  * @version $Id$
  * @since 11.3RC1
  */
-public class DBListClassFieldTest extends AbstractListClassFieldTest
+public class DBListClassFieldTest extends AbstractClassEditorTest
 {
-    public DBListClassFieldTest()
-    {
-        super("Database List");
-    }
+    private final String fieldName = "Database List";
 
     /**
      * Tests that the field preview is properly updated when the display type is changed. Currently selected items must
      * be preserved.
      */
     @Test
-    public void testDisplayType()
+    public void displayType()
     {
         // Add a new database list field.
         DBListClassFieldEditPane dbListField = new DBListClassFieldEditPane(editor.addField(this.fieldName).getName());
@@ -59,11 +57,11 @@ public class DBListClassFieldTest extends AbstractListClassFieldTest
         dbListField.getMultipleSelectionCheckBox().click();
 
         // The size field should be disabled (it can be used only when display type is select).
-        assertTrue(isReadOnly(dbListField.getSizeInput()));
+        assertTrue(dbListField.isReadOnly());
 
         // Change the display type to 'select'.
         dbListField.getDisplayTypeSelect().selectByVisibleText("select");
-        assertFalse(isReadOnly(dbListField.getSizeInput()));
+        assertFalse(dbListField.isReadOnly());
         dbListField.closeConfigPanel();
 
         // Assert that the selected values were preserved.
@@ -75,10 +73,50 @@ public class DBListClassFieldTest extends AbstractListClassFieldTest
         // Change the display type back to 'input'.
         dbListField.openConfigPanel();
         dbListField.getDisplayTypeSelect().selectByVisibleText("input");
-        assertTrue(isReadOnly(dbListField.getSizeInput()));
+        assertTrue(dbListField.isReadOnly());
         dbListField.closeConfigPanel();
         // Assert that the selected values have been preserved.
         assertEquals(Arrays.asList("AppWithinMinutes.DBList", "AppWithinMinutes.Date"),
             dbListField.getPicker().getValues());
+    }
+
+    /**
+     * Tests that multiple select state is synchronized with the rest of the meta properties.
+     *
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    @Test
+    public void multipleSelect()
+    {
+        // Add a new list field.
+        ListClassFieldEditPane listField = new ListClassFieldEditPane(this.editor.addField(this.fieldName).getName());
+
+        // Open the configuration panel and play with the multiple selection option.
+        listField.openConfigPanel();
+
+        // Radio display type should disable multiple selection.
+        listField.getMultipleSelectionCheckBox().click();
+        assertTrue(listField.getMultipleSelectionCheckBox().isSelected());
+        listField.getDisplayTypeSelect().selectByVisibleText("radio");
+        assertFalse(listField.getMultipleSelectionCheckBox().isSelected());
+
+        // Enabling multiple selection when display type is radio should change display type to check box.
+        listField.getMultipleSelectionCheckBox().click();
+        assertEquals("checkbox", listField.getDisplayTypeSelect().getFirstSelectedOption().getAttribute("value"));
+
+        // 'select' display type supports properly multiple selection only if size is greater than 1.
+        assertEquals("1", listField.getSizeInput().getAttribute("value"));
+        listField.getDisplayTypeSelect().selectByVisibleText("select");
+        assertEquals("5", listField.getSizeInput().getAttribute("value"));
+
+        // Check that the specified size is not modified if it's greater than 1.
+        listField.getSizeInput().clear();
+        listField.getSizeInput().sendKeys("2");
+        listField.getDisplayTypeSelect().selectByVisibleText("input");
+        assertTrue(listField.isReadOnly());
+        listField.getDisplayTypeSelect().selectByVisibleText("select");
+        assertFalse(listField.isReadOnly());
+        assertEquals("2", listField.getSizeInput().getAttribute("value"));
     }
 }

@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
@@ -868,30 +869,24 @@ public class EditIT
         // Right now error messages from the server are different if we are using Save&View or Save&Continue.
         // This needs to be fixed as part of XWIKI-16425.
         String saveContinueErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
-            + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) +".";
+            + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) + ".";
 
         String saveViewErrorMessage = "Failed to save the page. Reason: Server Error";
-        String errorServerNotRespondingMessage = "Failed to save the page. Reason: Server not responding";
-
-        // Apparently for MYSQL and Oracle the error message are also different.
-        if (testConfiguration.getDatabase() == Database.MYSQL || testConfiguration.getDatabase() == Database.ORACLE) {
-            saveContinueErrorMessage = errorServerNotRespondingMessage;
-            saveViewErrorMessage = errorServerNotRespondingMessage;
-        }
 
         // try with save and continue
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndContinue(false);
-
-        wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
+        //wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
+        waitForSaveError(setup, wikiEditPage, saveContinueErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum");
         wikiEditPage.clickSaveAndContinue();
 
         // try with save and view
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndView(false);
-        wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
+        //wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
+        waitForSaveError(setup, wikiEditPage, saveViewErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum version 2");
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
@@ -914,6 +909,24 @@ public class EditIT
             // PostgreSQL specific log
             "value too long for type character varying(768)"
         );
+    }
+
+    // FIXME: remove when https://jira.xwiki.org/browse/XWIKI-18513 is fixed
+    private void waitForSaveError(TestUtils setup, WikiEditPage wikiEditPage, String mainError)
+    {
+        String fallbackError = "Failed to save the page. Reason: Server not responding";
+
+        By notificationMessageLocator =
+            By.xpath(String.format("//div[contains(@class,'xnotification-error') and (contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
+        setup.getDriver().waitUntilElementIsVisible(notificationMessageLocator);
+        // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
+        // this method always waits for the last notification message of the specified level.
+        try {
+            setup.getDriver().findElementWithoutWaiting(notificationMessageLocator).click();
+        } catch (WebDriverException e) {
+            // The notification message may disappear before we get to click on it and thus we ignore in case there's
+            // an error.
+        }
     }
 
     @Test

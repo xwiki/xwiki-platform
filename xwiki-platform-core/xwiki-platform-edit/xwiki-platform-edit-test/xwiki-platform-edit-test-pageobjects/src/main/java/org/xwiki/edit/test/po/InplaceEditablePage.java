@@ -147,9 +147,22 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage save(boolean wait)
     {
+        return save(wait ? "Saved" : null);
+    }
+
+    /**
+     * Clicks on the Save button and waits for the specified save confirmation message.
+     * 
+     * @param expectedSuccessMessage the save success confirmation to wait for
+     * @return this page object
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public InplaceEditablePage save(String expectedSuccessMessage)
+    {
         getDriver().findElementByCssSelector("input[name='action_saveandcontinue']").click();
-        if (wait) {
-            waitForNotificationSuccessMessage("Saved");
+        if (expectedSuccessMessage != null) {
+            waitForNotificationSuccessMessage(expectedSuccessMessage);
         }
         return this;
     }
@@ -172,9 +185,23 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage saveAndView(boolean wait)
     {
+        return saveAndView(wait ? "Saved" : null);
+    }
+
+    /**
+     * Clicks on the Save and View button and waits for the specified save confirmation message and for the page to be
+     * rendered in view mode.
+     * 
+     * @param expectedSuccessMessage the save success confirmation to wait for
+     * @return this page object
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public InplaceEditablePage saveAndView(String expectedSuccessMessage)
+    {
         getDriver().findElementByCssSelector("input[name='action_save']").click();
-        if (wait) {
-            waitForNotificationSuccessMessage("Saved");
+        if (expectedSuccessMessage != null) {
+            waitForNotificationSuccessMessage(expectedSuccessMessage);
             return waitForView();
         }
         return this;

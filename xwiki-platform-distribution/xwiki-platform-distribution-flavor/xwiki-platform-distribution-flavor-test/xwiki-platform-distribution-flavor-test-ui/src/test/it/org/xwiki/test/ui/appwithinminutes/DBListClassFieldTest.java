@@ -83,7 +83,7 @@ public class DBListClassFieldTest extends AbstractClassEditorTest
     /**
      * Tests that multiple select state is synchronized with the rest of the meta properties.
      *
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     @Test

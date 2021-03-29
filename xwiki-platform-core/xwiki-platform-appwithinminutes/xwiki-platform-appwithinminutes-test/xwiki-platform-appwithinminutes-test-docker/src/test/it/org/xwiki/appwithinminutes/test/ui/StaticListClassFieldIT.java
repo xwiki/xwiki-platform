@@ -40,7 +40,7 @@ import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEd
  * Special class editor tests that address only the Static List class field type.
  *
  * @version $Id$
- * @since 13.2
+ * @since 13.3RC1
  * @since 12.10.6
  */
 @UITest

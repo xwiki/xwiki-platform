@@ -163,7 +163,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
 
     /**
      * @return {@code true} if the field is readonly, {@code false} otherwise
-     * @since 13.2
+     * @since 13.3RC1
      * @since 12.10.6
      */
     public boolean isReadOnly()

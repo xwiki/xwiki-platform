@@ -96,6 +96,7 @@ import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.bridge.event.UserAuthenticatedEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
@@ -4355,7 +4356,9 @@ public class XWiki implements EventListener
             // We still need to call checkAuth to set the proper user.
             XWikiUser user = checkAuth(context);
             if (user != null) {
+                ObservationManager om = getObservationManager();
                 context.setUser(user.getUser());
+                om.notify(new UserAuthenticatedEvent(user.getUserReference()), user, context);
             }
 
             // Always allow.

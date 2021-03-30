@@ -421,6 +421,8 @@ public class XWiki implements EventListener
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     private EntityReferenceSerializer<String> localStringEntityReferenceSerializer;
 
     private ResourceReferenceManager resourceReferenceManager;
@@ -740,6 +742,17 @@ public class XWiki implements EventListener
         }
 
         return this.relativeEntityReferenceResolver;
+    }
+
+    private UserReferenceResolver<DocumentReference> getUserReferenceResolver()
+    {
+        if (this.documentReferenceUserReferenceResolver == null) {
+            this.documentReferenceUserReferenceResolver = Utils.getComponent(new DefaultParameterizedType(UserReferenceResolver.class,
+                    DocumentReference.class),
+                "document");
+        }
+
+        return this.documentReferenceUserReferenceResolver;
     }
 
     private EntityReferenceSerializer<String> getLocalStringEntityReferenceSerializer()
@@ -4358,11 +4371,9 @@ public class XWiki implements EventListener
             // We still need to call checkAuth to set the proper user.
             XWikiUser user = checkAuth(context);
 
-            UserReferenceResolver<DocumentReference> userReferenceResolver;
-            UserReference userReference = userReferenceResolver.resolve(user.getUserReference());
-
             if (user != null) {
                 context.setUser(user.getUser());
+                UserReference userReference = getUserReferenceResolver().resolve(user.getUserReference());
                 getObservationManager().notify(new UserAuthenticationEvent(userReference), user);
             }
 

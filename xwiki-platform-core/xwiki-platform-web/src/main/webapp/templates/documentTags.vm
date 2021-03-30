@@ -117,10 +117,6 @@
         #set($hasTagsPlugin = false)
         #set($tags = $doc.getTagList())
     #end
-    ##   #if($!tags.size() == 0)
-    ##     No tags
-    ##   #else
-    ##   #end
     <div class="doc-tags #if(!$hasedit && $tags.isEmpty() )hidden#end" id="${tagsId}">
         $services.localization.render('core.tags.list.label')
         #if($hasedit || !$tags.isEmpty())

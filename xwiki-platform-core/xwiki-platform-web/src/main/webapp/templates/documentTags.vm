@@ -121,9 +121,9 @@
     ##     No tags
     ##   #else
     ##   #end
-    <div class="doc-tags" id="${tagsId}">
+    <div class="doc-tags #if(!$hasedit)tag-visibility#end" id="${tagsId}">
+        $services.localization.render('core.tags.list.label')
         #if($hasedit || !$tags.isEmpty())
-            $services.localization.render('core.tags.list.label')
             #foreach($tag in $tags)
                 #displayTag($tag)
             #end

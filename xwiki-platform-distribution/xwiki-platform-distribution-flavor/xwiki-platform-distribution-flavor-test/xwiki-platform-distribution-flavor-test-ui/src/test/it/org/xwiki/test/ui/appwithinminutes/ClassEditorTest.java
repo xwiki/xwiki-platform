@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
+
 /**
  * Tests the application class editor.
  * 
@@ -45,11 +47,6 @@ import org.xwiki.xclass.test.po.ClassSheetPage;
  */
 public class ClassEditorTest extends AbstractClassEditorTest
 {
-    /**
-     * The message displayed when the canvas is empty.
-     */
-    public static final String EMPTY_CANVAS_HINT = "Drag fields from the palette and drop them in this area.";
-
     /**
      * Tests that the hint is displayed only when the canvas is empty.
      */

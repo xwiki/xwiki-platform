@@ -33,6 +33,9 @@
 .diff-container table {
   /* Prevent scroll bars when the table fills the entire width. */
   margin: 0;
+  /* Having a table size of 100% leads to the display of an horizontal scroll bar when a td has a border. A 99.99% width
+     is visually indistinguishable but prevents this overflow. */
+  width: 99.99%
 }
 
 .diff-container td {
@@ -53,6 +56,20 @@ td.diff-line {
   vertical-align: middle;
   /* Preserve code formatting and also wrap long lines that exceed the available width. */
   white-space: pre-wrap;
+}
+
+/* Prevent the code formatting for diff lines containing a decision form as it breaks the display of the form.
+   The code formatting and long line wrapping is instead applied on the proposed decisions preview contained in the 
+   line. */
+td.diff-line.diff-line-decision {
+  white-space: normal;
+  padding: 0.5em;
+}
+
+td.diff-line.diff-line-decision span.diff-decision {
+  /* Preserve code formatting and also wrap long lines that exceed the available width. */
+  white-space: pre-wrap;
+  width: 70%;
 }
 
 .diff-line-added {
@@ -91,7 +108,6 @@ td.diff-line-meta {
 }
 
 span.diff-decision {
-  padding-top: 10px;
   display: inline-block;
 }
 

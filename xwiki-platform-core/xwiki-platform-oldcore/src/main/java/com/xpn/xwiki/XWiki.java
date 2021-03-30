@@ -58,6 +58,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -96,7 +97,6 @@ import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
-import org.xwiki.bridge.event.UserAuthenticatedEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
@@ -110,7 +110,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
-import org.xwiki.extension.event.ExtensionInitializedEvent;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -168,6 +167,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authentication.UserAuthenticationEvent;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -177,6 +177,8 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -4355,10 +4357,13 @@ public class XWiki implements EventListener
         if (action.equals("skin") && SKIN_RESOURCE_SPACE_NAMES.contains(firstSpaceName)) {
             // We still need to call checkAuth to set the proper user.
             XWikiUser user = checkAuth(context);
+
+            UserReferenceResolver<DocumentReference> userReferenceResolver;
+            UserReference userReference = userReferenceResolver.resolve(user.getUserReference());
+
             if (user != null) {
-                ObservationManager om = getObservationManager();
                 context.setUser(user.getUser());
-                om.notify(new UserAuthenticatedEvent(user.getUserReference()), user, context);
+                getObservationManager().notify(new UserAuthenticationEvent(userReference), user);
             }
 
             // Always allow.

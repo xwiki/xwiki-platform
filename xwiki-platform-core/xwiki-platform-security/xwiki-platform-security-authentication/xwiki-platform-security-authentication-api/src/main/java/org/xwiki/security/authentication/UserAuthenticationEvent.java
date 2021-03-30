@@ -17,24 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.bridge.event;
+package org.xwiki.security.authentication;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.event.AbstractCancelableEvent;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
- * An event triggered when a user is authenticated.
+ * This event is triggered every time a user is authenticated.
  * <p>
- * The event also send the following parameters:
+ * The event also sends the following parameters:
  * </p>
  * <ul>
- * <li>source: the current {com.xpn.xwiki.user.api.XWikiUser} instance which has been authenticated.</li>
- * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * <li>source: the user reference (as a {@code org.xwiki.user.UserReference}) used for the authentication.</li>
  * </ul>
- * 
+ *
  * @version $Id$
- * @since 2.7RC1
+ * @since 13.3RC1
  */
-public class UserAuthenticatedEvent extends AbstractDocumentEvent
+@Unstable
+public class UserAuthenticationEvent extends AbstractCancelableEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -43,14 +46,25 @@ public class UserAuthenticatedEvent extends AbstractDocumentEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only delete events affecting the same user.
-     *
-     * @param userReference the reference of the user to match
+     * Used to serialize user reference.
      */
-    public UserAuthenticatedEvent(DocumentReference userReference)
+    private static final UserReferenceSerializer<String> SERIALIZER = null;
+
+    /**
+     * This event will match any other document event of the same type.
+     */
+    public UserAuthenticationEvent()
     {
-        super(userReference);
+        super();
     }
 
+    /**
+     * This event will match only events of the same type affecting the same document.
+     *
+     * @param userReference the reference related to the user
+     */
+    public UserAuthenticationEvent(UserReference userReference)
+    {
+        super(SERIALIZER.serialize(userReference));
+    }
 }

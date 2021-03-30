@@ -32,7 +32,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents the actions possible on a livetable.
@@ -318,7 +317,6 @@ public class LiveTableElement extends BaseElement
      * @since 13.3RC1
      * @since 12.10.6
      */
-    @Unstable
     public void sortAscending(String columnTitle)
     {
         WebElement element = getHeaderByColumnTitle(columnTitle);
@@ -349,7 +347,6 @@ public class LiveTableElement extends BaseElement
      * @since 13.3RC1
      * @since 12.10.6
      */
-    @Unstable
     public void sortDescending(String columnTitle)
     {
         WebElement element = getHeaderByColumnTitle(columnTitle);

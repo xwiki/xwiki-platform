@@ -73,7 +73,9 @@ public class ApplicationHomePage extends ViewPage
      */
     public EntryNamePane clickAddNewEntry()
     {
-        addEntryLink.click();
+        this.addEntryLink.click();
+        // Waits for the dialog box to be displayed before continuing.
+        getDriver().waitUntilElementIsVisible(By.cssSelector("div.xdialog-box"));
         return new EntryNamePane();
     }
 

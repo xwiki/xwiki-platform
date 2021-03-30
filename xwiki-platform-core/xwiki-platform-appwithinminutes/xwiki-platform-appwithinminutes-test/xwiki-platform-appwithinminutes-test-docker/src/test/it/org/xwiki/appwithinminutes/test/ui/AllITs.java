@@ -55,4 +55,10 @@ public class AllITs
     class NestedStaticListClassFieldIT extends StaticListClassFieldIT
     {
     }
+
+    @Nested
+    @DisplayName("Add entry test")
+    class NestedAddEntryIT extends AddEntryIT
+    {
+    }
 }

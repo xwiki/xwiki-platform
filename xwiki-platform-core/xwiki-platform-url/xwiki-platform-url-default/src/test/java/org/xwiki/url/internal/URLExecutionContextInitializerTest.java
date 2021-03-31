@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url;
+package org.xwiki.url.internal;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.internal.URLExecutionContextInitializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

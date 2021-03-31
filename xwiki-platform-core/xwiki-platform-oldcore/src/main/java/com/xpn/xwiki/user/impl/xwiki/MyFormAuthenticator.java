@@ -41,6 +41,8 @@ import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 
+import com.xpn.xwiki.web.XWikiResponse;
+
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
@@ -244,8 +246,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
-                String continueToURL = getContinueToURL(request);
                 // This is the url that the user was initially accessing before being prompted for login.
+                String continueToURL = getContinueToURL(request);
                 response.sendRedirect(response.encodeRedirectURL(continueToURL));
             }
         } else {

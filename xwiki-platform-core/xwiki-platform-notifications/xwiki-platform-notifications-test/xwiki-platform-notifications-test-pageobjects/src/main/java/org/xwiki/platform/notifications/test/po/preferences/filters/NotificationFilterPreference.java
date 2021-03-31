@@ -73,7 +73,7 @@ public class NotificationFilterPreference
                 By.tagName(LIST_HTML_TAG));
         for (WebElement eventType : eventTypeElements) {
             String text = eventType.getText();
-            if (!"-".equals(text)) {
+            if (!text.startsWith("All events")) {
                 this.eventTypes.add(text);
             }
         }

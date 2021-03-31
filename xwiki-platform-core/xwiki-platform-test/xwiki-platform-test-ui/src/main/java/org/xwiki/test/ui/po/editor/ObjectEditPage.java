@@ -184,7 +184,9 @@ public class ObjectEditPage extends EditPage
             WebElement element = elements.get(i);
             // Make sure all forms are displayed otherwise we can't interact with them.
             if (!element.isDisplayed()) {
-                titles.get(i).click();
+                WebElement title = titles.get(i);
+                getDriver().scrollTo(title);
+                title.click();
             }
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);
             objects.add(new ObjectEditPane(By.id(element.getAttribute("id")), className, objectNumber));

@@ -100,7 +100,7 @@ class UserChangePasswordIT
         preferencesPage = userProfilePage.switchToPreferences();
         changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
     }
 
@@ -112,7 +112,7 @@ class UserChangePasswordIT
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword(DEFAULT_PASSWORD, PASSWORD_1, PASSWORD_2);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
     }
 
@@ -122,7 +122,7 @@ class UserChangePasswordIT
     {
         ChangePasswordPage changePasswordPage = ProfileUserProfilePage.gotoPage(this.userName)
             .switchToPreferences().changePassword();
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("This field is required.", changePasswordPage.getValidationErrorMessage());
     }
 
@@ -137,7 +137,7 @@ class UserChangePasswordIT
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(PASSWORD_1, PASSWORD_2);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
     }
 
@@ -149,7 +149,7 @@ class UserChangePasswordIT
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword("badPassword", PASSWORD_1, PASSWORD_1);
-        changePasswordPage.submit();
+        changePasswordPage = changePasswordPage.submit();
         assertEquals("Current password is invalid.", changePasswordPage.getErrorMessage());
     }
 

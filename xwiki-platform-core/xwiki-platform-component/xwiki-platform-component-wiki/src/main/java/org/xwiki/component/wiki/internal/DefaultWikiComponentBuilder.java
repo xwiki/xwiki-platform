@@ -40,6 +40,7 @@ import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,6 +76,9 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
      */
     @Inject
     private WikiComponentBridge componentBridge;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
 
     @Override
     public List<DocumentReference> getDocumentReferences()
@@ -118,7 +122,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
         rawComponent.setSyntax(componentBridge.getSyntax(reference));
 
         // Create the method invocation handler of the proxy
-        InvocationHandler handler = new DefaultWikiComponentInvocationHandler(rawComponent, contextComponentManager);
+        InvocationHandler handler =
+            new DefaultWikiComponentInvocationHandler(rawComponent, this.authorExecutor, this.contextComponentManager);
 
         // Prepare a list containing the interfaces the component implements
         List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();

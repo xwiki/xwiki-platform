@@ -39,7 +39,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  
   <content>help.syntaxpage.title=Guía de Sintaxis XWiki
 help.syntaxtitle=Sintaxis XWiki {0}
 help.syntaxall=Todo

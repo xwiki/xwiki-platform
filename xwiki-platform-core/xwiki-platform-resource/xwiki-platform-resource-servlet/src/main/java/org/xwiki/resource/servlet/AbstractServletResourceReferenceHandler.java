@@ -82,7 +82,9 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
             InputStream resourceStream = getResourceStream(typedResourceReference);
             if (resourceStream != null) {
                 try {
-                    serveResource(typedResourceReference, filterResource(typedResourceReference, resourceStream));
+                    HttpServletResponse response = getHttpServletResponse();
+                    serveResource(typedResourceReference,
+                        filterResource(typedResourceReference, resourceStream, response));
                 } catch (ResourceReferenceHandlerException e) {
                     this.logger.error(e.getMessage(), e);
                     sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -185,12 +187,30 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
 
     /**
      * Filter the resource before sending it to the client.
-     * 
+     *
      * @param resourceReference the resource to filter
      * @param resourceStream the resource content
      * @return the filtered resource content
+     * @deprecated use {@link #filterResource(ResourceReference, InputStream, HttpServletResponse)} instead
      */
+    @Deprecated
     protected InputStream filterResource(R resourceReference, InputStream resourceStream)
+        throws ResourceReferenceHandlerException
+    {
+        return resourceStream;
+    }
+
+    /**
+     * Filter the resource before sending it to the client.
+     * 
+     * @param resourceReference the resource to filter
+     * @param resourceStream the resource content
+     * @param response the servlet response if it exists, {@code null} otherwise
+     * @return the filtered resource content
+     * @since 13.3RC1
+     */
+    protected InputStream filterResource(R resourceReference, InputStream resourceStream,
+        HttpServletResponse response)
         throws ResourceReferenceHandlerException
     {
         return resourceStream;
@@ -239,5 +259,20 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
                     String.format("Failed to return status code [%s].", statusCode), e);
             }
         }
+    }
+
+    /**
+     * @return the {@link HttpServletResponse} of the query if the response is an instance of {@link ServletResponse},
+     *     {@code null} otherwise.
+     */
+    private HttpServletResponse getHttpServletResponse()
+    {
+        HttpServletResponse response;
+        if (this.container.getResponse() instanceof ServletResponse) {
+            response = ((ServletResponse) this.container.getResponse()).getHttpServletResponse();
+        } else {
+            response = null;
+        }
+        return response;
     }
 }

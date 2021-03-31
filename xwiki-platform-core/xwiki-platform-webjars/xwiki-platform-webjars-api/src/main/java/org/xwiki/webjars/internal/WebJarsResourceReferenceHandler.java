@@ -20,6 +20,7 @@
 package org.xwiki.webjars.internal;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -29,13 +30,21 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHeaders;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler;
 import org.xwiki.velocity.VelocityManager;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Handles {@code webjars} Resource References.
@@ -55,11 +64,6 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
 
     /**
-     * The encoding used when evaluating WebJar (text) resources.
-     */
-    private static final String UTF8 = "UTF-8";
-
-    /**
      * Used to evaluate the Velocity code from the WebJar resources.
      */
     @Inject
@@ -67,6 +71,9 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
 
     @Inject
     private ClassLoaderManager classLoaderManager;
+
+    @Inject
+    private LESSCompiler lessCompiler;
 
     @Override
     public List<ResourceType> getSupportedResourceReferences()
@@ -90,27 +97,79 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     @Override
     protected boolean isResourceCacheable(WebJarsResourceReference resourceReference)
     {
-        return !Boolean.valueOf(resourceReference.getParameterValue("evaluate"));
+        return !Boolean.parseBoolean(resourceReference.getParameterValue("evaluate"));
     }
 
     @Override
-    protected InputStream filterResource(WebJarsResourceReference resourceReference, InputStream resourceStream)
+    protected InputStream filterResource(WebJarsResourceReference resourceReference, InputStream resourceStream,
+        HttpServletResponse response)
         throws ResourceReferenceHandlerException
     {
+        String resourceName = getResourceName(resourceReference);
+        InputStream stream;
         if (!isResourceCacheable(resourceReference)) {
-            String resourceName = getResourceName(resourceReference);
-            try {
-                // Evaluates the given resource using Velocity.
-                StringWriter writer = new StringWriter();
-                this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
-                    resourceName, new InputStreamReader(resourceStream, UTF8));
-                return new ByteArrayInputStream(writer.toString().getBytes(UTF8));
-            } catch (Exception e) {
-                throw new ResourceReferenceHandlerException(
-                    String.format("Failed to evaluate the Velocity code from WebJar resource [%s]", resourceName), e);
+            if (resourceName.endsWith(".less")) {
+                stream = lessResourceHandler(resourceReference, resourceStream, response);
+            } else {
+                stream = defaultResourceHandler(resourceStream, resourceName);
             }
+        } else {
+            stream = super.filterResource(resourceReference, resourceStream, response);
         }
-        return super.filterResource(resourceReference, resourceStream);
+        return stream;
+    }
+
+    private InputStream lessResourceHandler(WebJarsResourceReference resourceReference,
+        InputStream resourceStream, HttpServletResponse response)
+        throws ResourceReferenceHandlerException
+    {
+        if (response != null) {
+            response.setHeader(HttpHeaders.CONTENT_TYPE, "text/css");
+        }
+        
+        LESSResourceReference lessResourceReference = new LESSResourceReference()
+        {
+            @Override
+            public String getContent(String skin) throws LESSCompilerException
+            {
+                // Load the content of the resource in a string 
+                try {
+                    return IOUtils.toString(resourceStream, UTF_8);
+                } catch (IOException e) {
+                    throw new LESSCompilerException(
+                        String.format("Failed to load the webjer resource [%s]", this.serialize()), e);
+                }
+            }
+
+            @Override
+            public String serialize()
+            {
+                // Return a unique identifier for the webjar resource.
+                return resourceReference.getResourceName();
+            }
+        };
+        try {
+            String compile = this.lessCompiler.compile(lessResourceReference, true, false, false);
+            return IOUtils.toInputStream(compile, UTF_8);
+        } catch (LESSCompilerException e) {
+            throw new ResourceReferenceHandlerException("Error when compiling the resource", e);
+        }
+    }
+
+    private ByteArrayInputStream defaultResourceHandler(InputStream resourceStream, String resourceName)
+        throws ResourceReferenceHandlerException
+    {
+        try {
+            // Evaluates the given resource using Velocity.
+            StringWriter writer = new StringWriter();
+            this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
+                resourceName, new InputStreamReader(resourceStream, UTF_8));
+            return new ByteArrayInputStream(writer.toString().getBytes(UTF_8));
+        } catch (Exception e) {
+            throw new ResourceReferenceHandlerException(
+                String.format("Failed to evaluate the Velocity code from WebJar resource [%s]", resourceName),
+                e);
+        }
     }
 
     /**

@@ -17,10 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.webjars;
+package org.xwiki.webjars.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -29,11 +30,13 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.apache.velocity.exception.VelocityException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.classloader.ClassLoaderManager;
@@ -41,16 +44,21 @@ import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
-import org.xwiki.resource.ResourceReferenceHandlerException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.webjars.internal.WebJarsResourceReference;
-import org.xwiki.webjars.internal.WebJarsResourceReferenceHandler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static ch.qos.logback.classic.Level.ERROR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -58,57 +66,68 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
- * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReferenceHandler}.
+ * Unit tests for {@link WebJarsResourceReferenceHandler}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class WebJarsResourceReferenceHandlerTest
+@ComponentTest
+class WebJarsResourceReferenceHandlerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WebJarsResourceReferenceHandler> componentManager =
-        new MockitoComponentMockingRule<>(WebJarsResourceReferenceHandler.class);
-
-    private ServletRequest request;
-
-    private ServletResponse response;
-
-    private ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
-
+    @InjectMockComponents
     private WebJarsResourceReferenceHandler handler;
 
+    @MockComponent
+    private VelocityManager velocityManager;
+
+    @MockComponent
+    private ClassLoaderManager classLoaderManager;
+
+    @MockComponent
+    private LESSCompiler lessCompiler;
+
+    @MockComponent
+    private Container container;
+
+    @Mock
+    private ServletRequest request;
+
+    @Mock
+    private ServletResponse response;
+
+    @Mock
+    private ResourceReferenceHandlerChain chain;
+
+    @Mock
     private NamespaceURLClassLoader classLoader;
 
-    @Before
-    public void configure() throws Exception
-    {
-        Container container = this.componentManager.getInstance(Container.class);
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
-        this.response = mock(ServletResponse.class);
+    @BeforeEach
+    void setUp() throws Exception
+    {
         ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
         when(this.response.getOutputStream()).thenReturn(responseOutputStream);
 
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         when(this.response.getHttpServletResponse()).thenReturn(httpResponse);
-        when(container.getResponse()).thenReturn(this.response);
+        when(this.container.getResponse()).thenReturn(this.response);
 
-        this.request = mock(ServletRequest.class);
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         when(this.request.getHttpServletRequest()).thenReturn(httpRequest);
-        when(container.getRequest()).thenReturn(this.request);
+        when(this.container.getRequest()).thenReturn(this.request);
 
-        this.handler = this.componentManager.getComponentUnderTest();
-
-        this.classLoader = mock(NamespaceURLClassLoader.class);
-        ClassLoaderManager clm = this.componentManager.getInstance(ClassLoaderManager.class);
-        when(clm.getURLClassLoader("wiki:wiki", true)).thenReturn(this.classLoader);
+        when(this.classLoaderManager.getURLClassLoader("wiki:wiki", true)).thenReturn(this.classLoader);
     }
 
     @Test
-    public void executeWhenResourceDoesntExist() throws Exception
+    void executeWhenResourceDoesntExist() throws Exception
     {
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
@@ -122,7 +141,7 @@ public class WebJarsResourceReferenceHandlerTest
     }
 
     @Test
-    public void executeWhenResourceExists() throws Exception
+    void executeWhenResourceExists() throws Exception
     {
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
@@ -131,7 +150,7 @@ public class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        Long now = new Date().getTime();
+        long now = new Date().getTime();
         this.handler.handle(reference, this.chain);
 
         assertEquals(1, this.handler.getSupportedResourceReferences().size());
@@ -157,7 +176,7 @@ public class WebJarsResourceReferenceHandlerTest
     }
 
     @Test
-    public void return304WhenIfModifiedSinceHeader() throws Exception
+    void return304WhenIfModifiedSinceHeader() throws Exception
     {
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
@@ -173,7 +192,7 @@ public class WebJarsResourceReferenceHandlerTest
     }
 
     @Test
-    public void evaluateResource() throws Exception
+    void evaluateResource() throws Exception
     {
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
@@ -183,9 +202,8 @@ public class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+        when(this.velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
         doAnswer(new Answer<Void>()
         {
@@ -211,7 +229,7 @@ public class WebJarsResourceReferenceHandlerTest
     }
 
     @Test
-    public void failingResourceEvaluation() throws Exception
+    void failingResourceEvaluation() throws Exception
     {
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
@@ -221,9 +239,8 @@ public class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+        when(this.velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
         when(velocityEngine.evaluate(any(), any(), eq("angular/2.1.11/angular.js"), any(Reader.class)))
             .thenThrow(new VelocityException("Bad code!"));
@@ -231,9 +248,10 @@ public class WebJarsResourceReferenceHandlerTest
         this.handler.handle(reference, this.chain);
 
         // Verify the exception is logged.
-        verify(this.componentManager.getMockedLogger()).error(
-            eq("Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]"),
-            any(ResourceReferenceHandlerException.class));
+        assertEquals(1, this.logCapture.size());
+        assertEquals(ERROR, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
+            this.logCapture.getMessage(0));
 
         // Verify that the client is properly notified about the failure.
         verify(this.response.getHttpServletResponse()).sendError(500,
@@ -241,5 +259,38 @@ public class WebJarsResourceReferenceHandlerTest
 
         // The next handlers are still called.
         verify(this.chain).handleNext(reference);
+    }
+
+    @Test
+    void filterResourceLessNoEvaluate() throws Exception
+    {
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+        InputStream resourceStream = mock(InputStream.class);
+        HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+        InputStream stream = this.handler.filterResource(resourceReference, resourceStream, httpServletResponse);
+        assertSame(resourceStream, stream);
+        verifyNoInteractions(resourceStream);
+        verifyNoInteractions(httpServletResponse);
+    }
+    
+    @Test
+    void filterResourceLessAndEvaluate() throws Exception
+    {
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+        resourceReference.addParameter("evaluate", "true");
+        InputStream resourceStream = mock(InputStream.class);
+        HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+
+        when(this.lessCompiler.compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false)))
+            .thenReturn("compiled less");
+        
+        
+        InputStream stream = this.handler.filterResource(resourceReference, resourceStream, httpServletResponse);
+        assertNotSame(resourceStream, stream);
+        verifyNoInteractions(resourceStream);
+        verify(httpServletResponse).setHeader(HttpHeaders.CONTENT_TYPE, "text/css");
+        verify(this.lessCompiler).compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false));
     }
 }

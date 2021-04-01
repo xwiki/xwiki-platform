@@ -22,37 +22,33 @@ package org.xwiki.webjars.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpHeaders;
+import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.velocity.exception.VelocityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
-import org.xwiki.lesscss.compiler.LESSCompiler;
-import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
+import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.webjars.internal.filter.WebJarsResourceFilter;
 
 import static ch.qos.logback.classic.Level.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -83,13 +78,15 @@ class WebJarsResourceReferenceHandlerTest
     private WebJarsResourceReferenceHandler handler;
 
     @MockComponent
-    private VelocityManager velocityManager;
-
-    @MockComponent
     private ClassLoaderManager classLoaderManager;
 
     @MockComponent
-    private LESSCompiler lessCompiler;
+    @Named("less")
+    private WebJarsResourceFilter lessFilter;
+
+    @MockComponent
+    @Named("velocity")
+    private WebJarsResourceFilter velocityFilter;
 
     @MockComponent
     private Container container;
@@ -202,18 +199,8 @@ class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        VelocityEngine velocityEngine = mock(VelocityEngine.class);
-        when(this.velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation)
-            {
-                ((StringWriter) invocation.getArguments()[1]).write("evaluated content");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(), any(), eq("angular/2.1.11/angular.js"), any(Reader.class));
+        when(this.velocityFilter.handle(any(), any()))
+            .thenAnswer(invocation -> new ByteArrayInputStream("evaluated content".getBytes()));
 
         this.handler.handle(reference, this.chain);
 
@@ -239,11 +226,9 @@ class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        VelocityEngine velocityEngine = mock(VelocityEngine.class);
-        when(this.velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        when(velocityEngine.evaluate(any(), any(), eq("angular/2.1.11/angular.js"), any(Reader.class)))
-            .thenThrow(new VelocityException("Bad code!"));
+        when(this.velocityFilter.handle(any(), any())).thenThrow(new ResourceReferenceHandlerException(
+            "Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
+            new VelocityException("Bad code!")));
 
         this.handler.handle(reference, this.chain);
 
@@ -267,13 +252,12 @@ class WebJarsResourceReferenceHandlerTest
         WebJarsResourceReference resourceReference =
             new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
         InputStream resourceStream = mock(InputStream.class);
-        HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
-        InputStream stream = this.handler.filterResource(resourceReference, resourceStream, httpServletResponse);
+        InputStream stream = this.handler.filterResource(resourceReference, resourceStream);
         assertSame(resourceStream, stream);
         verifyNoInteractions(resourceStream);
-        verifyNoInteractions(httpServletResponse);
+        verifyNoInteractions(this.lessFilter);
     }
-    
+
     @Test
     void filterResourceLessAndEvaluate() throws Exception
     {
@@ -281,16 +265,35 @@ class WebJarsResourceReferenceHandlerTest
             new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
         resourceReference.addParameter("evaluate", "true");
         InputStream resourceStream = mock(InputStream.class);
-        HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
 
-        when(this.lessCompiler.compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false)))
-            .thenReturn("compiled less");
-        
-        
-        InputStream stream = this.handler.filterResource(resourceReference, resourceStream, httpServletResponse);
+        InputStream stream = this.handler.filterResource(resourceReference, resourceStream);
         assertNotSame(resourceStream, stream);
         verifyNoInteractions(resourceStream);
-        verify(httpServletResponse).setHeader(HttpHeaders.CONTENT_TYPE, "text/css");
-        verify(this.lessCompiler).compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false));
+        verify(this.lessFilter).handle(resourceStream, "testdirectory/testfile.less");
+    }
+
+    @Test
+    void getContentType() throws Exception
+    {
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+
+        String mimeType =
+            this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
+                resourceReference);
+        assertEquals("text/x-less", mimeType);
+    }
+
+    @Test
+    void getContentTypeLessAndEvaluate() throws Exception
+    {
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+        resourceReference.addParameter("evaluate", "true");
+
+        String mimeType =
+            this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
+                resourceReference);
+        assertEquals("text/css", mimeType);
     }
 }

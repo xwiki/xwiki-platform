@@ -35,12 +35,12 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
 public interface WebJarsResourceFilter
 {
     /**
-     * Handle the filtering of the request resource, returning an new content instead of the one initially requested.
+     * Handle the filtering of the request resource, returning a new content instead of the one initially requested.
      *
      * @param resourceStream the input stream of the webjar resource initially requested
      * @param resourceName the name of the webjar resource initially requested
      * @return an input stream of the filtered resource
      * @throws ResourceReferenceHandlerException in case of error during the filtering
      */
-    InputStream handle(InputStream resourceStream, String resourceName) throws ResourceReferenceHandlerException;
+    InputStream filter(InputStream resourceStream, String resourceName) throws ResourceReferenceHandlerException;
 }

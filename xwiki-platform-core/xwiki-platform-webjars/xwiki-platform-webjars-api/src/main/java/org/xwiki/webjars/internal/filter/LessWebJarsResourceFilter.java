@@ -47,23 +47,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Singleton
 public class LessWebJarsResourceFilter implements WebJarsResourceFilter
 {
-    @Inject
-    private LESSCompiler lessCompiler;
-
-    @Override
-    public InputStream handle(InputStream resourceStream, String resourceName)
-        throws ResourceReferenceHandlerException
-    {
-        LESSResourceReference lessResourceReference = new WebjarLESSResourceReference(resourceStream, resourceName);
-        try {
-            String compile = this.lessCompiler.compile(lessResourceReference, true, false, false);
-            return IOUtils.toInputStream(compile, UTF_8);
-        } catch (LESSCompilerException e) {
-            throw new ResourceReferenceHandlerException(
-                String.format("Error when compiling the resource [%s]", resourceName), e);
-        }
-    }
-
     private static class WebjarLESSResourceReference implements LESSResourceReference
     {
         private final InputStream resourceStream;
@@ -93,6 +76,23 @@ public class LessWebJarsResourceFilter implements WebJarsResourceFilter
         {
             // Return a unique identifier for the webjar resource.
             return this.resourceName;
+        }
+    }
+
+    @Inject
+    private LESSCompiler lessCompiler;
+
+    @Override
+    public InputStream filter(InputStream resourceStream, String resourceName)
+        throws ResourceReferenceHandlerException
+    {
+        LESSResourceReference lessResourceReference = new WebjarLESSResourceReference(resourceStream, resourceName);
+        try {
+            String compile = this.lessCompiler.compile(lessResourceReference, true, false, false);
+            return IOUtils.toInputStream(compile, UTF_8);
+        } catch (LESSCompilerException e) {
+            throw new ResourceReferenceHandlerException(
+                String.format("Error when compiling the resource [%s]", resourceName), e);
         }
     }
 }

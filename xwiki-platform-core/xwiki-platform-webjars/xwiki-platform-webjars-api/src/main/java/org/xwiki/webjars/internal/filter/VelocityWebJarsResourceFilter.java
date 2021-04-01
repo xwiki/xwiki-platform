@@ -35,7 +35,7 @@ import org.xwiki.velocity.VelocityManager;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Evaluates the velocity content inside the request webjars resource.
+ * Evaluates the velocity content inside the requested WebJars resource.
  *
  * @version $Id$
  * @since 13.3RC1
@@ -52,7 +52,7 @@ public class VelocityWebJarsResourceFilter implements WebJarsResourceFilter
     private VelocityManager velocityManager;
 
     @Override
-    public InputStream handle(InputStream resourceStream, String resourceName)
+    public InputStream filter(InputStream resourceStream, String resourceName)
         throws ResourceReferenceHandlerException
     {
         try {

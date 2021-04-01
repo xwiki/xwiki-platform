@@ -98,9 +98,9 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
         if (!isResourceCacheable(resourceReference)) {
             String resourceName = getResourceName(resourceReference);
             if (resourceName.endsWith(LESS_FILE_EXTENSION)) {
-                stream = this.lessFilter.handle(resourceStream, resourceName);
+                stream = this.lessFilter.filter(resourceStream, resourceName);
             } else {
-                stream = this.velocityFilter.handle(resourceStream, resourceName);
+                stream = this.velocityFilter.filter(resourceStream, resourceName);
             }
         } else {
             stream = super.filterResource(resourceReference, resourceStream);
@@ -121,6 +121,9 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
         WebJarsResourceReference resourceReference) throws IOException
     {
         String mimeType;
+        // When the resource is not cacheable and the request resource is a less file, we compile it to css.
+        // In this case, the content type must be explicitly set to text/css instead of the default text/x-less
+        // that would otherwise be computed from the resource filename.
         if (!isResourceCacheable(resourceReference) && getResourceName(resourceReference)
             .endsWith(LESS_FILE_EXTENSION))
         {

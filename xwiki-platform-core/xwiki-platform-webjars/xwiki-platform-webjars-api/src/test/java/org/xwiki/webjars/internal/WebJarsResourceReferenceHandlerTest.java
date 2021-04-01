@@ -199,7 +199,7 @@ class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        when(this.velocityFilter.handle(any(), any()))
+        when(this.velocityFilter.filter(any(), any()))
             .thenAnswer(invocation -> new ByteArrayInputStream("evaluated content".getBytes()));
 
         this.handler.handle(reference, this.chain);
@@ -226,7 +226,7 @@ class WebJarsResourceReferenceHandlerTest
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
 
-        when(this.velocityFilter.handle(any(), any())).thenThrow(new ResourceReferenceHandlerException(
+        when(this.velocityFilter.filter(any(), any())).thenThrow(new ResourceReferenceHandlerException(
             "Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
             new VelocityException("Bad code!")));
 
@@ -269,7 +269,7 @@ class WebJarsResourceReferenceHandlerTest
         InputStream stream = this.handler.filterResource(resourceReference, resourceStream);
         assertNotSame(resourceStream, stream);
         verifyNoInteractions(resourceStream);
-        verify(this.lessFilter).handle(resourceStream, "testdirectory/testfile.less");
+        verify(this.lessFilter).filter(resourceStream, "testdirectory/testfile.less");
     }
 
     @Test

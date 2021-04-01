@@ -85,7 +85,7 @@ class VelocityWebJarsResourceFilterTest
                 return true;
             });
 
-        InputStream handle = this.resourceFilter.handle(mock(InputStream.class), "resourceName.css");
+        InputStream handle = this.resourceFilter.filter(mock(InputStream.class), "resourceName.css");
 
         verify(this.velocityEngine)
             .evaluate(eq(this.velocityContext), any(Writer.class), eq("resourceName.css"), any(Reader.class));
@@ -101,7 +101,7 @@ class VelocityWebJarsResourceFilterTest
 
         ResourceReferenceHandlerException exception =
             assertThrows(ResourceReferenceHandlerException.class,
-                () -> this.resourceFilter.handle(mock(InputStream.class), "resourceName.css"));
+                () -> this.resourceFilter.filter(mock(InputStream.class), "resourceName.css"));
 
         assertEquals("Failed to evaluate the Velocity code from WebJar resource [resourceName.css]",
             exception.getMessage());

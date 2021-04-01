@@ -63,7 +63,7 @@ class LessWebJarsResourceFilterTest
         when(this.lessCompiler.compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false)))
             .thenReturn("some content");
 
-        InputStream stream = this.resourceFilter.handle(mock(InputStream.class), "resourceName.less");
+        InputStream stream = this.resourceFilter.filter(mock(InputStream.class), "resourceName.less");
 
         verify(this.lessCompiler).compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false));
         assertEquals("some content", IOUtils.toString(stream, StandardCharsets.UTF_8));
@@ -76,7 +76,7 @@ class LessWebJarsResourceFilterTest
             .thenThrow(LESSCompilerException.class);
 
         ResourceReferenceHandlerException exception = assertThrows(ResourceReferenceHandlerException.class,
-            () -> this.resourceFilter.handle(mock(InputStream.class), "resourceName.less"));
+            () -> this.resourceFilter.filter(mock(InputStream.class), "resourceName.less"));
 
         assertEquals("Error when compiling the resource [resourceName.less]", exception.getMessage());
         assertThat(exception.getCause(), instanceOf(LESSCompilerException.class));

@@ -1,23 +1,23 @@
 /*
-        * See the NOTICE file distributed with this work for additional
-        * information regarding copyright ownership.
-        *
-        * This is free software; you can redistribute it and/or modify it
-        * under the terms of the GNU Lesser General Public License as
-        * published by the Free Software Foundation; either version 2.1 of
-        * the License, or (at your option) any later version.
-        *
-        * This software is distributed in the hope that it will be useful,
-        * but WITHOUT ANY WARRANTY; without even the implied warranty of
-        * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-        * Lesser General Public License for more details.
-        *
-        * You should have received a copy of the GNU Lesser General Public
-        * License along with this software; if not, write to the Free
-        * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-        * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-        */
-        package org.xwiki.web;
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.web;
 
 import java.util.Arrays;
 
@@ -52,12 +52,12 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @ComponentList({
-        // Security SS so that $service.security.* calls in the vm work and their behavior controlled.
-        SecurityScriptService.class,
-        SecurityAuthorizationScriptService.class,
-        RightConverter.class,
-        // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
-        SkinExtensionAsync.class
+    // Security SS so that $service.security.* calls in the vm work and their behavior controlled.
+    SecurityScriptService.class,
+    SecurityAuthorizationScriptService.class,
+    RightConverter.class,
+    // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
+    SkinExtensionAsync.class
 })
 class DocumentTagsTest extends TemplateTest
 {
@@ -69,9 +69,9 @@ class DocumentTagsTest extends TemplateTest
 
         // Enable the ssfx/jsfx plugins
         oldcore.getSpyXWiki().getPluginManager().addPlugin("ssfx", CssSkinFileExtensionPlugin.class.getName(),
-                oldcore.getXWikiContext());
+            oldcore.getXWikiContext());
         oldcore.getSpyXWiki().getPluginManager().addPlugin("jsfx", JsSkinFileExtensionPlugin.class.getName(),
-                oldcore.getXWikiContext());
+            oldcore.getXWikiContext());
 
         // Set up the current doc in the context so that $doc is bound in scripts
         DocumentReference documentReference = new DocumentReference("xwiki", "space", "page");
@@ -113,8 +113,8 @@ class DocumentTagsTest extends TemplateTest
         // - No tag is listed after the tag label
         // - The "+" link is displayed since the user has edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags \" id=\"xdocTags\"> core.tags.list.label "
-                + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
-                + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
+            + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
+            + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
     }
 
     @Test
@@ -137,10 +137,10 @@ class DocumentTagsTest extends TemplateTest
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags \" id=\"xdocTags\"> core.tags.list.label "
-                + "<span class=\"tag-wrapper\"><span class=\"tag\">"
+            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
                 + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span></span> "
-                + "<span class=\"tag-wrapper\"><span class=\"tag\">"
+            + "<span class=\"tag-wrapper\"><span class=\"tag\">"
                 + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag2\">tag2</a></span></span> "
-                + "</div>"));
+            + "</div>"));
     }
 }

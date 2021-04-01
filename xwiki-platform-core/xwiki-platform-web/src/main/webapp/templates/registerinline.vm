@@ -44,7 +44,6 @@
     <form id="register" action="" method="post" class="xform third">
       <div>
         <input type="hidden" name="form_token" value="$!services.csrf.token" />
-        <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
         <input type="hidden" name="register" value="1" />
         <input type="hidden" name="xredirect" value="$!request.xredirect" />
         #set ($class = $xwiki.getClass('XWiki.XWikiUsers'))

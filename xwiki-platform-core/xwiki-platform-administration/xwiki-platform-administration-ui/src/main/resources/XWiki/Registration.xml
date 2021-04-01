@@ -293,17 +293,6 @@
       })
     #set($discard = $fields.add($field))
   #end
-  ##
-  ## Pass the name of the template to $xwiki.createUser so any contained information will be passed in.
-  #set($field =
-    {'name' : 'template',
-      'params' : {
-        'type' : 'hidden',
-        'value' : 'XWiki.XWikiUserTemplate'
-      }
-    })
-  #set($discard = $fields.add($field))
-  ##
   ## Pass the redirect parameter on so that the login page may redirect to the right place.
   ## Not necessary in Firefox 3.0.10 or Opera 9.64, I don't know about IE or Safari.
   #set($field =

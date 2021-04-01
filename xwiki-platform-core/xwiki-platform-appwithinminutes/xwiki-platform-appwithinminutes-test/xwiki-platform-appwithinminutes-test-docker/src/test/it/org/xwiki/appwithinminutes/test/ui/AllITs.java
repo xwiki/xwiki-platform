@@ -49,10 +49,16 @@ public class AllITs
     class NestedStaticListClassFieldIT extends StaticListClassFieldIT
     {
     }
-    
+
     @Nested
     @DisplayName("LiveTable Generator test")
     class NestedLiveTableGeneratorIT extends LiveTableGeneratorIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Add entry test")
+    class NestedAddEntryIT extends AddEntryIT
     {
     }
 }

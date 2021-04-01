@@ -24,6 +24,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
+import org.xwiki.appwithinminutes.test.po.ListClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.StaticListClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.StaticListItemsEditor;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -39,7 +40,8 @@ import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEd
  * Special class editor tests that address only the Static List class field type.
  *
  * @version $Id$
- * @since 13.2
+ * @since 13.3RC1
+ * @since 12.10.6
  */
 @UITest
 class StaticListClassFieldIT
@@ -146,5 +148,42 @@ class StaticListClassFieldIT
         // Assert the order of the items.
         staticListField.getItemByValue("value1").click();
         assertEquals(Arrays.asList("XWiki", "value1"), staticListField.getDefaultSelectedValues());
+    }
+
+    @Test
+    @Order(3)
+    void multipleSelect(TestReference testReference)
+    {
+        ApplicationClassEditPage editor = goToEditor(testReference);
+
+        // Add a new list field.
+        ListClassFieldEditPane listField = new ListClassFieldEditPane(editor.addField(this.fieldName).getName());
+
+        // Open the configuration panel and play with the multiple selection option.
+        listField.openConfigPanel();
+
+        // Radio display type should disable multiple selection.
+        listField.getMultipleSelectionCheckBox().click();
+        assertTrue(listField.getMultipleSelectionCheckBox().isSelected());
+        listField.getDisplayTypeSelect().selectByVisibleText("radio");
+        assertFalse(listField.getMultipleSelectionCheckBox().isSelected());
+
+        // Enabling multiple selection when display type is radio should change display type to check box.
+        listField.getMultipleSelectionCheckBox().click();
+        assertEquals("checkbox", listField.getDisplayTypeSelect().getFirstSelectedOption().getAttribute("value"));
+
+        // 'select' display type supports properly multiple selection only if size is greater than 1.
+        assertEquals("1", listField.getSizeInput().getAttribute("value"));
+        listField.getDisplayTypeSelect().selectByVisibleText("select");
+        assertEquals("5", listField.getSizeInput().getAttribute("value"));
+
+        // Check that the specified size is not modified if it's greater than 1.
+        listField.getSizeInput().clear();
+        listField.getSizeInput().sendKeys("2");
+        listField.getDisplayTypeSelect().selectByVisibleText("input");
+        assertTrue(listField.isReadOnly());
+        listField.getDisplayTypeSelect().selectByVisibleText("select");
+        assertFalse(listField.isReadOnly());
+        assertEquals("2", listField.getSizeInput().getAttribute("value"));
     }
 }

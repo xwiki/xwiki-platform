@@ -167,7 +167,14 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>3.6.3</version>
+      <version>4.3.2</version>
+      <exclusions>
+        <!-- Not the right id -->
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
@@ -827,6 +834,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
+                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,

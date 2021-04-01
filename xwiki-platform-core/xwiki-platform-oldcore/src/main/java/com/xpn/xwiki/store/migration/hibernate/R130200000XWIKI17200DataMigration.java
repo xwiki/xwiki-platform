@@ -155,7 +155,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
                 }
             }
         } catch (SQLException e) {
-            this.logger.error("Error while extracting metadata", e);
+            throw new DataMigrationException("Error while extracting metadata", e);
         }
 
         if (builder.length() > 0) {

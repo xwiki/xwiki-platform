@@ -117,17 +117,19 @@
         #set($hasTagsPlugin = false)
         #set($tags = $doc.getTagList())
     #end
-    <div class="doc-tags #if(!$hasedit && $tags.isEmpty() )hidden#end" id="${tagsId}">
+    <div class="doc-tags#if(!$hasedit && $tags.isEmpty()) hidden#end" id="${tagsId}">
         $services.localization.render('core.tags.list.label')
         #if(!$tags.isEmpty())
             #foreach($tag in $tags)
                 #displayTag($tag)
             #end
         #end
-        #if($hasedit)
-            #if($xwiki.tag)
-                <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')" rel="nofollow">[+]</a>#else #displayAddForm()#end</div>
-            #end
+        #if($hasedit && $xwiki.tag)
+            <div class="tag-tool tag-add">
+                #if("$!{request.showTagAddForm}" == '')
+                    <a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')" rel="nofollow">[+]</a>
+                #{else}#displayAddForm()#end
+            </div>
         #end
     </div>
 

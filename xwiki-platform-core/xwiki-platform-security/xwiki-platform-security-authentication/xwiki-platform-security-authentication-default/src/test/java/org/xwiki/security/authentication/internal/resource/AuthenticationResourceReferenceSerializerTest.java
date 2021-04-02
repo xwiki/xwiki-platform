@@ -24,26 +24,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 
-import com.xpn.xwiki.XWikiContext;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link AuthenticationResourceReferenceSerializer}.
@@ -55,18 +46,6 @@ class AuthenticationResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private AuthenticationResourceReferenceSerializer serializer;
-
-    private XWikiContext xWikiContext;
-
-    @BeforeComponent
-    void setup(MockitoComponentManager componentManager) throws Exception
-    {
-        Provider<XWikiContext> contextProvider = componentManager
-            .registerMockComponent(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        this.xWikiContext = mock(XWikiContext.class);
-        when(contextProvider.get()).thenReturn(this.xWikiContext);
-        when(this.xWikiContext.getWikiId()).thenReturn("foobar");
-    }
 
     @Test
     void serialize() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
@@ -81,7 +60,7 @@ class AuthenticationResourceReferenceSerializerTest
         Map<String, List<String>> parameters = new HashedMap();
         parameters.put("key1", Collections.singletonList("value1"));
         parameters.put("key2", Arrays.asList("value2_a", "value2_b"));
-        ExtendedURL expectedURL = new ExtendedURL(Arrays.asList("foobar", "authenticate", "forgot"), parameters);
+        ExtendedURL expectedURL = new ExtendedURL(Arrays.asList("authenticate", "forgot"), parameters);
 
         assertEquals(expectedURL, serialized);
     }

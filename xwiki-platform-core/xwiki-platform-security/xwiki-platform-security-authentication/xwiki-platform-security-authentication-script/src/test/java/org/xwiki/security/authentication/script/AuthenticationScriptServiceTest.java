@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.internet.InternetAddress;
 
@@ -50,6 +51,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -93,6 +95,10 @@ class AuthenticationScriptServiceTest
 
     @MockComponent
     private ContextualAuthorizationManager authorizationManager;
+
+    @MockComponent
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -173,7 +179,10 @@ class AuthenticationScriptServiceTest
 
         ExtendedURL extendedURL = mock(ExtendedURL.class);
         when(this.defaultResourceReferenceSerializer.serialize(resourceReference)).thenReturn(extendedURL);
-        when(extendedURL.serialize()).thenReturn("http://something");
+
+        ExtendedURL extendedURLNormalized = mock(ExtendedURL.class);
+        when(this.urlNormalizer.normalize(extendedURL)).thenReturn(extendedURLNormalized);
+        when(extendedURLNormalized.serialize()).thenReturn("http://something");
 
         assertEquals("http://something", this.scriptService.getAuthenticationURL(action, parameters));
     }

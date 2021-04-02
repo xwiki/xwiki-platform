@@ -234,7 +234,7 @@ public class ConfigurationFilesGenerator
                 String.format("jdbc:mysql://%s:%s/xwiki?useSSL=false", ipAddress, port),
                 DB_USERNAME,
                 DB_PASSWORD,
-                "com.mysql.jdbc.Driver",
+                "com.mysql.cj.jdbc.Driver",
                 null,
                 null,
                 null,

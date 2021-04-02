@@ -109,6 +109,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
+import org.xwiki.extension.event.ExtensionInitializedEvent;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -4353,7 +4354,6 @@ public class XWiki implements EventListener
         if (action.equals("skin") && SKIN_RESOURCE_SPACE_NAMES.contains(firstSpaceName)) {
             // We still need to call checkAuth to set the proper user.
             XWikiUser user = checkAuth(context);
-
             if (user != null) {
                 context.setUser(user.getUser());
             }

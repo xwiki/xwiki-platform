@@ -31,7 +31,14 @@ import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
+import org.xwiki.security.authentication.UserAuthenticatedEvent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,6 +46,19 @@ import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
+
+    private ObservationManager observationManager;
+
+    /**
+     * Used to convert a string into a proper Document Name.
+     */
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    /**
+     * Used to convert a {@link DocumentReference} into a proper {@link UserReference}.
+     */
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -56,6 +76,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             // show the basic authentication window again.
             showLogin(request.getCurrentRequest(), response);
             return true;
+        } else {
+            getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
         }
 
         return false;
@@ -73,6 +95,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             // make sure the Principal contains wiki name information
             if (!StringUtils.contains(principal.getName(), ':')) {
                 principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
+
+                getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
             }
 
             request.setUserPrincipal(principal);
@@ -218,5 +242,46 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         throws IOException
     {
         showLogin(request, response, this.realmName);
+    }
+
+    private ObservationManager getObservationManager() {
+        if ( this.observationManager == null ) {
+            this.observationManager = Utils.getComponent(ObservationManager.class);
+        }
+        return this.observationManager;
+    }
+
+    private DocumentReferenceResolver<String> getDocumentReferenceResolver() {
+        if ( this.documentReferenceResolver == null ) {
+            this.documentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        }
+        return this.documentReferenceResolver;
+    }
+
+    private UserReferenceResolver<DocumentReference> getUserReferenceResolver() {
+        if ( this.userReferenceResolver == null ) {
+            this.userReferenceResolver =
+                Utils.getComponent(new DefaultParameterizedType(UserReferenceResolver.class,DocumentReference.class),
+                    "current");
+        }
+        return this.userReferenceResolver;
+    }
+
+    private UserReference getContextUserReference(Principal principal)
+    {
+        UserReference contextUserReference;
+
+        if (principal != null) {
+            // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
+            // as the current wiki.
+            DocumentReference userDocumentReference =
+                getDocumentReferenceResolver().resolve(principal.getName());
+            contextUserReference = getUserReferenceResolver().resolve(userDocumentReference);
+        } else {
+            contextUserReference = null;
+        }
+
+        return contextUserReference;
     }
 }

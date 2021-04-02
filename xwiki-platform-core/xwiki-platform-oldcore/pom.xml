@@ -167,7 +167,14 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>3.6.3</version>
+      <version>4.3.2</version>
+      <exclusions>
+        <!-- Not the right id -->
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>

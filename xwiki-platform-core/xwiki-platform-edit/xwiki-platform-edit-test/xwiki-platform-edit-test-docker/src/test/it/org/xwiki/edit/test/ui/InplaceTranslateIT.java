@@ -95,7 +95,7 @@ class InplaceTranslateIT
         assertFalse(viewPage.getTranslateButton().isDisplayed());
         assertEquals("title EN", viewPage.getDocumentTitle());
 
-        viewPage.setDocumentTitle("title FR").saveAndView();
+        viewPage.setDocumentTitle("title FR").saveAndView("Enregistr\u00E9");
         assertEquals("title FR", viewPage.getDocumentTitle());
         assertFalse(viewPage.getTranslateButton().isDisplayed());
 
@@ -103,7 +103,7 @@ class InplaceTranslateIT
         viewPage.editInplace();
         assertEquals("title FR", viewPage.getDocumentTitle());
 
-        viewPage.setDocumentTitle("French Title").saveAndView();
+        viewPage.setDocumentTitle("French Title").saveAndView("Enregistr\u00E9");
         assertEquals("French Title", viewPage.getDocumentTitle());
 
         infoPane = viewPage.openInformationDocExtraPane();
@@ -128,7 +128,7 @@ class InplaceTranslateIT
         assertFalse(viewPage.getTranslateButton().isDisplayed());
         assertEquals("title EN", viewPage.getDocumentTitle());
 
-        viewPage.setDocumentTitle("title DE").saveAndView();
+        viewPage.setDocumentTitle("title DE").saveAndView("Gespeichert");
         assertEquals("title DE", viewPage.getDocumentTitle());
         assertFalse(viewPage.getTranslateButton().isDisplayed());
 
@@ -175,7 +175,7 @@ class InplaceTranslateIT
         assertFalse(viewPage.hasTranslateButton());
         assertEquals("title DE", viewPage.getDocumentTitle());
 
-        viewPage.editInplace().setDocumentTitle("Deutsch Title").saveAndView();
+        viewPage.editInplace().setDocumentTitle("Deutsch Title").saveAndView("Gespeichert");
         assertEquals("Deutsch Title", viewPage.getDocumentTitle());
 
         //

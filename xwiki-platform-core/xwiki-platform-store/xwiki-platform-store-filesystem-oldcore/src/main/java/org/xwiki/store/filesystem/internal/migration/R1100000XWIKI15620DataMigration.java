@@ -30,7 +30,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -213,8 +212,9 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     {
         boolean foundFile = false;
 
-        int indexOfExtension = FilenameUtils.indexOfExtension(attachmentName);
-        String baseAttachmentName = FilenameUtils.removeExtension(attachmentName);
+        int indexOfExtension = attachmentName.lastIndexOf('.');
+        String baseAttachmentName =
+            indexOfExtension >= 0 ? attachmentName.substring(0, indexOfExtension) : attachmentName;
 
         for (File file : attachmentDirectory.listFiles()) {
             String decodedFileName = FileSystemStoreUtils.decode(file.getName());

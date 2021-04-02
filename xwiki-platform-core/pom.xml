@@ -126,14 +126,7 @@
               </item>
             </revapi.ignore>
             -->
-            <revapi.ignore>
-              <item>
-                <code>java.class.noLongerInheritsFromClass</code>
-                <old>class com.xpn.xwiki.web.SaveAction</old>
-                <new>class com.xpn.xwiki.web.SaveAction</new>
-                <justification>Should not have any impact in practice.</justification>
-              </item>
-            </revapi.ignore>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

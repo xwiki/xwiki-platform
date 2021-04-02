@@ -50,7 +50,7 @@
 <tr class="diff-conflict-resolution">
   <td class="diff-line-number"><span class="fa fa-pencil"></span></td>
   <td class="diff-line-number"></td>
-  <td class="diff-line" id="conflict_decision_container_$block.conflict.reference">
+  <td class="diff-line diff-line-decision" id="conflict_decision_container_$block.conflict.reference">
     #displayConflictValue($block.conflict "current")
     #displayConflictValue($block.conflict "previous")
     #displayConflictValue($block.conflict "next")

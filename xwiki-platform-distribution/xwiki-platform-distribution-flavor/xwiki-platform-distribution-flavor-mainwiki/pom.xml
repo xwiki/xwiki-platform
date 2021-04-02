@@ -68,12 +68,5 @@
       <type>xar</type>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-help-center</artifactId>
-      <version>1.5.4</version>
-      <type>xar</type>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 </project>

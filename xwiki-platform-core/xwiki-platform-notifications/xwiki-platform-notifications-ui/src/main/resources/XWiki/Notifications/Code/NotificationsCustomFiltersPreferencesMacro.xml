@@ -271,11 +271,14 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
     self.docURL = docURL;
     self.filterTypeSelector = modal.find('select#notificationFilterTypeSelector');
     self.eventTypeSelector = modal.find('select#notificationFilterEventTypeSelector');
-    self.notificationFormatSelector = modal.find('input[name=notificationFilterNotificationFormatSelector]:checked');
     self.filterScopeTree = modal.find('.location-tree');
     self.cancelButton = modal.find('button[data-action="cancel"]');
     self.submitButton = modal.find('button[data-action="submit"]');
-
+    
+    self.getFormats = function () {
+      return self.modal.find('input[name=notificationFilterNotificationFormatSelector]:checked').map(function () { return $(this).val();}).get().join(',');
+    };
+    
     /**
      * Initialization
      */
@@ -285,7 +288,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         self.submitButton.prop('disabled', 'disabled');
 
         self.filterScopeTree.on('changed.jstree', function(e, data) {
-          if (data.selected.length &gt; 0 &amp;&amp; self.notificationFormatSelector.val() !== undefined) {
+          if (data.selected.length &gt; 0 &amp;&amp; self.getFormats() !== "") {
             self.submitButton.prop('disabled', '');
           }
         });
@@ -306,7 +309,6 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
 
       var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
       var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
-      var filterFormats = self.notificationFormatSelector.map(function () { return $(this).val();}).get().join(',');
       var eventTypesSelected = self.eventTypeSelector.val();
       var eventTypes;
       if (eventTypesSelected != null &amp;&amp; eventTypesSelected.length &gt; 0) {
@@ -318,7 +320,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         action: 'createScopeFilterPreference',
         target: target,
         filterType: self.filterTypeSelector.val(),
-        filterFormats: filterFormats,
+        filterFormats: self.getFormats(),
         eventTypes: eventTypes,
         csrf: xm.form_token,
         wiki: [],
@@ -328,7 +330,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       if (target == 'user') {
         params['user'] = self.modal.data('user');
       }
-      
+
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var reference = node.data.id;

@@ -230,6 +230,4 @@ El formato completo de un enlace es **##[etiqueta&gt;&gt;] (recurso) [||parámet
 ** **##cadenaDeConsulta##**: Una cadena de consulta opcional que especifica los parámetros que serán añadidos a la dirección destino del enlace y utilizados en la URL renderizada. Ejemplo: ##url:http:~/~/dominio.com/ruta||queryString="midato1=5&amp;midato2=Hola"## produce la dirección destino #http:~/~/dominio.com/ruta?midato1=5&amp;midato2=Hola##
 ** **##anchor##**: Un nombre de ancla opcional que apunta a un ancla definida en el enlace referenciado. Ten en cuenta que en XWiki se crean anclas automáticamente para los encabezados. Ejemplo: ##url:http:~/~/dominio.com/ruta||anchor="HTablaDeContenidos"## produce la dirección destino ##http:~/~/dominio.com/ruta#HTablaDeContenidos##
 ** **##target##**: Un parámetro opcional que permite abrir el destino del enlace en una ventana nueva. Ejemplo: ##target="~_blank"##</content>
-  
-  
 </xwikidoc>

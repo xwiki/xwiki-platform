@@ -92,10 +92,10 @@ class DocumentTagsTest extends TemplateTest
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
         // Verify that the generated HTML matches the expectation:
-        // - The tag label is displayed
+        // - The tag label is supposed to not be displayed
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags hidden\" id=\"xdocTags\"> core.tags.list.label </div>"));
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags hidden\\E\" id=\"xdocTags\"> core.tags.list.label </div>"));
     }
 
     @Test
@@ -112,7 +112,7 @@ class DocumentTagsTest extends TemplateTest
         // - The tag label is displayed
         // - No tag is listed after the tag label
         // - The "+" link is displayed since the user has edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags \" id=\"xdocTags\"> core.tags.list.label "
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
             + "<div class=\"tag-tool tag-add\"><a href=\"\\E.*\"\\Q title=\"core.tags.add.tooltip\" "
             + "rel=\"nofollow\">[+]</a></div> </div>\\E"));
     }
@@ -136,8 +136,7 @@ class DocumentTagsTest extends TemplateTest
         // - The tag label is displayed
         // - The tags after the tag label
         // - No "+" link is displayed since the user doesn't have edit right
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags \" id=\"xdocTags\"> core.tags.list.label "
-
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
             + "<span class=\"tag-wrapper\"><span class=\"tag\">"
                 + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span></span> "
             + "<span class=\"tag-wrapper\"><span class=\"tag\">"

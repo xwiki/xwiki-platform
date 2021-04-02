@@ -79,7 +79,10 @@ public class ListClassTest
         assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a ,b", ", ", false));
         assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a , b", ", ", false));
         assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a  b", ", ", false));
-        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a,,b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a    b", ", ", false));
+        assertEquals(Arrays.asList("a", "", "b"), ListClass.getListFromString("a,,b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a,|,b", "|, ", false));
+        assertEquals(Arrays.asList("a", "", "b"), ListClass.getListFromString("a,||b", "|, ", false));
     }
 
     /**

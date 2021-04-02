@@ -19,10 +19,9 @@
  */
 package org.xwiki.security.authentication;
 
-import org.xwiki.observation.event.AbstractCancelableEvent;
+import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * This event is triggered every time a user is authenticated.
@@ -37,7 +36,7 @@ import org.xwiki.user.UserReferenceSerializer;
  * @since 13.3RC1
  */
 @Unstable
-public class UserAuthenticationEvent extends AbstractCancelableEvent
+public class UserAuthenticatedEvent extends AbstractFilterableEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -46,14 +45,14 @@ public class UserAuthenticationEvent extends AbstractCancelableEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * Used to serialize user reference.
+     * Reference of the user who triggered the authentication event.
      */
-    private static final UserReferenceSerializer<String> SERIALIZER = null;
+    private UserReference userReference;
 
     /**
      * This event will match any other document event of the same type.
      */
-    public UserAuthenticationEvent()
+    public UserAuthenticatedEvent()
     {
         super();
     }
@@ -63,8 +62,17 @@ public class UserAuthenticationEvent extends AbstractCancelableEvent
      *
      * @param userReference the reference related to the user
      */
-    public UserAuthenticationEvent(UserReference userReference)
+    public UserAuthenticatedEvent(UserReference userReference)
     {
-        super(SERIALIZER.serialize(userReference));
+        super();
+        this.userReference = userReference;
+    }
+
+    /**
+     * @return the {@link UserReference} of the source user reference.
+     */
+    public UserReference getUserReference()
+    {
+        return this.userReference;
     }
 }

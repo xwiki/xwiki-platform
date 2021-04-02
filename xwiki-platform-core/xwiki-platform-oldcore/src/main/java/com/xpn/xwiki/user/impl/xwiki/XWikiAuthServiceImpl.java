@@ -22,10 +22,12 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,11 +39,18 @@ import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+import org.xwiki.security.authentication.UserAuthenticatedEvent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -57,12 +66,15 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
+public class XWikiAuthServiceImpl extends AbstractXWikiAuthService implements EventListener
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
 
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
         new EntityReference("XWiki", EntityType.SPACE));
+
+    @Inject
+    private ObservationManager observationManager;
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -70,6 +82,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "current");
 
+    /**
+     * Used to convert a {@link DocumentReference} into a proper {@link org.xwiki.user.UserReference}.
+     */
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
     /**
      * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include the
      * wiki name as part of the serialized name since user names are saved in the database (for example as the document
@@ -80,10 +96,31 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
+
     /**
      * Each wiki has its own authenticator.
      */
     protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<String, XWikiAuthenticator>();
+
+    public UserReferenceResolver<DocumentReference> getDocumentReferenceUserReferenceResolver()
+    {
+        if ( this.documentReferenceUserReferenceResolver == null ) {
+            this.documentReferenceUserReferenceResolver =
+                Utils.getComponent(new DefaultParameterizedType(UserReferenceResolver.class,
+                    DocumentReference.class),
+                "document");
+        }
+        return this.documentReferenceUserReferenceResolver;
+    }
+
+    public ObservationManager getObservationManager()
+    {
+        if (this.observationManager == null) {
+            this.observationManager = Utils.getComponent(ObservationManager.class);
+        }
+
+        return this.observationManager;
+    }
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
@@ -249,7 +286,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
+            ObservationManager om = getObservationManager();
+
             final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
+            final UserReference userReference = getContextUserReference(wrappedRequest.getUserPrincipal(), context);
             if (LOGGER.isInfoEnabled()) {
                 if (userName != null) {
                     LOGGER.info("User " + userName + " is authentified");
@@ -259,6 +299,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             if (userName == null) {
                 return null;
             }
+
+            om.notify(new UserAuthenticatedEvent(), userReference);
 
             return new XWikiUser(userName);
         } catch (Exception e) {
@@ -298,6 +340,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
+            ObservationManager om = getObservationManager();
+
             Principal principal = wrappedRequest.getUserPrincipal();
             if (LOGGER.isInfoEnabled()) {
                 if (principal != null) {
@@ -308,6 +352,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             if (principal == null) {
                 return null;
             }
+
+            om.notify(new UserAuthenticatedEvent(),getContextUserReference(principal, context));
 
             return new XWikiUser(getContextUserName(principal, context));
         } catch (Exception e) {
@@ -332,6 +378,23 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         return contextUserName;
+    }
+
+    private UserReference getContextUserReference(Principal principal, XWikiContext context)
+    {
+        UserReference contextUserReference;
+
+        if (principal != null) {
+            // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
+            // as the current wiki.
+            DocumentReference userDocumentReference =
+                this.currentDocumentReferenceResolver.resolve(principal.getName());
+            contextUserReference = this.getDocumentReferenceUserReferenceResolver().resolve(userDocumentReference);
+        } else {
+            contextUserReference = null;
+        }
+
+        return contextUserReference;
     }
 
     @Override
@@ -605,5 +668,27 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         return strippedURL;
+    }
+
+    private static final List<Event> LISTENER_EVENTS = Arrays.<Event>asList(new UserAuthenticatedEvent());
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return LISTENER_EVENTS;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        if (event instanceof UserAuthenticatedEvent) {
+            LOGGER.info("Authenticated user [{}]", source.toString());
+        }
+    }
+
+    @Override
+    public String getName()
+    {
+        return "xwiki-auth";
     }
 }

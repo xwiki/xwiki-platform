@@ -58,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -167,7 +166,6 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authentication.UserAuthenticationEvent;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -177,8 +175,6 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
@@ -420,8 +416,6 @@ public class XWiki implements EventListener
     private EntityReferenceResolver<String> currentMixedEntityReferenceResolver;
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
-
-    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     private EntityReferenceSerializer<String> localStringEntityReferenceSerializer;
 
@@ -742,17 +736,6 @@ public class XWiki implements EventListener
         }
 
         return this.relativeEntityReferenceResolver;
-    }
-
-    private UserReferenceResolver<DocumentReference> getUserReferenceResolver()
-    {
-        if (this.documentReferenceUserReferenceResolver == null) {
-            this.documentReferenceUserReferenceResolver = Utils.getComponent(new DefaultParameterizedType(UserReferenceResolver.class,
-                    DocumentReference.class),
-                "document");
-        }
-
-        return this.documentReferenceUserReferenceResolver;
     }
 
     private EntityReferenceSerializer<String> getLocalStringEntityReferenceSerializer()
@@ -4373,8 +4356,6 @@ public class XWiki implements EventListener
 
             if (user != null) {
                 context.setUser(user.getUser());
-                UserReference userReference = getUserReferenceResolver().resolve(user.getUserReference());
-                getObservationManager().notify(new UserAuthenticationEvent(userReference), user);
             }
 
             // Always allow.

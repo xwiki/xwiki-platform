@@ -9,4 +9,3 @@ org.xwiki.security.authentication.internal.resource.AuthenticationResourceRefere
 org.xwiki.security.authentication.internal.resource.AuthenticationResourceReferenceSerializer
 org.xwiki.security.authentication.internal.DefaultResetPasswordManager
 org.xwiki.security.authentication.internal.ResetPasswordMailSender
-org.xwiki.security.authentication.internal.UserAuthenticationLoggerListener

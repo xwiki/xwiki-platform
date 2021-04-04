@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -73,7 +73,7 @@ TourCode.StepClass_order=Ordre
 TourCode.StepClass_element=Élément (Sélecteur CSS identifiant un élément)
 TourCode.StepClass_title=Titre
 TourCode.StepClass_content=Contenu
-TourCode.StepClass_backdrop=Backdrop
+TourCode.StepClass_backdrop=Arrière-plan
 TourCode.StepClass_placement=Emplacement
 TourCode.StepClass_targetPage=Page cible
 TourCode.StepClass_action=Action cible
@@ -98,5 +98,6 @@ tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour !
 
 # Template
 tour.template.name=Visite guidée
-tour.template.description=Tour étape par étape</content>
+tour.template.description=Tour étape par étape
+</content>
 </xwikidoc>

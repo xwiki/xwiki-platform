@@ -102,17 +102,6 @@
     <filter-class>org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</filter-class>
   </filter>
 
-  <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
-  <filter>
-    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
-    <filter-class>org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</filter-class>
-    <!-- A parameter used to identify the request as a an XML-RPC call -->
-    <init-param>
-      <param-name>mode</param-name>
-      <param-value>2</param-value>
-    </init-param>
-  </filter>
-
   <!-- This filter is used to add the 'Content-Type-Script' header to the HTTP response. -->
   <filter>
     <filter-name>Set Content-Script-Type</filter-name>

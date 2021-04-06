@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.store.migration.hibernate;
+package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

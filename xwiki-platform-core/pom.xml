@@ -126,7 +126,13 @@
               </item>
             </revapi.ignore>
             -->
-            
+            <revapi.ignore>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.store.migration.hibernate.MigrationResourceAccessor</old>
+                <justification>Was never meant to be public</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

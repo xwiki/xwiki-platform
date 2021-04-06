@@ -25,19 +25,22 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>13.2-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-ui</artifactId>
   <name>XWiki Platform - Refactoring - UI</name>
   <description>Administration UI for the refactoring operations</description>
   <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Refactoring Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

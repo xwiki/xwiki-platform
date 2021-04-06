@@ -43,4 +43,22 @@ public class AllITs
     class NestedWizardIT extends WizardIT
     {
     }
+
+    @Nested
+    @DisplayName("StaticListClassField test")
+    class NestedStaticListClassFieldIT extends StaticListClassFieldIT
+    {
+    }
+
+    @Nested
+    @DisplayName("LiveTable Generator test")
+    class NestedLiveTableGeneratorIT extends LiveTableGeneratorIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Add entry test")
+    class NestedAddEntryIT extends AddEntryIT
+    {
+    }
 }

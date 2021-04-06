@@ -7,3 +7,4 @@ org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerComponen
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerDocumentInitializer
 org.xwiki.notifications.filters.internal.migrators.NotificationFilterPreferencesMigrator
 org.xwiki.notifications.filters.internal.migrators.ScopeNotificationFilterClassMigrator
+org.xwiki.notifications.filters.internal.UserAddedEventListener

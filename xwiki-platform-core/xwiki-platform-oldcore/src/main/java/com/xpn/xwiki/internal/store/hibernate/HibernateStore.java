@@ -66,6 +66,7 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -1145,7 +1146,15 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public String getConfiguredTableName(PersistentClass persistentClass)
     {
-        String tableName = persistentClass.getTable().getName();
+        return getConfiguredTableName(persistentClass.getTable());
+    }
+
+    /**
+     * @since 13.2
+     */
+    public String getConfiguredTableName(Table table)
+    {
+        String tableName = table.getName();
         // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
         if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
             tableName = tableName.toUpperCase();

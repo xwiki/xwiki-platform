@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -183,6 +185,28 @@ public class TreeElement extends BaseElement
         }
 
         return new ArrayList<String>();
+    }
+
+    /**
+     * Allow to select multiple nodes at once by maintaining ctrl key pressed while clicking on nodes.
+     * @param nodes the nodes to select.
+     * @since 13.3RC1
+     */
+    public void selectNodes(TreeNodeElement... nodes)
+    {
+        this.clearSelection();
+        List<WebElement> webElements = new ArrayList<>();
+        for (TreeNodeElement node : nodes) {
+            if (!node.isSelected()) {
+                webElements.add(node.getLabelElement());
+            }
+        }
+
+        Actions actions = getDriver().createActions().keyDown(Keys.CONTROL);
+        for (WebElement webElement : webElements) {
+            actions = actions.click(webElement);
+        }
+        actions.keyUp(Keys.CONTROL).build().perform();
     }
 
     /**

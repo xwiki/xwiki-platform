@@ -95,7 +95,11 @@ public class TreeNodeElement extends BaseElement
         return getLabelElement().getText();
     }
 
-    private WebElement getLabelElement()
+    /**
+     * @return the label element to allow performing actions on it.
+     * @since 13.3RC1
+     */
+    public WebElement getLabelElement()
     {
         String labelId = getElement().getAttribute("aria-labelledby");
         return getElement().findElement(By.id(labelId));

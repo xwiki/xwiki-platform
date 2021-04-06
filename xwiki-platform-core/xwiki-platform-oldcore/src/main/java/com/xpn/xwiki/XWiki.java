@@ -109,10 +109,13 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
+import org.xwiki.extension.event.ExtensionInitializedEvent;
+import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.annotation.Serializable;
+import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -6012,62 +6015,77 @@ public class XWiki implements EventListener
         this.groupService = groupService;
     }
 
-    // added some log statements to make debugging easier - LBlaze 2005.06.02
+    private Class<? extends XWikiAuthService> getAuthServiceClass() throws ClassNotFoundException
+    {
+        String authClass = getConfiguration().getProperty("xwiki.authentication.authclass");
+        if (StringUtils.isEmpty(authClass)) {
+            if (isLDAP()) {
+                authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
+            } else {
+                authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
+            }
+        }
+
+        // Get main wiki ClassLoader
+        ClassLoaderManager clManager = Utils.getComponent(ClassLoaderManager.class);
+        ClassLoader classloader = null;
+        if (clManager != null) {
+            classloader = clManager.getURLClassLoader("wiki:xwiki", false);
+        }
+
+        // Get the class
+        if (classloader != null) {
+            return (Class<? extends XWikiAuthService>) Class.forName(authClass, true, classloader);
+        } else {
+            return (Class<? extends XWikiAuthService>) Class.forName(authClass);
+        }
+    }
+
     public XWikiAuthService getAuthService()
     {
         synchronized (this.AUTH_SERVICE_LOCK) {
             if (this.authService == null) {
-
                 LOGGER.info("Initializing AuthService...");
 
-                String authClass = getConfiguration().getProperty("xwiki.authentication.authclass");
-                if (StringUtils.isNotEmpty(authClass)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Using custom AuthClass " + authClass + ".");
-                    }
-                } else {
-                    if (isLDAP()) {
-                        authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
-                    } else {
-                        authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
-                    }
-
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Using default AuthClass " + authClass + ".");
-                    }
-                }
-
                 try {
-                    // Get the current ClassLoader
-                    @SuppressWarnings("deprecation")
-                    ClassLoaderManager clManager = Utils.getComponent(ClassLoaderManager.class);
-                    ClassLoader classloader = null;
-                    if (clManager != null) {
-                        classloader = clManager.getURLClassLoader("wiki:xwiki", false);
-                    }
+                    Class<? extends XWikiAuthService> authClass = getAuthServiceClass();
 
-                    // Get the class
-                    if (classloader != null) {
-                        this.authService = (XWikiAuthService) Class.forName(authClass, true, classloader).newInstance();
-                    } else {
-                        this.authService = (XWikiAuthService) Class.forName(authClass).newInstance();
-                    }
-
-                    LOGGER.debug("Initialized AuthService using Relfection.");
+                    setAuthService(authClass);
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to initialize AuthService " + authClass
-                        + " using Reflection, trying default implementations using 'new'.", e);
+                    LOGGER.warn("Failed to get the configured AuthService class, fallbacking on standard authenticator",
+                        e);
 
                     this.authService = new XWikiAuthServiceImpl();
 
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(
-                            "Initialized AuthService " + this.authService.getClass().getName() + " using 'new'.");
+                        LOGGER.debug("Initialized AuthService {} using 'new'.", this.authService.getClass().getName());
                     }
                 }
             }
 
             return this.authService;
+        }
+    }
+
+    private void setAuthService(Class<? extends XWikiAuthService> authClass)
+    {
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Using AuthClass {}", authClass.getName());
+            }
+
+            this.authService = authClass.newInstance();
+
+            LOGGER.debug("Initialized AuthService using Reflection.");
+        } catch (Exception e) {
+            LOGGER.warn("Failed to initialize the AuthService from class [{}], fallbacking on standard authenticator",
+                authClass.getName(), e);
+
+            this.authService = new XWikiAuthServiceImpl();
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Initialized AuthService {} using 'new'.", this.authService.getClass().getName());
+            }
         }
     }
 
@@ -7805,7 +7823,10 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
+        if (event instanceof JobFinishedEvent) {
+            // An extension just been initialized (after an install or upgrade for example)
+            onJobFinished((JobFinishedEvent) event);
+        } else if (event instanceof WikiDeletedEvent) {
             // A wiki has been deleted
             onWikiDeletedEvent((WikiDeletedEvent) event);
         } else if (event instanceof ComponentDescriptorAddedEvent) {
@@ -7824,6 +7845,31 @@ public class XWiki implements EventListener
                         getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
                 }
             }
+        }
+    }
+
+    private void onJobFinished(JobFinishedEvent event)
+    {
+        // Skip it if:
+        // * the authenticator was not yet initialized
+        // * we are using the standard authenticator
+        // * the event is not related to an install job
+        if (this.authService == null || this.authService.getClass() == XWikiAuthServiceImpl.class
+            || !event.getJobType().equals(InstallJob.JOBTYPE)) {
+            return;
+        }
+
+        try {
+            // Get the class corresponding to the configuration
+            Class<? extends XWikiAuthService> authClass = getAuthServiceClass();
+
+            // If the class does not have the same reference anymore it means it's coming from a different classloader
+            // which generally imply that it's coming from an extension which has been reloaded or upgraded
+            if (this.authService.getClass() != authClass) {
+                setAuthService(authClass);
+            }
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("Failed to get the class of the configured authenticator, setting standard authenticator.", e);
         }
     }
 
@@ -7873,7 +7919,7 @@ public class XWiki implements EventListener
         Arrays.<Event>asList(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
             new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
             new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE), new WikiDeletedEvent(),
-            new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
+            new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class), new JobFinishedEvent());
 
     @Override
     public List<Event> getEvents()

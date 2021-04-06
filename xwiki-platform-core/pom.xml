@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.2-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -128,10 +128,9 @@
             -->
             <revapi.ignore>
               <item>
-                <code>java.class.noLongerInheritsFromClass</code>
-                <old>class com.xpn.xwiki.web.SaveAction</old>
-                <new>class com.xpn.xwiki.web.SaveAction</new>
-                <justification>Should not have any impact in practice.</justification>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.store.migration.hibernate.MigrationResourceAccessor</old>
+                <justification>Was never meant to be public</justification>
               </item>
             </revapi.ignore>
           </analysisConfiguration>

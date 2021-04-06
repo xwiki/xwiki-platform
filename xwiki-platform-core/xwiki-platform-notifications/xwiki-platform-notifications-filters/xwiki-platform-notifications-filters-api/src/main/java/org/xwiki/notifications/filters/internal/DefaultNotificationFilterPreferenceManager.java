@@ -37,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -55,6 +56,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 @Singleton
 public class DefaultNotificationFilterPreferenceManager implements NotificationFilterPreferenceManager
 {
+    private static final String ENABLE_ERROR_MESSAGE = "Failed to enable or disabled the filter preference [{}].";
+
     @Inject
     private ComponentManager componentManager;
 
@@ -77,8 +80,30 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
 
             return filterPreferences;
         } catch (ComponentLookupException e) {
-            throw new NotificationException(String.format("Unable to fetch a list of notification preference "
-                    + "providers with user [%s].", user));
+            throw new NotificationException(
+                String.format("Unable to fetch a list of notification preference providers with user [%s].", user));
+        }
+    }
+
+    @Override
+    public Collection<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        Set<NotificationFilterPreference> filterPreferences = new HashSet<>();
+
+        try {
+            List<NotificationFilterPreferenceProvider> providers
+                = componentManager.getInstanceList(NotificationFilterPreferenceProvider.class);
+
+            for (NotificationFilterPreferenceProvider provider : providers) {
+                filterPreferences.addAll(provider.getFilterPreferences(wikiReference));
+            }
+
+            return filterPreferences;
+        } catch (ComponentLookupException e) {
+            throw new NotificationException(
+                String.format("Unable to fetch a list of notification preference providers with wiki [%s].",
+                    wikiReference));
         }
     }
 
@@ -153,7 +178,23 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
             }
 
         } catch (ComponentLookupException e) {
-            logger.info("Failed to remove the filter preference [{}].", filterPreferenceId, e);
+            logger.info("Failed to remove the user filter preference [{}].", filterPreferenceId, e);
+        }
+    }
+
+    @Override
+    public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        try {
+            for (NotificationFilterPreferenceProvider provider
+                : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
+                NotificationFilterPreferenceProvider.class)) {
+                provider.deleteFilterPreference(wikiReference, filterPreferenceId);
+            }
+
+        } catch (ComponentLookupException e) {
+            logger.info("Failed to remove the wiki filter preference [{}].", filterPreferenceId, e);
         }
     }
 
@@ -170,7 +211,23 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
             }
 
         } catch (ComponentLookupException e) {
-            logger.info("Failed to enable or disabled the filter preference [{}].", filterPreferenceId, e);
+            logger.info(ENABLE_ERROR_MESSAGE, filterPreferenceId, e);
+        }
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException
+    {
+        try {
+            for (NotificationFilterPreferenceProvider provider
+                : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
+                NotificationFilterPreferenceProvider.class)) {
+                provider.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
+            }
+
+        } catch (ComponentLookupException e) {
+            logger.info(ENABLE_ERROR_MESSAGE, filterPreferenceId, e);
         }
     }
 

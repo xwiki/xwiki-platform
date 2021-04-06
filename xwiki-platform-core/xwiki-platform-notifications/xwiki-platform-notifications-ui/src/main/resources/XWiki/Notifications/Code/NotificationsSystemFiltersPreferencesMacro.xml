@@ -262,10 +262,10 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
   /**
   * Construct the Toggleable Filter Preference object.
   */
-  return function(domElement, userURL, row) {
+  return function(domElement, docURL, row) {
     var self               = this;
     self.domElement        = $(domElement);
-    self.userURL           = userURL;
+    self.docURL           = docURL;
     self.row               = row;
     /**
      * Initialization
@@ -286,7 +286,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       var objectNumber = self.domElement.attr('data-objectNumber');
       if (objectNumber == '') {
         // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.userURL + '/objects?media=json&amp;minorRevision=true';
+        var restURL = self.docURL + '/objects?media=json&amp;minorRevision=true';
         var params = {
           'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
           'property#filterName': filterName,
@@ -302,7 +302,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         });
       } else if (objectNumber != '') {
         // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.userURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
+        var restURL = self.docURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
           + '/properties/isEnabled?media=json&amp;minorRevision=true';
         $.ajax(restURL, {
           method: 'PUT',
@@ -422,7 +422,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'SystemToggleableFilterPreference', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, SystemToggleableFilterPreference) {
+      <code>require(['jquery', 'SystemToggleableFilterPreference', 'xwiki-meta', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, SystemToggleableFilterPreference, xm) {
   $(document).on('xwiki:livetable:notifications-filters-system:toggle', function(event, data) {
     var changedRow = $(data.row.isEnabled);
     if (changedRow.length &gt; 0) {
@@ -438,23 +438,30 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
-  var userURL = $('.systemFilterPreferences').attr('data-user-url');
-  var targetUser = $('.systemFilterPreferences').attr('data-user');
+  var target = $('.systemFilterPreferences').attr('data-target');
   
+  var docURL = $('.systemFilterPreferences').attr('data-doc-url');
+  var postParams = {
+    action: 'setFilterPreferenceEnabled',
+    csrf: xm.form_token,
+    target: target
+  };
+  if (target == 'user') {
+    var targetUser = $('.systemFilterPreferences').attr('data-user');
+    postParams['user'] = targetUser;
+  };
+
   // Callback on livetable row printing
   $(document).on('xwiki:livetable:notificationSystemFilterPreferencesLiveTable:newrow', function(event, data) {
     // Enable / Disable action for classic filter preferences
     $(data.row).find('.notificationFilterPreferenceCheckbox').on('switchChange.bootstrapSwitch', function(event, state) {
       // TODO: Translation keys
       var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
-      $.post(serviceURL, {
-        action: 'setFilterPreferenceEnabled',
+      var params = {
         filterPreferenceId: data.data.filterPreferenceId,
-        target: 'user',
-        user: targetUser,
-        enabled: state,
-        csrf: xm.form_token
-      }).done(function() {
+        enabled: state
+      };
+      $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
         notif.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         $(document).trigger('xwiki:livetable:notifications-filters-system:toggle', {'row': data.data, 'state': state});
@@ -465,7 +472,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
     });
     // Enable / Disable action for toggleable filter preferences
     $(data.row).find('.toggleableFilterPreferenceCheckbox').each(function() {
-      new SystemToggleableFilterPreference(this, userURL, data.data);
+      new SystemToggleableFilterPreference(this, docURL, data.data);
     });
   });
   
@@ -817,26 +824,17 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
-#if (!$xcontext.userReference)
-  {{info}}
-    {{translation key="notifications.settings.filters.preferences.forGuest" /}}
-  {{/info}}
-## FIXME: This check should not be needed with a proper API able to check rights on UserReference.
-## This should be improved later with such API.
-#elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.user.class.simpleName != 'DocumentUserReference')
-  {{error}}
-    This macro only allows to handle DocumentUserReference references and you specified a $wikimacro.parameters.user.class.simpleName reference.
-  {{/error}}
-#elseif ("$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
-  {{error}}
-    You don't have administration right on  $wikimacro.parameters.user.
-  {{/error}}
+#checkMacroNotificationPreferencesParameters($checkResult)
+#if ($checkResult)
+#if ($wikimacro.parameters.target == "wiki")
+  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))""")
 #else
-## TODO: We should actually manipulate only UserReferences here.
-#if ("$!wikimacro.parameters.user" != "")
-  #set ($targetUser = $wikimacro.parameters.user.reference)
-#else
-  #set ($targetUser = $xcontext.userReference)
+  #if ("$!wikimacro.parameters.user" != "")
+    #set ($targetUser = $wikimacro.parameters.user.reference)
+  #else
+    #set ($targetUser = $xcontext.userReference)
+  #end
+  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$services.model.serialize($targetUser)""")
 #end
 ######################################################
 ### CSS and JAVASCRIPTS
@@ -849,7 +847,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="systemFilterPreferences xform" data-user-url="$escapetool.xml($services.rest.url($targetUser))" data-user="$services.model.serialize($targetUser)"&gt;
+&lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
   &lt;div class="row"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))
@@ -862,12 +860,16 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
     'notificationFormats': { 'sortable': false, 'html': true, 'filterable': false },
     'isEnabled':           { 'sortable': false, 'html' : true, 'filterable': false }
   })
+  #set ($extraParams = "eventType=&amp;format=&amp;type=system")
+  #if ($wikimacro.parameters.target == 'user')
+    #set ($extraParams = "$extraParams&amp;user=${services.model.serialize($targetUser, 'default')}")
+  #end
   #set($options  = {
     'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
     'rowCount'          : 10,
     'description'       : 'This table lists every system filter registered in the wiki.',
     'translationPrefix' : 'notifications.settings.filters.preferences.system.table.',
-    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($targetUser, 'default')}&amp;type=system",
+    'extraParams'       : $extraParams,
     'outputOnlyHtml'    : true
   })
 
@@ -984,6 +986,84 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
     </property>
     <property>
       <type>org.xwiki.user.UserReference</type>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>77306320-9711-4c7f-afd2-3c92b89fbf7c</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue>user</defaultValue>
+    </property>
+    <property>
+      <description>Target of the macro (could be "user" for the given user or "wiki" for the current wiki)</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>target</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

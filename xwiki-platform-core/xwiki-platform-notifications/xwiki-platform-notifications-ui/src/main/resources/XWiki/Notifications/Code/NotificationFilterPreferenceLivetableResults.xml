@@ -55,7 +55,16 @@
 ##
 ## Build the list of NotificationFilterPreference related to the given user.
 ##
-#set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
+#if ("$!request.user" != "")
+  #set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
+  #set ($target = $request.user)
+  #set ($userTarget = true)
+## when request user is not given we are sending the list of NotificationFilterPreference of the current wiki.
+#else
+  #set ($target = $services.wiki.getCurrentWikiReference())
+  #set ($document = $xwiki.getDocument('XWiki.XWikiPreferences'))
+  #set ($userTarget = false)
+#end
 #set ($elements = [])
 #set ($index = 0)
 
@@ -78,7 +87,11 @@
   ## We display them first because we don't want them to be hidden by thousands of page filters the autowatch option
   ## might have created. It would be not good to have to go to the last page of the livetable to find out these commonly
   ## used filters.
-  #set ($filters = $services.notification.filters.getToggleableNotificationFilters($request.user))
+  #if ($userTarget)
+    #set ($filters = $services.notification.filters.getToggleableNotificationFilters($target))
+  #else
+    #set ($filters = $services.notification.filters.getWikiToggleableNotificationFilters($target))
+  #end
   #foreach ($filter in $filters)
     #set ($index = $index + 1)
     ## Optimization to render only displayed rows (between $offset and $limitOffset)
@@ -116,12 +129,20 @@
 #if ($displayCustom)
   ## Also get the list of available filters for the user
   #set ($filters = $collectiontool.arrayList)
-  #set ($discard = $filters.addAll($services.notification.filters.getFilters($request.user)))
+  #if ($userTarget)
+    #set ($discard = $filters.addAll($services.notification.filters.getFilters($target)))
+  #else
+    #set ($discard = $filters.addAll($services.notification.filters.getWikiFilters($target)))
+  #end
   #set ($filters = $collectiontool.sort($filters, ['name']))
   #set ($displayHiddenDocument = "$xwiki.getUserPreference('displayHiddenDocuments')" == '1')
   #foreach ($filter in $filters)
     #set ($filtersPreferences = $collectiontool.arrayList)
-    #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter, $request.user)))
+    #if ($userTarget)
+      #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter, $target)))
+    #else
+      #set ($discard = $filtersPreferences.addAll($services.notification.filters.getWikiFilterPreferences($filter, $target)))
+    #end
     #set ($filtersPreferences = $collectiontool.sort($filtersPreferences, ['id']))
     #foreach ($preference in $filtersPreferences)
       #set ($page = $preference.pageOnly)
@@ -202,8 +223,9 @@ $jsontool.serialize({
   &lt;/ul&gt;
 #end
 #macro (displayNotificationFormatsList $formatList)
+  #set ($sortedFormatList = $collectiontool.sort($formatList))
   &lt;ul class="list-unstyled"&gt;
-  #foreach ($notificationFormat in $formatList)
+  #foreach ($notificationFormat in $sortedFormatList)
     &lt;li&gt;$services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()")&lt;/li&gt;
   #end
   &lt;/ul&gt;

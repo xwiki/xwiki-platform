@@ -86,6 +86,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -251,6 +252,7 @@ public class MockitoOldcore
         this.spyXWiki.setRightService(this.mockRightService);
         this.spyXWiki.setAuthService(this.mockAuthService);
         this.spyXWiki.setGroupService(this.mockGroupService);
+        this.spyXWiki.setPluginManager(new XWikiPluginManager());
 
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());

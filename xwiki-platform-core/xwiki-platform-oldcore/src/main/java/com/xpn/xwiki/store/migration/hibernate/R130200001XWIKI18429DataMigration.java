@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.store.migration.hibernate;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 
@@ -30,10 +32,16 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.boot.Metadata;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Selectable;
+import org.hibernate.mapping.Table;
+import org.hibernate.mapping.Value;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.version.Version;
@@ -58,7 +66,9 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigration
 {
-    private static final int MAXSIZE = 768;
+    private static final int MAXSIZE_MIN = 720;
+
+    private static final int MAXSIZE_MAX = 768;
 
     private static final Version MYSQL57 = new DefaultVersion("5.7");
 
@@ -89,6 +99,13 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         // Nothing to do here, everything's done as part of Liquibase pre update
     }
 
+    private void warnDatabaTooOld(String databaseName, Version databaseVersion)
+    {
+        this.logger.warn(
+            "The migration cannot run on {} versions lower than {}. The short String limitation will remain 255.",
+            databaseName, databaseVersion);
+    }
+
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
@@ -105,13 +122,13 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
 
                 if (productName.equalsIgnoreCase("mariadb")) {
                     if (version.compareTo(MARIADB102) < 0) {
-                        this.logger.warn("The migration cannot run on MariaDB versions lower than 10.2");
+                        warnDatabaTooOld("MariaDB", MARIADB102);
 
                         return false;
                     }
                 } else {
                     if (version.compareTo(MYSQL57) < 0) {
-                        this.logger.warn("The migration cannot run on MySQL versions lower than 5.7");
+                        warnDatabaTooOld("MySQL", MYSQL57);
 
                         return false;
                     }
@@ -137,26 +154,93 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         stringBuilder.append("\" ");
     }
 
+    private void updateColumn(Column column, DatabaseMetaData databaseMetaData, StringBuilder builder)
+        throws SQLException
+    {
+        int expectedLenght = column.getLength();
+
+        if (expectedLenght >= MAXSIZE_MIN && expectedLenght <= MAXSIZE_MAX) {
+            Integer databaseSize = getDatabaseSize(column, databaseMetaData);
+
+            // Skip the update if the column does not exist of if its size if greater or equals already
+            if (databaseSize != null && databaseSize.intValue() < expectedLenght) {
+                update(column, builder);
+            }
+        }
+    }
+
+    private Integer getDatabaseSize(Column column, DatabaseMetaData databaseMetaData) throws SQLException
+    {
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String tableName = this.hibernateStore.getConfiguredTableName(column.getValue().getTable());
+        String columnName = this.hibernateStore.getConfiguredColumnName(column);
+
+        ResultSet resultSet;
+        if (this.hibernateStore.isCatalog()) {
+            resultSet = databaseMetaData.getColumns(databaseName, null, tableName, columnName);
+        } else {
+            resultSet = databaseMetaData.getColumns(null, databaseName, tableName, columnName);
+        }
+
+        if (resultSet.next()) {
+            return resultSet.getInt("COLUMN_SIZE");
+        }
+
+        return null;
+    }
+
+    private void updateProperty(Property property, DatabaseMetaData databaseMetaData, StringBuilder builder)
+        throws SQLException
+    {
+        if (property != null) {
+            updateValue(property.getValue(), databaseMetaData, builder);
+        }
+    }
+
+    private void updateValue(Value value, DatabaseMetaData databaseMetaData, StringBuilder builder) throws SQLException
+    {
+        if (value instanceof Collection) {
+            Table collectionTable = ((Collection) value).getCollectionTable();
+
+            for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
+                updateColumn(it.next(), databaseMetaData, builder);
+            }
+        } else if (value != null) {
+            for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
+                Selectable selectable = it.next();
+                if (selectable instanceof Column) {
+                    updateColumn((Column) selectable, databaseMetaData, builder);
+                }
+            }
+        }
+    }
+
     @Override
     public String getPreHibernateLiquibaseChangeLog() throws DataMigrationException
     {
         StringBuilder builder = new StringBuilder();
 
-        for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
-            // Find properties to update
-            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
-                Property property = it.next();
+        try (SessionImplementor session = (SessionImplementor) this.hibernateStore.getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
 
-                for (Iterator<Column> it2 = property.getColumnIterator(); it2.hasNext();) {
-                    Column column = it2.next();
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                    int expectedLenght = column.getLength();
+                for (PersistentClass entity : this.hibernateStore.getConfigurationMetadata().getEntityBindings()) {
+                    // Check if the table exist
+                    if (exists(entity, databaseMetaData)) {
+                        // Find properties to update
+                        for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+                            updateProperty(it.next(), databaseMetaData, builder);
+                        }
 
-                    if (expectedLenght == MAXSIZE) {
-                        update(entity, column, builder);
+                        // Check the key
+                        updateValue(entity.getKey(), databaseMetaData, builder);
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new DataMigrationException("Error while extracting metadata", e);
         }
 
         if (builder.length() > 0) {
@@ -167,7 +251,22 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
         return null;
     }
 
-    private void update(PersistentClass entity, Column column, StringBuilder builder)
+    private boolean exists(PersistentClass entity, DatabaseMetaData databaseMetaData) throws SQLException
+    {
+        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+
+        ResultSet resultSet;
+        if (this.hibernateStore.isCatalog()) {
+            resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
+        } else {
+            resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
+        }
+
+        return resultSet.next();
+    }
+
+    private void update(Column column, StringBuilder builder)
     {
         if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
             // Not using <modifyDataType> here because Liquibase ignores attributes likes "NOT NULL"
@@ -175,7 +274,7 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             JdbcEnvironment jdbcEnvironment =
                 this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
             String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()
-                .format(entity.getTable().getQualifiedTableName(), this.hibernateStore.getDialect());
+                .format(column.getValue().getTable().getQualifiedTableName(), this.hibernateStore.getDialect());
             builder.append(this.hibernateStore.getDialect().getAlterTableString(tableName));
             builder.append(" MODIFY ");
             builder.append(column.getQuotedName(this.hibernateStore.getDialect()));
@@ -184,7 +283,8 @@ public class R130200001XWIKI18429DataMigration extends AbstractHibernateDataMigr
             builder.append("</sql>");
         } else {
             builder.append("<modifyDataType");
-            appendXmlAttribute("tableName", this.hibernateStore.getConfiguredTableName(entity), builder);
+            appendXmlAttribute("tableName", this.hibernateStore.getConfiguredTableName(column.getValue().getTable()),
+                builder);
             appendXmlAttribute("columnName", this.hibernateStore.getConfiguredColumnName(column), builder);
             appendXmlAttribute("newDataType",
                 column.getSqlType(this.hibernateStore.getDialect(), this.hibernateStore.getConfigurationMetadata()),

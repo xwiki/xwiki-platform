@@ -125,14 +125,20 @@
     </property>
     <property>
       <code>'use strict';
-require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotificationsMacro) {
-  $(document).ready(function() {
-    $('.notifications-macro').each(function () {
+require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], function ($, XWikiAsyncNotificationsMacro) {
+  var init = function(event, data) {
+    var container = $((data &amp;&amp; data.elements) || document);
+    container.find('.notifications-macro').each(function () {
       new XWikiAsyncNotificationsMacro(this);
     });
-  });
-});
-</code>
+  };
+
+  // Initialize the notification macros inserted after this code is loaded.
+  $(document).on('xwiki:dom:updated', init);
+
+  // Initialize the notification macros found initially when this code is loaded.
+  $(init);
+});</code>
     </property>
     <property>
       <name>JS</name>

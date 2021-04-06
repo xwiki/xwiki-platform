@@ -21,8 +21,6 @@ package org.xwiki.security.authentication.internal.resource;
 
 import java.util.Arrays;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -31,8 +29,6 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.url.ExtendedURL;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default serializer for {@link AuthenticationResourceReference}.
@@ -45,15 +41,11 @@ import com.xpn.xwiki.XWikiContext;
 public class AuthenticationResourceReferenceSerializer implements
     ResourceReferenceSerializer<AuthenticationResourceReference, ExtendedURL>
 {
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
     @Override
     public ExtendedURL serialize(AuthenticationResourceReference resource)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         return new ExtendedURL(Arrays.asList(
-            contextProvider.get().getWikiId(),
             AuthenticationResourceReference.TYPE.getId(),
             resource.getAction().getRequestParameter()),
             resource.getParameters());

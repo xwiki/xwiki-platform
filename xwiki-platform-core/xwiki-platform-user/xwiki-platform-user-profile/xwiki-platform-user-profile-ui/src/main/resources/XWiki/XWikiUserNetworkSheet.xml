@@ -276,7 +276,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         $.post(url, {
           'action': 'unwatchUser',
           'csrf': xm.form_token,
-          'userId': button.attr('data-userid')
+          'user': button.attr('data-userid'),
+          'target': 'user'
         }).done(function() {
           button.parent('li').remove();
           notification.hide();

@@ -111,6 +111,23 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
+    public Collection<NotificationFilter> getAllFilters(WikiReference wikiReference) throws NotificationException
+    {
+        WikiReference currentWikiReference = wikiDescriptorManager.getCurrentWikiReference();
+        List<NotificationFilter> filters;
+        try {
+            modelContext.setCurrentEntityReference(wikiReference);
+
+            filters = componentManager.getInstanceList(NotificationFilter.class);
+        } catch (Exception e) {
+            throw new NotificationException(ERROR_MESSAGE, e);
+        } finally {
+            modelContext.setCurrentEntityReference(currentWikiReference);
+        }
+        return new HashSet<>(filters);
+    }
+
+    @Override
     public Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled)
         throws NotificationException
     {

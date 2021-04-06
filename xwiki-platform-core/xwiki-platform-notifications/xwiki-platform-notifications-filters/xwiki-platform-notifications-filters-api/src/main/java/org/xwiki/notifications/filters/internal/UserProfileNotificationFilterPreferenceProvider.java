@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
@@ -40,10 +41,15 @@ import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
  * @since 9.8RC1
  */
 @Component
-@Named("userProfile")
+@Named(UserProfileNotificationFilterPreferenceProvider.HINT)
 @Singleton
 public class UserProfileNotificationFilterPreferenceProvider implements NotificationFilterPreferenceProvider
 {
+    /**
+     * Hint for this provider.
+     */
+    public static final String HINT = "userProfile";
+
     @Inject
     @Named("cached")
     private ModelBridge modelBridge;
@@ -52,6 +58,13 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
         return this.modelBridge.getFilterPreferences(user);
+    }
+
+    @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return this.modelBridge.getFilterPreferences(wikiReference);
     }
 
     @Override
@@ -68,10 +81,24 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     }
 
     @Override
+    public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        this.modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+    }
+
+    @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
         this.modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException
+    {
+        this.modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
     }
 
     @Override

@@ -150,7 +150,8 @@
       $.post(url, {
         'action': action,
         'csrf': xm.form_token,
-        'userId': XWiki.Model.serialize(xm.documentReference)
+        'user': XWiki.Model.serialize(xm.documentReference),
+        'target': 'user'
       }).done(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');

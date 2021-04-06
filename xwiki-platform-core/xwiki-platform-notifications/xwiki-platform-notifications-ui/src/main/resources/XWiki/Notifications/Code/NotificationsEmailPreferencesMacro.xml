@@ -124,72 +124,63 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>'use strict';
-/**
- * Start the real script.
- */
-require(['jquery', 'xwiki-meta'], function ($, xm) {
+      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
 
   /**
-   * Page initialization
+   * Handle the notification email interval.
    */
-  $(document).ready(function() {
-
-    /**
-     * Handle the notification email interval
-     */
-    $('.notificationEmailInterval').change(function () {
-      var intervalSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      var target = $('.notifEmailPreferences').attr('data-target');
-      var targetUser = "";
-      if (target == 'user') {
-        var targetUser = $('.notifEmailPreferences').attr('data-user');
-      }
-      $.post(serviceURL, {
-        'action': 'setInterval',
-        'interval': intervalSelect.val(),
-        'csrf': xm.form_token,
-        'target': $('.notifEmailPreferences').attr('data-target'),
-        'user': targetUser
-      }).done(function (data) {
-        notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done'));
-      }).fail(function (data) {
-        notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error'));
-      });
+  $(document).off('change.notificationEmailInterval');
+  $(document).on('change.notificationEmailInterval', '.notificationEmailInterval', function() {
+    var intervalSelect = $(this);
+    var notification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+      'notifications.settings.saving')), 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
+      XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    var target = $('.notifEmailPreferences').attr('data-target');
+    var targetUser = target === 'user' ? $('.notifEmailPreferences').attr('data-user') : '';
+    $.post(serviceURL, {
+      'action': 'setInterval',
+      'interval': intervalSelect.val(),
+      'target': target,
+      'user': targetUser,
+      'csrf': xm.form_token
+    }).done(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.saved')), 'done'));
+    }).fail(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.savingfailed')), 'error'));
     });
-
-    /**
-     * Handle the include diff in email setting
-     */
-    $('.notificationEmailDiffType').change(function () {
-      var diffTypeSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      var target = $('.notifEmailPreferences').attr('data-target');
-      var targetUser = "";
-      if (target == 'user') {
-        var targetUser = $('.notifEmailPreferences').attr('data-user');
-      }
-      $.post(serviceURL, {
-        'action': 'setDiffType',
-        'diffType': diffTypeSelect.val(),
-        'target': $('.notifEmailPreferences').attr('data-target'),
-        'user': targetUser,
-        'csrf': xm.form_token
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
-    });
-
   });
-});
-</code>
+
+  /**
+   * Handle the include diff in email setting
+   */
+  $(document).off('change.notificationEmailDiffType');
+  $(document).on('change.notificationEmailDiffType', '.notificationEmailDiffType', function() {
+    var diffTypeSelect = $(this);
+    var notification = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+      'notifications.settings.saving')), 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
+      XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    var target = $('.notifEmailPreferences').attr('data-target');
+    var targetUser = target === 'user' ? $('.notifEmailPreferences').attr('data-user') : '';
+    $.post(serviceURL, {
+      'action': 'setDiffType',
+      'diffType': diffTypeSelect.val(),
+      'target': target,
+      'user': targetUser,
+      'csrf': xm.form_token
+    }).done(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.saved')), 'done'));
+    }).fail(function (data) {
+      notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.settings.savingfailed')), 'error'));
+    });
+  });
+});</code>
     </property>
     <property>
       <name>JS</name>

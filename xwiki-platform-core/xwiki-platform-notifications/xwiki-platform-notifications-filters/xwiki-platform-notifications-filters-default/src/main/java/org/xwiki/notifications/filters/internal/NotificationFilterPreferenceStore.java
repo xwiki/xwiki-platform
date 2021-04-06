@@ -30,11 +30,15 @@ import javax.inject.Singleton;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -91,6 +95,25 @@ public class NotificationFilterPreferenceStore
     }
 
     /**
+     * Get the notification preference that corresponds to the given id and wiki.
+     *
+     * @param wikiReference a wiki
+     * @param filterPreferenceId a filter preference id
+     * @return the corresponding preference
+     * @throws NotificationException if an error occurs
+     */
+    public NotificationFilterPreference getFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        for (NotificationFilterPreference preference : getPreferencesOfWiki(wikiReference)) {
+            if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
+                return preference;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get all the notification preferences that corresponds to the given user.
      *
      * @param user the user from which we need to extract the preference
@@ -100,33 +123,59 @@ public class NotificationFilterPreferenceStore
     public List<DefaultNotificationFilterPreference> getPreferencesOfUser(DocumentReference user)
         throws NotificationException
     {
-        if (user == null) {
+        try {
+            return this.getPreferencesOfEntity(user, UserProfileNotificationPreferenceProvider.NAME);
+        } catch (QueryException e) {
+            throw new NotificationException(String.format(
+                "Error while loading the notification filter preferences of the user [%s].", user.toString()), e);
+        }
+    }
+
+    /**
+     * Get all the notification preferences that corresponds to the given user.
+     *
+     * @param wikiReference the wiki from which we need to extract the preferences
+     * @return a set of available filter preferences
+     * @throws NotificationException if an error happens
+     * @since 13.3RC1
+     */
+    public List<DefaultNotificationFilterPreference> getPreferencesOfWiki(WikiReference wikiReference)
+        throws NotificationException
+    {
+        try {
+            return getPreferencesOfEntity(wikiReference, WikiNotificationPreferenceProvider.NAME);
+        } catch (QueryException e) {
+            throw new NotificationException(String.format(
+                "Error while loading the notification filter preferences of the wiki [%s].", wikiReference.getName()),
+                e);
+        }
+    }
+
+    private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference,
+        String providerHint) throws QueryException
+    {
+        if (entityReference == null) {
             return Collections.emptyList();
         }
 
-        String serializedUser = entityReferenceSerializer.serialize(user);
+        String serializedEntity = entityReferenceSerializer.serialize(entityReference);
 
         XWikiContext context = contextProvider.get();
 
-        try {
-            Query query = queryManager.createQuery(
-                "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner " + "order by nfp.id",
-                Query.HQL);
-            query.bindValue("owner", serializedUser);
-            if (filterPreferenceConfiguration.useMainStore()) {
-                query.setWiki(context.getMainXWiki());
-            }
-            List<DefaultNotificationFilterPreference> results = query.execute();
-
-            for (DefaultNotificationFilterPreference preference : results) {
-                preference.setProviderHint("userProfile");
-            }
-
-            return results;
-        } catch (QueryException e) {
-            throw new NotificationException(String.format(
-                "Error while loading the notification filter preferences of the user [%s].", serializedUser), e);
+        Query query = queryManager.createQuery(
+            "select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner " + "order by nfp.id",
+            Query.HQL);
+        query.bindValue("owner", serializedEntity);
+        if (filterPreferenceConfiguration.useMainStore()) {
+            query.setWiki(context.getMainXWiki());
         }
+        List<DefaultNotificationFilterPreference> results = query.execute();
+
+        for (DefaultNotificationFilterPreference preference : results) {
+            preference.setProviderHint(providerHint);
+        }
+
+        return results;
     }
 
     /**
@@ -139,6 +188,32 @@ public class NotificationFilterPreferenceStore
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
         NotificationFilterPreference preference = getFilterPreference(user, filterPreferenceId);
+        this.deleteFilterPreference(preference);
+    }
+
+    /**
+     * Delete a filter preference.
+     *
+     * @param wikiReference reference of the wiki concerned by the filter preference
+     * @param filterPreferenceId name of the filter preference
+     * @throws NotificationException if an error happens
+     * @since 13.3RC1
+     */
+    public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        NotificationFilterPreference preference = getFilterPreference(wikiReference, filterPreferenceId);
+        this.deleteFilterPreference(preference);
+    }
+
+    /**
+     * Delete a filter preference.
+     *
+     * @param preference the preference to delete.
+     * @throws NotificationException if an error happens
+     */
+    private void deleteFilterPreference(NotificationFilterPreference preference) throws NotificationException
+    {
         if (preference == null) {
             return;
         }
@@ -180,11 +255,38 @@ public class NotificationFilterPreferenceStore
     public void saveFilterPreferences(DocumentReference user,
         Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        if (user == null) {
+        this.saveFilterPreferences((EntityReference) user, filterPreferences);
+    }
+
+    /**
+     * Save a collection of NotificationFilterPreferences.
+     *
+     * @param wikiReference reference of the wiki concerned by the filter preference
+     * @param filterPreferences a list of NotificationFilterPreference
+     * @throws NotificationException if an error happens
+     * @since 13.3RC1
+     */
+    public void saveFilterPreferences(WikiReference wikiReference,
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+    {
+        this.saveFilterPreferences((EntityReference) wikiReference, filterPreferences);
+    }
+
+    /**
+     * Save a collection of NotificationFilterPreferences.
+     *
+     * @param entityReference reference of the entity concerned by the filter preference
+     * @param filterPreferences a list of NotificationFilterPreference
+     * @throws NotificationException if an error happens
+     */
+    private void saveFilterPreferences(EntityReference entityReference,
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+    {
+        if (entityReference == null) {
             return;
         }
 
-        String serializedUser = entityReferenceSerializer.serialize(user);
+        String serializedEntity = entityReferenceSerializer.serialize(entityReference);
 
         XWikiContext context = contextProvider.get();
 
@@ -208,7 +310,7 @@ public class NotificationFilterPreferenceStore
                 // handle extended objects (like ScopeNotificationFilterPreference).
                 // So we create a copy just in case we are not saving a basic NotificationFilterPreference object.
                 DefaultNotificationFilterPreference copy = new DefaultNotificationFilterPreference(preference);
-                copy.setOwner(serializedUser);
+                copy.setOwner(serializedEntity);
                 session.saveOrUpdate(copy);
             }
 

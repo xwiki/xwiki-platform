@@ -150,9 +150,9 @@
 #elseif ("$!request.action" == 'watchUser' || "$!request.action" == 'unwatchUser')
   #try()
     #if ($request.action == 'watchUser')
-      #set ($discard = $services.notification.watch.watchUser($request.userId))
+      #set ($discard = $services.notification.watch.watchUser($request.user))
     #else
-      #set ($discard = $services.notification.watch.unwatchUser($request.userId))
+      #set ($discard = $services.notification.watch.unwatchUser($request.user))
     #end
   #end
   #if ("$!exception" != '')

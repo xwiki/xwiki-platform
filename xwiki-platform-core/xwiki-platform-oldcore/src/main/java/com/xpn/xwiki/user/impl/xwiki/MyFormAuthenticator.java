@@ -142,6 +142,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 return false;
             }
             if ("1".equals(request.getParameter("basicauth"))) {
+                getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
                 return true;
             }
         } catch (Exception e) {
@@ -169,14 +170,14 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                         LOGGER.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
 
-                    getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
-
                     // make sure the Principal contains wiki name information
                     if (!StringUtils.contains(principal.getName(), ':')) {
                         principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
                     }
 
                     request.setUserPrincipal(principal);
+
+                    getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
                     request.setUserPrincipal(null);
@@ -221,8 +222,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 LOGGER.info("User " + principal.getName() + " has been logged-in");
             }
 
-            getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
-
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
 
             // invalidate old session if the user was already authenticated, and they logged in as a different user
@@ -248,6 +247,9 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
 
             request.setUserPrincipal(principal);
+
+            getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
+
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
                 String continueToURL = getContinueToURL(request);

@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authentication;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
+import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -36,7 +36,7 @@ import org.xwiki.user.UserReference;
  * @since 13.3RC1
  */
 @Unstable
-public class UserAuthenticatedEvent extends AbstractFilterableEvent
+public class UserAuthenticatedEvent implements Event
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -75,4 +75,12 @@ public class UserAuthenticatedEvent extends AbstractFilterableEvent
     {
         return this.userReference;
     }
+
+    @Override
+    public boolean matches(Object other)
+    {
+        return other instanceof UserAuthenticatedEvent
+            && ((UserAuthenticatedEvent) other).getUserReference().equals(this.getUserReference());
+    }
+
 }

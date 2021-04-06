@@ -95,11 +95,12 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             // make sure the Principal contains wiki name information
             if (!StringUtils.contains(principal.getName(), ':')) {
                 principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
-
-                getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
             }
 
             request.setUserPrincipal(principal);
+
+            getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
+
             return false;
         } else {
             // login failed

@@ -73,7 +73,7 @@
 ## Menus
 platform.wiki.menu.wikiindex=Wikiliste
 platform.wiki.menu.deletewiki=Slett wiki
-platform.wiki.menu.userwikis=Wiki
+platform.wiki.menu.userwikis=Wikier
 
 ## Dependencies
 platform.wiki.dependencies.wiki.missing="Wiki" Java-komponenten er ikke installert. Denne siden fungerer ikke som den skal. Forsikre deg om at "Wiki API" og "Wiki Script"-utvidelsene er installert (ved hjelp av utvidelsesbehandleren) eller at filene 'xwiki-platform-wiki-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-script-&lt;versjon&gt;.jar er tilstede under mappen "WEB-INF/lib/" (hvis manuell installasjon).
@@ -124,7 +124,7 @@ platform.wiki.users.leave.confirmation.no=Nei
 platform.wiki.users.leave.success=Brukeren {0}{1}{2} forlot wiki {3}{4}{5}.
 platform.wiki.users.join.title=Bli med i Wiki
 platform.wiki.users.leave.title=Forlat Wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.empty=Forlat Wiki
 platform.wiki.users.delete.title=Slett wiki "{0}"
 platform.wiki.users.delete.empty=Slett wiki
 platform.wiki.users.invitation.reply.hint=En melding som svar som administratorer kan lese og hvor du kan begrunne din beslutning.
@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.dw=Etter å ha klikket på "Opprett" -knappen, 
 platform.wiki.create.wizard.step.previous=Forrige steg
 platform.wiki.create.wizard.step.next=Neste steg
 platform.wiki.create.wizard.step.create=Opprett
-
 platform.wiki.create.wizard.step.creation=Wiki opprettelse
 platform.wiki.create.wizard.step.creation.wait=Vennligst vent til wikien er opprettet.
 platform.wiki.create.wizard.step.creation.complete=Wiki {0} er opprettet. Du kan nå bruke den.
@@ -279,29 +278,30 @@ platform.wiki.sheet.aliases=Et alias er et annet navn på wikien. Du kan legge t
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}Application Manager-programtillegget{1} er ikke installert. Installer det og prøv igjen.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
+admin.wikis=Wikier
 ### Missing: admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=Systemet klargjør wikien.
+platform.wiki.create.wizard.step.provisioning.wait=Vent mens systemet klargjør wiki-en.
+platform.wiki.create.wizard.step.provisioning.complete=Wikien er nesten klar. Klikk på "fullfør" for å utføre den siste operasjonen.
+platform.wiki.create.wizard.step.provisioning.error=Wikien {0} er opprettet, men noen av sidene i malen er ikke kopiert. Du burde sannsynligvis slette den.
+platform.wiki.create.wizard.step.provisioning.finalize=Fullfør
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=Ja, slett denne wiki-en!
+platform.wiki.delete.confirmation.no=Nei, ta meg tilbake!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

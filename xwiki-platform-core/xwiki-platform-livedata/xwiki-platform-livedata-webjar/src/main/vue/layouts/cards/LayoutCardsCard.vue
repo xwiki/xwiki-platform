@@ -81,8 +81,6 @@
       </XWikiDraggableItem>
     </XWikiDraggable>
 
-    <XWikiLoader />
-
   </div>
 </template>
 
@@ -92,7 +90,6 @@ import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
-import XWikiLoader from "../../utilities/XWikiLoader.vue";
 
 export default {
 
@@ -103,7 +100,6 @@ export default {
     LivedataDisplayer,
     XWikiDraggable,
     XWikiDraggableItem,
-    XWikiLoader,
   },
 
   inject: ["logic"],
@@ -218,20 +214,4 @@ export default {
 
 }
 
-
-/* Loading loader */
-
-.layout-cards .card {
-  position: relative;
-}
-
-.layout-cards .card > .xwiki-loader {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: none;
-}
-
-.livedata-layout.fetch-entries .layout-cards .card > .xwiki-loader {
-  display: block;
-}
 </style>

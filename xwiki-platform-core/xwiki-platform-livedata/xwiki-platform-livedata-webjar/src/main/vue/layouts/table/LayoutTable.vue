@@ -45,6 +45,8 @@
     <!-- Entry selector info bar -->
     <LivedataEntrySelectorInfoBar />
 
+    <!-- Loading bar -->
+    <LayoutLoader />
 
     <!-- Table layout root -->
     <div class="layout-table-wrapper">
@@ -75,8 +77,6 @@
           <!-- Component to create a new entry -->
           <LayoutTableNewRow v-if="canAddEntry"/>
 
-          <!-- Lodaing component -->
-          <XWikiLoader />
         </tbody>
 
       </table>
@@ -95,7 +95,7 @@ import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
-import XWikiLoader from "../../utilities/XWikiLoader.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
 
@@ -110,7 +110,7 @@ export default {
     LayoutTableHeaderFilters,
     LayoutTableRow,
     LayoutTableNewRow,
-    XWikiLoader,
+    LayoutLoader,
   },
 
   inject: ["logic"],
@@ -144,23 +144,6 @@ export default {
   align-items: center;
   justify-content: flex-start;
   padding-left: 2rem;
-}
-
-
-/* Loading loader */
-
-.layout-table tbody {
-  position: relative;
-}
-
-.layout-table tbody > .xwiki-loader {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: none;
-}
-
-.livedata-layout.fetch-entries .layout-table tbody > .xwiki-loader {
-  display: block;
 }
 
 </style>

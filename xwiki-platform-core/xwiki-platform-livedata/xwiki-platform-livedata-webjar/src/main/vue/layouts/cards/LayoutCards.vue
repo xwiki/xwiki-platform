@@ -47,6 +47,9 @@
     <!-- Entry selector info bar -->
     <LivedataEntrySelectorInfoBar/>
 
+    <!-- Loading bar -->
+    <LayoutLoader />
+
 
     <!-- Cards layout root -->
     <div class="layout-table-root">
@@ -79,6 +82,7 @@ import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
 
@@ -92,6 +96,7 @@ export default {
     LivedataEntrySelectorInfoBar,
     LayoutCardsCard,
     LayoutCardsNewCard,
+    LayoutLoader,
   },
 
   inject: ["logic"],
@@ -126,6 +131,11 @@ export default {
     grid-gap: 1.5rem; /* safari */
   }
 
+}
+
+.layout-cards .layout-loader {
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 </style>

@@ -85,9 +85,18 @@ export default {
   watch: {
     layoutId: {
       immediate: true,
-      handler () {
+      handler (layoutId, previousLayoutId) {
         // Try to load layout
-        this.loadLayout(this.layoutId).catch(err => {
+        this.loadLayout(this.layoutId)
+        .then(layoutComponent => {
+          // dispatch events
+          this.logic.triggerEvent("layoutLoaded", {
+            layoutId,
+            previousLayoutId,
+            component: layoutComponent,
+          });
+        })
+        .catch(err => {
           // If the layout was not the default one, try to load default layout
           if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
             console.warn(err);
@@ -137,16 +146,6 @@ export default {
 
     },
   },
-
-  mounted () {
-    this.logic.onEvent("beforeentryfetch", () => {
-      this.$el.classList.add("fetch-entries");
-    });
-
-    this.logic.onEvent("afterentryfetch", () => {
-      this.$el.classList.remove("fetch-entries");
-    });
-  }
 
 };
 </script>

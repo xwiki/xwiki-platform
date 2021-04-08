@@ -36,7 +36,7 @@ public class LikeRightTest
     @Test
     void getters()
     {
-        assertEquals("Like", LikeRight.INSTANCE.getName());
+        assertEquals("like", LikeRight.INSTANCE.getName());
         assertEquals(RuleState.ALLOW, LikeRight.INSTANCE.getDefaultState());
         assertEquals(RuleState.ALLOW, LikeRight.INSTANCE.getTieResolutionPolicy());
         assertEquals(null, LikeRight.INSTANCE.getImpliedRights());

@@ -19,8 +19,8 @@
  */
 package org.xwiki.icon.internal;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -124,12 +124,14 @@ public class DefaultIconSetManager implements IconSetManager
 
         IconSet iconSet = iconSetCache.get(DEFAULT_ICONSET_NAME);
         if (iconSet == null) {
-            try {
-                // lazy loading
-                iconSet = iconSetLoader.loadIconSet(new InputStreamReader(
-                        xwiki.getResourceAsStream("/resources/icons/default.iconset")), DEFAULT_ICONSET_NAME);
+            // lazy loading
+            try (InputStreamReader reader =
+                new InputStreamReader(xwiki.getResourceAsStream("/resources/icons/default.iconset"))) {
+                iconSet = iconSetLoader.loadIconSet(reader, DEFAULT_ICONSET_NAME);
                 iconSetCache.put(DEFAULT_ICONSET_NAME, iconSet);
-            } catch (IconException | MalformedURLException e) {
+            } catch (IOException e) {
+                throw new IconException("Failed to load the current default icon set resource.", e);
+            } catch (IconException e) {
                 throw new IconException("Failed to get the current default icon set.", e);
             }
         }

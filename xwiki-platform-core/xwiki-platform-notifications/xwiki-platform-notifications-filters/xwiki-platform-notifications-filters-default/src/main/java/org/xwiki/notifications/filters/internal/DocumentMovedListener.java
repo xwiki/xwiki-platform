@@ -19,14 +19,15 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
-import org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -35,10 +36,9 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Update the notification filter preferences when a document is renamed/moved.
@@ -67,7 +67,7 @@ public class DocumentMovedListener extends AbstractEventListener
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    private LegacyEventStreamStoreConfiguration legacyEventStreamStoreConfiguration;
+    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
 
     @Inject
     private Logger logger;
@@ -99,29 +99,27 @@ public class DocumentMovedListener extends AbstractEventListener
 
         try {
             boolean isExecutedOnMainStore = false;
-            if (legacyEventStreamStoreConfiguration.useLocalStore()) {
+            if (filterPreferenceConfiguration.useLocalStore()) {
                 updatePreferences(sourceLocation, targetLocation);
                 isExecutedOnMainStore = wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId());
             }
-            if (legacyEventStreamStoreConfiguration.useMainStore() && !isExecutedOnMainStore) {
-                namespaceContextExecutor.execute(new WikiNamespace(wikiDescriptorManager.getMainWikiId()),
-                    () -> {
-                        updatePreferences(sourceLocation, targetLocation);
-                        return null;
-                    }
-                );
+            if (filterPreferenceConfiguration.useMainStore() && !isExecutedOnMainStore) {
+                namespaceContextExecutor.execute(new WikiNamespace(wikiDescriptorManager.getMainWikiId()), () -> {
+                    updatePreferences(sourceLocation, targetLocation);
+                    return null;
+                });
             }
 
         } catch (Exception e) {
             logger.error("Failed to update the notification filter preference when [{}] has been moved to [{}].",
-                    renamedEvent.getSourceReference(), renamedEvent.getTargetReference(), e);
+                renamedEvent.getSourceReference(), renamedEvent.getTargetReference(), e);
         } finally {
             ((CachedModelBridge) cachedModelBridge).clearCache();
         }
     }
 
     private void updatePreferences(DocumentReference sourceLocation, DocumentReference targetLocation)
-            throws XWikiException
+        throws XWikiException
     {
         XWikiContext context = contextProvider.get();
         XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
@@ -129,17 +127,17 @@ public class DocumentMovedListener extends AbstractEventListener
         Session session = hibernateStore.getSession(context);
 
         if ("WebHome".equals(sourceLocation.getName())) {
-            session.createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage "
-                    + "where p.page = :oldPage")
-                    .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
-                    .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference()))
-                    .executeUpdate();
+            session
+                .createQuery(
+                    "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage")
+                .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
+                .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference())).executeUpdate();
         }
-        session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
+        session
+            .createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
                 + "where p.pageOnly = :oldPage")
-                .setString(NEW_PAGE, serializer.serialize(targetLocation))
-                .setString(OLD_PAGE, serializer.serialize(sourceLocation))
-                .executeUpdate();
+            .setString(NEW_PAGE, serializer.serialize(targetLocation))
+            .setString(OLD_PAGE, serializer.serialize(sourceLocation)).executeUpdate();
 
         hibernateStore.endTransaction(context, true);
     }

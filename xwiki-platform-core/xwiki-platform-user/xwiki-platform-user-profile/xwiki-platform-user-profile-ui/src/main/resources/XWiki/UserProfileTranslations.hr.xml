@@ -57,5 +57,8 @@ userprofile.default=Zadano
 ### Missing: user.profile.network.unfollow=Stop following
 ### Missing: user.profile.network.done=Done
 ### Missing: user.profile.network.saving=Saving...
-### Missing: user.profile.network.error=Error saving the notification setting</content>
+### Missing: user.profile.network.error=Error saving the notification setting
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
 </xwikidoc>

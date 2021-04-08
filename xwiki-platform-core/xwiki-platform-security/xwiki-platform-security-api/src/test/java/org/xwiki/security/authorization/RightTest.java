@@ -19,9 +19,19 @@
  */
 package org.xwiki.security.authorization;
 
-import org.junit.jupiter.api.Test;
+import java.util.Collections;
+import java.util.Set;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.xwiki.model.EntityType;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link Right}.
@@ -30,11 +40,82 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class RightTest
 {
+    class CustomRight implements RightDescription
+    {
+        private String name;
+
+        CustomRight(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return this.name;
+        }
+
+        @Override
+        public RuleState getDefaultState()
+        {
+            return RuleState.ALLOW;
+        }
+
+        @Override
+        public RuleState getTieResolutionPolicy()
+        {
+            return RuleState.DENY;
+        }
+
+        @Override
+        public boolean getInheritanceOverridePolicy()
+        {
+            return false;
+        }
+
+        @Override
+        public Set<Right> getImpliedRights()
+        {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<EntityType> getTargetedEntityType()
+        {
+            return Collections.singleton(EntityType.SPACE);
+        }
+
+        @Override
+        public boolean isReadOnly()
+        {
+            return true;
+        }
+    }
+
     @Test
-    public void toRight()
+    void toRight()
     {
         assertSame(Right.VIEW, Right.toRight("view"));
         assertSame(Right.VIEW, Right.toRight("VIEW"));
         assertSame(Right.ILLEGAL, Right.toRight("notexist"));
+    }
+
+    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
+    @Test
+    void constructorWithImpliedByRight()
+    {
+        assertNull(Right.VIEW.getImpliedRights());
+
+        Right myRight = new Right(new CustomRight("foo"), Collections.singleton(Right.VIEW));
+        assertSame(Right.toRight("foo"), myRight);
+        assertEquals(Collections.singleton(myRight), Right.VIEW.getImpliedRights());
+    }
+
+    @Disabled("Disabled because it breaks the DefaultAuthorizationManagerIntegrationTest since Rights are static.")
+    @Test
+    void like()
+    {
+        Right myRight = new Right(new CustomRight("foo"));
+        assertTrue(myRight.like(new CustomRight("foo")));
     }
 }

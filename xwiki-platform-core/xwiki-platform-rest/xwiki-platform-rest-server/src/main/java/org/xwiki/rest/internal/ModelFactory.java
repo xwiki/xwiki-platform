@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -492,51 +493,49 @@ public class ModelFactory
     public Translations toRestTranslations(URI baseUri, Document doc) throws XWikiException
     {
         Translations translations = this.objectFactory.createTranslations();
+        Locale defaultLocale = getDefaultLocale(doc);
+        translations.setDefault(defaultLocale.toString());
 
-        List<String> languages = doc.getTranslationList();
+        List<Locale> locales = doc.getTranslationLocales();
 
         List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
 
-        if (!languages.isEmpty()) {
-            if (!doc.getDefaultLanguage().equals("")) {
-                translations.setDefault(doc.getDefaultLanguage());
+        // Add the default (original) page translation, if it makes sense.
+        if (!locales.isEmpty() && !Locale.ROOT.equals(defaultLocale)) {
+            Translation translation = this.objectFactory.createTranslation();
+            translation.setLanguage(translations.getDefault());
 
-                Translation translation = this.objectFactory.createTranslation();
-                translation.setLanguage(doc.getDefaultLanguage());
+            String pageTranslationUri = Utils
+                .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
+                .toString();
+            Link pageTranslationLink = this.objectFactory.createLink();
+            pageTranslationLink.setHref(pageTranslationUri);
+            pageTranslationLink.setRel(Relations.PAGE);
+            translation.getLinks().add(pageTranslationLink);
 
-                /* Add the default page with the default translation explicitely */
-                String pageTranslationUri = Utils
-                    .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
-                    .toString();
-                Link pageTranslationLink = this.objectFactory.createLink();
-                pageTranslationLink.setHref(pageTranslationUri);
-                pageTranslationLink.setRel(Relations.PAGE);
-                translation.getLinks().add(pageTranslationLink);
+            String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
+                doc.getDocumentReference().getName()).toString();
+            Link historyLink = this.objectFactory.createLink();
+            historyLink.setHref(historyUri);
+            historyLink.setRel(Relations.HISTORY);
+            translation.getLinks().add(historyLink);
 
-                String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName()).toString();
-                Link historyLink = this.objectFactory.createLink();
-                historyLink.setHref(historyUri);
-                historyLink.setRel(Relations.HISTORY);
-                translation.getLinks().add(historyLink);
-
-                translations.getTranslations().add(translation);
-            }
+            translations.getTranslations().add(translation);
         }
 
-        for (String language : languages) {
+        for (Locale locale : locales) {
             Translation translation = this.objectFactory.createTranslation();
-            translation.setLanguage(language);
+            translation.setLanguage(locale.toString());
 
             String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
             String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), language).toString();
+                doc.getDocumentReference().getName(), locale).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -546,6 +545,31 @@ public class ModelFactory
         }
 
         return translations;
+    }
+
+    private Locale getDefaultLocale(Document document)
+    {
+        if (document.isTranslation()) {
+            // The default locale field is not always set on document translations:
+            //
+            // * it is empty for translation pages created by the user because the save action doesn't set it and the
+            // edit form doesn't include this field;
+            // * it may be set for translation pages that are part of an XWiki extension because the XAR Maven plugin
+            // used to build the extension has a rule to enforce it;
+            //
+            // So we should take the default locale from the original document.
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext).getRealLocale();
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to get the default locale from [{}]. Root cause is [{}].",
+                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                // Fall-back on the default locale specified on the translation page, which may not be accurate.
+                return document.getDefaultLocale();
+            }
+        } else {
+            return document.getRealLocale();
+        }
     }
 
     /**
@@ -562,6 +586,7 @@ public class ModelFactory
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getDocumentReference().getName());
         pageSummary.setTitle(doc.getDisplayTitle());
+        pageSummary.setRawTitle(doc.getTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(toRestTranslations(baseUri, doc));

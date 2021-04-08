@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-provision-plugin</artifactId>
   <name>XWiki Platform - Tools - Provision</name>
@@ -35,7 +35,6 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>50</xwiki.pitest.mutationThreshold>
     <!-- Allow Maven plugins to output to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -71,6 +70,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -83,12 +87,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-integration</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

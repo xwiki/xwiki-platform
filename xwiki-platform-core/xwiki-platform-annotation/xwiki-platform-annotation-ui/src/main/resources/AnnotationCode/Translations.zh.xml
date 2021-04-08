@@ -36,82 +36,82 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: annotations.title=Annotate
-### Missing: annotations.menu.loading=Loading annotation settings
-### Missing: annotations.menu.loaderror=Failed:
-### Missing: annotations.tab.info.noannotations=No annotations on this page
+  <content>annotations.title=注解
+annotations.menu.loading=加载注解设置
+annotations.menu.loaderror=失败：
+annotations.tab.info.noannotations=此页面没有注解
 
-### Missing: annotations.settings.display=Show annotations
-### Missing: annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
-### Missing: annotations.settings.error.notarget=No page specified to get annotations settings for.
+annotations.settings.display=显示注解
+annotations.settings.error.wrongsyntax=使用Xwiki/1.0语法的页面中注解不可用。
+annotations.settings.error.notarget=没有指定要获取注解设置的页面。
 
-### Missing: annotations.annotated.loading=Loading annotated page
-### Missing: annotations.annotated.loaderror=Failed:
-### Missing: annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
-### Missing: annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
-### Missing: annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
+annotations.annotated.loading=加载注解页面
+annotations.annotated.loaderror=失败：
+annotations.annotated.loaderror.wrongresponse=服务器返回了错误格式的响应
+annotations.annotated.error.noannotatedelement=因内容不可用导致注解无法加载。
+annotations.annotated.error.wrongsyntax=使用XWiki/1.0语法编写的页面中注解不可用。
 
-### Missing: annotations.action.edit.text=[Edit]
-### Missing: annotations.action.edit.tooltip=Edit annotation
-### Missing: annotations.action.edit.submit.text=Update
+annotations.action.edit.text=[编辑]
+annotations.action.edit.tooltip=编辑注解
+annotations.action.edit.submit.text=更新
 annotations.action.edit.cancel.text=取消
-### Missing: annotations.action.edit.success=Annotation updated.
-### Missing: annotations.action.edit.loaderror=Failed:
-### Missing: annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
+annotations.action.edit.success=注解已更新。
+annotations.action.edit.loaderror=失败：
+annotations.action.edit.error.notfound=此注解已不存在。请刷新页面。
 
-### Missing: annotations.action.delete.text=[Delete]
-### Missing: annotations.action.delete.tooltip=Delete annotation
-### Missing: annotations.action.delete.confirm=Are you sure you want to delete this annotation?
-### Missing: annotations.action.delete.inProgress=Deleting annotation...
-### Missing: annotations.action.delete.done=Annotation deleted
-### Missing: annotations.action.delete.failed=Failed to delete annotation:
+annotations.action.delete.text=[删除]
+annotations.action.delete.tooltip=删除注解
+annotations.action.delete.confirm=你确定要删除此注解吗？
+annotations.action.delete.inProgress=正在删除注解...
+annotations.action.delete.done=注解已删除
+annotations.action.delete.failed=注解删除失败：
 
-### Missing: annotations.action.create.submit.text=Add annotation
+annotations.action.create.submit.text=添加注解
 annotations.action.create.cancel.text=取消
-### Missing: annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
-### Missing: annotations.action.create.form.loaderror=Failed:
-### Missing: annotations.action.create.success=Annotation added.
-### Missing: annotations.action.create.loaderror=Failed:
-### Missing: annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page.
-### Missing: annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
-### Missing: annotations.action.create.helpmessage=To annotate a piece of text, select it and hit {0}.
-### Missing: annotations.action.create.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
-### Missing: annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
+annotations.action.create.selection.invalid=请选择一个非空内容。
+annotations.action.create.form.loaderror=失败：
+annotations.action.create.success=注解已添加。
+annotations.action.create.loaderror=失败：
+annotations.action.create.error.unauthorized=你没有在本页面添加注解的权限。
+annotations.action.create.error.unauthorizedguest=你没有在此页面添加注解的权限。请先登录。
+annotations.action.create.helpmessage=如果只想对部分内容添加注解，先选择要注解的内容然后点击{0}。
+annotations.action.create.error.wrongsyntax=使用XWiki/1.0语法编写的页面中注解不可用。
+annotations.action.create.error.notarget=没有指定要添加注释的目标。
 
-### Missing: annotations.action.view.hide.text=hide
-### Missing: annotations.action.view.form.loaderror=Failed:
-### Missing: annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
-### Missing: annotations.action.view.thread=View thread
+annotations.action.view.hide.text=隐藏
+annotations.action.view.form.loaderror=失败：
+annotations.action.view.error.notfound=此注解已不存在。请刷新页面。
+annotations.action.view.thread=查看线程
 
-### Missing: annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page:
-### Missing: annotations.updated.text=This annotation was automatically repositioned after a page update. Originally:
-### Missing: annotations.action.validate.text=[Validate]
-### Missing: annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
-### Missing: annotations.action.validate.success=Annotation validated.
-### Missing: annotations.action.validate.loaderror=Failed:
+annotations.altered.text=因注解不存在，此注解无法显示：
+annotations.updated.text=页面更新后此注解已重新定位。原始值：
+annotations.action.validate.text=[有效的]
+annotations.action.validate.tooltip=验证选择的文字的注解的自动更新
+annotations.action.validate.success=注解已验证。
+annotations.action.validate.loaderror=失败：
 
-### Missing: annotations.filters.show=Filter
-### Missing: annotations.filters.nooption=There are no values to filter for "{0}"
-### Missing: annotations.filters.anyvalue=any value
-### Missing: annotations.filters.clearvalue=clear
+annotations.filters.show=过滤
+annotations.filters.nooption=没有从"{0}"中过滤出数据
+annotations.filters.anyvalue=任何值
+annotations.filters.clearvalue=清空
 
-### Missing: annotations.config.title=Annotations configuration panel
-### Missing: annotations.config.display.title=Annotation display
-### Missing: annotations.config.type.title=Annotation type
-### Missing: annotations.config.activate.title=Annotation activation
-### Missing: annotations.config.activate.explanation=The following two settings allow you to configure which locations annotations are active in. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
-### Missing: annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.
-### Missing: admin.annotations=Annotations
-### Missing: admin.annotations.description=Configure the page annotations
+annotations.config.title=注解配置面板
+annotations.config.display.title=注解显示
+annotations.config.type.title=注解类型
+annotations.config.activate.title=注解激活
+annotations.config.activate.explanation=以下两个设置允许您配置哪些位置的注释是活动的。第一个设置指定了一般规则，而第二个列表指定了该规则不应适用的位置。例如，激活为 "yes "例外位置为 "XWiki "和 "Main "意味着除了 "XWiki "和 "Main "之外，注释将在所有位置上激活。作为一个相反的例子，使用激活为 "no "和例外位置 "Documents "意味着注释将只对 "Documents "位置激活。
+annotations.config.type.explanation=如果你想为你的注解添加额外的属性，请为这个类添加属性。
+admin.annotations=注解
+admin.annotations.description=配置此页面的注解
 
-### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
-### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
-### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
-### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
+AnnotationCode.AnnotationConfig_activated=注解已激活
+AnnotationCode.AnnotationConfig_activated.hint=决定注解是否在wiki上处于激活状态
+AnnotationCode.AnnotationConfig_exceptionSpaces=以下位置除外
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=停用以下位置的注解：
+AnnotationCode.AnnotationConfig_displayed=默认显示注释
+AnnotationCode.AnnotationConfig_displayed.hint=确定注解会默认显示还是只有当“显示注解”被选择时才显示
+AnnotationCode.AnnotationConfig_displayHighlight=已默认高亮显示注解
+AnnotationCode.AnnotationConfig_displayHighlight.hint=确定高亮显示注解是要总是显示还是只有当鼠标移到注解上时才显示
+AnnotationCode.AnnotationConfig_annotationClass=XWiki类定义了注释的结构</content>
   
 </xwikidoc>

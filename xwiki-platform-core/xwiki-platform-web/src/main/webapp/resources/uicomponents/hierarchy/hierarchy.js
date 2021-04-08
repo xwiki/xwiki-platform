@@ -17,13 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
+    {'evaluate': true, 'minify': $services.debug.minify})
+})
+#set ($l10nKeys = [
+  'web.hierarchy.error'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
 
 /**
  * Expand hierarchy breadcrumbs on clicks.
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  'use strict';
-
   $(document).ready(function() {
 
     /**
@@ -35,7 +49,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       ellipsis.addClass('loading');
       // Get the full breadcumb with an AJAX call
       var breadcrumb  = $(this).parents('.breadcrumb-expandable');
-      var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT)).getURL('get', 'xpage=hierarchy_reference');
+      var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT))
+        .getURL('get', 'xpage=hierarchy_reference');
       $.ajax(ajaxURL, { 'data': {
           'id'           : breadcrumb[0].id,
           'displayTitle' : breadcrumb.data('displaytitle'),
@@ -48,7 +63,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           $(document).trigger('xwiki:dom:updated', {'elements': updatedBreadcrumb.toArray()});
         })
         .fail(function (){
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('web.hierarchy.error'))", 'error');
+          new XWiki.widgets.Notification(l10n['web.hierarchy.error'], 'error');
           ellipsis.removeClass('loading');
         });
     };
@@ -80,11 +95,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 /**
  * Extend the breadcrumbs with tree navigation.
  */
-require([
-  /*! #set ($requireConfigParams = {'evaluate': true, 'minify': $services.debug.minify}) */
-  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    $requireConfigParams))
-], function() {
+require([paths.treeRequireConfig], function() {
   require(['tree', 'bootstrap'], function($) {
     var enhanceBreadcrumb = function(breadcrumb) {
       breadcrumb.children('li.dropdown').on('shown.bs.dropdown', function(event) {
@@ -114,3 +125,6 @@ require([
     enhanceBreadcrumb($('ol.breadcrumb'));
   });
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

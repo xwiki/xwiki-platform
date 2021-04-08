@@ -1,8 +1,11 @@
+com.xpn.xwiki.web.JsxAction
+com.xpn.xwiki.web.SsxAction
 org.xwiki.skinx.internal.CssDocumentSkinExtension
 org.xwiki.skinx.internal.JsDocumentSkinExtension
 org.xwiki.skinx.internal.CssFileSkinExtension
 org.xwiki.skinx.internal.JsFileSkinExtension
 org.xwiki.skinx.internal.CssResourceSkinExtension
+org.xwiki.skinx.internal.DefaultSkinExtensionConfiguration
 org.xwiki.skinx.internal.JsResourceSkinExtension
 org.xwiki.skinx.internal.LinkSkinExtension
 org.xwiki.skinx.internal.SsxExportURLFactoryActionHandler

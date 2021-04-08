@@ -17,23 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.criteria.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the {@link DurationFactory} class.
  */
-public class DurationFactoryTest
+class DurationFactoryTest
 {
     /**
      * Test for {@link DurationFactory#DAY}
      */
     @Test
-    public void testDay()
+    void day()
     {
         doDurationTest(DurationFactory.DAY, 0, 0, 0, 1);
     }
@@ -42,7 +41,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#WEEK}
      */
     @Test
-    public void testWeek()
+    void week()
     {
         doDurationTest(DurationFactory.WEEK, 0, 0, 1, 0);
     }
@@ -51,7 +50,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#MONTH}
      */
     @Test
-    public void testMonth()
+    void month()
     {
         doDurationTest(DurationFactory.MONTH, 0, 1, 0, 0);
     }
@@ -60,7 +59,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#YEAR}
      */
     @Test
-    public void testYear()
+    void year()
     {
         doDurationTest(DurationFactory.YEAR, 1, 0, 0, 0);
     }
@@ -69,7 +68,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#createDuration(int, int, int, int)}
      */
     @Test
-    public void testCreateDuration()
+    void createDuration()
     {
         doCreateDurationTest(0, 0, 0, 0);
         doCreateDurationTest(1, 2, 5, 4);
@@ -87,7 +86,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#createDays(int)}
      */
     @Test
-    public void testCreateDays()
+    void createDays()
     {
         doCreateDaysTest(0);
         doCreateDaysTest(-3);
@@ -103,7 +102,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#createWeeks(int)}
      */
     @Test
-    public void testCreateWeeks()
+    void createWeeks()
     {
         doCreateWeeksTest(0);
         doCreateWeeksTest(-1);
@@ -119,7 +118,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#createMonths(int)}
      */
     @Test
-    public void testCreateMonths()
+    void createMonths()
     {
         doCreateMonthsTest(0);
         doCreateMonthsTest(-13);
@@ -135,7 +134,7 @@ public class DurationFactoryTest
      * Test for {@link DurationFactory#createYears(int)}
      */
     @Test
-    public void testCreateYears()
+    void createYears()
     {
         doCreateYearsTest(0);
         doCreateYearsTest(-2);

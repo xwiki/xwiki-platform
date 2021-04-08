@@ -147,6 +147,10 @@ admin.other.description=Различные настройки для расши�
 administration.section.analytics.status=Статус
 administration.section.analytics.status.hint=Определите, активно ли отслеживание в Google Analytics ™
 
+# Social category
+admin.social=Социальные сети
+admin.social.description=Конфигурация для социальных функций.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 

@@ -26,8 +26,9 @@
       <tr #if ($block.isConflicting())class="diff-conflict"#end>
         <td class="diff-line-number">...</td>
         <td class="diff-line-number">...</td>
-        <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
-          +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+        #set ($previousMeta = "-$mathtool.add($block.previousStart, 1),$block.previousSize")
+        #set ($nextMeta = "+$mathtool.add($block.nextStart, 1),$block.nextSize")
+        <td class="diff-line diff-line-meta">@@ $previousMeta $nextMeta @@</td>
       </tr>
       #foreach ($line in $block)
         <tr #if ($block.isConflicting())class="diff-conflict"#end>
@@ -49,7 +50,7 @@
 <tr class="diff-conflict-resolution">
   <td class="diff-line-number"><span class="fa fa-pencil"></span></td>
   <td class="diff-line-number"></td>
-  <td class="diff-line" id="conflict_decision_container_$block.conflict.reference">
+  <td class="diff-line diff-line-decision" id="conflict_decision_container_$block.conflict.reference">
     #displayConflictValue($block.conflict "current")
     #displayConflictValue($block.conflict "previous")
     #displayConflictValue($block.conflict "next")
@@ -580,23 +581,21 @@
 #macro (displayDocumentChangesHeader $from $to)
   <div id="changes-info">
     <div id="changes-info-boxes">
+      #if ("$!from.previousLink" != '')
+        <a href="$from.previousLink" class="changes-arrow-left"
+          title="$escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))">&lt;</a>
+      #end
       <div id="changes-info-box-from" class="changes-info-box">
         #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink 'core.viewers.diff.from')
       </div> ## changes-info-box-from
       <div id="changes-info-box-to" class="changes-info-box">
         #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink 'core.viewers.diff.to')
       </div> ## changes-info-box-to
-      #if ("$!from.previousLink" != '')
-        <a href="$from.previousLink" class="changes-arrow-left"
-          title="$escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))">&lt;</a>
-      #end
       #if ("$!to.nextLink" != '')
         <a href="$to.nextLink" class="changes-arrow-right"
           title="$escapetool.xml($services.localization.render('core.viewers.diff.nextChange'))">&gt;</a>
       #end
-      <div class="clearfloats"></div>
     </div> ## changes-info-boxes
-    <div class="clearfloats"></div>
     <div id="changes-info-comment">
       $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
       #if ("$!to.doc.comment" == '')
@@ -606,7 +605,6 @@
       #end
     </div> ## changes-info-comment
   </div> ## changes-info
-  <div class="clearfloats"></div>
 #end
 
 #macro (displayDocumentRawChanges $origdoc $newdoc $conflictsList)
@@ -928,8 +926,9 @@ data-documentversion="$!version"##
       <tr>
         <td class="diff-line-number">...</td>
         <td class="diff-line-number">...</td>
-        <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
-          +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+        #set ($previousMeta = "-$mathtool.add($block.previousStart, 1),$block.previousSize")
+        #set ($nextMeta = "+$mathtool.add($block.nextStart, 1),$block.nextSize")
+        <td class="diff-line diff-line-meta">@@ $previousMeta $nextMeta @@</td>
       </tr>
       #foreach ($line in $block)
       <tr>

@@ -19,10 +19,13 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.JestClientManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.google.gson.Gson;
 
@@ -42,26 +45,31 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 5.2M2
  */
-public class DefaultPingSenderTest
+@ComponentTest
+class DefaultPingSenderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultPingSender> mocker =
-        new MockitoComponentMockingRule<>(DefaultPingSender.class);
+    @InjectMockComponents
+    private DefaultPingSender pingSender;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private JestClientManager jestManager;
 
     @Test
-    public void sendPing() throws Exception
+    void sendPing() throws Exception
     {
         JestClient client = mock(JestClient.class);
         DocumentResult indexResult = new DocumentResult(new Gson());
         indexResult.setSucceeded(true);
         when(client.execute(any(Index.class))).thenReturn(indexResult);
 
-        JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
-        when(jestManager.getClient()).thenReturn(client);
+        when(this.jestManager.getClient()).thenReturn(client);
 
-        PingDataProvider pingDataProvider = this.mocker.registerMockComponent(PingDataProvider.class, "test");
+        PingDataProvider pingDataProvider = this.componentManager.registerMockComponent(PingDataProvider.class, "test");
 
-        this.mocker.getComponentUnderTest().sendPing();
+        this.pingSender.sendPing();
 
         // Verify that provideMapping() and provideData() are called
         verify(pingDataProvider).provideMapping();
@@ -69,16 +77,15 @@ public class DefaultPingSenderTest
     }
 
     @Test
-    public void sendPingWhenClientNull() throws Exception
+    void sendPingWhenClientNull() throws Exception
     {
-        JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(null);
 
         // Register a data provider to make it available and to make sure it's not called, i.e. that a null client
         // will prevent a ping from being sent.
-        PingDataProvider pingDataProvider = this.mocker.registerMockComponent(PingDataProvider.class, "test");
+        PingDataProvider pingDataProvider = this.componentManager.registerMockComponent(PingDataProvider.class, "test");
 
-        this.mocker.getComponentUnderTest().sendPing();
+        this.pingSender.sendPing();
 
         // Verify that provideMapping() and provideData() are not called
         verify(pingDataProvider, never()).provideMapping();

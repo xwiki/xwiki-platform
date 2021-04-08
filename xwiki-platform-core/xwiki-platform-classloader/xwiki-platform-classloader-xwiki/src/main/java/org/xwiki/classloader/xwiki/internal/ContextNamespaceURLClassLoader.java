@@ -21,7 +21,6 @@ package org.xwiki.classloader.xwiki.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -59,7 +58,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
         // there's any NamingContext instance bound to it and at Tomcat's init (for example), Tomcat binds the defined
         // DataSource to the Tomcat CL (WebappClassLoader). Thus if we loose the path from our CL to the Tomcat CL, all
         // the DataSources defined in Tomcat will fail to be usable from our Hibernate code.
-        super(new URI[] {}, Thread.currentThread().getContextClassLoader(), null);
+        super(new URL[] {}, Thread.currentThread().getContextClassLoader(), null);
 
         this.wikis = wikis;
         this.classLoaderManager = classLoaderManager;
@@ -74,10 +73,11 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
             this.currentClassLoader =
                 this.classLoaderManager.getURLClassLoader(currentWiki != null ? "wiki:" + currentWiki : null, false);
 
+            // We protect against overridden implementations of ClassLoaderManager#getURLClassLoader() returning null
+            // (note that our default implementation doesn't and already falls back on the system classloader and thus
+            // this "if" is never going to be true with the default implementation).
             if (this.currentClassLoader == null) {
-                // Fallback on system classloader in the very weird edge case where ClassLoaderManager does not return
-                // any (which is already supposed to fallback on system classloader)
-                this.currentClassLoader = new NamespaceURLClassLoader(new URI[] {}, getSystemClassLoader(), null);
+                this.currentClassLoader = new NamespaceURLClassLoader(new URL[] {}, getSystemClassLoader(), null);
             }
 
             this.cachedCurrentWiki = currentWiki;
@@ -181,7 +181,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
     /**
      * {@inheritDoc}
      * <p>
-     * Yes it's a protected method but it's sometime called directly from {@link ClassLoader#loadClass(String, String)}.
+     * Yes it's a protected method but it's sometime called directly from {@link ClassLoader#loadClass(String, boolean)}
      * </p>
      * 
      * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)

@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -96,7 +97,7 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
     {
         List<String> types = getValidTypes();
 
-        return types.isEmpty() || types.contains(type);
+        return types.isEmpty() || types.contains(StringUtils.defaultString(type));
     }
 
 }

@@ -83,8 +83,7 @@ public class DatabaseMailResender implements MailResender
     private MailSender mailSender;
 
     @Override
-    public MailStatusResult resendAsynchronously(String batchId, String uniqueMessageId)
-        throws MailStoreException
+    public MailStatusResult resendAsynchronously(String batchId, String uniqueMessageId) throws MailStoreException
     {
         // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
         // to be able to call this method and for it to have any effect.
@@ -105,22 +104,39 @@ public class DatabaseMailResender implements MailResender
     public List<Pair<MailStatus, MailStatusResult>> resendAsynchronously(Map<String, Object> filterMap, int offset,
         int count) throws MailStoreException
     {
+        return resendGeneric(filterMap, offset, count,
+            (batchId, messageId) -> resendAsynchronously(batchId, messageId));
+    }
+
+    @Override
+    public List<Pair<MailStatus, MailStatusResult>> resend(Map<String, Object> filterMap, int offset, int count)
+        throws MailStoreException
+    {
+        return resendGeneric(filterMap, offset, count,
+            (batchId, messageId) -> resend(batchId, messageId));
+    }
+
+    private List<Pair<MailStatus, MailStatusResult>> resendGeneric(Map<String, Object> filterMap, int offset,
+        int count, SingleMailResender singleMailResender) throws MailStoreException
+    {
         List<Pair<MailStatus, MailStatusResult>> results = new ArrayList<>();
         List<MailStatus> statuses = this.store.load(filterMap, offset, count, null, true);
         for (MailStatus status : statuses) {
-            resendAsynchronouslySingleStatus(status, results);
+            resendSingleStatus(status, results, singleMailResender);
         }
         return results;
+
     }
 
-    private void resendAsynchronouslySingleStatus(MailStatus status, List<Pair<MailStatus, MailStatusResult>> results)
+    private void resendSingleStatus(MailStatus status, List<Pair<MailStatus, MailStatusResult>> results,
+        SingleMailResender singleMailResender)
     {
         // Only try to resend if the mail didn't fail because it couldn't be prepared, as this would mean the message
         // was never saved and thus we cannot resend it...
         if (!MailState.PREPARE_ERROR.toString().equals(status.getState())) {
             try {
                 results.add(new ImmutablePair<>(status,
-                    resendAsynchronously(status.getBatchId(), status.getMessageId())));
+                    singleMailResender.resendSingleMessage(status.getBatchId(), status.getMessageId())));
             } catch (MailStoreException e) {
                 // Failed to resend the message.
                 // Log a warning but continue to try to send the other mails...
@@ -134,5 +150,21 @@ public class DatabaseMailResender implements MailResender
     {
         MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
         return message;
+    }
+
+    private MailStatusResult resend(String batchId, String uniqueMessageId) throws MailStoreException
+    {
+        MailStatusResult result = resendAsynchronously(batchId, uniqueMessageId);
+        if (result != null) {
+            // Wait for the message to have been resent before returning
+            result.waitTillProcessed(Long.MAX_VALUE);
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    private interface SingleMailResender
+    {
+        MailStatusResult resendSingleMessage(String batchId, String messageId) throws MailStoreException;
     }
 }

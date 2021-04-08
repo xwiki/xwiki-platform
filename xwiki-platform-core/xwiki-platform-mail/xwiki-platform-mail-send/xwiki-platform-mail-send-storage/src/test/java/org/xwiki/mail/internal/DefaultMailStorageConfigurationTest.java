@@ -19,12 +19,15 @@
  */
 package org.xwiki.mail.internal;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import javax.inject.Named;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -33,28 +36,51 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4.1
  */
-public class DefaultMailStorageConfigurationTest
+@ComponentTest
+class DefaultMailStorageConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultMailStorageConfiguration> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailStorageConfiguration.class);
+    @InjectMockComponents
+    private DefaultMailStorageConfiguration configuration;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesSource;
+
+    @MockComponent
+    @Named("mailsend")
+    private ConfigurationSource mailConfigSource;
 
     @Test
-    public void discardSuccessStatusesWhenNotDefined() throws Exception
+    void discardSuccessStatusesWhenNotDefined()
     {
-        ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         when(xwikiPropertiesSource.getProperty("mail.sender.database.discardSuccessStatuses", 1)).thenReturn(1);
 
-        assertEquals(true, this.mocker.getComponentUnderTest().discardSuccessStatuses());
+        assertEquals(true, this.configuration.discardSuccessStatuses());
     }
 
     @Test
-    public void discardSuccessStatusesFalseWhenDefinedInMailConfig() throws Exception
+    void discardSuccessStatusesFalseWhenDefinedInMailConfig()
     {
-        ConfigurationSource mailConfigSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
         when(mailConfigSource.getProperty("discardSuccessStatuses")).thenReturn(0);
 
-        assertEquals(false, this.mocker.getComponentUnderTest().discardSuccessStatuses());
+        assertEquals(false, this.configuration.discardSuccessStatuses());
+    }
+
+    @Test
+    void resendAutomaticallyAtStartupWhenNotDefined()
+    {
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(true);
+
+        assertEquals(true, this.configuration.resendAutomaticallyAtStartup());
+    }
+
+    @Test
+    void resendAutomaticallyAtStartupWhenFalse()
+    {
+        when(xwikiPropertiesSource.getProperty(
+            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(false);
+
+        assertEquals(false, this.configuration.resendAutomaticallyAtStartup());
     }
 }

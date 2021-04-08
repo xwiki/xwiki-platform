@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
+define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
   //
   // Toggle between raw and rendered changes.
   //
@@ -32,8 +32,13 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         tabPanel.addClass('loading').load(url + ' #' + fragmentId, {'include': fragmentId}, function() {
           // Remove the duplicated tab pane div because the loaded tab pane doesn't replace the existing one.
           tabPanel.removeClass('loading').children('.tab-pane').children().unwrap();
+          $(document).trigger('xwiki:dom:updated', {'elements': tabPanel.toArray()});
         });
       }
+      // Toggle the corresponding actions.
+      var hint = $(event.target).data('hint');
+      $(event.target).closest('.changes-body-header').find('.changes-actions').removeClass('active').filter('.' + hint)
+        .addClass('active');
     });
   };
 
@@ -93,15 +98,43 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  var enhanceHTMLDiff = function(container) {
+  var hideHTMLDiffContext = function(htmlDiff) {
+    // Hide all context nodes.
+    htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', true);
     // Show ellipsis before and after diff blocks.
-    container.find('.html-diff [data-xwiki-html-diff-block]').each(function() {
+    htmlDiff.find('[data-xwiki-html-diff-block]').each(function() {
       maybeMarkEllipsis(getPreviousElement(this), true);
       maybeMarkEllipsis(getNextElement(this), false);
     });
+  };
+
+  var enhanceHTMLDiff = function(container) {
+    container.find('.html-diff-context-toggle').click(function(event) {
+      event.preventDefault();
+      var toggle = $(this);
+      var htmlDiff = toggle.closest('.changes-body').find('.html-diff');
+      if (toggle.hasClass('html-diff-context-toggle-show')) {
+        // Show all context nodes.
+        htmlDiff.find('[data-xwiki-html-diff-hidden]').attr('data-xwiki-html-diff-hidden', false);
+        toggle.removeClass('html-diff-context-toggle-show').addClass('html-diff-context-toggle-hide');
+      } else {
+        hideHTMLDiffContext(htmlDiff);
+        toggle.removeClass('html-diff-context-toggle-hide').addClass('html-diff-context-toggle-show');
+      }
+    });
+
+    var htmlDiff = (container.hasClass('html-diff') && container) || container.find('.html-diff');
+    hideHTMLDiffContext(htmlDiff);
+
+    // Enable the show / hide context toggle only if there are context nodes.
+    htmlDiff.each(function() {
+      var contextNodeCount = $(this).find('[data-xwiki-html-diff-hidden]').length;
+      $(this).closest('.changes-body').find('.html-diff-context-toggle').toggleClass('hidden', contextNodeCount === 0);
+    });
 
     // Show the hidden content when the ellipsis is clicked.
-    container.find('.html-diff').on('click', '[data-xwiki-html-diff-hidden="ellipsis"]', function() {
+    htmlDiff.off('click.showDiffContext').on('click.showDiffContext', '[data-xwiki-html-diff-hidden="ellipsis"]',
+    function() {
       $(this).attr('data-xwiki-html-diff-hidden', 'false');
       if ($(this).attr('data-xwiki-html-diff-expand') === 'up') {
         maybeMarkEllipsis(getPreviousElement(this), true);
@@ -165,3 +198,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   init($(document.body));
 });
+
+// Execute the code when this file is loaded with $xwiki.jsfx.use(). This is not needed if the file is loaded with
+// RequireJS but it shoudn't hurt either. We do this in order to ensure that the module code is executed only once.
+require(['xwiki-diff'], function() {});

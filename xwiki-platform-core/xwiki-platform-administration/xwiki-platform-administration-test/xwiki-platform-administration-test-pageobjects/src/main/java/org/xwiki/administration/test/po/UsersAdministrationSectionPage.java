@@ -22,6 +22,7 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
@@ -83,6 +84,9 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public UsersAdministrationSectionPage waitUntilPageIsLoaded()
     {
         this.usersLiveTable.waitUntilReady();
+        // The create user button is disabled initially and enabled later by the JavaScript code that handles the user
+        // creation (the create user modal).
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.createUserButton));
         return this;
     }
 

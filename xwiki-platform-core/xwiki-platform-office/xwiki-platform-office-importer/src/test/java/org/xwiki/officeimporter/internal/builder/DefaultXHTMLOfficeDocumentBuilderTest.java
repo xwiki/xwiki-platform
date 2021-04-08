@@ -20,23 +20,31 @@
 package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -69,6 +77,9 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @XWikiTempDir
+    private File outputDirectory;
+
     @MockComponent
     private OfficeServer officeServer;
 
@@ -85,11 +96,26 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
 
         InputStream officeFileStream = new ByteArrayInputStream("office content".getBytes());
-        Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
-        artifacts.put("file.html", "HTML content".getBytes());
-        artifacts.put("file.txt", "Text content".getBytes());
-        when(this.officeConverter.convert(Collections.singletonMap("file.odt", officeFileStream), "file.odt",
-            "file.html")).thenReturn(artifacts);
+
+        OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
+        when(converterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
+        File outputFile = new File(this.outputDirectory, "file.html");
+        when(converterResult.getOutputFile()).thenReturn(outputFile);
+        Set<File> allFiles = new HashSet<>();
+        allFiles.add(outputFile);
+        File otherArtifact = new File(this.outputDirectory, "file.txt");
+        allFiles.add(otherArtifact);
+
+        for (File file : allFiles) {
+            Files.createFile(file.toPath());
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            IOUtils.write("HTML content".getBytes(), fos);
+        }
+        when(converterResult.getAllFiles()).thenReturn(allFiles);
+
+        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odt", officeFileStream), "file.odt",
+            "file.html")).thenReturn(converterResult);
 
         Map<String, byte[]> embeddedImages = Collections.singletonMap("image.png", "Image content".getBytes());
         Document xhtmlDoc = mock(Document.class);
@@ -110,9 +136,9 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
 
         assertEquals(xhtmlDoc, result.getContentDocument());
 
-        Map<String, byte[]> expectedArtifacts = new HashMap<String, byte[]>();
-        expectedArtifacts.put("file.txt", artifacts.get("file.txt"));
-        expectedArtifacts.put("image.png", embeddedImages.get("image.png"));
-        assertEquals(expectedArtifacts, result.getArtifacts());
+        Set<File> expectedFileArtifacts = new HashSet<>();
+        expectedFileArtifacts.add(otherArtifact);
+        expectedFileArtifacts.add(new File(this.outputDirectory, "image.png"));
+        assertEquals(expectedFileArtifacts, result.getArtifactsFiles());
     }
 }

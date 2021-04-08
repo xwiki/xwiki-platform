@@ -38,6 +38,7 @@
                 <type>
                   <name>syntax</name>
                   <id>syntax</id>
+                  <variants class="empty-list"/>
                 </type>
                 <version>1.0</version>
               </org.xwiki.rendering.syntax.Syntax>
@@ -141,6 +142,7 @@
                 <type>
                   <name>syntax</name>
                   <id>syntax</id>
+                  <variants class="empty-list"/>
                 </type>
                 <version>1.0</version>
               </org.xwiki.rendering.syntax.Syntax>
@@ -244,6 +246,7 @@
                 <type>
                   <name>syntax</name>
                   <id>syntax</id>
+                  <variants class="empty-list"/>
                 </type>
                 <version>1.0</version>
               </org.xwiki.rendering.syntax.Syntax>

@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,6 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
     {
         Parser parser = this.componentManager.getInstance(Parser.class, syntax);
         XDOM xdom = parser.parse(new StringReader(content));
-        return new XDOMOfficeDocument(xdom, new HashMap<>(), this.componentManager);
+        return new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
     }
 }

@@ -25,10 +25,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-core</artifactId>
-  <name>XWiki Plarform - Search - SOLR - Server - Core</name>
+  <name>XWiki Platform - Search - SOLR - Server - Core</name>
   <packaging>jar</packaging>
   <description>A package containing a SOLR core for XWiki</description>
   <dependencies>

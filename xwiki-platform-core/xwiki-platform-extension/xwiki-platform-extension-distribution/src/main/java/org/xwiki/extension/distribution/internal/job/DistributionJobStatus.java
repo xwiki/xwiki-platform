@@ -223,4 +223,13 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     {
         return this.properties.get(key);
     }
+
+    /**
+     * @since 11.10.6
+     * @since 12.4
+     */
+    void removeProperty(String key)
+    {
+        this.properties.remove(key);
+    }
 }

@@ -71,6 +71,7 @@ public class NotificationsRSS
      */
     public void loadEntries(String containerDomain, String realDomain)
     {
+        String originalURL = this.url;
         this.url = this.url.replace(containerDomain, realDomain);
         HttpClient client = HttpClientBuilder.create().build();
 
@@ -87,7 +88,10 @@ public class NotificationsRSS
             SyndFeedInput input = new SyndFeedInput();
             feed = input.build(new XmlReader(response.getEntity().getContent()));
         } catch (Exception e) {
-            throw new AssertionError(String.format("Error while loading and parsing the RSS feed from URL [%s]", url),
+            throw new AssertionError(
+                String.format("Error while loading and parsing the RSS feed from URL [%s]. "
+                    + "Original URL was [%s] internal domain [%s] replaced by external one [%s].",
+                    url, originalURL, containerDomain, realDomain),
                 e);
         }
     }

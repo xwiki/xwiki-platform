@@ -32,8 +32,6 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public class TestReference extends DocumentReference
 {
-    private DocumentReference reference;
-
     /**
      * @param extensionContext the test context
      */

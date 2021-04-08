@@ -21,15 +21,15 @@ package org.xwiki.url.internal;
 
 import java.util.Arrays;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link URLStringEntityReferenceSerializer}.
@@ -37,21 +37,21 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 8.2M1
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class,
     URLSymbolScheme.class
 })
-public class URLStringEntityReferenceSerializerTest
+class URLStringEntityReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<URLStringEntityReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(URLStringEntityReferenceSerializer.class);
+    @InjectMockComponents
+    private URLStringEntityReferenceSerializer serializer;
 
     @Test
-    public void serializeReferences() throws Exception
+    void serializeReferences()
     {
         EntityReference reference = new DocumentReference("wiki!", Arrays.asList("space:.!"), "page.!");
-        assertEquals("wiki!!:space!:!.!!.page!.!!", this.mocker.getComponentUnderTest().serialize(reference));
+        assertEquals("wiki!!:space!:!.!!.page!.!!", this.serializer.serialize(reference));
     }
 }
 

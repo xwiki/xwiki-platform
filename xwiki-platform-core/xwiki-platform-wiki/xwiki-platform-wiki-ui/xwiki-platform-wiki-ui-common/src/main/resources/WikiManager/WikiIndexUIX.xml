@@ -114,7 +114,13 @@
   ##
   ## The wiki index is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
   #set ($wikiIndexRef = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
-  #if (($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY') &amp;&amp; $xwiki.exists($wikiIndexRef) &amp;&amp; $services.security.authorization.hasAccess('view', $wikiIndexRef))
+  #set ($hasAccessToWikiManagerHome = $services.security.authorization.hasAccess('view', $wikiIndexRef))
+  ## Logs to debug problems when displaying UIXes.
+  #set ($discard = $services.logging.getLogger('WikiManager.WikiIndexUIX').debug('Main wiki: [{}]', $xcontext.isMainWiki()))
+  #set ($discard = $services.logging.getLogger('WikiManager.WikiIndexUIX').debug('User scope: [{}]', $!services.wiki.user.userScope))
+  #set ($discard = $services.logging.getLogger('WikiManager.WikiIndexUIX').debug('Wiki Manager home exists: [{}]', $xwiki.exists($wikiIndexRef)))
+  #set ($discard = $services.logging.getLogger('WikiManager.WikiIndexUIX').debug('Wiki Manager home access: [{}]', $hasAccessToWikiManagerHome))
+  #if (($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY') &amp;&amp; $xwiki.exists($wikiIndexRef) &amp;&amp; $hasAccessToWikiManagerHome)
     #drawerItem($xwiki.getURL($wikiIndexRef), 'list', $escapetool.xml($services.localization.render('platform.wiki.menu.wikiindex')))
   #end
 {{/html}}{{/velocity}}

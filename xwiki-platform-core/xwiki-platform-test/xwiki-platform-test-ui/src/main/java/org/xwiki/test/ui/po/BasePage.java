@@ -29,7 +29,6 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
@@ -369,10 +368,12 @@ public class BasePage extends BaseElement
 
     /**
      * @since 7.3M2
+     * @deprecated use {@link #clickMoreActionsSubMenuEntry(String)} instead which has a better name
      */
+    @Deprecated
     public void clickAdminActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickMoreActionsSubMenuEntry(id);
     }
 
     /**
@@ -402,13 +403,13 @@ public class BasePage extends BaseElement
      */
     public CopyPage copy()
     {
-        clickAdminActionsSubMenuEntry("tmActionCopy");
+        clickMoreActionsSubMenuEntry("tmActionCopy");
         return new CopyPage();
     }
 
     public RenamePage rename()
     {
-        clickAdminActionsSubMenuEntry("tmActionRename");
+        clickMoreActionsSubMenuEntry("tmActionRename");
         return new RenamePage();
     }
 
@@ -417,8 +418,21 @@ public class BasePage extends BaseElement
      */
     public ConfirmationPage delete()
     {
-        clickAdminActionsSubMenuEntry("tmActionDelete");
+        clickMoreActionsSubMenuEntry("tmActionDelete");
         return new ConfirmationPage();
+    }
+
+    /**
+     * Specific delete action when the delete action is performed on a page.
+     *
+     * @return a specialized confirmation page for page deletion
+     *
+     * @since 12.8RC1
+     */
+    public DeletePageConfirmationPage deletePage()
+    {
+        clickMoreActionsSubMenuEntry("tmActionDelete");
+        return new DeletePageConfirmationPage();
     }
 
     /**
@@ -577,42 +591,6 @@ public class BasePage extends BaseElement
         toggleNotificationsMenu();
         this.watchWikiLink.click();
         toggleNotificationsMenu();
-    }
-
-    /**
-     * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
-     * safely.
-     * <p>
-     * Subclassed should override this method and add additional checks needed by their logic.
-     * 
-     * @since 6.2
-     */
-    public void waitUntilPageJSIsLoaded()
-    {
-        // Prototype
-        getDriver().waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
-
-        // JQuery and dependencies
-        // JQuery dropdown plugin needed for the edit button's dropdown menu.
-        // TODO: We seem to have a flicker possibly caused by this check taking more than the default 10s timeout from
-        // time to time, see https://jira.xwiki.org/browse/XCOMMONS-1865. Testing this hypothesis by waiting a first
-        // time and if it fails waiting again and logging some message. Remove if the increased timeout doesn't help.
-        // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
-        // machine, etc).
-        try {
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        } catch (TimeoutException e) {
-            LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
-            getDriver()
-                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
-        }
-
-        // Make sure all asynchronous elements have been executed
-        getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
-
-        // Make sure the shortcuts are loaded
-        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 
     /**

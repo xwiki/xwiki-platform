@@ -20,15 +20,18 @@
 package com.xpn.xwiki.web;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -47,6 +50,9 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 2.4M2
  */
+@Component
+@Named("create")
+@Singleton
 public class CreateAction extends XWikiAction
 {
     /**
@@ -89,11 +95,6 @@ public class CreateAction extends XWikiAction
      * Local entity reference serializer hint.
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
-
-    /**
-     * Current entity reference resolver hint.
-     */
-    private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
 
     /**
      * The action to perform when creating a new page from a template.
@@ -236,10 +237,6 @@ public class CreateAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
 
-        // resolver to use to resolve references received in request parameters
-        DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
-
         String parent = getParent(request, doc, isSpace, context);
 
         // get the title of the page to create, as specified in the parameters
@@ -254,28 +251,10 @@ public class CreateAction extends XWikiAction
 
         String action = null;
         if (actionOnCreate == ActionOnCreate.SAVE_AND_EDIT) {
-            XWiki xwiki = context.getWiki();
-
-            DocumentReference templateReference = resolver.resolve(template);
-            newDocument.readFromTemplate(templateReference, context);
-            if (!StringUtils.isEmpty(parent)) {
-                DocumentReference parentReference = resolver.resolve(parent);
-                newDocument.setParentReference(parentReference);
-            }
-            if (title != null) {
-                newDocument.setTitle(title);
-            }
-            DocumentReference currentUserReference = context.getUserReference();
-            newDocument.setAuthorReference(currentUserReference);
-            newDocument.setCreatorReference(currentUserReference);
-
-            // Make sure the user is allowed to make this modification
-            context.getWiki().checkSavingDocument(currentUserReference, newDocument, context);
-
-            xwiki.saveDocument(newDocument, context);
+            initAndSaveDocument(context, newDocument, title, template, parent);
             action = newDocument.getDefaultEditMode(context);
         } else {
-            action = actionOnCreate == ActionOnCreate.SAVE_AND_VIEW ? "save" : getEditMode(template, resolver, context);
+            action = actionOnCreate == ActionOnCreate.SAVE_AND_VIEW ? "save" : getEditMode(template, context);
         }
 
         // Perform a redirection to the selected action of the document to create.
@@ -290,6 +269,53 @@ public class CreateAction extends XWikiAction
             // Perform the redirect
             sendRedirect(context.getResponse(), redirectURL);
         }
+    }
+
+    /**
+     * Initialize and save the new document before editing it. Follow the steps done by the Save action.
+     * 
+     * @param context the XWiki context
+     * @param newDocument the document being created
+     * @param title the document title
+     * @param template the template to copy
+     * @param parent the parent document
+     * @throws XWikiException if copying the template or saving the document fails
+     */
+    private void initAndSaveDocument(XWikiContext context, XWikiDocument newDocument, String title, String template,
+        String parent) throws XWikiException
+    {
+        XWiki xwiki = context.getWiki();
+
+        // Set the locale and default locale, considering that we're creating the original version of the document
+        // (not a translation).
+        newDocument.setLocale(Locale.ROOT);
+        if (newDocument.getDefaultLocale() == Locale.ROOT) {
+            newDocument.setDefaultLocale(xwiki.getLocalePreference(context));
+        }
+
+        // Copy the template.
+        readFromTemplate(newDocument, template, context);
+
+        // Set the parent field.
+        if (!StringUtils.isEmpty(parent)) {
+            DocumentReference parentReference = getCurrentMixedDocumentReferenceResolver().resolve(parent);
+            newDocument.setParentReference(parentReference);
+        }
+
+        // Set the document title
+        if (title != null) {
+            newDocument.setTitle(title);
+        }
+
+        // Set the author and creator.
+        DocumentReference currentUserReference = context.getUserReference();
+        newDocument.setAuthorReference(currentUserReference);
+        newDocument.setCreatorReference(currentUserReference);
+
+        // Make sure the user is allowed to make this modification
+        xwiki.checkSavingDocument(currentUserReference, newDocument, context);
+
+        xwiki.saveDocument(newDocument, context);
     }
 
     private String getRedirectParameters(String parent, String title, String template, ActionOnCreate actionOnCreate)
@@ -425,7 +451,7 @@ public class CreateAction extends XWikiAction
      * @return the default edit mode for a document created from the passed template
      * @throws XWikiException in case something goes wrong accessing template document
      */
-    private String getEditMode(String template, DocumentReferenceResolver<String> resolver, XWikiContext context)
+    private String getEditMode(String template, XWikiContext context)
         throws XWikiException
     {
         // Determine the edit action (edit/inline) for the newly created document, if a template is passed it is
@@ -433,7 +459,7 @@ public class CreateAction extends XWikiAction
         String editAction = ActionOnCreate.EDIT.name().toLowerCase();
         XWiki xwiki = context.getWiki();
         if (!StringUtils.isEmpty(template)) {
-            DocumentReference templateReference = resolver.resolve(template);
+            DocumentReference templateReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
             if (xwiki.exists(templateReference, context)) {
                 editAction = xwiki.getDocument(templateReference, context).getDefaultEditMode(context);
             }

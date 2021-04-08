@@ -21,6 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -32,6 +36,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 
+@Component
+@Named("downloadrev")
+@Singleton
 public class DownloadRevAction extends DownloadAction
 {
     @Override

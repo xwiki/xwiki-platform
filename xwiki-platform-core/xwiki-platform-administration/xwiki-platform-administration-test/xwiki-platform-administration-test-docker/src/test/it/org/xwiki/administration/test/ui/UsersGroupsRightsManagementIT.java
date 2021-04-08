@@ -109,56 +109,124 @@ public class UsersGroupsRightsManagementIT
         assertFalse(rightsEditPage.hasEntity(groupName));
     }
 
+    /**
+     * Verify the following group editing features, from 2 locations: from the Admin UI Group page and from the
+     * Group page itself (in inline edit mode):
+     * <ul>
+     * <li>Validate adding users as group members.</li>
+     * <li>Validate adding sub-groups</li>
+     * <li>Validate removing user members.</li>
+     * <li>Validate removing sub-groups.</li>
+     * </ul>
+     */
     @Test
     @Order(2)
-    public void addUserAndSubgroupToGroup(TestUtils setup, TestReference testReference) throws Exception
+    public void editGroup(TestUtils setup, TestReference testReference) throws Exception
     {
+        //
+        // Setup
+        //
+
         String testName = testReference.getLastSpaceReference().getName();
-        String BIG_GROUP = String.format("%s_%s", testName, "biggroup");
-        String SUB_GROUP = String.format("%s_%s", testName, "subgroup");
-        String TESTER = String.format("%s_%s", testName, "tester");
-        String TESTER2 = String.format("%s_%s", testName, "anothertester");
+        String devs = String.format("%s_%s", testName, "devs");
+        String frontEndDevs = String.format("%s_%s", testName, "frontEndDevs");
+        String backEndDevs = String.format("%s_%s", testName, "backEndDevs");
+        String alice = String.format("%s_%s", testName, "Alice");
+        String bob = String.format("%s_%s", testName, "Bob");
 
         // Clean-up
-        setup.rest().deletePage("XWiki", BIG_GROUP);
-        setup.rest().deletePage("XWiki", SUB_GROUP);
-        setup.rest().deletePage("XWiki", TESTER);
-        setup.rest().deletePage("XWiki", TESTER2);
+        setup.rest().deletePage("XWiki", devs);
+        setup.rest().deletePage("XWiki", frontEndDevs);
+        setup.rest().deletePage("XWiki", backEndDevs);
+        setup.rest().deletePage("XWiki", alice);
+        setup.rest().deletePage("XWiki", bob);
 
-        // Create the groups & the user
-        setup.createUser(TESTER, TESTER, "", "first_name", "", "last_name", "");
-        setup.createUser(TESTER2, TESTER2, "", "first_name", "", "last_name", "");
+        // Create the groups & the users.
+        setup.createUser(alice, alice, "", "first_name", "", "last_name", "");
+        setup.createUser(bob, bob, "", "first_name", "", "last_name", "");
         GroupsPage groupsPage = GroupsPage.gotoPage();
-        groupsPage.addNewGroup(SUB_GROUP);
-        groupsPage.addNewGroup(BIG_GROUP);
+        groupsPage.addNewGroup(frontEndDevs).addNewGroup(backEndDevs).addNewGroup(devs);
 
-        // Test that the 2 groups have been successfully added
-        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", BIG_GROUP), "bigGroup doesn't exist!");
-        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", SUB_GROUP), "subGroup doesn't exist!");
+        // Test that the groups have been successfully added.
+        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", devs), "devs group doesn't exist!");
+        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", frontEndDevs), "frontEndDevs group doesn't exist!");
+        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", backEndDevs), "backEndDevs group doesn't exist!");
 
-        // Add SUB_GROUP & TESTER as members of BIG_GROUP
-        GroupEditPage bigGroupPage = GroupEditPage.gotoPage(new DocumentReference("xwiki", "XWiki", BIG_GROUP));
-        bigGroupPage.addMemberToGroup(SUB_GROUP, false);
-        bigGroupPage.addMemberToGroup(TESTER, true);
+        //
+        // Work with the group page directly.
+        //
 
-        // Test that SUB_GROUP is a member of BIG_GROUP
-        bigGroupPage.filterMembers(SUB_GROUP);
-        assertTrue(bigGroupPage.getMembersTable().hasRow("Member", SUB_GROUP), "subGroup is not part of bigGroup!");
+        // Add members by editing the group page directly.
+        GroupEditPage devsGroupPage = GroupEditPage.gotoPage(new DocumentReference("xwiki", "XWiki", devs));
+        devsGroupPage.addGroups(frontEndDevs, backEndDevs).addUsers(alice, bob);
 
-        // Test that TESTER is a member of BIG_GROUP
-        bigGroupPage.filterMembers(TESTER);
-        assertTrue(bigGroupPage.getMembersTable().hasRow("Member", TESTER), "tester is not part of bigGroup!");
+        // Verify that the members have been added to the live table.
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", frontEndDevs),
+            "frontEndDevs group is not part of devs group!");
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", backEndDevs),
+            "backEndDevs group is not part of devs group!");
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", alice), "Alice is not part of devs group!");
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", bob), "Bob is not part of devs group!");
 
-        // Test adding an user through the modal edit
+        // Remove an user and a sub-group.
+        devsGroupPage.removeMembers(alice, backEndDevs);
+
+        // Verify that the live table has been updated.
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", frontEndDevs),
+            "frontEndDevs group is not part of devs group!");
+        assertFalse(devsGroupPage.getMembersTable().hasRow("Member", backEndDevs),
+            "backEndDevs group is still part of devs group!");
+        assertFalse(devsGroupPage.getMembersTable().hasRow("Member", alice), "Alice is still part of devs group!");
+        assertTrue(devsGroupPage.getMembersTable().hasRow("Member", bob), "Bob is not part of devs group!");
+
+        //
+        // Work with the group edit modal from the administration.
+        //
+
+        // Edit the group from the administration, using the modal.
         groupsPage = GroupsPage.gotoPage();
-        EditGroupModal editGroupModal = groupsPage.clickEditGroup(BIG_GROUP);
-        assertFalse(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is part of bigGroup!");
-        editGroupModal.addMember(TESTER2, true);
-        editGroupModal.close();
-        // Wait for the groups live table to be reloaded.
+        assertEquals("2", groupsPage.getMemberCount(devs));
+        EditGroupModal devsGroupModal = groupsPage.clickEditGroup(devs);
+
+        // Verify that the changes we did by editing the group page directly have been saved.
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", frontEndDevs),
+            "frontEndDevs group is not part of devs group!");
+        assertFalse(devsGroupModal.getMembersTable().hasRow("Member", backEndDevs),
+            "backEndDevs group is part of devs group!");
+        assertFalse(devsGroupModal.getMembersTable().hasRow("Member", alice), "Alice is part of devs group!");
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", bob), "Bob is not part of devs group!");
+
+        // Add new members to the group.
+        devsGroupModal.addUsers(alice).addGroups(backEndDevs);
+
+        // Check if the group live table is updated.
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", backEndDevs),
+            "backEndDevs group is not part of devs group!");
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", alice), "Alice is not part of devs group!");
+
+        // Close the modal and wait for the groups live table to be reloaded.
+        devsGroupModal.close();
         groupsPage.getGroupsTable().waitUntilReady();
-        editGroupModal = groupsPage.clickEditGroup(BIG_GROUP);
-        assertTrue(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is not part of bigGroup!");
+
+        // Check the new group member count.
+        assertEquals("4", groupsPage.getMemberCount(devs));
+
+        // Edit the group again and remove some members.
+        devsGroupModal = groupsPage.clickEditGroup(devs);
+        devsGroupModal.removeMembers(bob, backEndDevs);
+
+        // Verify that the live table is updated.
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", frontEndDevs),
+            "frontEndDevs group is not part of devs group!");
+        assertFalse(devsGroupModal.getMembersTable().hasRow("Member", backEndDevs),
+            "backEndDevs group is still part of devs group!");
+        assertTrue(devsGroupModal.getMembersTable().hasRow("Member", alice), "Alice is not part of devs group!");
+        assertFalse(devsGroupModal.getMembersTable().hasRow("Member", bob), "Bob is still part of devs group!");
+
+        // Close the modal and check the updated member count.
+        devsGroupModal.close();
+        groupsPage.getGroupsTable().waitUntilReady();
+        assertEquals("2", groupsPage.getMemberCount(devs));
     }
 
     /**
@@ -309,54 +377,10 @@ public class UsersGroupsRightsManagementIT
     }
 
     /**
-     * Test adding a group to a group. Specifically, assert that the group is added as a member itself, not adding all
-     * its members one by one.
-     */
-    @Test
-    @Order(7)
-    public void addGroupToGroup(TestUtils setup, TestReference testReference)
-    {
-        String groupName = testReference.getLastSpaceReference().getName();
-
-        // ensure the group doesn't exist yet
-        setup.deletePage("XWiki", groupName);
-
-        GroupsPage groupsPage = GroupsPage.gotoPage();
-        groupsPage = groupsPage.addNewGroup(groupName);
-
-        groupsPage.filterGroups(groupName);
-        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
-        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "0"));
-
-        EditGroupModal editGroupModal = groupsPage.clickEditGroup(groupName);
-        assertEquals(0, editGroupModal.getMembersTable().getRowCount());
-        editGroupModal.addMember("XWikiAllGroup", false);
-        assertEquals(1, editGroupModal.getMembersTable().getRowCount());
-        assertTrue(editGroupModal.getMembersTable().hasRow("Member", "XWikiAllGroup"));
-        editGroupModal.close();
-        groupsPage.getGroupsTable().waitUntilReady();
-
-        assertEquals(1, groupsPage.getGroupsTable().getRowCount());
-        assertTrue(groupsPage.getGroupsTable().hasRow("Members", "1"));
-
-        // Now do the same by editing the group page in Inline Form edit mode.
-        setup.deletePage("XWiki", groupName);
-
-        groupsPage = GroupsPage.gotoPage();
-        groupsPage = groupsPage.addNewGroup(groupName);
-
-        setup.gotoPage("XWiki", groupName, "edit", "editor=inline");
-        GroupEditPage groupEditPage = new GroupEditPage();
-        groupEditPage = groupEditPage.addMemberToGroup("XWikiAllGroup", false);
-
-        assertTrue(groupEditPage.getMembersTable().hasRow("Member", "XWikiAllGroup"));
-    }
-
-    /**
      * Validate member filtering on group sheet.
      */
     @Test
-    @Order(8)
+    @Order(7)
     public void testFilteringOnGroupSheet(TestUtils setup, TestReference testReference)
     {
         String groupName = testReference.getLastSpaceReference().getName();

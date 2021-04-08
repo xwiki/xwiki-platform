@@ -551,10 +551,25 @@ public class XWikiDocumentTest
 
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
             "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
+
+        assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 & 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#38; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 < 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#60; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 > 2");
+
+        assertEquals("1 > 2", this.document.display("string", "view", this.oldcore.getXWikiContext()));
 
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}",
             this.document.display("area", "view", this.oldcore.getXWikiContext()));
@@ -650,75 +665,6 @@ public class XWikiDocumentTest
 
         assertEquals("<p><strong>bold</strong></p>",
             this.document.getRenderedContent("**bold**", "xwiki/2.0", this.oldcore.getXWikiContext()));
-    }
-
-    @Test
-    public void rename() throws XWikiException
-    {
-        // Possible ways to write parents, include documents, or make links:
-        // "name" -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
-        // "space.name" -means----> DOCWIKI+":"+input
-        // "database:space.name" (no change)
-
-        this.document.setContent("[[doc:pageinsamespace]]");
-        this.document.setSyntax(Syntax.XWIKI_2_1);
-        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        XWikiDocument targetDocument = this.document.duplicate(targetReference);
-        targetDocument.setStore(this.xWikiStoreInterface);
-
-        DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
-        XWikiDocument doc1 = new XWikiDocument(reference1);
-        doc1.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>doc:" + DOCSPACE + "."
-            + DOCNAME + "]] [[doc:" + DOCNAME + "]]");
-        doc1.setSyntax(Syntax.XWIKI_2_1);
-        doc1.setStore(this.xWikiStoreInterface);
-
-        DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
-        XWikiDocument doc2 = new XWikiDocument(reference2);
-        doc2.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc2.setSyntax(Syntax.XWIKI_2_1);
-        doc2.setStore(this.xWikiStoreInterface);
-
-        DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
-        XWikiDocument doc3 = new XWikiDocument(reference3);
-        doc3.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc3.setSyntax(Syntax.XWIKI_2_1);
-        doc3.setStore(this.xWikiStoreInterface);
-
-        // Test to make sure it also drags children along.
-        DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
-        XWikiDocument doc4 = new XWikiDocument(reference4);
-        doc4.setParent(DOCSPACE + "." + DOCNAME);
-        doc4.setStore(this.xWikiStoreInterface);
-
-        DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
-        XWikiDocument doc5 = new XWikiDocument(reference5);
-        doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
-        doc5.setStore(this.xWikiStoreInterface);
-
-        when(this.xWiki.copyDocument(any(), any(), any())).thenReturn(true);
-        when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
-        when(this.xWiki.getDocument(eq(reference1), any())).thenReturn(doc1);
-        when(this.xWiki.getDocument(eq(reference2), any())).thenReturn(doc2);
-        when(this.xWiki.getDocument(eq(reference3), any())).thenReturn(doc3);
-        when(this.xWiki.getDocument(eq(reference4), any())).thenReturn(doc4);
-        when(this.xWiki.getDocument(eq(reference5), any())).thenReturn(doc5);
-        when(this.xWikiStoreInterface.getTranslationList(any(), any())).thenReturn(Arrays.asList());
-
-        this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5),
-            this.oldcore.getXWikiContext());
-
-        // Test links
-        assertEquals("[[doc:Wiki:Space.pageinsamespace]]", this.document.getContent());
-        assertEquals("[[doc:newwikiname:newspace.newpage]] " + "[[someName>>doc:newwikiname:newspace.newpage]] "
-            + "[[doc:newwikiname:newspace.newpage]]", doc1.getContent());
-        assertEquals("[[doc:newspace.newpage]]", doc2.getContent());
-        assertEquals("[[doc:newpage]]", doc3.getContent());
-
-        // Test parents
-        assertEquals("newwikiname:newspace.newpage", doc4.getParent());
-        assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"), doc5.getParentReference());
     }
 
     /**

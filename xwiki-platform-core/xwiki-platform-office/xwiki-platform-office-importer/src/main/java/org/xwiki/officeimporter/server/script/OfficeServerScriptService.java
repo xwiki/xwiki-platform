@@ -34,6 +34,7 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office manager APIs to server-side scripts.
@@ -155,9 +156,31 @@ public class OfficeServerScriptService implements ScriptService
     }
 
     /**
-     * @return current status of the office server process as a string
+     * Determine if the server is connected. This method should be used as a check whenever to activate a feature that
+     * needs Office Server.
+     *
+     * @return {@code true} iff the server state is connected.
+     * @since 12.3
+     * @since 11.10.5
      */
-    public String getServerState()
+    @Unstable
+    public boolean isConnected()
+    {
+        this.officeServer.refreshState();
+        return this.officeServer.getState() == OfficeServer.ServerState.CONNECTED;
+    }
+
+    /**
+     * Display the translated state of the server.
+     * This should only be used in the administration to have a precise view on the state. For other usages,
+     * {@link #isConnected()} should be used.
+     *
+     * @return a translated string describing the server state.
+     * @since 12.3
+     * @since 11.10.5
+     */
+    @Unstable
+    public String displayServerState()
     {
         this.officeServer.refreshState();
 
@@ -175,7 +198,20 @@ public class OfficeServerScriptService implements ScriptService
             CaseUtils.toCamelCase(this.officeServer.getState().name().toLowerCase(), false, '_');
 
         return this.contextualLocalizationManager
-                   .getTranslationPlain(TRANSLATION_KEY_SERVER_STATE_PREFIX + normalizedStatusKey);
+            .getTranslationPlain(TRANSLATION_KEY_SERVER_STATE_PREFIX + normalizedStatusKey);
+    }
+
+    /**
+     * @return current status of the office server process as a string
+     * @deprecated Since 12.3 this method shouldn't be used anymore: if the goal is to know if the server is connected
+     *              or not, then {@link #isConnected()} should be used instead. If the goal is to display the state of
+     *              the server then {@link #displayServerState()} should be used.
+     */
+    @Deprecated
+    public String getServerState()
+    {
+        this.officeServer.refreshState();
+        return this.officeServer.getState().toString();
     }
 
     /**

@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -30,10 +34,19 @@ import com.xpn.xwiki.doc.XWikiLock;
 /**
  * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
  */
+@Component
+@Named("inline")
+@Singleton
 @Deprecated
 public class InlineAction extends XWikiAction
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
+    }
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -69,7 +82,7 @@ public class InlineAction extends XWikiAction
                 doc2.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
             }
             try {
-                doc2.readFromTemplate(peform, context);
+                readFromTemplate(doc2, peform.getTemplate(), context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     return "docalreadyexists";
@@ -80,7 +93,7 @@ public class InlineAction extends XWikiAction
                 context.put("cdoc", doc2);
             } else {
                 XWikiDocument cdoc2 = cdoc.clone();
-                cdoc2.readFromTemplate(peform, context);
+                readFromTemplate(cdoc2, peform.getTemplate(), context);
                 context.put("cdoc", cdoc2);
             }
 

@@ -19,15 +19,12 @@
  */
 package org.xwiki.notifications.filters.watch;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Possible ways of automatically watching documents.
  * 
  * @version $Id$
  * @since 9.8RC1
  */
-@Unstable
 public enum AutomaticWatchMode
 {
     /**

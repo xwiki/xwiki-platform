@@ -27,21 +27,27 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.properties.internal.converter.LocaleConverter;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -50,6 +56,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -58,9 +65,10 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@AllComponents
+@SolrComponentList
 @ComponentTest
-public class DefaultSolrTest
+@ComponentList({TestSolrCoreInitializer.class, LocaleConverter.class})
+class DefaultSolrTest
 {
     @XWikiTempDir
     private File permanentDirectory;
@@ -100,7 +108,7 @@ public class DefaultSolrTest
     // Tests
 
     @Test
-    public void getXWikiClient() throws Exception
+    void searchClient() throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class);
 
@@ -108,15 +116,27 @@ public class DefaultSolrTest
 
         assertNotNull(client);
 
-        client.add(new SolrInputDocument("id", "42"));
+        client.add(new SolrInputDocument("id", "0"));
 
-        SolrDocument storedDocument = client.getById("42");
+        SolrDocument storedDocument = client.getById("0");
 
         assertNotNull(storedDocument);
+
+        SolrInputDocument inputDocument = new SolrInputDocument("id", "1");
+
+        inputDocument.setField(FieldUtils.NAME, "name");
+        inputDocument.setField(FieldUtils.DOCUMENT_LOCALE, "");
+
+        client.add(inputDocument);
+
+        storedDocument = client.getById("1");
+
+        assertEquals("name", storedDocument.get(FieldUtils.NAME));
+        assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
     }
 
     @Test
-    public void getTestClient() throws Exception
+    void testClient() throws Exception
     {
         Solr solr = this.componentManager.getInstance(Solr.class);
         SolrUtils solrUtils = this.componentManager.getInstance(SolrUtils.class);
@@ -125,11 +145,23 @@ public class DefaultSolrTest
 
         assertNotNull(client);
 
+        assertTrue(client.query(new SolrQuery()).getResults().isEmpty());
+
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put("name", "content");
         fieldAttributes.put("type", "string");
         new SchemaRequest.AddField(fieldAttributes).process(client);
         fieldAttributes.put("name", "testlocale");
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "testlist");
+        fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "testlocales");
+        fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "text");
+        fieldAttributes.put("type", "text_general");
+        fieldAttributes.remove("multiValued");
         new SchemaRequest.AddField(fieldAttributes).process(client);
 
         SolrInputDocument inputDocument = new SolrInputDocument();
@@ -150,15 +182,25 @@ public class DefaultSolrTest
 
         solrUtils.setString("testlocale", Locale.FRANCE, inputDocument);
 
-        client.add(inputDocument);
+        solrUtils.setString("testlocales", Arrays.asList(Locale.ENGLISH, Locale.FRENCH), Locale.class, inputDocument);
 
+        solrUtils.set("text", "two words UPPERCASE", inputDocument);
+
+        client.add(inputDocument);
         client.commit();
 
+        assertEquals(1, client.query(new SolrQuery()).getResults().size());
+
         SolrDocument storedDocument = client.getById("42");
+
+        assertNotNull(storedDocument);
 
         assertEquals("42", solrUtils.getId(storedDocument));
         assertEquals("content1", solrUtils.get("content", storedDocument));
         assertEquals(Locale.FRANCE, solrUtils.get("testlocale", storedDocument, Locale.class));
+        assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH),
+            solrUtils.getCollection("testlocales", storedDocument, Locale.class));
+        assertEquals("two words UPPERCASE", solrUtils.get("text", storedDocument));
 
         Map<String, Object> storedMap = solrUtils.getMap("testmap", storedDocument);
 
@@ -171,7 +213,49 @@ public class DefaultSolrTest
         assertEquals(Arrays.asList("testvalue1", "testvalue2"), storedMap.get("teststrings"));
         assertEquals(Arrays.asList(43, 44), storedMap.get("testints"));
 
-        assertNotNull(storedDocument);
+        SolrQuery query = new SolrQuery("content:content1");
+        SolrDocumentList documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("content1");
+        query.set(CommonParams.DF, "content");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("two");
+        query.set(CommonParams.DF, "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("words");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("uppercase");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
+
+        query = new SolrQuery("UPPERCASE");
+        query.set("defType", "edismax");
+        query.set("qf", "text");
+        documents = client.query(query).getResults();
+        assertEquals(1, documents.size());
+        storedDocument = documents.get(0);
+        assertEquals("42", solrUtils.getId(storedDocument));
 
         SchemaResponse.FieldTypeResponse response = new SchemaRequest.FieldType("__xversion").process(client);
         assertEquals(String.valueOf(AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION),
@@ -179,5 +263,33 @@ public class DefaultSolrTest
         response = new SchemaRequest.FieldType("__cversion").process(client);
         assertEquals(String.valueOf(TestSolrCoreInitializer.VERSION),
             response.getFieldType().getAttributes().get("defVal"));
+
+        inputDocument = new SolrInputDocument();
+
+        solrUtils.setId("42", inputDocument);
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic", inputDocument);
+
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic", "atomic2"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic", "atomic2"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic"), solrUtils.get("testlist", client.getById("42")));
     }
 }

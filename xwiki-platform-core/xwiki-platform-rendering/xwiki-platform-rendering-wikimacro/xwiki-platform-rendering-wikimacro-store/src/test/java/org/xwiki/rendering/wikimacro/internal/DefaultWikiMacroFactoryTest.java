@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class DefaultWikiMacroFactoryTest
+class DefaultWikiMacroFactoryTest
 {
     private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
 
@@ -100,6 +100,7 @@ public class DefaultWikiMacroFactoryTest
         this.macroObject.setIntValue(WikiMacroConstants.MACRO_INLINE_PROPERTY, 1);
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "No content");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "==Hi==");
+        this.macroObject.setIntValue(WikiMacroConstants.MACRO_PRIORITY_PROPERTY, 42);
         this.macroDefinitionDoc =
             this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, this.oldcore.getXWikiContext());
         this.macroDefinitionDoc.addXObject(this.macroObject);
@@ -116,7 +117,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacro() throws Exception
+    void createWikiMacro() throws Exception
     {
         // Build a wiki macro.
         WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
@@ -126,6 +127,7 @@ public class DefaultWikiMacroFactoryTest
         assertEquals("testmacro", macro.getId());
         assertEquals("testmacro", macro.getDescriptor().getId().getId());
         assertEquals("Test Macro", macro.getDescriptor().getName());
+        assertEquals(42, macro.getPriority());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
@@ -139,7 +141,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void isAllowed() throws Exception
+    void isAllowed() throws Exception
     {
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
@@ -160,7 +162,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithoutName() throws Exception
+    void createWikiMacroWithoutName() throws Exception
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "");
         saveDocument();
@@ -174,7 +176,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithContent() throws Exception
+    void createWikiMacroWithContent() throws Exception
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Optional");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
@@ -194,7 +196,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithEmptyCode() throws Exception
+    void createWikiMacroWithEmptyCode() throws Exception
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "");
         saveDocument();
@@ -204,7 +206,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithContentWikiType() throws Exception
+    void createWikiMacroWithContentWikiType() throws Exception
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Mandatory");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
@@ -225,7 +227,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithContentCustomType() throws Exception
+    void createWikiMacroWithContentCustomType() throws Exception
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Mandatory");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
@@ -249,7 +251,7 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void containsWikiMacro()
+    void containsWikiMacro()
     {
         assertTrue(this.wikiMacroFactory.containsWikiMacro(DOCUMENT_REFERENCE));
 

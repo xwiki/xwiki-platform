@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="">
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="">
   <web>XWiki</web>
   <name>AdminTranslations</name>
   <language/>
@@ -147,6 +147,10 @@ admin.other.description=Various configurations for extensions.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
 
+# Social category
+admin.social=Social
+admin.social.description=Configuration for social features.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
@@ -178,6 +182,7 @@ administration.section.users.deleteUser.markDisabledMessage=Instead of deleting 
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

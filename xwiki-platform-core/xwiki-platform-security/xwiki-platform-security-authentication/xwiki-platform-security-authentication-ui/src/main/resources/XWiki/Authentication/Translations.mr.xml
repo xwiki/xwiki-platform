@@ -47,5 +47,6 @@ authentication.admin.timeWindow.hint=कार्यनीती कार्य
 authentication.admin.isAuthenticationSecurityEnabled.label=प्रमाणीकरण सुरक्षा यंत्रणा सक्षम किंवा अक्षम करा
 authentication.admin.isAuthenticationSecurityEnabled.hint=प्रमाणीकरण सुरक्षा यंत्रणा अक्षम केल्याने प्रमाणीकरण अयशस्वी रेकॉर्ड देखील रीसेट होईल.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=निष्क्रिय केलेले
-authentication.admin.isAuthenticationSecurityEnabled.enabled=सक्रीय केलेले</content>
+authentication.admin.isAuthenticationSecurityEnabled.enabled=सक्रीय केलेले
+### Missing: authentication.admin.heading=Authentication Security</content>
 </xwikidoc>

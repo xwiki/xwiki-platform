@@ -333,7 +333,7 @@ var PreviousUIForm = Class.create({
       // Remove the previous UI extension display.
       this.form.next().remove();
       // Display the default UI extension.
-      for (var next = this.form.next(); next; next = next.show().next());
+      for (var next = this.form.next(); next; next = next.show().next()) {};
       // Refresh the display of the recommended UI extension so that we get the upgrade button.
       var recommendedUIExtension = this.recommendedUI.down('.extension-item');
       recommendedUIExtension && recommendedUIExtension._extensionBehaviour.refresh({hideExtensionDetails: true});

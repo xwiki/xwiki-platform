@@ -82,7 +82,6 @@ public class AppsLiveTableIT
     {
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
         classEditPage.addField("Short Text");
         classEditPage.clickNextStep().clickNextStep().clickFinish();
@@ -153,12 +152,8 @@ public class AppsLiveTableIT
         testUtils.createPage(xwikiPreferences, "");
         testUtils.addObject(xwikiPreferences, "XWiki.XWikiGlobalRights",
             "levels", "edit,script",
-            "allow", "Allow",
+            "allow", "1",
             "users", String.format("XWiki.%s,XWiki.%s", USERNAME, anotherUserName));
-
-        // FIXME: Looks like adding the object is not enough: we need to trigger a save to call some listeners to
-        // update the rights.
-        new ObjectEditPage().clickSaveAndView();
 
         testUtils.login(USERNAME, PASSWORD);
         appWithinMinutesHomePage = AppWithinMinutesHomePage.gotoPage();

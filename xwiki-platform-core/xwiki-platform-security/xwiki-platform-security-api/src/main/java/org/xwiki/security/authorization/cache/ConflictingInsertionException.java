@@ -34,4 +34,27 @@ public class ConflictingInsertionException extends Exception
 {
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may
+     * subsequently be initialized by a call to {@link #initCause}.
+     */
+    public ConflictingInsertionException()
+    {
+
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently
+     * be initialized by a call to {@link #initCause}.
+     *
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     *            method.
+     * @since 12.5RC1
+     * @since 11.10.6
+     */
+    public ConflictingInsertionException(String message)
+    {
+        super(message);
+    }
 }

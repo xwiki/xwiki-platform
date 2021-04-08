@@ -55,7 +55,9 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
 
             url.append(context.getURLFactory().getServerURL(context));
 
-            url.append('/');
+            if (url.charAt(url.length() - 1) != '/') {
+                url.append('/');
+            }
 
             String webAppPath = xwiki.getWebAppPath(context);
             if (!webAppPath.equals("/")) {

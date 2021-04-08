@@ -37,6 +37,23 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ApplicationCreatePage extends ViewPage
 {
+
+    /**
+     * The error message displayed when we try to create an application with an empty name.
+     * 
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public static final String EMPTY_APP_NAME_ERROR_MESSAGE = "Please enter the application name.";
+    
+    /**
+     * The warning message displayed when we input the name of an existing application.
+     * 
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public static final String APP_NAME_USED_WARNING_MESSAGE = "This application already exists.";
+    
     /**
      * The widget used to select the application location.
      */
@@ -57,13 +74,14 @@ public class ApplicationCreatePage extends ViewPage
     }
 
     /**
-     * Types the given string into the application name input.
+     * Types the given string into the application name input and wait for the preview to be available.
      *
      * @param appName the application name
      */
     public void setApplicationName(String appName)
     {
         this.locationPicker.setTitle(appName);
+        waitForApplicationNamePreview();
     }
 
     /**
@@ -75,19 +93,14 @@ public class ApplicationCreatePage extends ViewPage
     }
 
     /**
-     * Waits until the preview for the currently inputed application name is displayed.
+     * Waits until the preview for the currently entered application name is displayed.
      */
     public void waitForApplicationNamePreview()
     {
         final String appName = this.locationPicker.getTitle();
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                List<WebElement> previews = driver.findElements(By.className("appName-preview"));
-                return previews.size() == 1 && previews.get(0).getText().contains(appName);
-            }
+        getDriver().waitUntilCondition(driver -> {
+            List<WebElement> previews = driver.findElements(By.className("appName-preview"));
+            return previews.size() == 1 && previews.get(0).getText().contains(appName);
         });
     }
 

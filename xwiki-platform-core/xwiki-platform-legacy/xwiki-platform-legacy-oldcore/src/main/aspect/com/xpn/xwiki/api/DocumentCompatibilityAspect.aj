@@ -87,4 +87,14 @@ public privileged aspect DocumentCompatibilityAspect
     {
         rename(this.getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName));
     }
+
+    /**
+     * @return the list of existing translations for this document.
+     * @deprecated since 12.4RC1, use {@link #getTranslationLocales()} instead
+     */
+    @Deprecated
+    public List<String> Document.getTranslationList() throws XWikiException
+    {
+        return this.doc.getTranslationList(getXWikiContext());
+    }
 }

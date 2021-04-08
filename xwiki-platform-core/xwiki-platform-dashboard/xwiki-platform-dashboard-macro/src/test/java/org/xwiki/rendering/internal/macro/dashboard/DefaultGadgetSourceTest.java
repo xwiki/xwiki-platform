@@ -28,9 +28,7 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,17 +41,17 @@ import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -65,7 +63,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DefaultGadgetSourceTest
+class DefaultGadgetSourceTest
 {
     @InjectMockComponents
     private DefaultGadgetSource defaultGadgetSource;
@@ -76,6 +74,9 @@ public class DefaultGadgetSourceTest
 
     @MockComponent
     private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
 
     @Mock
     private DocumentReference documentReference;
@@ -104,9 +105,13 @@ public class DefaultGadgetSourceTest
     @Mock
     private MacroTransformationContext macroTransformationContext;
 
+    @Mock
+    private VelocityEngine velocityEngine;
+
+    private ContentExecutor<MacroTransformationContext> contentExecutor;
+
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager)
-        throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReferenceResolver<String> currentReferenceResolver =
             componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -129,48 +134,26 @@ public class DefaultGadgetSourceTest
         when(transformationContext.getId()).thenReturn(transformationId);
 
         VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
-        VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-        when(velocityEngine.evaluate(any(), any(), any(), any(String.class))).then(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                StringWriter stringWriter = (StringWriter) args[1];
-                String title = (String) args[3];
-                stringWriter.append(title);
-                return null;
-            }
+
+        when(authorExecutor.call(any(), eq(ownerAuthorReference), eq(ownerSourceReference))).then(invocationOnMock -> {
+            Callable callable = (Callable) invocationOnMock.getArguments()[0];
+            return callable.call();
         });
 
-        AuthorExecutor authorExecutor = componentManager.getInstance(AuthorExecutor.class);
-        when(authorExecutor.call(any(), eq(ownerAuthorReference), eq(ownerSourceReference))).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Callable callable = (Callable) invocationOnMock.getArguments()[0];
-                return callable.call();
-            }
-        });
-
-        ContentExecutor<MacroTransformationContext> contentExecutor =
+        this.contentExecutor =
             componentManager.getInstance(ContentExecutor.TYPE_MACRO_TRANSFORMATION);
-        when(contentExecutor.execute(any(), any(), any(), any())).then(new Answer<XDOM>() {
-            @Override
-            public XDOM answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                String content = invocationOnMock.getArgument(0);
-                XDOM xdom = new XDOM(Collections.singletonList(new WordBlock(content)));
-                return xdom;
-            }
+        when(contentExecutor.execute(any(), any(), any(), any())).then((Answer<XDOM>) invocationOnMock -> {
+            String content = invocationOnMock.getArgument(0);
+            XDOM xdom = new XDOM(Collections.singletonList(new WordBlock(content)));
+            return xdom;
         });
         when(ownerDocument.getAuthorReference()).thenReturn(ownerAuthorReference);
         when(ownerDocument.getDocumentReference()).thenReturn(ownerSourceReference);
     }
 
     @Test
-    public void getGadgets() throws Exception
+    void getGadgets() throws Exception
     {
         assertEquals(new ArrayList<>(), this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext));
 
@@ -181,12 +164,50 @@ public class DefaultGadgetSourceTest
         when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some content");
         when(gadgetObject1.getStringValue("position")).thenReturn("0");
         when(gadgetObject1.getNumber()).thenReturn(42);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(true);
+        when(this.velocityEngine.evaluate(any(), any(), any(), eq("Gadget 1"))).then((Answer<Void>) invocation -> {
+            Object[] args = invocation.getArguments();
+            StringWriter stringWriter = (StringWriter) args[1];
+            String title = "Evaluated velocity version of gadget 1";
+            stringWriter.append(title);
+            return null;
+        });
 
         List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
         assertEquals(1, gadgets.size());
         Gadget gadget = gadgets.get(0);
-        assertEquals("Gadget 1", gadget.getTitle().get(0).toString());
+        assertEquals("Evaluated velocity version of gadget 1", gadget.getTitle().get(0).toString());
         assertEquals("Some content", gadget.getContent().get(0).toString());
         assertEquals("42", gadget.getId());
+        verify(this.contentExecutor)
+            .execute(eq("Evaluated velocity version of gadget 1"), any(), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Some content"), any(), any(), any());
+    }
+
+    @Test
+    void getGadgetWithoutScriptRight() throws Exception
+    {
+        assertEquals(new ArrayList<>(), this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext));
+
+        BaseObject gadgetObject1 = mock(BaseObject.class);
+        when(xWikiDocument.getXObjects(gadgetClassReference)).thenReturn(Collections.singletonList(gadgetObject1));
+        when(gadgetObject1.getOwnerDocument()).thenReturn(ownerDocument);
+        when(gadgetObject1.getStringValue("title")).thenReturn("Gadget 2");
+        when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some other content");
+        when(gadgetObject1.getStringValue("position")).thenReturn("2");
+        when(gadgetObject1.getNumber()).thenReturn(12);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(false);
+
+        List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
+        assertEquals(1, gadgets.size());
+        Gadget gadget = gadgets.get(0);
+        assertEquals("Gadget 2", gadget.getTitle().get(0).toString());
+        assertEquals("Some other content", gadget.getContent().get(0).toString());
+        assertEquals("12", gadget.getId());
+        verify(this.contentExecutor)
+            .execute(eq("Gadget 2"), any(), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Some other content"), any(), any(), any());
     }
 }

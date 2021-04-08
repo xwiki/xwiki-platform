@@ -18,7 +18,7 @@
     #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))
   #end
   {{html clean="false"}}
-    <form action="">
+    <form action="" method="post">
       #displayJobStatus($uninstallJob.status, 'platform.extension.distributionWizard.extension.cleanStep.uninstall')
 
       #formHiddenCleanApply()

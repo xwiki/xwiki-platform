@@ -63,7 +63,7 @@ public class DefaultResourceTypeResolver implements ResourceTypeResolver<Extende
     public ResourceType resolve(ExtendedURL extendedURL, Map<String, Object> parameters)
         throws CreateResourceTypeException
     {
-        ResourceTypeResolver resolver;
+        ResourceTypeResolver<ExtendedURL> resolver;
         try {
             resolver = this.componentManager.getInstance(
                 new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class),

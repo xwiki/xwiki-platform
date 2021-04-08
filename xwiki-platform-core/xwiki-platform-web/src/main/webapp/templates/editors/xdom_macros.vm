@@ -45,7 +45,9 @@
     ## Support for XDOM input.
     #set ($content = $services.rendering.render($edit.data, $syntaxId))
   #end
-  #set ($attributes = {})
+  #set ($attributes = {
+    'data-syntax': $syntaxId
+  })
   #getTextAreaAttributes($edit.parameters $attributes)
   #set ($textArea = {
     'content': $content,

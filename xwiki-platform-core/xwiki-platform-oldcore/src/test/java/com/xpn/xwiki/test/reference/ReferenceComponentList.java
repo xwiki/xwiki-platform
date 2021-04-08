@@ -61,6 +61,8 @@ import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerial
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupEntityReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentGetPagePageReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
@@ -80,6 +82,10 @@ import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolv
 import com.xpn.xwiki.internal.model.reference.CurrentStringPageAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringPageReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentUserAndGroupDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentUserAndGroupEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.UserAndGroupDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.UserAndGroupEntityReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -150,6 +156,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     CurrentStringPageReferenceResolver.class,
     CurrentReferencePageObjectReferenceResolver.class,
     CurrentReferencePageReferenceResolver.class,
+    CurrentEntityUserAndGroupDocumentReferenceResolver.class,
+    CurrentEntityUserAndGroupEntityReferenceResolver.class,
+    CurrentUserAndGroupDocumentReferenceResolver.class,
+    CurrentUserAndGroupEntityReferenceResolver.class,
+    UserAndGroupDocumentReferenceResolver.class,
+    UserAndGroupEntityReferenceResolver.class,
 
     DefaultModelConfiguration.class,
     EntityReferenceFactory.class

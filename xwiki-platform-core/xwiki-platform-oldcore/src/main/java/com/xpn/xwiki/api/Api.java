@@ -27,8 +27,8 @@ import javax.inject.Provider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,6 +55,8 @@ public class Api
     private Provider<XWikiContext> xcontextProvider;
 
     private AuthorizationManager authorizationManager;
+
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
@@ -101,6 +103,20 @@ public class Api
         }
 
         return this.authorizationManager;
+    }
+
+    /**
+     * @return the {@link ContextualAuthorizationManager} component
+     * @since 12.5RC1
+     * @since 11.10.6
+     */
+    protected ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        if (this.contextualAuthorizationManager == null) {
+            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        }
+
+        return this.contextualAuthorizationManager;
     }
 
     private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
@@ -172,7 +188,6 @@ public class Api
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      * @since 11.5RC1
      */
-    @Unstable
     protected boolean hasAccess(Right right, DocumentReference entityReference)
     {
         return getAuthorizationManager().hasAccess(right, this.context.getUserReference(), entityReference);

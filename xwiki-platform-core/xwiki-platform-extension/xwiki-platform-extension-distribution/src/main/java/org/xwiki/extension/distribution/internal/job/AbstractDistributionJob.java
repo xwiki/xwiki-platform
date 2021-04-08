@@ -282,4 +282,10 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
     {
         return getStatus().getproperty(key);
     }
+
+    @Override
+    public void removeProperty(String key)
+    {
+        getStatus().removeProperty(key);
+    }
 }

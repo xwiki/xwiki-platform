@@ -108,7 +108,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
      */
     public List<String> getDefaultSelectedValues()
     {
-        List<String> selectedValues = new ArrayList<String>();
+        List<String> selectedValues = new ArrayList<>();
         for (WebElement selectedItem : getSelectedItems()) {
             selectedValues.add(selectedItem.getAttribute("value"));
         }
@@ -121,7 +121,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
     protected List<WebElement> getSelectedItems()
     {
         By xpath = By.xpath(".//*[local-name() = 'option' or @type = 'radio' or @type = 'checkbox']");
-        List<WebElement> selectedItems = new ArrayList<WebElement>();
+        List<WebElement> selectedItems = new ArrayList<>();
         for (WebElement item : getDriver().findElementsWithoutWaiting(defaultValueContainer, xpath)) {
             if (item.isSelected()) {
                 selectedItems.add(item);
@@ -159,5 +159,15 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
             return "select".equalsIgnoreCase(input.getTagName()) ? "select" : input.getAttribute("type").toLowerCase();
         }
         return null;
+    }
+
+    /**
+     * @return {@code true} if the field is readonly, {@code false} otherwise
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public boolean isReadOnly()
+    {
+        return getSizeInput().getAttribute("readOnly") != null;
     }
 }

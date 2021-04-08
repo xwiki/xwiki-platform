@@ -34,9 +34,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class CaptchaScriptServiceTest
+class CaptchaScriptServiceTest
 {
     @MockComponent
     private CaptchaConfiguration configuration;
@@ -55,7 +55,7 @@ public class CaptchaScriptServiceTest
     private CaptchaScriptService captchaScriptService;
 
     @Test
-    public void register(MockitoComponentManager componentManager) throws Exception
+    void register(MockitoComponentManager componentManager) throws Exception
     {
         ScriptService service = componentManager.getInstance(ScriptService.class, "captcha");
 
@@ -63,7 +63,7 @@ public class CaptchaScriptServiceTest
     }
 
     @Test
-    public void getDefaultName()
+    void getDefaultName()
     {
         when(configuration.getDefaultName()).thenReturn("SomeDefaultCaptchaName");
 
@@ -71,7 +71,7 @@ public class CaptchaScriptServiceTest
     }
 
     @Test
-    public void getCaptchaNames(MockitoComponentManager componentManager) throws Exception
+    void getCaptchaNames(MockitoComponentManager componentManager) throws Exception
     {
         // An instance map of mock instances.
         Map<String, Object> instanceMap = new HashMap<>();

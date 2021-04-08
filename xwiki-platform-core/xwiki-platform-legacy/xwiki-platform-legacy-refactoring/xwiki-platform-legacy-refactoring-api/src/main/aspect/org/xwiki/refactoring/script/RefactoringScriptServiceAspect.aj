@@ -54,9 +54,6 @@ import org.xwiki.refactoring.job.RestoreRequest;
 public privileged aspect RefactoringScriptServiceAspect
 {
     @Inject
-    private DocumentAccessBridge RefactoringScriptService.documentAccessBridge;
-
-    @Inject
     private ModelContext RefactoringScriptService.modelContext;
 
     /**

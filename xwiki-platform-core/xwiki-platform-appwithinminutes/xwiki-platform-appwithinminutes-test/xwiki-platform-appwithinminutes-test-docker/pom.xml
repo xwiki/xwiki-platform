@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-appwithinminutes-test</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-appwithinminutes-test-docker</artifactId>
   <name>XWiki Platform - AppWithinMinutes - Tests - Functional Docker Tests</name>
@@ -47,6 +47,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Required by AddEntryIT. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -62,18 +69,20 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllIT.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

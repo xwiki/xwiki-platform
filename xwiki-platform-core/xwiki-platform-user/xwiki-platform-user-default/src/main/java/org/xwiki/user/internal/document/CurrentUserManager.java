@@ -60,13 +60,24 @@ public class CurrentUserManager implements UserManager
     public boolean exists(UserReference userReference)
     {
         boolean exists;
-        UserReference resolvedUserReference = this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
-        if (SuperAdminUserReference.INSTANCE == resolvedUserReference
-            || GuestUserReference.INSTANCE == resolvedUserReference)
-        {
+
+        // Note: the passed userReference is always CurrentUserReference.INSTANCE since this user manager is called
+        // only in this case. That's why it's not used.
+
+        // If there's no user in the context, then it means guest and thus it doesn't exist.
+        DocumentReference currentUserReference = getXWikiContext().getUserReference();
+        if (currentUserReference == null) {
             exists = false;
         } else {
-            exists = this.documentUserManager.exists(resolvedUserReference);
+            // Resolve the current user reference into a real reference.
+            UserReference resolvedUserReference = this.userReferenceResolver.resolve(currentUserReference);
+            if (SuperAdminUserReference.INSTANCE == resolvedUserReference
+                || GuestUserReference.INSTANCE == resolvedUserReference)
+            {
+                exists = false;
+            } else {
+                exists = this.documentUserManager.exists(resolvedUserReference);
+            }
         }
         return exists;
     }

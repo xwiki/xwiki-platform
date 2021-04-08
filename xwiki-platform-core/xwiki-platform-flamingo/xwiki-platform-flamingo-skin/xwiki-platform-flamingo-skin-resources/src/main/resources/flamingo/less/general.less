@@ -106,3 +106,28 @@ pre {
 img {
   max-width: 100%;
 }
+
+// Hyphenation ================================================================
+
+.hyphenate {
+  // We don't use Bootstrap's .hyphens class because it doesn't work in Chrome.
+  // See XWIKI-17770: Horizontal scroll of Livetable when page name is too long on Chrome
+  // We use instead the solution described at
+  // https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
+
+  // These are technically the same, but use both.
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  // This is the dangerous one in WebKit, as it breaks things wherever.
+  word-break: break-all;
+  // Instead use this non-standard one:
+  word-break: break-word;
+
+  // Adds a hyphen where the word breaks, if supported (No Blink).
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}

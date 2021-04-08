@@ -101,7 +101,12 @@ public class AdvancedSearchPane extends BaseElement
         idInput.sendKeys(extensionId);
         versionInput.clear();
         versionInput.sendKeys(extensionVersion);
+
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
         searchButton.click();
+        getDriver().waitUntilPageIsReloaded();
+
         return new SearchResultsPane();
     }
 

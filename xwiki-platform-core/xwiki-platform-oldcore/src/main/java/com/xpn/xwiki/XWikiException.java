@@ -148,6 +148,8 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION = 3205;
 
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_RENAMING_DOC = 3206;
+
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT = 3211;
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT = 3212;

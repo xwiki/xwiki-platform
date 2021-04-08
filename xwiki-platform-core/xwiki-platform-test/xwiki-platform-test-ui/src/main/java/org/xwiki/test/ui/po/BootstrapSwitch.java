@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
 
@@ -65,6 +66,9 @@ public class BootstrapSwitch
     {
         this.webElement = webElement;
         this.driver = driver;
+
+        // Wait until the switch has a state.
+        driver.waitUntilCondition(webDriver -> isSwitchOff() || isSwitchOn() || isSwitchIndeterminate());
     }
 
     /**
@@ -72,15 +76,27 @@ public class BootstrapSwitch
      */
     public State getState()
     {
+        State result;
         if (isSwitchIndeterminate()) {
-            return State.UNDETERMINED;
+            result = State.UNDETERMINED;
+        } else if (isSwitchOn()) {
+            result = State.ON;
+        } else if (isSwitchOff()) {
+            result = State.OFF;
+        } else {
+            throw new AssertionError("Cannot find the state of the element");
         }
-        return isSwitchOn() ? State.ON : State.OFF;
+        return result;
     }
 
     private boolean isSwitchOn()
     {
         return getHTMLClass().contains("bootstrap-switch-on");
+    }
+
+    private boolean isSwitchOff()
+    {
+        return getHTMLClass().contains("bootstrap-switch-off");
     }
 
     private boolean isSwitchIndeterminate()
@@ -110,6 +126,7 @@ public class BootstrapSwitch
      */
     public void setState(State wantedState) throws Exception
     {
+        this.driver.scrollTo(webElement);
         if (wantedState == State.UNDETERMINED) {
             throw new Exception("It is not possible to set a switch to undetermined state manually.");
         }
@@ -118,7 +135,13 @@ public class BootstrapSwitch
             if (tries++ > 2) {
                 throw new Exception("Failed to give the desired state.");
             }
-            click();
+            try {
+                click();
+            } catch(TimeoutException e) {
+                // Workaround a possible flicker in click.
+                // If the error doesn't come because of a flicker then the wanted state will never be reached so
+                // we'll get the failure anyway.
+            }
         }
     }
 

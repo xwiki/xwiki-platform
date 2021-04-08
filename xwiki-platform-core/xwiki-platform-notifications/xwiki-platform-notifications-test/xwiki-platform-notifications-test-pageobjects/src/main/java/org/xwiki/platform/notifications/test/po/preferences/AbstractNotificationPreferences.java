@@ -77,8 +77,6 @@ public abstract class AbstractNotificationPreferences extends BaseElement
      */
     public void setAlertState(BootstrapSwitch.State state) throws Exception
     {
-        // ensure the element is visible.
-        getDriver().scrollTo(this.webElement);
         alertSwitch.setState(state);
     }
 
@@ -89,8 +87,6 @@ public abstract class AbstractNotificationPreferences extends BaseElement
      */
     public void setEmailState(BootstrapSwitch.State state) throws Exception
     {
-        // ensure the element is visible.
-        getDriver().scrollTo(this.webElement);
         emailSwitch.setState(state);
     }
 

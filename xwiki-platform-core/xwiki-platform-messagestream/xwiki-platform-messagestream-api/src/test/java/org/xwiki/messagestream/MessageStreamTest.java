@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.messagestream.internal.DefaultMessageStream;
 import org.xwiki.model.ModelContext;
@@ -42,8 +42,19 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link org.xwiki.userstatus.internal.DefaultEvent default event} and
@@ -51,411 +62,427 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
-@MockingRequirement(DefaultMessageStream.class)
-public class MessageStreamTest extends AbstractMockingComponentTestCase<MessageStream>
+@ComponentTest
+class MessageStreamTest
 {
-    private MessageStream stream;
+    private static final DocumentReference CURRENT_USER = new DocumentReference("wiki", "XWiki", "JohnDoe");
 
-    private final DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "JohnDoe");
+    private static final DocumentReference TARGET_USER = new DocumentReference("wiki", "XWiki", "JaneBuck");
 
-    private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
+    private static final DocumentReference TARGET_GROUP = new DocumentReference("wiki", "XWiki", "MyFriends");
 
-    private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
+    @MockComponent
+    private DocumentAccessBridge mockBridge;
 
-    @Before
-    public void configure() throws Exception
+    @MockComponent
+    private QueryManager mockQueryManager;
+
+    @MockComponent
+    private EventStream mockEventStream;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> mockSerializer;
+
+    @MockComponent
+    private EventFactory mockEventFactory;
+
+    @MockComponent
+    private ModelContext mockContext;
+
+    @MockComponent
+    private EventStore mockEventStore;
+
+    @InjectMockComponents
+    private DefaultMessageStream stream;
+
+    private Query mockQuery = mock(Query.class);
+
+    @BeforeEach
+    void beforeEach()
     {
-        this.stream = getComponentManager().getInstance(MessageStream.class);
-    }
-
-    @Test
-    public void testPostPublicMessage() throws Exception
-    {
-        Event postedMessage = setupForPublicMessage();
-        this.stream.postPublicMessage("Hello World!");
-        Assert.assertEquals("Hello World!", postedMessage.getBody());
-        Assert.assertEquals(Importance.MINOR, postedMessage.getImportance());
-        Assert.assertEquals("publicMessage", postedMessage.getType());
-        Assert.assertEquals(this.currentUser, postedMessage.getRelatedEntity());
-    }
-
-    @Test
-    public void testPostPublicMessageWithNullMessage() throws Exception
-    {
-        Event postedMessage = setupForPublicMessage();
-        this.stream.postPublicMessage(null);
-        Assert.assertEquals(null, postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostPublicMessageWithEmptyMessage() throws Exception
-    {
-        Event postedMessage = setupForPublicMessage();
-        this.stream.postPublicMessage("");
-        Assert.assertEquals("", postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostPublicMessageWithLongMessage() throws Exception
-    {
-        Event postedMessage = setupForPublicMessage();
-        this.stream.postPublicMessage(StringUtils.repeat('a', 10000));
-        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostPersonalMessage() throws Exception
-    {
-        Event postedMessage = setupForPersonalMessage();
-        this.stream.postPersonalMessage("Hello World!");
-        Assert.assertEquals("Hello World!", postedMessage.getBody());
-        Assert.assertEquals(Importance.MEDIUM, postedMessage.getImportance());
-        Assert.assertEquals("personalMessage", postedMessage.getType());
-        Assert.assertEquals(this.currentUser, postedMessage.getRelatedEntity());
-    }
-
-    @Test
-    public void testPostPersonalMessageWithNullMessage() throws Exception
-    {
-        Event postedMessage = setupForPersonalMessage();
-        this.stream.postPersonalMessage(null);
-        Assert.assertEquals(null, postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostPersonalMessageWithEmptyMessage() throws Exception
-    {
-        Event postedMessage = setupForPersonalMessage();
-        this.stream.postPersonalMessage("");
-        Assert.assertEquals("", postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostPersonalMessageWithLongMessage() throws Exception
-    {
-        Event postedMessage = setupForPersonalMessage();
-        this.stream.postPersonalMessage(StringUtils.repeat('a', 10000));
-        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostDirectMessage() throws Exception
-    {
-        Event postedMessage = setupForDirectMessage();
-        this.stream.postDirectMessageToUser("Hello World!", this.targetUser);
-        Assert.assertEquals("Hello World!", postedMessage.getBody());
-        Assert.assertEquals(Importance.CRITICAL, postedMessage.getImportance());
-        Assert.assertEquals("directMessage", postedMessage.getType());
-        Assert.assertEquals("wiki:XWiki.JaneBuck", postedMessage.getStream());
-        Assert.assertEquals(new ObjectReference("XWiki.XWikiUsers", this.targetUser), postedMessage.getRelatedEntity());
-    }
-
-    @Test
-    public void testPostDirectMessageWithNullMessage() throws Exception
-    {
-        Event postedMessage = setupForDirectMessage();
-        this.stream.postDirectMessageToUser(null, this.targetUser);
-        Assert.assertEquals(null, postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostDirectMessageWithEmptyMessage() throws Exception
-    {
-        Event postedMessage = setupForDirectMessage();
-        this.stream.postDirectMessageToUser("", this.targetUser);
-        Assert.assertEquals("", postedMessage.getBody());
-    }
-
-    @Test
-    public void testPostDirectMessageWithLongMessage() throws Exception
-    {
-        Event postedMessage = setupForDirectMessage();
-        this.stream.postDirectMessageToUser(StringUtils.repeat('a', 10000), this.targetUser);
-        Assert.assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testPostDirectMessageWithNonExistingTarget() throws Exception
-    {
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final DocumentReference targetUser = new DocumentReference("xwiki", "XWiki", "Nobody");
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).exists(targetUser);
-                will(returnValue(false));
-            }
-        });
-        this.stream.postDirectMessageToUser("Hello Nobody!", targetUser);
-    }
-
-    @Test
-    public void testPostGroupMessage() throws Exception
-    {
-        Event postedMessage = setupForGroupMessage();
-        this.stream.postMessageToGroup("Hello Friends!", this.targetGroup);
-        Assert.assertEquals("Hello Friends!", postedMessage.getBody());
-        Assert.assertEquals(Importance.MAJOR, postedMessage.getImportance());
-        Assert.assertEquals("groupMessage", postedMessage.getType());
-        Assert.assertEquals("wiki:XWiki.MyFriends", postedMessage.getStream());
-        Assert.assertEquals(new ObjectReference("XWiki.XWikiGroups", this.targetGroup), postedMessage
-            .getRelatedEntity());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testPostGroupMessageWithNonExistingTarget() throws Exception
-    {
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final DocumentReference targetGroup = new DocumentReference("xwiki", "XWiki", "Nobodies");
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).exists(targetGroup);
-                will(returnValue(false));
-            }
-        });
-        this.stream.postMessageToGroup("Hello Nobodies!", targetGroup);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessages() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages();
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesForAuthor() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(this.currentUser);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithNegativeLimit() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(-4, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithZeroLimit() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(0, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithLimit1() throws Exception
-    {
-        setupForLimitQueries(1, 0);
-        this.stream.getRecentPersonalMessages(1, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithLimit30() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(30, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithLimit100() throws Exception
-    {
-        setupForLimitQueries(100, 0);
-        this.stream.getRecentPersonalMessages(100, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithNegativeOffset() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(30, -4);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithNegativeLimitAndOffset() throws Exception
-    {
-        setupForLimitQueries(30, 0);
-        this.stream.getRecentPersonalMessages(-1, -1);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithZeroOffset() throws Exception
-    {
-        setupForLimitQueries(100, 0);
-        this.stream.getRecentPersonalMessages(100, 0);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithOffset1() throws Exception
-    {
-        setupForLimitQueries(20, 1);
-        this.stream.getRecentPersonalMessages(20, 1);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWithOffset100() throws Exception
-    {
-        setupForLimitQueries(50, 100);
-        this.stream.getRecentPersonalMessages(50, 100);
-    }
-
-    @Test
-    public void testGetRecentPersonalMessagesWhenQueryFails() throws Exception
-    {
-        final Query mockQuery = getMockQuery();
-        final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
-        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockBridge).getCurrentUserReference();
-                will(returnValue(MessageStreamTest.this.currentUser));
-                allowing(mockSerializer).serialize(MessageStreamTest.this.currentUser);
-                will(returnValue("wiki:XWiki.JohnDoe"));
-                exactly(1).of(mockQuery).setLimit(30);
-                will(returnValue(mockQuery));
-                exactly(1).of(mockQuery).setOffset(0);
-                will(returnValue(mockQuery));
-                allowing(mockQuery).bindValue(with(any(String.class)), with("wiki:XWiki.JohnDoe"));
-                allowing(mockQueryManager).createQuery(with(aNonNull(String.class)), with(aNonNull(String.class)));
-                will(returnValue(mockQuery));
-                exactly(1).of(mockEventStream).searchEvents(with(mockQuery));
-                will(throwException(new QueryException("", null, null)));
-            }
-        });
-        List<Event> result = this.stream.getRecentPersonalMessages();
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        when(this.mockSerializer.serialize(CURRENT_USER)).thenReturn("wiki:XWiki.JohnDoe");
+        when(this.mockSerializer.serialize(TARGET_USER)).thenReturn("wiki:XWiki.JaneBuck");
+        when(this.mockSerializer.serialize(TARGET_GROUP)).thenReturn("wiki:XWiki.MyFriends");
     }
 
     private Event setupForNewMessage() throws ComponentLookupException, Exception
     {
-        final EventFactory mockEventFactory = getComponentManager().getInstance(EventFactory.class);
-        final Event e = new DefaultEvent();
-        e.setId(UUID.randomUUID().toString());
-        final ModelContext mockContext = getComponentManager().getInstance(ModelContext.class);
-        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockEventFactory).createEvent();
-                will(returnValue(e));
-                exactly(1).of(mockContext).getCurrentEntityReference();
-                will(returnValue(new DocumentReference("wiki", "Space", "Page")));
-                exactly(1).of(mockEventStream).addEvent(e);
-            }
-        });
-        return e;
+        Event event = new DefaultEvent();
+        event.setId(UUID.randomUUID().toString());
+
+        when(this.mockEventFactory.createEvent()).thenReturn(event);
+        when(this.mockContext.getCurrentEntityReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
+
+        return event;
+    }
+
+    private void verifyForNewMessage(Event event) throws EventStreamException
+    {
+        verify(this.mockEventFactory).createEvent();
+        verify(this.mockEventStore).saveEvent(event);
     }
 
     private Event setupForPublicMessage() throws Exception
     {
-        final Event e = setupForNewMessage();
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).getCurrentUserReference();
-                will(returnValue(MessageStreamTest.this.currentUser));
-                exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.currentUser);
-                will(returnValue("wiki:XWiki.JohnDoe"));
-            }
-        });
+        Event e = setupForNewMessage();
+
+        when(this.mockBridge.getCurrentUserReference()).thenReturn(CURRENT_USER);
+
         return e;
     }
 
     private Event setupForPersonalMessage() throws Exception
     {
-        final Event e = setupForNewMessage();
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).getCurrentUserReference();
-                will(returnValue(MessageStreamTest.this.currentUser));
-                exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.currentUser);
-                will(returnValue("wiki:XWiki.JohnDoe"));
-            }
-        });
+        Event e = setupForNewMessage();
+
+        when(this.mockBridge.getCurrentUserReference()).thenReturn(CURRENT_USER);
+
         return e;
     }
 
     private Event setupForDirectMessage() throws ComponentLookupException, Exception
     {
-        final Event e = setupForNewMessage();
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).exists(MessageStreamTest.this.targetUser);
-                will(returnValue(true));
-                exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetUser);
-                will(returnValue("wiki:XWiki.JaneBuck"));
-            }
-        });
+        Event e = setupForNewMessage();
+
+        when(this.mockBridge.exists(TARGET_USER)).thenReturn(true);
+
         return e;
     }
 
     private Event setupForGroupMessage() throws ComponentLookupException, Exception
     {
-        final Event e = setupForNewMessage();
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockBridge).exists(MessageStreamTest.this.targetGroup);
-                will(returnValue(true));
-                exactly(1).of(mockSerializer).serialize(MessageStreamTest.this.targetGroup);
-                will(returnValue("wiki:XWiki.MyFriends"));
-            }
-        });
+        Event e = setupForNewMessage();
+
+        when(this.mockBridge.exists(TARGET_GROUP)).thenReturn(true);
+
         return e;
     }
 
-    private void setupForLimitQueries(final int expectedLimit, final int expectedOffset)
-        throws ComponentLookupException, Exception
+    private void setupForLimitQueries(int expectedLimit, int expectedOffset) throws ComponentLookupException, Exception
     {
-        final Query mockQuery = getMockQuery();
-        final QueryManager mockQueryManager = getComponentManager().getInstance(QueryManager.class);
-        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
-        final DocumentAccessBridge mockBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final EntityReferenceSerializer<String> mockSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockBridge).getCurrentUserReference();
-                will(returnValue(MessageStreamTest.this.currentUser));
-                allowing(mockSerializer).serialize(MessageStreamTest.this.currentUser);
-                will(returnValue("wiki:XWiki.JohnDoe"));
-                exactly(1).of(mockQuery).setLimit(expectedLimit);
-                will(returnValue(mockQuery));
-                exactly(1).of(mockQuery).setOffset(expectedOffset);
-                will(returnValue(mockQuery));
-                allowing(mockQuery).bindValue(with(any(String.class)), with("wiki:XWiki.JohnDoe"));
-                allowing(mockQueryManager).createQuery(with(aNonNull(String.class)), with(aNonNull(String.class)));
-                will(returnValue(mockQuery));
-                exactly(1).of(mockEventStream).searchEvents(with(mockQuery));
-                will(returnValue(null));
-            }
-        });
+        when(this.mockQuery.setLimit(expectedLimit)).thenReturn(mockQuery);
+        when(this.mockQuery.setOffset(expectedOffset)).thenReturn(mockQuery);
+
+        when(this.mockQueryManager.createQuery(anyString(), anyString())).thenReturn(mockQuery);
+
+        when(this.mockBridge.getCurrentUserReference()).thenReturn(CURRENT_USER);
+
+        when(this.mockEventStream.searchEvents(mockQuery)).thenReturn(null);
     }
 
-    private Query getMockQuery()
+    private void verifyLimitQueries(int expectedLimit, int expectedOffset) throws QueryException
     {
-        return getMockery().mock(Query.class);
+        verify(this.mockQuery).setLimit(expectedLimit);
+        verify(this.mockQuery).setOffset(expectedOffset);
+        verify(this.mockEventStream).searchEvents(this.mockQuery);
+    }
+
+    // Tests
+
+    @Test
+    void postPublicMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+
+        this.stream.postPublicMessage("Hello World!");
+
+        assertEquals("Hello World!", postedMessage.getBody());
+        assertEquals(Importance.MINOR, postedMessage.getImportance());
+        assertEquals("publicMessage", postedMessage.getType());
+        assertEquals(CURRENT_USER, postedMessage.getRelatedEntity());
+    }
+
+    @Test
+    void postPublicMessageWithNullMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+
+        this.stream.postPublicMessage(null);
+
+        assertEquals(null, postedMessage.getBody());
+    }
+
+    @Test
+    void postPublicMessageWithEmptyMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+
+        this.stream.postPublicMessage("");
+
+        assertEquals("", postedMessage.getBody());
+    }
+
+    @Test
+    void postPublicMessageWithLongMessage() throws Exception
+    {
+        Event postedMessage = setupForPublicMessage();
+
+        this.stream.postPublicMessage(StringUtils.repeat('a', 10000));
+
+        assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
+    }
+
+    @Test
+    void postPersonalMessage() throws Exception
+    {
+        Event postedMessage = setupForPersonalMessage();
+
+        this.stream.postPersonalMessage("Hello World!");
+
+        assertEquals("Hello World!", postedMessage.getBody());
+        assertEquals(Importance.MEDIUM, postedMessage.getImportance());
+        assertEquals("personalMessage", postedMessage.getType());
+        assertEquals(CURRENT_USER, postedMessage.getRelatedEntity());
+    }
+
+    @Test
+    void postPersonalMessageWithNullMessage() throws Exception
+    {
+        Event postedMessage = setupForPersonalMessage();
+
+        this.stream.postPersonalMessage(null);
+
+        assertEquals(null, postedMessage.getBody());
+    }
+
+    @Test
+    void postPersonalMessageWithEmptyMessage() throws Exception
+    {
+        Event postedMessage = setupForPersonalMessage();
+
+        this.stream.postPersonalMessage("");
+
+        assertEquals("", postedMessage.getBody());
+    }
+
+    @Test
+    void postPersonalMessageWithLongMessage() throws Exception
+    {
+        Event postedMessage = setupForPersonalMessage();
+
+        this.stream.postPersonalMessage(StringUtils.repeat('a', 10000));
+
+        assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
+    }
+
+    @Test
+    void postDirectMessage() throws Exception
+    {
+        Event postedMessage = setupForDirectMessage();
+
+        this.stream.postDirectMessageToUser("Hello World!", TARGET_USER);
+
+        verifyForNewMessage(postedMessage);
+
+        assertEquals("Hello World!", postedMessage.getBody());
+        assertEquals(Importance.CRITICAL, postedMessage.getImportance());
+        assertEquals("directMessage", postedMessage.getType());
+        assertEquals("wiki:XWiki.JaneBuck", postedMessage.getStream());
+        assertEquals(new ObjectReference("XWiki.XWikiUsers", TARGET_USER), postedMessage.getRelatedEntity());
+    }
+
+    @Test
+    void postDirectMessageWithNullMessage() throws Exception
+    {
+        Event postedMessage = setupForDirectMessage();
+
+        this.stream.postDirectMessageToUser(null, TARGET_USER);
+
+        verifyForNewMessage(postedMessage);
+
+        assertEquals(null, postedMessage.getBody());
+    }
+
+    @Test
+    void postDirectMessageWithEmptyMessage() throws Exception
+    {
+        Event postedMessage = setupForDirectMessage();
+
+        this.stream.postDirectMessageToUser("", TARGET_USER);
+
+        verifyForNewMessage(postedMessage);
+
+        assertEquals("", postedMessage.getBody());
+    }
+
+    @Test
+    void postDirectMessageWithLongMessage() throws Exception
+    {
+        Event postedMessage = setupForDirectMessage();
+
+        this.stream.postDirectMessageToUser(StringUtils.repeat('a', 10000), TARGET_USER);
+
+        verifyForNewMessage(postedMessage);
+
+        assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
+    }
+
+    @Test
+    void postDirectMessageWithNonExistingTarget() throws Exception
+    {
+        DocumentReference targetUser = new DocumentReference("xwiki", "XWiki", "Nobody");
+        when(this.mockBridge.exists(targetUser)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class,
+            () -> this.stream.postDirectMessageToUser("Hello Nobody!", targetUser));
+    }
+
+    @Test
+    void postGroupMessage() throws Exception
+    {
+        Event postedMessage = setupForGroupMessage();
+
+        this.stream.postMessageToGroup("Hello Friends!", TARGET_GROUP);
+
+        assertEquals("Hello Friends!", postedMessage.getBody());
+        assertEquals(Importance.MAJOR, postedMessage.getImportance());
+        assertEquals("groupMessage", postedMessage.getType());
+        assertEquals("wiki:XWiki.MyFriends", postedMessage.getStream());
+        assertEquals(new ObjectReference("XWiki.XWikiGroups", TARGET_GROUP), postedMessage.getRelatedEntity());
+    }
+
+    @Test
+    void postGroupMessageWithNonExistingTarget() throws Exception
+    {
+        DocumentReference targetGroup = new DocumentReference("xwiki", "XWiki", "Nobodies");
+
+        when(this.mockBridge.exists(targetGroup)).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class,
+            () -> this.stream.postMessageToGroup("Hello Nobodies!", targetGroup));
+    }
+
+    @Test
+    void getRecentPersonalMessages() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages();
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesForAuthor() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(CURRENT_USER);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithNegativeLimit() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(-4, 0);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithZeroLimit() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(0, 0);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithLimit1() throws Exception
+    {
+        setupForLimitQueries(1, 0);
+
+        this.stream.getRecentPersonalMessages(1, 0);
+
+        verifyLimitQueries(1, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithLimit30() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(30, 0);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithLimit100() throws Exception
+    {
+        setupForLimitQueries(100, 0);
+
+        this.stream.getRecentPersonalMessages(100, 0);
+
+        verifyLimitQueries(100, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithNegativeOffset() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(30, -4);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithNegativeLimitAndOffset() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        this.stream.getRecentPersonalMessages(-1, -1);
+
+        verifyLimitQueries(30, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithZeroOffset() throws Exception
+    {
+        setupForLimitQueries(100, 0);
+
+        this.stream.getRecentPersonalMessages(100, 0);
+
+        verifyLimitQueries(100, 0);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithOffset1() throws Exception
+    {
+        setupForLimitQueries(20, 1);
+
+        this.stream.getRecentPersonalMessages(20, 1);
+
+        verifyLimitQueries(20, 1);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWithOffset100() throws Exception
+    {
+        setupForLimitQueries(50, 100);
+
+        this.stream.getRecentPersonalMessages(50, 100);
+
+        verifyLimitQueries(50, 100);
+    }
+
+    @Test
+    void getRecentPersonalMessagesWhenQueryFails() throws Exception
+    {
+        setupForLimitQueries(30, 0);
+
+        doThrow(new QueryException("", null, null)).when(this.mockEventStream).searchEvents(this.mockQuery);
+
+        List<Event> result = this.stream.getRecentPersonalMessages();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verifyLimitQueries(30, 0);
     }
 }

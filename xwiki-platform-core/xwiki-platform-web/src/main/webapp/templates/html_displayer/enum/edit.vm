@@ -28,9 +28,21 @@
     $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
   #end
 >
+  #set ($translationKeyPrefix = $displayer.type.getName() + '.')
   #foreach ($enumValue in $enumValues)
-    <option value="$escapetool.xml($enumValue)"#if ($enumValue == $displayer.value) selected#end>
-      $escapetool.xml($enumValue)
+    #set ($value = $enumValue.name())
+    #set ($translationKey = $translationKeyPrefix + $value)
+    #if ($services.localization.get($translationKey))
+      #set ($label = $services.localization.render($translationKey))
+    #else
+      #set ($label = $enumValue.toString())
+      #if ($label == $value && $value == $value.toUpperCase())
+        ## Show something nicer than the upper case value.
+        #set ($label = $stringtool.capitalize($label.toLowerCase().replace('_', ' ')))
+      #end
+    #end
+    <option value="$escapetool.xml($value)"#if ($value.equalsIgnoreCase($displayer.value)) selected#end>
+      $escapetool.xml($label)
     </option>
   #end
 </select>

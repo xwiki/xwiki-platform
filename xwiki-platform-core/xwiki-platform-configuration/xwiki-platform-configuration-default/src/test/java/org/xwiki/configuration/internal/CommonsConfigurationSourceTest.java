@@ -26,13 +26,20 @@ import java.util.Properties;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConversionException;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link CommonsConfigurationSource}.
@@ -40,129 +47,132 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.0M1
  */
-public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+public class CommonsConfigurationSourceTest
 {
     private Configuration configuration;
 
     private CommonsConfigurationSource source;
 
-    @Override
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void setUp(ComponentManager componentManager) throws Exception
     {
-        super.setUp();
-
         this.source = new CommonsConfigurationSource();
-        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
-        ReflectionUtils.setFieldValue(source, "converterManager", converterManager);
+        ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
+        ReflectionUtils.setFieldValue(this.source, "converterManager", converterManager);
         this.configuration = new BaseConfiguration();
         this.source.setConfiguration(this.configuration);
     }
 
     @Test
-    public void testDefaultValue()
+    void testDefaultValue()
     {
-        configuration.setProperty("string", "value");
+        this.configuration.setProperty("string", "value");
 
-        Assert.assertEquals("default", source.getProperty("unknown", "default"));
-        Assert.assertEquals("value", source.getProperty("string", "default"));
-        Assert.assertEquals(null, source.getProperty("unknown", (String) null));
+        assertEquals("default", this.source.getProperty("unknown", "default"));
+        assertEquals("value", this.source.getProperty("string", "default"));
+        assertEquals(null, this.source.getProperty("unknown", (String) null));
     }
 
     @Test
-    public void testStringProperty()
+    void testStringProperty()
     {
-        configuration.setProperty("string", "value");
+        this.configuration.setProperty("string", "value");
 
-        Assert.assertEquals("value", source.getProperty("string"));
-        Assert.assertEquals("value", source.getProperty("string", String.class));
+        assertEquals("value", this.source.getProperty("string"));
+        assertEquals("value", this.source.getProperty("string", String.class));
 
-        Assert.assertNull(source.getProperty("unknown"));
-        Assert.assertNull(source.getProperty("unknown", String.class));
+        assertNull(this.source.getProperty("unknown"));
+        assertNull(this.source.getProperty("unknown", String.class));
     }
 
-    @Test(expected = ConversionException.class)
-    public void testStringPropertyWhenConversionError()
+    @Test
+    void testStringPropertyWhenConversionError()
     {
-        configuration.setProperty("string", "value");
+        this.configuration.setProperty("string", "value");
 
         // Try to retrieve a String property as a Boolean
-        source.getProperty("string", Boolean.class);
-    }
-
-    @Test(expected = ConversionException.class)
-    public void testBooleanPropertyWhenConversionError()
-    {
-        configuration.setProperty("property", "");
-
-        // Try to retrieve a Boolean property as a String
-        source.getProperty("property", Color.class);
+        Exception exception = assertThrows(ConversionException.class,
+            () -> this.source.getProperty("string", Boolean.class));
+        assertEquals("Key [string] is not compatible with type [java.lang.Boolean]", exception.getMessage());
     }
 
     @Test
-    public void testBooleanProperty()
+    void testBooleanPropertyWhenConversionError()
+    {
+        this.configuration.setProperty("property", "");
+
+        // Try to retrieve a String property as a Color
+        Exception exception = assertThrows(ConversionException.class,
+            () -> this.source.getProperty("property", Color.class));
+        assertEquals("Key [property] is not compatible with type [java.awt.Color]", exception.getMessage());
+    }
+
+    @Test
+    void testBooleanProperty()
     {
         // Test boolean value
-        configuration.setProperty("boolean", true);
+        this.configuration.setProperty("boolean", true);
 
-        Assert.assertEquals(true, source.getProperty("boolean"));
-        Assert.assertEquals(true, source.getProperty("boolean", Boolean.class));
-        Assert.assertEquals(true, source.getProperty("unknown", true));
-        Assert.assertEquals(false, source.getProperty("unknown", false));
+        assertEquals(true, this.source.getProperty("boolean"));
+        assertEquals(true, this.source.getProperty("boolean", Boolean.class));
+        assertEquals(true, this.source.getProperty("unknown", true));
+        assertEquals(false, this.source.getProperty("unknown", false));
     }
 
     @Test
-    public void testUnknownBooleanProperty()
+    void testUnknownBooleanProperty()
     {
-        Assert.assertNull(source.getProperty("unknown", Boolean.class));
+        assertNull(this.source.getProperty("unknown", Boolean.class));
     }
 
     @Test
-    public void testListProperty()
+    void testListProperty()
     {
-        configuration.setProperty("list", "value1");
-        configuration.addProperty("list", "value2");
+        this.configuration.setProperty("list", "value1");
+        this.configuration.addProperty("list", "value2");
         List<String> expected = Arrays.asList("value1", "value2");
 
-        Assert.assertEquals(expected, source.getProperty("list"));
-        Assert.assertEquals(expected, source.getProperty("list", List.class));
+        assertEquals(expected, this.source.getProperty("list"));
+        assertEquals(expected, this.source.getProperty("list", List.class));
 
-        Assert.assertTrue(source.getProperty("unknown", List.class).isEmpty());
-        Assert.assertEquals(Arrays.asList("toto"), source.getProperty("unknown", Arrays.asList("toto")));
+        assertTrue(this.source.getProperty("unknown", List.class).isEmpty());
+        assertEquals(Arrays.asList("toto"), this.source.getProperty("unknown", Arrays.asList("toto")));
     }
 
     @Test
-    public void testListPropertyWhenArrayList()
+    void testListPropertyWhenArrayList()
     {
-        configuration.setProperty("list", "value");
+        this.configuration.setProperty("list", "value");
         List<String> expected = Arrays.asList("value");
 
-        Assert.assertEquals(expected, source.getProperty("list", Arrays.asList("default")));
+        assertEquals(expected, this.source.getProperty("list", Arrays.asList("default")));
     }
 
     @Test
-    public void testPropertiesProperty()
+    void testPropertiesProperty()
     {
-        configuration.setProperty("properties", "key1=value1");
-        configuration.addProperty("properties", "key2=value2");
+        this.configuration.setProperty("properties", "key1=value1");
+        this.configuration.addProperty("properties", "key2=value2");
         List<String> expectedList = Arrays.asList("key1=value1", "key2=value2");
         Properties expectedProperties = new Properties();
         expectedProperties.put("key1", "value1");
         expectedProperties.put("key2", "value2");
 
-        Assert.assertEquals(expectedList, source.getProperty("properties"));
-        Assert.assertEquals(expectedProperties, source.getProperty("properties", Properties.class));
+        assertEquals(expectedList, this.source.getProperty("properties"));
+        assertEquals(expectedProperties, this.source.getProperty("properties", Properties.class));
 
-        Assert.assertTrue(source.getProperty("unknown", Properties.class).isEmpty());
+        assertTrue(this.source.getProperty("unknown", Properties.class).isEmpty());
     }
 
     @Test
-    public void testIsEmpty()
+    void testIsEmpty()
     {
-        Assert.assertTrue(configuration.isEmpty());
+        assertTrue(this.configuration.isEmpty());
 
-        configuration.addProperty("properties", "key2=value2");
+        this.configuration.addProperty("properties", "key2=value2");
 
-        Assert.assertFalse(configuration.isEmpty());
+        assertFalse(this.configuration.isEmpty());
     }
 }

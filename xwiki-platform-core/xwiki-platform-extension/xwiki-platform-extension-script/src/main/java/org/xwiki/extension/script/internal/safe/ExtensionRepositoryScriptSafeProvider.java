@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -75,6 +76,10 @@ public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafePro
         } else if (unsafe instanceof LocalExtensionRepository) {
             safe =
                 new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,
+                    this.defaultSafeProvider, this.execution, hasProgrammingRights());
+        } else if (unsafe instanceof ExtensionIndex) {            
+            safe =
+                new SafeExtensionIndex<ExtensionIndex>((ExtensionIndex) unsafe,
                     this.defaultSafeProvider, this.execution, hasProgrammingRights());
         } else if (unsafe instanceof AdvancedSearchable) {
             if (unsafe instanceof Ratable) {

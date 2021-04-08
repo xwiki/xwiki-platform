@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=Seitenbaum
+rendering.macro.documentTree.description=Zeigt den Baum der XWiki-Seiten an.
+rendering.macro.documentTree.parameter.readOnly.name=Nur lesen
+rendering.macro.documentTree.parameter.readOnly.description=Soll der Benutzer die Möglichkeit haben, die Baumstruktur zu ändern, sofern er die notwendigen Rechte hat?
+rendering.macro.documentTree.parameter.showWikis.name=Wikis anzeigen
+rendering.macro.documentTree.parameter.showWikis.description=Ob die Wiki-Knoten angezeigt werden sollen oder nicht. Dies kann nur im Hauptwiki verwendet werden und wenn die Baumquelle mit Programmierrechten gespeichert wurde.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Zeigt den detaillierten Wiki-Namen
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Zeigt bei der Anzeige eines Wiki-Knotens den detaillierten Namen des Wikis anstelle der Wiki-ID an.
+rendering.macro.documentTree.parameter.showSpaces.name=Zeige Spaces
+rendering.macro.documentTree.parameter.showSpaces.description=Ob die Raumknoten angezeigt werden sollen oder nicht. Die Seiten werden nach Space gruppiert, wenn die Knoten angezeigt werden.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Seitentitel anzeigen
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Ob bei der Anzeige eines Seitenknotens der Seitentitel anstelle des Seitennamens angezeigt werden soll.
+rendering.macro.documentTree.parameter.showTranslations.name=Übersetzungen anzeigen
+rendering.macro.documentTree.parameter.showTranslations.description=Ob die Übersetzungen der Seite angezeigt werden sollen oder nicht.
+rendering.macro.documentTree.parameter.showAttachments.name=Zeige Anlagen
+rendering.macro.documentTree.parameter.showAttachments.description=Ob die Anhänge der Seite angezeigt werden sollen oder nicht.
+rendering.macro.documentTree.parameter.showObjects.name=Zeige Objekte
+rendering.macro.documentTree.parameter.showObjects.description=Ob die Objekte der Seite angezeigt werden sollen oder nicht.
+rendering.macro.documentTree.parameter.showClassProperties.name=Klasseneigenschaften anzeigen
+rendering.macro.documentTree.parameter.showClassProperties.description=Ob die Klasseneigenschaften für Seiten, die Klassen definieren, angezeigt werden sollen.
+rendering.macro.documentTree.parameter.root.name=Wurzel
+rendering.macro.documentTree.parameter.root.description=Die ID des Wurzelknotens. Dies ist nützlich, wenn Sie nur die Nachkommen eines bestimmten Knotens (der die angegebene Wurzel ist) anzeigen möchten. Der Baum zeigt die Kinder des Wurzelknotens auf der ersten Ebene an, sodass der Wurzelknoten nicht wirklich angezeigt wird. Wenn der Wurzelknoten nicht angegeben ist, wird der gesamte Baum angezeigt. Das Format eines Knotenbezeichners ist entityType:entityReference, wobei der Entitätstyp z. B. wiki, space, document sein kann. Z. B.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Wurzel anzeigen
+rendering.macro.documentTree.parameter.showRoot.description=Ob der Wurzelknoten angezeigt werden soll oder nicht. Der Wurzelknoten wird standardmäßig nicht angezeigt, da er in der Regel aus dem Kontext stammt, in dem der Baum angezeigt wird (z.B. ein Label vor dem Baum). Es gibt jedoch einige Fälle, in denen Sie den Wurzelknoten anzeigen möchten: um einen neuen Knoten unter der Wurzel anlegen zu können.
+rendering.macro.documentTree.parameter.compact.name=Kompakt
+rendering.macro.documentTree.parameter.compact.description=Wenn Sie nur begrenzten horizontalen Platz zur Verfügung haben, sollten Sie diese Einstellung auf true setzen. Die Folge ist, dass die Knotensymbole und die Kanten, die sie verbinden, ausgeblendet werden. Außerdem werden einige spezielle Stile angewendet, um sicherzustellen, dass der Baum weniger horizontalen Platz einnimmt, während die Knotenbeschriftungen vollständig sichtbar bleiben.
+rendering.macro.documentTree.parameter.links.name=Links
+rendering.macro.documentTree.parameter.links.description=Gibt an, ob die Knotenbeschriftungen als Links (Anker) aussehen und sich verhalten sollen.
+rendering.macro.documentTree.parameter.checkboxes.name=Kontrollkästchen
+rendering.macro.documentTree.parameter.checkboxes.description=Ob ein Kontrollkästchen vor jedem Baumknoten angezeigt werden soll, damit der Benutzer mehrere Baumknoten auswählen kann.
+rendering.macro.documentTree.parameter.openTo.name=Offen für
+rendering.macro.documentTree.parameter.openTo.description=Die ID des Knotens, zu dem der Baum geöffnet werden soll. Alle Vorfahren des angegebenen Knotens, bis hin zur Wurzel des Baumes, werden ebenfalls geöffnet.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Nur sichtbare anzeigen
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Zeigt nur die Wiki, Bereichs- und Seitenknoten an, für die der aktuelle Benutzer ein Ansichtsrecht hat. Wenn dies auf "false" gesetzt ist, werden die Wiki-, Bereichs- und Seitenknoten, die vom aktuellen Benutzer nicht angezeigt werden können, im Baum unter ihrem Namen aufgeführt. Der Benutzer kann ihren Inhalt jedoch nicht sehen, indem er ihren Links folgt (er weiß dann nur von ihrer Existenz).
+rendering.macro.documentTree.parameter.filterByClass.name=Nach Klasse filtern
+rendering.macro.documentTree.parameter.filterByClass.description=Zeigt nur die Seiten an, die ein Objekt des angegebenen Typs enthalten. Der Wert dieses Parameters ist der vollständige Name einer XWiki-Seite, die eine Klassendefinition enthält. Mit "Blog.CategoryClass" können Sie z. B. nur die Seiten anzeigen, die Blog-Kategorien darstellen. Lassen Sie diesen Parameter leer, wenn Sie den Typ der in der Struktur angezeigten Seiten nicht einschränken möchten.
+rendering.macro.documentTree.parameter.finder.name=Suchfeld
+rendering.macro.documentTree.parameter.finder.description=Zeigt eine Texteingabe an, die zum Suchen von Baumknoten verwendet werden kann. Die Eingabe wird oberhalb des Baums angezeigt und bietet während der Eingabe Vorschläge an, die auf dem Inhalt des Baums basieren. Wenn ein Vorschlag ausgewählt wird, wird der Baum bis zum entsprechenden Knoten aufgeklappt.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Hierarchie-Modus der Seite
+rendering.macro.documentTree.parameter.hierarchyMode.description=Gibt an, welche Hierarchie zwischen den Seiten verwendet werden soll. Mögliche Werte sind "reference" (Standard) und "parentchild". Wenn "reference" verwendet wird, wird die Seitenhierarchie nur über die Seitenreferenz definiert, insbesondere über die verschachtelte Raumkomponente der Seitenreferenz. Wenn "parentchild" verwendet wird, basiert die Hierarchie auf der Eltern-Kind-Beziehung, die durch das Seitenfeld "parent" aus der Datenbank definiert ist.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Ausgeblendete Dokumente filtern
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Setzen Sie diesen Parameter auf false, wenn Sie die ausgeblendeten Dokumente in die Struktur einschließen möchten. Andernfalls, wenn der Wert true ist, werden die ausgeblendeten Dokumente je nach den Einstellungen des aktuellen Benutzers ausgeschlossen oder einbezogen.
+rendering.macro.documentTree.parameter.limit.name=Limit
+rendering.macro.documentTree.parameter.limit.description=Die maximale Anzahl der Kindknoten, die beim ersten Aufklappen eines übergeordneten Knotens angezeigt werden sollen. Der Rest der Kindknoten ist über einen "mehr ..."-Link zugänglich. Dieser Parameter dient im Wesentlichen dazu, die Kindknoten zu paginieren und hilft so bei der Skalierung des Baums, wenn die Anzahl der Kindknoten groß ist.
+rendering.macro.documentTree.parameter.exclusions.name=Ausschlüsse
+rendering.macro.documentTree.parameter.exclusions.description=Die Liste der Knoten, die aus dem Baum ausgeschlossen werden sollen. Die Knoten werden durch ihre ID angegeben und durch Komma getrennt.
+
+index.documentTree.empty=Keine Seiten gefunden
+index.documentTree.more={0} mehr ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Kinddokumente anzeigen
+rendering.macro.documentTree.parameter.showChildDocuments.description=Ob die untergeordneten Dokumente basierend auf dem übergeordneten Feld des Dokuments angezeigt werden sollen.</content>
+  
+</xwikidoc>

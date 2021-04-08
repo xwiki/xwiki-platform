@@ -76,7 +76,7 @@ function insertTags(tagOpen, tagClose, sampleText) {
     var startPos = txtarea.selectionStart;
     var endPos = txtarea.selectionEnd;
     var scrollTop = txtarea.scrollTop;
-    var myText = (txtarea.value).substring(startPos, endPos);
+    var subst, myText = (txtarea.value).substring(startPos, endPos);
     if (!myText) {
       myText = sampleText;
     }

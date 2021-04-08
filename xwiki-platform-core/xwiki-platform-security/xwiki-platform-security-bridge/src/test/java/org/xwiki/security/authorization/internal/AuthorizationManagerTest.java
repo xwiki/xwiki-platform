@@ -262,4 +262,19 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         assertAccessTrue("Main wiki oner shoudl have Programming Right", Right.PROGRAM,
             new DocumentReference("wiki", "XWiki", "Admin"), null, ctx);
     }
+
+    @Test
+    public void testGroupAccess() throws Exception
+    {
+        LegacyTestWiki testWiki =
+            new LegacyTestWiki(getMockery(), getComponentManager(), "userAndGroupAdmin.xml", false);
+
+        DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
+        DocumentReference group = new DocumentReference("wiki", "XWiki", "group");
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setWikiId("wiki");
+
+        assertAccessTrue("User should have admin right", Right.ADMIN, user, ctx.getWikiReference(), ctx);
+        assertAccessTrue("Group should have admin right", Right.ADMIN, group, ctx.getWikiReference(), ctx);
+    }
 }

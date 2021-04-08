@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
@@ -47,6 +48,7 @@ import org.xwiki.security.authorization.SecurityEntryReaderExtra;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.XWikiConstants;
+import org.xwiki.text.XWikiToStringBuilder;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -132,6 +134,16 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         public Collection<SecurityRule> getRules()
         {
             return rules;
+        }
+
+        @Override
+        public String toString()
+        {
+            ToStringBuilder builder = new XWikiToStringBuilder(this);
+            builder.append("entity", this.reference);
+            builder.append("rules", this.rules);
+
+            return builder.toString();
         }
     }
 

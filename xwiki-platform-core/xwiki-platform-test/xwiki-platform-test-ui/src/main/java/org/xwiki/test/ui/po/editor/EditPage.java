@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
+import org.xwiki.test.ui.po.BootstrapSelect;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -350,18 +350,21 @@ public class EditPage extends BasePage
 
     /**
      * Set the default language input field.
+     * 
      * @param defaultLanguage the string to fill the input.
      * @since 11.3RC1
      */
     public void setDefaultLanguage(String defaultLanguage)
     {
-        defaultLanguageField.clear();
-        defaultLanguageField.sendKeys(defaultLanguage);
+        // Select the parent of the default language field because we're using the Bootstrap select widget.
+        WebElement parent = this.defaultLanguageField.findElement(By.xpath("./.."));
+        BootstrapSelect select = new BootstrapSelect(parent, getDriver());
+        select.selectByValue(defaultLanguage);
     }
 
     public String getDefaultLanguage()
     {
-        return defaultLanguageField.getAttribute("value");
+        return new Select(this.defaultLanguageField).getFirstSelectedOption().getAttribute("value");
     }
 
     public boolean isCSRFWarningDisplayed()

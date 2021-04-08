@@ -38,12 +38,12 @@ public class HTML5DutchWebGuidelinesValidatorTest
     private HTML5DutchWebGuidelinesValidator validator;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    public void beforeEach()
     {
         this.validator = new HTML5DutchWebGuidelinesValidator();
     }
 
-    private void setValidatorDocument(InputStream document) throws Exception
+    private void setValidatorDocument(InputStream document)
     {
         this.validator.setDocument(document);
     }
@@ -95,7 +95,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testInvalid() throws Exception
+    public void testInvalid()
     {
         setValidatorDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         this.validator.validate();
@@ -225,19 +225,19 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd2s5FramesetDoctype() throws Exception
+    public void testRpd2s5FramesetDoctype()
     {
         // JSoup does not handle the doctype.
     }
 
     @Test
-    public void testRpd2s5FramesetTag() throws Exception
+    public void testRpd2s5FramesetTag()
     {
         // JSoup does not handle the <frameset> tag
     }
 
     @Test
-    public void testRpd2s5FrameTag() throws Exception
+    public void testRpd2s5FrameTag()
     {
         // JSoup does not handle <frame> tags
     }
@@ -360,7 +360,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     // RPD 3s13
 
     @Test
-    public void testRpd3s13BulletList() throws Exception
+    public void testRpd3s13BulletList()
     {
         //ToDo: difficult to do with JSoup
         /*
@@ -375,7 +375,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s13DashList() throws Exception
+    public void testRpd3s13DashList()
     {
         //ToDo: difficult to do with JSoup
         /*
@@ -390,7 +390,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
     }
 
     @Test
-    public void testRpd3s13NumberedList() throws Exception
+    public void testRpd3s13NumberedList()
     {
         //ToDo: difficult to do with JSoup
         /*

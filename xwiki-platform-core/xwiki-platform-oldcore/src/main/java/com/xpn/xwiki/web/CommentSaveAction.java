@@ -23,6 +23,10 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -42,6 +46,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 8.4RC1
  */
+@Component
+@Named("commentsave")
+@Singleton
 public class CommentSaveAction extends CommentAddAction
 {
     private static final String COMMENT_FIELD_NAME = "comment";
@@ -66,6 +73,12 @@ public class CommentSaveAction extends CommentAddAction
      * Pattern to get the comment's number.
      */
     private final Pattern pattern = Pattern.compile("XWiki.XWikiComments_(\\d+)_comment");
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
+    }
 
     private int getCommentIdFromRequest(XWikiRequest request) throws XWikiException
     {

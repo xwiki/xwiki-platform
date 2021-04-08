@@ -169,7 +169,7 @@
         ### Server State
         ###
         &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverstate'))&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;$escapetool.html($services.officemanager.serverState)&lt;/dd&gt;
+        &lt;dd&gt;$escapetool.html($services.officemanager.displayServerState())&lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/fieldset&gt;
     ###

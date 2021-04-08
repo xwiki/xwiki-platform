@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsApplicationsPreferencesMacro</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -102,6 +105,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -139,12 +144,17 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
   /**
    * Page initialization
    */
-  $(document).ready(function() {
+  var preferenceInit = function (event) {
 
     var applications = [];
+    if (event.data &amp;&amp; event.data.elements) {
+      var container = $(event.data.elements);
+    } else {
+      var container = $(document);
+    }
 
     // Create application widgets
-    $('.applicationElem').each(function() {
+    container.find('.applicationElem').each(function() {
       applications.push(new ApplicationWidget($(this)));
     });
 
@@ -174,11 +184,18 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
           }
         }
       }
+      var target = $('.notifPreferences').attr('data-target');
+      var targetUser = "";
+      if (target == 'user') {
+        var targetUser = XWiki.Model.serialize(new XWiki.Document().getDocumentReference())
+      }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {
         action: 'savePreferences',
         target: $('.notifPreferences').attr('data-target'),
-        json: JSON.stringify(data)
+        user: targetUser,
+        json: JSON.stringify(data),
+        csrf: xm.form_token
       }).done(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
@@ -198,7 +215,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      * happens in the meantime.
      */
     var nextSave = 0;
-    $($('.notifPreferences')).on('switchChange.bootstrapSwitch', function(event, state) {
+    $($('.notifPreferences')).off('switchChange.bootstrapSwitch').on('switchChange.bootstrapSwitch', function(event, state) {
       if (nextSave != 0) {
         clearTimeout(nextSave);
       }
@@ -219,7 +236,10 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       $(this).removeClass('loading');
     });
 
-  });
+  };
+  
+  $(document).ready(preferenceInit);
+  $(document).on('xwiki:dom:updated', preferenceInit)
 });
 </code>
     </property>
@@ -249,8 +269,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -298,6 +321,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -340,9 +365,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       // Enable bootstrap switches
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))',
-        onText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))',
-        offText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))'
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
       });
     };
 
@@ -421,8 +444,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -470,6 +496,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -514,19 +542,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       // Enable bootstrap switch.
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'small',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))',
-        onText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))',
-        offText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))'
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
       });
       // Set initial state for the switches
       self.updateSwitches();
       self.updateTypesOnChange = true;
       // Handle collapsing
-      self.collapseButton.click(function() {
+      // Make sure the click listener is registered only once.
+      self.collapseButton.off('click.toggleVisibility').on('click.toggleVisibility', function() {
         for (var i = 0; i &lt; self.eventTypes.length; ++i) {
           self.eventTypes[i].toggleVisibility();
         }
       });
+
       // Handle switch change
       self.switchAlert.on('switchChange.bootstrapSwitch', function(event, state) {
         for (var i = 0; i &lt; self.eventTypes.length; ++i) {
@@ -603,8 +631,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -633,6 +664,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -668,6 +701,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -737,11 +772,51 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
         <prettyName>Macro code</prettyName>
         <rows>20</rows>
         <size>40</size>
@@ -753,21 +828,43 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <prettyName>Macro content type</prettyName>
+        <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
@@ -815,6 +912,16 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -829,6 +936,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
@@ -843,18 +952,20 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       </visibility>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
-#if (!$xcontext.userReference &amp;&amp; $xcontext.macro.params.target == 'user')
-  {{info}}
-    {{translation key="notifications.settings.applications.forGuest" /}}
-  {{/info}}
-#elseif ($xcontext.macro.params.target == 'wiki' &amp;&amp; !$services.security.authorization.hasAccess('admin', $services.model.createWikiReference($services.wiki.currentWikiId)))
-  {{error}}
-    {{translation key="notifications.settings.error.notAdmin" /}}
-  {{/error}}
-#else
+#checkMacroNotificationPreferencesParameters($checkResult)
+#if ($checkResult)
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
@@ -865,14 +976,21 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 ######################################################
 ### GLOBALS
 ######################################################
-#set ($userDoc = $xwiki.getDocument($xcontext.userReference))
+#if ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.target == 'user')
+  #set ($targetUser = $wikimacro.parameters.user.reference)
+  #set ($targetUserReference = $wikimacro.parameters.user)
+#else
+  #set ($targetUser = $xcontext.userReference)
+  #set ($targetUserReference = $services.user.currentUserReference)
+#end
+#set ($userDoc = $xwiki.getDocument($targetUser))
 ######################################################
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($xcontext.macro.params.target)"&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
@@ -955,8 +1073,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 #macro(displayPreference $type $format)
   #set ($checked = '')
   #set ($preference = '')
-  #if (($xcontext.macro.params.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
-    ($xcontext.macro.params.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format)))
+  #if (($wikimacro.parameters.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
+    ($wikimacro.parameters.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabledForUser($type.eventType, $format, $targetUserReference)))
     #set ($checked = 'checked="checked"')
   #end
   &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-filter="${type.filter}"&gt;
@@ -973,6 +1091,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <contentDescription/>
     </property>
     <property>
+      <contentJavaType/>
+    </property>
+    <property>
       <contentType>No content</contentType>
     </property>
     <property>
@@ -986,6 +1107,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <name>Notifications Applications Preferences</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -1046,6 +1170,15 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>user</defaultValue>
@@ -1058,6 +1191,87 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <name>target</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>79c9b6f0-e62f-493d-9be6-49a58adc9e8d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>User reference of the user for which to display and manipulate the application preferences. This parameter is optional, only used if the target parameter is set to ##user## and default value is the context user. Note that for using this parameter, the context user needs administrator right on the given user reference.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>user</name>
+    </property>
+    <property>
+      <type>org.xwiki.user.UserReference</type>
     </property>
   </object>
 </xwikidoc>

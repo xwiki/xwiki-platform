@@ -42,26 +42,26 @@
   
   <content>## Homepage Tour (by steps order)
 tour.homepageTour.welcome.title=Bienvenido a XWiki
-tour.homepageTour.welcome.content=En los próximos minutos descubrirás la interfaz de tu wiki y las funcionalidades básicas.
+tour.homepageTour.welcome.content=En los próximos minutos descubrirás la interfaz y las funcionalidades básicas de tu wiki.
 tour.homepageTour.panels.title=Paneles
-tour.homepageTour.panels.contentA=Los paneles actuales te permiten acceder a las aplicaciones y páginas de tu wiki.
-tour.homepageTour.panels.contentB=Los administradores pueden personalizarlos y decidir qué paneles se muestran.
-tour.homepageTour.breadcrumbs.title=Migas de pan
-tour.homepageTour.breadcrumbs.contentA=Las migas de pan le permiten identificar dónde se encuentra su página y navegar por la jerarquía.
-tour.homepageTour.breadcrumbs.contentB=El botón {0} siempre le llevará a la página principal del wiki.
+tour.homepageTour.panels.contentA=Los paneles resaltados te permiten acceder a las aplicaciones y páginas de tu wiki.
+tour.homepageTour.panels.contentB=Los administradores pueden personalizarlos y decidir qué paneles mostrar.
+tour.homepageTour.breadcrumbs.title=Pistas
+tour.homepageTour.breadcrumbs.contentA=Las pistas de navegación te permiten identificar dónde se encuentra tu página y navegar por la jerarquía.
+tour.homepageTour.breadcrumbs.contentB=El botón {0} siempre le llevará a la página de inicio de la wiki.
 tour.homepageTour.pageContent.title=Contenido de la página
 tour.homepageTour.pageContent.contentA=Este es el lugar donde se muestra el contenido de la página actual.
-tour.homepageTour.pageContent.contentB=Edite esta página para añadir tablas, listas, macros y estructura con el fin de organizar su conocimiento.
+tour.homepageTour.pageContent.contentB=Edita esta página para añadir tablas, listas, macros y estructura con el fin de organizar tu conocimiento.
 tour.homepageTour.pageMenu.title=Menú de la página
 tour.homepageTour.pageMenu.contentA=Este menú contiene acciones relacionadas con la página. Con los permisos adecuados, puede editar, crear, administrar o eliminar páginas.
 tour.homepageTour.pageMenu.contentB=El botón {0} muestra más acciones como Exportar, Imprimir y Compartir.
-tour.homepageTour.pageTabs.title=Pestañas
-tour.homepageTour.pageTabs.contentA=Los comentarios son una gran manera para que los usuarios discutan el contenido de la página.
-tour.homepageTour.pageTabs.contentB=También puede adjuntar archivos, comparar versiones de página o ver información de la página.
+tour.homepageTour.pageTabs.title=Pestañas de página
+tour.homepageTour.pageTabs.contentA=Los comentarios son una gran herramienta para que los usuarios debatan sobre el contenido de la página.
+tour.homepageTour.pageTabs.contentB=También puedes adjuntar archivos, comparar versiones de página o ver información de la página.
 tour.homepageTour.header.title=Cabecera
-tour.homepageTour.header.contentA=Puede buscar contenido, estar atento a los cambios de página o acceder a su perfil de usuario.
-tour.homepageTour.header.contentB=El botón {0} abre un cajón que contiene acciones relacionadas con el wiki como Administración e Índices.
-tour.homepageTour.tourComplete.title=Tour Completo
-tour.homepageTour.tourComplete.contentA=Esto completa tu recorrido en la interfaz de XWiki y las funcionalidades básicas.
-tour.homepageTour.tourComplete.contentB=Para obtener más detalles sobre cada característica, acceda a la {0}documentación{1}.</content>
+tour.homepageTour.header.contentA=Puedes buscar contenido, seguir los cambios en las páginas o acceder a tu perfil de usuario.
+tour.homepageTour.header.contentB=El botón {0} abre un cajón que contiene acciones relacionadas con la wiki como Administración e Índices.
+tour.homepageTour.tourComplete.title=Tour completado
+tour.homepageTour.tourComplete.contentA=Esto completa tu recorrido por la interfaz y funcionalidades básicas de XWiki.
+tour.homepageTour.tourComplete.contentB=Para obtener más detalles de cada funcionalidad, accede a la {0}documentación{1}.</content>
 </xwikidoc>

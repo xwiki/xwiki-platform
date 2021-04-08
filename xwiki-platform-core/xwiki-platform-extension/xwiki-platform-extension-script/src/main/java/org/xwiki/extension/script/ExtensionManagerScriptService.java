@@ -38,6 +38,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
@@ -67,7 +68,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -639,7 +639,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @return the {@link UninstallRequest}
      * @since 11.10
      */
-    @Unstable
     public UninstallRequest createUninstallRequest()
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
@@ -693,7 +692,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      *         {@code null} in case of failure
      * @since 11.10
      */
-    @Unstable
     public Job createUninstallPlan(UninstallRequest uninstallRequest)
     {
         setError(null);
@@ -1008,6 +1006,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public boolean isAllowed(Extension extension, String namespace)
     {
+        if (extension instanceof IndexedExtension) {
+            if (Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
+                // If the extension has explicitly been marked as incompatible, return false
+                return false;
+            }
+        }
+
         return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);
     }
 

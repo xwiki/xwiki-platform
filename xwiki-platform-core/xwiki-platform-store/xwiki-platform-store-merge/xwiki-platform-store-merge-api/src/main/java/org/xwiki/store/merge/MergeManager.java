@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
@@ -34,7 +33,6 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
  * @since 11.8RC1
  */
 @Role
-@Unstable
 public interface MergeManager
 {
     /**

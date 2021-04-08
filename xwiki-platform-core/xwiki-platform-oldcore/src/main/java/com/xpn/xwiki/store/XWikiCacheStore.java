@@ -43,12 +43,12 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -218,6 +218,36 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    public void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext inputxcontext)
+        throws XWikiException
+    {
+        // Make sure to use the right XWikiContext instance to avoid issues
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+        try {
+            this.store.renameXWikiDoc(doc, newReference, context);
+        } finally {
+            // Flushing the cache for old document
+            String key = getKey(doc, context);
+            getCache().remove(key);
+            getPageExistCache().remove(key);
+
+            WikiReference originalWikiReference = doc.getDocumentReference().getWikiReference();
+            // Flushing the cache for new document
+            if (!newReference.getWikiReference().equals(originalWikiReference)) {
+                context.setWikiReference(newReference.getWikiReference());
+            }
+            XWikiDocument newDoc = new XWikiDocument(newReference);
+            key = getKey(newDoc, context);
+            getCache().remove(key);
+            getPageExistCache().remove(key);
+            context.setWikiReference(originalWikiReference);
+
+            // Restore the previous XWikiContext
+            restoreExecutionXContext();
+        }
+    }
+
+    @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         // Make sure to use the right XWikiContext instance to avoid issues
@@ -375,10 +405,9 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
                     LOGGER.debug("Cache: put doc {} in cache", key);
                 }
-
-                cachedoc.setStore(this.store);
             }
 
+            cachedoc.setStore(this);
             LOGGER.debug("Cache: end for doc {} in cache", key);
 
             return cachedoc;
@@ -757,7 +786,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
      * @return the cache that handle the limit size properties.
      * @since 11.4RC1
      */
-    @Unstable
     public Cache<Integer> getLimitSizePropertyCache()
     {
         return this.limitSizePropertyCache;

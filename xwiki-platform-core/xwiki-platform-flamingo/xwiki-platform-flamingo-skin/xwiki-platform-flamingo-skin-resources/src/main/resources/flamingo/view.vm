@@ -48,7 +48,11 @@
   </div>## mainContentArea
   #if($viewer == 'content')
     #if ($displayContentFooter)
-      #template('contentfooter.vm')
+      <div id="xdocFooter">
+        #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.contentFooter', {'sortByParameter': 'order'}))
+          $services.rendering.render($uix.execute(), 'xhtml/1.0')
+        #end
+      </div>
     #end
     #if ($displayDocExtra)
       #template('docextra.vm')

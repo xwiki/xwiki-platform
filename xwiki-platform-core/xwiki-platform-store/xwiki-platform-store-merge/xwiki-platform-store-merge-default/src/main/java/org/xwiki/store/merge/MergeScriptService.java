@@ -33,7 +33,6 @@ import org.xwiki.diff.Conflict;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.diff.internal.DefaultConflictDecision;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -49,7 +48,6 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 @Component
 @Named("merge")
 @Singleton
-@Unstable
 public class MergeScriptService implements ScriptService
 {
     /**
@@ -99,7 +97,6 @@ public class MergeScriptService implements ScriptService
      * @return a decision that solve the conflict.
      * @since 11.8RC1
      */
-    @Unstable
     public ConflictDecision<String> getDecision(Conflict<String> conflict, ConflictDecision.DecisionType type,
         String customDecision)
     {
@@ -119,7 +116,6 @@ public class MergeScriptService implements ScriptService
      * @param decisionList the list of decision to save.
      * @since 11.8RC1
      */
-    @Unstable
     public void recordDecisions(List<ConflictDecision> decisionList)
     {
         XWikiContext context = contextProvider.get();

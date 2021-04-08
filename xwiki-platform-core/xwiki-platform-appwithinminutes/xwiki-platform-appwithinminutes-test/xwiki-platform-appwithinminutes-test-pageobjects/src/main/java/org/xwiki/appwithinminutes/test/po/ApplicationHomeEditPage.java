@@ -60,6 +60,14 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     private WebElement titleInput;
 
     /**
+     * Default constructor which waits on xaction_save button.
+     */
+    public ApplicationHomeEditPage()
+    {
+        super(true, true);
+    }
+
+    /**
      * Clicks on the Previous Step button.
      *
      * @return the page that represents the previous step of the App Within Minutes wizard

@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Sandbox</title>
+  <title>沙箱</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -136,7 +136,7 @@ XWiki允许您创建连接到wiki中其他页面或者互联网页面的链接�
 
 = 宏 =
 
-Macros allow you to make wiki content look better and to add additional features to your wiki. Here are 2 examples of how macros can be used in wiki pages:
+宏使您可以使Wiki内容看起来更好，并为Wiki添加其他功能。以下是两个如何在Wiki页面中使用宏的示例：
 
 == 告警宏 ==
 

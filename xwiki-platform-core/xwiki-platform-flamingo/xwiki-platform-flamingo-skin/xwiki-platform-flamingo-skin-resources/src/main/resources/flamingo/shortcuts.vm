@@ -93,7 +93,7 @@
 ###########################################
 ##        ADD KEYBOARD SHORTCUTS
 ###########################################
-<script type="text/javascript">
+<script>
   #if($!xcontext.user != 'XWiki.XWikiGuest')
     //<![CDATA[
     /**

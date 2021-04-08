@@ -188,7 +188,7 @@
 
 {{velocity}}
 {{html clean="false"}}
-&lt;script language="javascript"&gt;
+&lt;script&gt;
   require.config({
     paths: {
       'xwiki-icon-picker': '$xwiki.getURL($services.model.createDocumentReference('', 'IconThemesCode', 'IconPicker'), 'jsx', "minify=$!{escapetool.url($request.minify)}")'

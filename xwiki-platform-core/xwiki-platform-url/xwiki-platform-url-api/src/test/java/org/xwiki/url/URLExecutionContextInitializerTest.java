@@ -19,13 +19,14 @@
  */
 package org.xwiki.url;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.internal.URLExecutionContextInitializer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,30 +35,32 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.2M1
  */
-public class URLExecutionContextInitializerTest
+@ComponentTest
+class URLExecutionContextInitializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<URLExecutionContextInitializer> mocker =
-        new MockitoComponentMockingRule<>(URLExecutionContextInitializer.class);
+    @InjectMockComponents
+    private URLExecutionContextInitializer initializer;
+
+    @MockComponent
+    private URLConfiguration configuration;
 
     @Test
-    public void initializeWhenFormatIdNotInContext() throws Exception
+    void initializeWhenFormatIdNotInContext() throws Exception
     {
         ExecutionContext ec = new ExecutionContext();
-        URLConfiguration configuration = this.mocker.getInstance(URLConfiguration.class);
-        when(configuration.getURLFormatId()).thenReturn("test");
+        when(this.configuration.getURLFormatId()).thenReturn("test");
 
-        this.mocker.getComponentUnderTest().initialize(ec);
+        this.initializer.initialize(ec);
 
         assertEquals("test", ec.getProperty("urlscheme"));
     }
 
     @Test
-    public void initializeWhenFormatIdAlreadyInContext() throws Exception
+    void initializeWhenFormatIdAlreadyInContext() throws Exception
     {
         ExecutionContext ec = new ExecutionContext();
         ec.setProperty("urlscheme", "existing");
-        this.mocker.getComponentUnderTest().initialize(ec);
+        this.initializer.initialize(ec);
 
         assertEquals("existing", ec.getProperty("urlscheme"));
     }

@@ -21,7 +21,9 @@ package org.xwiki.rendering.async.internal;
 
 import java.util.List;
 
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.rendering.RenderingException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Execute a task and return a {@link AsyncRendererResult} containing the resulting String (and possibly other more
@@ -57,4 +59,19 @@ public interface AsyncRenderer
      * @return true if the result be reused several times
      */
     boolean isCacheAllowed();
+
+    /**
+     * This allows to specify if the job associated to this renderer should be a {@link org.xwiki.job.GroupedJob} or
+     * not. A GroupedJob benefits from being executed in a specific pool of threads that can be customized with a
+     * {@link org.xwiki.job.GroupedJobInitializer}. By returning {@code null} here, you decide to not use a GroupedJob
+     * and to use a single job executor.
+     *
+     * @return the {@link JobGroupPath} to be used for this renderer: if null a single job executor will be used.
+     * @since 12.5RC1
+     */
+    @Unstable
+    default JobGroupPath getJobGroupPath()
+    {
+        return null;
+    }
 }

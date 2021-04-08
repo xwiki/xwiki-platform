@@ -24,6 +24,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.and;
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeToBe;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+
 /**
  * Page object used to interact with the Administration menu.
  * 
@@ -34,6 +38,17 @@ public class AdministrationMenu extends BaseElement
 {
     @FindBy(className = "admin-menu")
     private WebElement container;
+
+    @FindBy(id = "adminsearchmenu")
+    private WebElement searchInput;
+
+    /**
+     * Create a new instance and waits for the menu to be ready for user interaction.
+     */
+    public AdministrationMenu()
+    {
+        waitUntilReady();
+    }
 
     private By categoryByName(String categoryName)
     {
@@ -135,5 +150,18 @@ public class AdministrationMenu extends BaseElement
     {
         return getDriver().findElementsWithoutWaiting(this.container, sectionByName(categoryName, sectionName))
             .size() == 0;
+    }
+
+    /**
+     * Wait for the menu to be ready for user interaction.
+     * 
+     * @return this administration menu
+     * @since 12.8RC1
+     */
+    protected AdministrationMenu waitUntilReady()
+    {
+        getDriver().waitUntilCondition(
+            and(attributeToBe(this.container, "data-ready", "true"), elementToBeClickable(this.searchInput)));
+        return this;
     }
 }

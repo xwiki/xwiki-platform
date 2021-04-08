@@ -40,6 +40,8 @@ public class AsyncRendererConfiguration
 
     protected boolean secureSet;
 
+    protected boolean placeHolderForced;
+
     /**
      * @return the list of context entries to take remember for the execution
      */
@@ -89,5 +91,29 @@ public class AsyncRendererConfiguration
         this.secureDocumentReference = documentReference;
         this.secureAuthorReference = authorReference;
         this.secureSet = true;
+    }
+
+    /**
+     * @return {@code true} if the renderer should display a placeholder even if the data is already available.
+     * @see #setPlaceHolderForced(boolean).
+     * @since 12.5RC1
+     */
+    public boolean isPlaceHolderForced()
+    {
+        return placeHolderForced;
+    }
+
+    /**
+     * Set to {@code true} to force the renderer to return an async placeholder even if the data is available.
+     * This allows to use easily the Async rendering framework with AJAX requests: we can force the async renderers
+     * in an AJAX request to return always placeholders, so they are resolved once added in the current DOM by using
+     * Javascript.
+     *
+     * @param placeHolderForced {@code true} to force using a placeholder.
+     * @since 12.5RC1
+     */
+    public void setPlaceHolderForced(boolean placeHolderForced)
+    {
+        this.placeHolderForced = placeHolderForced;
     }
 }

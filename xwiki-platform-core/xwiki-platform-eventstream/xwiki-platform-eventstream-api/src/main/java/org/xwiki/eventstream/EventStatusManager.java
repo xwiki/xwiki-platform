@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Handle the statuses for the events.
@@ -40,24 +39,42 @@ public interface EventStatusManager
      * @param events a list of events
      * @param entityIds a list of ids of entities (users and groups)
      * @return the list of statuses corresponding to each pair or event/entity
-     *
      * @throws Exception if an error occurs
      */
     List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception;
 
     /**
      * Save in the storage the given status.
+     * 
      * @param eventStatus the status to save
      * @throws Exception if an error occurs
+     * @deprecated since 12.3RC1, use {@link EventStore#saveEventStatus(EventStatus)} instead
      */
+    @Deprecated
     void saveEventStatus(EventStatus eventStatus) throws Exception;
+
+    /**
+     * Delete from the storage the given status.
+     * 
+     * @param eventStatus the status to save
+     * @throws Exception if an error occurs
+     * @since 12.5RC1
+     * @deprecated since 12.5RC1, use {@link EventStore#deleteEventStatus(EventStatus)} instead
+     */
+    @Deprecated
+    default void deleteEventStatus(EventStatus eventStatus) throws Exception
+    {
+
+    }
 
     /**
      * @param startDate date before which to remove event status
      * @param entityId the id of the entity concerned by the status
+     * @throws Exception if an error occurs
      * @since 12.1RC1
+     * @deprecated since 12.6, use {@link EventStore#deleteEventStatuses(String, Date)} instead
      */
-    @Unstable
+    @Deprecated
     default void deleteAllForEntity(Date startDate, String entityId) throws Exception
     {
     }

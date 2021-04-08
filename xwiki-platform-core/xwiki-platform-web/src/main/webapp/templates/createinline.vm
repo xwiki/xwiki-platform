@@ -141,7 +141,7 @@
           }
         ]
       }])
-    #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && "$!services.officemanager.serverState" == 'Connected')
+    #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && $services.officemanager.isConnected())
       ## TODO: handle this use case with an extension point
       #set ($discard = $options[0].options.add({
         'name': $services.localization.render('office.createForm.type.name'),
@@ -242,7 +242,7 @@
         #set ($defaultValue = 'blank')
       #end
     #end
-    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium', '', true)</dd>
+    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium page-type', '', true)</dd>
   #else
     <input type="hidden" name="template" value="$escapetool.xml($template)" />
   #end

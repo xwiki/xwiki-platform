@@ -44,7 +44,7 @@ import org.xwiki.notifications.sources.NotificationManager;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageIterator
-        implements PeriodicMimeMessageIterator
+    implements PeriodicMimeMessageIterator
 {
     @Inject
     private NotificationManager notificationManager;
@@ -53,17 +53,17 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
 
     @Override
     public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
-            Date lastTrigger, DocumentReference templateReference)
+        Date lastTrigger, DocumentReference templateReference)
     {
         this.lastTrigger = lastTrigger;
+
         super.initialize(userIterator, factoryParameters, templateReference);
     }
 
     @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        return notificationManager.getEvents(serializer.serialize(user),
-                NotificationFormat.EMAIL, Integer.MAX_VALUE / 4, null,
-                lastTrigger, Collections.emptyList());
+        return this.notificationManager.getEvents(this.serializer.serialize(user), NotificationFormat.EMAIL,
+            Integer.MAX_VALUE / 4, null, this.lastTrigger, Collections.emptyList());
     }
 }

@@ -748,21 +748,24 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     {
         Collection<DocumentReference> groupReferences = null;
 
-        String prefixedFullName = this.entityReferenceSerializer.serialize(memberReference);
-
         List<String> groupNames;
         try {
             Query query;
-            if (memberReference.getWikiReference().getName().equals(context.getWikiId())
+            if (XWikiRightService.isGuest(memberReference)) {
+                query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
+                    .bindValue("username", XWikiRightService.GUEST_USER_FULLNAME)
+                    .bindValue("shortname", XWikiRightService.GUEST_USER_FULLNAME)
+                    .bindValue("veryshortname", XWikiRightService.GUEST_USER);
+            } else if (memberReference.getWikiReference().getName().equals(context.getWikiId())
                 || (memberReference.getLastSpaceReference().getName().equals("XWiki")
                     && memberReference.getName().equals(XWikiRightService.GUEST_USER))) {
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
-                    .bindValue("username", prefixedFullName)
+                    .bindValue("username", this.entityReferenceSerializer.serialize(memberReference))
                     .bindValue("shortname", this.localWikiEntityReferenceSerializer.serialize(memberReference))
                     .bindValue("veryshortname", memberReference.getName());
             } else {
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUserInOtherWiki")
-                    .bindValue("prefixedmembername", prefixedFullName);
+                    .bindValue("prefixedmembername", this.entityReferenceSerializer.serialize(memberReference));
             }
 
             query.setOffset(offset);
@@ -780,8 +783,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
         // itself are part of it.
-        if (isAllGroupImplicit(context) && memberReference.getWikiReference().getName().equals(context.getWikiId())
-            && !memberReference.getName().equals(XWikiRightService.GUEST_USER)) {
+        if (isAllGroupImplicit(context) && !XWikiRightService.isGuest(memberReference)
+            && memberReference.getWikiReference().getName().equals(context.getWikiId())) {
             DocumentReference currentXWikiAllGroup =
                 new DocumentReference(context.getWikiId(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
 

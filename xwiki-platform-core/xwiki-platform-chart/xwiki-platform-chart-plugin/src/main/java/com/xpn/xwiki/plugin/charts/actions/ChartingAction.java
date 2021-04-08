@@ -21,6 +21,11 @@ package com.xpn.xwiki.plugin.charts.actions;
 
 import java.io.IOException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.ChartingPluginApi;
@@ -28,6 +33,9 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.XWikiRequest;
 
+@Component
+@Named("charting")
+@Singleton
 public class ChartingAction extends XWikiAction
 {
     @Override

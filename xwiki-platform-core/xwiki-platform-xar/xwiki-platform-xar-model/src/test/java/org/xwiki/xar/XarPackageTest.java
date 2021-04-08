@@ -27,10 +27,14 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.model.XarModel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XarPackageTest
+/**
+ * Unit tests for {@link XarPackage}.
+ *
+ * @version $Id$
+ */
+class XarPackageTest
 {
     private static final LocalDocumentReference SPACE_PAGE = new LocalDocumentReference("Space", "Page", Locale.ROOT);
 
@@ -66,10 +70,8 @@ public class XarPackageTest
         assertEquals(expected.getEntryType(), actual.getEntryType());
     }
 
-    // Tests
-
     @Test
-    public void readDescriptor() throws Exception
+    void readDescriptor() throws Exception
     {
         XarPackage xarPackage = new XarPackage();
 
@@ -100,7 +102,7 @@ public class XarPackageTest
     }
 
     @Test
-    public void readDescriptorWithEmptyId() throws Exception
+    void readDescriptorWithEmptyId() throws Exception
     {
         XarPackage xarPackage = new XarPackage();
 

@@ -17,19 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-selectize': "$xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
-  }
-});
+/*!
+#set ($paths = {
+  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+})
+#[[*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
+require.config({paths});
 
 /**
  * Utils
  */
 define('xwiki-selectize-utils', ['jquery'], function($) {
-  'use strict';
-
   var maybeLoadMoreSuggestions = function(source, params) {
     return function(suggestions) {
       if (suggestions.length < params.limit) {
@@ -67,8 +69,6 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
  * Users
  */
 define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectize'], function($, utils) {
-  'use strict';
-
   var getSelectizeOptions = function(select) {
     return {
       create: true,
@@ -118,14 +118,14 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
       $(this).xwikiSelectize($.extend(getSelectizeOptions($(this)), options));
     });
   };
+
+  return {loadUsers}
 });
 
 /**
  * Groups
  */
 define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectize'], function($, utils) {
-  'use strict';
-
   var getSelectizeOptions = function(select) {
     return {
       create: true,
@@ -185,5 +185,8 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths]));

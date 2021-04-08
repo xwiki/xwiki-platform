@@ -84,7 +84,9 @@
     #livetable('userstable' $columns $columnOptions $liveTableOptions)
   &lt;/div&gt;
   &lt;p&gt;
-    &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createUserModal"&gt;
+    &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createUserModal"
+        ## Disable the button until the JavaScript code that handles the user creation is ready.
+        disabled="disabled"&gt;
       $escapetool.xml($services.localization.render('rightsmanager.addnewuser'))
     &lt;/button&gt;
   &lt;/p&gt;
@@ -659,6 +661,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       ));
     });
   });
+
+  // Finally, enable the user creation.
+  $('button[data-target="#createUserModal"]').prop('disabled', false);
 });</code>
     </property>
     <property>

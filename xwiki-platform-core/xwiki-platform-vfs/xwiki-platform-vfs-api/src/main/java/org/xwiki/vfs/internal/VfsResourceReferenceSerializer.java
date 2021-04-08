@@ -20,7 +20,6 @@
 package org.xwiki.vfs.internal;
 
 import java.lang.reflect.Type;
-import java.net.URI;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,10 +64,10 @@ public class VfsResourceReferenceSerializer extends AbstractVfsResourceReference
         //
         // Look for a scheme-specific serializer to convert from a relative URI into an absolute URI and if not found
         // then don't perform any transformation of the URI.
-        URI uri = resourceReference.getURI();
+        String scheme = resourceReference.getScheme();
         try {
             ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> schemeSpecificSerializer =
-                this.componentManagerProvider.get().getInstance(TYPE, uri.getScheme());
+                this.componentManagerProvider.get().getInstance(TYPE, scheme);
             extendedURL = schemeSpecificSerializer.serialize(resourceReference);
         } catch (ComponentLookupException e) {
             extendedURL = super.serialize(resourceReference);
@@ -78,9 +77,9 @@ public class VfsResourceReferenceSerializer extends AbstractVfsResourceReference
     }
 
     @Override
-    protected URI makeAbsolute(URI uri)
+    protected String getAbsoluteReference(VfsResourceReference resourceReference)
     {
         // Don't make any transformation by default
-        return uri;
+        return String.format("%s:%s", resourceReference.getScheme(), resourceReference.getReference());
     }
 }

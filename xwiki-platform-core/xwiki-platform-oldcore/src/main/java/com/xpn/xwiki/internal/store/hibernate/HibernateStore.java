@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,9 +31,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -58,12 +59,14 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -115,14 +118,10 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
 
-    private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
-
-    static {
-        DRIVER_MAPPING.put("org.postgresql.Driver", DatabaseProduct.POSTGRESQL);
-        DRIVER_MAPPING.put("oracle.jdbc.driver.OracleDriver", DatabaseProduct.ORACLE);
-        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
-        DRIVER_MAPPING.put("org.hsqldb.jdbcDriver", DatabaseProduct.HSQLDB);
-    }
+    /**
+     * The name of the property for configuring the current timezone.
+     */
+    private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
 
     @Inject
     private Logger logger;
@@ -252,6 +251,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
     {
         this.configurationMetadata = null;
+        this.databaseProductCache = DatabaseProduct.UNKNOWN;
+        this.dialect = null;
     }
 
     /**
@@ -273,6 +274,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
                 this.environment.getPermanentDirectory().getAbsolutePath());
 
+            try {
+                newURL = StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
+                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.logger.error("Failedd to encode the current timezone id", e);
+            }
+
             // Set the new URL
             hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
             this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
@@ -291,7 +299,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
 
         // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(standardServiceRegistry);
+        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
     }
 
     private void disposeInternal()
@@ -418,14 +426,12 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        DatabaseProduct product = this.databaseProductCache;
-
-        if (product == DatabaseProduct.UNKNOWN) {
+        if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
             if (this.sessionFactory != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
-                        product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                        this.databaseProductCache = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
                     } catch (SQLException ignored) {
                         // do not care, return UNKNOWN
                     }
@@ -435,15 +441,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String driver = this.configuration.getProperty("hibernate.connection.driver_class");
-                if (driver == null) {
-                    driver = this.configuration.getProperty("connection.driver_class");
+                String connectionURL = this.configuration.getProperty("hibernate.connection.url");
+                if (connectionURL == null) {
+                    connectionURL = this.configuration.getProperty("connection.url");
                 }
-                product = DRIVER_MAPPING.getOrDefault(driver, DatabaseProduct.UNKNOWN);
+                this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
 
-        return product;
+        return this.databaseProductCache;
+    }
+
+    private String extractJDBCConnectionURLScheme(String fullConnectionURL)
+    {
+        // Format of a JDBC URL is always: "jdbc:<db scheme>:..."
+        return StringUtils.split(fullConnectionURL, ':')[1];
     }
 
     /**
@@ -601,12 +613,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            if (this.sessionFactory instanceof SessionFactoryImplementor) {
-                this.dialect = ((SessionFactoryImplementor) this.sessionFactory).getJdbcServices().getDialect();
-            } else {
-                // TODO: there is probably a better fallback
-                this.dialect = Dialect.getDialect(getConfiguration().getProperties());
-            }
+            JdbcServices jdbcServices = this.standardServiceRegistry.getService(JdbcServices.class);
+            this.dialect = jdbcServices.getDialect();
         }
 
         return this.dialect;
@@ -664,7 +672,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             // close session with rollback to avoid further usage
             endTransaction(false);
 
-            Object[] args = { wikiId };
+            Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
                 e, args);
@@ -785,8 +793,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         // Put back legacy feature to the Hibernate session
         if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session,
-                this.loggerConfiguration);
+            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -1063,7 +1070,21 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(Metadata metadata)
     {
-        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
+        SchemaUpdate updater = new SchemaUpdate();
+        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
+
+        List<Exception> exceptions = updater.getExceptions();
+
+        if (exceptions.isEmpty()) {
+            return;
+        }
+
+        // Print the errors
+        for (Exception exception : exceptions) {
+            this.logger.error(exception.getMessage(), exception);
+        }
+
+        throw new HibernateException("Failed to update the database. See the log for all errors", exceptions.get(0));
     }
 
     /**
@@ -1099,11 +1120,22 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         if (propertyName != null) {
             Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            columnName = column.getName();
 
-            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-                columnName = columnName.toLowerCase();
-            }
+            return getConfiguredColumnName(column);
+        }
+
+        return columnName;
+    }
+
+    /**
+     * @since 13.2RC1
+     */
+    public String getConfiguredColumnName(Column column)
+    {
+        String columnName = column.getName();
+
+        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
         }
 
         return columnName;
@@ -1114,7 +1146,15 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public String getConfiguredTableName(PersistentClass persistentClass)
     {
-        String tableName = persistentClass.getTable().getName();
+        return getConfiguredTableName(persistentClass.getTable());
+    }
+
+    /**
+     * @since 13.2
+     */
+    public String getConfiguredTableName(Table table)
+    {
+        String tableName = table.getName();
         // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
         if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
             tableName = tableName.toUpperCase();

@@ -56,7 +56,8 @@ public interface RightDescription
     boolean getInheritanceOverridePolicy();
 
     /**
-     * @return a set of additional rights implied by this right.
+     * @return a set of additional rights implied by this right. Note that this method should
+     * return {@code null} instead of an empty set.
      */
     Set<Right> getImpliedRights();
 

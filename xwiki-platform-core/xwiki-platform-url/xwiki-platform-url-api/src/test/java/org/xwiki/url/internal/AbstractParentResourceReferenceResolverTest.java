@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @version $Id$
  */
 @ComponentTest
-public class AbstractParentResourceReferenceResolverTest
+class AbstractParentResourceReferenceResolverTest
 {
     @Component
     @Named("test")
@@ -56,8 +56,7 @@ public class AbstractParentResourceReferenceResolverTest
     private TestParentResourceReferenceResolver resolver;
 
     @Test
-    public void resolve()
-        throws MalformedURLException, CreateResourceReferenceException, UnsupportedResourceReferenceException
+    void resolve() throws MalformedURLException, CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         ExtendedURL extendedURL = new ExtendedURL(
             new URL("http://host/xwiki/test/child/1/2/3?key1=value11&key1=value12&key2=value2"), "xwiki/test");

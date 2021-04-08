@@ -27,7 +27,6 @@ import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
@@ -37,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest(servletEngine = ServletEngine.JETTY, verbose = true)
+@UITest
 public class AnnotationsIT
 {
     @BeforeAll

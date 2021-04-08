@@ -30,6 +30,9 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.APP_NAME_USED_WARNING_MESSAGE;
+import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.EMPTY_APP_NAME_ERROR_MESSAGE;
+
 /**
  * Tests the first step of the App Within Minutes wizard.
  *
@@ -40,16 +43,6 @@ public class ApplicationNameTest extends AbstractTest
 {
     @Rule
     public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(true, getUtil());
-
-    /**
-     * The error message displayed when we try to create an application with an empty name.
-     */
-    private static final String EMPTY_APP_NAME_ERROR_MESSAGE = "Please enter the application name.";
-
-    /**
-     * The warning message displayed when we input the name of an existing application.
-     */
-    public static final String APP_NAME_USED_WARNING_MESSAGE = "This application already exists.";
 
     /**
      * Try to create an application with an empty name using the next step button.
@@ -71,7 +64,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the application name.
         appCreatePage.setApplicationName("A");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertFalse(appCreatePage.getContent().contains(EMPTY_APP_NAME_ERROR_MESSAGE));
 
         // Clear the application name using the Backspace key.
@@ -86,7 +78,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Fix the application name and move to the next step.
         appCreatePage.setApplicationName(getTestMethodName());
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertEquals(getTestMethodName(), appCreatePage.clickNextStep().getDocumentTitle());
     }
 
@@ -110,7 +101,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the application name.
         appCreatePage.setApplicationName("B");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertFalse(appCreatePage.getContent().contains(EMPTY_APP_NAME_ERROR_MESSAGE));
 
         // Clear the application name using the Backspace key.
@@ -124,7 +114,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Fix the application name and move to the next step using the Enter key.
         appCreatePage.setApplicationName(getTestMethodName());
-        appCreatePage.waitForApplicationNamePreview();
         getDriver().addPageNotYetReloadedMarker();
         appCreatePage.getApplicationNameInput().sendKeys(Keys.RETURN);
         getDriver().waitUntilPageIsReloaded();
@@ -146,7 +135,6 @@ public class ApplicationNameTest extends AbstractTest
 
         // Type the name of an existing space.
         appCreatePage.setApplicationName("Help");
-        appCreatePage.waitForApplicationNamePreview();
         Assert.assertTrue(appCreatePage.getContent().contains(APP_NAME_USED_WARNING_MESSAGE));
 
         // Proceed to the next step.

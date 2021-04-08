@@ -121,110 +121,112 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #end ## deletedAttachments != 0
 &lt;/noscript&gt;
 {{/html}}##
-#else ## request.list
+#end## !$request.list
+{{/velocity}}
+
+{{velocity output="false"}}
 ## ============================================================================================
 ## This page is called from live table via Ajax with the argument xpage=plain. It returns a
 ## set of results serialized in JSON.
 ## @programming This service page needs to be saved by a user with the programming access level
 ## to work as expected
 ## ============================================================================================
-#if("$!{request.get('xpage')}" == 'plain')
-$response.setContentType('application/json')
-#set($offset = $numbertool.toNumber($request.get('offset')).intValue())
-## offset starts from 0 in velocity and 1 in javascript
-#set($offset = $offset - 1)
-#if (!$offset || $offset &lt; 0)
-  #set ($offset = 0)
-#end
-#set($limit = $numbertool.toNumber($request.get('limit')).intValue())
-#if (!$limit)
-  #set ($limit = 15)
-#end
-#set($filenameFilter = $request.get('datt.filename'))
-#set($docNameFilter = $request.get('datt.docName'))
-#set($dateFilter = $request.get('datt.date'))
-#set($deleterFilter = $request.get('datt.deleter'))
-#set($sql = '')
-#set($params = {})
-#if("$!{filenameFilter}" != '')
-  #set($sql = "and lower(datt.filename) like '%${filenameFilter.trim().toLowerCase()}%' ")
-#end
-#if("$!{docNameFilter}" != '')
-  #set($sql = "and lower(datt.docName) like '%${docNameFilter.trim().toLowerCase()}%' ")
-#end
-#if("$!{dateFilter}" != '')
-  #set($dates = $dateFilter.split('-'))
-  #if($dates.size() == 2)
-    ## Date range matching
-    #set($sql = "${sql} and datt.date between :startDate and :endDate ")
-    #set($discard = $params.put('startDate', $datetool.toDate($numbertool.toNumber($dates[0]))))
-    #set($discard = $params.put('endDate', $datetool.toDate($numbertool.toNumber($dates[1]))))
-  #else
-    ## Single value matching
-    #set($sql = "${sql} and upper(str(datt.date)) like upper(str(:date)) ")
-    #set($discard = $params.put('date', $dateFilter))
+#if ($request.list &amp;&amp; $request.xpage == 'plain')
+  #set ($offset = $numbertool.toNumber($request.get('offset')).intValue())
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set ($offset = $offset - 1)
+  #if (!$offset || $offset &lt; 0)
+    #set ($offset = 0)
   #end
-#end
-#if("$!{deleterFilter}" != '')
-  #set($sql = $sql + "and lower(datt.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
-#end
-#if("$!{request.sort}" != '')
-  #set($order = $request.sort)
-#else
-  #set($order = 'datt.id')
-#end
-#if("$!{request.dir}" != '')
-  #set($dir = $request.dir)
-#else
-  #set($dir = 'asc')
-#end
-#set($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
-#set($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
-#set($items = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset).execute())
-#set($totalItems = $services.query.hql($countSql).bindValues($params).execute().get(0))
-#set($returnedItems = $items.size())
-## ==============================================
-## json starts
-## ==============================================
-{
-"totalrows": $totalItems,
-"returnedrows": $returnedItems,
-"offset": ${mathtool.add($offset, 1)},
-"reqNo": ${request.reqNo},
-"query" : "$selectSql", 
-"rows": [
-#foreach($item in $items)
-  #set($datt = $xwiki.getDeletedAttachment("$item.get(0)"))
-  #if($foreach.count &gt; 1) , #end
-  {
-    #set($originalAttachment = $datt.getAttachment())
-    #set($originalDocument = $xwiki.getDocument($datt.docName))
-    #if ($originalDocument)
-      "deleteUrl" : "$originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;form_token=$!{services.csrf.getToken()}")",
-      #if ($originalAttachment)
-        "url" : "$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}")",
-      #end
+  #set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  #set ($filenameFilter = $request.get('datt.filename'))
+  #set ($docNameFilter = $request.get('datt.docName'))
+  #set ($dateFilter = $request.get('datt.date'))
+  #set ($deleterFilter = $request.get('datt.deleter'))
+  #set ($sql = '')
+  #set ($params = {})
+  #if ("$!filenameFilter" != '')
+    #set ($sql = "and lower(datt.filename) like '%${filenameFilter.trim().toLowerCase()}%' ")
+  #end
+  #if ("$!docNameFilter" != '')
+    #set ($sql = "and lower(datt.docName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+  #end
+  #if ("$!dateFilter" != '')
+    #set ($dates = $dateFilter.split('-'))
+    #if ($dates.size() == 2)
+      ## Date range matching
+      #set ($sql = "${sql} and datt.date between :startDate and :endDate ")
+      #set ($discard = $params.put('startDate', $datetool.toDate($numbertool.toNumber($dates[0]))))
+      #set ($discard = $params.put('endDate', $datetool.toDate($numbertool.toNumber($dates[1]))))
+    #else
+      ## Single value matching
+      #set ($sql = "${sql} and upper(str(datt.date)) like upper(str(:date)) ")
+      #set ($discard = $params.put('date', $dateFilter))
     #end
-    "filename"  : "$escapetool.javascript($datt.filename)",
-    "docName"  : "$escapetool.javascript($datt.docName)",
-    "title"  : #if ($originalDocument)"$escapetool.javascript($originalDocument.plainTitle)"#else"$escapetool.javascript($datt.docName)"#end,
-    "documentUrl" : "$xwiki.getURL($datt.docName)",
-    "canDelete" : $datt.canDelete(),
-    "canRestore" : $datt.canRestore(),
-    "alreadyExists" : #if($originalDocument.getAttachment($datt.filename)) true #else false #end,
-    "restoreUrl" : "$xwiki.getAttachmentURL($datt.docName, $datt.filename)",
-    "date" : "$xwiki.formatDate($datt.date, $dateFormat)",
-    "deleter" : "$escapetool.javascript($datt.deleter)",
-    "deletername" : "$escapetool.javascript($xwiki.getUserName($datt.deleter, false))",
-    "deleterurl" : "$xwiki.getURL($datt.deleter, 'view')"
-  }
+  #end
+  #if ("$!deleterFilter" != '')
+    #set ($sql = $sql + "and lower(datt.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
+  #end
+  #if ("$!request.sort" != '')
+    #set ($order = $request.sort)
+  #else
+    #set ($order = 'datt.id')
+  #end
+  #if ("$!request.dir" != '')
+    #set ($dir = $request.dir)
+  #else
+    #set ($dir = 'asc')
+  #end
+  #set ($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
+  #set ($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
+  #set ($items = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset).execute())
+  #set ($totalItems = $services.query.hql($countSql).bindValues($params).execute().get(0))
+  #set ($json = {
+    'totalrows': $totalItems,
+    'returnedrows': $items.size(),
+    'offset': $mathtool.add($offset, 1),
+    'reqNo': $request.reqNo,
+    'query': $selectSql,
+    "rows": []
+  })
+  #foreach ($item in $items)
+    #set ($datt = $xwiki.getDeletedAttachment("$item.get(0)"))
+    #set ($originalDocument = $xwiki.getDocument($datt.docName))
+    #set ($row = {
+      'filename': $datt.filename,
+      'docName': $datt.docName,
+      'documentUrl': $xwiki.getURL($datt.docName),
+      'canDelete': $datt.canDelete(),
+      'canRestore': $datt.canRestore(),
+      'restoreUrl': $xwiki.getAttachmentURL($datt.docName, $datt.filename),
+      'date': $xwiki.formatDate($datt.date, $dateFormat),
+      'deleter': $datt.deleter,
+      'deletername': $xwiki.getUserName($datt.deleter, false),
+      'deleterurl': $xwiki.getURL($datt.deleter, 'view')
+    })
+    #set ($row.alreadyExists = "$!originalDocument.getAttachment($datt.filename)" != '')
+    #if ($originalDocument)
+      #set ($row.title = $originalDocument.plainTitle)
+      #set ($row.deleteUrl = $originalDocument.getAttachmentURL($datt.filename, 'delattachment', $escapetool.url({
+        'trashId': $datt.id,
+        'form_token': $services.csrf.token
+      })))
+      #set ($originalAttachment = $datt.getAttachment())
+      #if ($originalAttachment)
+        #set ($row.url = $originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, $escapetool.url({
+          'rid': $datt.id
+        })))
+      #end
+    #else
+      #set ($row.title = $datt.docName)
+    #end
+    #set ($discard = $json.rows.add($row))
+  #end
+  #jsonResponse($json)
 #end
-]}
-## ==============================================
-## json ended
-## ==============================================
-#end## xpage=plain
-#end## request.list
 {{/velocity}}</content>
   <object>
     <name>XWiki.DeletedAttachments</name>

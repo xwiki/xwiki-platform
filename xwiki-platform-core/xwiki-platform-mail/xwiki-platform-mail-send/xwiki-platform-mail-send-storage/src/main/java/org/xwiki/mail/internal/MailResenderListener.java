@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MailResender;
+import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -58,6 +59,9 @@ public class MailResenderListener implements EventListener
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private MailStorageConfiguration configuration;
 
     /**
      * We use a provider since a Listener cannot get injected any component that requires the Database to be ready to
@@ -84,12 +88,13 @@ public class MailResenderListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // TODO: wrap in a job and run asynchronously in order to not block XWiki startup
+        if (this.configuration.resendAutomaticallyAtStartup()) {
+            // TODO: wrap in a job and run asynchronously in order to not block XWiki startup
+            MailResender resender = this.mailResenderProvider.get();
 
-        MailResender resender = this.mailResenderProvider.get();
-
-        // Resend all mails that in some prepare state since they've not been sent
-        resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "prepare_%"));
+            // Resend all mails that in some prepare state since they've not been sent
+            resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "prepare_success"));
+        }
     }
 
     private void resendAllMatching(MailResender resender, Map<String, Object> filterMap)

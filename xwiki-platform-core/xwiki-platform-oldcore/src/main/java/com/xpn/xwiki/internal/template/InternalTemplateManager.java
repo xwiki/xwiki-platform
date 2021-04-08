@@ -100,13 +100,13 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class InternalTemplateManager implements Initializable
 {
-    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
-
     /**
      * The reference of the superadmin user.
      */
-    private static final DocumentReference SUPERADMIN_REFERENCE =
+    public static final DocumentReference SUPERADMIN_REFERENCE =
         new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+
+    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     private static final String TEMPLATE_RESOURCE_SUFFIX = "/templates/";
 

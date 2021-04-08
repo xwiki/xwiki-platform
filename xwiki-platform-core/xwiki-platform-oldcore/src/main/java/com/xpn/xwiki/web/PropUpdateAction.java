@@ -24,6 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,8 +37,17 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
 
+@Component
+@Named("propupdate")
+@Singleton
 public class PropUpdateAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
+    }
+
     public boolean propUpdate(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();

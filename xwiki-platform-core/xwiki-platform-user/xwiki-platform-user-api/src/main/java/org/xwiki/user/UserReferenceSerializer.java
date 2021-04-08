@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Converts a {@link UserReference} into a serialied form (e.g. into a String representation).
+ * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
  *
  * @param <T> the type into which to serialize the user reference (e.g. String)
  * @version $Id$

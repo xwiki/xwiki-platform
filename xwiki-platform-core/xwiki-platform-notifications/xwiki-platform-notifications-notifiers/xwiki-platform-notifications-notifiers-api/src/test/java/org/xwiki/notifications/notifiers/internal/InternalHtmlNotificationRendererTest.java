@@ -111,6 +111,11 @@ public class InternalHtmlNotificationRendererTest
             + "class=\"notification-event\">"
             + "<div class=\"my-composite-event\"></div></div>";
         assertEquals(expectedResult, this.notificationRenderer.render(compositeEvent, eventStatus));
+
+        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+            + "class=\"notification-event\">"
+            + "<div class=\"my-composite-event\"></div></div>";
+        assertEquals(expectedResult, this.notificationRenderer.render(compositeEvent, null));
     }
 
     @Test
@@ -164,6 +169,18 @@ public class InternalHtmlNotificationRendererTest
         assertEquals(expectedResult, this.notificationRenderer.render(
             Arrays.asList(compositeEvent1, compositeEvent2),
             Arrays.asList(eventStatus1, eventStatus2),
+            true));
+
+        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+            + "class=\"notification-event\">"
+            + "<div class=\"my-composite-event1\"></div></div>"
+            + "<div data-eventtype=\"BarType\" data-ids=\"oneId\" data-eventdate=\"12\" class=\"notification-event\">"
+            + "<div class=\"my-composite-event2\"></div></div>"
+            + "<div class=\"notifications-macro-load-more\"></div>";
+
+        assertEquals(expectedResult, this.notificationRenderer.render(
+            Arrays.asList(compositeEvent1, compositeEvent2),
+            null,
             true));
     }
 }

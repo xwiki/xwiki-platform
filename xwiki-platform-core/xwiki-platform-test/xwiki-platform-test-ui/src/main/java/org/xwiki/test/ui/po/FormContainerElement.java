@@ -29,7 +29,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a form element and provide utility methods to get/set form data. This
@@ -49,7 +48,6 @@ public class FormContainerElement extends BaseElement
      * @since 11.5RC1
      * @since 11.3.1
      */
-    @Unstable
     public FormContainerElement(By formSelector)
     {
         this.formElement = getDriver().findElementWithoutWaiting(formSelector);

@@ -39,6 +39,7 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
+import org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider;
 import org.xwiki.text.StringUtils;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
@@ -54,8 +55,6 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class ScopeNotificationFilterExpressionGenerator
 {
-    private static final String USER_PROFILE_PROVIDER_HINT = "userProfile";
-
     @Inject
     private ScopeNotificationFilterPreferencesGetter scopeNotificationFilterPreferencesGetter;
 
@@ -83,7 +82,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // Get the filters to handle
         ScopeNotificationFilterPreferencesHierarchy preferences
                 = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(filterPreferences,
-                    eventType, format);
+                    eventType, format, false);
 
         // The aim is to generate a black list with exceptions (handleExclusiveFilters) and a white
         // list (handleTopLevelInclusiveFilters).
@@ -204,7 +203,8 @@ public class ScopeNotificationFilterExpressionGenerator
         // handle it without using the subquery mechanism that we can see in
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
-        return StringUtils.isNotBlank(pref.getPageOnly()) && USER_PROFILE_PROVIDER_HINT.equals(pref.getProviderHint())
+        return StringUtils.isNotBlank(pref.getPageOnly())
+            && UserProfileNotificationFilterPreferenceProvider.HINT.equals(pref.getProviderHint())
             && pref.getEventTypes().isEmpty();
     }
 
@@ -298,7 +298,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // This optimization can only works on preferences stored by the user, that's why we add a condition
         // on the provider hint.
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-                && USER_PROFILE_PROVIDER_HINT.equals(nfp.getProviderHint());
+                && UserProfileNotificationFilterPreferenceProvider.HINT.equals(nfp.getProviderHint());
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

@@ -85,18 +85,39 @@
   #set ($includes = ['rawChanges'])
 #end
 <div class="changes-body">
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#rawChanges" aria-controls="rawChanges" role="tab" data-toggle="pill">
-        $escapetool.xml($services.localization.render('web.history.changes.raw'))
-      </a>
-    </li>
-    <li role="presentation">
-      <a href="#renderedChanges" aria-controls="renderedChanges" role="tab" data-toggle="pill">
-        $escapetool.xml($services.localization.render('web.history.changes.rendered'))
-      </a>
-    </li>
-  </ul>
+  <div class="changes-body-header">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6">
+        <ul class="nav nav-pills" role="tablist">
+          <li role="presentation" class="active">
+            <a href="#rawChanges" aria-controls="rawChanges" role="tab" data-toggle="pill" data-hint="raw">
+              $escapetool.xml($services.localization.render('web.history.changes.raw'))
+            </a>
+          </li>
+          <li role="presentation">
+            <a href="#renderedChanges" aria-controls="renderedChanges" role="tab" data-toggle="pill" data-hint="rendered">
+              $escapetool.xml($services.localization.render('web.history.changes.rendered'))
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="changes-actions raw active"></div>
+        <div class="changes-actions rendered">
+          <a href="#toggleRenderedDiffContext" class="html-diff-context-toggle html-diff-context-toggle-show hidden">
+            <span class="html-diff-context-show">
+              $services.icon.renderHTML('plus-square')
+              $escapetool.xml($services.localization.render('web.history.changes.showContext'))
+            </span>
+            <span class="html-diff-context-hide">
+              $services.icon.renderHTML('minus-square')
+              $escapetool.xml($services.localization.render('web.history.changes.hideContext'))
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="rawChanges">
       #if ($includes.contains('rawChanges'))

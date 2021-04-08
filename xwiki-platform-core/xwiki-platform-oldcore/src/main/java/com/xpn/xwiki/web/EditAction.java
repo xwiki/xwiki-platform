@@ -19,12 +19,15 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -37,6 +40,9 @@ import com.xpn.xwiki.doc.XWikiLock;
  *
  * @version $Id$
  */
+@Component
+@Named("edit")
+@Singleton
 public class EditAction extends XWikiAction
 {
     /**
@@ -50,6 +56,12 @@ public class EditAction extends XWikiAction
     public EditAction()
     {
         this.waitForXWikiInitialization = false;
+    }
+
+    @Override
+    protected Class<? extends XWikiForm> getFormClass()
+    {
+        return EditForm.class;
     }
 
     @Override
@@ -90,7 +102,7 @@ public class EditAction extends XWikiAction
         EditForm editForm = (EditForm) context.getForm();
 
         // Update the edited document based on the template specified on the request.
-        editedDocument.readFromTemplate(editForm, context);
+        readFromTemplate(editedDocument, editForm.getTemplate(), context);
 
         // The default values from the template can be overwritten by additional request parameters.
         updateDocumentTitleAndContentFromRequest(editedDocument, context);

@@ -57,5 +57,8 @@ user.profile.network.follow=Ab sofort folgen
 user.profile.network.unfollow=Nicht mehr folgen
 user.profile.network.done=Erledigt
 user.profile.network.saving=Speichert…
-user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen</content>
+user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
 </xwikidoc>

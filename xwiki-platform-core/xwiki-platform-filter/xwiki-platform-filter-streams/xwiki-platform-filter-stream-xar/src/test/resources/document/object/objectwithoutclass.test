@@ -43,6 +43,7 @@
                 <type>
                   <name>XWiki</name>
                   <id>xwiki</id>
+                  <variants class="empty-list"/>
                 </type>
                 <version>1.0</version>
               </org.xwiki.rendering.syntax.Syntax>

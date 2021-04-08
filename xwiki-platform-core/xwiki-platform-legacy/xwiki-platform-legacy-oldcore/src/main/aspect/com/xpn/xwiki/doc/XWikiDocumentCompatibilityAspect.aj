@@ -426,4 +426,44 @@ privileged public aspect XWikiDocumentCompatibilityAspect
             setParentReference((EntityReference) null);
         }
     }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentName, getBackLinkedPages(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, java.util.List, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
+        throws XWikiException
+    {
+        rename(newDocumentName, backlinkDocumentNames, getChildren(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, List, List, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
+    public void XWikiDocument.rename(String newDocumentName, List<String> backlinkDocumentNames,
+        List<String> childDocumentNames, XWikiContext context) throws XWikiException
+    {
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        for (String backlinkDocumentName : backlinkDocumentNames) {
+            backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
+        }
+
+        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        for (String childDocumentName : childDocumentNames) {
+            childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
+        }
+
+        rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), backlinkDocumentReferences,
+            childDocumentReferences, context);
+    }
 }

@@ -19,11 +19,14 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -41,6 +44,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  */
+@Component
+@Named("delattachment")
+@Singleton
 public class DeleteAttachmentAction extends XWikiAction
 {
     @Override

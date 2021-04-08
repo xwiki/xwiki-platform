@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -85,6 +86,9 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
     @Inject
     private VelocityContextFactory velocityContextFactory;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
@@ -205,7 +209,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         VelocityContext existingVelocityContext = this.velocityManager.getVelocityContext();
         VelocityContext velocityContext;
         if (existingVelocityContext != null) {
-            velocityContext = new XWikiVelocityContext(existingVelocityContext);
+            velocityContext =
+                new XWikiVelocityContext(existingVelocityContext, this.loggerConfiguration.isDeprecatedLogEnabled());
         } else {
             try {
                 velocityContext = this.velocityContextFactory.createContext();

@@ -320,22 +320,21 @@ LiveValidation.prototype = {
    *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   validate: function(){
-  	if(!this.element.disabled){
-		this.beforeValidation();
-		var isValid = this.doValidations();
-		if(isValid){
-			this.beforeValid();
-			this.onValid();
-			this.afterValid();
-			return true;
-		}else {
-			this.beforeInvalid();
-			this.onInvalid();
-			this.afterInvalid();
-			return false;
-		}
-		this.afterValidation();
-	}else{
+  	if (!this.element.disabled){
+		  this.beforeValidation();
+		  var isValid = this.doValidations();
+		  if(isValid){
+			  this.beforeValid();
+			  this.onValid();
+			  this.afterValid();
+		  }else {
+			  this.beforeInvalid();
+			  this.onInvalid();
+			  this.afterInvalid();
+		  }
+		  this.afterValidation();
+		  return isValid;
+	  }else{
       return true;
     }
   },
@@ -390,9 +389,10 @@ LiveValidation.prototype = {
     if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
       var className = this.validationFailed ? this.invalidClass : this.validClass;
-	  $(elementToInsert).addClassName( this.messageClass + ' ' + className );
-	  var parent = this.insertAfterWhatNode.up();
-      if( nxtSibling = this.insertAfterWhatNode.next()){
+      $(elementToInsert).addClassName(this.messageClass + ' ' + className);
+      var parent = this.insertAfterWhatNode.up();
+      var nxtSibling = this.insertAfterWhatNode.next();
+      if (nxtSibling) {
         parent.insertBefore(elementToInsert, nxtSibling);
       }else{
         parent.appendChild(elementToInsert);

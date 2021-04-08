@@ -71,7 +71,6 @@ platform.flamingo.themes.category.breadcrumb=ब्रेडक्रंब
 platform.flamingo.themes.category.advanced=प्रगत
 platform.flamingo.themes.defaultvalue=डीफॉल्ट
 platform.flamingo.themes.lessCode.description=या फील्डमध्ये आपण थेट LESS कोड लिहू शकता जो skin मध्ये जोडला जाईल.
-platform.flamingo.themes.incompatiblebrowser=क्षमस्व, इंटरनेट एक्सप्लोररच्या या आवृत्तीसह पूर्वावलोकन कार्य करत नाही. आपल्याला नवीन ब्राउझर वापरण्याची आवश्यकता आहे.
 platform.flamingo.themes.local=लोकॅल
 platform.flamingo.themes.global=वैश्विक
 
@@ -87,6 +86,11 @@ platform.flamingo.themes.global=वैश्विक
 ## until 7.3M1
 #######################################
 platform.flamingo.themes.lessCode.warning=दुर्दैवाने, हे फील्ड थेट पूर्वावलोकनात घेतले जात नाही.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=क्षमस्व, इंटरनेट एक्सप्लोररच्या या आवृत्तीसह पूर्वावलोकन कार्य करत नाही. आपल्याला नवीन ब्राउझर वापरण्याची आवश्यकता आहे.
 
 #@deprecatedend</content>
 </xwikidoc>

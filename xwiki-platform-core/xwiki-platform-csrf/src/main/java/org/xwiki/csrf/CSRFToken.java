@@ -20,7 +20,6 @@
 package org.xwiki.csrf;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Anti-CSRF (Cross Site Request Forgery) protection using secret token validation mechanism.
@@ -72,7 +71,6 @@ public interface CSRFToken
      * @return the URI to call to trigger back the failed request.
      * @since 11.3RC1
      */
-    @Unstable
     default String getRequestURI()
     {
         // Avoid revapi complaints.

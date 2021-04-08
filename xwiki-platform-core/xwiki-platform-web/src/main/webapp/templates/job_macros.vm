@@ -21,7 +21,7 @@
 
 $services.template.execute('logging_macros.vm')
 
-#macro (displayJobProgressBar $jobStatus)
+#macro (displayJobProgressBar $jobStatus $hideLog)
   <div class="ui-progress">
     <div class="box info hidden" id="state-none-hint">
       $services.localization.render("job.state.NONE.hint")
@@ -35,7 +35,7 @@ $services.template.execute('logging_macros.vm')
       #set ($percent = $numbertool.toNumber($mathtool.mul($percent, 100)).intValue())
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
-    #if ($jobStatus && $jobStatus.logTail.size() > 0)
+    #if (!$hideLog && $jobStatus && $jobStatus.logTail.size() > 0)
       <p class="ui-progress-message">
         #printLogMessage($jobStatus.logTail.lastLogEvent)
       </p>
@@ -106,7 +106,7 @@ $services.template.execute('logging_macros.vm')
   #if (!$finished)
     ## No message.
   #else
-    #displayJobFinishedMessage($status $successKey $errorKey $canceledKey)
+    #displayJobFinishedMessage($status, $successKey, $errorKey, $canceledKey, $translationPrefix)
   #end
 #end
 
@@ -144,13 +144,13 @@ $services.template.execute('logging_macros.vm')
 #end
 
 #macro (outputJobStatusJSON $jobStatus $translationPrefix)
-  #getJobStatusJSON($jobStatus $json)
+  #getJobStatusJSON($jobStatus, $json, $translationPrefix)
   #set ($json.message = "#displayJobFinishedMessage($jobStatus, $NULL, $NULL, $NULL, $translationPrefix)")
   $response.setContentType('application/json')
   $jsontool.serialize($json)
 #end
 
-#macro (displayJobStatus $jobStatus $translationPrefix $jobStatusURL)
+#macro (displayJobStatus $jobStatus $translationPrefix $jobStatusURL $showLogs)
   #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
   #set ($jobState = $jobStatus.state)
   #set ($finished = $jobState == 'FINISHED')
@@ -177,7 +177,7 @@ $services.template.execute('logging_macros.vm')
     #else
       #jobFinishedMessage($status, $translationPrefix)
     #end
-    #if ($isAdvancedUser || $isSuperAdmin)
+    #if ($showLogs || $isAdvancedUser || $isSuperAdmin)
       #displayJobStatusLog($jobStatus true)
     #end
   </div>

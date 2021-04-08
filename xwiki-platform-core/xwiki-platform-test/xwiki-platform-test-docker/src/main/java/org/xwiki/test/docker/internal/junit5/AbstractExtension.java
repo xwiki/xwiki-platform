@@ -71,7 +71,7 @@ public abstract class AbstractExtension
         return store.get(VncRecordingContainer.class, VncRecordingContainer.class);
     }
 
-    protected void saveBrowserWebDriverContainer(ExtensionContext context, BrowserWebDriverContainer container)
+    protected void saveBrowserWebDriverContainer(ExtensionContext context, BrowserWebDriverContainer<?> container)
     {
         ExtensionContext.Store store = getStore(context);
         store.put(BrowserWebDriverContainer.class, container);

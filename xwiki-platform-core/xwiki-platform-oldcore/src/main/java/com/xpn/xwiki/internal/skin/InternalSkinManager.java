@@ -134,6 +134,8 @@ public class InternalSkinManager implements Initializable
 
         if (skin == null) {
             skin = createSkin(id);
+
+            this.cache.set(id, skin);
         }
 
         return skin;

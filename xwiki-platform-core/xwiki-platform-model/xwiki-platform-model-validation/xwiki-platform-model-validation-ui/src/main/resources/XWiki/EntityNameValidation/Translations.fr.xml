@@ -70,6 +70,7 @@ entitynamevalidation.replacementCharacter.removeCharacter.remove=Supprimer
 entitynamevalidation.replacementCharacter.remove.inProgress=Le caractère interdit est en cours de suppression...
 entitynamevalidation.replacementCharacter.remove.done=Le caractère interdit a été supprimé.
 entitynamevalidation.replacementCharacter.remove.failed=Erreur lors de la suppression du caractère interdit.
-entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Aucun</content>
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Aucun
+entitynamevalidation.admin.heading=Stratégies de nommage</content>
   
 </xwikidoc>

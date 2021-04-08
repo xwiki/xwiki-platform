@@ -35,7 +35,6 @@ public abstract class AbstractRightsDocumentInitializer extends AbstractMandator
 {
     /**
      * @param pageName the document name of the rights class
-     * @param title the title of the document
      */
     public AbstractRightsDocumentInitializer(String pageName)
     {

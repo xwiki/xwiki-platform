@@ -440,7 +440,7 @@
       <displayInSection>Name Strategies</displayInSection>
     </property>
     <property>
-      <heading>Name Strategies</heading>
+      <heading>$services.localization.render('entitynamevalidation.admin.heading')</heading>
     </property>
     <property>
       <iconAttachment/>

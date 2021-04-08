@@ -107,7 +107,7 @@ public abstract class AbstractSxAction extends XWikiAction
         }
 
         if (getDebugConfiguration().isMinify()) {
-            extensionContent = sxType.getCompressor().compress(extensionContent);
+            extensionContent = compress(extensionContent, sxType.getCompressor(), context);
         }
 
         try {
@@ -116,7 +116,11 @@ public abstract class AbstractSxAction extends XWikiAction
         } catch (IOException ex) {
             getLogger().warn("Failed to send SX content: [{}]", ex.getMessage());
         }
+    }
 
+    protected String compress(String source, SxCompressor compressor, XWikiContext context)
+    {
+        return compressor.compress(source);
     }
 
     @Override

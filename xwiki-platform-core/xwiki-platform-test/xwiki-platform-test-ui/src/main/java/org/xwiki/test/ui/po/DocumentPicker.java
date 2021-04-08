@@ -137,6 +137,19 @@ public class DocumentPicker extends BaseElement
         return this;
     }
 
+    public DocumentPicker setWiki(String wikiName)
+    {
+        WebElement selectWebElement = this.container.findElement(By.className("location-wiki-field"));
+        if (!selectWebElement.isDisplayed())
+        {
+            toggleLocationAdvancedEdit();
+        }
+
+        Select wikiSelect = new Select(selectWebElement);
+        wikiSelect.selectByValue(wikiName);
+        return this;
+    }
+
     /**
      * Clicks the "pick document" button that triggers a modal pop-up to be displayed.
      * <p>

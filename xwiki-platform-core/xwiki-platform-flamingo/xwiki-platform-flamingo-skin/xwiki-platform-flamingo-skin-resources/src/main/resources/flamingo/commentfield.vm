@@ -1,0 +1,78 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+#template('display_macros.vm')
+### Return a single comment field
+###
+###
+## requested field name containing the comment number
+## (e.g. XWiki.XWikiComments_42_comment)
+#set ($name = $escapetool.xml($request.name))
+## the number of the comment, if no number is provided we generate a field for a new comment.
+#set ($number = $numbertool.toNumber($request.number).intValue())
+
+## the 'comment' field from the XWikiComments class is used as a template for the field to display
+#set ($xCommentClass = 'XWiki.XWikiComments')
+#set ($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
+
+
+## the number of the comment, if no number is provided we generate a field for a new comment.
+#if ($number && $number > -1)
+  #set ($commentObj = $doc.getObject($xCommentClass, $number))
+  #set ($value = $commentObj.getValue('comment'))
+#else
+  #set ($commentObj = $doc.newObject($xCommentClass))
+  #set ($value = '')
+#end
+
+## Forces the value of the comment to the content from the request if it exists.
+#if ($request.content)
+  #set ($value = $request.content)
+#end
+
+## We can't simply call $doc.display() on this object because we would get comment as the
+## field name. Instead we want the field name to be XWiki.XWikiComments_comment for new comments
+## and XWiki.XWikiComments_N_comment for edited comments.
+## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
+#set ($commentObjClass = $commentObj.getxWikiClass())
+#set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
+#set ($discard = $commentObjBaseClass.put($name, $commentClass.getXWikiClass().get('comment')))
+#set ($discard = $commentObjBaseClass.get($name).setName($name))
+
+## attribution of the value to the new field in the object.
+#set ($discard = $commentObj.set($name, $value))
+
+#set ($fieldToDisplay = $commentObjClass.get($name))
+
+## We need to know the type of editor used for comments in order to hide/display the preview button.
+#set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
+<input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
+
+<label for="$name">$services.localization.render('core.viewers.comments.add.comment.label')</label>
+#initRequiredSkinExtensions()
+## display of the comment field
+$doc.displayEdit($fieldToDisplay, '', $commentObj)
+
+## ensure to load the appropriate JSX for the editor.
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+
+## reset the temporary added field.
+#set ($discard = $commentObjBaseClass.removeField($name))

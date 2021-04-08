@@ -1,1 +1,0 @@
-org.xwiki.test.page.StubRenderingConfiguration

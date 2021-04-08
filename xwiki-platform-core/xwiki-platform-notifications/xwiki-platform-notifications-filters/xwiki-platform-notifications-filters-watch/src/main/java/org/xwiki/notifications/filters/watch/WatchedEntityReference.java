@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.watch;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Reference to an entity (a location, a user, etc...) to watch.
@@ -33,11 +34,23 @@ public interface WatchedEntityReference
 {
     /**
      * @param userReference a user
-     * @return if the given user watch the current entity reference
+     * @return {@code true} if the given user watch the current entity reference for any event type or format.
      * @throws NotificationException if an error happens
      * @since 9.9RC1
      */
     boolean isWatched(DocumentReference userReference) throws NotificationException;
+
+    /**
+     * @param userReference a user
+     * @return {@code true} if the given user watch the current entity reference for all events.
+     * @throws NotificationException if an error happens
+     * @since 12.8RC1
+     */
+    @Unstable
+    default boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
+    {
+        return isWatched(userReference);
+    }
 
     /**
      * @param notificationFilterPreference a filter preference

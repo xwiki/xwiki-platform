@@ -45,6 +45,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -118,6 +119,28 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
+        throws NotificationException
+    {
+        if (wikiReference == null) {
+            return Collections.EMPTY_SET;
+        }
+
+        String wiki = serializer.serialize(wikiReference);
+
+        Set<NotificationFilterPreference> preferences = cache.get(wiki);
+        if (preferences != null) {
+            return preferences;
+        }
+
+        preferences = modelBridge.getFilterPreferences(wikiReference);
+
+        cache.set(wiki, preferences);
+
+        return preferences;
+    }
+
+    @Override
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
     {
         // We need to store the user reference in the cache's key, otherwise all users of the same context will share
@@ -144,11 +167,35 @@ public class CachedModelBridge implements ModelBridge, Initializable
     }
 
     @Override
+    public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
+        throws NotificationException
+    {
+        modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+        clearCache(wikiReference);
+    }
+
+    @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
             throws NotificationException
     {
         modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
         clearCache(user);
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
+        throws NotificationException
+    {
+        modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
+        clearCache(wikiReference);
+    }
+
+    @Override
+    public void saveFilterPreferences(WikiReference wikiReference,
+        Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+    {
+        modelBridge.saveFilterPreferences(wikiReference, filterPreferences);
+        clearCache(wikiReference);
     }
 
     @Override
@@ -175,13 +222,22 @@ public class CachedModelBridge implements ModelBridge, Initializable
         clearCache(user);
     }
 
-    private void clearCache(DocumentReference user)
+    @Override
+    public void createScopeFilterPreference(WikiReference wikiReference, NotificationFilterType type,
+        Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
+        throws NotificationException
     {
-        if (user == null) {
+        modelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes, reference);
+        clearCache(wikiReference);
+    }
+
+    private void clearCache(EntityReference entityReference)
+    {
+        if (entityReference == null) {
             return;
         }
 
-        String userId = serializer.serialize(user);
+        String userId = serializer.serialize(entityReference);
         cache.remove(userId);
 
         ExecutionContext context = execution.getContext();

@@ -57,7 +57,6 @@ public class DocumentFieldsTest extends AbstractTest
         String appName = RandomStringUtils.randomAlphabetic(6);
         ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
         appCreatePage.setApplicationName(appName);
-        appCreatePage.waitForApplicationNamePreview();
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
 
         // Add a standard field.
@@ -81,7 +80,7 @@ public class DocumentFieldsTest extends AbstractTest
         contentField.setDefaultValue(defaultContent);
 
         // Add live table columns for Title and Content.
-        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep().waitUntilPageIsLoaded();
+        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
         homeEditPage.addLiveTableColumn("My Title");
         homeEditPage.addLiveTableColumn("My Content");
 

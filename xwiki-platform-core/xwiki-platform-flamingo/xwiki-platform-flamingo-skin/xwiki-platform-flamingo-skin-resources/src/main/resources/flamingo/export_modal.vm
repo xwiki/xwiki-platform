@@ -53,7 +53,7 @@
     <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="exportModalHeadingOffice">
       <div class="panel-body">
         <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.pdf')</a>
-        #if("$!{services.officemanager.serverState}" == 'Connected')
+        #if($services.officemanager.isConnected())
           <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.odt')</a>
           <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.rtf')</a>
         #end

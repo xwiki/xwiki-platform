@@ -27,10 +27,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -42,9 +40,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 /**
  * Gets the Mail Sending configuration. The configuration is checked in the following order:
  * <ul>
- *   <li>Look in Mail.MailConfig in the current wiki</li>
- *   <li>[Backward compatibility] Look in (current space).XWikiPreferences in the current wiki</li>
- *   <li>[Backward compatibility] Look in XWiki.XWikiPreferences in the current wiki</li>
+ *   <li>Look in {@code Mail.MailConfig} in the current wiki</li>
+ *   <li>Look in {@code Mail.MailConfig} in the main wiki</li>
+ *   <li>[Backward compatibility] Look in {@code (current space).XWikiPreferences} in the current wiki</li>
+ *   <li>[Backward compatibility] Look in {@code }XWiki.XWikiPreferences} in the current wiki</li>
  *   <li>Look in the xwiki properties file</li>
  * </ul>
  *
@@ -120,7 +119,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     @Inject
     @Named("mailsend")
-    private ConfigurationSource mailConfigSource;
+    private ConfigurationSource currentWikiMailConfigSource;
 
     @Inject
     @Named("mailsendmainwiki")
@@ -133,13 +132,10 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
     @Override
     public String getHost()
     {
-        String host = this.mailConfigSource.getProperty(HOST_PROPERTY, String.class);
+        String host = this.currentWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
         if (host == null && !isMainWiki()) {
             host = this.mainWikiMailConfigSource.getProperty(HOST_PROPERTY, String.class);
         }
@@ -154,7 +150,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        Integer port = this.mailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
+        Integer port = this.currentWikiMailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
         if (port == null && !isMainWiki()) {
             port = this.mainWikiMailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
         }
@@ -169,7 +165,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getUsername()
     {
-        String username = this.mailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
+        String username = this.currentWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
         if (username == null && !isMainWiki()) {
             username = this.mainWikiMailConfigSource.getProperty(USERNAME_PROPERTY, String.class);
         }
@@ -184,7 +180,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getPassword()
     {
-        String password = this.mailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
+        String password = this.currentWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
         if (password == null && !isMainWiki()) {
             password = this.mainWikiMailConfigSource.getProperty(PASSWORD_PROPERTY, String.class);
         }
@@ -201,7 +197,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         List<String> bccAddresses = new ArrayList<>();
 
-        String bccAsString = this.mailConfigSource.getProperty(BCC_PROPERTY, String.class);
+        String bccAsString = this.currentWikiMailConfigSource.getProperty(BCC_PROPERTY, String.class);
         if (bccAsString == null && !isMainWiki()) {
             bccAsString = this.mainWikiMailConfigSource.getProperty(BCC_PROPERTY, String.class);
         }
@@ -223,7 +219,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getFromAddress()
     {
-        String from = this.mailConfigSource.getProperty(FROM_PROPERTY, String.class);
+        String from = this.currentWikiMailConfigSource.getProperty(FROM_PROPERTY, String.class);
         if (from == null && !isMainWiki()) {
             from = this.mainWikiMailConfigSource.getProperty(FROM_PROPERTY, String.class);
         }
@@ -240,7 +236,8 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         Properties properties;
 
-        String extraPropertiesAsString = this.mailConfigSource.getProperty(PROPERTIES_PROPERTY, String.class);
+        String extraPropertiesAsString =
+            this.currentWikiMailConfigSource.getProperty(PROPERTIES_PROPERTY, String.class);
         if (extraPropertiesAsString == null && !isMainWiki()) {
             extraPropertiesAsString = this.mainWikiMailConfigSource.getProperty(PROPERTIES_PROPERTY, String.class);
         }
@@ -317,7 +314,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public long getSendWaitTime()
     {
-        Long waitTime = this.mailConfigSource.getProperty(SEND_WAIT_TIME);
+        Long waitTime = this.currentWikiMailConfigSource.getProperty(SEND_WAIT_TIME);
 
         if (waitTime == null) {
             waitTime = this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME);

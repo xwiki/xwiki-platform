@@ -221,6 +221,8 @@
 
 {{velocity}}
 #set ($discard = $xwiki.ssx.use('Panels.Applications'))
+## Effects are used by the "More applications" link.
+#set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
 #set ($discard = $xwiki.jsx.use('Panels.Applications'))
 
 #panelheader($services.localization.render('panels.applications.title'))
@@ -528,10 +530,11 @@ $$('.applicationPanelMoreButton').each(function(button) {
 .panel-width-Large .applicationsPanel li .application-img {
   display: block;
   float: left;
+  width: 20px;
 }
 
 .applicationsPanel li .application-label {
-  margin-left: 0.5em;
+  margin-left: 0.1em;
 }
 
 .applicationPanelMoreContainer ul {

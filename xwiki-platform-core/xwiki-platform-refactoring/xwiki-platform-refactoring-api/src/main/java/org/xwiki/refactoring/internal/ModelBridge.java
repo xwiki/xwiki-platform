@@ -58,11 +58,24 @@ public interface ModelBridge
 
     /**
      * Delete the specified document.
+     * If the recycle bin is activated, the document is sent to the recycle bin.
+     * Otherwise the document is removed permanently.
      * 
      * @param documentReference the reference of the document to delete
      * @return {@code true} if the document was deleted successfully, {@code false} if the delete failed
      */
     boolean delete(DocumentReference documentReference);
+
+    /**
+     * Delete or move to the recycle bin the specified document.
+     * @param documentReference the reference of the document to delete or move to the recycle bin
+     * @param skipRecycleBin if {@code false}, the document is moved to the recycle bin (if the recycle bin is not
+     *                    activated, the document is removed permanently nevertheless), if {@code true},
+     *                    the document is removed permanently
+     * @return {@code true} if the document was deleted successfully, {@code false} if the delete operation failed
+     * @since 12.8RC1
+     */
+    boolean delete(DocumentReference documentReference, boolean skipRecycleBin);
 
     /**
      * Remove the edit lock from the specified document.
@@ -168,4 +181,14 @@ public interface ModelBridge
      */
     boolean permanentlyDeleteAllDocuments(PermanentlyDeleteJob deleteJob,
         AbstractCheckRightsRequest checkRightsRequest);
+
+    /**
+     * Rename a document to the specified reference.
+     *
+     * @param source the document to rename
+     * @param destination the reference of the document that is going to be created
+     * @return {@code true} if the document was renamed successfully, {@code false} if the rename failed
+     * @since 12.5RC1
+     */
+    boolean rename(DocumentReference source, DocumentReference destination);
 }

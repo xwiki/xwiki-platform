@@ -7,8 +7,10 @@ set -e
 # Rights
 #########################
 
-## Make sure tomcat is able to write in the data folder
-chown -R tomcat.tomcat /var/lib/xwiki/data
+## Make sure Tomcat is able to write in the data folder
+if [ ! 'tomcat' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R tomcat.tomcat /var/lib/xwiki/data
+fi
 
 #########################
 # Configuration
@@ -22,12 +24,3 @@ chown -R tomcat.tomcat /var/lib/xwiki/data
 
 # Need to reload systemd for the injected tomcat9 service configuration to be taken into account
 systemctl daemon-reload
-
-# Restart tomcat9 service
-invoke-rc.d --quiet tomcat9 restart || {
-    RESULT=$?
-    # Ignore if tomcat9 init script does not exist (yet)
-    if [ $RESULT != 100 ]; then
-    exit $RESULT
-    fi
-}

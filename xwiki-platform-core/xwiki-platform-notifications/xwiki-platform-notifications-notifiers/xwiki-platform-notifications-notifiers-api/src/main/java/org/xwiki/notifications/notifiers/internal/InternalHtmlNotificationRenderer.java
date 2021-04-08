@@ -92,7 +92,7 @@ public class InternalHtmlNotificationRenderer
      * Use the appropriate {@link NotificationRenderer} to render first the event to block, and then render it
      * to HTML5.
      * @param compositeEvent the event to render in HTML.
-     * @param status the read status of the given event.
+     * @param status the read status of the given event, this might be null in case of Guest user.
      * @return a string containing the HTML to display.
      * @throws Exception in case of error during some rendering operation.
      */
@@ -113,7 +113,7 @@ public class InternalHtmlNotificationRenderer
         parentDiv.setParameter("data-eventtype", compositeEvent.getType());
         parentDiv.setParameter("data-ids", StringUtils.join(compositeEvent.getEventIds(), ","));
         parentDiv.setParameter("data-eventdate", String.valueOf(getLastCompositeEventDate(compositeEvent).getTime()));
-        if (!status.getStatus()) {
+        if (status != null && !status.getStatus()) {
             parentDivClass.append(" notification-event-unread");
         }
 
@@ -149,7 +149,9 @@ public class InternalHtmlNotificationRenderer
      *
      * @param compositeEvents the events to render
      * @param compositeEventStatuses the read status of the given list of events, in the same order as returned by
-     *                              {@link org.xwiki.notifications.CompositeEventStatusManager}.
+     *                              {@link org.xwiki.notifications.CompositeEventStatusManager}. This argument might be
+     *                              empty or null if the current user is Guest. Note that if list of statuses is shorter
+     *                              than the list of events, then it won't be used.
      * @param loadMore if {@code true} add a final div in the rendered HTML with a dedicated class to allow a load more
      *                 button.
      * @return a string contaning the HTML to display.
@@ -158,9 +160,14 @@ public class InternalHtmlNotificationRenderer
         boolean loadMore)
     {
         StringBuilder stringBuilder = new StringBuilder();
+
+        boolean useStatus = (compositeEventStatuses != null && compositeEventStatuses.size() == compositeEvents.size());
         for (int i = 0; i < compositeEvents.size(); i++) {
             CompositeEvent compositeEvent = compositeEvents.get(i);
-            CompositeEventStatus compositeEventStatus = compositeEventStatuses.get(i);
+            CompositeEventStatus compositeEventStatus = null;
+            if (useStatus) {
+                compositeEventStatus = compositeEventStatuses.get(i);
+            }
             try {
                 stringBuilder.append(this.render(compositeEvent, compositeEventStatus));
             } catch (Exception e) {

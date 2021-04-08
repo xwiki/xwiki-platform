@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,140 +20,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.4" reference="XWiki.MessageStreamConfig" locale="">
   <web>XWiki</web>
   <name>MessageStreamConfig</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiPreferences</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiPreferences</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>$services.localization.render('admin.messagestream')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+$response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=MessageStream'))
+{{/velocity}}</content>
   <attachment>
     <filename>messagestream.png</filename>
     <mimetype>image/png</mimetype>
-    <filesize>6017</filesize>
     <author>xwiki:XWiki.Admin</author>
     <version>1.1</version>
     <comment/>
-    <content>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
-</content>
+    <content>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</content>
+    <filesize>6017</filesize>
   </attachment>
   <class>
     <name>XWiki.MessageStreamConfig</name>
@@ -199,6 +92,10 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
     </visibilityLevel>
   </class>
   <object>
+    <name>XWiki.MessageStreamConfig</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>07130c68-b32b-4064-baaf-625045fb8504</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -208,9 +105,23 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <codeToExecute>
+      <categoryIcon>
+        <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -235,10 +146,10 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -248,6 +159,7 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
       <configureGlobally>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
@@ -260,7 +172,34 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </configureGlobally>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
       <displayInSection>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>displayInSection</name>
         <number>1</number>
@@ -273,6 +212,7 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </displayInSection>
       <heading>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>heading</name>
         <number>2</number>
@@ -285,6 +225,7 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </heading>
       <iconAttachment>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>iconAttachment</name>
         <number>8</number>
@@ -297,6 +238,7 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </iconAttachment>
       <linkPrefix>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>linkPrefix</name>
         <number>5</number>
@@ -310,6 +252,7 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
       </linkPrefix>
       <propertiesToShow>
         <cache>0</cache>
+        <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
         <multiSelect>1</multiSelect>
@@ -328,11 +271,23 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
     </class>
-    <name>XWiki.MessageStreamConfig</name>
-    <number>0</number>
-    <className>XWiki.ConfigurableClass</className>
-    <guid>07130c68-b32b-4064-baaf-625045fb8504</guid>
+    <property>
+      <categoryIcon>link</categoryIcon>
+    </property>
     <property>
       <codeToExecute/>
     </property>
@@ -341,6 +296,12 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory>other</displayBeforeCategory>
+    </property>
+    <property>
+      <displayInCategory>social</displayInCategory>
     </property>
     <property>
       <displayInSection>MessageStream</displayInSection>
@@ -359,8 +320,15 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <value>active</value>
       </propertiesToShow>
     </property>
+    <property>
+      <sectionOrder>300</sectionOrder>
+    </property>
   </object>
   <object>
+    <name>XWiki.MessageStreamConfig</name>
+    <number>0</number>
+    <className>XWiki.MessageStreamConfig</className>
+    <guid>1531641f-d0a7-4df2-b019-773e3883ba3a</guid>
     <class>
       <name>XWiki.MessageStreamConfig</name>
       <customClass/>
@@ -404,10 +372,6 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibilityLevel>
     </class>
-    <name>XWiki.MessageStreamConfig</name>
-    <number>0</number>
-    <className>XWiki.MessageStreamConfig</className>
-    <guid>1531641f-d0a7-4df2-b019-773e3883ba3a</guid>
     <property>
       <active>0</active>
     </property>
@@ -415,7 +379,4 @@ tb8h4EdlWIBPCbpS8RWh05YfjpABOEuzbJ1Jiy8fvHEpP5L2IVVR73Uknb1Rz559hgakt8lwk68F
       <visibilityLevel>everyone</visibilityLevel>
     </property>
   </object>
-  <content>{{velocity}}
-$response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=MessageStream'))
-{{/velocity}}</content>
 </xwikidoc>

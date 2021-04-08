@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -41,7 +40,6 @@ import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -50,7 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.10
  */
-@UITest
+@UITest(extraJARs = {
+    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+})
 public class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
@@ -261,4 +262,40 @@ public class UserProfileIT
         assertEquals(1, groupsPaneLiveTable.getRowCount());
         assertEquals("XWikiAllGroup", groupsPaneLiveTable.getCell(1, 1).getText());
     }
+
+    @Test
+    @Order(8)
+    public void toggleEnableDisable(TestUtils setup)
+    {
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        // We are already logged in with this user, so we shouldn't be able to change the status
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        // Buttons should be available with super admin
+        setup.loginAsSuperAdmin();
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        // Ensure that we can disable the user and buttons are switching
+        userProfilePage.clickDisable();
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertTrue(userProfilePage.isEnableButtonAvailable());
+
+        // Ensure that the state has been saved
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertTrue(userProfilePage.isEnableButtonAvailable());
+
+        // Enable back
+        userProfilePage.clickEnable();
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+    }
+
 }

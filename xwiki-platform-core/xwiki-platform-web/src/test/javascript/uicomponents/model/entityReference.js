@@ -17,17 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'entityReference': 'uicomponents/model/entityReference',
-    'prototype': 'js/prototype/prototype'
-  },
-  shim: {
-    entityReference: ['prototype']
-  }
-});
-
-define(['entityReference'], function() {
+define(['xwiki-entityReference'], function(XWiki) {
 
 describe('EntityReference', function() {
   describe('Serializer', function() {

@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -50,7 +49,6 @@ public class XWikiUser
      * 
      * @since 11.8RC1
      */
-    @Unstable
     public static final String ACTIVE_PROPERTY = "active";
 
     /**
@@ -58,7 +56,6 @@ public class XWikiUser
      * 
      * @since 11.8RC1
      */
-    @Unstable
     public static final String EMAIL_CHECKED_PROPERTY = "email_checked";
 
     /**
@@ -89,7 +86,6 @@ public class XWikiUser
      * @param userReference the document reference of the user.
      * @since 11.6RC1
      */
-    @Unstable
     public XWikiUser(DocumentReference userReference)
     {
         this(userReference,
@@ -103,7 +99,6 @@ public class XWikiUser
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @since 11.6RC1
      */
-    @Unstable
     public XWikiUser(DocumentReference userReference, boolean main)
     {
         this.userReference = userReference;
@@ -254,7 +249,6 @@ public class XWikiUser
      *         superadmin user.
      * @since 11.8RC1
      */
-    @Unstable
     public boolean isEmailChecked(XWikiContext context)
     {
         boolean isChecked;
@@ -281,7 +275,6 @@ public class XWikiUser
      * @param context used to retrieve the user document.
      * @since 11.8RC1
      */
-    @Unstable
     public void setEmailChecked(boolean checked, XWikiContext context)
     {
         // We don't modify any information for guest and superadmin.
@@ -305,7 +298,6 @@ public class XWikiUser
      *         user is the guest or superadmin user.
      * @since 11.6RC1
      */
-    @Unstable
     public boolean isDisabled(XWikiContext context)
     {
         boolean disabled;
@@ -332,7 +324,6 @@ public class XWikiUser
      * @param context used to retrieve the user document.
      * @since 11.6RC1
      */
-    @Unstable
     public void setDisabled(boolean disable, XWikiContext context)
     {
         // We don't modify any information for guest and superadmin.
@@ -355,7 +346,6 @@ public class XWikiUser
      * @return true if the user exists.
      * @since 11.6RC1
      */
-    @Unstable
     public boolean exists(XWikiContext context)
     {
         boolean exists = false;

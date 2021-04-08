@@ -25,78 +25,73 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AttachmentURLStreamHandler}.
  * 
  * @version $Id$
  */
-public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
+@ComponentTest
+public class AttachmentURLStreamHandlerTest
 {
+    @InjectMockComponents
+    private AttachmentURLStreamHandler handler;
+
+    @MockComponent
+    @Named("current")
     private AttachmentReferenceResolver<String> arf;
 
+    @MockComponent
     private DocumentAccessBridge dab;
 
-    private ExtendedURLStreamHandler handler;
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        this.arf = registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
-        this.dab = registerMockComponent(DocumentAccessBridge.class);
-
-        this.handler = getComponentManager().getInstance(ExtendedURLStreamHandler.class, "attachmentjar");
-    }
-
     @Test
-    public void testInvalidAttachmentJarURL() throws Exception
+    void invalidAttachmentJarURL() throws Exception
     {
         URL url = new URL(null, "http://invalid/url", (URLStreamHandler) this.handler);
 
         try {
             url.openConnection();
-            Assert.fail("Should have thrown an exception here");
+            fail("Should have thrown an exception here");
         } catch (RuntimeException expected) {
-            Assert.assertEquals("An attachment JAR URL should start with [attachmentjar://], got [http://invalid/url]",
+            assertEquals("An attachment JAR URL should start with [attachmentjar://], got [http://invalid/url]",
                 expected.getMessage());
         }
     }
 
     @Test
-    public void testAttachmentJarURL() throws Exception
+    void attachmentJarURL() throws Exception
     {
         URL url = new URL(null, "attachmentjar://Space.Page@filename", (URLStreamHandler) this.handler);
 
         final AttachmentReference attachmentReference = new AttachmentReference("filename",
             new DocumentReference("wiki", "space", "page"));
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(AttachmentURLStreamHandlerTest.this.arf).resolve("Space.Page@filename");
-                will(returnValue(attachmentReference));
-                oneOf(AttachmentURLStreamHandlerTest.this.dab).getAttachmentContent(attachmentReference);
-                will(returnValue(new ByteArrayInputStream("content".getBytes())));
-            }
-        });
+
+        when(this.arf.resolve("Space.Page@filename")).thenReturn(attachmentReference);
+        when(this.dab.getAttachmentContent(attachmentReference))
+            .thenReturn(new ByteArrayInputStream("content".getBytes()));
 
         URLConnection connection = url.openConnection();
         InputStream input = null;
         try {
             connection.connect();
             input = connection.getInputStream();
-            Assert.assertEquals("content", IOUtils.toString(input));
+            assertEquals("content", IOUtils.toString(input));
         } finally {
             if (input != null) {
                 input.close();
@@ -108,17 +103,10 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
      * Verify that URL-encoded chars are decoded.
      */
     @Test
-    public void testAttachmentJarURLWithEncodedChars() throws Exception
+    void attachmentJarURLWithEncodedChars() throws Exception
     {
         URL url = new URL(null, "attachmentjar://some%20page", (URLStreamHandler) this.handler);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(AttachmentURLStreamHandlerTest.this.arf).resolve("some page");
-            }
-        });
-
         url.openConnection();
+        verify(this.arf).resolve("some page");
     }
 }

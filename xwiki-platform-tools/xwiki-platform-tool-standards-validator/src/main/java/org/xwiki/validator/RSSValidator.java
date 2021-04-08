@@ -24,9 +24,9 @@ import org.xwiki.validator.ValidationError.Type;
 import org.xwiki.validator.framework.AbstractXMLValidator;
 import org.xwiki.validator.framework.XMLErrorHandler;
 
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.ParsingFeedException;
-import com.sun.syndication.io.SyndFeedInput;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.ParsingFeedException;
+import com.rometools.rome.io.SyndFeedInput;
 
 /**
  * Validate provided input.

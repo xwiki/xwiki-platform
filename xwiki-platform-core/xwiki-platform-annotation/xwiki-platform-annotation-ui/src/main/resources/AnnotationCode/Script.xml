@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.4" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -54,22 +54,27 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -101,13 +106,15 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -115,7 +122,7 @@
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>var XWiki = (function (XWiki) {
@@ -524,22 +531,27 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -571,13 +583,15 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -585,7 +599,7 @@ return XWiki;
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>## Retrieve the annotation settings from the configuration object
@@ -683,36 +697,8 @@ XWiki.Annotation = Class.create({
   hookMenuButton : function() {
     // Since 7.4M1, the annotations trigger is inserted via an UIX.
     var annotationsTrigger = $('tmAnnotationsTrigger');
-    if (annotationsTrigger) {
-      annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
-    } else {
-      // If the UIX is not there, then it means we are in an old skin (such as colibri), and so we let the following
-      // legacy code to maintain backward compatibility.
-      var contentmenu = $('contentmenu');
-      if (contentmenu) {
-        var rightMenu = contentmenu.down('.rightmenu');
-        // create and insert if it doesn't exist
-        if (!rightMenu) {
-          rightMenu = new Element('div', {'class':'rightmenu'});
-          // insert it before the left menu
-          var leftMenu = contentmenu.down('.leftmenu');
-          if (leftMenu) {
-            leftMenu.insert({before: rightMenu});
-          } else {
-            contentmenu.insert({bottom: rightMenu});
-          }
-        }
-        // create the annotations button
-        var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
-        var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-        annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
-        annContainer.insert({top: annLink});
-        rightMenu.insert({bottom: annContainer});
-
-        annLink.observe('click', this.toggleSettingsPanel.bind(this));
-      }
-    }
-  },
+    annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+ },
 
   setAnnotationVisibility : function (visibility) {
     this.displayingAnnotations = visibility;
@@ -1252,6 +1238,8 @@ XWiki.Annotation = Class.create({
 
     // put the content in
     container.update(content);
+    // Initialize the widgets / editors used on the annotation popup.
+    document.fire('xwiki:dom:updated', {elements: [container]});
     return true;
   },
 
@@ -1291,6 +1279,9 @@ XWiki.Annotation = Class.create({
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand update
@@ -1402,8 +1393,15 @@ XWiki.Annotation = Class.create({
           // The content of the Comments tab is reloaded when a comment is added so we can't cache the reference to the
           // reply button.
           replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+          // Ensure to have the focus on the right button on which we click:
+          // it avoids to have CKEditor focusing again on the original button we clicked once loaded.
+          replyButtonInTab.focus();
           // Click the reply button from the comments tab button instead.
           replyButtonInTab.click();
+          // We want to be moved to the reply editor: we scroll to the reply button just above the editor
+          // it allows to see both the annotation + the editor. If we scrolled only in the editor, we'd have the
+          // original annotation hidden in case of many comments.
+          replyButtonInTab.scrollIntoView();
 
           // Lose the focus on the bubble so that it can go away.
           container.blur();
@@ -1420,6 +1418,10 @@ XWiki.Annotation = Class.create({
       // it's not attached anymore: either mouseout or escape
       return;
     }
+
+    // Cancel the edit otherwise the user will be asked for confirmation when leaving the page.
+    document.fire('xwiki:actions:cancel');
+
     bubble.remove();
     var bubbleIndex = this.bubbles.indexOf(bubble);
     if (bubbleIndex &gt;= 0) {
@@ -1570,8 +1572,10 @@ XWiki.Annotation = Class.create({
   },
 
   onAnnotationAdd : function(event) {
-    // don't submit
     event.stop();
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
+    document.fire('xwiki:actions:beforeSave')
     var form = this.createPanel.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand submit

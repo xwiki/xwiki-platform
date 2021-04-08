@@ -20,27 +20,25 @@
 package org.xwiki.flamingo.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 
 public class ViewThemePage extends ViewPage
 {
-    @FindBy(id = "preview-curtain")
-    private WebElement previewCurtain;
-
     public ViewThemePage()
     {
-        this.waitUntilPageJSIsLoaded();
+        this.waitUntilReady();
     }
 
-    public boolean isPreviewBoxLoading()
+    /**
+     * Wait until the theme viewer is ready for user interaction.
+     * 
+     * @since 12.9RC1
+     */
+    protected void waitUntilReady()
     {
-        return previewCurtain.isDisplayed();
-    }
-
-    public void waitUntilPreviewIsLoaded()
-    {
-        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
+        // The refresh button is disabled initially, until the preview is ready, and whenever a refresh is in progress.
+        getDriver().waitUntilCondition(elementToBeClickable(By.id("refresh")));
     }
 }

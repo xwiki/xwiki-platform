@@ -21,9 +21,11 @@
 package org.xwiki.security.authorization.cache.internal;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityShadowEntry;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Default implementation of the security shadow entry.
@@ -83,5 +85,15 @@ public class DefaultSecurityShadowEntry implements SecurityShadowEntry
             .append(this.getWikiReference())
             .append(this.getReference())
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("user", this.user);
+        builder.append("wiki", this.wikiReference);
+
+        return builder.toString();
     }
 }

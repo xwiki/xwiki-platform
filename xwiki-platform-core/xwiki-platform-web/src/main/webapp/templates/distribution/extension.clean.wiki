@@ -119,7 +119,7 @@
       </ul>
     </div>
 
-    <form action="">
+    <form action="" method="post">
       #formHidden()
 
       <div id="uninstalled_extensions"></div>

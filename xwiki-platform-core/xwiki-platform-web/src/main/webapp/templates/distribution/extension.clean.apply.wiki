@@ -68,13 +68,13 @@
   #end
 
   {{html}}
-    <form action="">
+    <form action="" method="post">
       #formHiddenCleanApply()
 
       #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapplyfinalize'), 'cleanapplyfinalize', false, '')
     </form>
 
-    <form action="">
+    <form action="" method="post">
       #formHidden()
 
       #foreach($extensoinId in $requestUninstalled)

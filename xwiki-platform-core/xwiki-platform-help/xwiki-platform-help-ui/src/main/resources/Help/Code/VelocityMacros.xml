@@ -1,0 +1,426 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.VelocityMacros" locale="">
+  <web>Help.Code</web>
+  <name>VelocityMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set ($discard = $xwiki.ssx.use('Help.Code.VelocityMacros'))
+#set ($discard = $xwiki.jsx.use('Help.Code.VelocityMacros'))
+#set ($docextras = [])
+
+#macro (helpActionCard $data)
+  &lt;div class="well"&gt;
+    &lt;h2&gt;$escapetool.xml($data.title)&lt;/h2&gt;
+    &lt;div class="row"&gt;
+      &lt;div class="col-xs-12 col-md-7"&gt;
+        &lt;p&gt;$data.description&lt;/p&gt;
+        &lt;p class="noitems"&gt;$data.tip&lt;/p&gt;
+        #foreach ($action in $data.actions)
+          #set ($actionType = $action.type)
+          #if ("$!actionType" == '')
+            #set ($actionType = 'default')
+          #end
+          &lt;a href="$action.url" class="btn btn-$actionType"&gt;
+            $escapetool.xml($action.label)
+          &lt;/a&gt;
+        #end
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-md-5"&gt;
+        #helpVideoPopup($data.title $data.thumbnail)
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (helpVideoPopup $title $fileNamePrefix)
+  #set ($id = $stringtool.substringBeforeLast($fileNamePrefix, '.'))
+  &lt;a href="#" data-toggle="modal" data-target="#${id}Modal"&gt;
+    &lt;video class="thumbnail" autoplay loop muted&gt;
+      #helpVideoSources($fileNamePrefix)
+    &lt;/video&gt;
+  &lt;/a&gt;
+  &lt;div class="modal fade video-modal" id="${id}Modal" tabindex="-1" role="dialog" aria-labelledby="${id}ModalLabel"&gt;
+    &lt;div class="modal-dialog modal-lg" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;span class="modal-title" id="${id}ModalLabel"&gt;$!escapetool.xml($title)&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;video controls autoplay&gt;
+            #helpVideoSources($fileNamePrefix)
+          &lt;/video&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (helpVideoSources $fileNamePrefix)
+  #set ($attachments = [])
+  #set ($attachment = $doc.getAttachment($fileNamePrefix))
+  #if ($attachment)
+    #set ($discard = $attachments.add($attachment))
+  #else
+    #foreach ($attachment in $doc.attachmentList)
+      #if ($stringtool.startsWith($attachment.filename, $fileName))
+        #set ($discard = $attachments.add($attachment))
+      #end
+    #end
+  #end
+  #foreach ($attachment in $attachments)
+    &lt;source src="$doc.getAttachmentURL($attachment.filename)" type="$escapetool.xml($attachment.mimeType)" /&gt;
+  #end
+#end
+
+#macro (helpExampleCard $data)
+  #set ($documentationURL = $NULL)
+  #if ($data.documentation)
+    #set ($externalDocumentation = $data.documentation.contains('://'))
+    #if ($externalDocumentation)
+      #set ($documentationURL = $data.documentation)
+    #else
+      #set ($documentationURL = $xwiki.getURL($data.documentation))
+    #end
+  #end
+  #set ($examplesURL = $NULL)
+  #if ($data.examples)
+    #if ($data.examples.startsWith('/'))
+      ## Relative internal URL
+      #set ($examplesURL = $data.examples)
+    #else
+      ## Page reference
+      #set ($examplesURL = $xwiki.getURL($data.examples))
+    #end
+    #set ($url = $examplesURL)
+  #else
+    #set ($url = $documentationURL)
+  #end
+  &lt;div class="well"&gt;
+    &lt;div&gt;
+      &lt;a href="$!url"&gt;
+        #if ($data.icon)
+          &lt;span class="icon $data.icon"&gt;&lt;/span&gt;
+        #end
+        $escapetool.xml($data.title)
+      &lt;/a&gt;
+    &lt;/div&gt;
+    #if ($data.description)
+      &lt;p class="noitems"&gt;
+        $data.description
+      &lt;/p&gt;
+    #end
+    #if (($data.examples &amp;&amp; $data.documentation) || !$data.thumbnail)
+      &lt;ul class="noitems"&gt;
+        #if ($data.examples)
+          &lt;li&gt;
+            &lt;a href="$examplesURL"&gt;$services.localization.render('help.example.label')&lt;/a&gt;
+          &lt;/li&gt;
+        #end
+        #if ($data.documentation)
+          &lt;li&gt;
+            &lt;a href="$documentationURL"#if ($externalDocumentation) class="wikiexternallink"#end&gt;
+             $services.localization.render('help.more.label')
+            &lt;/a&gt;
+          &lt;/li&gt;
+        #end
+      &lt;/ul&gt;
+    #end
+    #if ($data.thumbnail)
+      &lt;a href="$!url"&gt;
+        #set ($attachmentReference = $services.model.resolveAttachment($data.thumbnail))
+        &lt;img src="$xwiki.getURL($attachmentReference)" class="thumbnail"
+          alt="$escapetool.xml($attachmentReference.name)" /&gt;
+      &lt;/a&gt;
+    #end
+  &lt;/div&gt;
+#end
+{{/velocity}}</content>
+  <object>
+    <name>Help.Code.VelocityMacros</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d0a6a2ec-d449-4fb4-9169-b4e49ab826e8</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  $(document).on('show.bs.modal', '.video-modal', function(event) {
+    $(this).find('.modal-body &gt; video').each(function() {
+      // Play it from the start.
+      this.currentTime = 0;
+      this.play();
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Help.Code.VelocityMacros</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>23863448-84f0-42d1-8555-afd20f2cf118</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.well {
+  h3:first-child, h6:first-child {
+    margin-top: 0;
+  },
+  h3:last-child, h6:last-child, p:last-child, ul:last-child {
+    margin-bottom: 0;
+  }
+  h6 a {
+    color: @text-color;
+  }
+  a:hover, a:focus {
+    text-decoration: none;
+  }
+  ul.noitems {
+    list-style-type: none;
+    padding: 0;
+  }
+  .thumbnail {
+    margin-bottom: 0;
+  }
+  .icon {
+    color: @text-muted;
+    display: block;
+    font-size: 300%;
+    margin-bottom: 10px;
+  }
+}
+
+.video-modal .modal-body {
+  text-align: center;
+}
+
+#xwikicontent video {
+  max-width: 100%;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

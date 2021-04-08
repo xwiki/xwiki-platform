@@ -24,7 +24,7 @@ $doc.display("description", $obj)
 #set($newtitle = $request.title)
 #if($newtitle)
 #set($newtitle = $newtitle.replace('"',"'"))
-&lt;script type="text/javascript"&gt;
+&lt;script&gt;
 var title = "${newtitle}";
 {pre}
 document.forms.edit["XWiki.PhotoAlbumClass_0_title"].value = title;

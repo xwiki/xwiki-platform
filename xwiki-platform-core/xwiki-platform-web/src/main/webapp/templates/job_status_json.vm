@@ -20,7 +20,7 @@
 #template('job_macros.vm')
 
 #set($jobId = $request.getParameterValues('jobId'))
-#set($translationPrefix = $request.getParameterValues('translationPrefix'))
+#set($translationPrefix = $request.getParameter('translationPrefix'))
 
 #set($jobStatus = $services.job.getJobStatus($jobId))
 

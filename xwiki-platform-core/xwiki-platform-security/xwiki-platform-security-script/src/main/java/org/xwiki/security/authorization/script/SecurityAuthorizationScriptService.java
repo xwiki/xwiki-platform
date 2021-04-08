@@ -32,6 +32,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Security Authorization Script Service.
@@ -144,5 +145,18 @@ public class SecurityAuthorizationScriptService implements ScriptService
     public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
         return authorizationManager.hasAccess(right, userReference, entityReference);
+    }
+
+    /**
+     * Check that a specific right is registered or not.
+     *
+     * @param rightName the name of the right to check for registration.
+     * @return {@code true} only if the right name can be find.
+     * @since 12.7RC1
+     */
+    @Unstable
+    public boolean isRightRegistered(String rightName)
+    {
+        return Right.toRight(rightName) != Right.ILLEGAL;
     }
 }

@@ -177,7 +177,7 @@ public class ConfigurableClassIT
         String codeToExecute = "#set($code = 's sh')"
             + "Thi${code}ould be displayed."
             + "#if($xcontext.hasProgrammingRights())"
-            + "This should not be displayed."
+            + "This should be displayed too."
             + "#end";
         String heading = "#set($code = 'his sho')"
             + "T${code}uld also be displayed.";
@@ -205,7 +205,8 @@ public class ConfigurableClassIT
             String content = viewPage.getContent();
             assertTrue(content.contains("This should be displayed."));
             assertTrue(content.contains("This should also be displayed."));
-            assertFalse(content.contains("This should not be displayed."));
+            assertTrue(content.contains("This should be displayed too."));
+            // It's false because of the dropPermission in ConfigurableClass (but supposed to be fixed at some point)
             assertTrue(content.contains("Has Programming permission: false"));
             // Make sure javascript has not added a Save button.
             assertFalse(setup.getDriver().hasElementWithoutWaiting(

@@ -34,7 +34,7 @@ import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
+import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -238,7 +238,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 LOGGER.info("User " + username + " login has failed");
             }
 
-            authenticationFailureManager.recordAuthenticationFailure(username);
+            authenticationFailureManager.recordAuthenticationFailure(username, request);
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
             int rCode = HttpServletResponse.SC_UNAUTHORIZED;

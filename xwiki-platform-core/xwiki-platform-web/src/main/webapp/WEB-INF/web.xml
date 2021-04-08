@@ -24,11 +24,11 @@
      * metadata-complete="true" is used to disable scanning the web application and its libraries for classes that use
        annotations to define components of a web application (Servlets etc.). Thus leading to a faster startup.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-    version="3.0"
-    metadata-complete="true">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+  version="3.1"
+  metadata-complete="true">
 
   <!-- "absolute-ordering" specifies which web fragment JARs (according to the names in their WEB-INF/web-fragment.xml
        files) have to be scanned for SCIs (javax.servlet.ServletContainerInitializer), fragments and annotations.
@@ -42,7 +42,7 @@
   <!-- Filter in charge of deciding whether to call the ResourceReferenceHandler Servlet (currently used to handle new
        Resource Types registered as Components) or instead to continue with the rest of the filters and mappings below.
        In the future, the goal is to move more and more Resource handling using the ResourceReferenceHandler Servlet and
-       remove the Struts Action Servlet at some point.
+       remove the Legacy Action Servlet at some point.
 
        Note: it is important that this filter be the first filter declared (and thus executed). -->
   <filter>
@@ -235,7 +235,7 @@
 
   <servlet>
     <servlet-name>action</servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <servlet-class>com.xpn.xwiki.web.LegacyActionServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>ApplicationResources</param-value>
@@ -243,10 +243,6 @@
     <init-param>
       <param-name>xwiki</param-name>
       <param-value>com.xpn.xwiki.XWiki</param-value>
-    </init-param>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>/WEB-INF/struts-config.xml</param-value>
     </init-param>
     <init-param>
       <param-name>debug</param-name>
@@ -261,6 +257,7 @@
       <param-value>true</param-value>
     </init-param>
     <load-on-startup>2</load-on-startup>
+    <multipart-config/>
   </servlet>
 
   <servlet>

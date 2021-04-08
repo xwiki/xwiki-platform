@@ -22,14 +22,11 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -38,7 +35,6 @@ import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -55,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @since 8.2M1
  */
 @ComponentTest
-public class DefaultExtendedRenderingConfigurationTest
+class DefaultExtendedRenderingConfigurationTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -64,7 +60,7 @@ public class DefaultExtendedRenderingConfigurationTest
     private DefaultExtendedRenderingConfiguration defaultExtendedRenderingConfiguration;
 
     @BeforeComponent
-    public void setup() throws Exception
+    void setup() throws Exception
     {
         Provider<ComponentManager> contextComponentManagerProvider = this.componentManager.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
@@ -72,7 +68,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void getImageWidthLimit() throws Exception
+    void getImageWidthLimit() throws Exception
     {
         ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageWidthLimit", -1)).thenReturn(100);
@@ -81,7 +77,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void getImageHeightLimit() throws Exception
+    void getImageHeightLimit() throws Exception
     {
         ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageHeightLimit", -1)).thenReturn(150);
@@ -90,7 +86,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void isImageDimensionsIncludedInImageURL() throws Exception
+    void isImageDimensionsIncludedInImageURL() throws Exception
     {
         ConfigurationSource source = componentManager.getInstance(ConfigurationSource.class);
         when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(false);
@@ -101,7 +97,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndExistingXWikiCfgProperty() throws Exception
+    void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndExistingXWikiCfgProperty() throws Exception
     {
         ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
         when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(null);
@@ -135,7 +131,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndNoXWikiCfgProperty() throws Exception
+    void getConfiguredAndDisabledSyntaxesWhenNoConfigXObjectAndNoXWikiCfgProperty() throws Exception
     {
         ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
         when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(null);
@@ -170,7 +166,7 @@ public class DefaultExtendedRenderingConfigurationTest
     }
 
     @Test
-    public void getConfiguredAndDisabledSyntaxesWhenConfigXObjectExists() throws Exception
+    void getConfiguredAndDisabledSyntaxesWhenConfigXObjectExists() throws Exception
     {
         ConfigurationSource renderingSource = componentManager.getInstance(ConfigurationSource.class, "rendering");
         when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(Arrays.asList("syntax1/1.0", "syntax2/1.0"));
@@ -197,8 +193,9 @@ public class DefaultExtendedRenderingConfigurationTest
         assertEquals(1, configuredSyntaxes.size());
         assertTrue(configuredSyntaxes.contains(xwikiSyntax20));
     }
+
     @Test
-    public void getDefaultContentSyntax() throws Exception
+    void getDefaultContentSyntax() throws Exception
     {
         CoreConfiguration coreConfiguration = componentManager.getInstance(CoreConfiguration.class);
         when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_2_1);

@@ -37,11 +37,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-{{html wiki="true"}}
+{{html wiki='true'}}
 #set ($discard = $doc.use('Menu.MenuClass'))
-(% class="xform" %)
+(% class='xform' %)
 (((
-  ; &lt;label#if ($xcontext.action=='edit') for="Menu.MenuClass_0_content1"#end&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action=='edit') for='Menu.MenuClass_0_content1'#end&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
   : $doc.display('content1')
 )))
 {{/html}}

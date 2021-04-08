@@ -17,18 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-suggestPages': "$xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true)" +
-      "?v=$escapetool.url($xwiki.version)",
-    'xwiki-suggestAttachments': "$xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
-  }
-});
+/*!
+#set ($paths = {
+  'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true),
+  'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)
+})
+#[[*/
+// Start JavaScript-only code.
+(function(paths) {
+  "use strict";
+
+require.config({paths});
 
 define('xwiki-entityTypeSwitch', ['jquery', 'xwiki-suggestPages', 'xwiki-suggestAttachments'], function($) {
-  'use strict';
-
   var maybeEnableEntityTypeSwitch = function(entityTypeField) {
     var referenceField = getReferenceField(entityTypeField);
     entityTypeField.change(function(event) {
@@ -87,5 +88,8 @@ require(['jquery', 'xwiki-entityTypeSwitch', 'xwiki-events-bridge'], function($)
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths]));

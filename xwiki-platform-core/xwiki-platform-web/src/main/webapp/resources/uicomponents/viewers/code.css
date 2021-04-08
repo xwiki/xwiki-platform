@@ -60,6 +60,8 @@
 
 .revision .content {
   word-break: break-all;
+  /* Preserve the source formatting and wrap long lines that exceed the available width. */
+  white-space: pre-wrap;
 }
 
 .unselectable {

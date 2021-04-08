@@ -43,6 +43,10 @@ import org.xwiki.user.UserReferenceSerializer;
 @Singleton
 public class DocumentStringUserReferenceSerializer implements UserReferenceSerializer<String>
 {
+    private static final String SUPERADMIN_REFERENCE_STRING = "XWiki.superadmin";
+
+    private static final String GUEST_REFERENCE_STRING = "XWiki.XWikiGuest";
+
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -56,11 +60,16 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
         if (userReference == null) {
             result = null;
         } else if (SuperAdminUserReference.INSTANCE == userReference) {
-            result = "XWiki.superadmin";
+            result = SUPERADMIN_REFERENCE_STRING;
         } else if (GuestUserReference.INSTANCE == userReference) {
-            result = "XWiki.XWikiGuest";
+            result = GUEST_REFERENCE_STRING;
         } else if (CurrentUserReference.INSTANCE == userReference) {
-            result = serializeInternal(this.currentUserReferenceUserReferenceResolver.resolve(null));
+            UserReference resolvedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
+            if (GuestUserReference.INSTANCE == resolvedUserReference) {
+                result = GUEST_REFERENCE_STRING;
+            } else {
+                result = serializeInternal(resolvedUserReference);
+            }
         } else {
             result = serializeInternal(userReference);
         }

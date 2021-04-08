@@ -34,6 +34,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
@@ -75,7 +76,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @AllComponents
-public class DefaultWikiMacroTest
+class DefaultWikiMacroTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -87,6 +88,8 @@ public class DefaultWikiMacroTest
      * Dummy document reference of the document which contains the wiki macro.
      */
     private DocumentReference wikiMacroDocumentReference;
+
+    private DocumentReference wikiMacroAuthorReference;
 
     private XWikiDocument wikiMacroDocument;
 
@@ -115,9 +118,10 @@ public class DefaultWikiMacroTest
 
         this.oldcore.getSpyXWiki().saveDocument(this.user, this.oldcore.getXWikiContext());
 
-        this.wikiMacroDocument.setCreatorReference(this.user.getAuthorReference());
-        this.wikiMacroDocument.setAuthorReference(this.user.getAuthorReference());
-        this.wikiMacroDocument.setContentAuthorReference(this.user.getAuthorReference());
+        this.wikiMacroAuthorReference = new DocumentReference("mawiki", "maspace", "mauser");
+        this.wikiMacroDocument.setCreatorReference(this.wikiMacroAuthorReference);
+        this.wikiMacroDocument.setAuthorReference(this.wikiMacroAuthorReference);
+        this.wikiMacroDocument.setContentAuthorReference(this.wikiMacroAuthorReference);
 
         this.wikiMacroObject = new BaseObject();
         this.wikiMacroObject.setXClassReference(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(),
@@ -129,8 +133,13 @@ public class DefaultWikiMacroTest
         when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.PROGRAM), any(), any())).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.PROGRAM))).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.SCRIPT))).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
 
         this.oldcore.getXWikiContext().setUserReference(this.user.getDocumentReference());
+
+        XWikiDocument sDocument = new XWikiDocument(new DocumentReference("swiki", "sspace", "sdoc"));
+        sDocument.setContentAuthorReference(new DocumentReference("swiki", "sspace", "suser"));
+        this.oldcore.getXWikiContext().put("sdoc", sDocument);
     }
 
     private void registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception
@@ -144,10 +153,17 @@ public class DefaultWikiMacroTest
     private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
         List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
     {
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId(macroId)).name("Wiki Macro")
-            .description("Description").defaultCategory("Test").visibility(WikiMacroVisibility.GLOBAL)
-            .supportsInlineMode(true).contentDescriptor(new DefaultContentDescriptor(false))
-            .parameterDescriptors(parameterDescriptors).build();
+        registerWikiMacro(macroId, macroContent, syntax, new DefaultContentDescriptor(false), parameterDescriptors);
+    }
+
+    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
+        DefaultContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
+        throws Exception
+    {
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor.Builder().id(new MacroId(macroId)).name("Wiki Macro").description("Description")
+                .defaultCategory("Test").visibility(WikiMacroVisibility.GLOBAL).supportsInlineMode(true)
+                .contentDescriptor(contentDescriptor).parameterDescriptors(parameterDescriptors).build();
 
         this.wikiMacroDocument.setSyntax(syntax);
         this.wikiMacroObject.setLargeStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, macroContent);
@@ -192,16 +208,18 @@ public class DefaultWikiMacroTest
      * Test normal wiki macro execution.
      */
     @Test
-    public void testExecute() throws Exception
+    void testExecute() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
 
         assertXHTML("<p>This is <strong>bold</strong></p>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
-        assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string>"
-            + "<org.xwiki.rendering.syntax.Syntax><type><name>XWiki</name><id>xwiki</id></type><version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
-            + "<macroMarker name=\"wikimacro1\"><p><parameters><entry><string>param1</string><string>value1</string></entry><entry><string>param2</string><string>value2</string></entry></parameters></p>"
-            + "<paragraph><word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word></format></paragraph>"
-            + "</macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
+        assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string><org.xwiki.rendering.syntax.Syntax>"
+            + "<type><name>XWiki</name><id>xwiki</id><variants class=\"empty-list\"></variants></type>"
+            + "<version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
+            + "<macroMarker name=\"wikimacro1\"><p><parameters><entry><string>param1</string><string>value1</string>"
+            + "</entry><entry><string>param2</string><string>value2</string></entry></parameters></p><paragraph>"
+            + "<word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word>"
+            + "</format></paragraph></macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**
@@ -209,7 +227,7 @@ public class DefaultWikiMacroTest
      * other words, the nested macro should not generate extra paragraph elements.
      */
     @Test
-    public void testExecuteWhenInlineAndWithMacro() throws Exception
+    void testExecuteWhenInlineAndWithMacro() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**", Syntax.XWIKI_2_0);
         registerWikiMacro("wikimacro2", "{{wikimacro1 param1=\"v1\" param2=\"v2\"/}}", Syntax.XWIKI_2_0);
@@ -223,7 +241,7 @@ public class DefaultWikiMacroTest
      * Check that macro used inside wiki macro are executed as part of the document.
      */
     @Test
-    public void testExecuteWhenInnerMacro() throws Exception
+    void testExecuteWhenInnerMacro() throws Exception
     {
         WikiModel wikiModel = this.componentManager.registerMockComponent(WikiModel.class);
         registerWikiMacro("wikimacro1", "{{toc/}}", Syntax.XWIKI_2_0);
@@ -242,7 +260,7 @@ public class DefaultWikiMacroTest
      * Check that macro used inside wiki macro are executed with the right syntax.
      */
     @Test
-    public void testExecuteWhenWithDifferentMacroSyntax() throws Exception
+    void testExecuteWhenWithDifferentMacroSyntax() throws Exception
     {
         registerWikiMacro("wikimacro", "{{groovy}}println \"[[path:/some/path]]\"{{/groovy}}", Syntax.XWIKI_2_1);
 
@@ -257,11 +275,12 @@ public class DefaultWikiMacroTest
      * {@link DefaultWikiMacro} re-parse it.
      */
     @Test
-    public void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
+    void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
-        registerWikiMacro("wikimacrowithresult", "{{groovy}}"
-            + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
-            + "{{/groovy}}", Syntax.XWIKI_2_0);
+        registerWikiMacro("wikimacrowithresult",
+            "{{groovy}}" + "xcontext.macro.result = java.util.Collections.singletonList("
+                + "new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));" + "{{/groovy}}",
+            Syntax.XWIKI_2_0);
 
         assertXHTML("<p>Hello World</p>", "Hello {{wikimacrowithresult param1=\"World\" param2=\"param2\"/}}");
     }
@@ -270,7 +289,7 @@ public class DefaultWikiMacroTest
      * Test default parameter value injection.
      */
     @Test
-    public void testDefaultParameterValues() throws Exception
+    void testDefaultParameterValues() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -316,7 +335,7 @@ public class DefaultWikiMacroTest
      * Test result value injection.
      */
     @Test
-    public void testResultValueFromContext() throws Exception
+    void testResultValueFromContext() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -344,9 +363,8 @@ public class DefaultWikiMacroTest
                 }
             });
 
-        registerWikiMacro("wikimacro1",
-            "{{velocity}}#set ($xcontext.macro.result = $wordBlock)"
-                + "{{/velocity}}", Syntax.XWIKI_2_0, Collections.emptyList());
+        registerWikiMacro("wikimacro1", "{{velocity}}#set ($xcontext.macro.result = $wordBlock)" + "{{/velocity}}",
+            Syntax.XWIKI_2_0, Collections.emptyList());
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -360,7 +378,7 @@ public class DefaultWikiMacroTest
      * Test result value injection from new binding.
      */
     @Test
-    public void testResultValueFromNewBinding() throws Exception
+    void testResultValueFromNewBinding() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -391,9 +409,8 @@ public class DefaultWikiMacroTest
                 }
             });
 
-        registerWikiMacro("wikimacro1",
-            "{{velocity}}#set ($wikimacro.result = $wordBlock)"
-                + "{{/velocity}}", Syntax.XWIKI_2_0, Collections.emptyList());
+        registerWikiMacro("wikimacro1", "{{velocity}}#set ($wikimacro.result = $wordBlock){{/velocity}}",
+            Syntax.XWIKI_2_0, Collections.emptyList());
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -407,7 +424,7 @@ public class DefaultWikiMacroTest
      * Test parameter types are converted to appropriate value
      */
     @Test
-    public void testParameterType() throws Exception
+    void testParameterType() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -441,26 +458,29 @@ public class DefaultWikiMacroTest
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", true, null, Integer.class));
 
+        //@formatter:off
         registerWikiMacro("wikimacro1",
             "{{velocity}}"
-                + "$xcontext.macro.params.param1 $xcontext.macro.params.param1.class.name "
-                + "$xcontext.macro.params.paraM1 $xcontext.macro.params.paraM1.class.name "
-                + "$wikimacro.parameters.param1 $wikimacro.parameters.param1.class.name "
-                + "$wikimacro.parameters.paraM1 $wikimacro.parameters.paraM1.class.name"
-                + "{{/velocity}}",
+            + "$xcontext.macro.params.param1 $xcontext.macro.params.param1.class.name "
+            + "$xcontext.macro.params.paraM1 $xcontext.macro.params.paraM1.class.name "
+            + "$wikimacro.parameters.param1 $wikimacro.parameters.param1.class.name "
+            + "$wikimacro.parameters.paraM1 $wikimacro.parameters.paraM1.class.name"
+            + "{{/velocity}}",
             Syntax.XWIKI_2_0, parameterDescriptors);
+        //@formatter:on
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("{{wikimacro1 param1=\"43\"/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
+        converter.convert(new StringReader("{{wikimacro1 param1=\"43\"/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0,
+            printer);
 
         assertEquals("43 java.lang.String 43 java.lang.String 43 java.lang.Integer 43 java.lang.Integer",
             printer.toString());
     }
 
     @Test
-    public void testContext() throws Exception
+    void testContext() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -505,7 +525,7 @@ public class DefaultWikiMacroTest
      * Makes sure getParameterNames return parameters with source case.
      */
     @Test
-    public void testDefaultParameterNames() throws Exception
+    void testDefaultParameterNames() throws Exception
     {
         // Override default velocity manager with a mock
         VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
@@ -545,15 +565,18 @@ public class DefaultWikiMacroTest
     }
 
     @Test
-    public void testGetCurrentMacroBlock() throws Exception
+    void testGetCurrentMacroBlock() throws Exception
     {
+        //@formatter:off
         registerWikiMacro("wikimacro",
-            "{{groovy}}" + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
-                + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
-                + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
-                + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
-                + "{{/groovy}}",
+            "{{groovy}}"
+            + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
+            + "{{/groovy}}",
             Syntax.XWIKI_2_0, Collections.<WikiMacroParameterDescriptor>emptyList());
+        //@formatter:on
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -566,14 +589,17 @@ public class DefaultWikiMacroTest
     }
 
     @Test
-    public void testExecuteWhenWikiMacroBinding() throws Exception
+    void testExecuteWhenWikiMacroBinding() throws Exception
     {
-        registerWikiMacro("wikimacrobindings", "{{groovy}}"
+        //@formatter:off
+        registerWikiMacro("wikimacrobindings",
+            "{{groovy}}"
             + "println xcontext.macro.doc\n"
             + "println xcontext.macro.doc.class\n"
             + "println wikimacro.doc\n"
             + "println wikimacro.doc.class\n"
             + "{{/groovy}}");
+        //@formatter:on
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -582,19 +608,22 @@ public class DefaultWikiMacroTest
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        //@formatter:off
         String expectedOutput = "<p>"
             + this.wikiMacroDocument.toString() + "<br/>"
             + "class com.xpn.xwiki.api.Document<br/>"
             + this.wikiMacroDocument.toString() + "<br/>"
             + "class com.xpn.xwiki.api.Document"
             + "</p>";
+        //@formatter:on
+
         assertEquals(expectedOutput, printer.toString());
     }
 
     @Test
-    public void testExecuteWhenWikiRequiringPRAfterDropPermission() throws Exception
+    void testExecuteWhenWikiRequiringPRAfterDropPermission() throws Exception
     {
-        registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
+        registerWikiMacro("wikimacrobindings", "{{groovy}}print xcontext.macro.doc{{/groovy}}");
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -612,4 +641,185 @@ public class DefaultWikiMacroTest
             "Wiki macro did not properly restord persmission dropping");
     }
 
+    @Test
+    void testWikimacrocontentWhenTypeWiki() throws Exception
+    {
+        registerWikiMacro("wikimacro",
+            "{{velocity}}$xcontext.context.authorReference{{/velocity}}\n{{wikimacrocontent/}}", Syntax.XWIKI_2_0,
+            new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE),
+            Collections.<WikiMacroParameterDescriptor>emptyList());
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader(
+            "{{wikimacro}}" + "{{velocity}}$xcontext.context.authorReference{{/velocity}}\n[[label>>path:reference]]"
+                + "{{/wikimacro}}"),
+            Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n" + 
+            "beginMacroMarkerStandalone [wikimacro] [] [{{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
+            "[[label>>path:reference]]]\n" + 
+            "beginParagraph\n" + 
+            "onWord [mawiki]\n" + 
+            "onSpecialSymbol [:]\n" + 
+            "onWord [maspace]\n" + 
+            "onSpecialSymbol [.]\n" + 
+            "onWord [mauser]\n" + 
+            "onNewLine\n" + 
+            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[wikimacrocontent]=[true]]\n" +
+            "beginMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
+            "onWord [swiki]\n" + 
+            "onSpecialSymbol [:]\n" + 
+            "onWord [sspace]\n" + 
+            "onSpecialSymbol [.]\n" + 
+            "onWord [suser]\n" + 
+            "endMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
+            "onNewLine\n" + 
+            "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
+            "onWord [label]\n" + 
+            "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
+            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[wikimacrocontent]=[true]]\n" +
+            "endParagraph\n" + 
+            "endMacroMarkerStandalone [wikimacro] [] [{{velocity}}$xcontext.context.authorReference{{/velocity}}\n" + 
+            "[[label>>path:reference]]]\n" + 
+            "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void testWikimacroparameterWhenTypeWiki() throws Exception
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
+            .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("wikimacro",
+            "{{velocity}}$xcontext.context.authorReference{{/velocity}}\n{{wikimacroparameter name=\"param1\"/}}",
+            Syntax.XWIKI_2_0, parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(
+            new StringReader("{{wikimacro param1=\""
+                + "{{velocity}}$xcontext.context.authorReference{{/velocity}}\n[[label>>path:reference]]" + "\"/}}"),
+            Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n" + 
+            "beginMacroMarkerStandalone [wikimacro] "
+                + "[param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" +
+            "[[label>>path:reference]]]\n" + 
+            "beginParagraph\n" + 
+            "onWord [mawiki]\n" + 
+            "onSpecialSymbol [:]\n" + 
+            "onWord [maspace]\n" + 
+            "onSpecialSymbol [.]\n" + 
+            "onWord [mauser]\n" + 
+            "onNewLine\n" + 
+            "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n" +
+            "beginMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
+            "onWord [swiki]\n" + 
+            "onSpecialSymbol [:]\n" + 
+            "onWord [sspace]\n" + 
+            "onSpecialSymbol [.]\n" + 
+            "onWord [suser]\n" + 
+            "endMacroMarkerInline [velocity] [] [$xcontext.context.authorReference]\n" + 
+            "onNewLine\n" + 
+            "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
+            "onWord [label]\n" + 
+            "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n" + 
+            "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n" +
+            "endParagraph\n" + 
+            "endMacroMarkerStandalone [wikimacro] "
+                + "[param1={{velocity}}$xcontext.context.authorReference{{/velocity}}\n" +
+            "[[label>>path:reference]]]\n" + 
+            "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void testWikimacrocontentWhenInRawBlock() throws Exception
+    {
+        registerWikiMacro("wikimacro",
+            "{{html wiki='true' clean='false'}}<span class='class'>{{wikimacrocontent/}}</span>{{/html}}",
+            Syntax.XWIKI_2_0, new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE),
+            Collections.<WikiMacroParameterDescriptor>emptyList());
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro}}[[label>>path:reference]]{{/wikimacro}}"), Syntax.XWIKI_2_1,
+            Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n"
+            + "beginMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
+            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "beginMetaData [[non-generated-content]="
+                + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
+            + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "onWord [label]\n"
+            + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "endMetaData [[non-generated-content]="
+                + "[java.util.List<org.xwiki.rendering.block.Block>][wikimacrocontent]=[true]]\n"
+            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "endMacroMarkerStandalone [wikimacro] [] [[[label>>path:reference]]]\n"
+            + "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void testWikimacroparameterWhenInRawBlock() throws Exception
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays
+            .asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, null, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("wikimacro",
+        //@formatter:off
+            "{{html wiki='true' clean='false'}}"
+              + "<span class='class'>{{wikimacroparameter name=\"param1\"/}}</span>" +
+            "{{/html}}",
+        //@formatter:on
+            Syntax.XWIKI_2_0, new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE), parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro param1=\"[[label>>path:reference]]\"/}}"),
+            Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
+
+        //@formatter:off
+        String expect =
+            "beginDocument [[syntax]=[XWiki 2.1]]\n"
+            + "beginMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n"
+            + "onRawText [<span class='class'>] [xhtml/1.0]\n"
+            + "beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
+            + "beginLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "onWord [label]\n"
+            + "endLink [Typed = [true] Type = [path] Reference = [reference]] [false]\n"
+            + "endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]"
+                + "[parameter-name]=[param1][wikimacrocontent]=[true]]\n"
+            + "onRawText [</span>] [xhtml/1.0]\n"
+            + "endMacroMarkerStandalone [wikimacro] [param1=[[label>>path:reference]]]\n" +
+            "endDocument [[syntax]=[XWiki 2.1]]";
+        //@formatter:on
+
+        assertEquals(expect, printer.toString());
+    }
 }

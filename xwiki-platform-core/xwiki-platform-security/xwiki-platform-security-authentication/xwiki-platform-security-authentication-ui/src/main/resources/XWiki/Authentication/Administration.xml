@@ -313,7 +313,7 @@
       <displayInSection>Authentication</displayInSection>
     </property>
     <property>
-      <heading>Authentication Security</heading>
+      <heading>$services.localization.render('authentication.admin.heading')</heading>
     </property>
     <property>
       <iconAttachment/>

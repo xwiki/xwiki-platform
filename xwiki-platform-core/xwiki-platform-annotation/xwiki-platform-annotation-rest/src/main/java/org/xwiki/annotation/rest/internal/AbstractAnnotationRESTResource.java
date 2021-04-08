@@ -35,6 +35,7 @@ import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.annotation.rest.model.jaxb.AnnotatedContent;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
+import org.xwiki.annotation.rest.model.jaxb.AnnotationFieldCollection;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationStub;
@@ -44,6 +45,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -66,6 +68,18 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      * TODO: action should be obtained from the calling client in the parameters
      */
     protected static final String DEFAULT_ACTION = "view";
+
+    private static final String COMMENT_KEY = "comment";
+
+    private static final String COMMENT_SYNTAX_KEY = "comment_syntax";
+
+    /**
+     * The name of the request parameter value represents the parameter that requires
+     * conversion from HTML to wiki syntax.
+     * This parameter and its implementation is directly inspired from
+     * {@link org.xwiki.wysiwyg.filter.ConversionFilter}.
+     */
+    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
     /**
      * The annotations service to be used by this REST interface.
@@ -90,6 +104,9 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     @Inject
     protected EntityReferenceSerializer<String> referenceSerializer;
+
+    @Inject
+    private HTMLConverter htmlConverter;
 
     /**
      * Builds an annotation response containing the annotated content along with the annotation stubs, according to the
@@ -358,5 +375,30 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             // Just log it.
             getLogger().error("Failed to update the context for page [{}].", documentReference, e);
         }
+    }
+
+    protected Map<String, Object> getMap(AnnotationFieldCollection annotation)
+    {
+        Map<String, Object> metadataMap = new HashMap<>();
+        for (AnnotationField f : annotation.getFields()) {
+            metadataMap.put(f.getName(), f.getValue());
+        }
+
+        // We perform conversion only if:
+        //   1. there is a RequiresHTMLConversion parameter
+        //   2. the value of this parameter is exactly "comment"
+        //   3. the syntax of comment is given in the parameters
+        // Note that this transformation only makes sense if the annotations are saved in an xobject that contains
+        // a "comment" property.
+        if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)
+            && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))
+            && metadataMap.containsKey(COMMENT_SYNTAX_KEY)) {
+            String syntax = (String) metadataMap.get(COMMENT_SYNTAX_KEY);
+
+            String convertedComment = this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax);
+            metadataMap.put(COMMENT_KEY, convertedComment);
+            metadataMap.remove(REQUIRES_HTML_CONVERSION);
+        }
+        return metadataMap;
     }
 }

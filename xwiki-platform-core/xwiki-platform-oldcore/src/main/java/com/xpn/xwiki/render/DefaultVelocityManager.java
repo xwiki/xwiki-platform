@@ -41,6 +41,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -98,6 +99,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
      */
     @Inject
     private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     @Inject
     private VelocityFactory velocityFactory;
@@ -183,7 +187,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         if (currentVelocityContext instanceof ScriptVelocityContext) {
             velocityContext = (ScriptVelocityContext) currentVelocityContext;
         } else {
-            velocityContext = new ScriptVelocityContext(currentVelocityContext, this.reservedBindings);
+            velocityContext = new ScriptVelocityContext(currentVelocityContext,
+                this.loggerConfiguration.isDeprecatedLogEnabled(), this.reservedBindings);
             this.execution.getContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
                 velocityContext);
         }

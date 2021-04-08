@@ -47,5 +47,6 @@ authentication.admin.timeWindow.hint=La plage de temps, en seconde, durant laque
 authentication.admin.isAuthenticationSecurityEnabled.label=Activer ou désactiver le mécanisme d'authentification sécurisée
 authentication.admin.isAuthenticationSecurityEnabled.hint=Désactiver le mécanisme d'authentification sécurisée supprimera du même coup le journal des échecs d'authentification.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Désactivé
-authentication.admin.isAuthenticationSecurityEnabled.enabled=Activé</content>
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Activé
+authentication.admin.heading=Sécurité d'authentification</content>
 </xwikidoc>

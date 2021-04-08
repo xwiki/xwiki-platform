@@ -19,8 +19,12 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.Optional;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -75,6 +79,50 @@ public class ObjectEditPane extends FormContainerElement
     }
 
     /**
+     * Helper to retrieve the xobject content div. This method returns an empty optional if the information have not
+     * been loaded.
+     */
+    private Optional<WebElement> getObjectContent()
+    {
+        String xobjectContentId = String.format("xobject_%s_%s_content", this.className, this.objectNumber);
+        try {
+            return Optional.of(getDriver().findElementWithoutWaiting(By.id(xobjectContentId)));
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Checks if the information are loaded and displayed.
+     *
+     * @return {@code true} if the object information are displayed (i.e. the object is expanded)
+     * @since 13.1RC1
+     */
+    @Unstable
+    public boolean isObjectDisplayed()
+    {
+        Optional<WebElement> objectContent = getObjectContent();
+        return objectContent.map(WebElement::isDisplayed).orElse(false);
+    }
+
+    /**
+     * Click on the xobject div to expand it, and waits until the information are loaded and displayed.
+     * This method checks if the information are already displayed to avoid collapsing them if it's already the case.
+     *
+     * @since 13.1RC1
+     */
+    @Unstable
+    public void displayObject()
+    {
+        String xobjectId = String.format("xobject_%s_%s_title", this.className, this.objectNumber);
+
+        if (!isObjectDisplayed()) {
+            getDriver().findElementWithoutWaiting(By.id(xobjectId)).click();
+            getDriver().waitUntilCondition(driver -> isObjectDisplayed());
+        }
+    }
+
+    /**
      * Opens the date picker for the specified date property of the edited object.
      * 
      * @param datePropertyName the name of a date property of the edited object
@@ -118,5 +166,49 @@ public class ObjectEditPane extends FormContainerElement
     {
         this.setFieldValue(byPropertyName(propertyName), propertyValue);
         return this;
+    }
+
+    /**
+     * @return the div container of the current object edit. Note that this should only be used in the case of
+     * ObjectEditor.
+     */
+    private WebElement getXobjectContainer()
+    {
+        return getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
+    }
+
+    /**
+     * @return {@code true} if the delete link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isDeleteLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("delete")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return {@code true} if the edit link is displayed for this object.
+     * @since 12.4RC1
+     */
+    public boolean isEditLinkDisplayed()
+    {
+        try {
+            return getXobjectContainer().findElement(By.className("edit")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return the current object number.
+     * @since 12.4RC1
+     */
+    public int getObjectNumber()
+    {
+        return objectNumber;
     }
 }

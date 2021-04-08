@@ -267,7 +267,7 @@ public class DefaultMergeManager implements MergeManager
             // Default locale
             MergeManagerResult<Locale, Locale> localeMergeResult = this.mergeObject(previousDoc.getDefaultLocale(),
                 newDoc.getDefaultLocale(), currentDoc.getDefaultLocale(), configuration);
-            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.LOCALE, localeMergeResult);
+            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.DEFAULT_LOCALE, localeMergeResult);
             mergedDocument.setDefaultLocale(localeMergeResult.getMergeResult());
 
             // Parent
@@ -519,7 +519,7 @@ public class DefaultMergeManager implements MergeManager
                                 } else {
                                     // Already added to the DB, lets assume the user is prescient
                                     attachmentMergeResult.getLog().warn("Attachment [{}] already added",
-                                        previousAttachment.getReference());
+                                        nextAttachment.getReference());
                                 }
                             } catch (XWikiException e) {
                                 attachmentMergeResult.getLog().error("Failed to compare attachments with reference "

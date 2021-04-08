@@ -19,9 +19,11 @@
  */
 package org.xwiki.resource;
 
-import org.junit.Test;
+import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.resource.AbstractResourceReference}.
@@ -33,15 +35,37 @@ public class AbstractResourceReferenceTest
 {
     public class TestableResourceReference extends AbstractResourceReference
     {
+        @Override
+        public void setParameter(String name, Object value)
+        {
+            super.setParameter(name, value);
+        }
     }
 
     @Test
-    public void verifyToString()
+    void verifyToString()
     {
         TestableResourceReference reference = new TestableResourceReference();
         reference.setType(new ResourceType("test"));
         reference.addParameter("param1", "value1");
 
         assertEquals("type = [test], parameters = [[param1] = [[value1]]]", reference.toString());
+    }
+
+    @Test
+    void setParameter()
+    {
+        TestableResourceReference reference = new TestableResourceReference();
+        reference.addParameter("param", "value1");
+
+        assertEquals(Arrays.asList("value1"), reference.getParameterValues("param"));
+
+        reference.addParameter("param", "value2");
+
+        assertEquals(Arrays.asList("value1", "value2"), reference.getParameterValues("param"));
+
+        reference.setParameter("param", "value3");
+
+        assertEquals(Arrays.asList("value3"), reference.getParameterValues("param"));
     }
 }

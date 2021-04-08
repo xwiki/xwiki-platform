@@ -30,8 +30,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,8 +41,12 @@ import static org.mockito.Mockito.when;
  * @since 2.2M1
  */
 @ComponentTest
-@ComponentList({ DefaultSymbolScheme.class })
-public class DefaultStringEntityReferenceSerializerTest implements TestConstants
+// @formatter:off
+@ComponentList({
+    DefaultSymbolScheme.class
+})
+// @formatter:on
+class DefaultStringEntityReferenceSerializerTest implements TestConstants
 {
     @MockComponent
     private EntityReferenceProvider provider;
@@ -54,7 +58,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     private DefaultStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.provider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.provider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
@@ -75,14 +79,14 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializeWikiReferences() throws Exception
+    void serializeWikiReferences()
     {
         EntityReference reference = resolver.resolve("wiki", EntityType.WIKI);
         assertEquals("wiki", serializer.serialize(reference));
     }
 
     @Test
-    public void serializeDocumentReferences() throws Exception
+    void serializeDocumentReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         assertEquals("wiki:space.page", serializer.serialize(reference));
@@ -131,14 +135,14 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializeSpaceReferences() throws Exception
+    void serializeSpaceReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
         assertEquals("wiki:space1.space2", serializer.serialize(reference));
     }
 
     @Test
-    public void serializeAttachmentReferences() throws Exception
+    void serializeAttachmentReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         assertEquals("wiki:space.page@filename", serializer.serialize(reference));
@@ -159,7 +163,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializeReferencesWithChild()
+    void serializeReferencesWithChild()
     {
         EntityReference reference = resolver.resolve("wiki:Space.Page", EntityType.DOCUMENT);
         assertEquals("wiki:Space", serializer.serialize(reference.getParent()));
@@ -171,7 +175,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void serializeObjectReferences()
+    void serializeObjectReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^Object", EntityType.OBJECT);
         assertEquals("wiki:space.page^Object", serializer.serialize(reference));
@@ -199,7 +203,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void serializeObjectPropertyReferences()
+    void serializeObjectPropertyReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^xwiki.class[0].prop", EntityType.OBJECT_PROPERTY);
         assertEquals("wiki:space.page^xwiki.class[0].prop", serializer.serialize(reference));
@@ -227,7 +231,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void serializeClassPropertyReferences()
+    void serializeClassPropertyReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^ClassProperty", EntityType.CLASS_PROPERTY);
         assertEquals("wiki:space.page^ClassProperty", serializer.serialize(reference));
@@ -252,7 +256,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializeRelativeReferences()
+    void serializeRelativeReferences()
     {
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
         assertEquals("page", serializer.serialize(reference));
@@ -265,7 +269,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializePageReferences() throws Exception
+    void serializePageReferences()
     {
         EntityReference reference = resolver.resolve("wiki:space/page", EntityType.PAGE);
         assertEquals("wiki:space/page", serializer.serialize(reference));
@@ -308,7 +312,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     }
 
     @Test
-    public void serializePageReferencesParameters() throws Exception
+    void serializePageReferencesParameters()
     {
         EntityReference reference =
             resolver.resolve("wiki:page1;param1=value1;param2=value2/page2;en_US", EntityType.PAGE);

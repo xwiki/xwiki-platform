@@ -351,4 +351,22 @@ public class DistributionInternalScriptService implements ScriptService
 
         return null;
     }
+
+    /**
+     * Remove a stored property.
+     *
+     * @param key the key of the property to be removed.
+     * @since 11.10.6
+     * @since 12.4
+     */
+    public void removeProperty(String key)
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            DistributionJob job = this.distributionManager.getCurrentDistributionJob();
+
+            if (job != null) {
+                job.removeProperty(key);
+            }
+        }
+    }
 }

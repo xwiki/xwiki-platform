@@ -21,6 +21,7 @@ package org.xwiki.user.test.po;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -69,6 +70,12 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     @FindBy(css = ".activity-follow a")
     private WebElement followUnfollowButton;
+
+    @FindBy(id = "disable")
+    private WebElement disableButton;
+
+    @FindBy(id = "enable")
+    private WebElement enableButton;
 
     public static ProfileUserProfilePage gotoPage(String username)
     {
@@ -168,5 +175,35 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     {
         this.followUnfollowButton.click();
         return new ProfileUserProfilePage(this.getUsername());
+    }
+
+    public boolean isEnableButtonAvailable()
+    {
+        try {
+            return this.enableButton.isDisplayed() && this.enableButton.isEnabled();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public boolean isDisableButtonAvailable()
+    {
+        try {
+            return this.disableButton.isDisplayed() && this.disableButton.isEnabled();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public void clickEnable()
+    {
+        this.enableButton.click();
+        waitForNotificationSuccessMessage("Done");
+    }
+
+    public void clickDisable()
+    {
+        this.disableButton.click();
+        waitForNotificationSuccessMessage("Done");
     }
 }

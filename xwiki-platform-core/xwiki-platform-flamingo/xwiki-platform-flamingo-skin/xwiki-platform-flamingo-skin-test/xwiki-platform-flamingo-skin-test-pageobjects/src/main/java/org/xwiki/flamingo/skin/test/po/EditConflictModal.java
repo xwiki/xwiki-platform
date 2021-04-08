@@ -39,7 +39,8 @@ public class EditConflictModal extends BaseModal
     /**
      * The different choices available to resolve the conflict.
      */
-    public enum ConflictChoice {
+    public enum ConflictChoice
+    {
         /**
          * Merge choice.
          */
@@ -64,7 +65,8 @@ public class EditConflictModal extends BaseModal
     /**
      * The available versions for performing a diff.
      */
-    public enum AvailableDiffVersions {
+    public enum AvailableDiffVersions
+    {
         /**
          * Version when the user started to edit.
          */

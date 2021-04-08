@@ -24,6 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -50,6 +53,9 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
     @Inject
     private XWikiStubContextProvider stubContextProvider;
 
+    @Inject
+    private Container container;
+
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
@@ -61,6 +67,14 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
             if (stubContext != null) {
                 // the stub context has been properly initialized, we declare it in the Execution context
                 stubContext.declareInExecutionContext(context);
+
+                // Set the stub request and the response
+                if (this.container.getRequest() == null) {
+                    this.container.setRequest(new ServletRequest(stubContext.getRequest()));
+                }
+                if (this.container.getResponse() == null) {
+                    this.container.setResponse(new ServletResponse(stubContext.getResponse()));
+                }
             }
         }
     }

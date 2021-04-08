@@ -26,23 +26,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Provider;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,28 +63,34 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class DatabaseMailResenderTest
+@ComponentTest
+class DatabaseMailResenderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DatabaseMailResender> mocker =
-        new MockitoComponentMockingRule<>(DatabaseMailResender.class);
+    @InjectMockComponents
+    private DatabaseMailResender databaseMailResender;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void resendAsynchronouslySingleMesssage() throws Exception
+    void resendAsynchronouslySingleMesssage() throws Exception
     {
-        MailListener listener = this.mocker.registerMockComponent(MailListener.class, "database");
+        MailListener listener = this.componentManager.registerMockComponent(MailListener.class, "database");
 
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         String batchId = UUID.randomUUID().toString();
 
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(any(), eq(batchId), eq("messageId"))).thenReturn(message);
 
-        MailSender sender = this.mocker.getInstance(MailSender.class);
+        MailSender sender = this.componentManager.getInstance(MailSender.class);
         when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(), any(MailListener.class)))
             .thenReturn(new DefaultMailResult(batchId));
 
-        this.mocker.getComponentUnderTest().resendAsynchronously(batchId, "messageId");
+        this.databaseMailResender.resendAsynchronously(batchId, "messageId");
 
         // The test is here
         verify(sender).sendAsynchronously(eq(Arrays.asList(message)), any(), same(listener));
@@ -81,22 +98,20 @@ public class DatabaseMailResenderTest
     }
 
     @Test
-    public void resendAsynchronouslySingleMessageWhenMailContentStoreLoadingFails() throws Exception
+    void resendAsynchronouslySingleMessageWhenMailContentStoreLoadingFails() throws Exception
     {
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(any(), eq("batchId"), eq("messageId"))).thenThrow(
             new MailStoreException("error"));
 
-        try {
-            this.mocker.getComponentUnderTest().resendAsynchronously("batchId", "messageId");
-            fail("Should have thrown an exception here");
-        } catch (MailStoreException expected) {
-            assertEquals("error", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MailStoreException.class, () -> {
+            this.databaseMailResender.resendAsynchronously("batchId", "messageId");
+        });
+        assertEquals("error", exception.getMessage());
     }
 
     @Test
-    public void resendAsynchronouslySeveralMessages() throws Exception
+    void resendAsynchronouslySeveralMessages() throws Exception
     {
         Map filterMap = Collections.singletonMap("state", "prepare_%");
 
@@ -112,26 +127,76 @@ public class DatabaseMailResenderTest
         statuses.add(status1);
         statuses.add(status2);
 
-        MailStatusStore statusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        MailStatusStore statusStore = this.componentManager.getInstance(MailStatusStore.class, "database");
         when(statusStore.load(filterMap, 0, 0, null, true)).thenReturn(statuses);
 
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         ExtendedMimeMessage message1 = new ExtendedMimeMessage();
         when(contentStore.load(any(), eq("batch1"), eq("message1"))).thenReturn(message1);
         ExtendedMimeMessage message2 = new ExtendedMimeMessage();
         when(contentStore.load(any(), eq("batch2"), eq("message2"))).thenReturn(message2);
 
-        MailSender sender = this.mocker.getInstance(MailSender.class);
+        MailSender sender = this.componentManager.getInstance(MailSender.class);
 
-        this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 0, 0);
+        this.databaseMailResender.resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
         verify(sender).sendAsynchronously(eq(Arrays.asList(message1)), any(), any(MailListener.class));
         verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
     }
 
+    @BeforeComponent("resendSynchronouslySeveralMessages")
+    void setupResendSynchronouslySeveralMessages() throws Exception
+    {
+        this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, MailListener.class), "database");
+    }
+
     @Test
-    public void resendAsynchronouslySeveralMessagesWhenMailContentStoreLoadingFailsForFirstMessage() throws Exception
+    void resendSynchronouslySeveralMessages() throws Exception
+    {
+        Map filterMap = Collections.singletonMap("state", "prepare_%");
+
+        MailStatus status1 = new MailStatus();
+        status1.setBatchId("batch1");
+        status1.setMessageId("message1");
+
+        MailStatus status2 = new MailStatus();
+        status2.setBatchId("batch2");
+        status2.setMessageId("message2");
+
+        List<MailStatus> statuses = new ArrayList<>();
+        statuses.add(status1);
+        statuses.add(status2);
+
+        MailStatusStore statusStore = this.componentManager.getInstance(MailStatusStore.class, "database");
+        when(statusStore.load(filterMap, 0, 0, null, true)).thenReturn(statuses);
+
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
+        ExtendedMimeMessage message1 = new ExtendedMimeMessage();
+        when(contentStore.load(any(), eq("batch1"), eq("message1"))).thenReturn(message1);
+        ExtendedMimeMessage message2 = new ExtendedMimeMessage();
+        when(contentStore.load(any(), eq("batch2"), eq("message2"))).thenReturn(message2);
+
+        Provider<MailListener> databaseMailListenerProvider = this.componentManager.getInstance(
+            new DefaultParameterizedType(null, Provider.class, MailListener.class), "database");
+        DatabaseMailListener databaseMailListener1 = mock(DatabaseMailListener.class);
+        DatabaseMailListener databaseMailListener2 = mock(DatabaseMailListener.class);
+        when(databaseMailListenerProvider.get()).thenReturn(databaseMailListener1, databaseMailListener2);
+        MailStatusResult mailStatusResult1 = mock(MailStatusResult.class);
+        when(databaseMailListener1.getMailStatusResult()).thenReturn(mailStatusResult1);
+        MailStatusResult mailStatusResult2 = mock(MailStatusResult.class);
+        when(databaseMailListener2.getMailStatusResult()).thenReturn(mailStatusResult2);
+
+        this.databaseMailResender.resend(filterMap, 0, 0);
+
+        // The test is here
+        verify(mailStatusResult1).waitTillProcessed(Long.MAX_VALUE);
+        verify(mailStatusResult2).waitTillProcessed(Long.MAX_VALUE);
+    }
+
+    @Test
+    void resendAsynchronouslySeveralMessagesWhenMailContentStoreLoadingFailsForFirstMessage() throws Exception
     {
         Map filterMap = Collections.singletonMap("state", "prepare_%");
 
@@ -149,28 +214,27 @@ public class DatabaseMailResenderTest
         statuses.add(status1);
         statuses.add(status2);
 
-        MailStatusStore statusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        MailStatusStore statusStore = this.componentManager.getInstance(MailStatusStore.class, "database");
         when(statusStore.load(filterMap, 0, 0, null, true)).thenReturn(statuses);
 
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(any(), eq("batch1"), eq("message1"))).thenThrow(
             new MailStoreException("error1"));
         ExtendedMimeMessage message2 = new ExtendedMimeMessage();
         when(contentStore.load(any(), eq("batch2"), eq("message2"))).thenReturn(message2);
 
-        MailSender sender = this.mocker.getInstance(MailSender.class);
+        MailSender sender = this.componentManager.getInstance(MailSender.class);
 
-        this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 0, 0);
+        this.databaseMailResender.resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
-        verify(this.mocker.getMockedLogger()).warn(
-            "Failed to resend mail message for batchId [{}], messageId [{}]. Root cause [{}]",
-            "batch1", "message1", "MailStoreException: error1");
+        assertEquals("Failed to resend mail message for batchId [batch1], messageId [message1]. "
+            + "Root cause [MailStoreException: error1]", logCapture.getMessage(0));
         verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
     }
 
     @Test
-    public void resendAsynchronouslySeveralMessagesWhenMailFailedPrepare() throws Exception
+    void resendAsynchronouslySeveralMessagesWhenMailFailedPrepare() throws Exception
     {
         Map filterMap = Collections.singletonMap("state", "prepare_%");
 
@@ -182,16 +246,16 @@ public class DatabaseMailResenderTest
         List<MailStatus> statuses = new ArrayList<>();
         statuses.add(status1);
 
-        MailStatusStore statusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        MailStatusStore statusStore = this.componentManager.getInstance(MailStatusStore.class, "database");
         when(statusStore.load(filterMap, 0, 0, null, true)).thenReturn(statuses);
 
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        MailContentStore contentStore = this.componentManager.getInstance(MailContentStore.class, "filesystem");
         ExtendedMimeMessage message1 = new ExtendedMimeMessage();
         when(contentStore.load(any(), eq("batch1"), eq("message1"))).thenReturn(message1);
 
-        MailSender sender = this.mocker.getInstance(MailSender.class);
+        MailSender sender = this.componentManager.getInstance(MailSender.class);
 
-        this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 0, 0);
+        this.databaseMailResender.resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
         verify(sender, never()).sendAsynchronously(eq(Arrays.asList(message1)), any(), any(MailListener.class));

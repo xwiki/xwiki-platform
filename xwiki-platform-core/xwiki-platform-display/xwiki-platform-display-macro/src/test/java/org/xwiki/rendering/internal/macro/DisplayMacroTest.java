@@ -24,20 +24,23 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.hamcrest.collection.IsArray;
-import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
-import org.junit.Assert;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -46,23 +49,38 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.display.DisplayMacro;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.display.DisplayMacroParameters;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.test.integration.junit5.BlockAssert;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 
 /**
@@ -70,52 +88,71 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
  *
  * @version $Id$
  */
-public class DisplayMacroTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents(excludes = {
+    CurrentMacroEntityReferenceResolver.class,
+    DefaultAuthorizationManager.class
+})
+public class DisplayMacroTest
 {
-    private ScriptMockSetup mockSetup;
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private DocumentModelBridge displayedDocument;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
+
+    // Make sure to not load the standard AuthorizationManager which trigger too many things
+    @MockComponent
+    private AuthorizationManager authorizationManager;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @MockComponent
+    @Named("current")
+    private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
+    @MockComponent
+    private WikiModel wikiModel;
+
+    /**
+     * Mocks the component that is used to resolve the 'reference' parameter.
+     */
+    @MockComponent
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     private DisplayMacro displayMacro;
 
     private PrintRendererFactory rendererFactory;
 
-    /**
-     * Mocks the component that is used to resolve the 'reference' parameter.
-     */
-    private EntityReferenceResolver<String> mockEntityReferenceResolver;
-
-    private ContextualAuthorizationManager mockContextualAuthorization;
-
-    private DocumentModelBridge mockDocument;
-
-    @Override
+    @BeforeEach
     public void setUp() throws Exception
     {
-        super.setUp();
+        MemoryConfigurationSource memoryConfigurationSource = new MemoryConfigurationSource();
+        this.componentManager.registerComponent(ConfigurationSource.class, memoryConfigurationSource);
+        this.componentManager.registerComponent(ConfigurationSource.class, "xwikicfg", memoryConfigurationSource);
+
+        this.displayMacro = this.componentManager.getInstance(Macro.class, "display");
+        this.rendererFactory = this.componentManager.getInstance(PrintRendererFactory.class, "event/1.0");
 
         // Put a fake XWiki context on the execution context.
-        Execution execution = getComponentManager().getInstance(Execution.class);
-        execution.getContext().setProperty("xwikicontext", new HashMap<Object, Object>());
-    }
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        ExecutionContext ec = new ExecutionContext();
+        ecm.initialize(ec);
+        execution.getContext().setProperty("xwikicontext", new HashMap<>());
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-
-        this.mockEntityReferenceResolver =
-            registerMockComponent(EntityReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
-        // Make sure to not load the standard AuthorizationManager which trigger too many things
-        registerMockComponent(AuthorizationManager.class);
-
-        this.mockContextualAuthorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
-        this.displayMacro = (DisplayMacro) getComponentManager().getInstance(Macro.class, "display");
-        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
+        when(this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
     }
 
     @Test
-    public void testDisplayMacroShowsVelocityMacrosAreIsolated() throws Exception
+    public void executeShowsVelocityMacrosAreIsolated() throws Exception
     {
         // @formatter:off
         String expected =
@@ -133,7 +170,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 + "endDocument";
         // @formatter:on
 
-        // We verify that a Velocity macro set in the including page is not seen in the displayed page.
+        // We verify that a Velocity macro set in the page doing the display is not seen in the displayed page.
         List<Block> blocks =
             runDisplayMacroWithPreVelocity("#macro(testmacro)#end", "{{velocity}}#testmacro{{/velocity}}");
 
@@ -141,24 +178,21 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testDisplayMacroWithNoDocumentSpecified() throws Exception
+    public void executeWithNoDocumentSpecified()
     {
         DisplayMacroParameters parameters = new DisplayMacroParameters();
 
-        try {
-            this.displayMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
-            Assert.fail("An exception should have been thrown");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You must specify a 'reference' parameter pointing to the entity to display.",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.displayMacro.execute(parameters, null, createMacroTransformationContext("whatever", false)));
+        assertEquals("You must specify a 'reference' parameter pointing to the entity to display.",
+            exception.getMessage());
     }
 
     /**
      * Verify that relative links returned by the display macro as wrapped with a MetaDataBlock.
      */
     @Test
-    public void testDisplayMacroWhenDisplayingDocumentWithRelativeReferences() throws Exception
+    public void executeWhenDisplayingDocumentWithRelativeReferences() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -178,22 +212,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
             + "endDocument";
         // @formatter:on
 
-        final DocumentReference displayedDocumentReference =
+        DocumentReference displayedDocumentReference =
             new DocumentReference("displayedWiki", "displayedSpace", "displayedPage");
-        setUpDocumentMock("displayedWiki:displayedSpace.displayedPage", displayedDocumentReference,
+        setupDocumentMocks("displayedWiki:displayedSpace.displayedPage", displayedDocumentReference,
             "[[page]] [[attach:test.png]] image:test.png");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(DocumentReference.class)));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)),
-                    with(any(DocumentModelBridge.class)));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(displayedDocumentReference));
-                oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
-            }
-        });
+        when(this.dab.getCurrentDocumentReference()).thenReturn(displayedDocumentReference);
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("displayedWiki:displayedSpace.displayedPage");
@@ -204,63 +227,41 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
-    private static class ExpectedRecursiveInclusionException extends RuntimeException
-    {
-    }
-
     @Test
-    public void testDisplayMacroWithRecursiveDisplay() throws Exception
+    public void executeWithRecursiveDisplay() throws Exception
     {
-        final DocumentDisplayer mockDocumentDisplayer = getMockery().mock(DocumentDisplayer.class);
+        // Other tests use the real DocumentDisplayer component implementation but for this test we mock it so that
+        // we can control how it behaves.
+        DocumentDisplayer documentDisplayer = mock(DocumentDisplayer.class);
+        this.displayMacro.setDocumentDisplayer(documentDisplayer);
 
-        this.displayMacro.setDocumentAccessBridge(mockSetup.bridge);
-        FieldUtils.writeField(this.displayMacro, "documentDisplayer", mockDocumentDisplayer, true);
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
 
-        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
-
-        final DisplayMacroParameters parameters = new DisplayMacroParameters();
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("wiki:space.page");
 
-        final DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
-        setUpDocumentMock("wiki:space.page", includedDocumentReference, "");
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(DocumentReference.class)));
-                will(returnValue(true));
+        DocumentReference displayedDocumentReference = new DocumentReference("wiki", "space", "page");
+        setupDocumentMocks("wiki:space.page", displayedDocumentReference, "");
 
-                allowing(mockDocumentDisplayer).display(with(same(mockDocument)),
-                    with(any(DocumentDisplayerParameters.class)));
-                will(new CustomAction("recursively call the include macro again")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        try {
-                            displayMacro.execute(parameters, null, macroContext);
-                        } catch (Exception expected) {
-                            if (expected.getMessage().contains("Found recursive display")) {
-                                throw new ExpectedRecursiveInclusionException();
-                            }
-                        }
-                        return true;
-                    }
-                });
+        when(documentDisplayer.display(same(this.displayedDocument), any(DocumentDisplayerParameters.class)))
+            .thenAnswer((Answer) invocation -> {
+                // Call again the display macro when the document displayer executes to simulate a recursive call.
+                // Verify that it raises a MacroExecutionException in this case.
+                Throwable exception = assertThrows(MacroExecutionException.class,
+                    () -> this.displayMacro.execute(parameters, null, macroContext));
+                assertTrue(exception.getMessage().contains("Found recursive display of document [wiki:space.page]"));
+                throw exception;
             }
-        });
+        );
 
-        try {
-            this.displayMacro.execute(parameters, null, macroContext);
-            Assert.fail("The display macro hasn't checked the recursive display");
-        } catch (MacroExecutionException expected) {
-            if (!(expected.getCause() instanceof ExpectedRecursiveInclusionException)) {
-                throw expected;
-            }
-        }
+        // Verify that the exception bubbles up.
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.displayMacro.execute(parameters, null, macroContext));
+        assertEquals("Found recursive display of document [wiki:space.page]", exception.getMessage());
     }
 
     @Test
-    public void testDisplayMacroInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
+    public void executeInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -278,29 +279,12 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         // Add a Source MetaData Block as a parent of the display Macro block.
         new MetaDataBlock(Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()),
-            new MetaData(Collections.<String, Object>singletonMap(MetaData.BASE, "wiki:space.page")));
+            new MetaData(Collections.singletonMap(MetaData.BASE, "wiki:space.page")));
 
         final DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
         final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
-        setUpDocumentMock("relativePage", resolvedReference, "content");
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockEntityReferenceResolver).resolve(with("wiki:space.page"), with(EntityType.DOCUMENT),
-                    with(IsArray.array(any(MacroBlock.class))));
-                will(returnValue(sourceReference));
-                allowing(mockEntityReferenceResolver).resolve(with("relativePage"), with(EntityType.DOCUMENT),
-                    with(IsArray.array(any(MacroBlock.class))));
-                will(returnValue(resolvedReference));
-                allowing(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(resolvedReference));
-                oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
-            }
-        });
+        setupDocumentMocks("relativePage", resolvedReference, "content");
+        when(this.dab.getCurrentDocumentReference()).thenReturn(sourceReference);
 
         List<Block> blocks = this.displayMacro.execute(parameters, null, macroContext);
 
@@ -308,7 +292,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testDisplayMacroWhenSectionSpecified() throws Exception
+    public void executeWhenSectionSpecified() throws Exception
     {
         // @formatter:off
         String expected =
@@ -335,18 +319,102 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testDisplayMacroWhenInvalidSectionSpecified() throws Exception
+    public void executeWhenInvalidSectionSpecified()
     {
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setSection("unknown");
 
-        try {
-            runDisplayMacro(parameters, "content", false);
-            Assert.fail("Should have raised an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("Cannot find section [unknown] in document [wiki:Space.DisplayedPage]",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> runDisplayMacro(parameters, "content", false));
+        assertEquals("Cannot find section [unknown] in document [wiki:Space.DisplayedPage]", exception.getMessage());
+    }
+
+    @Test
+    void executeWhenExcludeFirstHeadingTrueAndHeadingIsFirstBlock() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
+            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent");
+        when(this.dab.getCurrentDocumentReference())
+            .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
+
+        List<Block> blocks = this.displayMacro.execute(parameters, null, macroContext);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWhenExcludeFirstHeadingFalseAndHeadingIsFirstBlock() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, Hcontent]\n"
+            + "onWord [content]\n"
+            + "endHeader [1, Hcontent]\n"
+            + "endSection\n"
+            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(false);
+
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        setupDocumentMocks("document", resolvedReference, "=content=");
+        when(this.dab.getCurrentDocumentReference())
+            .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
+
+        List<Block> blocks = this.displayMacro.execute(parameters, null, macroContext);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWhenExcludeFirstHeadingTrueAndHeadingIsNotFirstBlock() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginGroup\n"
+            + "beginSection\n"
+            + "beginHeader [1, Hcontent]\n"
+            + "onWord [content]\n"
+            + "endHeader [1, Hcontent]\n"
+            + "endSection\n"
+            + "endGroup\n"
+            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        setupDocumentMocks("document", resolvedReference, "(((= content =)))");
+
+        List<Block> blocks = this.displayMacro.execute(parameters, null, macroContext);
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
     }
 
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
@@ -358,41 +426,29 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         return context;
     }
 
-    private void setUpDocumentMock(final String resolve, final DocumentReference reference, final String content)
-        throws Exception
+    private void setupDocumentMocks(String displayedReferenceString, DocumentReference displayedReference,
+        String displayedContent) throws Exception
     {
-        mockDocument = getMockery().mock(DocumentModelBridge.class, resolve);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockEntityReferenceResolver).resolve(with(resolve), with(EntityType.DOCUMENT),
-                    with(IsArray.array(any(MacroBlock.class))));
-                will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocumentInstance((EntityReference) reference);
-                will(returnValue(mockDocument));
-                allowing(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
-                will(returnValue(mockDocument));
-                allowing(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-                allowing(mockDocument).getXDOM();
-                will(returnValue(getXDOM(content)));
-                allowing(mockDocument).getDocumentReference();
-                will(returnValue(reference));
-                allowing(mockDocument).getRealLanguage();
-                will(returnValue(""));
-            }
-        });
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, displayedReference)).thenReturn(true);
+        when(this.macroEntityReferenceResolver.resolve(eq(displayedReferenceString), eq(EntityType.DOCUMENT),
+            any(MacroBlock.class))).thenReturn(displayedReference);
+        when(this.dab.getDocumentInstance((EntityReference) displayedReference)).thenReturn(this.displayedDocument);
+        when(this.dab.getTranslatedDocumentInstance(this.displayedDocument)).thenReturn(this.displayedDocument);
+        when(this.displayedDocument.getDocumentReference()).thenReturn(displayedReference);
+        when(this.displayedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.displayedDocument.getXDOM()).thenReturn(getXDOM(displayedContent));
+        when(this.displayedDocument.getRealLanguage()).thenReturn("");
     }
 
     private XDOM getXDOM(String content) throws Exception
     {
-        Parser xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
-        return xwiki20Parser.parse(new StringReader(content));
+        Parser parser = this.componentManager.getInstance(Parser.class, "xwiki/2.0");
+        return parser.parse(new StringReader(content));
     }
 
     private List<Block> runDisplayMacroWithPreVelocity(String velocity, String displayedContent) throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer,
             "wiki:Space.DisplayingPage", velocity);
@@ -413,31 +469,15 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent, boolean pushpopMock)
         throws Exception
     {
-        final DocumentReference displayedDocumentReference = new DocumentReference("wiki", "Space", "DisplayedPage");
+        DocumentReference displayedDocumentReference = new DocumentReference("wiki", "Space", "DisplayedPage");
         String displayedDocStringRef = "wiki:space.page";
-        setUpDocumentMock(displayedDocStringRef, displayedDocumentReference, displayedContent);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(same(displayedDocumentReference)));
-                will(returnValue(true));
-                atMost(1).of(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(displayedDocumentReference));
-
-                if (pushpopMock) {
-                    oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
-                    oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
-                }
-            }
-        });
-        this.displayMacro.setDocumentAccessBridge(this.mockSetup.bridge);
+        setupDocumentMocks(displayedDocStringRef, displayedDocumentReference, displayedContent);
 
         parameters.setReference(displayedDocStringRef);
 
         // Create a Macro transformation context with the Macro transformation object defined so that the display
         // macro can transform displayed page which is using a new context.
-        MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
+        MacroTransformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(displayedDocStringRef, false);
         macroContext.setId("wiki:Space.DisplayingPage");
         macroContext.setTransformation(macroTransformation);

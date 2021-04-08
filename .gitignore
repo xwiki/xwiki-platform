@@ -36,6 +36,7 @@ nbproject
 
 # Debugging stuff to not commit
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core.zip
+xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core-minimal.zip
 
 # Weblate
 # This folder is actually used internally by weblate to know if something needs to be committed or not, ignoring it

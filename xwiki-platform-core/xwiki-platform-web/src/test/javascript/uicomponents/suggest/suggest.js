@@ -19,9 +19,9 @@
  */
 require.config({
   paths: {
-    'prototype': 'js/prototype/prototype',
-    'xlist': 'uicomponents/widgets/list/xlist',
-    'suggest': 'uicomponents/suggest/suggest'
+    'prototype': 'js/prototype/prototype.min',
+    'xlist': 'uicomponents/widgets/list/xlist.min',
+    'suggest': 'uicomponents/suggest/suggest.min'
   },
   shim: {
     'xlist': ['prototype'],

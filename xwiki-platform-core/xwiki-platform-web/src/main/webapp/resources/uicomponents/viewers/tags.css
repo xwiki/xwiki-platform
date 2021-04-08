@@ -1,7 +1,11 @@
 #template("colorThemeInit.vm")
 .doc-tags {
-  float: left;
-  width: 48%;
+  /* Stretch to fill the available width and to push the document creator to the right. Also set the minimum width in
+    order to improve the display on small screens. */
+  flex: 1 300px;
+  /* Leave some space above and below in case the footer wraps on multiple lines. Also leave some space between the tags
+    and the next footer item (e.g. the document creator). */
+  padding: 3px 2em 3px 0;
 }
 .tag-wrapper {
   padding: 2px 1px;

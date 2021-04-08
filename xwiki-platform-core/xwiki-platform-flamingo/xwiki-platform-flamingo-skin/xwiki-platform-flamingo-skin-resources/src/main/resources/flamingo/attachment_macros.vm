@@ -97,7 +97,7 @@
         >$escapetool.xml($attachment.filename)</a>
       </span>
       <div class="btn-group xwikibuttonlinks">
-        #if ($services.officemanager.serverState == "Connected" &&
+        #if ($services.officemanager.isConnected() &&
             $services.officeviewer.isMimeTypeSupported($attachment.mimeType.toLowerCase()))
           ## Link to preview office document.
           <a class="viewlink btn btn-xs btn-default" title="$escapetool.xml($services.localization.render(

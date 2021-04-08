@@ -54,7 +54,7 @@
       <displayType/>
       <name>obfuscate</name>
       <number>1</number>
-      <prettyName>Obfsucate Email Addresses</prettyName>
+      <prettyName>Obfuscate Email Addresses</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

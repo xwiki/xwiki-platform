@@ -69,9 +69,9 @@
           <execution>
             <phase>package</phase>
             <configuration>
-              <tasks>
+              <target>
                 <move file="${project.build.directory}/${project.artifactId}-${project.version}.zip" tofile="${project.build.directory}/${project.artifactId}-${project.version}.xpi"/>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>

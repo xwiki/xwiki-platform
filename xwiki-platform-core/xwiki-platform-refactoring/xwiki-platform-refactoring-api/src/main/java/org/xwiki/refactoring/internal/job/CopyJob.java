@@ -74,36 +74,16 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     }
 
     @Override
-    protected boolean copyOrMove(DocumentReference sourceReference, DocumentReference targetReference)
+    protected void performRefactoring(DocumentReference sourceReference, DocumentReference targetReference)
     {
-        this.progressManager.pushLevelProgress(3, this);
+        DocumentCopyingEvent documentCopyingEvent = new DocumentCopyingEvent(sourceReference, targetReference);
+        DocumentCopiedEvent documentCopiedEvent = new DocumentCopiedEvent(sourceReference, targetReference);
+        copyOrMove(sourceReference, targetReference, documentCopyingEvent, documentCopiedEvent);
+    }
 
-        try {
-            // Step 1: Send before event.
-            this.progressManager.startStep(this);
-            DocumentCopyingEvent documentCopyingEvent = new DocumentCopyingEvent(sourceReference, targetReference);
-            this.observationManager.notify(documentCopyingEvent, this, this.getRequest());
-            if (documentCopyingEvent.isCanceled()) {
-                return false;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 2: Copy the source document.
-            this.progressManager.startStep(this);
-            if (!super.copyOrMove(sourceReference, targetReference)) {
-                return false;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 3: Send after event.
-            this.progressManager.startStep(this);
-            DocumentCopiedEvent documentCopiedEvent = new DocumentCopiedEvent(sourceReference, targetReference);
-            this.observationManager.notify(documentCopiedEvent, this, this.getRequest());
-            this.progressManager.endStep(this);
-
-            return true;
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
+    @Override
+    protected boolean atomicOperation(DocumentReference source, DocumentReference target)
+    {
+        return this.modelBridge.copy(source, target);
     }
 }

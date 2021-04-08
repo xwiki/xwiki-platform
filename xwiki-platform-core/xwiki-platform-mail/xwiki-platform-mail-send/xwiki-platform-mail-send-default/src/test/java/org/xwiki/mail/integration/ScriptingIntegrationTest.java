@@ -161,7 +161,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     @BeforeEach
     public void initialize() throws Exception
     {
-        this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
+        this.scriptService = this.componentManager.getInstance(ScriptService.class, "mail.sender");
 
         // Set the EC
         Execution execution = this.componentManager.getInstance(Execution.class);

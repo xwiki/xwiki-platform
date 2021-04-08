@@ -162,9 +162,22 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitUntilElementIsVisible(WebElement button, String xpathSuffix)
     {
+        return clickAndWaitUntilElementIsVisible(button, xpathSuffix, getDriver().getTimeout());
+    }
+
+    /**
+     * Clicks on the given button and waits for the specified element to be visible.
+     * 
+     * @param button the button to be clicked
+     * @param xpathSuffix the XPath suffix inside the 'extension-item' element
+     * @param timeout the maximum number of seconds to wait for the end
+     * @return the new extension pane, after the specified element became visible
+     */
+    private ExtensionPane clickAndWaitUntilElementIsVisible(WebElement button, String xpathSuffix, int timeout)
+    {
         String xpath = getXPath();
         button.click();
-        getDriver().waitUntilElementIsVisible(By.xpath(xpath + xpathSuffix));
+        getDriver().waitUntilElementIsVisible(By.xpath(xpath + xpathSuffix), timeout);
         // We have to create a new extension pane because the DOM has changed.
         return new ExtensionPane(getDriver().findElementWithoutWaiting(By.xpath(xpath)));
     }
@@ -207,12 +220,25 @@ public class ExtensionPane extends BaseElement
      */
     private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button)
     {
+        return clickAndWaitForConfirmationOrJobDone(button, getDriver().getTimeout());
+    }
+
+    /**
+     * Clicks on the given button and waits for a confirmation or for the job/action to be done.
+     * 
+     * @param button the button to be clicked
+     * @param timeout the maximum number of seconds to wait for the end
+     * @return the extension pane showing the confirmation or the job log
+     */
+    private ExtensionPane clickAndWaitForConfirmationOrJobDone(WebElement button, int timeout)
+    {
         // Wait until the the continue button is present or the extension is not loading and both the extension body and
         // the progress section are present and not loading.
         return clickAndWaitUntilElementIsVisible(button,
             "[descendant::button[@name = 'extensionAction' and @value = 'continue' and not(@disabled)] or ("
-            + "not(contains(@class, 'loading')) and descendant::*[@class = 'extension-body']"
-            + "/*[@class = 'extension-body-progress extension-body-section'])]");
+                + "not(contains(@class, 'loading')) and descendant::*[@class = 'extension-body']"
+                + "/*[@class = 'extension-body-progress extension-body-section'])]",
+            timeout);
     }
 
     /**
@@ -323,6 +349,17 @@ public class ExtensionPane extends BaseElement
     }
 
     /**
+     * Confirms the current action and wait for it to be performed.
+     * 
+     * @param timeout the maximum number of seconds to wait for the end
+     * @return the extension pane displaying the extension after the current action has been performed
+     */
+    public ExtensionPane confirm(int timeout)
+    {
+        return clickAndWaitForConfirmationOrJobDone(getContinueButton(), timeout);
+    }
+
+    /**
      * @return the button used to continue the current job or to execute a previously computed job plan
      */
     public WebElement getContinueButton()
@@ -345,9 +382,8 @@ public class ExtensionPane extends BaseElement
         }
         String sectionAnchor = StringUtils.substringAfterLast(found.get(0).getAttribute("href"), "#");
         found.get(0).click();
-        By sectionXPath =
-            By.xpath(".//*[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
-                + sectionAnchor + "']]");
+        By sectionXPath = By.xpath(".//*[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
+            + sectionAnchor + "']]");
         return getDriver().findElementWithoutWaiting(container, sectionXPath);
     }
 

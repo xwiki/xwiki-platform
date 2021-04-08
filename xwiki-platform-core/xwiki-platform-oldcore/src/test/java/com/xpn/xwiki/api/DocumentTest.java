@@ -23,9 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,27 +36,25 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @ReferenceComponentList
-public class DocumentTest
+class DocumentTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
-    @MockComponent
-    private AuthorizationManager authorization;
-
     @Test
-    public void testToStringReturnsFullName()
+    void toStringReturnsFullName()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         assertEquals("Space.Page", new Document(doc, new XWikiContext()).toString());
@@ -66,7 +62,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testGetObjects() throws XWikiException
+    void getObjects() throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
@@ -92,7 +88,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testRemoveObjectDoesntCauseDataLoss() throws XWikiException
+    void removeObjectDoesntCauseDataLoss() throws XWikiException
     {
         // Setup comment class
         XWikiDocument commentDocument = new XWikiDocument(new DocumentReference("wiki", "XWiki", "XWikiComments"));
@@ -129,7 +125,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws XWikiException
+    void saveAsAuthorUsesGuestIfDroppedPermissions() throws XWikiException
     {
         DocumentReference aliceReference = new DocumentReference("wiki", "XWiki", "Alice");
         DocumentReference bobReference = new DocumentReference("wiki", "XWiki", "Bob");
@@ -137,10 +133,10 @@ public class DocumentTest
         XWikiDocument cdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
         XWikiDocument sdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "AuthorPage"));
 
-        when(this.authorization.hasAccess(same(Right.EDIT), eq(aliceReference), eq(cdoc.getDocumentReference())))
-            .thenReturn(true);
-        when(this.authorization.hasAccess(same(Right.EDIT), isNull(), eq(cdoc.getDocumentReference())))
-            .thenReturn(false);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.EDIT), eq(aliceReference),
+            eq(cdoc.getDocumentReference()))).thenReturn(true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.EDIT), isNull(),
+            eq(cdoc.getDocumentReference()))).thenReturn(false);
 
         this.oldcore.getXWikiContext().setDoc(cdoc);
         this.oldcore.getXWikiContext().put("sdoc", sdoc);
@@ -157,24 +153,21 @@ public class DocumentTest
         doc.saveAsAuthor();
 
         this.oldcore.getXWikiContext().dropPermissions();
-        try {
-            doc.saveAsAuthor();
 
-            fail("saveAsAuthor did not throw an exception after dropPermissions() had been called.");
-        } catch (XWikiException e) {
-            assertTrue("Wrong error message when trying to save a document after calling dropPermissions()",
-                e.getMessage().contains("Access denied; user null, acting through script in "
-                    + "document Space.Page cannot save document Space.Page"));
-        }
+        Throwable exception = assertThrows(XWikiException.class, () -> doc.saveAsAuthor());
+        assertTrue(
+            exception.getMessage()
+                .contains("Access denied; user null, acting through script in "
+                    + "document Space.Page cannot save document Space.Page"),
+            "Wrong error message when trying to save a document after calling dropPermissions()");
 
-        assertEquals(
-            "After dropping permissions and attempting to save a document,"
-                + " the user was permanantly switched to guest.",
-            bobReference, this.oldcore.getXWikiContext().getUserReference());
+        assertEquals(bobReference, this.oldcore.getXWikiContext().getUserReference(),
+            "After dropping permissions and attempting to save a document, "
+                + "the user was permanently switched to guest.");
     }
 
     @Test
-    public void testUser()
+    void user()
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         Document document = xdoc.newDocument(this.oldcore.getXWikiContext());
@@ -185,7 +178,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testChangeAuthorWhenModifyingDocumentContent()
+    void changeAuthorWhenModifyingDocumentContent()
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki0", "Space", "Page"));
         xdoc.setAuthorReference(new DocumentReference("wiki1", "XWiki", "initialauthor"));
@@ -209,7 +202,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testChangeAuthorWhenModifyingObjectProperty() throws XWikiException
+    void changeAuthorWhenModifyingObjectProperty() throws XWikiException
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki0", "Space", "Page"));
         xdoc.setAuthorReference(new DocumentReference("wiki1", "XWiki", "initialauthor"));
@@ -241,7 +234,7 @@ public class DocumentTest
     }
 
     @Test
-    public void testChangeAuthorWhenModifyingDocumentProperty() throws XWikiException
+    void changeAuthorWhenModifyingDocumentProperty() throws XWikiException
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki0", "Space", "Page"));
         xdoc.setAuthorReference(new DocumentReference("wiki1", "XWiki", "initialauthor"));
@@ -269,5 +262,51 @@ public class DocumentTest
         assertEquals(new DocumentReference("wiki1", "XWiki", "initialcontentauthor"),
             document.getContentAuthorReference());
         assertEquals(new DocumentReference("wiki1", "XWiki", "initialcreator"), document.getCreatorReference());
+    }
+
+    @Test
+    void saveAsAuthorWhenNoPR() throws XWikiException
+    {
+        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki0", "Space", "Page"));
+        xdoc.setAuthorReference(new DocumentReference("wiki1", "XWiki", "initialauthor"));
+        xdoc.setContentAuthorReference(new DocumentReference("wiki1", "XWiki", "initialcontentauthor"));
+        xdoc.setCreatorReference(new DocumentReference("wiki1", "XWiki", "initialcreator"));
+
+        xdoc.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(xdoc, this.oldcore.getXWikiContext());
+
+        // Set context user
+        this.oldcore.getXWikiContext().setUserReference(new DocumentReference("wiki2", "XWiki", "contextuser"));
+        // Set context author
+        XWikiDocument contextDocument = new XWikiDocument("wiki1", "XWiki", "authordocument");
+        DocumentReference authorReference = new DocumentReference("wiki3", "XWiki", "contextauthor");
+        contextDocument.setContentAuthorReference(authorReference);
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT, authorReference,
+            xdoc.getDocumentReference())).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(false);
+
+        Document document = xdoc.newDocument(this.oldcore.getXWikiContext());
+
+        assertEquals(new DocumentReference("wiki1", "XWiki", "initialauthor"), document.getAuthorReference());
+
+        when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
+            document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(false);
+
+        assertThrows(XWikiException.class, () -> document.save());
+
+        when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
+            document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);
+
+        document.save();
+
+        assertEquals(authorReference, document.getAuthorReference());
+
+        when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
+
+        document.save();
+
+        assertEquals(this.oldcore.getXWikiContext().getUserReference(), document.getAuthorReference());
     }
 }

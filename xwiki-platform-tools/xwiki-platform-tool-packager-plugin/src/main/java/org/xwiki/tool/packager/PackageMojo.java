@@ -709,6 +709,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-store-filesystem-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
+        // Components for executing Jobs.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
+            "xwiki-commons-job-default", this.getXWikiCommonsVersion(), "compile", "jar"));
+
         // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
         // Rights.
         if (this.test && !isSkipTests() && this.testProgrammingRights) {

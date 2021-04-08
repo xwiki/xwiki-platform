@@ -20,17 +20,13 @@
 package org.xwiki.configuration.internal.test;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -42,14 +38,19 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 
 /**
  * Utility to test all extensions of {@link AbstractDocumentConfigurationSource}.
@@ -58,10 +59,14 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  */
 public abstract class AbstractTestDocumentConfigurationSource
 {
-    @Rule
-    public MockitoOldcoreRule oldcore;
+    @InjectMockitoOldcore
+    protected MockitoOldcore oldcore;
 
-    public MockitoComponentMockingRule<ConfigurationSource> componentManager;
+    @InjectComponentManager
+    protected MockitoComponentManager componentManager;
+
+    @MockComponent
+    protected CacheManager cacheManager;
 
     protected static final String CURRENT_WIKI = "currentwiki";
 
@@ -69,32 +74,23 @@ public abstract class AbstractTestDocumentConfigurationSource
 
     protected ConverterManager mockConverter;
 
-    public AbstractTestDocumentConfigurationSource(Class<? extends ConfigurationSource> clazz)
-    {
-        this.componentManager = new MockitoComponentMockingRule<ConfigurationSource>(clazz);
-        this.oldcore = new MockitoOldcoreRule(this.componentManager);
-    }
+    protected abstract ConfigurationSource getConfigurationSource();
 
     protected abstract LocalDocumentReference getClassReference();
 
-    @Before
-    public void before() throws Exception
+    @BeforeComponent
+    public void beforeComponent() throws Exception
     {
         this.mockCache = mock(Cache.class);
+        when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(this.mockCache);
+    }
+
+    public void before() throws Exception
+    {
         this.mockConverter = this.componentManager.getInstance(ConverterManager.class);
 
-        when(this.mockConverter.convert(any(Type.class), anyObject())).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArguments()[1];
-            }
-        });
-
-        CacheManager cacheManager = this.componentManager.getInstance(CacheManager.class);
-
-        when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(this.mockCache);
+        when(this.mockConverter.convert(any(Type.class), any(Object.class))).then(
+            invocation -> invocation.getArguments()[1]);
 
         WikiDescriptorManager wikiManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         when(wikiManager.getCurrentWikiId()).thenReturn(CURRENT_WIKI);
@@ -105,26 +101,29 @@ public abstract class AbstractTestDocumentConfigurationSource
             new DocumentReference(getClassReference(), new WikiReference(CURRENT_WIKI)));
     }
 
-    protected void setStringProperty(DocumentReference documentReference, String propertyName, String propertyValue)
+    protected void setupBaseObject(DocumentReference documentReference, Consumer<BaseObject> consumer)
         throws XWikiException
     {
         XWikiContext xcontext = this.oldcore.getXWikiContext();
-
         XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(documentReference, xcontext);
-
         LocalDocumentReference classReference = getClassReference();
-
-        BaseObject baseOject = document.getXObject(classReference);
-        if (baseOject == null) {
-            baseOject = new BaseObject();
-            baseOject.setDocumentReference(documentReference);
-            baseOject.setXClassReference(classReference);
-            document.addXObject(baseOject);
+        BaseObject baseObject = document.getXObject(classReference);
+        if (baseObject == null) {
+            baseObject = new BaseObject();
+            baseObject.setDocumentReference(documentReference);
+            baseObject.setXClassReference(classReference);
+            document.addXObject(baseObject);
         }
-
-        baseOject.setStringValue(propertyName, propertyValue);
-
+        consumer.accept(baseObject);
         xcontext.getWiki().saveDocument(document, xcontext);
+    }
+
+    protected void setStringProperty(DocumentReference documentReference, String propertyName, String propertyValue)
+        throws XWikiException
+    {
+        setupBaseObject(documentReference, (baseObject) -> {
+            baseObject.setStringValue(propertyName, propertyValue);
+        });
     }
 
     protected void resetCache()

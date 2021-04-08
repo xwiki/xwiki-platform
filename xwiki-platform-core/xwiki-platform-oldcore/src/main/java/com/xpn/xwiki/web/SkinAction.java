@@ -24,10 +24,14 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -57,6 +61,9 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.0
  */
+@Component
+@Named("skin")
+@Singleton
 public class SkinAction extends XWikiAction
 {
     /** Logging helper. */

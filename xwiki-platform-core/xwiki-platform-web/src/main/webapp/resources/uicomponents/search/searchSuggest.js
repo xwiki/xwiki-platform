@@ -175,7 +175,7 @@ var XWiki = (function (XWiki) {
   });
 
   var init = function() {
-    /*
+    /*!
     ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
     ## search suggest contructor.
     #set ($sources = [])

@@ -19,8 +19,6 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;

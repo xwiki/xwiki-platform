@@ -17,18 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($paths = {
+  'selectize': $services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')
+})
+#set ($l10n = {
+  'selectTypedText': $services.localization.render('web.uicomponents.suggest.selectTypedText', ['{0}'])
+})
+#[[*/
+// Start JavaScript-only code.
+(function(paths, l10n) {
+  "use strict";
+
 require.config({
-  paths: {
-    'selectize': "$!services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')"
-  },
+  paths,
   shim: {
     'selectize': ['jquery']
   }
 });
 
-define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($) {
-  'use strict';
-
+define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
       '<span class="xwiki-selectize-option-icon" />',
@@ -118,10 +126,9 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        var text = $jsontool.serialize($services.localization.render('web.uicomponents.suggest.selectTypedText',
-          ['{0}']));
+        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em/>');
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
-        var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
+        var output = $('<div class="create option"/>').html(label);
         output.find('em').text(data.input);
         return output;
       }
@@ -131,11 +138,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       // Mark the picker as loading if the suggestions are retrieved asynchronously and there's no cached result for the
       // given value.
       var loading = typeof this.settings.load === 'function' && !this.loadedSearches.hasOwnProperty(value);
-      (this.$wrapper).toggleClass(this.settings.loadingClass, loading);
+      this.get$('wrapper').toggleClass(this.settings.loadingClass, loading);
     },
     onInitialize: function() {
-      var control = this.$control;
-      control.on('click', 'a.xwiki-selectize-option-label', function(event) {
+      this.get$('control').on('click', 'a.xwiki-selectize-option-label', function(event) {
         // Clicking on the label should select the option not follow the link.
         event.preventDefault();
       });
@@ -144,7 +150,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var loadSelectedValues = function() {
     var selectize = this.selectize;
-    var wrapper = selectize.$wrapper;
+    var wrapper = selectize.get$('wrapper');
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
     selectize.items.reduce(function(deferred, value) {
@@ -195,18 +201,18 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       // 'auto' means the dropdown width should be variable based on its content, but no less than the width of the
       // specified form field, otherwise the dropdown should have the same width as the form field.
       if (this.settings.dropdownWidth === 'auto') {
-        this['$dropdown'].css({
+        this.get$('dropdown').css({
           width: '',
-          'min-width': this['$control'][0].getBoundingClientRect().width
+          'min-width': this.get$('control')[0].getBoundingClientRect().width
         });
       }
     }
     setDropDownAlignment(this.selectize);
     if (this.selectize.settings.takeInputWidth) {
-      this.selectize['$control'].width($(this).data('initialWidth'));
+      this.selectize.get$('control').width($(this).data('initialWidth'));
     }
     // Set the title of the input field.
-    this.selectize['$control_input'].attr('title', $(this).attr('title'));
+    this.selectize.get$('control_input').attr('title', $(this).attr('title'));
   };
 
   var setDropDownAlignment = function(selectize) {
@@ -215,8 +221,15 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       dropdownAlignment = 'left';
     }
     if (dropdownAlignment) {
-      selectize['$dropdown'].addClass('selectize-dropdown-' + dropdownAlignment);
+      selectize.get$('dropdown').addClass('selectize-dropdown-' + dropdownAlignment);
     }
+  };
+
+  // Hack needed in order to be able to access internal selectize fields that are prefixed with $ when the JavaScript is
+  // minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly by their name
+  // (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
+  Selectize.prototype.get$ = function(key) {
+    return this['$' + key];
   };
 
   var getDefaultSettings = function(input) {
@@ -231,6 +244,37 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return $.extend({}, defaultSettings, getDefaultSettings(input), settings, input.data('xwiki-selectize'));
   };
 
+  var isSelectizeValueUpToDate = function(input) {
+    var expectedValues = $(input).val();
+    var actualValues = input.selectize.getValue();
+    if (Array.isArray(expectedValues)) {
+      return Array.isArray(actualValues) && actualValues.length === expectedValues.length &&
+        actualValues.every((actualValue, index) => actualValue === expectedValues[index]);
+    } else {
+      return actualValues === expectedValues;
+    }
+  };
+
+  var updateSelectizeValue = function(input) {
+    var selectize = input.selectize;
+    var values = $(input).val() || [];
+    if (typeof values === 'string') {
+      values = values.split(selectize.settings.delimiter);
+    }
+    // Clear the selection without triggering a change event.
+    selectize.clear(true);
+    values.forEach(value => {
+      if (selectize.options.hasOwnProperty(value)) {
+        // Select a known value without triggering a change event.
+        selectize.addItem(value, true);
+      } else {
+        // Select unknown value.
+        selectize.createItem(value, false);
+      }
+    });
+    loadSelectedValues.call(input);
+  };
+
   $.fn.xwikiSelectize = function(settings) {
     // Save the width before the input is hidden.
     // Each input in the current collection might have a different initial width.
@@ -240,14 +284,37 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return this.not('.selectized, .selectize-control')
       .on('initialize', customize)
       .on('change', function(event) {
-        // Update the live table if the widget is used as a live table filter.
-        var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
-          .closest('.xwiki-livetable').attr('id');
-        liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+        // Check if the value of the selectize widget is synchronized with the value of the underlying input.
+        if (isSelectizeValueUpToDate(this)) {
+          // Update the live table if the widget is used as a live table filter.
+          var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
+            .closest('.xwiki-livetable').attr('id');
+          liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+        } else {
+          // The input value has been changed outside of the selectize widget. Update the widget.
+          updateSelectizeValue(this);
+        }
       })
       // Each input in the current collection might have different in-line settings.
       .each(function() {
+        // FIXME: Apostrophe in input id breaks the selectize widget. The workaround is to remove the id before creating
+        // the selectize widget and then restore it afterwards. Remove this hack when the reported issue is closed.
+        // See https://github.com/selectize/selectize.js/issues/1568
+        var id = $(this).attr('id');
+        $(this).removeAttr('id');
+
         $(this).selectize(getSettings($(this), settings));
+
+        if (id) {
+          // Workaround for selectize bug #1568 (see above).
+          this.selectize.get$('control_input').attr('id', id + '-selectized');
+          // We call filter instead of using a CSS selector because the id can contain special characters.
+          $('label').filter(function() {
+            return $(this).attr('for') === id;
+          }).attr('for', id + '-selectized');
+          // Restore the id.
+          $(this).attr('id', id);
+        }
       })
       .trigger('initialize')
       .each(loadSelectedValues);
@@ -268,5 +335,8 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   };
 
   $(document).on('xwiki:dom:updated', init);
-  XWiki.domIsLoaded && init();
+  $(init);
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

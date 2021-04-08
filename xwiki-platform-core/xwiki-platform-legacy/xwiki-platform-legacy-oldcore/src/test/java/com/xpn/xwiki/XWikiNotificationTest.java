@@ -113,6 +113,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockRights = mock(XWikiRightService.class);
         mockRights.stubs().method("hasAccessLevel").will(returnValue(true));
+        mockRights.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) mockRights.proxy());
 
         TestListener listener = new TestListener();

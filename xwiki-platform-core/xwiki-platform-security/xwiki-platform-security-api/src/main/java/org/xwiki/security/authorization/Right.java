@@ -162,6 +162,11 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** Additional rights implied by this right. */
     private final Set<Right> impliedRights;
 
+    /**
+     * Immutable instance of the Additional rights implied by this right.
+     */
+    private transient Set<Right> immutableImpliedRights;
+
     /** Additional rights implied by this right. */
     private final boolean isReadOnly;
 
@@ -181,6 +186,23 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     }
 
     /**
+     * Construct a new Right from its description.
+     * This is a package private constructor, the registration of a new right should be done using
+     * the {@link AuthorizationManager}
+     *
+     * @param description Description of the right to create.
+     * @param impliedByRights the already existing rights that imply this new right.
+     * @since 12.6
+     */
+    Right(RightDescription description, Set<Right> impliedByRights)
+    {
+        this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
+            description.getInheritanceOverridePolicy(),
+            description.getImpliedRights(),
+            description.getTargetedEntityType(), description.isReadOnly(), impliedByRights);
+    }
+
+    /**
      * Construct a new Right.
      * @param name The string representation of this right.
      * @param defaultState The default state, in case no matching right is found at any level.
@@ -193,6 +215,26 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly)
+    {
+        this(name, defaultState, tieResolutionPolicy, inheritanceOverridePolicy, impliedRights, validEntityTypes,
+            isReadOnly, Collections.emptySet());
+    }
+
+    /**
+     * Construct a new Right.
+     * @param name The string representation of this right.
+     * @param defaultState The default state, in case no matching right is found at any level.
+     * @param tieResolutionPolicy Whether this right should be allowed or denied in case of a tie.
+     * @param inheritanceOverridePolicy Policy on how this right should be overridden by lower levels.
+     * @param impliedRights Additional rights implied by this right.
+     * @param validEntityTypes The type of entity where this right should be enabled.
+     * @param isReadOnly If true, this right could be allowed when the wiki is in read-only mode.
+     * @param impliedByRights Rights that imply the new right we are adding.
+     * @since 12.6
+     */
+    private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
+        boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
+        boolean isReadOnly, Set<Right> impliedByRights)
     {
         checkIllegalArguments(name, defaultState, tieResolutionPolicy);
 
@@ -223,6 +265,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             } else {
                 // If enabled on a wiki, enable also on main wiki.
                 enableFor(FARM);
+            }
+
+            for (Right impliedByRight : impliedByRights) {
+                impliedByRight.impliedRights.add(this);
             }
         }
     }
@@ -269,21 +315,17 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /**
      * Clone implied Rights.
      * @param impliedRights the collection of rights to clone.
-     * @return the cloned collection or null if no valid implied right has been provided.
+     * @return the cloned collection or an empty RightSet.
      */
     private Set<Right> cloneImpliedRights(Set<Right> impliedRights)
     {
-        if (impliedRights == null || impliedRights.size() == 0) {
-            return null;
+        if (impliedRights == null || impliedRights.isEmpty()) {
+            // We don't return null here since we want to be able to modify
+            // the set of other rights in constructor.
+            return new RightSet();
         }
 
-        Set<Right> implied = new RightSet(impliedRights);
-
-        if (implied.size() > 0) {
-            return Collections.unmodifiableSet(implied);
-        } else {
-            return null;
-        }
+        return new RightSet(impliedRights);
     }
 
     /**
@@ -373,7 +415,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     @Override
     public Set<Right> getImpliedRights()
     {
-        return impliedRights;
+        // We only assign an immutable set value if the implied right is not empty:
+        // if it's empty, we keep returning a null value for backward compatibility and performance reasons.
+        if (this.immutableImpliedRights == null && !impliedRights.isEmpty()) {
+            this.immutableImpliedRights = Collections.unmodifiableSet(this.impliedRights);
+        }
+        return this.immutableImpliedRights;
     }
 
     @Override
@@ -437,7 +484,34 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             .append(this.getTieResolutionPolicy(), description.getTieResolutionPolicy())
             .append(this.getInheritanceOverridePolicy(), description.getInheritanceOverridePolicy())
             .append(this.getTargetedEntityType(), description.getTargetedEntityType())
-            .append(this.getImpliedRights(), description.getImpliedRights())
-            .isEquals();
+            .isEquals() && this.likeImpliedRightsFrom(description);
+    }
+
+    /**
+     * Allow to verify that implied rights are equals.
+     * This method returns {@code true} even if the current instance returns an empty set and the description null,
+     * and vice versa. For other cases we rely on an usual EqualsBuilder check.
+     * This is a bulletproof method used in {@link #like(RightDescription)} since there's no guarantee that
+     * {@link #getImpliedRights()} returns an empty set or a null value.
+     *
+     * @param description the description for which to check implied rights.
+     * @return {@code true} if both the current instance implied right and the description's one are equals according to
+     *          {@link EqualsBuilder}, or if one is null and the other one is empty.
+     */
+    private boolean likeImpliedRightsFrom(RightDescription description)
+    {
+        Set<Right> localImpliedRights = getImpliedRights();
+        Set<Right> otherImpliedRights = description.getImpliedRights();
+        boolean result = new EqualsBuilder().append(localImpliedRights, otherImpliedRights).isEquals();
+        // If then result is false then we check it's not because of the special case where
+        // one value is null and the other empty.
+        // Note: we don't use single boolean operation to avoid checkstyle issue about complexity.
+        if (!result) {
+            // No risk of NPE on the isEmpty call since if the other variable would have been null, then
+            // the result would have been equal on the first place and we wouldn't be there.
+            result = (localImpliedRights == null && otherImpliedRights.isEmpty())
+                || (otherImpliedRights == null && localImpliedRights.isEmpty());
+        }
+        return result;
     }
 }

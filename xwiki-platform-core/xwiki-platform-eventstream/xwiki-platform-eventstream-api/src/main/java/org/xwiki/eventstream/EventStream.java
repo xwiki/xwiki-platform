@@ -30,15 +30,19 @@ import org.xwiki.query.QueryException;
  * 
  * @version $Id$
  * @since 3.0M2
+ * @deprecated since 12.5RC1, use {@link EventStore} instead
  */
 @Role
+@Deprecated
 public interface EventStream
 {
     /**
      * Add a new event to the storage.
      * 
      * @param e the event to store
+     * @deprecated since 12.3RC1, use {@link EventStore#saveEvent(Event)} instead
      */
+    @Deprecated
     void addEvent(Event e);
 
     /**
@@ -49,7 +53,9 @@ public interface EventStream
      * @param query a query stub
      * @return the list of events matched by the query
      * @throws QueryException if the query is malformed or cannot be executed
+     * @deprecated since 12.5RC1, use {@link EventStore#search(EventQuery)} instead
      */
+    @Deprecated
     List<Event> searchEvents(Query query) throws QueryException;
 
     /**
@@ -57,7 +63,9 @@ public interface EventStream
      * 
      * @param e the event to search for
      * @return the event's group of related events
+     * @deprecated since 12.6, use {@link EventStore#search(EventQuery)} instead
      */
+    @Deprecated
     EventGroup getRelatedEvents(Event e);
 
     /**
@@ -65,7 +73,9 @@ public interface EventStream
      * this method.
      * 
      * @param e the event to delete
+     * @deprecated since 12.3RC1, use {@link EventStore#deleteEvent(String)} instead
      */
+    @Deprecated
     void deleteEvent(Event e);
 
     /**
@@ -74,9 +84,24 @@ public interface EventStream
      * @throws QueryException if failing to get the event
      * @since 12.2
      * @since 11.10.4
+     * @deprecated since 12.3RC1, use {@link EventStore#getEvent(String)} instead
      */
+    @Deprecated
     default Event getEvent(String eventId) throws QueryException
     {
         return null;
+    }
+
+    /**
+     * @return the total number of events in the legacy store
+     * @throws QueryException when failing to query the events
+     * @since 12.6.1
+     * @since 12.7RC1
+     * @deprecated since 12.6.1, use {@link EventStore#search(EventQuery)} instead
+     */
+    @Deprecated
+    default long countEvents() throws QueryException
+    {
+        return 0;
     }
 }

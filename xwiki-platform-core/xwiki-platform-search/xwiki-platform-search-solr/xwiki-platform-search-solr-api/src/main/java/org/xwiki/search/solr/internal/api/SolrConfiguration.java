@@ -33,6 +33,24 @@ import org.xwiki.component.annotation.Role;
 public interface SolrConfiguration
 {
     /**
+     * Available modes of synchronization at startup.
+     * 
+     * @since 12.5RC1
+     */
+    enum SynchronizeAtStartupMode
+    {
+        /**
+         * Synchronize the whole farm at startup.
+         */
+        FARM,
+
+        /**
+         * Synchronize wiki by wki when they are started.
+         */
+        WIKI
+    }
+
+    /**
      * @return the type of Solr server used. Supported values: "embedded" or "remote".
      */
     String getServerType();
@@ -49,9 +67,16 @@ public interface SolrConfiguration
     /**
      * Retrieves the configuration files required by the Solr XWiki core in order to initialize.
      * 
-     * @return an input stream of a zip package containing the default core setup
+     * @return an input stream of a zip package containing the core setup
      */
     InputStream getSearchCoreDefaultContent();
+
+    /**
+     * Retrieves the minimal configuration reqiuired for a Solr core.
+     * 
+     * @return an input stream of a zip package containing the core setup
+     */
+    InputStream getMinimalCoreDefaultContent();
 
     // Indexer
 
@@ -90,4 +115,10 @@ public interface SolrConfiguration
      * @since 12.3RC1
      */
     String getDefaultHomeDirectory();
+
+    /**
+     * @return the default synchronization mode at startup when {@link #synchronizeAtStartup()} is set to {@code true}.
+     * @since 12.5RC1
+     */
+    SynchronizeAtStartupMode synchronizeAtStartupMode();
 }

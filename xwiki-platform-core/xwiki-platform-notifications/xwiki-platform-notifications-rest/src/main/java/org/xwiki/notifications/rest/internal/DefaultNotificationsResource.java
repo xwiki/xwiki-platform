@@ -31,6 +31,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -86,15 +87,16 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private DefaultNotificationParametersFactory notificationParametersFactory;
 
     @Override
-    public Response getNotifications(String useUserPreferences, String userId, String untilDate, String blackList,
-        String pages, String spaces, String wikis, String users, String maxCount, String displayOwnEvents,
-        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
-        String tags, String currentWiki, String async, String asyncId) throws Exception
+    public Response getNotifications(String useUserPreferences, String userId, String untilDate,
+        boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
+        String maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
+        String displayReadEvents, String displayReadStatus, String tags, String currentWiki, String async,
+        String asyncId) throws Exception
     {
         // Build the response
         Response.ResponseBuilder response;
-        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-            users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
+        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages,
+            spaces, wikis, users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
             displayReadEvents, tags, currentWiki, async, asyncId, false, false);
 
         if (result instanceof String) {
@@ -106,10 +108,20 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             xcontext.setURLFactory(
                 xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
 
-            Notifications notifications = new Notifications(this.notificationsRenderer
-                .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+            // Make sure to rendering the notifications in the right wiki
+            String currentOriginalWiki = xcontext.getOriginalWikiId();
+            try {
+                if (currentWiki != null) {
+                    xcontext.setOriginalWikiId(currentWiki);
+                }
 
-            response = Response.ok(notifications);
+                Notifications notifications = new Notifications(this.notificationsRenderer
+                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+
+                response = Response.ok(notifications);
+            } finally {
+                xcontext.setOriginalWikiId(currentOriginalWiki);
+            }
         }
 
         // Add the "cache control" header.
@@ -125,16 +137,16 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return NumberUtils.toInt(maxCount, defaultMaxCount);
     }
 
-    private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate, String blackList,
-        String pages, String spaces, String wikis, String users, int maxCount, String displayOwnEvents,
-        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String tags,
-        String currentWiki, String async, String asyncId, boolean onlyUnread, boolean count) throws Exception
+    private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
+        boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
+        int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
+        String displayReadEvents, String tags, String currentWiki, String async, String asyncId, boolean onlyUnread,
+        boolean count) throws Exception
     {
         Object result = null;
-        NotificationParameters notificationParameters =
-            getNotificationParameters(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users,
-                maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
-                currentWiki, onlyUnread);
+        NotificationParameters notificationParameters = getNotificationParameters(useUserPreferences, userId, untilDate,
+            untilDateIncluded, blackList, pages, spaces, wikis, users, maxCount, displayOwnEvents, displayMinorEvents,
+            displaySystemEvents, displayReadEvents, tags, currentWiki, onlyUnread);
 
         // 1. Check current asynchronous execution
         if (asyncId != null) {
@@ -177,9 +189,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         if (xWikiUser == null) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
-            Object result = getCompositeEvents(useUserPreferences, userId, null, null, pages, spaces, wikis, users,
-                toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
-                tags, currentWiki, async, asyncId, true, true);
+            Object result = getCompositeEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
+                users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
+                displayReadEvents, tags, currentWiki, async, asyncId, true, true);
 
             if (result instanceof String) {
                 response = Response.status(Status.ACCEPTED);
@@ -210,7 +222,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             return null;
         } else {
             List<CompositeEvent> events =
-                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages,
+                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate, true, blackList, pages,
                     spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
                     displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
@@ -227,22 +239,23 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         // That's why we need to use this workaround: manually getting the POST params in the request object.
         XWikiRequest request = getXWikiContext().getRequest();
         return getNotifications(request.get("useUserPreferences"), request.get("userId"), request.get("untilDate"),
-            request.get("blackList"), request.get("pages"), request.get("spaces"), request.get("wikis"),
-            request.get("users"), request.get("count"), request.get("displayOwnEvents"),
-            request.get("displayMinorEvents"), request.get("displaySystemEvents"), request.get("displayReadEvents"),
-            request.get("displayReadStatus"), request.get("tags"), request.get("currentWiki"), request.get("async"),
-            request.get("asyncId"));
+            BooleanUtils.toBooleanObject(request.get("untilDateIncluded")) != Boolean.FALSE, request.get("blackList"),
+            request.get("pages"), request.get("spaces"), request.get("wikis"), request.get("users"),
+            request.get("count"), request.get("displayOwnEvents"), request.get("displayMinorEvents"),
+            request.get("displaySystemEvents"), request.get("displayReadEvents"), request.get("displayReadStatus"),
+            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get("asyncId"));
     }
 
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
-        String blackList, String pages, String spaces, String wikis, String users, int maxCount,
-        String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-        String tags, String currentWiki, boolean onlyUnread) throws NotificationException
+        boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
+        int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
+        String displayReadEvents, String tags, String currentWiki, boolean onlyUnread) throws NotificationException
     {
         Map<ParametersKey, String> parametersMap = new HashMap<>();
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, useUserPreferences);
         parametersMap.put(ParametersKey.USER_ID, userId);
         parametersMap.put(ParametersKey.UNTIL_DATE, untilDate);
+        parametersMap.put(ParametersKey.UNTIL_DATE_INCLUDED, String.valueOf(untilDateIncluded));
         parametersMap.put(ParametersKey.BLACKLIST, blackList);
         parametersMap.put(ParametersKey.PAGES, pages);
         parametersMap.put(ParametersKey.SPACES, spaces);

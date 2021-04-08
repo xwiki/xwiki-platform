@@ -35,8 +35,8 @@
 #end
 
 #macro (displayTranslationSelector $options)
-  #set ($docTranslations = $doc.getTranslationList())
-  #if ($xwiki.isMultiLingual() && $docTranslations.size() > 0)
+  #set ($translationLocales = $doc.translationLocales)
+  #if ($xwiki.isMultiLingual() && $translationLocales.size() > 0)
     <dt>
       <label for="language">$services.localization.render('language')</label>
       <span class="xHint">$services.localization.render($options.hint)</span>
@@ -49,9 +49,8 @@
         </option>
         ## Add all the existing translations.
         #set ($currentLocale = $services.localization.currentLocale)
-        #foreach ($docTranslation in $docTranslations)
-          #set ($locale = $services.localization.toLocale($docTranslation))
-          <option value="$escapetool.xml($docTranslation)">
+        #foreach ($locale in $translationLocales)
+          <option value="$escapetool.xml($locale.toString())">
             $escapetool.xml($locale.getDisplayName($currentLocale))
           </option>
         #end

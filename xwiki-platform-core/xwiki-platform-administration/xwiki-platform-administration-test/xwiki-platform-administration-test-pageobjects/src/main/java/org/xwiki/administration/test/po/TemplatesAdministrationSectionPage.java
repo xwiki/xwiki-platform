@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.DocumentPicker;
 
 /**
@@ -41,8 +42,6 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     @FindBy(className = "location-picker")
     private WebElement documentPickerElement;
-
-    private DocumentPicker documentPicker;
 
     @FindBy(id = "createTemplateProvider")
     private WebElement createButton;
@@ -78,6 +77,19 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         this.createButton.click();
 
         return new TemplateProviderInlinePage();
+    }
+
+    /**
+     * Takes the user to the form used to create the template provider.
+     * 
+     * @param templateProviderReference the reference of the template provider page to create
+     * @return the page to edit the template provider
+     * @since 12.9RC1
+     */
+    public TemplateProviderInlinePage createTemplateProvider(LocalDocumentReference templateProviderReference)
+    {
+        return createTemplateProvider(getUtil().serializeReference(templateProviderReference.getParent()),
+            templateProviderReference.getName());
     }
 
     public List<WebElement> getExistingTemplatesLinks()

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+    
+    if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+        . /usr/share/dbconfig-common/dpkg/postrm.mysql
+        dbc_go xwiki $@
+    fi
+
+    if [ "$1" = "purge" ]; then
+        db_purge
+    fi
+fi
+
+case "$1" in
+    purge)
+        # Purge hibernate configuration
+        rm -f /etc/xwiki/hibernate.cfg.xml
+        ucf --purge /etc/xwiki/hibernate.cfg.xml || true
+        ;;
+esac
+
+exit 0

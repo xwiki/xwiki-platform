@@ -77,7 +77,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -90,8 +90,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ LinkedResourceHelper.class, ReferenceRenamer.class })
-public class DefaultLinkRefactoringTest
+// @formatter:off
+@ComponentList({
+    LinkedResourceHelper.class,
+    ReferenceRenamer.class
+})
+// @formatter:on
+class DefaultLinkRefactoringTest
 {
     @MockComponent
     @Named("compact")
@@ -134,7 +139,7 @@ public class DefaultLinkRefactoringTest
     int logIndex = 0;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         XWiki xwiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(xwiki);
@@ -169,10 +174,8 @@ public class DefaultLinkRefactoringTest
         when(this.contentParser.parse("areacontent", Syntax.XWIKI_2_1, documentReference)).thenReturn(xdom);
     }
 
-    // Tests
-
     @Test
-    public void updateRelativeLinks() throws Exception
+    void updateRelativeLinks() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "A", "B");
         AttachmentReference oldImageTargetAttachment = new AttachmentReference("attachment.txt", oldReference);
@@ -186,24 +189,24 @@ public class DefaultLinkRefactoringTest
 
         // Setup document content
         ResourceReference docLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock docLinkBlock = new LinkBlock(Collections.<Block>emptyList(), docLinkReference, false);
+        LinkBlock docLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
         ResourceReference imageReference = new AttachmentResourceReference("attachment.txt");
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
         when(newDocument.getXDOM())
-            .thenReturn(new XDOM(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock, imageBlock)));
+            .thenReturn(new XDOM(Arrays.asList(docLinkBlock, spaceLinkBlock, imageBlock)));
 
         // Setup object content
         ResourceReference xobjectDocLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock xobjectDocLinkBlock = new LinkBlock(Collections.<Block>emptyList(), xobjectDocLinkReference, false);
+        LinkBlock xobjectDocLinkBlock = new LinkBlock(Collections.emptyList(), xobjectDocLinkReference, false);
         ResourceReference xobjectSpaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock xobjectSpaceLinkBlock =
-            new LinkBlock(Collections.<Block>emptyList(), xobjectSpaceLinkReference, false);
+            new LinkBlock(Collections.emptyList(), xobjectSpaceLinkReference, false);
         ResourceReference xobjectImageReference = new AttachmentResourceReference("attachment.txt");
         ImageBlock xobjectImageBlock = new ImageBlock(imageReference, false);
         setTextarea(newDocument,
-            new XDOM(Arrays.<Block>asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
+            new XDOM(Arrays.asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
@@ -256,7 +259,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void updateRelativeLinksAcrossWikis() throws Exception
+    void updateRelativeLinksAcrossWikis() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki1", "A", "B");
         DocumentReference newReference = new DocumentReference("wiki2", "X", "Y");
@@ -270,13 +273,13 @@ public class DefaultLinkRefactoringTest
         when(newDocument.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock docLinkBlock = new LinkBlock(Collections.<Block>emptyList(), docLinkReference, false);
+        LinkBlock docLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
 
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
+            .thenReturn(Arrays.asList(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
@@ -309,7 +312,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameLinks() throws Exception
+    void renameLinks() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -323,13 +326,13 @@ public class DefaultLinkRefactoringTest
 
         // Setup document content
         ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
+        LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
         XDOM xdom = new XDOM(Collections.singletonList(linkBlock));
         when(document.getXDOM()).thenReturn(xdom);
 
         // Setup object content
         ResourceReference xobjectLinkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock xobjectLinkBlock = new LinkBlock(Collections.<Block>emptyList(), xobjectLinkReference, false);
+        LinkBlock xobjectLinkBlock = new LinkBlock(Collections.emptyList(), xobjectLinkReference, false);
         XDOM xobjectXDOM = new XDOM(Collections.singletonList(xobjectLinkBlock));
         setTextarea(document, xobjectXDOM);
 
@@ -349,7 +352,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameImage() throws Exception
+    void renameImage() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -368,7 +371,7 @@ public class DefaultLinkRefactoringTest
 
         ResourceReference imageReference = new AttachmentResourceReference("A.B@attachment.txt");
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
-        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(imageBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.asList(imageBlock));
 
         when(this.resourceReferenceResolver.resolve(imageReference, null, documentReference))
             .thenReturn(oldImageTargetAttachment);
@@ -404,8 +407,8 @@ public class DefaultLinkRefactoringTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference linkReference = new AttachmentResourceReference("A.B@attachment.txt");
-        LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
-        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(linkBlock));
+        LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.asList(linkBlock));
 
         when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
             .thenReturn(oldLinkTargetAttachment);
@@ -422,7 +425,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameNonTerminalDocumentLinks() throws Exception
+    void renameNonTerminalDocumentLinks() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -438,13 +441,13 @@ public class DefaultLinkRefactoringTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("A.WebHome", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.<Block>emptyList(), docLinkReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
 
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
+            .thenReturn(Arrays.asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference))
@@ -470,7 +473,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameNonTerminalToTerminalDocumentLinks() throws Exception
+    void renameNonTerminalToTerminalDocumentLinks() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -486,13 +489,13 @@ public class DefaultLinkRefactoringTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("A.WebHome", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.<Block>emptyList(), docLinkReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
 
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
+            .thenReturn(Arrays.asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference))
@@ -520,7 +523,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameLinksFromMacros() throws Exception
+    void renameLinksFromMacros() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -548,7 +551,7 @@ public class DefaultLinkRefactoringTest
         MacroBlock displayMacroBlock = new MacroBlock("display", displayParameters, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.<Block>asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
+            .thenReturn(Arrays.asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
 
         ResourceReference macroResourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
 
@@ -566,7 +569,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameLinksFromLinksAndMacros() throws Exception
+    void renameLinksFromLinksAndMacros() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -586,10 +589,10 @@ public class DefaultLinkRefactoringTest
         MacroBlock includeMacroBlock = new MacroBlock("include", includeParameters, false);
 
         ResourceReference resourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.<Block>emptyList(), resourceReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), resourceReference, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.<Block>asList(includeMacroBlock, documentLinkBlock));
+            .thenReturn(Arrays.asList(includeMacroBlock, documentLinkBlock));
 
         when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference))
             .thenReturn(oldLinkTarget);
@@ -623,7 +626,7 @@ public class DefaultLinkRefactoringTest
     }
 
     @Test
-    public void renameLinksAndTranslations() throws Exception
+    void renameLinksAndTranslations() throws Exception
     {
         DocumentReference baseDocumentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument baseDocument = mock(XWikiDocument.class);
@@ -654,8 +657,8 @@ public class DefaultLinkRefactoringTest
             when(xWikiDocument.getXDOM()).thenReturn(xdom);
 
             ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-            LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
-            when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(linkBlock));
+            LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
+            when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.asList(linkBlock));
 
             when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
                 .thenReturn(oldLinkTarget);
@@ -672,5 +675,30 @@ public class DefaultLinkRefactoringTest
             assertEquals("X.Y", linkBlock.getReference().getReference());
             assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
         }
+    }
+
+    @Test
+    void renameLinksBlockRendererNotFound() throws XWikiException
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "XWiki", "new");
+
+        XWiki xWiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(xWiki);
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xWiki.getDocument(newReference, this.xcontext)).thenReturn(document);
+
+        ComponentManager componentManager = mock(ComponentManager.class);
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+        when(document.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(componentManager.hasComponent(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
+            .thenReturn(false);
+
+        DocumentReference oldReference = new DocumentReference("xwiki", "XWiki", "old");
+        this.refactoring.updateRelativeLinks(oldReference, newReference);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("We can't rename the links from [null] because there is no renderer available for its "
+                         + "syntax [Markdown 1.1].", this.logCapture.getMessage(0));
     }
 }

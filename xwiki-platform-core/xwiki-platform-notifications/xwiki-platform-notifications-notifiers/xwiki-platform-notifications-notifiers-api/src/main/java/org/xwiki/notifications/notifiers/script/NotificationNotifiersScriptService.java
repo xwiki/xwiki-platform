@@ -157,17 +157,21 @@ public class NotificationNotifiersScriptService implements ScriptService
      * filled with the number once the request is done.
      * @param parameters the {@link NotificationParameters} used to make the request.
      *                   You can retrieve it by using
+     * @param forcePlaceHolder {@code true} if the script service should always return a placeholder, even when the data
+     *                          is immediately available (useful in case of AJAX request).
      * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
      * @return the HTML of an asynchronous placeholder.
      * @throws NotificationException in case of error during the request.
      * @since 12.2
      */
     @Unstable
-    public String getNotificationCount(NotificationParameters parameters) throws NotificationException
+    public String getNotificationCount(NotificationParameters parameters, boolean forcePlaceHolder)
+        throws NotificationException
     {
         NotificationAsyncRendererConfiguration configuration =
             new NotificationAsyncRendererConfiguration(parameters, true);
 
+        configuration.setPlaceHolderForced(forcePlaceHolder);
         return this.getAsyncNotification(configuration);
     }
 
@@ -177,23 +181,28 @@ public class NotificationNotifiersScriptService implements ScriptService
      * filled with the notifications once the request is done.
      * @param parameters the {@link NotificationParameters} used to make the request.
      *                   You can retrieve it by using
+     * @param forcePlaceHolder {@code true} if the script service should always return a placeholder, even when the data
+     *                         is immediately available (useful in case of AJAX request).
      * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
      * @return the HTML of an asynchronous placeholder.
      * @throws NotificationException in case of error during the request.
      * @since 12.2
      */
     @Unstable
-    public String getNotifications(NotificationParameters parameters) throws NotificationException
+    public String getNotifications(NotificationParameters parameters, boolean forcePlaceHolder)
+        throws NotificationException
     {
         NotificationAsyncRendererConfiguration configuration =
             new NotificationAsyncRendererConfiguration(parameters, false);
 
+        configuration.setPlaceHolderForced(forcePlaceHolder);
         return this.getAsyncNotification(configuration);
     }
 
     /**
-     * Common code to perform the asynchronous request for {@link #getNotificationCount(NotificationParameters)} and
-     * {@link #getNotifications(NotificationParameters)}.
+     * Common code to perform the asynchronous request for
+     * {@link #getNotificationCount(NotificationParameters, boolean)} and
+     * {@link #getNotifications(NotificationParameters, boolean)}.
      * @param configuration the actual asynchronous configuration to use for the request.
      * @return the HTML of an asynchronous placeholder.
      * @throws NotificationException in case of error during the request.
@@ -209,7 +218,7 @@ public class NotificationNotifiersScriptService implements ScriptService
             AsyncRendererExecutorResponse response =
                 this.asyncRendererExecutor.render(asyncNotificationRenderer, configuration);
             AsyncRendererResult result = response.getStatus().getResult();
-            if (result != null) {
+            if (result != null && !configuration.isPlaceHolderForced()) {
                 return result.getResult();
             } else {
                 return computeAsyncPlaceholder(response, configuration.isCount());

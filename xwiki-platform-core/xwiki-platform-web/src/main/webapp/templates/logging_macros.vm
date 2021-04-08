@@ -127,7 +127,10 @@ Caused by: #printThrowable($throwable.cause true)
     #end
   #end
   ## Add the last message element.
-  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+  ## Replace \ with <br/> so that new lines are visible in the generated HTML display
+  #set ($message = "$message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))")
+  #set ($message = $message.replace($escapetool.n, '<br/>'))
+  $message##
 #end
 
 #macro (printLog $log)
@@ -146,6 +149,7 @@ Caused by: #printThrowable($throwable.cause true)
 
 #macro (printLogs $logs $loading)
   <ul class="log">
+  ## Note: $logs is of type Iterable<LogEvent> and tuhs $log is of type LogEvent.
   #foreach ($log in $logs)
     #set ($logLevel = $log.level.toString().toLowerCase())
     ## Display the last log item as loading if the associated task is not finished.

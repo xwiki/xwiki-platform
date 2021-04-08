@@ -39,7 +39,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  
   <content>help.syntaxpage.title=XWiki सिन्टाक्स मार्गदर्शक
 help.syntaxtitle=XWiki सिन्टाक्स {0}
 help.syntaxall=सर्व

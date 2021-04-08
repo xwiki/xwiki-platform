@@ -17,19 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require.config({
-  paths: {
-    'xwiki-selectize': "$xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)" +
-      "?v=$escapetool.url($xwiki.version)"
-  }
-});
+/*!
+#set ($paths = {
+  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
+})
+#[[*/
+// Start JavaScript-only code.
+(function(paths, contextPath) {
+  "use strict";
+
+require.config({paths});
 
 define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($) {
-  'use strict';
-
   var getSelectizeOptions = function(select) {
     var loadURL = [
-      '$request.contextPath', 'rest',
+      contextPath, 'rest',
       'wikis', encodeURIComponent(XWiki.currentWiki),
       'classes', encodeURIComponent(select.attr('data-className')),
       'properties', encodeURIComponent(select.attr('data-propertyName')),
@@ -96,5 +98,8 @@ require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], functi
   };
 
   $(document).on('xwiki:dom:updated', init);
-  init();
+  $(init);
 });
+
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath]));

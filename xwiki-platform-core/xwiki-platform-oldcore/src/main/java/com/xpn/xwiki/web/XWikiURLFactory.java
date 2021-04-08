@@ -23,8 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactory
@@ -118,7 +116,6 @@ public interface XWikiURLFactory
      * @return a URL to load the given file with the given query parameters.
      * @since 11.1RC1
      */
-    @Unstable
     URL createSkinURL(String filename, String skin, XWikiContext context, Map<String, Object> queryParameters);
 
     /**
@@ -141,7 +138,6 @@ public interface XWikiURLFactory
      * @return an URL to load the given file.
      * @since 11.1RC1
      */
-    @Unstable
     URL createSkinURL(String filename, String spaces, String name, XWikiContext context,
         Map<String, Object> queryParameters);
 
@@ -167,7 +163,6 @@ public interface XWikiURLFactory
      * @return an URL to load the given file.
      * @since 11.1RC1
      */
-    @Unstable
     URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context,
         Map<String, Object> queryParameters);
 
@@ -189,7 +184,6 @@ public interface XWikiURLFactory
      * @return an URL to load the given file
      * @since 11.1RC1
      */
-    @Unstable
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context,
         Map<String, Object> queryParameters);
 

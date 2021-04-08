@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal.status;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -38,7 +39,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 
 /**
- * Abstract implementation {@link ForUserAlertEventFilter}.
+ * Abstract implementation of user event filters.
  *
  * @version $Id$
  * @since 12.1RC1
@@ -96,7 +97,7 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
         NotificationFormat format)
     {
         if (user != null && type == NotificationFilterType.EXCLUSIVE && format == this.format) {
-            ForUserNode node = new ForUserNode(user, this.read);
+            ForUserNode node = new ForUserNode(user, this.read, this.format);
 
             return this.not ? not(node) : node;
         }
@@ -152,5 +153,12 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
             .append(read)
             .append(not)
             .toHashCode();
+    }
+
+    @Override
+    public Set<FilteringPhase> getFilteringPhases()
+    {
+        // only post-filtering is supported here.
+        return SUPPORT_ONLY_POST_FILTERING_PHASE;
     }
 }

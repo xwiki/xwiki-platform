@@ -362,284 +362,39 @@
     </property>
     <property>
       <code>/**
- * Add a dependency to the "bootstrap-select" plugin, used to display a nice select field that handle
- * multiple selection.
- */
-require.config({
-  paths: {
-    'bootstrap-select': '$services.webjars.url("bootstrap-select", "js/bootstrap-select.min")'
-  },
-  shim: {
-    'bootstrap-select' : ['jquery', 'bootstrap']
-  }
-});
-/**
  * Replace the simple text input field for supported locales by a nicer select widget with all available locales
  * ready to be selected.
  *
- * Instead of dynamically replace the text input field on the client-side, we could have done on the server-side,
- * by using a custom displayer.
- * However, it's a pain to upgrade the XWiki.XWikiPreferences class to add a displayer.
- * The class is not even packaged by the administration application.
+ * Instead of dynamically replace the text input field on the client-side, we could have done on the server-side, by
+ * using a custom displayer. However, it's a pain to upgrade the XWiki.XWikiPreferences class to add a displayer. The
+ * class is not even packaged by the administration application.
  *
  * We also enable the improved select widget on the "timezone" field to make the user able to filter the choices.
  */
-require(['jquery','bootstrap','bootstrap-select'], function($) {
+require(['jquery', 'xwiki-locale-picker'], function($) {
   'use strict';
 
-  var locales = [
-#set ($separator = '')
-#set ($currentLocale = $services.localization.currentLocale)
-#set ($locales = $services.localization.availableLocales)
-#foreach ($locale in $collectiontool.sort($locales, 'displayName'))
-  #if ("$!locale" != '')
-    $separator
-    { code: '$locale', name: '$escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale))) &lt;small class="text-muted"&gt;($stringtool.capitalize($locale.getDisplayName($currentLocale)))&lt;/small&gt;'}##
-    #set ($separator = ',')
-  #end
-#end
-  ];
-
-  /**
-   * Get the initial values of the input
-   * @return an array of locales codes
-   */
-  var getLocalesFromInput = function (input) {
-    var locales = input.val().split(/,| /);
-    var results = [];
-    for (var i = 0; i &lt; locales.length; ++i) {
-      if (locales[i].trim() != '') {
-        results[results.length] = locales[i].trim();
-      }
-    }
-    return results;
-  }
-
-  /**
-   * Serialize an array of locales to a string that the XWiki server can handle
-   */
-  var serializeArray = function (array) {
-    // bootstrap-select returns null when nothing is selected.
-    array = array || [];
-    var result = '';
-    var separator = '';
-    for (var i = 0; i &lt; array.length; ++i) {
-      if (array[i] != '') {
-        result += separator;
-        result += array[i];
-        separator = ',';
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Initialization
-   */
-  $(document).ready(function() {
-
-    /**
-     * Enable the bootstrap-select plugin to have a nicer UI.
-     */
-    var enableSelectPicker = function (select) {
-      // Force 100% width on the select using the form-control CSS class.
-      select.addClass('form-control').selectpicker({
-        // Enable the filtering on choices if there is a lot of choices
-        liveSearch: select.find('option').length &gt; 10
-      });
-    }
-
-    //
-    // Adding the CSS of the boostrap-select plugin
-    //
-    var css = $('&lt;link rel="stylesheet" href="$services.webjars.url("bootstrap-select", "css/bootstrap-select.min.css")"&gt;');
-    $('head').append(css);
-
-    // Getting the original input
-    var localesInput = $('input[name="XWiki.XWikiPreferences_0_languages"]');
-
-    // Creating the select box
-    var select = $('&lt;select multiple&gt;');
-
-    // Add all available options
-    var currentLocales = getLocalesFromInput(localesInput);
-    for (var i = 0; i &lt; locales.length; ++i) {
-      var option = $('&lt;option&gt;');
-      option.prop('value', locales[i].code);
-      option.html(locales[i].name);
-      if ($.inArray(locales[i].code, currentLocales) &gt; -1) {
-        option.prop('selected', 'selected');
-      }
-      select.append(option);
-    }
-
-    // Problem: when we save the document, XWiki expects 'XWiki.XWikiPreferences_0_languages' to be a simple text,
-    // not a "select" field with different values.
-    // So we keep the old input field as an hidden input which will hold the serialized representation of the
-    // selected locales.
-    localesInput.prop('type', 'hidden');
-
-    // Adds the new select widget in the DOM
-    select.insertAfter(localesInput);
-
-    // Enable the select picker
-    enableSelectPicker(select);
-
-    // Synchronize the value of the hidden input text with the selected item in the select widget.
-    select.on('changed.bs.select', function (event) {
-      localesInput.prop('value', serializeArray(select.val()));
-    });
-
-    // We can also do it for the "default locale" field.
-    var defaultLocaleInput = $('input[name="XWiki.XWikiPreferences_0_default_language"]');
-    var select2 = $('&lt;select&gt;');
-    select2.prop('name', defaultLocaleInput.prop('name'));
-    select2.prop('id', defaultLocaleInput.prop('id'));
-    for (var i = 0; i &lt; locales.length; ++i) {
-      var option = $('&lt;option&gt;');
-      option.prop('value', locales[i].code);
-      option.html(locales[i].name);
-      if (defaultLocaleInput.val() == locales[i].code) {
-        option.prop('selected', 'selected');
-      }
-      select2.append(option);
-    }
-    defaultLocaleInput.replaceWith(select2);
-
-    // Enable bootstrap-select on the "timezone" field
-    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_timezone"]'));
-
-    // Enable it on the default locale field too
-    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_default_language"]'));
-
-    // Enable it on the last select field to be consistent
-    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_multilingual"]'));
+  $('input[name="XWiki.XWikiPreferences_0_languages"]').localePicker({
+    allowEmpty: false,
+    multiple: true
   });
-});
-</code>
+
+  $('input[name="XWiki.XWikiPreferences_0_default_language"]').localePicker({
+    allowEmpty: false
+  });
+
+  // Use the Bootstrap select widget for the other select elements in order to have a consistent UI.
+  $([
+    'select[name="XWiki.XWikiPreferences_0_multilingual"]',
+    'select[name="XWiki.XWikiPreferences_0_timezone"]'
+  ].join()).bootstrapSelect();
+});</code>
     </property>
     <property>
       <name>JS</name>
     </property>
     <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.AdminLocalizationSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>11e6fc77-e5c9-4ef0-9c57-60404f22ef27</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.bootstrap-select.btn-group .dropdown-menu li.active small.text-muted {
-  color: inherit;
-}
-</code>
-    </property>
-    <property>
-      <contentType/>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse/>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>

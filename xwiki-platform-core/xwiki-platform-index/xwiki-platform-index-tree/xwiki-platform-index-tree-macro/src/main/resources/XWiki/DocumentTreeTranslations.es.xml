@@ -36,16 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rendering.macro.documentTree.name=Jerarquía de página
+  <content>rendering.macro.documentTree.name=Jerarquía de páginas
 rendering.macro.documentTree.description=Muestra la jerarquía de páginas de XWiki.
 rendering.macro.documentTree.parameter.readOnly.name=Solo lectura
 rendering.macro.documentTree.parameter.readOnly.description=¿Debe el usuario poder modificar la estructura del árbol, siempre que tenga los permisos necesarios?
 rendering.macro.documentTree.parameter.showWikis.name=Mostrar Wikis
 rendering.macro.documentTree.parameter.showWikis.description=Indica si mostrar los nodos wiki o no. Esto sólo se puede utilizar en el wiki principal y si la fuente del árbol se ha guardado con derechos de programación.
-rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostrar el nombre amigable del Wiki
-rendering.macro.documentTree.parameter.showWikiPrettyName.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostrar el nombre elegante de la wiki
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Mostrar el nombre elegante de la wiki en lugar del id de wiki cuando se muestra un nodo wiki.
 rendering.macro.documentTree.parameter.showSpaces.name=Mostrar espacios
-rendering.macro.documentTree.parameter.showSpaces.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.
+rendering.macro.documentTree.parameter.showSpaces.description=Si mostrar los nodos de espacio o no. Las páginas se agrupan por espacio si se visualizan los nodos de espacio.
 rendering.macro.documentTree.parameter.showDocumentTitle.name=Mostrar el título de la página
 rendering.macro.documentTree.parameter.showDocumentTitle.description=Indica si se debe mostrar el título de la página en lugar del nombre de la página al visualizar un nodo de página.
 rendering.macro.documentTree.parameter.showTranslations.name=Mostrar traducciones

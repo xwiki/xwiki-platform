@@ -22,20 +22,23 @@ package org.xwiki.vfs.internal;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 import org.xwiki.vfs.VfsResourceReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,18 +47,28 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.4M2
  */
+@ComponentTest
 public class VfsResourceReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<VfsResourceReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(VfsResourceReferenceSerializer.class);
+    @InjectMockComponents
+    private VfsResourceReferenceSerializer vfsResourceReferenceSerializer;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> urlNormalizer;
+
+    @MockComponent
+    @Named("attach")
+    private ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @BeforeComponent
+    public void setup(MockitoComponentManager componentManager)
     {
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
     }
 
     @Test
@@ -67,12 +80,10 @@ public class VfsResourceReferenceSerializerTest
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
             "vfs", "somescheme:wiki:space.page@attachment", "path1", "path2", "test.txt"));
 
-        URLNormalizer<ExtendedURL> normalizer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class), "contextpath");
-        when(normalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        when(this.urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
 
         assertEquals("/vfs/somescheme%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
-            this.mocker.getComponentUnderTest().serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 
     @Test
@@ -83,13 +94,9 @@ public class VfsResourceReferenceSerializerTest
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));
-
-        ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                ExtendedURL.class), "attach");
         when(serializer.serialize(reference)).thenReturn(extendedURL);
 
         assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
-            this.mocker.getComponentUnderTest().serialize(reference).toString());
+            this.vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 }

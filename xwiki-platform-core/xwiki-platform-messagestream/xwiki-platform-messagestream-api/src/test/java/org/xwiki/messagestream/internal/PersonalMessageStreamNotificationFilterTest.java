@@ -22,52 +22,53 @@ package org.xwiki.messagestream.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.xwiki.notifications.NotificationFormat.ALERT;
+import static org.xwiki.notifications.filters.NotificationFilter.FilterPolicy.FILTER;
+import static org.xwiki.notifications.filters.NotificationFilter.FilterPolicy.KEEP;
+import static org.xwiki.notifications.filters.NotificationFilter.FilterPolicy.NO_EFFECT;
+import static org.xwiki.notifications.preferences.NotificationPreferenceProperty.EVENT_TYPE;
 
 /**
+ * Test of {@link PersonalMessageStreamNotificationFilter}.
+ *
  * @version $Id$
- * @since
  */
-public class PersonalMessageStreamNotificationFilterTest
+@ComponentTest
+class PersonalMessageStreamNotificationFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<PersonalMessageStreamNotificationFilter> mocker =
-            new MockitoComponentMockingRule<>(PersonalMessageStreamNotificationFilter.class);
+    @InjectMockComponents
+    private PersonalMessageStreamNotificationFilter personalMessageFilter;
 
+    @MockComponent
     private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
     private EventUserFilterPreferencesGetter preferencesGetter;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        preferencesGetter = mocker.getInstance(EventUserFilterPreferencesGetter.class);
-    }
-
     @Test
-    public void filterEvent() throws Exception
+    void filterEvent()
     {
         DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "User");
         DocumentReference user2 = new DocumentReference("xwiki", "XWiki", "User2");
-        when(serializer.serialize(user1)).thenReturn("xwiki:XWiki.User1");
-        when(serializer.serialize(user2)).thenReturn("xwiki:XWiki.User2");
+        when(this.serializer.serialize(user1)).thenReturn("xwiki:XWiki.User1");
+        when(this.serializer.serialize(user2)).thenReturn("xwiki:XWiki.User2");
 
         Event event1 = mock(Event.class);
         Event event2 = mock(Event.class);
@@ -78,41 +79,43 @@ public class PersonalMessageStreamNotificationFilterTest
         when(event1.getType()).thenReturn("personalMessage");
         when(event2.getType()).thenReturn("personalMessage");
         when(event3.getType()).thenReturn("otherType");
-        when(preferencesGetter.isUsedFollowed("xwiki:XWiki.User1", null, NotificationFormat.ALERT))
-                .thenReturn(true);
-        when(preferencesGetter.isUsedFollowed("xwiki:XWiki.User2", null, NotificationFormat.ALERT))
-                .thenReturn(false);
+        when(this.preferencesGetter.isUsedFollowed("xwiki:XWiki.User1", null, ALERT))
+            .thenReturn(true);
+        when(this.preferencesGetter.isUsedFollowed("xwiki:XWiki.User2", null, ALERT))
+            .thenReturn(false);
 
-        assertEquals(NotificationFilter.FilterPolicy.KEEP,
-                mocker.getComponentUnderTest().filterEvent(event1, null, null, NotificationFormat.ALERT));
-        assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event2, null, null, NotificationFormat.ALERT));
-        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event3, null, null, NotificationFormat.ALERT));
+        assertEquals(KEEP, this.personalMessageFilter.filterEvent(event1, null, null, ALERT));
+        assertEquals(FILTER, this.personalMessageFilter.filterEvent(event2, null, null, ALERT));
+        assertEquals(NO_EFFECT, this.personalMessageFilter.filterEvent(event3, null, null, ALERT));
     }
 
     @Test
-    public void matchesPreference() throws Exception
+    void matchesPreference()
     {
         NotificationPreference notificationPreference = mock(NotificationPreference.class);
         Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
-        properties.put(NotificationPreferenceProperty.EVENT_TYPE, "personalMessage");
+        properties.put(EVENT_TYPE, "personalMessage");
         when(notificationPreference.getProperties()).thenReturn(properties);
 
-        assertTrue(mocker.getComponentUnderTest().matchesPreference(notificationPreference));
+        assertTrue(this.personalMessageFilter.matchesPreference(notificationPreference));
 
         NotificationPreference notificationPreference2 = mock(NotificationPreference.class);
         Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
-        properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "otherEventType");
+        properties2.put(EVENT_TYPE, "otherEventType");
         when(notificationPreference2.getProperties()).thenReturn(properties2);
 
-        assertFalse(mocker.getComponentUnderTest().matchesPreference(notificationPreference2));
+        assertFalse(this.personalMessageFilter.matchesPreference(notificationPreference2));
     }
 
     @Test
-    public void getName() throws Exception
+    void getName()
     {
-        assertEquals("Personal Message Stream Notification Filter", mocker.getComponentUnderTest().getName());
+        assertEquals("Personal Message Stream Notification Filter", this.personalMessageFilter.getName());
     }
 
+    @Test
+    void filterExpressionNull()
+    {
+        assertNull(this.personalMessageFilter.filterExpression(null, null, null));
+    }
 }

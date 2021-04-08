@@ -171,7 +171,7 @@ require(['jquery'], function($) {
         }
         // Previously, we stored all the XWikiSelectWidgets in a Map where the DOM elements were the keys, but IE10 does
         // not support the Map object so we had to find a workaround.
-        $(domElement).data('xwikiSelectWidget', new XWikiSelectWidget(domElement));
+        $(domElement).data('xwikiSelectWidget', new XWikiSelectWidget(domElement)).attr('data-ready', true);
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately

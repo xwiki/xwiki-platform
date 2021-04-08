@@ -47,6 +47,14 @@ public class ApplicationTemplateProviderEditPage extends ApplicationEditPage
     private WebElement terminalSelect;
 
     /**
+     * Default constructor, wait for the next step button to be ready.
+     */
+    public ApplicationTemplateProviderEditPage()
+    {
+        super(true, false);
+    }
+
+    /**
      * Clicks on the Next Step button.
      *
      * @return the page that represents the next step of the App Within Minutes wizard

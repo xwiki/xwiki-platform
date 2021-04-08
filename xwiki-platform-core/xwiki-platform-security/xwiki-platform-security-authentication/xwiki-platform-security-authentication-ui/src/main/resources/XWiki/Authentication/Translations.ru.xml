@@ -47,6 +47,7 @@ authentication.admin.timeWindow.hint=Временной период в секу
 authentication.admin.isAuthenticationSecurityEnabled.label=Включить или отключить механизм безопасности аутентификации
 authentication.admin.isAuthenticationSecurityEnabled.hint=Отключение механизма безопасности аутентификации также сбрасывает записи об ошибках аутентификации.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Отключено
-authentication.admin.isAuthenticationSecurityEnabled.enabled=Включено</content>
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Включено
+### Missing: authentication.admin.heading=Authentication Security</content>
   
 </xwikidoc>

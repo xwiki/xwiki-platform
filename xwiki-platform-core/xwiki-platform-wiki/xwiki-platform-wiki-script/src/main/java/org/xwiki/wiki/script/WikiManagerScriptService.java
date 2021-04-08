@@ -41,6 +41,7 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.internal.standard.StandardURLConfiguration;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -404,6 +405,16 @@ public class WikiManagerScriptService implements ScriptService
     public String getCurrentWikiId()
     {
         return wikiDescriptorManager.getCurrentWikiId();
+    }
+
+    /**
+     * @return the reference of the current wiki.
+     * @since 12.7RC1
+     */
+    @Unstable
+    public WikiReference getCurrentWikiReference()
+    {
+        return wikiDescriptorManager.getCurrentWikiReference();
     }
 
     /**

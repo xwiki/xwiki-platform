@@ -51,7 +51,12 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
                 threadName += "?" + httpServletRequest.getQueryString();
             }
 
-            httpServletRequest.setAttribute(ORIGINAL_THREAD_NAME_ATTRIBUTE, Thread.currentThread().getName());
+            String originalThreadName = Thread.currentThread().getName();
+            // Note: we keep the original thread name since that name is usually unique in the thread pool which helps
+            // in debugging multithreading issues (otherwise we cannot differentiate two logs for the same URL).
+            threadName = String.format("%s - %s", originalThreadName, threadName);
+
+            httpServletRequest.setAttribute(ORIGINAL_THREAD_NAME_ATTRIBUTE, originalThreadName);
             Thread.currentThread().setName(threadName);
         }
     }

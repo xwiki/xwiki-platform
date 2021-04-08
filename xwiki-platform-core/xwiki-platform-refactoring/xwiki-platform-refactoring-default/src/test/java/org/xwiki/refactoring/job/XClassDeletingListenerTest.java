@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.job;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,8 +28,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -54,9 +51,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -76,11 +73,13 @@ import static org.mockito.Mockito.when;
  * @since 10.10RC1
  */
 @ComponentTest
+// @formatter:off
 @ComponentList({
     LocalStringEntityReferenceSerializer.class,
     DefaultSymbolScheme.class
 })
-public class XClassDeletingListenerTest
+// @formatter:on
+class XClassDeletingListenerTest
 {
     @MockComponent
     private EntityReferenceResolver<String> resolver;
@@ -98,7 +97,7 @@ public class XClassDeletingListenerTest
     private XClassDeletingListener deletingListener;
 
     @Test
-    public void test() throws Exception
+    void interactive() throws Exception
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -190,7 +189,7 @@ public class XClassDeletingListenerTest
 
             // Assert nothing is select by default
             for (EntitySelection selection : question.getConcernedEntities().values()) {
-                assertFalse(selection.getEntityReference() + " should not be selected",  selection.isSelected());
+                assertFalse(selection.isSelected(), selection.getEntityReference() + " should not be selected");
             }
             return null;
         }).when(status).ask(any(), anyLong(), any());
@@ -205,7 +204,7 @@ public class XClassDeletingListenerTest
     }
 
     @Test
-    public void testWhenNonInteractive() throws Exception
+    void nonInteractive()
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -225,7 +224,7 @@ public class XClassDeletingListenerTest
     }
 
     @Test
-    public void testCancel() throws Exception
+    void cancel() throws Exception
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -264,7 +263,7 @@ public class XClassDeletingListenerTest
     }
 
     @Test
-    public void testSimpleUser() throws Exception
+    void simpleUser() throws Exception
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -309,5 +308,4 @@ public class XClassDeletingListenerTest
         verify(status, times(1)).ask(any(), eq(1L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("The question has been canceled because this refactoring is forbidden."));
     }
-
 }

@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.text.StringUtils;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
@@ -43,10 +43,10 @@ public abstract class AbstractContainerExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
-    protected void start(GenericContainer container, TestConfiguration testConfiguration) throws Exception
+    protected void start(GenericContainer<?> container, TestConfiguration testConfiguration) throws Exception
     {
         if (testConfiguration.isVerbose()) {
-            LOGGER.info(String.format("Docker image used: [%s]", container.getDockerImageName()));
+            LOGGER.info("Docker image used: [{}]", container.getDockerImageName());
         }
 
         // When not in verbose mode, only print WARN and ERROR coming from the container startup
@@ -64,7 +64,7 @@ public abstract class AbstractContainerExecutor
      * @param targetDirectory the target where to mount the directory in the container.
      * @since 10.11RC1
      */
-    protected void mountFromHostToContainer(GenericContainer container, String sourceDirectory,
+    protected void mountFromHostToContainer(GenericContainer<?> container, String sourceDirectory,
         String targetDirectory)
     {
         // Note 1: File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes

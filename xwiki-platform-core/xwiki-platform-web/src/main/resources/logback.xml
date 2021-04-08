@@ -41,7 +41,6 @@
        the default WARN level. -->
   <logger name="com.xpn.xwiki" level="warn"/>
   <logger name="com.xpn.xwiki.store.migration" level="info"/>
-  <logger name="com.xpn.xwiki.render.XWikiRadeoxRenderEngine" level="warn"/>
   <logger name="com.xpn.xwiki.internal.filter" level="info"/>
 
   <!-- Special loggers, not using class names -->
@@ -75,9 +74,6 @@
   <logger name="org.hibernate.connection.DriverManagerConnectionProvider" level="warn"/>
   <!-- Log prepared statement cache activity -->
   <logger name="org.hibernate.ps.PreparedStatementCache" level="warn"/>
-
-  <!-- Deactivate Struts warnings -->
-  <logger name="org.apache.struts.util.RequestUtils" level="error"/>
 
   <!-- Deactive PDF Export CSS Applier warnings -->
   <logger name="org.apache.fop.layoutmgr.inline.ContentLayoutManager" level="error"/>

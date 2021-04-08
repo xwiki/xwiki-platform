@@ -21,32 +21,33 @@ package org.xwiki.localization;
 
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Validate {@link LocaleUtils}.
  * 
  * @version $Id$
  */
-public class LocaleUtilsTest
+class LocaleUtilsTest
 {
     @Test
-    public void getParentLocale()
+    void getParentLocale()
     {
-        Assert.assertEquals(Locale.ENGLISH, LocaleUtils.getParentLocale(Locale.US));
-        Assert.assertEquals(Locale.ROOT, LocaleUtils.getParentLocale(Locale.ENGLISH));
-        Assert.assertEquals(null, LocaleUtils.getParentLocale(Locale.ROOT));
+        assertEquals(Locale.ENGLISH, LocaleUtils.getParentLocale(Locale.US));
+        assertEquals(Locale.ROOT, LocaleUtils.getParentLocale(Locale.ENGLISH));
+        assertEquals(null, LocaleUtils.getParentLocale(Locale.ROOT));
     }
 
     @Test
-    public void toLocale()
+    void toLocale()
     {
-        Assert.assertEquals(null, LocaleUtils.toLocale(null));
-        Assert.assertEquals(Locale.ROOT, LocaleUtils.toLocale(""));
-        Assert.assertEquals(Locale.ENGLISH, LocaleUtils.toLocale("en"));
-        Assert.assertEquals(Locale.US, LocaleUtils.toLocale("en_US"));
+        assertEquals(null, LocaleUtils.toLocale((String) null));
+        assertEquals(Locale.ROOT, LocaleUtils.toLocale(""));
+        assertEquals(Locale.ENGLISH, LocaleUtils.toLocale("en"));
+        assertEquals(Locale.US, LocaleUtils.toLocale("en_US"));
 
-        Assert.assertEquals(Locale.FRENCH, LocaleUtils.toLocale("badLocale", Locale.FRENCH));
+        assertEquals(Locale.FRENCH, LocaleUtils.toLocale("badLocale", Locale.FRENCH));
     }
 }

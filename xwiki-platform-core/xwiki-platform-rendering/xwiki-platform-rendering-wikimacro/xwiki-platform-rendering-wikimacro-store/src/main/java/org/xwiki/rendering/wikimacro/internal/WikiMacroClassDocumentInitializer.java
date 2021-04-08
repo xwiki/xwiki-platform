@@ -78,6 +78,8 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         // The code property contains wiki markup
         xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
 
+        xclass.addNumberField(MACRO_PRIORITY_PROPERTY, "Priority", 10, "integer");
+
         super.createClass(xclass);
     }
 }

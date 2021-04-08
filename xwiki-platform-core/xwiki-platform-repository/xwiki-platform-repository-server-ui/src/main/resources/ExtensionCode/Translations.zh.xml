@@ -38,17 +38,16 @@
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
 extension.repository.emptyvalue=
-### Missing: extension.repository.name=Name
-### Missing: extension.repository.summary=Summary
+extension.repository.name=名称
+extension.repository.summary=概要
 extension.repository.type=类型
-### Missing: extension.repository.category=Category
-### Missing: extension.repository.authors=Authors
-### Missing: extension.repository.doc.creationDate=Created On
-### Missing: extension.repository.doc.date=Last Modified
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.category=类别
+extension.repository.authors=作者
+extension.repository.doc.creationDate=创建于
+extension.repository.doc.date=最后修改
+extension.repository.rating=评分
+extension.repository.installedCount=安装次数
 
 ## Administration UI
-### Missing: admin.repository=Extension Repository</content>
-  
+admin.repository=扩展库</content>
 </xwikidoc>

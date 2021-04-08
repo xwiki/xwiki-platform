@@ -21,16 +21,16 @@ package org.xwiki.url.internal;
 
 import java.util.Arrays;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link URLStringEntityReferenceResolver}.
@@ -38,22 +38,22 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 8.2M1
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class,
     URLSymbolScheme.class
 })
-public class URLStringEntityReferenceResolverTest
+class URLStringEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<URLStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(URLStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private URLStringEntityReferenceResolver resolver;
 
     @Test
-    public void resolveReferences() throws Exception
+    void resolveReferences()
     {
         EntityReference expected = new DocumentReference("wiki!", Arrays.asList("space:.!"), "page.!");
 
-        EntityReference reference = this.mocker.getComponentUnderTest().resolve("wiki!!:space!:!.!!.page!.!!",
+        EntityReference reference = this.resolver.resolve("wiki!!:space!:!.!!.page!.!!",
             EntityType.DOCUMENT);
 
         assertEquals(expected, reference);

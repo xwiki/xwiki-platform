@@ -114,11 +114,6 @@ table.xwiki-livetable {
 html>body .xwiki-livetable-display td {
   border: 0px;
 }
-.xwiki-livetable-display td.typetext {
-  max-width: 20em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 /* </Live Table Containers> */
 /* <Live Table Header> */
 table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header {
@@ -234,11 +229,6 @@ tbody.xwiki-livetable-display-body td.actions.hide-labels .action-icon {
 }
 tbody.xwiki-livetable-display-body td._images img {
   margin-right: 2px;
-}
-tbody.xwiki-livetable-display-body td._avatar img {
-  border-radius: 4px;
-  max-height: 50px;
-  max-width: 50px;
 }
 /* </ Live Table Body> */
 /* <Tag Cloud & Top Filters>  */

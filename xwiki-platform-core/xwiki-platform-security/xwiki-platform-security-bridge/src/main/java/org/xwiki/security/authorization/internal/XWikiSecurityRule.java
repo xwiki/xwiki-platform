@@ -78,6 +78,9 @@ public final class XWikiSecurityRule implements SecurityRule
         }
         if (groups != null) {
             this.groups.addAll(groups);
+
+            // Also add groups to users in case we directly test the right of a group
+            this.users.addAll(groups);
         }
         this.rights.addAll(rights);
         this.state = state;
@@ -120,6 +123,9 @@ public final class XWikiSecurityRule implements SecurityRule
             for (String group : GroupsClass.getListFromString(obj.getStringValue(XWikiConstants.GROUPS_FIELD_NAME))) {
                 DocumentReference ref = resolver.resolve(group, wikiReference);
                 this.groups.add(ref);
+
+                // Also add groups to users set in case we directly test the right of a group
+                this.users.add(ref);
             }
         }
     }

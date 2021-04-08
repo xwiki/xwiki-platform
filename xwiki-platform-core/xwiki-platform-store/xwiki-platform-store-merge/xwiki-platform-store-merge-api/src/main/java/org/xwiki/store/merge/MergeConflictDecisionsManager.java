@@ -27,7 +27,6 @@ import org.xwiki.diff.ConflictDecision;
 import org.xwiki.diff.MergeConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manage the decisions taken to solve the merge conflicts.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.8RC1
  */
 @Role
-@Unstable
 public interface MergeConflictDecisionsManager
 {
     /**

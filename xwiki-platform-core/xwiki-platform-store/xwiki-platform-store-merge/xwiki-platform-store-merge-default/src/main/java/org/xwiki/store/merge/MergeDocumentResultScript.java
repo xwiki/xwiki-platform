@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -36,7 +35,6 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
  * @version $Id$
  * @since 11.8RC1
  */
-@Unstable
 public class MergeDocumentResultScript
 {
     private final MergeDocumentResult mergeDocumentResult;

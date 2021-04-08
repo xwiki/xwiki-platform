@@ -20,6 +20,7 @@
 package org.xwiki.user.internal.document;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.AbstractConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
@@ -109,10 +111,16 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
         return getConfigurationSource().getProperty(key, valueClass, defaultValue);
     }
 
+    @Override
+    public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
+    {
+        getConfigurationSource().setProperties(properties);
+    }
+
     private ConfigurationSource getConfigurationSource()
     {
         ConfigurationSource configurationSource;
-        UserReference userReference = this.userReferenceResolver.resolve(getDocumentReference());
+        UserReference userReference = this.userReferenceResolver.resolve(getCurrentUserDocumentReference());
         if (SuperAdminUserReference.INSTANCE == userReference) {
             configurationSource = this.superAdminConfigurationSource;
         } else if (GuestUserReference.INSTANCE == userReference) {
@@ -123,7 +131,7 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
         return configurationSource;
     }
 
-    private DocumentReference getDocumentReference()
+    private DocumentReference getCurrentUserDocumentReference()
     {
         return this.documentAccessBridge.getCurrentUserReference();
     }

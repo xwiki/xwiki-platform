@@ -57,7 +57,7 @@ $doc.display("extract", "edit", $obj)
 #set($newtitle = $request.title)
 #if($newtitle)
 #set($newtitle = $newtitle.replace('"',"'"))
-&lt;script type="text/javascript"&gt;
+&lt;script&gt;
 var title = "${newtitle}";
 {pre}
 document.forms.edit["XWiki.ArticleClass_0_title"].value = title;

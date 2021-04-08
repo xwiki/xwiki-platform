@@ -26,6 +26,8 @@
 
 <suppressions>
   <suppress checks="ClassFanOutComplexity" files="NFExpressionToHQLParser.java"/>
+  <!-- Fan-Out of 21 vs 20 accepted -->
+  <suppress checks="ClassFanOutComplexity" files="DefaultParametrizedNotificationManager.java"/>
   <suppress checks="CyclomaticComplexity" files="NFExpressionToHQLParser.java"/>
   <suppress checks="ExecutableStatementCount" files="QueryGenerator.java"/>
 </suppressions>

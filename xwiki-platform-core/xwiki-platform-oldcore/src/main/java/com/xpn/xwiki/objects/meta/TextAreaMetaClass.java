@@ -77,8 +77,8 @@ public class TextAreaMetaClass extends StringMetaClass
         StaticListClass contentTypeClass = new StaticListClass(this);
         contentTypeClass.setName("contenttype");
         contentTypeClass.setPrettyName("Content");
-        contentTypeClass.setValues(
-            UNKNWON + '|' + ContentType.WIKI_TEXT + '|' + ContentType.VELOCITY_CODE + '|' + ContentType.PURE_TEXT);
+        contentTypeClass.setValues(UNKNWON + '|' + ContentType.WIKI_TEXT + '|' + ContentType.VELOCITY_CODE + '|'
+            + ContentType.PURE_TEXT + '|' + ContentType.VELOCITYWIKI);
         contentTypeClass.setDefaultValue(UNKNWON);
         contentTypeClass.setRelationalStorage(false);
         contentTypeClass.setDisplayType(editorClass.getDisplayType());

@@ -883,14 +883,16 @@ $doc.display("content", $obj)
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered">
+  <div class="centered">
     <fieldset class="xwikimessage">
       <legend><span>$title</span></legend>
-      <p class="xwikimessage">$message</p>
+      #if ("$!message" != '')
+        <p class="xwikimessage">$message</p>
+      #end
 #end
 #macro(xwikimessageboxend)
     </fieldset>
-    </div>
+  </div>
 #end
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
@@ -1102,10 +1104,18 @@ $html
       #foreach($document in $documentList)
         #if ($document.getSpace() != $previousSpace && $displaySpaces)
           #if($foreach.count > 1) </ul></div></li> #end ## Close previous space item if needed
-          <li class="xitem space"><div class="xitemcontainer">${escapetool.xml($document.getSpace())}<ul class="xlist"> ## Open new space item
+          <li class="xitem">
+            <div class="xitemcontainer">
+              $services.icon.renderHTML('space') $escapetool.xml($document.space)
+              <ul class="xlist"> ## Open new space item
           #set($previousSpace = $document.getSpace())
         #end
-        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">${escapetool.xml($document.getPlainTitle())}</a></div></li>
+        <li class="xitem">
+          <div class="xitemcontainer">
+            $services.icon.renderHTML('page')
+            <a href="$document.getURL()">$escapetool.xml($document.plainTitle)</a>
+          </div>
+        </li>
       #end
       #if($displaySpaces)
         </ul></div></li> ## Close last space item
@@ -1212,6 +1222,7 @@ $html
  *#
 #macro(submitButton $name $shortcut $value)
 <span class="buttonwrapper"><input class="button" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/></span>
+<input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,
@@ -1273,18 +1284,38 @@ $Msz MB##
  * @param colprops the columns properties
  * @param options the livetable options.
  *#
-#macro(livetable $divid $collist $colprops $options)
+#macro (livetable $divid $collist $colprops $options)
 ## Open wiki syntax wrappers.
 #if("$!options.outputOnlyHtml" != 'true')
 ## Do not indent:
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
-## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
-## attribute values (e.g. if the live table id contains whitespaces)
+## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in
+## the attribute values (e.g. if the live table id contains whitespaces)
 {{html clean="false"}}
 #else {pre} #end
 #end
+#if ($services.liveData.liveTable && $request.useLiveData == 'true')
+#livetable_liveData($divid $collist $colprops $options)
+#else
+#livetable_html($divid $collist $colprops $options)
+#end
+## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
+#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+
+#else{/pre}#end##
+#end## end-wrappers
+#end
+
+#macro (livetable_liveData $divid $collist $colprops $options)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/liveData.js', true))
+  #set ($liveDataConfig = $services.liveData.liveTable.getConfig($divid, $collist, $colprops, $options))
+  #set ($liveDataConfigJSON = $jsontool.serialize($liveDataConfig))
+  <div class="liveData" id="$!escapetool.xml($divid)" data-config="$escapetool.xml($liveDataConfigJSON)"></div>
+#end
+
+#macro(livetable_html $divid $collist $colprops $options)
   ##
   ## SX deps.
   ##
@@ -1481,19 +1512,15 @@ $Msz MB##
     #info("(<span class='docTitleComputed'></span>)&nbsp;$services.localization.render('platform.livetable.docTitleComputedHint')")
   </div>
 </div>## xwiki-livetable-container
-## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
-#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
-
-#else{/pre}#end##
-#end## end-wrappers
 #end## end-livetable-macro
 
 #macro (livetable_filters $columns $columnsProperties $xclassName)
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      #if ($columnProperties.type != 'hidden')
-        <td class="xwiki-livetable-display-header-filter">
+      ## Note: Even though the column is hidden, we still need a TD to generate valid HTML
+      <td class="xwiki-livetable-display-header-filter">
+        #if ($columnProperties.type != 'hidden')
           #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
             #set ($columnXPropertyName = $column)
@@ -1509,8 +1536,8 @@ $Msz MB##
             #set ($xproperty = $xclass.get($columnXPropertyName))
             #livetable_filter($column $columnProperties $xproperty)
           #end
-        </td>
-      #end
+        #end
+      </td>
     #end
   </tr>
 #end
@@ -1677,12 +1704,86 @@ $displayName##
 #**
  * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
  *
+ * To be used when the passed whereParams parameter is either of type Map or of type List but the whereSQL query is
+ * using the "?" syntax for specifying parameters. Should always be used instead of #addLivetableLocationFilter which
+ * is buggy when called several times (it'll add the same HQL binding name every time it's called!
+ * See https://jira.xwiki.org/browse/XWIKI-17463).
+ *
  * @param whereQL existing where clause to augment
  * @param whereParams existing query params to augment
+ * @param locationValue if not empty then filters pages matching the passed values, with the "/" character acting as
+ *        a wildcard (e.g. passing "Blog/Intro" will match "Blog.BlogIntroduction")
  * @param filterWebHome if true then treat "WebHome" as a normal input string like any other (defaults to false)
  * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
- *        parameter value is ignored
+ *        and locationValue parameters are ignored
  * @internal
+ * @since 12.5
+ *#
+#macro(filterLocation $whereQL $whereParams $locationValue $hqlLocationBindingName $filterWebHome $customWhereQL)
+  #if ("$!locationValue" != '')
+    ## Location is a special case, that we need to handle separatly.
+    ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+    #set ($locationFilterValue = $locationValue)
+    ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
+    ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
+    ## As a consequence, we must escape these characters.
+    ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' below.
+    ## Since we use '!' for the escaping, we also double existing ones.
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+    ## Because the user might filter with "/" as separator we replace that by "%", because it could be "."
+    ## (the space separator) or "/" (as it is in the document name).
+    ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+    ## to filter on different levels:
+    ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%.%'))
+    #if ("$!customWhereQL" != '')
+      #set ($internalWhereQL = "${whereQL} $customWhereQL")
+    #else
+      #if ($whereParams.entrySet())
+        #set ($discard = $whereParams.put($hqlLocationBindingName, "%${locationFilterValue}%"))
+      #else
+        #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+      #end
+      #if ($filterWebHome == true)
+        #if ($whereParams.entrySet())
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(:$hqlLocationBindingName) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(:$hqlLocationBindingName) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+        #else
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+        #end
+      #else
+        #if ($whereParams.entrySet())
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(:$hqlLocationBindingName) ESCAPE '!'")
+        #else
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+        #end
+      #end
+    #end
+    #set ($whereQL = $NULL)
+    #setVariable("$whereQL", $internalWhereQL)
+  #end
+#end
+##
+##
+#**
+ * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
+ *
+ * To be used when the passed whereParams parameter is either of type Map or of type List but the whereSQL query is
+ * using the "?" syntax for specifying parameters.
+ *
+ * @param whereQL existing where clause to augment
+ * @param whereParams existing query params to augment
+ * @param locationValue if not empty then filters pages matching the passed values, with the "/" character acting as
+ *        a wildcard (e.g. passing "Blog/Intro" will match "Blog.BlogIntroduction")
+ * @param filterWebHome if true then treat "WebHome" as a normal input string like any other (defaults to false)
+ * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
+ *        and locationValue parameters are ignored
+ * @internal
+ * @deprecated starting with 12.5 use #filterLocation since this macro is buggy when called several times
  *#
 #macro(addLivetableLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
   #if ("$!locationValue" != '')
@@ -1737,11 +1838,16 @@ $displayName##
 #**
  * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
  *
+ * To be used when the passed whereParams parameter is of type List and the whereSQL query is using the "?N" syntax
+ * for specifying parameters.
+ *
  * @param whereQL existing where clause to augment
  * @param whereParams existing query params to augment
+ * @param locationValue if not empty then filters pages matching the passed values, with the "/" character acting as
+ *        a wildcard (e.g. passing "Blog/Intro" will match "Blog.BlogIntroduction")
  * @param filterWebHome if true then treat "WebHome" as a normal input string like any other (defaults to false)
  * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
- *        parameter value is ignored
+ *        and locationValue parameters are ignored
  * @internal
  * @since 11.6
  *#
@@ -2714,22 +2820,6 @@ Recursive title display detected!##
   #end
 #end
 
-#**
- * Pulls all the JavaScript and CSS resources needed by the date & time picker.
- *#
-#macro (dateTimePicker_import)
-  ## A simple date picker widget.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
-  ## Used to parse and serialize the selected date using the date format specified in the XClass.
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-#end
-
 #macro (dateTimePicker_input $parameters)
   #set ($discard = $parameters.putIfAbsent('class', 'datetime'))
   #set ($discard = $parameters.putIfAbsent('data-timestamp', $parameters.value.time))
@@ -2753,13 +2843,6 @@ Recursive title display detected!##
 #macro (dateTimePicker $parameters)
   #dateTimePicker_import
   #dateTimePicker_input($parameters)
-#end
-
-#**
- * Pulls all the JavaScript and CSS resources needed by the color picker.
- *#
-#macro (colorPicker_import)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/colorpicker/colorPicker.js', true))
 #end
 
 #macro (colorPicker_input $parameters)
@@ -2798,4 +2881,26 @@ Recursive title display detected!##
   #end
   #set ($return = $NULL)
   #setVariable ("$return" $defaultDocumentEditor)
+#end
+
+#macro (displayUserLink $userReference)
+  #if ($userReference.class.simpleName == "DocumentUserReference")
+    #set ($docReference = $userReference.reference)
+    #set ($props = $services.user.getProperties($userReference))
+    #if ("$!props.firstName" == "" || "$!props.lastName" == "")
+      #set ($displayName = $docReference.name)
+    #else
+      #set ($displayName = "$props.firstName $props.lastName")
+    #end
+  #else
+    #set ($docReference = $userReference)
+    #set ($displayName = $docReference.name)
+  #end
+  <div class="user" data-reference="$escapetool.xml($docReference)">
+    <span class="user-avatar-wrapper">
+      #getUserAvatarURL($docReference $avatarURL 120)
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+    </span>
+    <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
+  </div>
 #end

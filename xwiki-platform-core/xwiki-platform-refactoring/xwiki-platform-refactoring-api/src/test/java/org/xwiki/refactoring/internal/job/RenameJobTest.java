@@ -130,7 +130,7 @@ public class RenameJobTest extends AbstractMoveJobTest
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
-        when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
+        when(this.modelBridge.rename(oldReference, newReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference);
         request.setCheckRights(false);
@@ -140,6 +140,6 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(oldReference);
+        verify(this.modelBridge).rename(oldReference, newReference);
     }
 }

@@ -202,12 +202,14 @@
   #else
     #set ($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
   #end
+  ## accordion.js requires effects.js
+  $xwiki.jsfx.use('js/scriptaculous/effects.js')##
   $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/Drag.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/toolTip.js')##
   {{html}}
-  &lt;script type="text/javascript"&gt;
+  &lt;script&gt;
   //&lt;![CDATA[
   window.ajaxurl = "$ajaxurl";
   window.allPanelsPlace = new Object();

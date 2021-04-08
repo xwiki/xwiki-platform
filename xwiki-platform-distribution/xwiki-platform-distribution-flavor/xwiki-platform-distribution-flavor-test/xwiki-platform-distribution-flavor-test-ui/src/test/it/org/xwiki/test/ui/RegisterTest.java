@@ -26,14 +26,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WebDriverException;
-import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 import org.xwiki.test.ui.po.RegistrationPage;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Test the user registration feature.
@@ -97,7 +93,8 @@ public class RegisterTest extends AbstractTest
     })
     public void testRegisterExistingUser()
     {
-        registrationPage.fillRegisterForm(null, null, "Admin", null, null, null);
+        // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value filled from the previously run test).
+        this.registrationPage.fillRegisterForm("", "", "Admin", "password", "password", "");
         // Can't use validateAndRegister here because user existence is not checked by LiveValidation.
         Assert.assertFalse(tryToRegister());
         Assert.assertTrue(this.registrationPage.validationFailureMessagesInclude("User already exists."));

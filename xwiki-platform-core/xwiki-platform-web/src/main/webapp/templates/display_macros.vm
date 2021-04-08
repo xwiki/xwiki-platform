@@ -1,0 +1,168 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#macro (displayObjectProperty $propertyReference $displayMode)
+  #set ($propertyReference = $services.model.resolveObjectProperty($propertyReference))
+  #set ($object = $doc.getObject($propertyReference.parent))
+  $!object.display($propertyReference.name, $displayMode)
+#end
+
+##
+## Document property displayers
+##
+
+#macro (displayDocumentProperty $propertyName $displayMode)
+  #if ($propertyName.matches('\w+'))
+    #evaluate("${escapetool.h}displayDocumentProperty_${propertyName}(${escapetool.d}displayMode)")
+  #end
+#end
+
+#macro (displayDocumentProperty_hidden $displayMode)
+  #set ($macro.parameters = {
+    'id': 'xhidden',
+    'name': 'xhidden',
+    'value': $tdoc.isHidden(),
+    'mode': $displayMode,
+    'trueValue': 1,
+    'falseValue': 0
+  })
+  #displayProperty_boolean($macro.parameters)
+#end
+
+#macro (displayDocumentProperty_syntax $displayMode)
+  #set ($macro.parameters = {
+    'id': 'xwikidocsyntaxinput2',
+    'name': 'syntaxId',
+    'value': $tdoc.syntax,
+    'mode': $displayMode
+  })
+  #displayProperty_syntax($macro.parameters)
+  #if ($displayMode == 'edit')
+    #set ($discard = $xwiki.jsfx.use('syntaxPicker.js', true))
+    ## Use a hidden input to store the answer to the syntax conversion confirmation.
+    <input type="hidden" name="convertSyntax" value="false"
+      data-document-reference="$escapetool.xml($services.model.serialize($tdoc.documentReference, 'default'))" />
+  #end
+#end
+
+#macro (displayDocumentProperty_defaultLocale $displayMode)
+  #set ($macro.parameters = {
+    'id': 'xwikidoclanguageinput2',
+    'name': 'defaultLanguage',
+    'value': $tdoc.defaultLocale,
+    'mode': $displayMode
+  })
+  #displayProperty_locale($macro.parameters)
+#end
+
+##
+## Generic displayers
+##
+
+#macro (displayProperty_boolean $parameters)
+  #if ($parameters.mode == 'edit')
+    <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)">
+      <option value="$escapetool.xml($parameters.getOrDefault('falseValue', false))"
+          #if (!$parameters.value)selected#end>
+        $escapetool.xml($services.localization.render('no'))
+      </option>
+      <option value="$escapetool.xml($parameters.getOrDefault('trueValue', true))"
+          #if ($parameters.value)selected#end>
+        $escapetool.xml($services.localization.render('yes'))
+      </option>
+    </select>
+  #else
+    <span data-value="$!escapetool.xml($parameters.value)"
+      >$escapetool.xml($services.localization.render("#if ($parameters.value)yes#{else}no#end"))</span>
+  #end
+#end
+
+#macro (displayProperty_syntax $parameters)
+  #if ($parameters.mode == 'edit')
+    #set ($configuredSyntaxes = $services.rendering.configuredSyntaxes)
+    #set ($availableParserSyntaxes = $services.rendering.availableParserSyntaxes)
+    #set ($availableRendererSyntaxes = $services.rendering.availableRendererSyntaxes)
+    <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)" data-type="syntax">
+      #foreach ($syntax in $configuredSyntaxes)
+        <option value="$escapetool.xml($syntax.toIdString())"
+          data-syntax="$escapetool.xml($jsontool.serialize($syntax))"
+          data-parser="$!availableParserSyntaxes.contains($syntax)"
+          data-renderer="$!availableRendererSyntaxes.contains($syntax)"
+          #if ($syntax.equals($parameters.value)) selected="selected"#end>$syntax.toString()</option>
+      #end
+      ## Add the selected value if it's not in the list of known values.
+      #if (!$configuredSyntaxes.contains($parameters.value))
+        <option value="$!escapetool.xml($parameters.value.toIdString())"
+          data-syntax="$escapetool.xml($jsontool.serialize($syntax))"
+          data-parser="$!availableParserSyntaxes.contains($parameters.value)"
+          data-renderer="$!availableRendererSyntaxes.contains($parameters.value)"
+          selected="selected">$!parameters.value.toString()</option>
+      #end
+    </select>
+    #if ($hasAdmin && $configuredSyntaxes.size() < 2)
+      <a href="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&section=Syntaxes')">
+        $escapetool.xml($services.localization.render('web.widgets.syntaxPicker.configureSyntaxes'))
+      </a>
+    #end
+  #else
+    <span data-value="$!escapetool.xml($parameters.value.toIdString())" data-type="syntax"
+      >$!escapetool.xml($parameters.value.toString())</span>
+  #end
+#end
+
+#macro (displayProperty_locale $parameters)
+  #if ($parameters.mode == 'edit')
+    #set ($discard = $xwiki.jsfx.use('localePicker.js', true))
+    <input type="text" data-type="locale" id="$!escapetool.xml($parameters.id)"
+      name="$!escapetool.xml($parameters.name)" value="$!escapetool.xml($parameters.value)"/>
+  #else
+    #set ($localeName = $parameters.value.getDisplayName($xcontext.locale))
+    #set ($styleName = '')
+    #if ("$!localeName" == '')
+      #set ($localeName = $services.localization.render('core.viewers.information.noLocale'))
+      #set ($styleName = 'text-muted')
+    #end
+    <span data-value="$!escapetool.xml($parameters.value)" class="$styleName">$!escapetool.xml($localeName)</span>
+  #end
+#end
+
+##
+## Helpers
+##
+
+#macro (initRequiredSkinExtensions)
+  #set ($requiredSkinExtensionsMap = $collectiontool.orderedMap)
+  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
+  ## (they are aready available on the target page so there's no need to re-load them).
+  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
+    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $xwiki.get($pluginName).importString))
+  #end
+#end
+
+#macro (getRequiredSkinExtensions $return)
+  #set ($macro.importStrings = [])
+  #foreach ($entry in $requiredSkinExtensionsMap.entrySet())
+    #set ($macro.importString = $xwiki.get($entry.key).importString)
+    ## Remove the always used skin extensions, keep only those that have been requested by the display macros above.
+    #set ($discard = $macro.importStrings.add($!stringtool.removeStart($macro.importString, $entry.value).trim()))
+  #end
+  #set ($macro.importStrings = $stringtool.join($macro.importStrings, ''))
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.importStrings)
+#end

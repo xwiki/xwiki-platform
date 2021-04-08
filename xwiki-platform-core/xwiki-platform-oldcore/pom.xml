@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -64,19 +64,17 @@
       <version>${commons.version}</version>
     </dependency>
 
-    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
-    <!-- Remove once the CSS4J project uploads its artifacts to Maven Central, see http://bit.ly/2rbTJoc -->
+    <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
-      <artifactId>css4j</artifactId>
-      <version>2.0.1</version>
+      <artifactId>xml-dtd</artifactId>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>2.0.1</version>
     </dependency>
+
+    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
     <!-- Standard dependencies found in the central repository -->
     <!-- Apache Commons -->
@@ -131,10 +129,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
-    </dependency>
 
     <!-- Used by parse groovy from page -->
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
@@ -166,14 +160,21 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>3.6.3</version>
+      <version>4.3.2</version>
+      <exclusions>
+        <!-- Not the right id -->
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
@@ -275,7 +276,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-job</artifactId>
+      <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -635,14 +636,6 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Skipped for now as it really take very long time -->
-      <plugin>
-        <groupId>org.pitest</groupId>
-        <artifactId>pitest-maven</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
       <!-- Publish a Core Test JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -841,6 +834,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
+                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,

@@ -100,43 +100,16 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     }
 
     @Override
-    protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference)
+    protected void performRefactoring(DocumentReference oldReference, DocumentReference newReference)
     {
-        this.progressManager.pushLevelProgress(4, this);
+        DocumentRenamingEvent documentRenamingEvent = new DocumentRenamingEvent(oldReference, newReference);
+        DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
+        copyOrMove(oldReference, newReference, documentRenamingEvent, documentRenamedEvent);
+    }
 
-        try {
-            // Step 1: Send before event.
-            this.progressManager.startStep(this);
-            DocumentRenamingEvent documentRenamingEvent = new DocumentRenamingEvent(oldReference, newReference);
-            this.observationManager.notify(documentRenamingEvent, this, this.getRequest());
-            if (documentRenamingEvent.isCanceled()) {
-                return false;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 2: Copy the source document.
-            this.progressManager.startStep(this);
-            if (!super.copyOrMove(oldReference, newReference)) {
-                return false;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 3: Delete the source document.
-            this.progressManager.startStep(this);
-            if (!this.modelBridge.delete(oldReference)) {
-                return false;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 4: Send after event.
-            this.progressManager.startStep(this);
-            DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
-            this.observationManager.notify(documentRenamedEvent, this, this.getRequest());
-            this.progressManager.endStep(this);
-
-            return true;
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
+    @Override
+    protected boolean atomicOperation(DocumentReference source, DocumentReference target)
+    {
+        return this.modelBridge.rename(source, target);
     }
 }

@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Provides configuration from the Mail.SendMailConfigClass document in the main wiki.
- * If the Mail.SendMailConfigClass xobject exists in the Mail.MailConfig document then always use configuration
- * values from it and if it doesn't then use the passed default values (if a default value is passed).
+ * Provides configuration from the {@code Mail.MailConfig} document in the main wiki.
+ * If the {@code Mail.SendMailConfigClass} xobject exists in the {@code Mail.MailConfig} document then always use
+ * configuration values from it and if it doesn't then use the passed default values (if a default value is passed).
  *
  * @version $Id$
  * @since 11.8RC1

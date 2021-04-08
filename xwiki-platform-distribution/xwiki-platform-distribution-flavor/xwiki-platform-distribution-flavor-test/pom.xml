@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>13.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -133,7 +133,7 @@
           <dependencies>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store</artifactId>
+              <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
               <version>${project.version}</version>
               <scope>runtime</scope>
             </dependency>
@@ -268,6 +268,7 @@
                     templates/changeavatar\.vm <!-- does not produce any output, just redirects -->
                     templates/deletegroupmember\.vm <!-- does not produce any output, expects "fullname" to be a valid user name -->
                     templates/deprecatedMacros\.vm <!-- does not produce any output -->
+                    templates/display\.vm <!-- returns 400 (Bad Request) if expected request parameters are missing -->
                     templates/docalreadyexists\.vm <!-- returns 409 and shows an error message -->
                     templates/get\.vm <!-- just renders the page content using rendercontent.vm -->
                     templates/recyclebin\.vm <!-- output only comes from contentview.vm and docextra.vm parameter "id" must be an integer -->
@@ -280,6 +281,9 @@
                     templates/xpart\.vm <!-- avoid recursive include -->
                     templates/init\.vm <!-- escaping does not like it but it does not take any parameter anyway -->
                     templates/xml\.vm <!-- it's not escaping test job to validate XML format -->
+                    <!-- Those pages are deprecated and triggers a log warning -->
+                    XWiki/ResetPassword\.xml
+                    XWiki/ForgotUsername\.xml
                 </value>
               </property>
               <property>

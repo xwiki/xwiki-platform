@@ -61,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -530,6 +531,30 @@ public class DefaultMergeManagerTest
             assertNotNull(newAttachment);
             assertEquals(10, newAttachment.getLongSize());
             assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, newAttachment.getContent(null));
+        }
+
+        @Test
+        public void mergeAttachmentNewButAddedInCurrent() throws Exception
+        {
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            attachment.setLongSize(10);
+            attachment.setFilename("file");
+
+            this.currentDocument.addAttachment(attachment);
+            this.nextDocument.addAttachment(attachment);
+
+            MergeDocumentResult result = merge();
+
+            assertFalse(result.isModified());
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.WARN);
+            assertEquals(1, logs.size());
+            assertEquals("Attachment [Attachment wiki:space.page@file] already added",
+                logs.get(0).getFormattedMessage());
+
+            XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
+            assertSame(attachment, newAttachment);
         }
 
         @Test

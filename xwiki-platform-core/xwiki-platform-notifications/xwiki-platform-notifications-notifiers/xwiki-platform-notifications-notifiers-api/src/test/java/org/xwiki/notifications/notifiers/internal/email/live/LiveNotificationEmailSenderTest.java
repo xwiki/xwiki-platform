@@ -32,8 +32,6 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
-import org.xwiki.notifications.notifiers.internal.email.live.LiveMimeMessageIterator;
-import org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 

@@ -38,6 +38,11 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
 public class GroupMessageDescriptor extends AbstractMessageDescriptor
 {
     /**
+     * Event type of the group messages.
+     */
+    public static final String EVENT_TYPE = "groupMessage";
+
+    /**
      * Construct a GroupMessageDescriptor.
      */
     public GroupMessageDescriptor()
@@ -48,7 +53,7 @@ public class GroupMessageDescriptor extends AbstractMessageDescriptor
     @Override
     public String getEventType()
     {
-        return "groupMessage";
+        return EVENT_TYPE;
     }
 
     @Override
@@ -60,8 +65,6 @@ public class GroupMessageDescriptor extends AbstractMessageDescriptor
     @Override
     public boolean isEnabled(String wikiId)
     {
-        // TODO: enable this descriptor and add a notification filter so users only get messages that are sent to a
-        // group they belong to.
-        return false;
+        return super.isEnabled(wikiId);
     }
 }

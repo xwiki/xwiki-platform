@@ -48,23 +48,32 @@ public class ScopeNotificationFilterPreferencesGetter
 
     /**
      * Get all "ScopeNotificationFilterPreference(s)" and transform them to LocationFilter(s).
-     * @param filterPreferences the collection of all preferences to take into account
-     * @param eventType the event type (could be null)
-     * @param format the notification format (could be null)
-     * @return a hierarchy of scope notification filter preferences
+     * This method has a specific handling of the {@code eventType} parameter based on {@code onlyGivenType} boolean
+     * value. If this value is {@code false}, then {@code eventType} is only used for filters matching specific types:
+     * filters matching all types are always considered. Moreover in that case if {@code eventType} is {@code null} all
+     * filters are considered. Now if {@code onlyGivenType} is {@code false} and {@code eventType} is not null, only the
+     * filters using the specified type are considered, filters matching all types won't be considered. On the contrary,
+     * if {@code onlyGivenType} is {@code false} and {@code eventType} is null, then only the filters matching all types
+     * are considered.
      *
-     * @since 10.3RC1
+     * @param filterPreferences the collection of all preferences to take into account
+     * @param eventType the type of event to take into account: {@code null} is accepted but have different meaning
+     *                  depending on {@code onlyGivenType}.
+     * @param format the notification format (can be {@code null} in which cases all formats are accepted)
+     * @param onlyGivenType if {@code true} only the given {@code evenType} is taken into account. If {@code false}, the
+     *                      given type and filters matching all types are taken into account.
+     * @return a hierarchy of scope notification filter preferences
+     * @since 12.8RC1
      */
     public ScopeNotificationFilterPreferencesHierarchy getScopeFilterPreferences(
-            Collection<NotificationFilterPreference> filterPreferences, String eventType, NotificationFormat format)
+        Collection<NotificationFilterPreference> filterPreferences, String eventType, NotificationFormat format,
+        boolean onlyGivenType)
     {
         List<ScopeNotificationFilterPreference> results = new ArrayList<>();
 
         // Filter them according to the event type and the filter name
         Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
-            pref -> matchFilter(pref)
-                    && matchFormat(pref, format)
-                    && (matchAllEvents(pref) || matchEventType(pref, eventType))
+            pref -> matchAllCriteria(pref, eventType, format, onlyGivenType)
         );
 
         Iterator<NotificationFilterPreference> iterator = filterPreferenceStream.iterator();
@@ -73,6 +82,21 @@ public class ScopeNotificationFilterPreferencesGetter
         }
 
         return new ScopeNotificationFilterPreferencesHierarchy(results);
+    }
+
+    private boolean matchAllCriteria(NotificationFilterPreference pref, String eventType, NotificationFormat format,
+        boolean onlyGivenType)
+    {
+        if (!matchFilter(pref) || !matchFormat(pref, format)) {
+            return false;
+        } else if (!onlyGivenType && !matchAllEvents(pref) && !matchEventType(pref, eventType)) {
+            return false;
+        } else if (onlyGivenType && eventType == null && !matchAllEvents(pref)) {
+            return false;
+        } else if (onlyGivenType && eventType != null && !matchEventType(pref, eventType)) {
+            return false;
+        }
+        return true;
     }
 
     private boolean matchFilter(NotificationFilterPreference pref)

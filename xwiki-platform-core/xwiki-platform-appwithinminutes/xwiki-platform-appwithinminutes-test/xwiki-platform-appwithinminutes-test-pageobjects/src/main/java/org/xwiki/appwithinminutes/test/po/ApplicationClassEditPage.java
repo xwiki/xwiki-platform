@@ -23,11 +23,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Represents the actions available when editing the application class. This is also the second step of the App Within
@@ -38,6 +36,13 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  */
 public class ApplicationClassEditPage extends ApplicationEditPage
 {
+    /**
+     * The message displayed when the canvas is empty.
+     * @since 13.3RC1
+     * @since 12.10.6
+     */
+    public static final String EMPTY_CANVAS_HINT = "Drag fields from the palette and drop them in this area.";
+    
     @FindBy(id = "palette")
     private WebElement palette;
 
@@ -49,6 +54,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     @FindBy(id = "updateClassSheet")
     private WebElement updateClassSheetCheckbox;
+
+    /**
+     * Default constructor which waits on xaction_save button.
+     */
+    public ApplicationClassEditPage()
+    {
+        super(true, true);
+    }
 
     /**
      * Clicks on the Next Step button.
@@ -95,19 +108,14 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                try {
-                    return !addedField.getAttribute("class").contains("loading");
-                } catch (NotFoundException e) {
-                    return false;
-                } catch (StaleElementReferenceException e) {
-                    // The element was removed from DOM in the meantime
-                    return false;
-                }
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return !addedField.getAttribute("class").contains("loading");
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
             }
         });
 
@@ -135,5 +143,35 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         if (updateClassSheetCheckbox.isSelected() != update) {
             updateClassSheetCheckbox.click();
         }
+    }
+
+    /**
+     * Opens an AWM class editor at the provided document location.
+     *
+     * @param reference the location of the document
+     * @return the corresponding AWM class editor page object
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public static ApplicationClassEditPage goToEditor(DocumentReference reference)
+    {
+        getUtil().gotoPage(reference, "edit",
+            "editor", "inline", "template", "AppWithinMinutes.ClassTemplate", "title",
+            reference.getName() + " Class");
+        return new ApplicationClassEditPage();
+    }
+
+    /**
+     * Creates a new application with the given name.
+     * @param appName the application name
+     * @return the corresponding page object
+     * @since 13.2
+     * @since 12.10.6
+     */
+    public static ApplicationClassEditPage createNewApplication(String appName)
+    {
+        ApplicationCreatePage appCreatePage = ApplicationCreatePage.gotoPage();
+        appCreatePage.setApplicationName(appName);
+        return appCreatePage.clickNextStep();
     }
 }

@@ -22,21 +22,27 @@ package com.xpn.xwiki.web;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
+import javax.inject.Named;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,13 +51,14 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -65,6 +72,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@OldcoreTest
 public class DownloadActionTest
 {
     /** The name of the attachment being downloaded in most of the tests. */
@@ -73,22 +81,26 @@ public class DownloadActionTest
     /** The URI requested in most of the tests. */
     private static final String DEFAULT_URI = "/xwiki/bin/download/space/page/file.txt";
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /** Mocked context document. */
     private XWikiDocument document;
 
     /** Mocked client request. */
+    @Mock
     private XWikiRequest request;
 
     /** Mocked client response. */
+    @Mock
     private XWikiResponse response;
 
     /** Mocked engine context. */
-    private XWikiEngineContext ec;
+    @Mock
+    private XWikiEngineContext engineContext;
 
     /** A mocked output stream where the output file data is being written. */
+    @Mock
     private ServletOutputStream out;
 
     /** The action being tested. */
@@ -97,13 +109,14 @@ public class DownloadActionTest
     /** The content of the file being downloaded in most of the tests. */
     private byte[] fileContent = "abcdefghijklmn".getBytes(XWiki.DEFAULT_ENCODING);
 
+    @MockComponent
     private ResourceReferenceManager resourceReferenceManager;
 
     private DocumentReference documentReference;
 
     /**
      * Default constructor.
-     * 
+     *
      * @throws UnsupportedEncodingException if UTF-8 is not available, so never
      */
     public DownloadActionTest() throws UnsupportedEncodingException
@@ -111,18 +124,13 @@ public class DownloadActionTest
         // Empty, needed for declaring the exception thrown while initializing fileContent
     }
 
-    @Before
+    @BeforeEach
     public void before() throws Exception
     {
         this.oldcore.registerMockEnvironment();
-
-        this.request = mock(XWikiRequest.class);
         this.oldcore.getXWikiContext().setRequest(this.request);
-        this.response = mock(XWikiResponse.class);
         this.oldcore.getXWikiContext().setResponse(this.response);
-        this.ec = mock(XWikiEngineContext.class);
-        this.oldcore.getXWikiContext().setEngineContext(this.ec);
-        this.out = mock(ServletOutputStream.class);
+        this.oldcore.getXWikiContext().setEngineContext(this.engineContext);
 
         XWikiPluginManager pluginManager = new XWikiPluginManager();
         pluginManager.initInterface();
@@ -132,487 +140,14 @@ public class DownloadActionTest
         this.oldcore.getXWikiContext().setDoc(this.document);
 
         doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
-        when(this.ec.getMimeType("file.txt")).thenReturn("text/plain");
+        when(this.engineContext.getMimeType("file.txt")).thenReturn("text/plain");
         when(this.response.getOutputStream()).thenReturn(this.out);
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
             any(XWikiContext.class))).thenReturn(false);
 
-        // Mock what's needed for extracting the filename from the URL
-        this.resourceReferenceManager = this.oldcore.getMocker().registerMockComponent(ResourceReferenceManager.class);
     }
 
-    @Test
-    public void downloadNormal() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadLongLength() throws XWikiException
-    {
-        XWikiAttachment filetxt = new XWikiAttachment(this.document, DEFAULT_FILE_NAME);
-        XWikiAttachmentContent content = mock(XWikiAttachmentContent.class);
-        when(content.getAttachment()).thenReturn(filetxt);
-        when(content.getContentInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
-        when(content.getLongSize()).thenReturn(Long.MAX_VALUE);
-        filetxt.setAttachment_content(content);
-        filetxt.setLongSize(Long.MAX_VALUE);
-        this.document.getAttachmentList().add(filetxt);
-
-        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        // Make sure we set the right content length
-        verify(this.response, times(1)).setContentLengthLong(Long.MAX_VALUE);
-    }
-
-    @Test
-    public void downloadWhenIfModifiedSinceBefore() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenIfModifiedSinceSame() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime(), DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-    }
-
-    @Test
-    public void downloadWhenIfModifiedSinceAfter() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-    }
-
-    @Test(expected = XWikiException.class)
-    public void downloadWhenMissingFile() throws XWikiException
-    {
-        setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
-
-        this.action.render(this.oldcore.getXWikiContext());
-    }
-
-    @Test
-    public void downloadWhenURLNotPointingToAttachment() throws XWikiException
-    {
-        ResourceReference rr = new EntityResourceReference(this.documentReference, EntityResourceAction.VIEW);
-        when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
-
-        when(this.request.getRequestURI()).thenReturn("/xwiki/bin/download/space/page");
-
-        try {
-            this.action.render(this.oldcore.getXWikiContext());
-            fail("Should have thrown an exception before reaching here");
-        } catch (XWikiException expected) {
-            assertEquals("Error number 11003 in 11: Attachment not found", expected.getMessage());
-        }
-    }
-
-    @Test
-    public void downloadById() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        XWikiAttachment att;
-        for (byte i = 0; i < 10; ++i) {
-            att = new XWikiAttachment(this.document, "file." + i + ".txt");
-            byte[] content = new byte[1];
-            content[0] = (byte) ('0' + i);
-            att.setContent(new ByteArrayInputStream(content));
-            att.setDate(d);
-            this.document.getAttachmentList().add(att);
-        }
-
-        when(this.ec.getMimeType("file.5.txt")).thenReturn("text/plain");
-
-        setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                return argument[0] == '5';
-            }
-        }), eq(0), eq(1));
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                return argument[0] == '5';
-            }
-        }), eq(0), eq(1));
-    }
-
-    @Test(expected = XWikiException.class)
-    public void testDownloadByWrongId() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, "42", null, null, -1l, DEFAULT_FILE_NAME);
-
-        this.action.render(this.oldcore.getXWikiContext());
-    }
-
-    @Test
-    public void downloadWhenInvalidId() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, "two", null, null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test(expected = XWikiException.class)
-    public void downloadWhenIncompletePath() throws XWikiException
-    {
-        setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l, DEFAULT_FILE_NAME);
-
-        this.action.render(this.oldcore.getXWikiContext());
-    }
-
-    @Test
-    public void downloadWhenDifferentMimeType() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, "file.png");
-        when(this.ec.getMimeType("file.png")).thenReturn("image/png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
-            "inline; filename*=utf-8''file.png");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenForce() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename*=utf-8''file.txt");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWithRealDate() throws XWikiException, IOException
-    {
-        Date d = new Date(411757300000l);
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenNameWithSpacesEncodedWithPlus() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, "file name.txt");
-        when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
-        setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l, "file name.txt");
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "inline; filename*=utf-8''file%20name.txt");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, "file name.txt");
-        when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
-        setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename*=utf-8''file%20name.txt");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, "file\u021B.txt");
-
-        when(this.ec.getMimeType("file\u021B.txt")).thenReturn("text/plain");
-        setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
-            "attachment; filename*=utf-8''file%C8%9B.txt");
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenValidStartRange() throws XWikiException, IOException
-    {
-        // This test expects bytes 0, 1, 2 and 3 from the file.
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 0-3/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), 4);
-        verifyOutputExpectations(0, 4);
-    }
-
-    @Test
-    public void downloadWhenValidMiddleRange() throws XWikiException, IOException
-    {
-        // This test expects bytes 3, 4 and 5 from the file.
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 3-5/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), 3);
-        verifyOutputExpectations(3, 6);
-    }
-
-    @Test
-    public void downloadWhenValidEndRange() throws XWikiException, IOException
-    {
-        // This test expects bytes 9, 10, 11, 12 and 13 from the file.
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length - 9);
-        verifyOutputExpectations(9, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenOneByteRange() throws XWikiException, IOException
-    {
-        // This test expects the last four bytes (10, 11, 12 and 13) from the file
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 0-0/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), 1);
-        verifyOutputExpectations(0, 1);
-    }
-
-    @Test
-    public void downloadWhenRestRange() throws XWikiException, IOException
-    {
-        // This test expects bytes from 11 to the end of the file (11, 12 and 13)
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 11-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length - 11);
-        verifyOutputExpectations(11, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenFullRestRange() throws XWikiException, IOException
-    {
-        // This test expects the whole file
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenTailRange() throws XWikiException, IOException
-    {
-        // This test expects the last four bytes (10, 11, 12 and 13) from the file
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 10-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length - 10);
-        verifyOutputExpectations(10, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenFullTailRange() throws XWikiException, IOException
-    {
-        // This test expects the whole file
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenOverflowingTailRange() throws XWikiException, IOException
-    {
-        // This test expects the whole file, although the client requested more
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenValidOverflowingRange() throws XWikiException, IOException
-    {
-        // This test expects bytes 9, 10, 11, 12 and 13 from the file, although 14 and 15 are requested as well.
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-        verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length - 9);
-        verifyOutputExpectations(9, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenInvalidSwappedRange() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenInvalidRange() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-        verifyOutputExpectations(0, this.fileContent.length);
-    }
-
-    @Test
-    public void downloadWhenOutsideRange() throws XWikiException, IOException
-    {
-        // This test expects a 416 response
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-    }
-
-    @Test
-    public void downloadWhenOutsideRestRange() throws XWikiException, IOException
-    {
-        // This test expects a 416 response
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L, DEFAULT_FILE_NAME);
-
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-    }
-
-    @Test
-    public void downloadWhenEmptyRange() throws XWikiException, IOException
-    {
-        Date d = new Date();
-        createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L, DEFAULT_FILE_NAME);
-        assertNull(this.action.render(this.oldcore.getXWikiContext()));
-
-        verifyOutputExpectations(0, this.fileContent.length);
-        verifyResponseExpectations(d.getTime(), this.fileContent.length);
-    }
-
+    // Helpers for the tests
     private void createAttachment(Date d, String name) throws IOException
     {
         XWikiAttachment filetxt = new XWikiAttachment(this.document, name);
@@ -668,5 +203,573 @@ public class DownloadActionTest
                 return true;
             }
         }), eq(0), eq(end - start));
+    }
+
+    @Test
+    void downloadNormal() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadLongLength() throws XWikiException
+    {
+        XWikiAttachment filetxt = new XWikiAttachment(this.document, DEFAULT_FILE_NAME);
+        XWikiAttachmentContent content = mock(XWikiAttachmentContent.class);
+        when(content.getAttachment()).thenReturn(filetxt);
+        when(content.getContentInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+        when(content.getLongSize()).thenReturn(Long.MAX_VALUE);
+        filetxt.setAttachment_content(content);
+        filetxt.setLongSize(Long.MAX_VALUE);
+        this.document.getAttachmentList().add(filetxt);
+
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        // Make sure we set the right content length
+        verify(this.response, times(1)).setContentLengthLong(Long.MAX_VALUE);
+    }
+
+    @Test
+    void downloadWhenIfModifiedSinceBefore() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenIfModifiedSinceSame() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime(), DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void downloadWhenIfModifiedSinceAfter() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void downloadWhenMissingFile() throws XWikiException
+    {
+        setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadWhenURLNotPointingToAttachment() throws XWikiException
+    {
+        ResourceReference rr = new EntityResourceReference(this.documentReference, EntityResourceAction.VIEW);
+        when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
+
+        when(this.request.getRequestURI()).thenReturn("/xwiki/bin/download/space/page");
+
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadById() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        XWikiAttachment att;
+        for (byte i = 0; i < 10; ++i) {
+            att = new XWikiAttachment(this.document, "file." + i + ".txt");
+            byte[] content = new byte[1];
+            content[0] = (byte) ('0' + i);
+            att.setContent(new ByteArrayInputStream(content));
+            att.setDate(d);
+            this.document.getAttachmentList().add(att);
+        }
+
+        when(this.engineContext.getMimeType("file.5.txt")).thenReturn("text/plain");
+
+        setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
+        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
+        {
+            @Override
+            public boolean matches(byte[] argument)
+            {
+                return argument[0] == '5';
+            }
+        }), eq(0), eq(1));
+        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
+        {
+            @Override
+            public boolean matches(byte[] argument)
+            {
+                return argument[0] == '5';
+            }
+        }), eq(0), eq(1));
+    }
+
+    @Test
+    void testDownloadByWrongId() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, "42", null, null, -1l, DEFAULT_FILE_NAME);
+
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadWhenInvalidId() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, "two", null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenIncompletePath() throws XWikiException
+    {
+        setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l, DEFAULT_FILE_NAME);
+
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadWhenDifferentMimeType() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "inline; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenForce() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
+            "attachment; filename*=utf-8''file.txt");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenMimeTypeBlacklisted() throws Exception
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+        this.oldcore.getConfigurationSource().setProperty(DownloadAction.BLACKLIST_PROPERTY,
+            Arrays.asList("application/x-bzip", "image/png"));
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "attachment; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenMimeTypeBlacklistedAndAttachmentAddedByPRUser() throws Exception
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+        this.oldcore.getConfigurationSource().setProperty(DownloadAction.BLACKLIST_PROPERTY,
+            Arrays.asList("application/x-bzip", "image/png"));
+        // Consider PR rights
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
+            any(XWikiContext.class))).thenReturn(true);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "inline; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenMimeTypeForcedDownloadAndAttachmentAddedByPRUser() throws Exception
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+        this.oldcore.getConfigurationSource().setProperty(DownloadAction.FORCE_DOWNLOAD_PROPERTY,
+            Arrays.asList("application/x-bzip", "image/png"));
+        // Consider PR rights
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
+            any(XWikiContext.class))).thenReturn(true);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "attachment; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenMimeTypeNotWhitelisted() throws Exception
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+        this.oldcore.getConfigurationSource().setProperty(DownloadAction.WHITELIST_PROPERTY,
+            Collections.singletonList("application/x-bzip"));
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "attachment; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenMimeTypeNotWhitelistedButAddedByPRUser() throws Exception
+    {
+        Date d = new Date();
+        createAttachment(d, "file.png");
+        when(this.engineContext.getMimeType("file.png")).thenReturn("image/png");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
+        this.oldcore.getConfigurationSource().setProperty(DownloadAction.WHITELIST_PROPERTY,
+            Collections.singletonList("application/x-bzip"));
+        // Consider PR rights
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
+            any(XWikiContext.class))).thenReturn(true);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
+            "inline; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWithRealDate() throws XWikiException, IOException
+    {
+        Date d = new Date(411757300000l);
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenNameWithSpacesEncodedWithPlus() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file name.txt");
+        when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
+        setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l, "file name.txt");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
+            "inline; filename*=utf-8''file%20name.txt");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file name.txt");
+        when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
+        setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
+            "attachment; filename*=utf-8''file%20name.txt");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file\u021B.txt");
+
+        when(this.engineContext.getMimeType("file\u021B.txt")).thenReturn("text/plain");
+        setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
+            "attachment; filename*=utf-8''file%C8%9B.txt");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenValidStartRange() throws XWikiException, IOException
+    {
+        // This test expects bytes 0, 1, 2 and 3 from the file.
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 0-3/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), 4);
+        verifyOutputExpectations(0, 4);
+    }
+
+    @Test
+    void downloadWhenValidMiddleRange() throws XWikiException, IOException
+    {
+        // This test expects bytes 3, 4 and 5 from the file.
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 3-5/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), 3);
+        verifyOutputExpectations(3, 6);
+    }
+
+    @Test
+    void downloadWhenValidEndRange() throws XWikiException, IOException
+    {
+        // This test expects bytes 9, 10, 11, 12 and 13 from the file.
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length - 9);
+        verifyOutputExpectations(9, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenOneByteRange() throws XWikiException, IOException
+    {
+        // This test expects the last four bytes (10, 11, 12 and 13) from the file
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 0-0/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), 1);
+        verifyOutputExpectations(0, 1);
+    }
+
+    @Test
+    void downloadWhenRestRange() throws XWikiException, IOException
+    {
+        // This test expects bytes from 11 to the end of the file (11, 12 and 13)
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 11-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length - 11);
+        verifyOutputExpectations(11, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenFullRestRange() throws XWikiException, IOException
+    {
+        // This test expects the whole file
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenTailRange() throws XWikiException, IOException
+    {
+        // This test expects the last four bytes (10, 11, 12 and 13) from the file
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 10-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length - 10);
+        verifyOutputExpectations(10, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenFullTailRange() throws XWikiException, IOException
+    {
+        // This test expects the whole file
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenOverflowingTailRange() throws XWikiException, IOException
+    {
+        // This test expects the whole file, although the client requested more
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenValidOverflowingRange() throws XWikiException, IOException
+    {
+        // This test expects bytes 9, 10, 11, 12 and 13 from the file, although 14 and 15 are requested as well.
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length - 9);
+        verifyOutputExpectations(9, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenInvalidSwappedRange() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenInvalidRange() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenOutsideRange() throws XWikiException, IOException
+    {
+        // This test expects a 416 response
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+    }
+
+    @Test
+    void downloadWhenOutsideRestRange() throws XWikiException, IOException
+    {
+        // This test expects a 416 response
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+    }
+
+    @Test
+    void downloadWhenEmptyRange() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, DEFAULT_FILE_NAME);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L, DEFAULT_FILE_NAME);
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyOutputExpectations(0, this.fileContent.length);
+        verifyResponseExpectations(d.getTime(), this.fileContent.length);
     }
 }

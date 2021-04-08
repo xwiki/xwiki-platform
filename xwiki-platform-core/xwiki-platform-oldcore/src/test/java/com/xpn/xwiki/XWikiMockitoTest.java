@@ -47,7 +47,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -59,6 +58,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -71,7 +72,9 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider;
+import com.xpn.xwiki.internal.debug.DebugConfiguration;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -194,6 +197,7 @@ public class XWikiMockitoTest
         when(target.getDocumentReference()).thenReturn(targetReference);
         when(target.getDocumentReferenceWithLocale()).thenReturn(targetReferenceWithLocale);
         when(target.getLocalReferenceMaxLength()).thenReturn(255);
+        when(target.getOriginalDocument()).thenReturn(new XWikiDocument(targetReference));
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
@@ -569,5 +573,66 @@ public class XWikiMockitoTest
         mainwikiDescriptor.setPort(8080);
 
         assertEquals(new URL("http://mainwiki.com:8080"), this.xwiki.getServerURL("subwiki", this.context));
+    }
+
+    @Test
+    void getSkinFileWithMinification() throws Exception
+    {
+        DebugConfiguration debugConfig = this.componentManager.registerMockComponent(DebugConfiguration.class);
+
+        InternalSkinManager skinManager = this.componentManager.registerMockComponent(InternalSkinManager.class);
+        Skin currentSkin = mock(Skin.class, "current");
+        when(skinManager.getCurrentSkin(true)).thenReturn(currentSkin);
+
+        Resource jsSource = mock(Resource.class, "jsSource");
+        when(jsSource.getURL(false)).thenReturn("path/to/test.js");
+
+        Resource jsMinified = mock(Resource.class, "jsMinified");
+        when(jsMinified.getURL(false)).thenReturn("path/to/test.min.js");
+
+        Resource cssSource = mock(Resource.class, "cssSource");
+        when(cssSource.getURL(false)).thenReturn("path/to/test.css");
+
+        Resource cssMinified = mock(Resource.class, "cssMinified");
+        when(cssMinified.getURL(false)).thenReturn("path/to/test.min.css");
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        this.context.setURLFactory(urlFactory);
+
+        // minify = false
+
+        when(currentSkin.getResource("test.min.js")).thenReturn(jsMinified);
+        // test.js is missing so it should fall-back on test.min.js
+        assertEquals("path/to/test.min.js", this.xwiki.getSkinFile("test.js", this.context));
+
+        when(currentSkin.getResource("test.js")).thenReturn(jsSource);
+        // test.js is available so it should be returned.
+        assertEquals("path/to/test.js", this.xwiki.getSkinFile("test.js", this.context));
+
+        // Expect the version indicated by the debug configuration.
+        assertEquals("path/to/test.js", this.xwiki.getSkinFile("test.min.js", this.context));
+
+        // minify = true
+        when(debugConfig.isMinify()).thenReturn(true);
+
+        when(currentSkin.getResource("test.css")).thenReturn(cssSource);
+        // test.min.css is missing so it should fall-back on test.css
+        assertEquals("path/to/test.css", this.xwiki.getSkinFile("test.css", this.context));
+
+        when(currentSkin.getResource("test.min.css")).thenReturn(cssMinified);
+        // test.min.css is available so it should be returned.
+        assertEquals("path/to/test.min.css", this.xwiki.getSkinFile("test.css", this.context));
+
+        // Expect the version indicated by the debug configuration.
+        assertEquals("path/to/test.min.css", this.xwiki.getSkinFile("test.min.css", this.context));
+
+        when(currentSkin.getResource("test.min.css")).thenReturn(null);
+        assertEquals("path/to/test.css", this.xwiki.getSkinFile("test.min.css", this.context));
+
+        // Verify that the debug configuration is used only for JavaScript and CSS.
+        Resource pngMinified = mock(Resource.class, "pngMinified");
+        when(pngMinified.getURL(false)).thenReturn("path/to/test.min.png");
+        when(currentSkin.getResource("test.min.png")).thenReturn(pngMinified);
+        assertNull(this.xwiki.getSkinFile("test.png", this.context));
     }
 }

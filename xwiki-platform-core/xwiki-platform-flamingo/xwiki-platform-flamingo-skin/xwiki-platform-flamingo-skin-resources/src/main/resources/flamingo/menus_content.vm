@@ -50,6 +50,28 @@
   ##
   #set ($topStaticExtensions = [])
   ##
+  ## TRANSLATE menu
+  ##
+  #define ($translateMenu)
+    ## Output the translate menu if all the following conditions are met:
+    ## * multilingual is on
+    ## * the user can edit the current document
+    ## * the user is viewing the original document version
+    ## * the document is translatable (either has a default locale specified or it has existing translations)
+    ## * the current UI locale doesn't match the original document locale
+    #if (
+      $displayTranslateMenu &&
+      $xwiki.isMultiLingual() &&
+      $hasEdit && !$isReadOnly &&
+      $xcontext.action == 'view' && $tdoc.realLocale == $doc.realLocale &&
+      ("$!doc.realLocale" != '' || !$doc.translationLocales.isEmpty()) &&
+      $doc.realLocale != $xcontext.locale
+    )
+      #displayTranslateMenu()
+    #end
+  #end
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!translateMenu", 'order': 5000}))
+  ##
   ## EDIT menu
   ##
   #define ($editMenu)
@@ -210,6 +232,23 @@
 #end
 
 #**
+ * Display the Translate button used to translate the current document in the current locale.
+ *#
+#macro(displayTranslateMenu)
+  #set ($translateHint = $services.localization.render('core.menu.translate.hint',
+    [$xcontext.locale.getDisplayName($xcontext.locale)]))
+  #set ($translateDetails = $services.localization.render('core.menu.translate.details', [
+    $doc.realLocale.getDisplayName($xcontext.locale),
+    $xcontext.locale.getDisplayName($xcontext.locale)
+  ]))
+  #set ($translateAttrs = "$!extraAttributes tabindex='0' data-toggle='popover' data-trigger='hover' " +
+    "data-container='body' data-placement='bottom' data-title='$escapetool.xml($translateHint)' " +
+    "data-content='$escapetool.xml($translateDetails)'")
+  #set ($translateURL = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
+  #displayMenu('tmTranslate', 'translate', '', 'core.menu.translate', true, $translateURL, $translateAttrs)
+#end
+
+#**
  * Display the edit menu
  *#
 #macro(displayEditMenu)
@@ -331,16 +370,6 @@
     #end
     #set ($discard = $staticExtensions.add( { 'content': $print, 'order': 90000}))
     ##
-    ## VIEW SOURCE
-    ##
-    #define ($viewSource)
-      #if ("$!request.rev" != '')
-        #set ($revisionParameter = "&rev=$request.rev")
-      #end
-      #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-    #end
-    #set ($discard = $staticExtensions.add( { 'content': $viewSource, 'order': 100000}))
-    ##
     ## SHARE BY EMAIL
     ##
     #if ($canShare)
@@ -393,16 +422,22 @@
       ## ----------------------------
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
         #set ($viewersContent = "#template('shortcuts.vm')")
-        ## Only show the Viewers section if it contains something to display.
-        #if ($stringtool.isNotBlank("$!viewersContent"))
-          ## Only display a separator if at least one menu entry has been displayed before
-          #if ($needsSeparator)
-            #submenuseparator()
-          #end
-          #submenuheader('core.menu.actions.viewers')
-          $viewersContent
-          #set ($needsSeparator = true)
+        ## Only display a separator if at least one menu entry has been displayed before
+        #if ($needsSeparator)
+          #submenuseparator()
         #end
+        #submenuheader('core.menu.actions.viewers')
+        ##
+        ## VIEW SOURCE
+        ##
+        #if ("$!request.rev" != '')
+          #set ($revisionParameter = "&rev=$request.rev")
+        #end
+        #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+        $viewersContent
+        ## Display Viewers menu UIX..
+        #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+        #set ($needsSeparator = true)
       #end
     #end
   #end
@@ -416,10 +451,18 @@
  * Add keyboard shortcuts
  *#
 #macro(keyboardShortcuts)
-  <script type="text/javascript">
+  <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')", function() {
+        var editLink = $('tmEdit').down('a');
+        // Make sure the shortcut doesn't work when the edit link is disabled.
+        if (editLink && !editLink.classList.contains('disabled')) {
+          // Simulate the user click because the edit link can have click listeners registered (which aren't executed if
+          // we simply change the window location using the link URL).
+          editLink.click();
+        }
+      }, {'disable_in_input': true});
       #if($isAdvancedUser)
         shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });

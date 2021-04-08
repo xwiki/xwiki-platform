@@ -140,14 +140,15 @@
       #set ($defaultLanguage = 'default')
     #end
   #end
+  #set ($translationLocales = $doc.translationLocales)
   #if (("$!tdoc.locale" == '' || $tdoc.locale == $doc.defaultLocale) &amp;&amp; ($forcetrans == ''))
     (% class="important" %)
     **$services.localization.render('panels.translation.editingOriginal', [$defaultLanguage])**
-    #if ($!doc.translationList.size() &gt; 0)
+    #if ($translationLocales.size() &gt; 0)
 
       $services.localization.render('panels.translation.existingTranslations')##
-      #foreach ($translation in $doc.translationList) ##
-        [[$translation&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${translation}")]]##
+      #foreach ($locale in $translationLocales) ##
+        [[$locale&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${locale}")]]##
       #end
 
     #end
@@ -156,22 +157,21 @@
     **$services.localization.render('panels.translation.editingTranslation', [${rlanguage}])**
 
     $services.localization.render('panels.translation.editOriginalLanguage', ["[[$defaultLanguage&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLocale}"")]]"])
-    #if ($doc.translationList.size() &gt; 1)
+    #if ($translationLocales.size() &gt; 1)
 
       $services.localization.render('panels.translation.otherTranslations')##
-      #foreach ($translation in $doc.translationList)
-        #if ($translation != "$tdoc.locale") ##
-          [[$translation&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${translation}")]]##
+      #foreach ($locale in $translationLocales)
+        #if ($locale != $tdoc.locale) ##
+          [[$locale&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${locale}")]]##
         #end
       #end
 
     #end
   #end
-  #set ($elangs = $doc.translationList)
   #set ($extraTranslations = '')
-  #foreach ($olang in $xwiki.getXWikiPreference('languages').split('\s*[|, ]\s*'))
-    #if (!$elangs.contains($olang) &amp;&amp; $olang != "$doc.defaultLocale" &amp;&amp; $olang != $forcetrans)
-      #set ($extraTranslations = "${extraTranslations}[[$olang&gt;&gt;path:${doc.getURL('edit', ""editor=${editor}&amp;language=${olang}"")}]] ")
+  #foreach ($locale in $xwiki.availableLocales)
+    #if (!$translationLocales.contains($locale) &amp;&amp; $locale != $doc.defaultLocale &amp;&amp; "$locale" != $forcetrans)
+      #set ($extraTranslations = "${extraTranslations}[[$locale&gt;&gt;path:${doc.getURL('edit', ""editor=${editor}&amp;language=${locale}"")}]] ")
     #end
   #end
   #if ($extraTranslations != '')

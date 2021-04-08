@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -53,11 +52,11 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
     private WikiDescriptorManager wikis;
 
     @Override
-    public void initialize(ExecutionContext context) throws ExecutionContextException
+    public void initialize(ExecutionContext context)
     {
         if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
             Thread.currentThread().setContextClassLoader(
-                new ContextNamespaceURLClassLoader(wikis, this.classLoaderManager));
+                new ContextNamespaceURLClassLoader(this.wikis, this.classLoaderManager));
         }
     }
 }

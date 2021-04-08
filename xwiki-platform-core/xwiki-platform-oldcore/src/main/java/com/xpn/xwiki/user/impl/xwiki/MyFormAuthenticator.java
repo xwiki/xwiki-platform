@@ -26,6 +26,10 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -33,35 +37,14 @@ import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
-import org.xwiki.security.authentication.UserAuthenticatedEvent;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
-    private ObservationManager observationManager;
-
-    /**
-     * Used to convert a string into a proper Document Name.
-     */
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    /**
-     * Used to convert a {@link DocumentReference} into a proper {@link UserReference}.
-     */
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+    private UserAuthenticatedManager userAuthenticatedManager;
 
     /**
      * Show the login page.
@@ -118,6 +101,13 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return processLogin(request, response, null);
     }
 
+    private UserAuthenticatedManager getUserAuthenticatedManager() {
+        if ( this.userAuthenticatedManager == null ) {
+            this.userAuthenticatedManager = UserAuthenticatedManager.INSTANCE;
+        }
+        return this.userAuthenticatedManager;
+    }
+
     private String convertUsername(String username, XWikiContext context)
     {
         return context.getWiki().convertUsername(username, context);
@@ -142,7 +132,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 return false;
             }
             if ("1".equals(request.getParameter("basicauth"))) {
-                getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
+                getUserAuthenticatedManager().notify(principal.getName());
                 return true;
             }
         } catch (Exception e) {
@@ -177,7 +167,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                     request.setUserPrincipal(principal);
 
-                    getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
+                    getUserAuthenticatedManager().notify(principal.getName());
+
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
                     request.setUserPrincipal(null);
@@ -248,7 +239,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             request.setUserPrincipal(principal);
 
-            getObservationManager().notify(new UserAuthenticatedEvent(getContextUserReference(principal)), null);
+            getUserAuthenticatedManager().notify(principal.getName());
 
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
@@ -317,45 +308,5 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
         return result;
     }
-
-    private ObservationManager getObservationManager() {
-        if ( this.observationManager == null ) {
-            this.observationManager = Utils.getComponent(ObservationManager.class);
-        }
-        return this.observationManager;
-    }
-
-    private DocumentReferenceResolver<String> getDocumentReferenceResolver() {
-        if ( this.documentReferenceResolver == null ) {
-            this.documentReferenceResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        }
-        return this.documentReferenceResolver;
-    }
-
-    private UserReferenceResolver<DocumentReference> getUserReferenceResolver() {
-        if ( this.userReferenceResolver == null ) {
-            this.userReferenceResolver =
-                Utils.getComponent(new DefaultParameterizedType(UserReferenceResolver.class,DocumentReference.class),
-                    "current");
-        }
-        return this.userReferenceResolver;
-    }
-
-    private UserReference getContextUserReference(Principal principal)
-    {
-        UserReference contextUserReference;
-
-        if (principal != null) {
-            // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
-            // as the current wiki.
-            DocumentReference userDocumentReference =
-                getDocumentReferenceResolver().resolve(principal.getName());
-            contextUserReference = getUserReferenceResolver().resolve(userDocumentReference);
-        } else {
-            contextUserReference = null;
-        }
-
-        return contextUserReference;
-    }
 }
+

@@ -19,18 +19,13 @@
  */
 package org.xwiki.security.authentication;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
  * This event is triggered every time a user is authenticated.
- * <p>
- * The event also sends the following parameters:
- * </p>
- * <ul>
- * <li>source: the user reference (as a {@code org.xwiki.user.UserReference}) used for the authentication.</li>
- * </ul>
  *
  * @version $Id$
  * @since 13.3RC1
@@ -38,12 +33,6 @@ import org.xwiki.user.UserReference;
 @Unstable
 public class UserAuthenticatedEvent implements Event
 {
-    /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
     /**
      * Reference of the user who triggered the authentication event.
      */
@@ -79,8 +68,20 @@ public class UserAuthenticatedEvent implements Event
     @Override
     public boolean matches(Object other)
     {
+        return other instanceof UserAuthenticatedEvent;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
         return other instanceof UserAuthenticatedEvent
             && ((UserAuthenticatedEvent) other).getUserReference().equals(this.getUserReference());
     }
 
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 41).toHashCode();
+    }
 }
+

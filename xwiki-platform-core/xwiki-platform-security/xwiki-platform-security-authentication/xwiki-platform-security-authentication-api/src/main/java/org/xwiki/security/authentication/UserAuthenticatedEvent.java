@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authentication;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
@@ -71,17 +70,5 @@ public class UserAuthenticatedEvent implements Event
         return other instanceof UserAuthenticatedEvent;
     }
 
-    @Override
-    public boolean equals(Object other)
-    {
-        return other instanceof UserAuthenticatedEvent
-            && ((UserAuthenticatedEvent) other).getUserReference().equals(this.getUserReference());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 41).toHashCode();
-    }
 }
 

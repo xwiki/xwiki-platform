@@ -22,6 +22,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.security.Principal;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,11 +36,13 @@ import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.user.UserAuthenticatedManager;
 import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
 
+    @Inject
     private UserAuthenticatedManager userAuthenticatedManager;
 
     @Override
@@ -59,8 +62,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             // show the basic authentication window again.
             showLogin(request.getCurrentRequest(), response);
             return true;
-        } else {
-            getUserAuthenticatedManager().notify(principal.getName());
         }
 
         return false;
@@ -91,13 +92,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             showLogin(request.getCurrentRequest(), response);
             return true;
         }
-    }
-
-    private UserAuthenticatedManager getUserAuthenticatedManager() {
-        if ( this.userAuthenticatedManager == null ) {
-            this.userAuthenticatedManager = UserAuthenticatedManager.INSTANCE;
-        }
-        return this.userAuthenticatedManager;
     }
 
     private static String convertUsername(String username, XWikiContext context)

@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.Principal;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.user.UserAuthenticatedManager;
 import com.xpn.xwiki.web.Utils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +46,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
+    @Inject
     private UserAuthenticatedManager userAuthenticatedManager;
 
     /**
@@ -101,13 +104,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return processLogin(request, response, null);
     }
 
-    private UserAuthenticatedManager getUserAuthenticatedManager() {
-        if ( this.userAuthenticatedManager == null ) {
-            this.userAuthenticatedManager = UserAuthenticatedManager.INSTANCE;
-        }
-        return this.userAuthenticatedManager;
-    }
-
     private String convertUsername(String username, XWikiContext context)
     {
         return context.getWiki().convertUsername(username, context);
@@ -132,7 +128,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 return false;
             }
             if ("1".equals(request.getParameter("basicauth"))) {
-                getUserAuthenticatedManager().notify(principal.getName());
                 return true;
             }
         } catch (Exception e) {
@@ -167,7 +162,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                     request.setUserPrincipal(principal);
 
-                    getUserAuthenticatedManager().notify(principal.getName());
+                    this.userAuthenticatedManager.notify(principal.getName());
 
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
@@ -239,7 +234,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             request.setUserPrincipal(principal);
 
-            getUserAuthenticatedManager().notify(principal.getName());
+            this.userAuthenticatedManager.notify(principal.getName());
 
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {

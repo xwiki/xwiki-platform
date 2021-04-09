@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.user.impl.xwiki;
+package com.xpn.xwiki.internal.user;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.web.Utils;
-
+import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.UserAuthenticatedEvent;
 import org.xwiki.stability.Unstable;
@@ -34,13 +34,15 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Wraps an {@link org.xwiki.observation.ObservationManager} and a {@link org.xwiki.user.UserReferenceResolver} to
- * notify about user who are authenticated through {@link com.xpn.xwiki.user.impl.xwiki.MyFormAuthenticator} and {@link
- * com.xpn.xwiki.user.impl.xwiki.MyBasicAuthenticator}.
+ * Wraps an {@code ObservationManager} and a {@code UserReferenceResolver} to
+ * notify about user who are authenticated through {@code MyFormAuthenticator} and
+ * {@code MyBasicAuthenticator}.
  *
  * @version $Id$
  * @since 13.3RC1
  */
+@Component(roles = UserAuthenticatedManager.class)
+@Singleton
 @Unstable
 public class UserAuthenticatedManager
 {
@@ -49,12 +51,15 @@ public class UserAuthenticatedManager
      */
     public static final UserAuthenticatedManager INSTANCE = new UserAuthenticatedManager();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthenticatedManager.class);
+    @Inject
+    private Logger logger;
 
     @Inject
+    @Named("observer")
     private ObservationManager observationManager;
 
     @Inject
+    @Named("referenceresolver")
     private UserReferenceResolver<String> userReferenceResolver;
 
     /**
@@ -66,30 +71,7 @@ public class UserAuthenticatedManager
     }
 
     /**
-     * @return {@link org.xwiki.observation.ObservationManager}
-     */
-    private ObservationManager getObservationManager()
-    {
-        if (this.observationManager == null) {
-            this.observationManager = Utils.getComponent(ObservationManager.class);
-        }
-        return this.observationManager;
-    }
-
-    /**
-     * @return {@link org.xwiki.user.UserReferenceResolver} to resolve a string into a proper {@link
-     *     org.xwiki.user.UserReference}
-     */
-    private UserReferenceResolver<String> getUserReferenceResolver()
-    {
-        if (this.userReferenceResolver == null) {
-            this.userReferenceResolver = Utils.getComponent(UserReferenceResolver.class);
-        }
-        return this.userReferenceResolver;
-    }
-
-    /**
-     * @param userReference {@link org.xwiki.user.UserReference} of user who triggers a UserAuthenticatedEvent
+     * @param userReference {@code UserReference} of user who triggers a UserAuthenticatedEvent
      */
     public void notify(UserReference userReference)
     {
@@ -101,17 +83,17 @@ public class UserAuthenticatedManager
      */
     public void notify(String stringUserReference)
     {
-        UserReference userReference = this.getUserReferenceResolver().resolve(stringUserReference);
+        UserReference userReference = this.userReferenceResolver.resolve(stringUserReference);
         this.notify(new UserAuthenticatedEvent(userReference));
     }
 
     /**
-     * @param event {@link org.xwiki.security.authentication.UserAuthenticatedEvent} that has already been created
+     * @param event {@code UserAuthenticatedEvent} that has already been created
      */
     public void notify(UserAuthenticatedEvent event)
     {
-        LOGGER.debug("User authenticated for [{}]", event.getUserReference());
-        this.getObservationManager().notify(event, null);
+        this.logger.debug("User authenticated for [{}]", event.getUserReference());
+        this.observationManager.notify(event, null);
     }
 }
 

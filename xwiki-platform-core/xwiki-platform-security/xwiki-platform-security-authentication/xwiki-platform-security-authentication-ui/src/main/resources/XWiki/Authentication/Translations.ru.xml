@@ -49,5 +49,4 @@ authentication.admin.isAuthenticationSecurityEnabled.hint=Отключение �
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Отключено
 authentication.admin.isAuthenticationSecurityEnabled.enabled=Включено
 ### Missing: authentication.admin.heading=Authentication Security</content>
-  
 </xwikidoc>

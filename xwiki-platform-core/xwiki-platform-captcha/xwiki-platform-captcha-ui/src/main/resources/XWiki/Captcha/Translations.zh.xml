@@ -40,4 +40,4 @@
 captcha.admin.defaultCaptchaName.label=默认的验证方式
 captcha.admin.defaultCaptchaName.hint=设置默认的验证码生成器。您可以使用扩展管理器来搜寻并安装使用其他的验证码生成器。
 </content>
-  </xwikidoc>
+</xwikidoc>

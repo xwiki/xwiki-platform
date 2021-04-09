@@ -113,5 +113,4 @@ AnnotationCode.AnnotationConfig_displayed.hint=确定注解会默认显示还是
 AnnotationCode.AnnotationConfig_displayHighlight=已默认高亮显示注解
 AnnotationCode.AnnotationConfig_displayHighlight.hint=确定高亮显示注解是要总是显示还是只有当鼠标移到注解上时才显示
 AnnotationCode.AnnotationConfig_annotationClass=XWiki类定义了注释的结构</content>
-  
 </xwikidoc>

@@ -154,7 +154,7 @@ com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.internal.render.DefaultOldRendering
 com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
-com.xpn.xwiki.internal.user.UserAuthenticatedManager
+com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier
 com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass

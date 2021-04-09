@@ -22,7 +22,6 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.security.Principal;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,14 +35,20 @@ import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.user.UserAuthenticatedManager;
+import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
 
-    @Inject
-    private UserAuthenticatedManager userAuthenticatedManager;
+    private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
+
+    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier() {
+        if ( this.userAuthenticatedEventNotifier == null ) {
+            this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+        }
+        return this.userAuthenticatedEventNotifier;
+    }
 
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
@@ -83,7 +88,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
             request.setUserPrincipal(principal);
 
-            userAuthenticatedManager.notify(principal.getName());
+            this.getUserAuthenticatedEventNotifier().notify(principal.getName());
 
             return false;
         } else {
@@ -126,7 +131,11 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
                 request.setUserPrincipal(principal);
 
-                UserAuthenticatedManager.INSTANCE.notify(principal.getName());
+
+                // Since this scope is static, no UserAuthenticatedEventNotifier is available
+                // So we create one here
+                UserAuthenticatedEventNotifier notifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+                notifier.notify(principal.getName());
 
                 return principal;
             } else {

@@ -33,31 +33,23 @@ import org.xwiki.user.UserReference;
 public class UserAuthenticatedEvent implements Event
 {
     /**
-     * Reference of the user who triggered the authentication event.
+     * The reference related to an authenticated user for whom a {@link UserAuthenticatedEvent} has been triggered.
      */
-    private UserReference userReference;
+    private final UserReference userReference;
 
     /**
-     * This event will match any other document event of the same type.
-     */
-    public UserAuthenticatedEvent()
-    {
-        super();
-    }
-
-    /**
-     * This event will match only events of the same type affecting the same document.
+     * This event will match only events of the same type affecting the same user.
      *
-     * @param userReference the reference related to the user
+     * @param userReference The reference related to an authenticated user for whom a {@link UserAuthenticatedEvent}
+     * has been triggered.
      */
     public UserAuthenticatedEvent(UserReference userReference)
     {
-        super();
         this.userReference = userReference;
     }
 
     /**
-     * @return the {@link UserReference} of the source user reference.
+     * @return the {@link UserReference} of the authenticated user.
      */
     public UserReference getUserReference()
     {

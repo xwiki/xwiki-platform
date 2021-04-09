@@ -21,7 +21,6 @@
 package com.xpn.xwiki.internal.user;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -29,57 +28,38 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.UserAuthenticatedEvent;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Wraps an {@code ObservationManager} and a {@code UserReferenceResolver} to
+ * This notifier helps dealing with events triggered when a user is authenticated through XWiki Oldcore's
+ * authenticators. It wraps an {@code ObservationManager} and a {@code UserReferenceResolver} to
  * notify about user who are authenticated through {@code MyFormAuthenticator} and
  * {@code MyBasicAuthenticator}.
  *
  * @version $Id$
  * @since 13.3RC1
  */
-@Component(roles = UserAuthenticatedManager.class)
+@Component(roles = UserAuthenticatedEventNotifier.class)
 @Singleton
-@Unstable
-public class UserAuthenticatedManager
+public class UserAuthenticatedEventNotifier
 {
-    /**
-     * The unique instance of this class.
-     */
-    public static final UserAuthenticatedManager INSTANCE = new UserAuthenticatedManager();
 
     @Inject
     private Logger logger;
 
     @Inject
-    @Named("observer")
     private ObservationManager observationManager;
 
     @Inject
-    @Named("referenceresolver")
     private UserReferenceResolver<String> userReferenceResolver;
 
     /**
-     * Nothing to pass to this class.
-     */
-    public UserAuthenticatedManager()
-    {
-        // Voluntarily empty. We want to have a single instance of this class.
-    }
-
-    /**
-     * @param userReference {@code UserReference} of user who triggers a UserAuthenticatedEvent
-     */
-    public void notify(UserReference userReference)
-    {
-        this.notify(new UserAuthenticatedEvent(userReference));
-    }
-
-    /**
-     * @param stringUserReference string form of the reference of user who triggers a UserAuthenticatedEvent
+     * Resolve a string as a {@code UserReference} and notify a {@code UserAuthenticatedEvent} created with that user
+     * reference.
+     *
+     * @param stringUserReference string form of the reference of user that will be resolved as a {@code
+     * UserReference} and passed to the {@code UserAuthenticatedEvent} instance creation
      */
     public void notify(String stringUserReference)
     {
@@ -88,12 +68,15 @@ public class UserAuthenticatedManager
     }
 
     /**
-     * @param event {@code UserAuthenticatedEvent} that has already been created
+     * Notify a {@link UserAuthenticatedEvent} that has already been created.
+     *
+     * @param event {@code UserAuthenticatedEvent}
      */
-    public void notify(UserAuthenticatedEvent event)
+    private void notify(UserAuthenticatedEvent event)
     {
-        this.logger.debug("User authenticated for [{}]", event.getUserReference());
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("User authenticated for [{}]", event.getUserReference());
+        }
         this.observationManager.notify(event, null);
     }
 }
-

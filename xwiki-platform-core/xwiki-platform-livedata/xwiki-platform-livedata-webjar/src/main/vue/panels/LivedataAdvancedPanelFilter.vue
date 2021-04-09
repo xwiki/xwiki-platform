@@ -40,7 +40,8 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-filter"></span> Filter
+      <span class="fa fa-filter"></span>
+      {{ $t('livedata.panel.filter.title')}}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
@@ -48,7 +49,7 @@
 
       <!-- Explain why the panel might be empty. -->
       <div v-show="!logic.getFilterableProperties().length" class="text-muted">
-        None of the displayed properties is filterable.
+        {{ $t('livedata.panel.filter.noneFilterable') }}
       </div>
 
       <!--
@@ -75,7 +76,7 @@
             class="delete-filter-group"
             href="#"
             @click.prevent="logic.removeAllFilters(filterGroup.property)"
-            title="Delete the whole property filters"
+            :title="$t('livedata.panel.filter.deleteAll')"
           >
             <span class="fa fa-trash-o"></span>
           </a>
@@ -124,7 +125,7 @@
             href="#"
             @click.prevent="logic.addFilter(filterGroup.property)"
           >
-            + Add filter
+            {{ $t('livedata.panel.filter.add') }}
           </a>
         </div>
 
@@ -152,7 +153,9 @@
           value="none"
           ref="selectFilterPropertiesNone"
           selected disabled
-        >Add filters</option>
+        >
+          {{ $t('livedata.panel.filter.addProperty') }}
+        </option>
         <!--
           Unfiltered properties
           Only display in the select properties that are not already filtering

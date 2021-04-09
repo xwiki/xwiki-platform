@@ -38,7 +38,8 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-sort"></span> Sort
+      <span class="fa fa-sort"></span>
+      {{ $t('livedata.panel.sort.title') }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
@@ -46,7 +47,7 @@
 
       <!-- Explain why the panel might be empty. -->
       <div v-show="!logic.getSortableProperties().length" class="text-muted">
-        None of the displayed properties is sortable.
+        {{ $t('livedata.panel.sort.noneSortable') }}
       </div>
 
       <!--
@@ -81,11 +82,11 @@
             <option
               value="false"
               :selected="!sortEntry.descending"
-            >Ascending</option>
+            >{{ $t('livedata.panel.sort.direction.ascending') }}</option>
             <option
               value="true"
               :selected="sortEntry.descending"
-            >Descending</option>
+            >{{ $t('livedata.panel.sort.direction.descending') }}</option>
           </select>
 
           <!-- Delete sort entry button -->
@@ -93,7 +94,7 @@
             class="delete-sort"
             href="#"
             @click.prevent="logic.removeSort(sortEntry.property)"
-            title="Delete Sort"
+            :title="$t('livedata.panel.sort.delete')"
           >
             <span class="fa fa-trash-o"></span>
           </a>
@@ -122,7 +123,7 @@
           value="none"
           ref="selectPropertiesNone"
           selected disabled
-        >Add Sort level</option>
+        >{{ $t('livedata.panel.sort.add') }}</option>
         <!--
           Unsorted properties
           Only display in the select properties that are not already sorting

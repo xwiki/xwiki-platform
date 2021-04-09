@@ -43,7 +43,7 @@
           v-for="action in actions"
           :key="action.id"
           :class="'action action_' + action.id"
-          :title="action.description"
+          :title="$t(`livedata.displayer.actions.${action.id}`)"
           :href="entry[action.urlProperty] || '#'"
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
@@ -90,6 +90,16 @@ export default {
         .filter(action => this.logic.isActionAllowed(action, this.entry))
         .map(action => this.logic.getActionDescriptor(action));
     },
+  },
+
+  beforeMount () {
+    this.logic.loadTranslations({
+      componentName: "displayer-actions",
+      prefix: "livedata.displayer.actions",
+      keys: [
+        "noValue",
+      ],
+    });
   },
 
 };

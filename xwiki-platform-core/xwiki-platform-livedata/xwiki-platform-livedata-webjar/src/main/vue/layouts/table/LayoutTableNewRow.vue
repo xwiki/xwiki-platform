@@ -46,7 +46,7 @@
         @click.prevent="logic.addEntry()"
       >
         <span class="fa fa-plus-circle"></span>
-        Add entry
+        {{ $t('livedata.addEntry') }}
       </a>
     </td>
 

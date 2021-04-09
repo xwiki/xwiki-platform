@@ -35,7 +35,7 @@
     <!-- Drowpdown open / close button-->
     <a
       class="btn btn-default dropdown-toggle"
-      title="More Actions"
+      :title="$t('livedata.dropdownMenu.title')"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="true"
@@ -48,7 +48,7 @@
     <ul class="dropdown-menu">
 
       <!-- Change layout Section -->
-      <li class="dropdown-header">Change Layout</li>
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.changeLayout') }}</li>
 
       <!-- Layout options -->
       <li
@@ -60,31 +60,31 @@
       >
         <a href="#" @click.prevent="logic.changeLayout(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
-          {{ layout.name }}
+          {{ $t(`livedata.layout.${layout.id}.title`) }}
         </a>
       </li>
 
       <!-- Advanced panels Section -->
-      <li class="dropdown-header">Actions</li>
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.header.panels') }}</li>
 
       <!-- Properties Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> Advanced Properties
+          <span class="fa fa-list-ul"></span> {{ $t('livedata.dropdownMenu.panels.properties') }}
         </a>
       </li>
 
       <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> Advanced Sorting
+          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sorting') }}
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> Advanced Filtering
+          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filtering') }}
         </a>
       </li>
 

@@ -47,7 +47,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
     private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
 
-    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier() {
+    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier()
+    {
         if ( this.userAuthenticatedEventNotifier == null ) {
             this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
         }

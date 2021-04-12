@@ -101,7 +101,8 @@
     #end
   </dt>
   ## TODO: For now we only want to display conflicts if the property is content
-  #if ($propertyName.toLowerCase().equals("content"))
+  #set ($contentLabel = $services.localization.render('web.history.changes.document.content'))
+  #if ($propertyName.equals($contentLabel))
     #set ($conflictsDiff = $conflicts)
   #else
     #set ($conflictsDiff = $NULL)

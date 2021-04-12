@@ -6586,6 +6586,32 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * Returns whether a page exists or not.
+     * 
+     * @param reference the reference of the page to check for its existence
+     * @return true if the page exists, false if not
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    public boolean exists(PageReference reference, XWikiContext context)
+    {
+        // Try as space
+        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+        if (exists(documentReference, context)) {
+            return true;
+        }
+
+        // Try as document
+        if (documentReference.getParent().getParent().getType() == EntityType.SPACE) {
+            return exists(new DocumentReference(documentReference.getParent().getName(),
+                documentReference.getParent().getParent(), documentReference.getParameters()), context);
+        }
+
+        return false;
+    }
+
     public String getAdType(XWikiContext context)
     {
         String adtype = "";

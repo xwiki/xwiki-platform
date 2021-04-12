@@ -33,7 +33,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
@@ -42,6 +41,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -565,6 +565,20 @@ public class XWiki extends Api
      * @since 2.3M2
      */
     public boolean exists(DocumentReference reference) throws XWikiException
+    {
+        return this.xwiki.exists(reference, getXWikiContext());
+    }
+
+    /**
+     * Returns whether a page exists or not.
+     *
+     * @param reference the reference of the page to check for its existence
+     * @return true if the page exists, false if not
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    public boolean exists(PageReference reference)
     {
         return this.xwiki.exists(reference, getXWikiContext());
     }

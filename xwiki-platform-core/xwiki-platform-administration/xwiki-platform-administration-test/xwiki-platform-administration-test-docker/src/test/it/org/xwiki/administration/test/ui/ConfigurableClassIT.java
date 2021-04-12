@@ -380,7 +380,7 @@ class ConfigurableClassIT
             "codeToExecute", test);
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
@@ -413,7 +413,7 @@ class ConfigurableClassIT
             "propertiesToShow", "TextArea, Select");
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 

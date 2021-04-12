@@ -797,4 +797,14 @@ public class BasePage extends BaseElement
         useShortcutKeyAndLoads("d");
         return new ViewPage();
     }
+
+    /**
+     * @return true if there's a rendering error on the page (i.e. an element with the class
+     *         {@code xwikirenderingerror")
+     * @since 13.3RC1
+     */
+    public boolean hasRenderingError()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror"));
+    }
 }

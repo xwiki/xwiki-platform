@@ -543,7 +543,7 @@ public class XWikiMockitoTest
 
         assertFalse(this.xwiki.exists(pageReference, this.context));
 
-        when(this.store.exists(OldcoreMatchers.isDocument(finalDocumentReference), same(context))).thenReturn(true);
+        when(this.store.exists(OldcoreMatchers.isDocument(webhomeDocumentReference), same(context))).thenReturn(true);
 
         assertTrue(this.xwiki.exists(pageReference, this.context));
     }

@@ -78,7 +78,6 @@ class ConfigurableClassIT
         // Check that the links are there and contain the expected values
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(
             testReference.getLastSpaceReference().getName());
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(asp.hasLink("TheLinkPrefixString"));
         assertTrue(asp.hasLink("TheLinkPrefixBoolean"));
         assertTrue(asp.hasLink("TheLinkPrefixTextArea"));
@@ -117,7 +116,6 @@ class ConfigurableClassIT
 
         // Assert that half of the configuration shows up but not the other half.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(app1Section);
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(asp.hasHeading(2, "HSomeHeading"));
         // Save button
         // Javascript injects a save button outside of the form and removes the default save button.
@@ -141,7 +139,6 @@ class ConfigurableClassIT
 
         // Now we go to where the other half of the configuration should be.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), app2Section);
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(asp.hasHeading(2, "HSomeOtherHeading"));
         // Save button
         // Javascript injects a save button outside of the form and removes the default save button.
@@ -255,7 +252,6 @@ class ConfigurableClassIT
 
         // Check it's not available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
-        asp.waitUntilActionButtonIsLoaded();
         assertFalse(setup.getDriver().hasElementWithoutWaiting(By.id(String.format("%s_%s", section, fullName))));
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
 
@@ -264,7 +260,6 @@ class ConfigurableClassIT
 
         // Check that it is available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(asp.hasHeading(2, "HSomeHeading"));
         formContainerElement = asp.getFormContainerElementForClass(fullName);
         assertEquals(String.format("%ssave/%s", setup.getBaseBinURL(), fullName.replace('.', '/')),
@@ -279,13 +274,11 @@ class ConfigurableClassIT
 
         // Check that it's not available in another space.
         asp = AdministrationSectionPage.gotoSpaceAdministration(new SpaceReference("xwiki", "XWiki"), section);
-        asp.waitUntilActionButtonIsLoaded();
         assertFalse(setup.getDriver().hasElementWithoutWaiting(By.id(String.format("%s_%s", section, fullName))));
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
 
         // Check that it's not available in global section.
         asp = AdministrationSectionPage.gotoPage(section);
-        asp.waitUntilActionButtonIsLoaded();
         assertFalse(setup.getDriver().hasElementWithoutWaiting(By.id(String.format("%s_%s", section, fullName))));
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
     }
@@ -319,7 +312,6 @@ class ConfigurableClassIT
         assertTrue(administrationPage.hasSection("Other", section));
         administrationPage.clickSection("Other", section);
         AdministrationSectionPage asp = new AdministrationSectionPage(section);
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(asp.hasHeading(2, "HSomeHeading"));
         FormContainerElement formContainerElement = asp.getFormContainerElement();
         assertEquals(String.format("%ssave/%s", setup.getBaseBinURL(), fullName.replace('.', '/')),
@@ -333,7 +325,6 @@ class ConfigurableClassIT
         assertTrue(formContainerElement.hasField(By.id(fullName + "_redirect")));
 
         administrationPage = AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference());
-        asp.waitUntilActionButtonIsLoaded();
         assertTrue(administrationPage.hasNotSection(section));
     }
 
@@ -363,7 +354,6 @@ class ConfigurableClassIT
 
         setup.loginAsSuperAdmin();
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        asp.waitUntilActionButtonIsLoaded();
         assertFalse(setup.getDriver().
             hasElementWithoutWaiting(By.id(String.format("%s_%s", section, fullName))));
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
@@ -390,7 +380,6 @@ class ConfigurableClassIT
             "codeToExecute", test);
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        asp.waitUntilActionButtonIsLoaded();
         assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
@@ -424,8 +413,7 @@ class ConfigurableClassIT
             "propertiesToShow", "TextArea, Select");
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        asp.waitUntilActionButtonIsLoaded();
-        assertFalse(setup.getDriver().hasElement(By.className("xwikirenderingerror")));
+        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
@@ -454,7 +442,6 @@ class ConfigurableClassIT
             "String", test);
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
-        asp.waitUntilActionButtonIsLoaded();
         FormContainerElement formContainerElement = asp.getFormContainerElement();
         assertEquals(test, formContainerElement.getFieldValue(By.name(fullName + "_0_TextArea")));
         assertEquals(test, formContainerElement.getFieldValue(By.name(fullName + "_0_String")));
@@ -524,7 +511,6 @@ class ConfigurableClassIT
         // Go to the document, it will create a lock.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section1);
         asp.waitUntilPageIsLoaded();
-        asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
         viewPage = setup.gotoPage(page1);
@@ -537,7 +523,6 @@ class ConfigurableClassIT
 
         asp = AdministrationSectionPage.gotoPage(section2);
         asp.waitUntilPageIsLoaded();
-        asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
         viewPage = setup.gotoPage(page1);
         assertEquals("Is This Page Locked false", viewPage.getContent());

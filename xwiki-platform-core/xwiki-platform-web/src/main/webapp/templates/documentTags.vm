@@ -88,14 +88,14 @@
 ##
 #macro(displayAddForm)
 <form action="$doc.getURL('view', "xpage=documentTags&amp;xaction=add&amp;xredirect=${xredirect}")" method="post" class="tag-add-form">
-  <div>
-      ## CSRF prevention
-    <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-    <label for="tag">$services.localization.render('core.tags.add.label')<br/>
-      <input class="input-tag" type="text" id="tag" name="tag" autocomplete="off"/></label><br/>
-    <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$services.localization.render('core.tags.add.submit')"/></span>
-    <span class="buttonwrapper"><a class="button button-add-tag-cancel" href="$doc.getURL('view', "#${tagsId}")">$services.localization.render('core.tags.add.cancel')</a></span>
-  </div>
+    <div>
+        ## CSRF prevention
+        <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
+        <label for="tag">$services.localization.render('core.tags.add.label')<br/>
+            <input class="input-tag" type="text" id="tag" name="tag" autocomplete="off"/></label><br/>
+        <span class="buttonwrapper"><input class="button button-add-tag" type="submit" value="$services.localization.render('core.tags.add.submit')"/></span>
+        <span class="buttonwrapper"><a class="button button-add-tag-cancel" href="$doc.getURL('view', "#${tagsId}")">$services.localization.render('core.tags.add.cancel')</a></span>
+    </div>
 </form>
 #end
 ##
@@ -109,7 +109,6 @@
 #else ## display
     $xwiki.ssfx.use('uicomponents/viewers/tags.css', {'forceSkinAction': true, 'colorTheme': "$!{themeDocFullName}"})##
     $xwiki.jsfx.use('uicomponents/viewers/tags.js', true)##
-
     #if($xwiki.tag)
         #set($hasTagsPlugin = true)
         #set($tags = $xwiki.tag.getTagsFromDocument($doc.fullName))
@@ -117,20 +116,17 @@
         #set($hasTagsPlugin = false)
         #set($tags = $doc.getTagList())
     #end
-    <div class="doc-tags#if(!$hasedit && $tags.isEmpty()) hidden#end" id="${tagsId}">
-        $services.localization.render('core.tags.list.label')
-        #if(!$tags.isEmpty())
-            #foreach($tag in $tags)
-                #displayTag($tag)
-            #end
-        #end
-        #if($hasedit && $xwiki.tag)
-            <div class="tag-tool tag-add">
-                #if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')" rel="nofollow">[+]</a>#{else}#displayAddForm()#end
-            </div>
-        #end
-    </div>
-
+<div class="doc-tags#if(!$hasedit && $tags.isEmpty()) hidden#end" id="${tagsId}">
+    $services.localization.render('core.tags.list.label')
+    #foreach($tag in $tags)
+        #displayTag($tag)
+    #end
+    #if($hasedit && $xwiki.tag)
+        #set($url = $doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}"))
+        #set($title = $services.localization.render('core.tags.add.tooltip'))
+        <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$url" title="$title" rel="nofollow">[+]</a>#{else}#displayAddForm()#end</div>
+    #end
+</div>
     #if($tagErrorMessage != '')
         #error($tagErrorMessage)
     #end

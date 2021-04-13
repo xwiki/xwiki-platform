@@ -19,7 +19,7 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
@@ -27,7 +27,7 @@ import org.xwiki.security.authorization.SecurityAccess;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThat;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**
@@ -36,7 +36,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * @version $Id$
  * @since 4.0M2 
  */
-public class SecurityAccessTest
+class SecurityAccessTest
 {
 
     /**
@@ -58,7 +58,7 @@ public class SecurityAccessTest
      * Assert that access levels can be cleared and set on a SecurityAccess instance.
      */
     @Test
-    public void testAccessLevel() throws Exception
+    void testAccessLevel() throws Exception
     {
         assertDefaultAccessLevel();
 
@@ -150,7 +150,7 @@ public class SecurityAccessTest
      * Assert that the clone method works.
      */
     @Test
-    public void testClone() throws Exception
+    void testClone() throws Exception
     {
         XWikiSecurityAccess l = XWikiSecurityAccess.getDefaultAccess().clone();
         XWikiSecurityAccess k = l.clone();

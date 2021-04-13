@@ -19,9 +19,10 @@
  */
 package org.xwiki.wysiwyg.internal.cleaner;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A generic JUnit test used by {@link HTMLCleanerTestSuite} to clean some passed HTML content and verify it matches
@@ -66,7 +67,7 @@ public class HTMLCleanerTest
     @Test
     public void execute()
     {
-        Assert.assertEquals(xhtmlFragment(expected), cleaner.clean(input));
+        assertEquals(xhtmlFragment(expected), cleaner.clean(input));
     }
 
     /**

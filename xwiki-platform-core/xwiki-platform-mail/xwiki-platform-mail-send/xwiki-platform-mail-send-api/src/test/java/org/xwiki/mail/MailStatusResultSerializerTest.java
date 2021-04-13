@@ -22,9 +22,9 @@ package org.xwiki.mail;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4RC1
  */
-public class MailStatusResultSerializerTest
+class MailStatusResultSerializerTest
 {
     @Test
-    public void serializeErrors() throws Exception
+    void serializeErrors() throws Exception
     {
         MailStatusResult statusResult = mock(MailStatusResult.class);
         Date date = new Date();

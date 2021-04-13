@@ -95,7 +95,7 @@ class DocumentTagsTest extends TemplateTest
         // - The tag label is supposed to not be displayed
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags hidden\\E\" id=\"xdocTags\"> core.tags.list.label </div>"));
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags hidden\\E\" id=\"xdocTags\"> </div>"));
     }
 
     @Test

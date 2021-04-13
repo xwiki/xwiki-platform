@@ -117,8 +117,8 @@
         #set($tags = $doc.getTagList())
     #end
 <div class="doc-tags" id="${tagsId}">
-    #if(!$hasedit && $tags.isEmpty())
-         $services.localization.render('core.tags.list.label')
+    #if($hasedit || !$tags.isEmpty())
+        $services.localization.render('core.tags.list.label')
     #end
     #foreach($tag in $tags)
         #displayTag($tag)

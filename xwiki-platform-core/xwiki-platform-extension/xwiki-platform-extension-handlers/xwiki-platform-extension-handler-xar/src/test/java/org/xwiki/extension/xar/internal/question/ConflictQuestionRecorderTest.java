@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 7.1RC1
  */
-public class ConflictQuestionRecorderTest
+class ConflictQuestionRecorderTest
 {
     @Test
     void recordAndReplay()

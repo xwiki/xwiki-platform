@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class HTMLCleanerTest
+class HTMLCleanerTest
 {
     /**
      * The HTML cleaner being tested.
@@ -65,7 +65,7 @@ public class HTMLCleanerTest
      * The actual test.
      */
     @Test
-    public void execute()
+    void execute()
     {
         assertEquals(xhtmlFragment(expected), cleaner.clean(input));
     }

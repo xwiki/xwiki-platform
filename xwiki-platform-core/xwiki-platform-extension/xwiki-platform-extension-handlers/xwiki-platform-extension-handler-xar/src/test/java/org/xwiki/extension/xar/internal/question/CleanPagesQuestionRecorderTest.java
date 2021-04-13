@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version $Id$
  * @since 7.1RC1
  */
-public class CleanPagesQuestionRecorderTest
+class CleanPagesQuestionRecorderTest
 {
     @Test
     void recordAndReplay()

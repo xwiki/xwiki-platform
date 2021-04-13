@@ -29,11 +29,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -56,8 +54,10 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultLocalizationSource implements LocalizationSource, XWikiRestComponent
 {
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private LocalizationContext localizationContext;
+
+    @Inject
+    private LocalizationManager localizationManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -66,7 +66,7 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
     private Logger logger;
 
     @Override
-    public Response translations(String wikiId, String locale, String prefix, List<String> keys)
+    public Response translations(String wikiId, String localeString, String prefix, List<String> keys)
     {
         XWikiContext xWikiContext = this.contextProvider.get();
 
@@ -76,16 +76,12 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
             // Set the requested wiki id.
             xWikiContext.setWikiId(wikiId);
 
-            ComponentManager componentManager = this.componentManagerProvider.get();
-            LocalizationContext localizationContext = componentManager.getInstance(LocalizationContext.class);
-            LocalizationManager localizationManager = componentManager.getInstance(LocalizationManager.class);
-
             // Resolve the local.
-            Locale local;
-            if (StringUtils.isNotEmpty(locale)) {
-                local = Locale.forLanguageTag(locale);
+            Locale locale;
+            if (localeString != null) {
+                locale = LocaleUtils.toLocale(localeString);
             } else {
-                local = localizationContext.getCurrentLocale();
+                locale = this.localizationContext.getCurrentLocale();
             }
 
             // Computes the prefix.
@@ -96,19 +92,19 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
             // Resolve the raw translation of the requested keys.
             for (String key : keys) {
                 String fullKey = cleanPrefix + key;
-                Translation translation = localizationManager.getTranslation(fullKey, local);
+                Translation translation = this.localizationManager.getTranslation(fullKey, locale);
                 if (translation != null) {
                     Object rawSource = translation.getRawSource();
                     result.put(fullKey, String.valueOf(rawSource));
                 } else {
+                    // When a translation key is not found, it is still added to the result object, associated with a 
+                    // null value.
                     result.putNull(fullKey);
-                    this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, local, wikiId);
+                    this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, locale, wikiId);
                 }
             }
 
             return Response.ok(result).build();
-        } catch (ComponentLookupException e) {
-            return Response.serverError().entity(e).build();
         } finally {
             // Restore the old wiki id in the context.
             xWikiContext.setWikiId(oldWikiId);

@@ -22,7 +22,6 @@ package org.xwiki.localization.internal;
 import java.util.Arrays;
 import java.util.Locale;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.core.Response;
 
@@ -30,8 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -47,7 +44,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import ch.qos.logback.classic.Level;
 
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -67,8 +63,10 @@ class DefaultLocalizationSourceTest
     private DefaultLocalizationSource defaultLocalizationSource;
 
     @MockComponent
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private LocalizationContext localizationContext;
+
+    @MockComponent
+    private LocalizationManager localizationManager;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -76,29 +74,17 @@ class DefaultLocalizationSourceTest
     @Mock
     private XWikiContext xcontext;
 
-    @Mock
-    private ComponentManager componentManager;
-
-    @Mock
-    private LocalizationContext localizationContext;
-
-    @Mock
-    private LocalizationManager localizationManager;
-
     private final Locale defaultLocale = Locale.forLanguageTag("es");
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         when(this.contextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWikiId()).thenReturn("initialWikiId");
-        when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
-        when(this.componentManager.getInstance(LocalizationContext.class)).thenReturn(this.localizationContext);
-        when(this.componentManager.getInstance(LocalizationManager.class)).thenReturn(this.localizationManager);
-        when(localizationContext.getCurrentLocale()).thenReturn(this.defaultLocale);
+        when(this.localizationContext.getCurrentLocale()).thenReturn(this.defaultLocale);
     }
 
     @Test
@@ -110,8 +96,8 @@ class DefaultLocalizationSourceTest
         expected.put("key1", "value1");
         expected.put("key2", "value2");
 
-        when(localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
-        when(localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
         when(translationKey1.getRawSource()).thenReturn("value1");
         when(translationKey2.getRawSource()).thenReturn("value2");
 
@@ -121,24 +107,9 @@ class DefaultLocalizationSourceTest
         assertEquals(OK.getStatusCode(), response.getStatus());
         assertEquals(expected, response.getEntity());
 
-        verify(localizationManager).getTranslation("key1", this.defaultLocale);
-        verify(localizationManager).getTranslation("key2", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key1", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key2", this.defaultLocale);
         verify(this.xcontext).setWikiId("mywiki");
-        verify(this.xcontext).setWikiId("initialWikiId");
-    }
-
-    @Test
-    void translationsComponentLookupFail() throws Exception
-    {
-        when(this.componentManager.getInstance(LocalizationContext.class)).thenThrow(ComponentLookupException.class);
-
-        Response response =
-            this.defaultLocalizationSource.translations("mywiki", null, null, Arrays.asList("key1", "key2"));
-
-        assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-        assertEquals(ComponentLookupException.class, response.getEntity().getClass());
-
-        // Checks the wiki id is restored even in case of failure.
         verify(this.xcontext).setWikiId("initialWikiId");
     }
 
@@ -150,8 +121,8 @@ class DefaultLocalizationSourceTest
         expected.putNull("key1");
         expected.put("key2", "value2");
 
-        when(localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(null);
-        when(localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(null);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
         when(translationKey2.getRawSource()).thenReturn("value2");
 
         Response response =
@@ -164,8 +135,8 @@ class DefaultLocalizationSourceTest
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
         assertEquals("Key [key1] not found for local [es] in wiki [mywiki].", this.logCapture.getMessage(0));
 
-        verify(localizationManager).getTranslation("key1", this.defaultLocale);
-        verify(localizationManager).getTranslation("key2", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key1", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key2", this.defaultLocale);
         verify(this.xcontext).setWikiId("mywiki");
         verify(this.xcontext).setWikiId("initialWikiId");
     }
@@ -180,8 +151,8 @@ class DefaultLocalizationSourceTest
         expected.put("key2", "value2");
 
         Locale localeFr = Locale.forLanguageTag("fr");
-        when(localizationManager.getTranslation("key1", localeFr)).thenReturn(translationKey1);
-        when(localizationManager.getTranslation("key2", localeFr)).thenReturn(translationKey2);
+        when(this.localizationManager.getTranslation("key1", localeFr)).thenReturn(translationKey1);
+        when(this.localizationManager.getTranslation("key2", localeFr)).thenReturn(translationKey2);
         when(translationKey1.getRawSource()).thenReturn("value1");
         when(translationKey2.getRawSource()).thenReturn("value2");
 
@@ -191,8 +162,8 @@ class DefaultLocalizationSourceTest
         assertEquals(OK.getStatusCode(), response.getStatus());
         assertEquals(expected, response.getEntity());
 
-        verify(localizationManager).getTranslation("key1", localeFr);
-        verify(localizationManager).getTranslation("key2", localeFr);
+        verify(this.localizationManager).getTranslation("key1", localeFr);
+        verify(this.localizationManager).getTranslation("key2", localeFr);
         verify(this.xcontext).setWikiId("mywiki");
         verify(this.xcontext).setWikiId("initialWikiId");
     }
@@ -206,8 +177,8 @@ class DefaultLocalizationSourceTest
         expected.put("key1", "value1");
         expected.put("key2", "value2");
 
-        when(localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
-        when(localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
         when(translationKey1.getRawSource()).thenReturn("value1");
         when(translationKey2.getRawSource()).thenReturn("value2");
 
@@ -217,8 +188,8 @@ class DefaultLocalizationSourceTest
         assertEquals(OK.getStatusCode(), response.getStatus());
         assertEquals(expected, response.getEntity());
 
-        verify(localizationManager).getTranslation("key1", defaultLocale);
-        verify(localizationManager).getTranslation("key2", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key1", this.defaultLocale);
+        verify(this.localizationManager).getTranslation("key2", this.defaultLocale);
         verify(this.xcontext).setWikiId("mywiki");
         verify(this.xcontext).setWikiId("initialWikiId");
     }

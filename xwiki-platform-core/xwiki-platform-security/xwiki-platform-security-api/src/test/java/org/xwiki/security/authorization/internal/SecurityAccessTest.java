@@ -27,7 +27,7 @@ import org.xwiki.security.authorization.SecurityAccess;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThat;
 import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
 
 /**

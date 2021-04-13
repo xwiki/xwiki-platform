@@ -19,14 +19,14 @@
  */
 package org.xwiki.extension.xar.internal.question;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
 public class ConflictQuestionRecorderTest
 {
     @Test
-    void recordAndReplay()
+    public void recordAndReplay()
     {
         XWikiDocument alice = mock(XWikiDocument.class, "Alice");
         when(alice.getDocumentReference()).thenReturn(new DocumentReference("dev", "Users", "Alice"));

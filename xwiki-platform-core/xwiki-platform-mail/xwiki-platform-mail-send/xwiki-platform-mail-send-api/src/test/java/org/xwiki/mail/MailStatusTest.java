@@ -23,10 +23,10 @@ import java.util.Date;
 
 import javax.mail.Message;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link MailStatus}.
@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.4RC1
  */
-class MailStatusTest
+public class MailStatusTest
 {
     @Test
-    void setError()
+    public void setError()
     {
         MailStatus status = new MailStatus();
         status.setError(new Exception("outer", new Exception("inner")));
@@ -48,7 +48,7 @@ class MailStatusTest
     }
 
     @Test
-    void verifyToStringWhenStatusHasNoError() throws Exception
+    public void verifyToStringWhenStatusHasNoError() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");
@@ -64,7 +64,7 @@ class MailStatusTest
     }
 
     @Test
-    void verifyToStringWhenStatusHasError() throws Exception
+    public void verifyToStringWhenStatusHasError() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");
@@ -82,7 +82,7 @@ class MailStatusTest
     }
 
     @Test
-    void verifyToStringWhenWiki() throws Exception
+    public void verifyToStringWhenWiki() throws Exception
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");

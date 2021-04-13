@@ -19,8 +19,8 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -28,8 +28,8 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * @since 7.0RC1
  * @version $Id$
  */
-class LESSSkinFileResourceReferenceTest
+public class LESSSkinFileResourceReferenceTest
 {
     private TemplateManager templateManager;
 
@@ -47,8 +47,8 @@ class LESSSkinFileResourceReferenceTest
 
     private Skin skin;
     
-    @BeforeEach
-    void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         templateManager = mock(TemplateManager.class);
         skinManager = mock(SkinManager.class);
@@ -57,7 +57,7 @@ class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    void getContent() throws Exception
+    public void getContent() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
                 = new LESSSkinFileResourceReference("style.less", templateManager, skinManager);
@@ -74,7 +74,7 @@ class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    void getContentWhenFileDoesNotExist() throws Exception
+    public void getContentWhenFileDoesNotExist() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
                 = new LESSSkinFileResourceReference("not-existing-file.less", templateManager, skinManager);
@@ -93,7 +93,7 @@ class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    void getContentWhenException() throws Exception
+    public void getContentWhenException() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
                 = new LESSSkinFileResourceReference("file.less", templateManager, skinManager);
@@ -119,7 +119,7 @@ class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    void serialize() throws Exception
+    public void serialize() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
                 = new LESSSkinFileResourceReference("file.less", templateManager, skinManager);

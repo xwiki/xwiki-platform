@@ -19,12 +19,12 @@
  */
 package org.xwiki.lesscss.internal.skin;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,18 +34,18 @@ import static org.mockito.Mockito.when;
  * @since 7.0RC1
  * @version $Id$
  */
-class DocumentSkinReferenceTest
+public class DocumentSkinReferenceTest
 {
     private EntityReferenceSerializer<String> entityReferenceSerializer;
     
-    @BeforeEach
-    void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         entityReferenceSerializer = mock(EntityReferenceSerializer.class);
     }
 
     @Test
-    void serialize() throws Exception
+    public void serialize() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         DocumentSkinReference documentSkinReference 

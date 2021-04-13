@@ -21,11 +21,11 @@ package org.xwiki.extension.xar.internal.question;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link CleanPagesQuestionRecorder}.
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CleanPagesQuestionRecorderTest
 {
     @Test
-    void recordAndReplay()
+    public void recordAndReplay()
     {
         DocumentReference aliceReference = new DocumentReference("dev", "Users", "Alice");
         DocumentReference bobReference = new DocumentReference("dev", "Users", "Bob");

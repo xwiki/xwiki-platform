@@ -19,15 +19,15 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,21 +38,21 @@ import static org.mockito.Mockito.when;
  * @since 7.0RC1
  * @version $Id$
  */
-class LESSObjectPropertyResourceReferenceTest
+public class LESSObjectPropertyResourceReferenceTest
 {
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     private DocumentAccessBridge bridge;
     
-    @BeforeEach
-    void SetUp() throws Exception
+    @Before
+    public void SetUp() throws Exception
     {
         entityReferenceSerializer = mock(EntityReferenceSerializer.class);
         bridge = mock(DocumentAccessBridge.class);
     }
     
     @Test
-    void getContent() throws Exception
+    public void getContent() throws Exception
     {
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference("property",
                 new ObjectReference("class", new DocumentReference("wiki", "Space", "Document")));
@@ -67,7 +67,7 @@ class LESSObjectPropertyResourceReferenceTest
     }
 
     @Test
-    void serialize() throws Exception
+    public void serialize() throws Exception
     {
         ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference("property",
                 new ObjectReference("class", new DocumentReference("wiki", "Space", "Document")));

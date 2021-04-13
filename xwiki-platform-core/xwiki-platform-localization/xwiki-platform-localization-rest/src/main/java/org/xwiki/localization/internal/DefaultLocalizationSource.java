@@ -91,16 +91,18 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
 
             // Resolve the raw translation of the requested keys.
             for (String key : keys) {
-                String fullKey = cleanPrefix + key;
-                Translation translation = this.localizationManager.getTranslation(fullKey, locale);
-                if (translation != null) {
-                    Object rawSource = translation.getRawSource();
-                    result.put(fullKey, String.valueOf(rawSource));
-                } else {
-                    // When a translation key is not found, it is still added to the result object, associated with a 
-                    // null value.
-                    result.putNull(fullKey);
-                    this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, locale, wikiId);
+                if (key != null) {
+                    String fullKey = cleanPrefix + key;
+                    Translation translation = this.localizationManager.getTranslation(fullKey, locale);
+                    if (translation != null) {
+                        Object rawSource = translation.getRawSource();
+                        result.put(fullKey, String.valueOf(rawSource));
+                    } else {
+                        // When a translation key is not found, it is still added to the result object, associated with
+                        // a null value.
+                        result.putNull(fullKey);
+                        this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, locale, wikiId);
+                    }
                 }
             }
 

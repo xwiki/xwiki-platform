@@ -193,4 +193,25 @@ class DefaultLocalizationSourceTest
         verify(this.xcontext).setWikiId("mywiki");
         verify(this.xcontext).setWikiId("initialWikiId");
     }
+
+    @Test
+    void translationMissingKey()
+    {
+        Translation translationKey1 = mock(Translation.class);
+        Translation translationKey2 = mock(Translation.class);
+
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
+        when(translationKey1.getRawSource()).thenReturn("value1");
+        when(translationKey2.getRawSource()).thenReturn("value2");
+
+        Response response =
+            this.defaultLocalizationSource.translations("mywiki", null, "key", Arrays.asList((String) null));
+
+        assertEquals(OK.getStatusCode(), response.getStatus());
+        assertEquals(JsonNodeFactory.instance.objectNode(), response.getEntity());
+
+        verify(this.xcontext).setWikiId("mywiki");
+        verify(this.xcontext).setWikiId("initialWikiId");
+    }
 }

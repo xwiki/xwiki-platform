@@ -50,6 +50,16 @@ class LocalizationRestIT
 
     @Test
     @Order(1)
+    void translationNoKeyParam(TestUtils testUtils) throws Exception
+    {
+        Map<String, Object[]> queryParams = new HashMap<>();
+        GetMethod getMethod = testUtils.rest().executeGet(LocalizationSource.class, queryParams, "xwiki");
+        String body = getMethod.getResponseBodyAsString();
+        assertEquals("<ObjectNode/>", body);
+    }
+
+    @Test
+    @Order(2)
     void translationKeyMissing(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
@@ -60,7 +70,7 @@ class LocalizationRestIT
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void translationOnXWiki(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.deletePage(testReference);

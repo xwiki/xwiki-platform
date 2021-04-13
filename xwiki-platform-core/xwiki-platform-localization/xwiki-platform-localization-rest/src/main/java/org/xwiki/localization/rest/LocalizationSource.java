@@ -48,9 +48,10 @@ public interface LocalizationSource
      * found, it is returned with a @{code null} value.
      *
      * @param wikiName the name of the wiki holding the translation keys
-     * @param locale the locale of the translation values
-     * @param prefix a common prefix, concatenated to each translation key before resolving their values
-     * @param keys the translation keys to resolve
+     * @param locale the locale of the translation values, when {@code null} the current locale of the user is used
+     * @param prefix a common prefix, concatenated to each translation key before resolving their values (can be
+     *     {@code null} in which case nothing is concatenated)
+     * @param keys the translation keys to resolve. If no key is passed, and empty object is returned
      * @return the response, an {@link Response.Status#INTERNAL_SERVER_ERROR} in case of component resolution issue, or
      *     a {@link Response.Status#OK} response with an object holding the translation values otherwise
      */

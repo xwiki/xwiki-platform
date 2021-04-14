@@ -31,7 +31,7 @@
   <artifactId>xwiki-platform-localization-rest-api</artifactId>
   <name>XWiki Platform - Localization - REST - API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Localisation - REST - API</description>
+  <description>The API of the Localization REST services.</description>
   <properties>
     <xwiki.extension.name>Localization REST Services API</xwiki.extension.name>
   </properties>

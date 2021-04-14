@@ -31,7 +31,7 @@
   <artifactId>xwiki-platform-localization-rest</artifactId>
   <name>XWiki Platform - Localization - REST - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Localisation - REST - Parent POM</description>
+  <description>Services to access XWiki Localizations through a RESTful API.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Localization REST Services</xwiki.extension.name>

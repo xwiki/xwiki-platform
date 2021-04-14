@@ -78,7 +78,7 @@ public interface ExtendedRenderingConfiguration
     /**
      * @return the list of Rendering Syntaxes that should not be used for the current wiki (i.e. that should not be
      *         proposed to the user when editing wiki pages). The reason is that we want by default that all syntaxes
-     *         are enabled (for example so that when installing a new Syntax throught the Extension Manager it's active
+     *         are enabled (for example so that when installing a new Syntax through the Extension Manager it's active
      *         by default)
      */
     List<Syntax> getDisabledSyntaxes();

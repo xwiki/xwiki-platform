@@ -63,10 +63,10 @@ class LessWebJarsResourceFilterTest
         when(this.lessCompiler.compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false)))
             .thenReturn("some content");
 
-        InputStream stream = this.resourceFilter.filter(mock(InputStream.class), "resourceName.less");
-
-        verify(this.lessCompiler).compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false));
-        assertEquals("some content", IOUtils.toString(stream, StandardCharsets.UTF_8));
+        try (InputStream stream = this.resourceFilter.filter(mock(InputStream.class), "resourceName.less")) {
+            verify(this.lessCompiler).compile(any(LESSResourceReference.class), eq(true), eq(false), eq(false));
+            assertEquals("some content", IOUtils.toString(stream, StandardCharsets.UTF_8));
+        }
     }
 
     @Test

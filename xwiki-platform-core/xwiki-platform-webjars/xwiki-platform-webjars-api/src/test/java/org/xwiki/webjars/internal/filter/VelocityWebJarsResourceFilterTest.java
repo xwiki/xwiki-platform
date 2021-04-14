@@ -85,11 +85,11 @@ class VelocityWebJarsResourceFilterTest
                 return true;
             });
 
-        InputStream handle = this.resourceFilter.filter(mock(InputStream.class), "resourceName.css");
-
-        verify(this.velocityEngine)
-            .evaluate(eq(this.velocityContext), any(Writer.class), eq("resourceName.css"), any(Reader.class));
-        assertEquals("some content", IOUtils.toString(handle, StandardCharsets.UTF_8));
+        try (InputStream handle = this.resourceFilter.filter(mock(InputStream.class), "resourceName.css")) {
+            verify(this.velocityEngine)
+                .evaluate(eq(this.velocityContext), any(Writer.class), eq("resourceName.css"), any(Reader.class));
+            assertEquals("some content", IOUtils.toString(handle, StandardCharsets.UTF_8));
+        }
     }
 
     @Test

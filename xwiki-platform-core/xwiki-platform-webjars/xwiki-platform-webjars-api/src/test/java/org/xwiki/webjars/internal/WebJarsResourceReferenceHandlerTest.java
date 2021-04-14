@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.inject.Named;
@@ -51,6 +50,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.webjars.internal.filter.WebJarsResourceFilter;
 
 import static ch.qos.logback.classic.Level.ERROR;
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -60,6 +60,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -127,7 +128,7 @@ class WebJarsResourceReferenceHandlerTest
     void executeWhenResourceDoesntExist() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
 
         this.handler.handle(reference, this.chain);
 
@@ -141,7 +142,7 @@ class WebJarsResourceReferenceHandlerTest
     void executeWhenResourceExists() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
@@ -176,7 +177,7 @@ class WebJarsResourceReferenceHandlerTest
     void return304WhenIfModifiedSinceHeader() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
 
         when(this.request.getHttpServletRequest().getHeader("If-Modified-Since")).thenReturn("some value");
 
@@ -192,12 +193,14 @@ class WebJarsResourceReferenceHandlerTest
     void evaluateResource() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
         reference.addParameter("evaluate", true);
 
-        ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
-        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
-            resourceStream);
+        try (ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes())) {
+            when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js"))
+                .thenReturn(
+                    resourceStream);
+        }
 
         when(this.velocityFilter.filter(any(), any()))
             .thenAnswer(invocation -> new ByteArrayInputStream("evaluated content".getBytes()));
@@ -219,12 +222,13 @@ class WebJarsResourceReferenceHandlerTest
     void failingResourceEvaluation() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
         reference.addParameter("evaluate", "true");
 
-        ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
-        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
-            resourceStream);
+        try (ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes())) {
+            when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js"))
+                .thenReturn(resourceStream);
+        }
 
         when(this.velocityFilter.filter(any(), any())).thenThrow(new ResourceReferenceHandlerException(
             "Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
@@ -250,11 +254,12 @@ class WebJarsResourceReferenceHandlerTest
     void filterResourceLessNoEvaluate() throws Exception
     {
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+            new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
         InputStream resourceStream = mock(InputStream.class);
-        InputStream stream = this.handler.filterResource(resourceReference, resourceStream);
-        assertSame(resourceStream, stream);
-        verifyNoInteractions(resourceStream);
+        try (InputStream stream = this.handler.filterResource(resourceReference, resourceStream)) {
+            assertSame(resourceStream, stream);
+        }
+        verify(resourceStream).close();
         verifyNoInteractions(this.lessFilter);
     }
 
@@ -262,12 +267,13 @@ class WebJarsResourceReferenceHandlerTest
     void filterResourceLessAndEvaluate() throws Exception
     {
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+            new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
         resourceReference.addParameter("evaluate", "true");
         InputStream resourceStream = mock(InputStream.class);
 
-        InputStream stream = this.handler.filterResource(resourceReference, resourceStream);
-        assertNotSame(resourceStream, stream);
+        try (InputStream stream = this.handler.filterResource(resourceReference, resourceStream)) {
+            assertNotSame(resourceStream, stream);
+        }
         verifyNoInteractions(resourceStream);
         verify(this.lessFilter).filter(resourceStream, "testdirectory/testfile.less");
     }
@@ -276,7 +282,7 @@ class WebJarsResourceReferenceHandlerTest
     void getContentType() throws Exception
     {
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+            new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
 
         String mimeType =
             this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
@@ -288,12 +294,27 @@ class WebJarsResourceReferenceHandlerTest
     void getContentTypeLessAndEvaluate() throws Exception
     {
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("testNamespace", Arrays.asList("testdirectory", "testfile.less"));
+            new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
         resourceReference.addParameter("evaluate", "true");
 
         String mimeType =
             this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
                 resourceReference);
         assertEquals("text/css", mimeType);
+    }
+
+    @Test
+    void handleVerifyResourceIsClosed() throws Exception
+    {
+        NamespaceURLClassLoader classLoader = mock(NamespaceURLClassLoader.class);
+        InputStream inputStream = mock(InputStream.class);
+
+        when(this.classLoaderManager.getURLClassLoader("nsTest", true)).thenReturn(classLoader);
+        when(classLoader.getResourceAsStream("META-INF/resources/webjars/seg1/seg2")).thenReturn(inputStream);
+
+        this.handler.handle(new WebJarsResourceReference("nsTest", asList("seg1", "seg2")),
+            mock(ResourceReferenceHandlerChain.class));
+
+        verify(inputStream, times(2)).close();
     }
 }

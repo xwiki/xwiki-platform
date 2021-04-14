@@ -47,7 +47,7 @@ import org.xwiki.tika.internal.TikaUtils;
 
 /**
  * Base class for {@link ResourceReferenceHandler}s that can handle servlet resource requests.
- * 
+ *
  * @param <R> the resource type
  * @version $Id$
  * @since 7.4.6
@@ -80,16 +80,18 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
                 getResourceName(typedResourceReference));
         } else if (!shouldBrowserUseCachedContent(typedResourceReference)) {
             // If we get here then either the resource is not cached by the browser or the resource is dynamic.
-            InputStream resourceStream = getResourceStream(typedResourceReference);
-            if (resourceStream != null) {
-                try {
-                    serveResource(typedResourceReference, filterResource(typedResourceReference, resourceStream));
-                } catch (ResourceReferenceHandlerException e) {
-                    this.logger.error(e.getMessage(), e);
-                    sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            try (InputStream resourceStream = getResourceStream(typedResourceReference)) {
+                if (resourceStream != null) {
+                    try (InputStream filteredSteam = filterResource(typedResourceReference, resourceStream)) {
+                        serveResource(typedResourceReference, filteredSteam);
+                    }
+                } else {
+                    sendError(HttpStatus.SC_NOT_FOUND, "Resource not found [%s].",
+                        getResourceName(typedResourceReference));
                 }
-            } else {
-                sendError(HttpStatus.SC_NOT_FOUND, "Resource not found [%s].", getResourceName(typedResourceReference));
+            } catch (IOException | ResourceReferenceHandlerException e) {
+                this.logger.error(e.getMessage(), e);
+                sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
         }
 
@@ -180,8 +182,6 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         } catch (Exception e) {
             String resourceName = getResourceName(resourceReference);
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);
-        } finally {
-            IOUtils.closeQuietly(resourceStream);
         }
     }
 

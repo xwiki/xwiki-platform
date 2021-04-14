@@ -433,7 +433,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-rest</artifactId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

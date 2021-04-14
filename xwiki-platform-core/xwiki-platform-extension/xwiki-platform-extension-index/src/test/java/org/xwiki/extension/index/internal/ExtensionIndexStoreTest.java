@@ -30,11 +30,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.internal.WikiDeletedListener;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.AbstractRemoteExtension;
 import org.xwiki.extension.DefaultExtensionAuthor;
+import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
@@ -44,6 +44,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionAuthorConverter;
+import org.xwiki.extension.internal.converter.ExtensionComponentConverter;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -71,13 +72,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link SolrEventStore}, {@link EventsSolrCoreInitializer} and {@link WikiDeletedListener}.
+ * Validate the extension index store.
  * 
  * @version $Id$
  */
 @ComponentTest
 @ComponentList({ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
-    ExtensionAuthorConverter.class, ExtensionFactory.class})
+    ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class})
 @ReferenceComponentList
 @SolrComponentList
 class ExtensionIndexStoreTest
@@ -179,6 +180,9 @@ class ExtensionIndexStoreTest
             new DefaultExtensionAuthor("first2 last2", "url2")));
         extension
             .setExtensionFeatures(Arrays.asList(new ExtensionId("feature1"), new ExtensionId("feature2", "version2")));
+        extension.setComponents(
+            Arrays.asList(new DefaultExtensionComponent("org.xwiki.contib.MyClassName<Generic1, Generic2>", "hint"),
+                new DefaultExtensionComponent("org.xwiki.contib.MyClassName2<Generic12, Generic22>", "hint2")));
 
         ExtensionDependency dependency1 =
             new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
@@ -200,6 +204,7 @@ class ExtensionIndexStoreTest
         assertEquals(new ArrayList<>(extension.getAllowedNamespaces()),
             new ArrayList<>(storedExtension.getAllowedNamespaces()));
         assertEquals(new ArrayList<>(extension.getAuthors()), new ArrayList<>(storedExtension.getAuthors()));
+        assertEquals(new ArrayList<>(extension.getComponents()), new ArrayList<>(storedExtension.getComponents()));
         assertEquals(new ArrayList<>(extension.getExtensionFeatures()),
             new ArrayList<>(storedExtension.getExtensionFeatures()));
         assertEquals(new ArrayList<>(extension.getDependencies()), new ArrayList<>(storedExtension.getDependencies()));
@@ -224,10 +229,29 @@ class ExtensionIndexStoreTest
         assertEquals(0, result.getOffset());
         assertEquals(1, result.getSize());
         assertEquals(1, result.getTotalHits());
+
+        result = this.indexStore
+            .search(new ExtensionQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPONENTS_INDEX + ":hint2"));
+
+        assertEquals(1, result.getSize());
+
+        result = this.indexStore.search(new ExtensionQuery("hint2"));
+
+        assertEquals(1, result.getSize());
+
+        result = this.indexStore.search(new ExtensionQuery(ExtensionIndexSolrCoreInitializer
+            .toComponentFieldName("org.xwiki.contib.MyClassName2<Generic12, Generic22>") + ":hint2"));
+
+        assertEquals(1, result.getSize());
+
+        result = this.indexStore.search(new ExtensionQuery(ExtensionIndexSolrCoreInitializer
+            .toComponentFieldName("org.xwiki.contib.MyClassName2<Generic12, Generic22>") + ":otherhint"));
+
+        assertEquals(0, result.getSize());
     }
 
     @Test
-    void search() throws SolrServerException, IOException, ResolveException, SearchException
+    void search() throws SolrServerException, IOException, SearchException
     {
         ExtensionId extensionId = new ExtensionId("id", "version");
 

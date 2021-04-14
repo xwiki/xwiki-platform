@@ -54,6 +54,7 @@ import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -182,7 +183,8 @@ class ExtensionIndexStoreTest
             .setExtensionFeatures(Arrays.asList(new ExtensionId("feature1"), new ExtensionId("feature2", "version2")));
         extension.setComponents(
             Arrays.asList(new DefaultExtensionComponent("org.xwiki.contib.MyClassName<Generic1, Generic2>", "hint"),
-                new DefaultExtensionComponent("org.xwiki.contib.MyClassName2<Generic12, Generic22>", "hint2")));
+                new DefaultExtensionComponent("org.xwiki.contib.MyClassName2<Generic12, Generic22>", "hint2"),
+                new DefaultExtensionComponent(Macro.class.getName(), "mymacro")));
 
         ExtensionDependency dependency1 =
             new DefaultExtensionDependency("dependency1", new DefaultVersionConstraint("version1"));
@@ -248,6 +250,10 @@ class ExtensionIndexStoreTest
             .toComponentFieldName("org.xwiki.contib.MyClassName2<Generic12, Generic22>") + ":otherhint"));
 
         assertEquals(0, result.getSize());
+
+        result = this.indexStore.search(new ExtensionQuery("component_macro:mymacro"));
+
+        assertEquals(1, result.getSize());
     }
 
     @Test

@@ -66,6 +66,8 @@ import org.xwiki.extension.repository.search.ExtensionQuery.Filter;
 import org.xwiki.extension.repository.search.ExtensionQuery.SortClause;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -592,6 +594,13 @@ public class ExtensionIndexStore implements Initializable
             // the Standard Query Parser)
             solrQuery.set("defType", "edismax");
             solrQuery.set("qf", BOOST);
+
+            // Add aliases for known components
+            // TODO: make it extensible
+            solrQuery.set("f.component_macro.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Macro.class.getName()));
+            solrQuery.set("f.component_scriptservice.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(ScriptService.class.getName()));
         }
 
         // Pagination

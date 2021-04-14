@@ -25,8 +25,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
+import org.xwiki.localization.rest.model.jaxb.Translations;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -37,25 +37,25 @@ import org.xwiki.stability.Unstable;
  */
 @Path("/wikis/{wikiName}/localization/translations")
 @Unstable
-public interface LocalizationSource
+public interface TranslationResource
 {
     /**
-     * Returns the raw translation values of the request keys. In other words, the translations values without the
-     * parameters resolved.
+     * Returns the raw translation values of the requested translation keys. In other words, the translations values
+     * without the parameters resolved.
      * <p>
-     * The payload of a successful response is an object where the keys are the requested translation keys (with the
-     * prefix concatenated), and the values are the resolved translation raw values. When the value of a key is not
-     * found, it is returned with a @{code null} value.
+     * The payload of a successful response is an {@link Translations} object containing a collection of {@link
+     * org.xwiki.localization.rest.model.jaxb.Translation}. Each translation is composed of a translation key (with the
+     * prefix concatenated), and the resolved translation raw value. If the translation key is not found, the raw value
+     * is {@code null}.
      *
      * @param wikiName the name of the wiki holding the translation keys
      * @param locale the locale of the translation values, when {@code null} the current locale of the user is used
      * @param prefix a common prefix, concatenated to each translation key before resolving their values (can be
      *     {@code null} in which case nothing is concatenated)
      * @param keys the translation keys to resolve. If no key is passed, and empty object is returned
-     * @return the response, an {@link Response.Status#INTERNAL_SERVER_ERROR} in case of component resolution issue, or
-     *     a {@link Response.Status#OK} response with an object holding the translation values otherwise
+     * @return the list of resolved translations
      */
     @GET
-    Response translations(@PathParam("wikiName") String wikiName, @QueryParam("locale") String locale,
+    Translations translations(@PathParam("wikiName") String wikiName, @QueryParam("locale") String locale,
         @QueryParam("prefix") String prefix, @QueryParam("key") List<String> keys);
 }

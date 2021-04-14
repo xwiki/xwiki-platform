@@ -26,7 +26,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.rest.LocalizationSource;
+import org.xwiki.localization.rest.TranslationResource;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -34,13 +34,13 @@ import org.xwiki.test.ui.TestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Functional tests of the localization REST endpoint.
+ * Functional tests of the translation REST endpoint.
  *
  * @version $Id$
  * @since 13.3RC1
  */
 @UITest
-class LocalizationRestIT
+class TranslationsRestIT
 {
     @BeforeEach
     void setUp(TestUtils testUtils)
@@ -53,9 +53,9 @@ class LocalizationRestIT
     void translationNoKeyParam(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
-        GetMethod getMethod = testUtils.rest().executeGet(LocalizationSource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
-        assertEquals("<ObjectNode/>", body);
+        assertEquals("<Translations><translations/></Translations>", body);
     }
 
     @Test
@@ -64,25 +64,35 @@ class LocalizationRestIT
     {
         Map<String, Object[]> queryParams = new HashMap<>();
         queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(LocalizationSource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
-        assertEquals("<ObjectNode><key1/></ObjectNode>", body);
+        assertEquals(
+            "<Translations>"
+                + "<translations><translations><key>key1</key><raw/></translations></translations>"
+                + "</Translations>",
+            body);
     }
 
     @Test
     @Order(3)
-    void translationOnXWiki(TestUtils testUtils, TestReference testReference) throws Exception
+    void translation(TestUtils testUtils, TestReference testReference) throws Exception
     {
+        // Creates a translation page to have some results to return when calling the REST endpoint.
         testUtils.deletePage(testReference);
         Map<String, Object> properties = new HashMap<>();
         properties.put("scope", "WIKI");
         testUtils.addObject(testReference, "XWiki.TranslationDocumentClass", properties);
         testUtils.rest().savePage(testReference, "key1=value1 {0}", "translation");
 
+        // Call the REST endpoint and request the translation keys created above.
         Map<String, Object[]> queryParams = new HashMap<>();
         queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(LocalizationSource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
-        assertEquals("<ObjectNode><key1>value1 {0}</key1></ObjectNode>", body);
+        assertEquals(
+            "<Translations>"
+                + "<translations><translations><key>key1</key><raw>value1 {0}</raw></translations></translations>"
+                + "</Translations>",
+            body);
     }
 }

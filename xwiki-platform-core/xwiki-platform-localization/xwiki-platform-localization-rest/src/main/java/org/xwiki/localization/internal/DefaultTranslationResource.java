@@ -25,9 +25,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
@@ -35,23 +33,24 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.rest.LocalizationSource;
+import org.xwiki.localization.rest.TranslationResource;
+import org.xwiki.localization.rest.model.jaxb.ObjectFactory;
+import org.xwiki.localization.rest.model.jaxb.Translations;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestComponent;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.xpn.xwiki.XWikiContext;
-
 /**
- * Default implementation of {@link LocalizationSource}.
+ * Default implementation of {@link TranslationResource}.
  *
  * @version $Id$
  * @since 13.3RC1
  */
 @Component
-@Named("org.xwiki.localization.internal.DefaultLocalizationSource")
+@Named("org.xwiki.localization.internal.DefaultTranslationResource")
 @Singleton
-public class DefaultLocalizationSource implements LocalizationSource, XWikiRestComponent
+public class DefaultTranslationResource implements TranslationResource, XWikiRestComponent
 {
     @Inject
     private LocalizationContext localizationContext;
@@ -60,23 +59,21 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
     private LocalizationManager localizationManager;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private ModelContext modelContext;
 
     @Inject
     private Logger logger;
 
     @Override
-    public Response translations(String wikiId, String localeString, String prefix, List<String> keys)
+    public Translations translations(String wikiId, String localeString, String prefix, List<String> keys)
     {
-        XWikiContext xWikiContext = this.contextProvider.get();
-
-        // Save the current context wiki id. It will be restored on the method is finished.
-        String oldWikiId = xWikiContext.getWikiId();
+        // Save the current entity reference. It will be restored on the method is finished.
+        EntityReference oldEntityReference = this.modelContext.getCurrentEntityReference();
         try {
-            // Set the requested wiki id.
-            xWikiContext.setWikiId(wikiId);
+            // Set the requested wiki.
+            this.modelContext.setCurrentEntityReference(new WikiReference(wikiId));
 
-            // Resolve the local.
+            // Resolve the locale.
             Locale locale;
             if (localeString != null) {
                 locale = LocaleUtils.toLocale(localeString);
@@ -87,7 +84,8 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
             // Computes the prefix.
             String cleanPrefix = Objects.toString(prefix, "");
 
-            ObjectNode result = JsonNodeFactory.instance.objectNode();
+            ObjectFactory objectFactory = new ObjectFactory();
+            Translations result = objectFactory.createTranslations();
 
             // Resolve the raw translation of the requested keys.
             for (String key : keys) {
@@ -95,21 +93,30 @@ public class DefaultLocalizationSource implements LocalizationSource, XWikiRestC
                     String fullKey = cleanPrefix + key;
                     Translation translation = this.localizationManager.getTranslation(fullKey, locale);
                     if (translation != null) {
-                        Object rawSource = translation.getRawSource();
-                        result.put(fullKey, String.valueOf(rawSource));
+                        String rawSource = (String) translation.getRawSource();
+                        result.getTranslations().add(createTranslation(objectFactory, fullKey, rawSource));
                     } else {
                         // When a translation key is not found, it is still added to the result object, associated with
                         // a null value.
-                        result.putNull(fullKey);
+                        result.getTranslations().add(createTranslation(objectFactory, fullKey, null));
                         this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, locale, wikiId);
                     }
                 }
             }
 
-            return Response.ok(result).build();
+            return result;
         } finally {
-            // Restore the old wiki id in the context.
-            xWikiContext.setWikiId(oldWikiId);
+            // Restore the old entity reference in the context.
+            this.modelContext.setCurrentEntityReference(oldEntityReference);
         }
+    }
+
+    private org.xwiki.localization.rest.model.jaxb.Translation createTranslation(ObjectFactory objectFactory,
+        String key, String raw)
+    {
+        org.xwiki.localization.rest.model.jaxb.Translation translation = objectFactory.createTranslation();
+        translation.setKey(key);
+        translation.setRaw(raw);
+        return translation;
     }
 }

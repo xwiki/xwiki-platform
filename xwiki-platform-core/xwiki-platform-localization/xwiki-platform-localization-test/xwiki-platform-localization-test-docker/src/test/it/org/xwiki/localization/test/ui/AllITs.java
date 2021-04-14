@@ -33,8 +33,8 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllITs
 {
     @Nested
-    @DisplayName("Localization REST tests")
-    class NestedLocalizationRestIT extends LocalizationRestIT
+    @DisplayName("Translations REST tests")
+    class NestedTranslationsRestIT extends TranslationsRestIT
     {
     }
 }

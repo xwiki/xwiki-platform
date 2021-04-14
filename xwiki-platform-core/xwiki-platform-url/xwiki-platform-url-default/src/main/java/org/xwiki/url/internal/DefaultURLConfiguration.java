@@ -71,8 +71,8 @@ public class DefaultURLConfiguration implements URLConfiguration
     }
 
     @Override
-    public boolean skipTrustedDomainsChecks()
+    public boolean isTrustedDomainsEnabled()
     {
-        return this.configuration.get().getProperty(PREFIX + "skipTrustedDomainsChecks", false);
+        return this.configuration.get().getProperty(PREFIX + "trustedDomainsEnabled", true);
     }
 }

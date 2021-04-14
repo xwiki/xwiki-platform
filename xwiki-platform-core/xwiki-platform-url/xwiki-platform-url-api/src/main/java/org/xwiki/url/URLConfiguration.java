@@ -68,13 +68,13 @@ public interface URLConfiguration
     /**
      * Define if the trusted domains check should be performed or not. This option is provided only to allow bypassing
      * security checks globally on the wiki in case of problems.
-     * @return {@code true} if the security checks on domains should be skipped. {@code false} otherwise.
+     * @return {@code true} if the security check on domains should be performed. {@code false} otherwise.
      * @since 13.3RC1
      * @since 12.10.7
      */
     @Unstable
-    default boolean skipTrustedDomainsChecks()
+    default boolean isTrustedDomainsEnabled()
     {
-        return false;
+        return true;
     }
 }

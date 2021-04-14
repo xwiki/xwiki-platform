@@ -97,34 +97,34 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Override
     public boolean isDomainTrusted(URL urlToCheck)
     {
-        if (this.urlConfiguration.skipTrustedDomainsChecks()) {
+        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
+            if (this.trustedDomains == null) {
+                computeTrustedDomains();
+            }
+
+            String host = urlToCheck.getHost();
+
+            while (StringUtils.contains(host, DOT)) {
+                if (trustedDomains.contains(host)) {
+                    return true;
+                } else {
+                    host = host.substring(host.indexOf(DOT) + 1);
+                }
+            }
+
+            Object bypassCheckProperty = execution.getContext()
+                .getProperty(URLSecurityManager.BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY);
+            boolean bypassCheck = bypassCheckProperty != null && Boolean.parseBoolean(bypassCheckProperty.toString());
+
+            if (bypassCheck) {
+                logger.info("Domain of URL [{}] does not belong to the list of trusted domains but it's considered as "
+                    + "trusted since the check has been bypassed.", urlToCheck);
+            }
+
+            return bypassCheck;
+        } else {
             return true;
         }
-        if (this.trustedDomains == null) {
-            computeTrustedDomains();
-        }
-
-        String host = urlToCheck.getHost();
-
-        while (StringUtils.contains(host, DOT)) {
-            if (trustedDomains.contains(host)) {
-                return true;
-            } else {
-                host = host.substring(host.indexOf(DOT) + 1);
-            }
-        }
-
-        String bypassCheckProperty = (String) execution.getContext()
-            .getProperty(URLSecurityManager.BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY);
-
-        boolean bypassCheck = Boolean.parseBoolean(bypassCheckProperty);
-        if (bypassCheck) {
-            logger
-                .info("Domain of URL [{}] does not belong to the list of trusted domains but it's considered as trusted"
-                    + " since the check has been bypassed.", urlToCheck);
-        }
-
-        return bypassCheck;
     }
 
     /**

@@ -76,6 +76,7 @@ class DefaultURLSecurityManagerTest
     {
         this.executionContext = mock(ExecutionContext.class);
         when(this.execution.getContext()).thenReturn(this.executionContext);
+        when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(true);
     }
 
     @Test
@@ -168,7 +169,7 @@ class DefaultURLSecurityManagerTest
         when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
             "foo.acme.org"
         ));
-        when(urlConfiguration.skipTrustedDomainsChecks()).thenReturn(true);
+        when(urlConfiguration.isTrustedDomainsEnabled()).thenReturn(false);
         assertThat("Any domain can be trusted when check is skipped: check with www.xwiki.org",
             this.urlSecurityManager.isDomainTrusted(new URL("http://www.xwiki.org")));
         assertThat("Any domain can be trusted when check is skipped: check with www.bar.eu",
@@ -176,7 +177,7 @@ class DefaultURLSecurityManagerTest
         assertThat("Any domain can be trusted when check is skipped: check with foo.acme.org",
             this.urlSecurityManager.isDomainTrusted(new URL("http://foo.acme.org")));
 
-        when(urlConfiguration.skipTrustedDomainsChecks()).thenReturn(false);
+        when(urlConfiguration.isTrustedDomainsEnabled()).thenReturn(true);
         assertThat("www.xwiki.org should not be trusted",
             !this.urlSecurityManager.isDomainTrusted(new URL("http://www.xwiki.org")));
         assertThat("www.bar.eu should not be trusted",
@@ -185,7 +186,7 @@ class DefaultURLSecurityManagerTest
             this.urlSecurityManager.isDomainTrusted(new URL("http://foo.acme.org")));
 
         when(this.executionContext.getProperty(URLSecurityManager.BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY))
-            .thenReturn("true");
+            .thenReturn(true);
         assertThat("www.xwiki.org should be trusted when check is bypassed",
             this.urlSecurityManager.isDomainTrusted(new URL("http://www.xwiki.org")));
 

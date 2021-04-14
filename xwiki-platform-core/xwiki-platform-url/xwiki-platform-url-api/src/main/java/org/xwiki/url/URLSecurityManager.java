@@ -45,7 +45,7 @@ public interface URLSecurityManager
      * Check if the given {@link URL} can be trusted based on the trusted domains of the wiki.
      * This method check on both the list of trusted domains given by the configuration
      * (see {@link URLConfiguration#getTrustedDomains()}) and the list of aliases used by the wiki descriptors.
-     * Note that this method always returns {@code true} if {@link URLConfiguration#skipTrustedDomainsChecks()} returns
+     * Note that this method always returns {@code true} if {@link URLConfiguration#isTrustedDomainsEnabled()} returns
      * {@code true}. Also the method will return {@code true} whenever the {@link org.xwiki.context.ExecutionContext}
      * contains a property named {@link #BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY} with the value {@code "true"}.
      *

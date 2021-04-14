@@ -25,19 +25,40 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-localization</artifactId>
+    <artifactId>xwiki-platform-localization-rest</artifactId>
     <version>13.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-localization-rest</artifactId>
-  <name>XWiki Platform - Localization - REST - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Localisation - REST - Parent POM</description>
+  <artifactId>xwiki-platform-localization-rest-default</artifactId>
+  <name>XWiki Platform - Localization - REST - Default</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Localization - REST - Default</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Localization REST Services</xwiki.extension.name>
+    <xwiki.extension.name>Localization REST Services - Default Implementation</xwiki.extension.name>
   </properties>
-  <modules>
-    <module>xwiki-platform-localization-rest-api</module>
-    <module>xwiki-platform-localization-rest-default</module>
-  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -92,10 +92,10 @@ class DocumentTagsTest extends TemplateTest
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
         // Verify that the generated HTML matches the expectation:
-        // - The tag label is displayed
+        // - The tag label is supposed to not be displayed
         // - No tag is listed after the tag label
         // - No "+" link is displayed since the user doesn't have edit rights
-        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label </div>"));
+        assertThat(result, matchesPattern("\\Q<div class=\"doc-tags hidden\\E\" id=\"xdocTags\"> </div>"));
     }
 
     @Test
@@ -135,7 +135,7 @@ class DocumentTagsTest extends TemplateTest
         // Verify that the generated HTML matches the expectation:
         // - The tag label is displayed
         // - The tags after the tag label
-        // - No "+" link is displayed since the user doesn't have edit rights
+        // - No "+" link is displayed since the user doesn't have edit right
         assertThat(result, matchesPattern("\\Q<div class=\"doc-tags\" id=\"xdocTags\"> core.tags.list.label "
             + "<span class=\"tag-wrapper\"><span class=\"tag\">"
                 + "<a href=\"/xwiki/bin/view/Main/Tags?do=viewTag&amp;tag=tag1\">tag1</a></span></span> "

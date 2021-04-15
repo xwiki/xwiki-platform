@@ -735,6 +735,25 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # url.useResourceLastModificationDate=true
 
+#-# [Since 13.3RC1]
+#-# [Since 12.10.7]
+#-# Define a list of trusted domains that can be used in the wiki for performing requests or redirections even if
+#-# the wiki does not use it. Domains are listed without http and separated with a comma in the list. Subdomains can be
+#-# specified.
+#-# Example of accepted value: foo.acme.org,enterprise.org
+#-#
+#-# By default the list of trusted domains is empty:
+# url.trustedDomains=
+
+#-# [Since 13.3RC1]
+#-# [Since 12.10.7]
+#-# Allow to enable or disable checks performed on domains by taking into account the list of trusted domains.
+#-# Disable this property only if you experienced some issues on your wiki: some security check won't be performed when
+#-# this property is set to false.
+#-#
+#-# By default this property is set to true:
+# url.trustedDomainsEnabled=true
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

@@ -963,6 +963,12 @@ public abstract class XWikiAction extends Action
         return false;
     }
 
+    /**
+     * Perform a redirect to the given URL.
+     * @param response the response to use to perform the redirect
+     * @param url the location of the redirect
+     * @throws XWikiException in case of IOException when performing the redirect.
+     */
     protected void sendRedirect(XWikiResponse response, String url) throws XWikiException
     {
         try {

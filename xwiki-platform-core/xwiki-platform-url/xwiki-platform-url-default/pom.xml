@@ -24,25 +24,34 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>12.10.7-SNAPSHOT</version>
+    <artifactId>xwiki-platform-url</artifactId>
+    <version>13.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
-  <name>XWiki Platform - URL - Scheme - Filesystem Implementation</name>
+  <artifactId>xwiki-platform-url-default</artifactId>
+  <name>XWiki Platform - URL - Default</name>
   <packaging>jar</packaging>
-  <description>URLs to XWiki Resources exported on the filesystem format</description>
+  <description>Default implementations of the API defined in xwiki-platform-url-api</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
+    <!-- The reason for this low TPC value is because this module is tested using integration tests in the various
+    URL Scheme modules -->
+    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-default</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

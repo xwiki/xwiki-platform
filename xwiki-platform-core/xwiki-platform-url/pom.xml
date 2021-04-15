@@ -35,6 +35,7 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-url-api</module>
     <module>xwiki-platform-url-container</module>
+    <module>xwiki-platform-url-default</module>
     <module>xwiki-platform-url-schemes</module>
   </modules>
 </project>

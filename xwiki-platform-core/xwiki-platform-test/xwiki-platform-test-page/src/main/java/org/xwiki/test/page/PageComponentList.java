@@ -64,6 +64,7 @@ import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxRegistry;
 import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
@@ -137,6 +138,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultContentParser.class,
     URLResourceReferenceTypeParser.class,
     DefaultMacroContentParser.class,
+    DefaultSyntaxRegistry.class,
 
     //Resource
     DefaultResourceReferenceManager.class,

@@ -35,13 +35,13 @@
     v-if="selectedCount > 0"
   >
     <span v-if="!logic.entrySelection.isGlobal">
-      {{ selectedCount }} entries selected
+      {{ $t('livedata.selection.infoBar.selectedCount', [selectedCount]) }}
     </span>
     <span v-else-if="logic.entrySelection.isGlobal && !logic.entrySelection.deselected.length">
-      All entries selected
+      {{ $t('livedata.selection.infoBar.allSelected') }}
     </span>
     <span v-else>
-      All entries selected but {{ logic.entrySelection.deselected.length }}
+      {{ $t('livedata.selection.infoBar.allSelectedBut', [logic.entrySelection.deselected.length]) }}
     </span>
   </div>
 </template>

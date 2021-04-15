@@ -27,7 +27,7 @@
   <div
     class="livedata-refresh-button"
     @click="logic.updateEntries()"
-    title="Refresh"
+    :title="$t('livedata.refresh')"
   >
     <span class="fa fa-repeat"></span>
   </div>

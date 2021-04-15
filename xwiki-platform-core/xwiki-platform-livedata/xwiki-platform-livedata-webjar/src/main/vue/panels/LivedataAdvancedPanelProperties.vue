@@ -37,7 +37,8 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-list-ul"></span> Properties
+      <span class="fa fa-list-ul"></span>
+      {{ $t('livedata.panel.properties.title') }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->

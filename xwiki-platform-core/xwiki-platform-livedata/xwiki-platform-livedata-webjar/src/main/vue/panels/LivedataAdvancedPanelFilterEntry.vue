@@ -59,7 +59,7 @@
       class="delete-filter"
       href="#"
       @click.prevent="logic.removeFilter(propertyId, filterIndex)"
-      title="Delete filters"
+      :title="$t('livedata.panel.filter.delete')"
     >
       <span class="fa fa-trash-o"></span>
     </a>

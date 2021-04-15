@@ -21,16 +21,24 @@
 
 define('xwiki-livedata', [
   "Vue",
+  "vue-i18n",
   "xwiki-livedata-vue",
   "xwiki-livedata-source",
   "xwiki-json-merge",
   "xwiki-livedata-polyfills"
 ], function (
   Vue,
+  VueI18n,
   XWikiLivedata,
   liveDataSource,
   jsonMerge
 ) {
+
+  /**
+   * Make vue use the i18n plugin
+   */
+  Vue.use(VueI18n);
+
 
   /**
    * Map the element to its data object
@@ -77,6 +85,15 @@ define('xwiki-livedata', [
     this.openedPanels = [];
 
     element.removeAttribute("data-config");
+
+    const lang = document.documentElement.getAttribute('lang');
+
+    const i18n = new VueI18n({
+      locale: lang,
+      messages: {},
+      silentFallbackWarn: true,
+    });
+
     // create Vuejs instance
     new Vue({
       el: this.element,
@@ -84,9 +101,86 @@ define('xwiki-livedata', [
         "XWikiLivedata": XWikiLivedata,
       },
       template: "<XWikiLivedata :logic='logic'></XWikiLivedata>",
+      i18n: i18n,
       data: {
         logic: this,
       },
+    });
+
+
+    /**
+     * Load given translations from the server
+     *
+     * @param {object} parameters
+     * @param {string} componentName The name component who needs the translations
+     * Used to avoid loading the same translations several times
+     * @param {string} prefix The translation keys prefix
+     * @param {string[]} keys
+     */
+    this.loadTranslations = async function ({ componentName, prefix, keys }) {
+      // If translations were already loaded, return
+      if (this.loadTranslations[componentName]) return;
+      this.loadTranslations[componentName] = true;
+      // Pad prefix with a dot if not
+      if (prefix.slice(-1) !== ".") {
+        prefix = prefix + ".";
+      }
+      // construct request url
+      const baseUrl = `http://localhost:8080/xwiki/bin/get/Sandbox/LDMockTranslations?outputSyntax=plain`;
+      const localeParam = `&locale=${ lang }`;
+      const prefixParam = prefix ? `&prefix=${ encodeURI(prefix) }` : "";
+      const keysParam = keys.map(key => `&key=${ encodeURI(key) }`).join("");
+      const url = baseUrl + localeParam + prefixParam + keysParam;
+      // Fetch translation and load them
+      try {
+        const response = await fetch(url);
+        const messages = await response.json();
+        i18n.mergeLocaleMessage(lang, messages)
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Load needed translations for the Livedata
+    this.loadTranslations({
+      prefix: "livedata",
+      keys: [
+        "dropdownMenu.title",
+        "dropdownMenu.changeLayout",
+        "dropdownMenu.header.panels",
+        "dropdownMenu.panels.properties",
+        "dropdownMenu.panels.sorting",
+        "dropdownMenu.panels.filtering",
+        "selection.selectInAllPages",
+        "selection.infoBar.selectedCount",
+        "selection.infoBar.allSelected",
+        "selection.infoBar.allSelectedBut",
+        "pagination.currentEntries",
+        "pagination.pageSize",
+        "pagination.page",
+        "pagination.first",
+        "pagination.previous",
+        "pagination.next",
+        "pagination.last",
+        "refresh",
+        "addEntry",
+        "panel.filter.title",
+        "panel.filter.noneFilterable",
+        "panel.filter.add",
+        "panel.filter.addProperty",
+        "panel.filter.delete",
+        "panel.filter.deleteAll",
+        "panel.properties.title",
+        "panel.sort.title",
+        "panel.sort.noneSortable",
+        "panel.sort.direction.ascending",
+        "panel.sort.direction.descending",
+        "panel.sort.add",
+        "panel.sort.delete",
+        // Get availaible layout titles
+        ...this.data.meta.layouts
+          .map(layoutDescriptor => `layout.${ layoutDescriptor.id }.title`),
+      ],
     });
 
     // Fetch the data if we don't have any.

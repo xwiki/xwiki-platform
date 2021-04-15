@@ -26,7 +26,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.rest.TranslationResource;
+import org.xwiki.localization.rest.TranslationsResource;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -34,7 +34,7 @@ import org.xwiki.test.ui.TestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Functional tests of the translation REST endpoint.
+ * Functional tests of the translations REST endpoint.
  *
  * @version $Id$
  * @since 13.3RC1
@@ -50,32 +50,32 @@ class TranslationsRestIT
 
     @Test
     @Order(1)
-    void translationNoKeyParam(TestUtils testUtils) throws Exception
+    void translationsNoKeyParam(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
-        assertEquals("<Translations><translations/></Translations>", body);
+        assertEquals("<Translations><translation/></Translations>", body);
     }
 
     @Test
     @Order(2)
-    void translationKeyMissing(TestUtils testUtils) throws Exception
+    void translationsKeyMissing(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
         queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
         assertEquals(
             "<Translations>"
-                + "<translations><translations><key>key1</key><raw/></translations></translations>"
+                + "<translation><translation><key>key1</key><rawSource/></translation></translation>"
                 + "</Translations>",
             body);
     }
 
     @Test
     @Order(3)
-    void translation(TestUtils testUtils, TestReference testReference) throws Exception
+    void translations(TestUtils testUtils, TestReference testReference) throws Exception
     {
         // Creates a translation page to have some results to return when calling the REST endpoint.
         testUtils.deletePage(testReference);
@@ -87,11 +87,13 @@ class TranslationsRestIT
         // Call the REST endpoint and request the translation keys created above.
         Map<String, Object[]> queryParams = new HashMap<>();
         queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationResource.class, queryParams, "xwiki");
+        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
         assertEquals(
             "<Translations>"
-                + "<translations><translations><key>key1</key><raw>value1 {0}</raw></translations></translations>"
+                + "<translation>"
+                + "<translation><key>key1</key><rawSource>value1 {0}</rawSource></translation>"
+                + "</translation>"
                 + "</Translations>",
             body);
     }

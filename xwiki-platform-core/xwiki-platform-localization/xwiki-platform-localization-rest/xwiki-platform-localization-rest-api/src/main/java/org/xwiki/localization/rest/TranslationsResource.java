@@ -37,25 +37,25 @@ import org.xwiki.stability.Unstable;
  */
 @Path("/wikis/{wikiName}/localization/translations")
 @Unstable
-public interface TranslationResource
+public interface TranslationsResource
 {
     /**
-     * Returns the raw translation values of the requested translation keys. In other words, the translations values
-     * without the parameters resolved.
+     * Returns the raw source of the requested translation keys. In other words, the translation values without the
+     * parameters resolved.
      * <p>
-     * The payload of a successful response is an {@link Translations} object containing a collection of {@link
+     * The payload of a successful response is a {@link Translations} object containing a collection of {@link
      * org.xwiki.localization.rest.model.jaxb.Translation}. Each translation is composed of a translation key (with the
-     * prefix concatenated), and the resolved translation raw value. If the translation key is not found, the raw value
-     * is {@code null}.
+     * prefix concatenated), and the resolved translation source for the requested locale. If the translation key is not
+     * found, the raw source is {@code null}.
      *
      * @param wikiName the name of the wiki holding the translation keys
-     * @param locale the locale of the translation values, when {@code null} the current locale of the user is used
-     * @param prefix a common prefix, concatenated to each translation key before resolving their values (can be
+     * @param locale the locale of the translations, when {@code null} the current locale of the user is used
+     * @param prefix a common prefix, concatenated to each translation key before resolving their sources (can be
      *     {@code null} in which case nothing is concatenated)
      * @param keys the translation keys to resolve. If no key is passed, and empty object is returned
      * @return the list of resolved translations
      */
     @GET
-    Translations translations(@PathParam("wikiName") String wikiName, @QueryParam("locale") String locale,
+    Translations getTranslations(@PathParam("wikiName") String wikiName, @QueryParam("locale") String locale,
         @QueryParam("prefix") String prefix, @QueryParam("key") List<String> keys);
 }

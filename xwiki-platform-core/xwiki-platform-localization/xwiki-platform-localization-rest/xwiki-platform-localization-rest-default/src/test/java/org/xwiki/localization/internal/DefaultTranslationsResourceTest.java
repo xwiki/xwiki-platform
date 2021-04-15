@@ -28,6 +28,7 @@ import javax.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -46,24 +47,23 @@ import ch.qos.logback.classic.Level;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link DefaultTranslationResource}.
+ * Test of {@link DefaultTranslationsResource}.
  *
  * @version $Id$
  * @since 13.3RC1
  */
 @ComponentTest
-class DefaultTranslationResourceTest
+class DefaultTranslationsResourceTest
 {
     private static final DocumentReference CURRENT_ENTITY =
         new DocumentReference("currentwiki", "XWiki", "CurrentEntity");
 
     @InjectMockComponents
-    private DefaultTranslationResource defaultTranslationResource;
+    private DefaultTranslationsResource defaultTranslationResource;
 
     @MockComponent
     private LocalizationContext localizationContext;
@@ -79,6 +79,12 @@ class DefaultTranslationResourceTest
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
+    @Mock
+    private Translation translationKey1;
+
+    @Mock
+    private Translation translationKey2;
+
     @BeforeEach
     void setUp()
     {
@@ -87,24 +93,22 @@ class DefaultTranslationResourceTest
     }
 
     @Test
-    void translations() throws Exception
+    void getTranslations() throws Exception
     {
-        Translation translationKey1 = mock(Translation.class);
-        Translation translationKey2 = mock(Translation.class);
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslations().addAll(asList(
+        expected.getTranslation().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
 
-        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
-        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
-        when(translationKey1.getRawSource()).thenReturn("value1");
-        when(translationKey2.getRawSource()).thenReturn("value2");
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(this.translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(this.translationKey2);
+        when(this.translationKey1.getRawSource()).thenReturn("value1");
+        when(this.translationKey2.getRawSource()).thenReturn("value2");
 
         Translations response =
-            this.defaultTranslationResource.translations("mywiki", null, null, asList("key1", "key2"));
+            this.defaultTranslationResource.getTranslations("mywiki", null, null, asList("key1", "key2"));
 
         assertEquals(marshal(expected), marshal(response));
 
@@ -115,28 +119,28 @@ class DefaultTranslationResourceTest
     }
 
     @Test
-    void translationsNotFound() throws Exception
+    void getTranslationsNotFound() throws Exception
     {
-        Translation translationKey2 = mock(Translation.class);
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslations().addAll(asList(
+        expected.getTranslation().addAll(asList(
             createTranslation(objectFactory, "key1", null),
             createTranslation(objectFactory, "key2", "value2")
         ));
 
         when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(null);
-        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
-        when(translationKey2.getRawSource()).thenReturn("value2");
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(this.translationKey2);
+        when(this.translationKey2.getRawSource()).thenReturn("value2");
 
         Translations response =
-            this.defaultTranslationResource.translations("mywiki", null, null, asList("key1", "key2"));
+            this.defaultTranslationResource.getTranslations("mywiki", null, null, asList("key1", "key2"));
 
         assertEquals(marshal(expected), marshal(response));
 
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Key [key1] not found for local [es] in wiki [mywiki].", this.logCapture.getMessage(0));
+        assertEquals("Translation key [key1] not found for locale [es] in wiki [mywiki].",
+            this.logCapture.getMessage(0));
 
         verify(this.localizationManager).getTranslation("key1", this.defaultLocale);
         verify(this.localizationManager).getTranslation("key2", this.defaultLocale);
@@ -145,25 +149,23 @@ class DefaultTranslationResourceTest
     }
 
     @Test
-    void translationsWithLocale() throws Exception
+    void getTranslationsWithLocale() throws Exception
     {
-        Translation translationKey1 = mock(Translation.class);
-        Translation translationKey2 = mock(Translation.class);
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslations().addAll(asList(
+        expected.getTranslation().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
 
         Locale localeFr = Locale.forLanguageTag("fr");
-        when(this.localizationManager.getTranslation("key1", localeFr)).thenReturn(translationKey1);
-        when(this.localizationManager.getTranslation("key2", localeFr)).thenReturn(translationKey2);
-        when(translationKey1.getRawSource()).thenReturn("value1");
-        when(translationKey2.getRawSource()).thenReturn("value2");
+        when(this.localizationManager.getTranslation("key1", localeFr)).thenReturn(this.translationKey1);
+        when(this.localizationManager.getTranslation("key2", localeFr)).thenReturn(this.translationKey2);
+        when(this.translationKey1.getRawSource()).thenReturn("value1");
+        when(this.translationKey2.getRawSource()).thenReturn("value2");
 
         Translations response =
-            this.defaultTranslationResource.translations("mywiki", "fr", null, asList("key1", "key2"));
+            this.defaultTranslationResource.getTranslations("mywiki", "fr", null, asList("key1", "key2"));
 
         assertEquals(marshal(expected), marshal(response));
 
@@ -174,24 +176,22 @@ class DefaultTranslationResourceTest
     }
 
     @Test
-    void translationWithPrefix() throws Exception
+    void getTranslationsWithPrefix() throws Exception
     {
-        Translation translationKey1 = mock(Translation.class);
-        Translation translationKey2 = mock(Translation.class);
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslations().addAll(asList(
+        expected.getTranslation().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
 
-        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
-        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
-        when(translationKey1.getRawSource()).thenReturn("value1");
-        when(translationKey2.getRawSource()).thenReturn("value2");
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(this.translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(this.translationKey2);
+        when(this.translationKey1.getRawSource()).thenReturn("value1");
+        when(this.translationKey2.getRawSource()).thenReturn("value2");
 
         Translations response =
-            this.defaultTranslationResource.translations("mywiki", null, "key", asList("1", "2"));
+            this.defaultTranslationResource.getTranslations("mywiki", null, "key", asList("1", "2"));
 
         assertEquals(marshal(expected), marshal(response));
 
@@ -202,18 +202,15 @@ class DefaultTranslationResourceTest
     }
 
     @Test
-    void translationMissingKey() throws Exception
+    void getTranslationsMissingKey() throws Exception
     {
-        Translation translationKey1 = mock(Translation.class);
-        Translation translationKey2 = mock(Translation.class);
-
-        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(translationKey1);
-        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(translationKey2);
-        when(translationKey1.getRawSource()).thenReturn("value1");
-        when(translationKey2.getRawSource()).thenReturn("value2");
+        when(this.localizationManager.getTranslation("key1", this.defaultLocale)).thenReturn(this.translationKey1);
+        when(this.localizationManager.getTranslation("key2", this.defaultLocale)).thenReturn(this.translationKey2);
+        when(this.translationKey1.getRawSource()).thenReturn("value1");
+        when(this.translationKey2.getRawSource()).thenReturn("value2");
 
         Translations response =
-            this.defaultTranslationResource.translations("mywiki", null, "key", asList((String) null));
+            this.defaultTranslationResource.getTranslations("mywiki", null, "key", asList((String) null));
 
         assertEquals(marshal(new ObjectFactory().createTranslations()), marshal(response));
 
@@ -222,12 +219,11 @@ class DefaultTranslationResourceTest
     }
 
     private org.xwiki.localization.rest.model.jaxb.Translation createTranslation(ObjectFactory objectFactory,
-        String key,
-        String value)
+        String key, String rawSource)
     {
         org.xwiki.localization.rest.model.jaxb.Translation mapEntry = objectFactory.createTranslation();
         mapEntry.setKey(key);
-        mapEntry.setRaw(value);
+        mapEntry.setRawSource(rawSource);
         return mapEntry;
     }
 

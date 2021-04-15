@@ -32,15 +32,15 @@
   <complexType name="Translation">
     <annotation>
       <documentation>Stores the information of a translation. Currently this includes the
-        translation key, and the raw value of the translation in a requested locale.
+        translation key, and the raw source of the translation in a requested locale.
       </documentation>
     </annotation>
     <sequence>
       <!-- The translation key. -->
       <element name="key" type="string"/>
-      <!-- The raw value of the translation. In other words, the translation value where the parameters are not 
+      <!-- The raw source of the translation. In other words, the translation value where the parameters are not 
       resolved. -->
-      <element name="raw" type="string" minOccurs="0"/>
+      <element name="rawSource" type="string" minOccurs="0"/>
     </sequence>
   </complexType>
 
@@ -50,7 +50,7 @@
     </annotation>
     <sequence>
       <!-- A collection of resolved translations. -->
-      <element name="translations" type="localization:Translation" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="translation" type="localization:Translation" minOccurs="0" maxOccurs="unbounded"/>
     </sequence>
   </complexType>
 

@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.rest.TranslationResource;
+import org.xwiki.localization.rest.TranslationsResource;
 import org.xwiki.localization.rest.model.jaxb.ObjectFactory;
 import org.xwiki.localization.rest.model.jaxb.Translations;
 import org.xwiki.model.ModelContext;
@@ -42,15 +42,15 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
- * Default implementation of {@link TranslationResource}.
+ * Default implementation of {@link TranslationsResource}.
  *
  * @version $Id$
  * @since 13.3RC1
  */
 @Component
-@Named("org.xwiki.localization.internal.DefaultTranslationResource")
+@Named("org.xwiki.localization.internal.DefaultTranslationsResource")
 @Singleton
-public class DefaultTranslationResource implements TranslationResource, XWikiRestComponent
+public class DefaultTranslationsResource implements TranslationsResource, XWikiRestComponent
 {
     @Inject
     private LocalizationContext localizationContext;
@@ -65,7 +65,7 @@ public class DefaultTranslationResource implements TranslationResource, XWikiRes
     private Logger logger;
 
     @Override
-    public Translations translations(String wikiId, String localeString, String prefix, List<String> keys)
+    public Translations getTranslations(String wikiId, String localeString, String prefix, List<String> keys)
     {
         // Save the current entity reference. It will be restored on the method is finished.
         EntityReference oldEntityReference = this.modelContext.getCurrentEntityReference();
@@ -89,17 +89,20 @@ public class DefaultTranslationResource implements TranslationResource, XWikiRes
 
             // Resolve the raw translation of the requested keys.
             for (String key : keys) {
+                // When no key parameter is passed to the request, the list of keys is initialized with a single null 
+                // value. See https://github.com/restlet/restlet-framework-java/issues/922
                 if (key != null) {
                     String fullKey = cleanPrefix + key;
                     Translation translation = this.localizationManager.getTranslation(fullKey, locale);
                     if (translation != null) {
                         String rawSource = (String) translation.getRawSource();
-                        result.getTranslations().add(createTranslation(objectFactory, fullKey, rawSource));
+                        result.getTranslation().add(createTranslation(objectFactory, fullKey, rawSource));
                     } else {
                         // When a translation key is not found, it is still added to the result object, associated with
                         // a null value.
-                        result.getTranslations().add(createTranslation(objectFactory, fullKey, null));
-                        this.logger.warn("Key [{}] not found for local [{}] in wiki [{}].", key, locale, wikiId);
+                        result.getTranslation().add(createTranslation(objectFactory, fullKey, null));
+                        this.logger
+                            .warn("Translation key [{}] not found for locale [{}] in wiki [{}].", key, locale, wikiId);
                     }
                 }
             }
@@ -112,11 +115,11 @@ public class DefaultTranslationResource implements TranslationResource, XWikiRes
     }
 
     private org.xwiki.localization.rest.model.jaxb.Translation createTranslation(ObjectFactory objectFactory,
-        String key, String raw)
+        String key, String rawSource)
     {
         org.xwiki.localization.rest.model.jaxb.Translation translation = objectFactory.createTranslation();
         translation.setKey(key);
-        translation.setRaw(raw);
+        translation.setRawSource(rawSource);
         return translation;
     }
 }

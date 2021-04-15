@@ -55,7 +55,8 @@ class TranslationsRestIT
         Map<String, Object[]> queryParams = new HashMap<>();
         GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
-        assertEquals("<Translations><translation/></Translations>", body);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+            + "<translations xmlns=\"http://www.xwiki.org/localization\"/>", body);
     }
 
     @Test
@@ -67,9 +68,10 @@ class TranslationsRestIT
         GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
         assertEquals(
-            "<Translations>"
-                + "<translation><translation><key>key1</key><rawSource/></translation></translation>"
-                + "</Translations>",
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<translations xmlns=\"http://www.xwiki.org/localization\">"
+                + "<translation><key>key1</key></translation>"
+                + "</translations>",
             body);
     }
 
@@ -90,11 +92,10 @@ class TranslationsRestIT
         GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
         String body = getMethod.getResponseBodyAsString();
         assertEquals(
-            "<Translations>"
-                + "<translation>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<translations xmlns=\"http://www.xwiki.org/localization\">"
                 + "<translation><key>key1</key><rawSource>value1 {0}</rawSource></translation>"
-                + "</translation>"
-                + "</Translations>",
+                + "</translations>",
             body);
     }
 }

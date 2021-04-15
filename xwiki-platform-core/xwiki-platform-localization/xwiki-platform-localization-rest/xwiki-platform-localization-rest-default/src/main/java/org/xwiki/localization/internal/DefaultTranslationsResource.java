@@ -96,11 +96,11 @@ public class DefaultTranslationsResource implements TranslationsResource, XWikiR
                     Translation translation = this.localizationManager.getTranslation(fullKey, locale);
                     if (translation != null) {
                         String rawSource = (String) translation.getRawSource();
-                        result.getTranslation().add(createTranslation(objectFactory, fullKey, rawSource));
+                        result.getTranslations().add(createTranslation(objectFactory, fullKey, rawSource));
                     } else {
                         // When a translation key is not found, it is still added to the result object, associated with
                         // a null value.
-                        result.getTranslation().add(createTranslation(objectFactory, fullKey, null));
+                        result.getTranslations().add(createTranslation(objectFactory, fullKey, null));
                         this.logger
                             .warn("Translation key [{}] not found for locale [{}] in wiki [{}].", key, locale, wikiId);
                     }

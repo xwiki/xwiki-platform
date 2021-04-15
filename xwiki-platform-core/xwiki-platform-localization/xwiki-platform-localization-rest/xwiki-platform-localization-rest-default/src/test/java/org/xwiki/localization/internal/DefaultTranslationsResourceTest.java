@@ -97,7 +97,7 @@ class DefaultTranslationsResourceTest
     {
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslation().addAll(asList(
+        expected.getTranslations().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
@@ -123,7 +123,7 @@ class DefaultTranslationsResourceTest
     {
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslation().addAll(asList(
+        expected.getTranslations().addAll(asList(
             createTranslation(objectFactory, "key1", null),
             createTranslation(objectFactory, "key2", "value2")
         ));
@@ -153,7 +153,7 @@ class DefaultTranslationsResourceTest
     {
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslation().addAll(asList(
+        expected.getTranslations().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
@@ -180,7 +180,7 @@ class DefaultTranslationsResourceTest
     {
         ObjectFactory objectFactory = new ObjectFactory();
         Translations expected = objectFactory.createTranslations();
-        expected.getTranslation().addAll(asList(
+        expected.getTranslations().addAll(asList(
             createTranslation(objectFactory, "key1", "value1"),
             createTranslation(objectFactory, "key2", "value2")
         ));
@@ -232,7 +232,7 @@ class DefaultTranslationsResourceTest
         // We need to marshal because jaxb generated objects does not have equalily operations.
         JAXBContext jaxbContext = JAXBContext.newInstance(Translations.class);
         StringWriter writer = new StringWriter();
-        jaxbContext.createMarshaller().marshal(new ObjectFactory().createTranslations(translations), writer);
+        jaxbContext.createMarshaller().marshal(translations, writer);
         return writer.toString();
     }
 }

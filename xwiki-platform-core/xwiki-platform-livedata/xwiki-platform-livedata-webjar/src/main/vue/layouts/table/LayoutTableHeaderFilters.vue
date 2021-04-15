@@ -105,4 +105,20 @@ export default {
   width: 0;
 }
 
+
+/* Table responsive mode */
+@media screen and (max-width: 767px) {
+
+  /* Only usefull for IE11 */
+  .layout-table .column-filters {
+    flex-grow: 1;
+  }
+
+  .layout-table .column-filters th {
+    width: 100%;
+    border-top: none;
+  }
+
+}
+
 </style>

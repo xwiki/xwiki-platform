@@ -74,4 +74,20 @@ export default {
 
 <style>
 
+/*
+ * Fix styles of xwiki html widgets when needed
+ * So that it renders best as displayer
+ */
+.xwiki-livedata .displayer-html .breadcrumb {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .displayer-html .breadcrumb {
+    text-align: right;
+  }
+}
+
 </style>

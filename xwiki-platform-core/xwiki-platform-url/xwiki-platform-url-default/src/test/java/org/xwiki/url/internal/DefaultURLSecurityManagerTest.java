@@ -24,6 +24,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.inject.Provider;
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,6 +41,9 @@ import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +71,11 @@ class DefaultURLSecurityManagerTest
 
     @MockComponent
     private Execution execution;
+
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    private XWikiContext xWikiContext;
     
     private ExecutionContext executionContext;
 
@@ -77,6 +88,8 @@ class DefaultURLSecurityManagerTest
         this.executionContext = mock(ExecutionContext.class);
         when(this.execution.getContext()).thenReturn(this.executionContext);
         when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(true);
+        this.xWikiContext = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(this.xWikiContext);
     }
 
     @Test
@@ -84,7 +97,7 @@ class DefaultURLSecurityManagerTest
     {
         when(urlConfiguration.getTrustedDomains()).thenReturn(Arrays.asList(
             "foo.acme.org",
-            "com" // this should not be taken into account
+            "localdomain"
         ));
 
         WikiDescriptor wikiDescriptor1 = mock(WikiDescriptor.class);
@@ -98,6 +111,11 @@ class DefaultURLSecurityManagerTest
             "enterprise.eu"
         ));
 
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(this.xWikiContext.getRequest()).thenReturn(request);
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+        when(request.getHttpServletRequest()).thenReturn(servletRequest);
+        when(servletRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/xwiki/bin/register/"));
         when(this.wikiDescriptorManager.getAll()).thenReturn(Arrays.asList(wikiDescriptor1, wikiDescriptor2));
 
         assertThat("www.xwiki.org is trusted", this.urlSecurityManager
@@ -128,10 +146,10 @@ class DefaultURLSecurityManagerTest
             .isDomainTrusted(new URL("https://enterprise.eu/xwiki/")));
         assertThat("enterprise.eu. is not trusted", !this.urlSecurityManager
             .isDomainTrusted(new URL("https://enterprise.eu./xwiki/")));
-
-        assertEquals("The domain [com] specified in the trusted domains configuration won't be taken into account "
-                + "since it doesn't respect the documented format.",
-            logCapture.getMessage(0));
+        assertThat("current domain is trusted", this.urlSecurityManager
+            .isDomainTrusted(new URL("https://localhost:8080/xwiki/bin/view/XWiki/Page")));
+        assertThat("local domain is trusted", this.urlSecurityManager
+            .isDomainTrusted(new URL("https://localhost.localdomain:8080/xwiki/bin/view/XWiki/Page")));
     }
 
     @Test

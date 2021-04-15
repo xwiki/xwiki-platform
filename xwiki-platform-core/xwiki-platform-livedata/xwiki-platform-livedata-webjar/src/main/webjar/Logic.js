@@ -86,10 +86,10 @@ define('xwiki-livedata', [
 
     element.removeAttribute("data-config");
 
-    const lang = document.documentElement.getAttribute('lang');
+    const locale = document.documentElement.getAttribute('lang');
 
     const i18n = new VueI18n({
-      locale: lang,
+      locale: locale,
       messages: {},
       silentFallbackWarn: true,
     });
@@ -118,24 +118,13 @@ define('xwiki-livedata', [
      * @param {string[]} keys
      */
     this.loadTranslations = async function ({ componentName, prefix, keys }) {
-      // If translations were already loaded, return
+      // If translations were already loaded, return.
       if (this.loadTranslations[componentName]) return;
       this.loadTranslations[componentName] = true;
-      // Pad prefix with a dot if not
-      if (prefix.slice(-1) !== ".") {
-        prefix = prefix + ".";
-      }
-      // construct request url
-      const baseUrl = `http://localhost:8080/xwiki/bin/get/Sandbox/LDMockTranslations?outputSyntax=plain`;
-      const localeParam = `&locale=${ lang }`;
-      const prefixParam = prefix ? `&prefix=${ encodeURI(prefix) }` : "";
-      const keysParam = keys.map(key => `&key=${ encodeURI(key) }`).join("");
-      const url = baseUrl + localeParam + prefixParam + keysParam;
-      // Fetch translation and load them
+      // Fetch translation and load them.
       try {
-        const response = await fetch(url);
-        const messages = await response.json();
-        i18n.mergeLocaleMessage(lang, messages)
+        const translations = await liveDataSource.getTranslations(locale, prefix, keys);
+        i18n.mergeLocaleMessage(locale, translations)
       } catch (error) {
         console.error(error);
       }
@@ -143,7 +132,7 @@ define('xwiki-livedata', [
 
     // Load needed translations for the Livedata
     this.loadTranslations({
-      prefix: "livedata",
+      prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
         "dropdownMenu.changeLayout",
@@ -166,7 +155,7 @@ define('xwiki-livedata', [
         "addEntry",
         "panel.filter.title",
         "panel.filter.noneFilterable",
-        "panel.filter.add",
+        "panel.filter.addConstraint",
         "panel.filter.addProperty",
         "panel.filter.delete",
         "panel.filter.deleteAll",
@@ -177,9 +166,7 @@ define('xwiki-livedata', [
         "panel.sort.direction.descending",
         "panel.sort.add",
         "panel.sort.delete",
-        // Get availaible layout titles
-        ...this.data.meta.layouts
-          .map(layoutDescriptor => `layout.${ layoutDescriptor.id }.title`),
+        "displayer.link.noValue"
       ],
     });
 

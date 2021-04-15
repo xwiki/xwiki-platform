@@ -125,7 +125,7 @@
             href="#"
             @click.prevent="logic.addFilter(filterGroup.property)"
           >
-            {{ $t('livedata.panel.filter.add') }}
+            + {{ $t('livedata.panel.filter.addConstraint') }}
           </a>
         </div>
 

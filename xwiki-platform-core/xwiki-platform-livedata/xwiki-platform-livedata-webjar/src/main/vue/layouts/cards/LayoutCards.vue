@@ -106,16 +106,6 @@ export default {
     canAddEntry () { return this.logic.canAddEntry(); },
   },
 
-  beforeMount () {
-    this.logic.loadTranslations({
-      componentName: "layout-cards",
-      prefix: "livedata.layout.cards",
-      keys: [
-        "title",
-      ],
-    });
-  },
-
 };
 </script>
 

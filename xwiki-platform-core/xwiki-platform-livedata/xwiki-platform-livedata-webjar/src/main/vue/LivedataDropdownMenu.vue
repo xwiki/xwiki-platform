@@ -60,7 +60,7 @@
       >
         <a href="#" @click.prevent="logic.changeLayout(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
-          {{ $t(`livedata.layout.${layout.id}.title`) }}
+          {{ layout.name }}
         </a>
       </li>
 

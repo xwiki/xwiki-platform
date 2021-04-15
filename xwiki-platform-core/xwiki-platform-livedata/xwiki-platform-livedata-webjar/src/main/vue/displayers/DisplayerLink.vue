@@ -97,19 +97,6 @@ export default {
     }
   },
 
-  beforeMount () {
-    this.logic.loadTranslations({
-      componentName: "displayer-link",
-      prefix: "livedata.displayer.link",
-      keys: [
-        "copy",
-        "rename",
-        "rights",
-        "delete",
-      ],
-    });
-  },
-
 };
 </script>
 

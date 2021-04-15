@@ -33,6 +33,8 @@
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
   },
   'css': {
+    'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'xwiki-livedata-vue.umd.min.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
     'selectize': [
       $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
@@ -51,8 +53,12 @@ require.config({
   paths: paths.js,
   map: {
     '*': {
+      'xwiki-livedata-vue': 'xwiki-livedata-vue-with-css',
       daterangepicker: 'daterangepicker-with-css',
       'xwiki-selectize': 'xwiki-selectize-with-css'
+    },
+    'xwiki-livedata-vue-with-css': {
+      'xwiki-livedata-vue': 'xwiki-livedata-vue'
     },
     'daterangepicker-with-css': {
       daterangepicker: 'daterangepicker'
@@ -81,6 +87,11 @@ define('loadCSS', function() {
     var urls = Array.isArray(url) ? url : [url];
     urls.forEach(loadCSS);
   };
+});
+
+define('xwiki-livedata-vue-with-css', ['loadCSS', 'xwiki-livedata-vue'], function(loadCSS) {
+  // Load the CSS for the live data.
+  loadCSS(paths.css.liveData);
 });
 
 define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {

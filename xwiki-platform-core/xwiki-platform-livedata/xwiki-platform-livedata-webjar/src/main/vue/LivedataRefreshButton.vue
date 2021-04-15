@@ -54,12 +54,11 @@ export default {
 .livedata-refresh-button {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 4px;
-}
+  border-radius: @border-radius-base;
 
-.livedata-refresh-button:hover,
-.livedata-refresh-button:active {
-  background-color: #ccc4;
+  &:hover, &:active {
+    background-color: @component-active-bg;
+  }
 }
 
 </style>

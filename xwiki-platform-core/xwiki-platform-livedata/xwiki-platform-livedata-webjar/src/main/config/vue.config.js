@@ -26,7 +26,8 @@ module.exports = {
   filenameHashing: false,
 
   configureWebpack: config => {
-    // skip less parsing
+    // Skip LESS parsing because we want the LESS code to be evaluated at runtime, on the server, in the context of the
+    // XWiki skin so that we can use skin and color theme variables.
     const lessRules = config.module.rules.find(rule => /less/.test(rule.test));
     lessRules.oneOf.forEach(context => {
       const loaders = context.use;
@@ -35,10 +36,10 @@ module.exports = {
         loaders.splice(lessLoaderIndex, 1);
       }
     });
-    // export style as less files
+    // Export all styles as LESS files to be included in the WebJar.
     const miniCssExtractPlugin = config.plugins.find(plugin => plugin.constructor.name === "MiniCssExtractPlugin");
     miniCssExtractPlugin.options.filename = "[name].less";
-    miniCssExtractPlugin.options.chunkFilename = "less/[name].less";
+    miniCssExtractPlugin.options.chunkFilename = "less/[name].less?evaluate=true";
   },
 
   chainWebpack: config => {
@@ -53,6 +54,8 @@ module.exports = {
     })
   },
   css: {
+    // We want to extract the styles as LESS files in order to be able to evaluate them at rutime in the context of the
+    // XWiki skin and color theme.
     extract: true,
   },
 };

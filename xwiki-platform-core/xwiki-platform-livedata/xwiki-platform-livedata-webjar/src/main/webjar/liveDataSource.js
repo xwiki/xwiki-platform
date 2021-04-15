@@ -86,9 +86,9 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }, true)).then(toTranslationsMap));
   };
 
-  var toTranslationsMap = function(translationsArray) {
+  var toTranslationsMap = function(responseJSON) {
     var translationsMap = {};
-    translationsArray.forEach(translation => translationsMap[translation.key] = translation.rawSource);
+    responseJSON.translations?.forEach(translation => translationsMap[translation.key] = translation.rawSource);
     return translationsMap;
   };
 

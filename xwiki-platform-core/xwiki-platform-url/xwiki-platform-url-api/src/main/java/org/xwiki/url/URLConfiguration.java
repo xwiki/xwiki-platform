@@ -19,7 +19,11 @@
  */
 package org.xwiki.url;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -44,6 +48,32 @@ public interface URLConfiguration
      * @since 11.1RC1
      */
     default boolean useResourceLastModificationDate()
+    {
+        return true;
+    }
+
+    /**
+     * Specify the list of domains that are considered as trusted by the administrators of the wiki: those domains can
+     * be used safely for redirections from the wiki or for performing other requests on them.
+     * @return the list of trusted domains that can be used in the wiki.
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    default List<String> getTrustedDomains()
+    {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Define if the trusted domains check should be performed or not. This option is provided only to allow bypassing
+     * security checks globally on the wiki in case of problems.
+     * @return {@code true} if the security check on domains should be performed. {@code false} otherwise.
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    default boolean isTrustedDomainsEnabled()
     {
         return true;
     }

@@ -19,6 +19,9 @@
  */
 package org.xwiki.url.internal;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -59,5 +62,17 @@ public class DefaultURLConfiguration implements URLConfiguration
     public boolean useResourceLastModificationDate()
     {
         return this.configuration.get().getProperty(PREFIX + "useResourceLastModificationDate", true);
+    }
+
+    @Override
+    public List<String> getTrustedDomains()
+    {
+        return this.configuration.get().getProperty(PREFIX + "trustedDomains", Collections.emptyList());
+    }
+
+    @Override
+    public boolean isTrustedDomainsEnabled()
+    {
+        return this.configuration.get().getProperty(PREFIX + "trustedDomainsEnabled", true);
     }
 }

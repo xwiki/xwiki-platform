@@ -78,7 +78,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   };
 
   var getTranslations = function(locale, prefix, keys) {
-    const translationsURL = module.config().contextPath + '/rest/localization/translations';
+    const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
     return Promise.resolve($.getJSON(translationsURL, $.param({
       locale: locale,
       prefix: prefix,

@@ -20,7 +20,7 @@
 
 
 define('xwiki-livedata', [
-  "Vue",
+  "vue",
   "vue-i18n",
   "xwiki-livedata-vue",
   "xwiki-livedata-source",

@@ -609,9 +609,9 @@ public class ExtensionIndexStore implements Initializable
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(Parser.class.getName()));
             solrQuery.set("f.component_renderer.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(PrintRendererFactory.class.getName()));
-            solrQuery.set("f.component_inputFilterStream.qf",
+            solrQuery.set("f.component_inputFilter.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(InputFilterStreamFactory.class.getName()));
-            solrQuery.set("f.component_outputFilterStream.qf",
+            solrQuery.set("f.component_outputFilter.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(OutputFilterStreamFactory.class.getName()));
         }
 

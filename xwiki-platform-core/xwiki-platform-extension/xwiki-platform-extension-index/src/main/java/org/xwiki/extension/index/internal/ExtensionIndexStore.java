@@ -599,7 +599,7 @@ public class ExtensionIndexStore implements Initializable
             solrQuery.set("defType", "edismax");
             solrQuery.set("qf", BOOST);
 
-            // Add aliases for known components
+            // Add aliases for well known components roles
             // TODO: make it extensible
             solrQuery.set("f.component_macro.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(Macro.class.getName()));

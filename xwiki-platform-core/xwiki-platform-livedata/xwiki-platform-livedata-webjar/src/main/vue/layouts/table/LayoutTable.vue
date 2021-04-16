@@ -54,12 +54,7 @@
         Table Header
         Implement quick sort, filter, and property reorder
       -->
-      <!-- The style property is used to inject css-variables -->
-      <thead
-        :style="{
-          '--property-count': properties.length,
-        }"
-      >
+      <thead>
         <!-- Table property names -->
         <LayoutTableHeaderNames/>
 
@@ -118,7 +113,6 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
-    properties () { return this.logic.getPropertyDescriptors() },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
   },
@@ -142,52 +136,6 @@ export default {
   align-items: center;
   justify-content: flex-start;
   padding-left: 2rem;
-}
-
-/* Table responsive mode */
-@media screen and (max-width: 767px) {
-
-  /* FOR IE11 support */
-  .layout-table thead {
-    display: flex;
-    flex-direction: row;
-  }
-  .layout-table thead tr {
-    display: flex;
-    flex-direction: column;
-  }
-  /*
-   * Align the property name with the filter
-   * 38px correspond to the height of the filters inputs
-   * This is hard coded and not scalable, but I don't have better for IE :(
-   * TODO fix when using color theme
-   */
-  .layout-table thead tr th {
-    height: 38px;
-  }
-
-  /* Align header titles with entry titles */
-  .layout-table thead th.draggable-item {
-    margin-left: -10px;
-  }
-
-  @supports (grid-auto-flow: column) {
-    .layout-table thead {
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-columns: auto 1fr;
-      grid-template-rows: repeat(var(--property-count), auto);
-      grid-column-gap: 1rem;
-    }
-
-    .layout-table thead tr {
-      display: contents;
-      height: auto;
-    }
-    .layout-table thead tr th {
-      height: auto;
-    }
-  }
 }
 
 </style>

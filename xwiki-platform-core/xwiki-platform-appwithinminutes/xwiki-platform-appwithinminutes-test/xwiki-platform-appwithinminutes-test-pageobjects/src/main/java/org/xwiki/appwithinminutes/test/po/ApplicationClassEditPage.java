@@ -20,7 +20,6 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -97,6 +96,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      * Drags a field of the specified type from the field palette to the field canvas.
      *
      * @param fieldType the type of field to add, as displayed on the field palette
+     * @return the newly added field page object
      */
     public ClassFieldEditPane addField(String fieldType)
     {
@@ -104,7 +104,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         WebElement field = palette.findElement(By.xpath(String.format(fieldXPath, fieldType)));
         // NOTE: We scroll the page up because the drag&drop fails sometimes if the dragged field and the canvas (drop
         // target) are not fully visible. See https://code.google.com/p/selenium/issues/detail?id=3075 .
-        getDriver().createActions().sendKeys(Keys.HOME).perform();
+        getDriver().executeScript("window.scrollTo(0, 0)");
         getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 

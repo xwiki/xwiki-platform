@@ -167,7 +167,7 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>4.3.2</version>
+      <version>4.3.3</version>
       <exclusions>
         <!-- Not the right id -->
         <exclusion>

@@ -47,15 +47,9 @@ public class AdministrationSectionPage extends ViewPage
 
     private final String section;
 
-    /**
-     * Always call this constructor when on a AdministrationSectionPage or it'll fail.
-     *
-     * @param section the section on which we are
-     */
     public AdministrationSectionPage(String section)
     {
         this.section = section;
-        waitUntilActionButtonIsLoaded();
     }
 
     public static AdministrationSectionPage gotoPage(String section)
@@ -177,7 +171,7 @@ public class AdministrationSectionPage extends ViewPage
      * If save button is present wait the action button js to be loaded.
      * @since 11.6RC1
      */
-    private void waitUntilActionButtonIsLoaded()
+    public void waitUntilActionButtonIsLoaded()
     {
         if (getDriver().hasElementWithoutWaiting(By.xpath("//input[@type='submit'][@name='formactionsac']"))) {
             getDriver().waitUntilJavascriptCondition(

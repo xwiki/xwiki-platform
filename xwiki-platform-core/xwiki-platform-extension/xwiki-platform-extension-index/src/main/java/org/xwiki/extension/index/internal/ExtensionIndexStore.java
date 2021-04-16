@@ -66,7 +66,11 @@ import org.xwiki.extension.repository.search.ExtensionQuery.Filter;
 import org.xwiki.extension.repository.search.ExtensionQuery.SortClause;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
@@ -601,6 +605,14 @@ public class ExtensionIndexStore implements Initializable
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(Macro.class.getName()));
             solrQuery.set("f.component_scriptservice.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(ScriptService.class.getName()));
+            solrQuery.set("f.component_parser.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Parser.class.getName()));
+            solrQuery.set("f.component_renderer.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(PrintRendererFactory.class.getName()));
+            solrQuery.set("f.component_inputFilterStream.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(InputFilterStreamFactory.class.getName()));
+            solrQuery.set("f.component_outputFilterStream.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(OutputFilterStreamFactory.class.getName()));
         }
 
         // Pagination

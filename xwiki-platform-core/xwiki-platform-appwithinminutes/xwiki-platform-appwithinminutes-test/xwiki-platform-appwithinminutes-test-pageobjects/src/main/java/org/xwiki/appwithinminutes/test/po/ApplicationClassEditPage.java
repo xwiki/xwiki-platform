@@ -102,10 +102,9 @@ public class ApplicationClassEditPage extends ApplicationEditPage
     {
         String fieldXPath = "//li[@class = 'field' and normalize-space(.) = '%s']";
         WebElement field = palette.findElement(By.xpath(String.format(fieldXPath, fieldType)));
-        // NOTE: We scroll to the top of the page (coordinates (0, 0)) because the drag&drop fails sometimes if the 
-        // dragged field and the canvas (drop target) are not fully visible. See
-        // https://code.google.com/p/selenium/issues/detail?id=3075 .
-        getDriver().scrollTo(0, 0);
+        // NOTE: We scroll to the top of the page because the drag&drop fails sometimes if the dragged field and the
+        // canvas (drop target) are not fully visible. See https://code.google.com/p/selenium/issues/detail?id=3075 .
+        scrollToTop();
         getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 

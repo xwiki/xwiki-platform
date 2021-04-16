@@ -249,6 +249,17 @@ public class ViewPage extends BasePage
         return getDriver().hasElementWithoutWaiting(this.content, elementLocator);
     }
 
+    /**
+     * Scrolls to the top of the screen.
+     *
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    public void scrollToTop()
+    {
+        getDriver().scrollTo(0, 0);
+    }
+
     private void useShortcutForDocExtraPane(String shortcut, String pane)
     {
         getDriver().createActions().sendKeys(shortcut).perform();

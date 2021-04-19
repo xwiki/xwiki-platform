@@ -705,8 +705,15 @@ public class TestUtils
     public void gotoPage(String url)
     {
         // Only navigate if the current URL is different from the one to go to, in order to improve performances.
-        if (!getDriver().getCurrentUrl().equals(url)) {
+        String currentURL = getDriver().getCurrentUrl();
+        if (!currentURL.equals(url)) {
             getDriver().get(url);
+            // The current URL is not updated right away (especially if the request is slow) and since we change the URL
+            // only if it's different than the current one it means we need to wait for the current URL to change
+            // afterwards, otherwise consecutive calls to this method won't have the expected result. Note that the new
+            // URL can be different than the given URL (e.g. when the server does a redirect) so we can only wait for
+            // the current URL to change.
+            getDriver().waitUntilCondition(driver -> !currentURL.equals(driver.getCurrentUrl()));
         }
     }
 

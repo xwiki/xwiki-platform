@@ -67,9 +67,7 @@ export default {
   height: 100%;
   min-height: 1rem;
   animation: waiting 2s linear infinite;
-  --c1: transparent;
-  --c2: #ccc4;
-  background: linear-gradient(135deg,  var(--c1) 25%,  var(--c2) 50%,  var(--c1) 75%);
+  background: linear-gradient(135deg, transparent 25%, #ccc4 50%, transparent 75%);
   background-repeat: repeat;
   background-size: 200% 100%;
 }

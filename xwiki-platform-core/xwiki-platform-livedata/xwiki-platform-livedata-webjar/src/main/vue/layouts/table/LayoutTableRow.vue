@@ -41,6 +41,7 @@
       v-for="property in properties"
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
+      :data-title="property.name"
     >
       <LivedataDisplayer
         :property-id="property.id"

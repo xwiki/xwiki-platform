@@ -224,4 +224,12 @@ export default {
   margin-top: 1rem;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .livedata-advanced-panel-sort .delete-sort {
+    /* Always show the delete icon on small screens because we cannot rely on hover. */
+    visibility: visible;
+  }
+}
+
 </style>

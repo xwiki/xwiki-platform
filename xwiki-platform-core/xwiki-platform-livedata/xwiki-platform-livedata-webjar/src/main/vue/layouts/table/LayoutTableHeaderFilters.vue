@@ -105,4 +105,13 @@ export default {
   width: 0;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .layout-table .column-filters th {
+    /* Overwrite the filters width so they don't overflow the table. */
+    width: 100%;
+    border-top: none;
+  }
+}
+
 </style>

@@ -161,4 +161,12 @@ export default {
   padding: 6px 0px;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .livedata-advanced-panel-properties .handle {
+    /* Always show the drag handler on small screens because we cannot rely on hover. */
+    opacity: 1;
+  }
+}
+
 </style>

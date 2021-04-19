@@ -125,4 +125,12 @@ export default {
   background-color: unset;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .livedata-filter-container .delete-filter {
+    /* Always show the delete icon on small screens because we can't rely on hover. */
+    visibility: visible;
+  }
+}
+
 </style>

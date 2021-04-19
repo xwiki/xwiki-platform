@@ -315,5 +315,23 @@ export default {
   padding: 2px 4px;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  /* Stack the pagination elements vertically. */
+  .livedata-pagination {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+  }
+
+  /* Hide the page size element. */
+  .livedata-pagination .pagination-page-size {
+    display: none;
+  }
+
+  .livedata-pagination .pagination-indexes {
+    margin-left: 0;
+  }
+}
 
 </style>

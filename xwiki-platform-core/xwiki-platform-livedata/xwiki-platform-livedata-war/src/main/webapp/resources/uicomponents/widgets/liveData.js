@@ -92,16 +92,19 @@ define('loadCSS', function() {
 define('xwiki-livedata-vue-with-css', ['loadCSS', 'xwiki-livedata-vue'], function(loadCSS) {
   // Load the CSS for the live data.
   loadCSS(paths.css.liveData);
+  return arguments[1];
 });
 
 define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
   // Load the CSS for the date range picker.
   loadCSS(paths.css.dateRangePicker);
+  return arguments[1];
 });
 
 define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
   // Load the CSS for the suggest picker.
   loadCSS(paths.css.selectize);
+  return arguments[1];
 });
 
 window.liveDataBaseURL = paths.liveDataBasePath;

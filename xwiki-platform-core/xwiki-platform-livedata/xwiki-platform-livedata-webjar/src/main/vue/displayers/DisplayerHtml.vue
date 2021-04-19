@@ -74,4 +74,13 @@ export default {
 
 <style>
 
+/*
+ * Fix the styles of some known HTML widgets that may be used with the HTML displayer.
+ */
+.xwiki-livedata .displayer-html .breadcrumb {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
 </style>

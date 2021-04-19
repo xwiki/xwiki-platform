@@ -48,7 +48,7 @@
 
 
     <!-- Table layout root -->
-    <table class="layout-table-root">
+    <table class="layout-table-root responsive-table">
 
       <!--
         Table Header
@@ -123,19 +123,39 @@ export default {
 
 <style>
 
-.layout-table table {
-  height: 100%;
+.layout-table {
+
+  table {
+    height: 100%;
+  }
+
+  th {
+    border-bottom: unset;
+  }
+
+  .livedata-entry-selector-all .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
+  }
+
 }
 
-.layout-table th {
-  border-bottom: unset;
-}
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .layout-table > .responsive-table > thead {
+    /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
+      because we have two rows, property names and filters, that we want to display as two equally sized columns. */
+    display: flex;
 
-.layout-table .livedata-entry-selector-all .btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding-left: 2rem;
+    > tr {
+      /* We want the property names column to have the same width as the filter column. */
+      flex: 1;
+      /* We need to set the width in order to be able to trim long property names. */
+      width: calc(50vw - @grid-gutter-width);
+    }
+  }
 }
 
 </style>

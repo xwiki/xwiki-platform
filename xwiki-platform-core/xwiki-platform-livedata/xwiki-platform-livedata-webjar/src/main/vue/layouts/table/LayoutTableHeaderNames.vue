@@ -67,7 +67,7 @@
           <span class="fa fa-ellipsis-v"></span>
         </div>
         <!-- Property Name -->
-        <span>{{ property.name }}</span>
+        <span class="property-name">{{ property.name }}</span>
         <!-- Spacer between the property name and the sort icon -->
         <span class="flex-spacer"></span>
         <!--
@@ -175,8 +175,8 @@ th.draggable-item {
 
 .layout-table .handle {
   height: 100%;
-  margin-left: -8px;
-  padding: 0px 8px;
+  margin-left: -@table-cell-padding;
+  padding: 0 @table-cell-padding;
   cursor: pointer; /* IE */
   cursor: grab;
   opacity: 0;
@@ -196,12 +196,33 @@ th.draggable-item {
 .layout-table .sort-icon {
   color: currentColor;
   opacity: 0;
+  padding-left: @table-cell-padding;
 }
 .layout-table .sort-icon.sorted {
   opacity: 1;
 }
 .layout-table .column-name:hover .sort-icon:not(.sorted) {
   opacity: 0.5;
+}
+
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .layout-table th.draggable-item {
+    /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
+    display: block;
+
+    .handle {
+      /* Always show the drag handler because hover is not available on mobile. */
+      opacity: 1;
+    }
+
+    /* Trim long property names. */
+    .property-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 </style>

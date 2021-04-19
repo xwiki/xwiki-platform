@@ -287,4 +287,12 @@ export default {
   margin-top: 1rem;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .livedata-advanced-panel-filter .delete-filter-group {
+    /* Always show the delete icon on small screens because we can't rely on hover. */
+    display: inline-block;
+  }
+}
+
 </style>

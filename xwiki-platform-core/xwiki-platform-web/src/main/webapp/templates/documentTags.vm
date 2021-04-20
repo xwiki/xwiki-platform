@@ -29,8 +29,8 @@
 #end
 ##
 #macro(removeTag $tag)
-    #if($xwiki.tag)
-        #set($result = $xwiki.tag.removeTagFromDocument($tag, $doc.fullName))
+    #if($services.tag)
+        #set($result = $services.tag.removeTagFromDocument($tag, $doc.documentReference))
         #if($result == 'OK' && "$!{request.ajax}" != '')
             $response.setStatus(200)
             #set($responseMessage = 'OK')
@@ -55,11 +55,11 @@
 #end
 ##
 #macro(addTag $tag)
-    #if($xwiki.tag)
-        #set($oldTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
-        #set($result = $xwiki.tag.addTagsToDocument($tag, $doc.fullName))
+    #if($services.tag)
+        #set($oldTags = $services.tag.getTagsFromDocument($doc.documentReference))
+        #set($result = $services.tag.addTagToDocument($tag, $doc.documentReference))
         #if($result == 'OK' && "$!{request.ajax}" != '')
-            #set($newTags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+            #set($newTags = $services.tag.getTagsFromDocument($doc.documentReference))
             #set($discard = $newTags.removeAll($oldTags))
             #foreach($t in $newTags)
                 #if($t != '' && !$oldTags.contains($t))
@@ -110,9 +110,9 @@
     $xwiki.ssfx.use('uicomponents/viewers/tags.css', {'forceSkinAction': true, 'colorTheme': "$!{themeDocFullName}"})##
     $xwiki.jsfx.use('uicomponents/viewers/tags.js', true)##
 <div class="doc-tags" id="${tagsId}">
-    #if($xwiki.tag)
+    #if($services.tag)
         #set($hasTagsPlugin = true)
-        #set($tags = $xwiki.tag.getTagsFromDocument($doc.fullName))
+        #set($tags = $services.tag.getTagsFromDocument($doc.documentReference))
     #else
         #set($hasTagsPlugin = false)
         #set($tags = $doc.getTagList())
@@ -126,7 +126,7 @@
     #end
     ##   #end
     #if($hasedit)
-        #if($xwiki.tag)
+        #if($services.tag)
           <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$services.localization.render('core.tags.add.tooltip')" rel="nofollow">[+]</a>#else #displayAddForm()#end</div>
         #else
             ## TODO

@@ -47,7 +47,9 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * TagPlugin is a plugin that allows to manipulate tags easily. It allows to get, rename and delete tags.
  * 
  * @version $Id$
+ * @deprecated since 13.1RC1, use {@link TagService} instead 
  */
+@Deprecated
 public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     /** Logging helper object. */

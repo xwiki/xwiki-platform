@@ -290,7 +290,7 @@
   ##
   ## TagCloud matching the current filters
   ##
-  #set($tagsMatchingFilters = $xwiki.tag.getTagCountForQuery($tagsMatchingFiltersFrom, $tagsMatchingFiltersWhere, $tagsMatchingParams))
+  #set($tagsMatchingFilters = $services.tag.getTagCountForQuery($tagsMatchingFiltersFrom, $tagsMatchingFiltersWhere, $tagsMatchingParams))
   ## FIXME: We use a map just because the client expects an object, but all we really need is a list..
   #set($matchingTags = {})
   #foreach($tag in $tagsMatchingFilters.keySet())
@@ -301,7 +301,7 @@
   ##
   ## TagCloud matching all the documents used by the live table
   ##
-  #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  #set($allMatchingTags = $services.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
   ## FIXME: We use a list of maps just because the client expects an array, but we should simply return $allMatchingTags..
   #set($tags = [])
   #foreach($tag in $allMatchingTags.keySet())

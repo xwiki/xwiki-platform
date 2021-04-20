@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.tag.TagScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,7 +37,9 @@ import com.xpn.xwiki.plugin.PluginApi;
  * 
  * @see PluginApi
  * @version $Id$
+ * @deprecated since 13.1RC1, see {@link TagScriptService} instead
  */
+@Deprecated
 public class TagPluginApi extends PluginApi<TagPlugin>
 {
     /** Logging helper object. */

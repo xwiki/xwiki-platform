@@ -41,7 +41,9 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  * @since 5.0M1
+ * @deprecated since 13.1RC1, use {@link TagQueryService} instead
  */
+@Deprecated
 public final class TagQueryUtils
 {
     /**

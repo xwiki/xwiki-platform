@@ -132,6 +132,31 @@
                 <old>class com.xpn.xwiki.store.migration.hibernate.MigrationResourceAccessor</old>
                 <justification>Was never meant to be public</justification>
               </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>enum com.xpn.xwiki.plugin.tag.TagOperationResult</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagParamUtils</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagPlugin</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagPluginApi</old>
+                <justification>Moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.class.removed</code>
+                <old>class com.xpn.xwiki.plugin.tag.TagQueryUtils</old>
+                <justification>Moved to legacy.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

@@ -81,8 +81,9 @@
         ## We don't use #em_submitButton because we want to use <button> instead of <input type="submit">, in order to 
         ## be able to use HTML content inside the text of the button (the search icon and the hidden span for screen readers).
         <span class="buttonwrapper">
-          <button class="primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
+          <button class="btn btn-primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
+        <button type="button" class="btn btn-default" data-toggle="collapse" data-target=".extension-search-more">$escapetool.xml($services.localization.render('extensions.search.more.label'))</button>
       </div>
 
       <div>
@@ -90,42 +91,58 @@
           #set ($selectedRepositoryId = $request.repo)
         #else
           #set ($selectedRepositoryId = '')
+          #set ($customExtensionFilter = false)
           #if ($request.recommended == 'false')
-            #set($recommended = false)
+            #set ($recommended = false)
+            #set ($customExtensionFilter = true)
           #else
-            #set($recommended = true)
+            #set ($recommended = true)
           #end
           #if ($request.indexed == 'false' || !$extensionManager.index.repository)
-            #set($indexed = false)
+            #set ($indexed = false)
+            #set ($customExtensionFilter = true)
           #else
-            #set($indexed = true)
+            #set ($indexed = true)
           #end
           #if ($request.compatible == 'false')
-            #set($compatible = false)
+            #set ($compatible = false)
+            #set ($customExtensionFilter = true)
           #else
-            #set($compatible = true)
+            #set ($compatible = true)
           #end
-          #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
-          <input type="checkbox" title="$recommendedTooltip" id="switch_recommended" name="recommended"#if($recommended) checked#end>
-          <input type="hidden" name="recommended" value="false" />
-          <label for="switch_recommended" title="$recommendedTooltip">$escapetool.xml($services.localization.render('extensions.search.recommended.label'))</label>
+          <div class="extension-search-more collapse#if($customExtensionFilter) in#end">
+            <div>
+              <span class="box">
+                #set($recommendedTooltip = $escapetool.xml($services.localization.render('extensions.search.recommended.tooltip')))
+                <input type="checkbox" title="$recommendedTooltip" id="switch_recommended" name="recommended"#if($recommended) checked#end>
+                <input type="hidden" name="recommended" value="false" />
+                <label for="switch_recommended" title="$recommendedTooltip">$escapetool.xml($services.localization.render('extensions.search.recommended.label'))</label>
+              </span>
+            </div>
 
-          #set($indexedTooltip = $escapetool.xml($services.localization.render('extensions.search.indexed.tooltip')))
-          <input type="checkbox" title="$indexedTooltip" id="switch_indexed" name="indexed"#if($indexed) checked#end>
-          <input type="hidden" name="indexed" value="false" />
-          <label for="switch_indexed" title="$indexedTooltip">$escapetool.xml($services.localization.render('extensions.search.indexed.label'))</label>
+            <div>
+              <span class="box">
+                #set($indexedTooltip = $escapetool.xml($services.localization.render('extensions.search.indexed.tooltip')))
+                <input type="checkbox" title="$indexedTooltip" id="switch_indexed" name="indexed"#if($indexed) checked#end>
+                <input type="hidden" name="indexed" value="false" />
+                <label for="switch_indexed" title="$indexedTooltip">$escapetool.xml($services.localization.render('extensions.search.indexed.label'))</label>
+              </span>
 
-          #if ($indexed)
-            #set($compatibleTooltip = $escapetool.xml($services.localization.render('extensions.search.compatible.tooltip')))
-            <input type="checkbox" title="$compatibleTooltip" id="switch_compatible" name="compatible"#if($compatible) checked#end>
-            <input type="hidden" name="compatible" value="false" />
-            <label for="switch_compatible" title="$compatibleTooltip">$escapetool.xml($services.localization.render('extensions.search.compatible.label'))</label>
-          #end
+              #if ($indexed)
+                <span class="box">
+                  #set($compatibleTooltip = $escapetool.xml($services.localization.render('extensions.search.compatible.tooltip')))
+                  <input type="checkbox" title="$compatibleTooltip" id="switch_compatible" name="compatible"#if($compatible) checked#end>
+                  <input type="hidden" name="compatible" value="false" />
+                  <label for="switch_compatible" title="$compatibleTooltip">$escapetool.xml($services.localization.render('extensions.search.compatible.label'))</label>
+                </span>
+              #end
+            </div>
+          </div>
         #end
       </div>
     </form>
     ## Advanced search form.
-    <form action="$xwiki.relativeRequestURL" class="xform">
+    <form action="$xwiki.relativeRequestURL" class="xform extension-search-more collapse#if($customExtensionFilter) in#end">
       <fieldset id="extension-search-advanced">
         <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
         <div id="extension-search-advanced-body"></div>

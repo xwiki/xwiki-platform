@@ -83,7 +83,8 @@
             #else
                 #set ($descriptionKey = 'mentions.event.mention.description')
             #end
-            #set ($description = "$services.localization.render($descriptionKey) <a href='$eventParams.getDocumentURL()'>$eventParams.getDocument().getTitle()</a>")
+            #set ($tdoc = $xwiki.getDocument($eventParams.getDocument().getDocumentReference()).getTranslatedDocument())
+            #set ($description = "$services.localization.render($descriptionKey) <a href='$eventParams.getDocumentURL()'>$tdoc.getRenderedTitle('xhtml/1.0')</a>")
             #displayEventDetail($event $description)
         #end
     #end

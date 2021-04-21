@@ -1321,10 +1321,6 @@ public class XWiki implements EventListener
             String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
 
-            // Save the configured syntaxes
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/1.0");
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
-
             getObservationManager().addListener(this);
         } finally {
             getProgress().popLevelProgress(this);
@@ -7704,6 +7700,10 @@ public class XWiki implements EventListener
     @Deprecated
     public List<String> getConfiguredSyntaxes()
     {
+        if (this.configuredSyntaxes == null) {
+            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/2.1");
+            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+        }
         return this.configuredSyntaxes;
     }
 

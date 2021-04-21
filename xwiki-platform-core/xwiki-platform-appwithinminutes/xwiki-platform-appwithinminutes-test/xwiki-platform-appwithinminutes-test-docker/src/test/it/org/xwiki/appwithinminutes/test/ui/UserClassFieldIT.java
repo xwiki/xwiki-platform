@@ -268,12 +268,11 @@ class UserClassFieldIT
         String testMethodName = testReference.getLastSpaceReference().getName();
         // Create the application entry.
         ClassSheetPage classSheetPage = new ClassSheetPage();
-//        testUtils.getDriver().findElement(By.cssSelector("input[value='Create the template']")).click();
-//        testUtils.getDriver().findElement(By.cssSelector("div.box.warningmessage a")).click();
+        testUtils.getDriver().findElement(By.cssSelector("input[value='Create the template']")).click();
+        testUtils.getDriver().findElement(By.cssSelector("div.box.warningmessage a")).click();
         InlinePage entryEditPage = classSheetPage.createNewDocument(testClassName, testMethodName + "Entry");
 
         // Assert the initial value.
-//        String id = testClassName + "." + testMethodName + "_0_user1";
         String id = String.format("%s.%s.WebHome_0_user1", testClassName, testMethodName);
         userPicker = new SuggestInputElement(testUtils.getDriver().findElement(By.id(id)));
 //        List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();

@@ -195,8 +195,27 @@
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
           <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/Help/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Contributors/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Movies/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Box/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Chart/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Gallery/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Notifications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/ToC/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Tree/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Videos/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Templates/WebHome\.xml</visibleTechnicalPage>
             <visibleTechnicalPage>.*/XWiki/XWikiSyntax\.xml</visibleTechnicalPage>
           </visibleTechnicalPages>
+          <contentPages>
+            <contentPage>.*/Help/Applications/Contributors/Charlie Chaplin\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Contributors/Frank Capra\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Meet John Doe\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Modern Times\.xml</contentPage>
+          </contentPages>
         </configuration>
       </plugin>
       <!-- Attach resources to the corresponding wiki pages. -->

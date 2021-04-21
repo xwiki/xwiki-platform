@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{velocity}}
 #set ($columnsProperties = {
   'longText1': {"type":"text","filterable":false,"sortable":false,"html":true},

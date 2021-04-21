@@ -647,15 +647,15 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
-  var target = $('.systemFilterPreferences').attr('data-target');
+  var target = $('.customFilterPreferences').attr('data-target');
   
-  var docURL = $('.systemFilterPreferences').attr('data-doc-url');
+  var docURL = $('.customFilterPreferences').attr('data-doc-url');
   var postParams = {
     csrf: xm.form_token,
     target: target
   };
   if (target == 'user') {
-    var targetUser = $('.systemFilterPreferences').attr('data-user');
+    var targetUser = $('.customFilterPreferences').attr('data-user');
     postParams['user'] = targetUser;
   };
 

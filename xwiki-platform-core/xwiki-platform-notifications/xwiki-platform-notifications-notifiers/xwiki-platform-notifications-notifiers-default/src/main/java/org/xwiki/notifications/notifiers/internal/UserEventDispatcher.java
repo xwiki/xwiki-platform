@@ -129,7 +129,6 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         this.secondaryQueue = new LinkedBlockingQueue<>(100000);
 
         // Start a background thread to filter and dispatch users events
-        // Not making it a daemon thread because we don't want to loose events
         Thread thread = new Thread(this);
         thread.setName("User event dispatcher thread");
         thread.setPriority(Thread.NORM_PRIORITY - 1);

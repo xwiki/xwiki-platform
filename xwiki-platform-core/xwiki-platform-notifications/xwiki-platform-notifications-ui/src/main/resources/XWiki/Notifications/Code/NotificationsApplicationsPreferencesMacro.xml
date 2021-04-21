@@ -187,7 +187,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       var target = $('.notifPreferences').attr('data-target');
       var targetUser = "";
       if (target == 'user') {
-        var targetUser = XWiki.Model.serialize(new XWiki.Document().getDocumentReference())
+        var targetUser = XWiki.Model.serialize(xm.userReference);
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {

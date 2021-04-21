@@ -413,6 +413,22 @@ ${name}##
     <dt>$services.localization.render('extensions.info.type')</dt>
     <dd>$extension.type</dd>
 
+    #if ($extension.components.size() > 0)
+      <dt>$services.localization.render('extensions.info.components', [$extension.components.size()])</dt>
+      <dd>
+      #if ($extension.components.size() == 1)
+        #set($component = $extension.components.iterator().next())
+        <tt>$escapetool.xml($component.roleType) ($escapetool.xml($component.roleHint))</tt>
+      #else
+        <ul>
+          #foreach ($component in $extension.components)
+            <li><tt>$escapetool.xml($component.roleType) ($escapetool.xml($component.roleHint))</tt></li>
+          #end
+        </ul>
+      #end
+      </dd>
+    #end
+
     <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
     #if ($extension.licenses.size() > 0)
       <dd>

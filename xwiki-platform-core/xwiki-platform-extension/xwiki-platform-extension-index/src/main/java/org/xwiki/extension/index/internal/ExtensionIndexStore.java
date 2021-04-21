@@ -70,6 +70,7 @@ import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.Solr;
@@ -609,6 +610,8 @@ public class ExtensionIndexStore implements Initializable
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(Parser.class.getName()));
             solrQuery.set("f.component_renderer.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(PrintRendererFactory.class.getName()));
+            solrQuery.set("f.component_blockrenderer.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(BlockRenderer.class.getName()));
             solrQuery.set("f.component_inputFilter.qf",
                 ExtensionIndexSolrCoreInitializer.toComponentFieldName(InputFilterStreamFactory.class.getName()));
             solrQuery.set("f.component_outputFilter.qf",

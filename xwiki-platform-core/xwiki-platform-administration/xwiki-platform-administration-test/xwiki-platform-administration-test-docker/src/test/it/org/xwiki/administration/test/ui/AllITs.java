@@ -73,4 +73,10 @@ public class AllITs
     class NestedPageTemplatesIT extends PageTemplatesIT
     {
     }
+    
+    @Nested
+    @DisplayName("User registration")
+    class NestedRegisterIT extends RegisterIT
+    {
+    }
 }

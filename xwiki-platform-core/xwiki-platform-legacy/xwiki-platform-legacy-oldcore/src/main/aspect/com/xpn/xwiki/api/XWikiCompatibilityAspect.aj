@@ -1185,4 +1185,17 @@ public privileged aspect XWikiCompatibilityAspect
 
         return true;
     }
+
+    /**
+     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
+     *         {@code mediawiki/1.0}, etc), taken only from {@code xwiki.cfg} (using the
+     *         {@code xwiki.rendering.syntaxes} property)
+     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
+     *             instead (they use a more elaborate algorithm to find out the supported syntaxes)
+     */
+    @Deprecated
+    public List<String> XWiki.getConfiguredSyntaxes()
+    {
+        return this.xwiki.getConfiguredSyntaxes();
+    }
 }

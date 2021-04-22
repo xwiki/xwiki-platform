@@ -2964,17 +2964,6 @@ public class XWiki extends Api
     }
 
     /**
-     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
-     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
-     *             instead
-     */
-    @Deprecated
-    public List<String> getConfiguredSyntaxes()
-    {
-        return this.xwiki.getConfiguredSyntaxes();
-    }
-
-    /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
      * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *

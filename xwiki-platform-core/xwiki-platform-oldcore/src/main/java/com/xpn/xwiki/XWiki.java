@@ -109,7 +109,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
-import org.xwiki.extension.event.ExtensionInitializedEvent;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -399,9 +398,6 @@ public class XWiki implements EventListener
     private static final String VERSION_FILE_PROPERTY = "version";
 
     private static XWikiInitializerJob job;
-
-    /** List of configured syntax ids. */
-    private List<String> configuredSyntaxes;
 
     /** Used to convert a proper Document Reference to string (standard form). */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
@@ -7689,22 +7685,6 @@ public class XWiki implements EventListener
         }
 
         return document;
-    }
-
-    /**
-     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
-     *         {@code mediawiki/1.0}, etc)
-     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
-     *             instead
-     */
-    @Deprecated
-    public List<String> getConfiguredSyntaxes()
-    {
-        if (this.configuredSyntaxes == null) {
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/2.1");
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
-        }
-        return this.configuredSyntaxes;
     }
 
     /**

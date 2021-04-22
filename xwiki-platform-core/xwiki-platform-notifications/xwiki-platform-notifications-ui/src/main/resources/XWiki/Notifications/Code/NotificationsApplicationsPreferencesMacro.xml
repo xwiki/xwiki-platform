@@ -187,7 +187,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       var target = $('.notifPreferences').attr('data-target');
       var targetUser = "";
       if (target == 'user') {
-        var targetUser = XWiki.Model.serialize(xm.userReference);
+        var targetUser = $('.notifPreferences').attr('data-user');
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {
@@ -976,12 +976,15 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 ######################################################
 ### GLOBALS
 ######################################################
-#if ("$!wikimacro.parameters.user" != "" &amp;&amp; $wikimacro.parameters.target == 'user')
-  #set ($targetUser = $wikimacro.parameters.user.reference)
-  #set ($targetUserReference = $wikimacro.parameters.user)
-#else
-  #set ($targetUser = $xcontext.userReference)
-  #set ($targetUserReference = $services.user.currentUserReference)
+#if ($wikimacro.parameters.target != "wiki")
+  #if ("$!wikimacro.parameters.user" != "")
+    #set ($targetUser = $wikimacro.parameters.user.reference)
+    #set ($targetUserReference = $wikimacro.parameters.user)
+  #else
+    #set ($targetUser = $xcontext.userReference)
+    #set ($targetUserReference = $services.user.currentUserReference)
+  #end
+  #set ($divData = "data-user=""$services.model.serialize($targetUser)""")
 #end
 #set ($userDoc = $xwiki.getDocument($targetUser))
 ######################################################
@@ -990,7 +993,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)"&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;

@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.page;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -69,8 +72,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests that wishes to unit test wiki page should extend this class and call {@link #loadPage} or
- * {@link #renderPage} to load and render a page located in the classpath.
+ * A testing framework to write integration tests for wiki pages. The philosophy is that these tests will use the real
+ * code / components to the max and tests should only need to mock the environment (database, file system, REST calls,
+ * remote SOLR, etc). Tests should extend this class and call {@link #loadPage} or {@link #renderPage} to load and
+ * render a page located in the classpath.
  *
  * @version $Id$
  * @since 7.3M1
@@ -235,7 +240,7 @@ public class PageTest
      * @throws Exception in case of errors
      */
     @BeforeEach
-    public void setUpForPageTest() throws Exception
+    void setUpForPageTest() throws Exception
     {
         // Configure mocks from OldcoreRule
         context = oldcore.getXWikiContext();
@@ -272,7 +277,8 @@ public class PageTest
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
 
-        initSkinEnvironment();
+        initializeSkinEnvironment();
+        initializeEnvironmentResources();
     }
 
     /**
@@ -281,7 +287,7 @@ public class PageTest
      * @throws Exception in case of errors
      */
     @AfterEach
-    public void tearDown() throws Exception
+    void tearDown() throws Exception
     {
         MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
         if (this.syntaxPushedInRenderingContext) {
@@ -308,10 +314,57 @@ public class PageTest
      *
      * @throws ComponentLookupException in case of error when loading an {@link Environment} instance
      */
-    private void initSkinEnvironment() throws ComponentLookupException
+    private void initializeSkinEnvironment() throws ComponentLookupException
     {
         // Load the environment from the test resources. This is needed to access the skins properties.
         Environment environment = this.componentManager.getInstance(Environment.class);
         when(environment.getResource(SKIN_PROPERTIES_PATH)).thenReturn(getClass().getResource(SKIN_PROPERTIES_PATH));
+    }
+
+    /**
+     * Make calls to {@code Environment#getResource*()} work by looking for environment resources in the current
+     * classloader and if not found there, offering the ability for tests to decide from where to serve resources
+     * by implementing {@link}.
+     * <p>
+     * Note that this method is protected in case the test need to completely override how resources are found.
+     */
+    protected void initializeEnvironmentResources() throws Exception
+    {
+        // Environment resources
+        Environment environment = oldcore.getMocker().getInstance(Environment.class);
+        when(environment.getResource(any(String.class))).thenAnswer(
+            (Answer) invocation -> {
+                String resourceName = (String) invocation.getArguments()[0];
+                // Try to load the resource from the CP first and if not found let tests be able to override
+                // {@code getEnvironmentResource()}.
+                URL url = getClass().getResource(resourceName);
+                if (url == null) {
+                    url = getEnvironmentResource(resourceName);
+                }
+                return url;
+            });
+        when(environment.getResourceAsStream(any(String.class))).thenAnswer(
+            (Answer) invocation -> {
+                String resourceName = (String) invocation.getArguments()[0];
+                // Try to load the resource from the CP first and if not found let tests be able to override
+                // {@code getEnvironmentResourceAsStream()}.
+                InputStream is = getClass().getResourceAsStream(resourceName);
+                if (is == null) {
+                    is = getEnvironmentResourceAsStream(resourceName);
+                }
+                return is;
+            });
+    }
+
+    protected URL getEnvironmentResource(String resourceName) throws Exception
+    {
+        // Tests should override this if they need to serve the resource from a location other than the classloader
+        return null;
+    }
+
+    protected InputStream getEnvironmentResourceAsStream(String resourceName) throws Exception
+    {
+        // Tests should override this if they need to serve the resource from a location other than the classloader
+        return null;
     }
 }

@@ -24,51 +24,30 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.stubbing.Answer;
-import org.xwiki.environment.Environment;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.text.StringUtils;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 /**
- * Template tests should extends this class.
+ * Template tests in this module should extends this class. It makes the template located in {@code src/main/webapp}
+ * available as resource environments for the tests. See {@link PageTest#getEnvironmentResource(String)} and
+ * {@link PageTest#getEnvironmentResourceAsStream(String)}.
  *
  * @version $Id$
  */
 public class TemplateTest extends PageTest
 {
-    @BeforeEach
-    public void templateSetup() throws Exception
+    @Override
+    protected URL getEnvironmentResource(String resourceName) throws Exception
     {
-        // Environment resources
-        Environment environment = oldcore.getMocker().getInstance(Environment.class);
-        when(environment.getResource(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String templateName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found load it from src/main/webapp/templates
-                // This is to support the skin.properties template resource coming from the PageTest module.
-                URL url = getClass().getResource(templateName);
-                if (url == null) {
-                    String templatePath = getResourcePath(templateName);
-                    url = new File(templatePath).toURI().toURL();
-                }
-                return url;
-            });
-        when(environment.getResourceAsStream(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String templateName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found load it from src/main/webapp/templates
-                // This is to support the skin.properties template resource coming from the PageTest module.
-                InputStream is = getClass().getResourceAsStream(templateName);
-                if (is == null) {
-                    String templatePath = getResourcePath(templateName);
-                    is = new FileInputStream(templatePath);
-                }
-                return is;
-            });
+        String templatePath = getResourcePath(resourceName);
+        return new File(templatePath).toURI().toURL();
+    }
+
+    @Override
+    protected InputStream getEnvironmentResourceAsStream(String resourceName) throws Exception
+    {
+        String templatePath = getResourcePath(resourceName);
+        return new FileInputStream(templatePath);
     }
 
     private String getResourcePath(String templateName)

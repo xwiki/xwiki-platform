@@ -102,7 +102,8 @@ public class DefaultTranslationsResource implements TranslationsResource, XWikiR
                         // a null value.
                         result.getTranslations().add(createTranslation(objectFactory, fullKey, null));
                         this.logger
-                            .warn("Translation key [{}] not found for locale [{}] in wiki [{}].", key, locale, wikiId);
+                            .warn("Translation key [{}] not found for locale [{}] in wiki [{}].", fullKey, locale,
+                                wikiId);
                     }
                 }
             }

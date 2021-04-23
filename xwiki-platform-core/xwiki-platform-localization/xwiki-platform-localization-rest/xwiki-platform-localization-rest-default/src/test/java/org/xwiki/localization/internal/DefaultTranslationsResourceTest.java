@@ -46,6 +46,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import ch.qos.logback.classic.Level;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -144,6 +145,28 @@ class DefaultTranslationsResourceTest
 
         verify(this.localizationManager).getTranslation("key1", this.defaultLocale);
         verify(this.localizationManager).getTranslation("key2", this.defaultLocale);
+        verify(this.modelContext).setCurrentEntityReference(new WikiReference("mywiki"));
+        verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+    }
+
+    @Test
+    void getTranslationsNotFoundWithPrefix() throws Exception
+    {
+        ObjectFactory objectFactory = new ObjectFactory();
+        Translations expected = objectFactory.createTranslations();
+        expected.getTranslations().addAll(singletonList(createTranslation(objectFactory, "prefix.key1", null)));
+
+        Translations response =
+            this.defaultTranslationResource.getTranslations("mywiki", null, "prefix.", singletonList("key1"));
+
+        assertEquals(marshal(expected), marshal(response));
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Translation key [prefix.key1] not found for locale [es] in wiki [mywiki].",
+            this.logCapture.getMessage(0));
+
+        verify(this.localizationManager).getTranslation("prefix.key1", this.defaultLocale);
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("mywiki"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
     }

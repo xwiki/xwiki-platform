@@ -131,13 +131,6 @@ XWiki.widgets.LiveTable = Class.create({
     this.sendReqNo = 0;
     this.recvReqNo = 0;
 
-    // Make sure updates are queued instead of being interleaved. This is cleaner than trying to stop the current update
-    // when a new JSON response is received. This is needed for instance when two live table results requests are made
-    // quicky one after another and the second response arrives while the first response is being processed (e.g. while
-    // the live table rows are being updated). Although the requests are made sequentially the code that handles the
-    // respose can end up being interleaved and this leads to UI inconsistencies.
-    this._updateQueue = [];
-
     // Initialize sort column and observe sort events
     this.observeSortableColumns(this.permalinks.getSortColumn(), this.permalinks.getSortDirection());
 
@@ -223,14 +216,29 @@ XWiki.widgets.LiveTable = Class.create({
         onSuccess: function( transport ) {
           var res = eval( '(' + transport.responseText + ')');
 
-          // Check if this response corresponds to the last update request.
-          if (res.reqNo >= self.sendReqNo) {
-            // The previous check is good but not enough to make sure the updates are not interleaved. It's still
-            // possible for another update request to be made right after this check is passed and its response to
-            // arrive while the current update is still in progress. We want the second update to wait for the first
-            // update to finish, and we do this by queueing updates.
-            self._scheduleUpdate(res, displayOffset, displayLimit);
+          if (res.reqNo < self.sendReqNo) {
+            return;
           }
+
+          self.recvReqNo = res.reqNo;
+
+          if (self.tagCloud && res.matchingtags) {
+            self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
+          }
+
+          // Let code know new entries arrived
+          // 1. Named event (for code interested by that table only)
+          document.fire("xwiki:livetable:" + self.domNodeName + ":receivedEntries", {
+            "data" : res
+          });
+          // 2. Generic event (for code potentially interested in any livetable)
+          document.fire("xwiki:livetable:receivedEntries", {
+            "data" : res,
+            "tableId" : self.domNodeName
+          });
+
+          self.updateFetchedRows(res);
+          self.displayRows(displayOffset, displayLimit);
         }
       });
 
@@ -248,49 +256,6 @@ XWiki.widgets.LiveTable = Class.create({
       // no withdrawal period
       doRequest();
     }
-  },
-
-  _scheduleUpdate: function(response, offset, limit) {
-    var length = this._updateQueue.push({
-      response: response,
-      offset: offset,
-      limit: limit
-    });
-    if (length === 1) {
-      // Process the update right away if it's the only one in the queue.
-      this._processNextUpdate();
-    }
-  },
-
-  _processNextUpdate: function() {
-    var update = this._updateQueue[0];
-    var response = update.response;
-    this.recvReqNo = response.reqNo;
-
-    if (this.tagCloud && response.matchingtags) {
-      this.tagCloud.updateTagCloud(response.tags, response.matchingtags);
-    }
-
-    // Let code know new entries arrived
-    // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
-      "data" : response
-    });
-    // 2. Generic event (for code potentially interested in any livetable)
-    document.fire("xwiki:livetable:receivedEntries", {
-      "data" : response,
-      "tableId" : this.domNodeName
-    });
-
-    this.updateFetchedRows(response);
-    this.displayRows(update.offset, update.limit);
-
-    if (this._updateQueue.length > 1) {
-      // Process the next update on the next event cycle.
-      setTimeout(this._processNextUpdate.bind(this), 0);
-    }
-    // Remove from the queue the update that has been processed.
-    this._updateQueue.shift();
   },
 
   /**

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -53,30 +54,30 @@ public class DefaultNotificationFilterDisplayer extends AbstractNotificationFilt
 
     @Override
     public Block display(NotificationFilter filter, NotificationFilterPreference preference)
-            throws NotificationException
+        throws NotificationException
     {
-        try {
-            setUpContext(scriptContextManager, filter, preference);
+        Map<String, Object> backup = setUpContext(this.scriptContextManager, filter, preference);
 
-            // Try to get a template using the filter name ; if no template is found, fallback on the default one.
-            String templateName = String.format("notification/filters/%s.vm",
-                    filter.getName().replaceAll("\\/", "."));
+        try {
+            // Try to get a template using the filter name; if no template is found, fallback on the default one.
+            String templateName = String.format("notification/filters/%s.vm", filter.getName().replaceAll("\\/", "."));
             Template template = templateManager.getTemplate(templateName);
 
             return (template != null) ? templateManager.execute(template)
-                    : templateManager.execute("notification/filters/default.vm");
+                : templateManager.execute("notification/filters/default.vm");
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to display the notification filter [%s] with the filter preference [%s].",
-                            filter, preference), e);
+                String.format("Failed to display the notification filter [%s] with the filter preference [%s].", filter,
+                    preference),
+                e);
         } finally {
-            cleanUpContext();
+            cleanUpContext(this.scriptContextManager, backup);
         }
     }
 
     @Override
     public Set<String> getSupportedFilters()
     {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 }

@@ -143,7 +143,7 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
             descriptor.setSortable(false);
         }
         // The returned property value is the displayer output.
-        descriptor.setDisplayer(new DisplayerDescriptor("html"));
+        descriptor.setDisplayer(new DisplayerDescriptor("xClassProperty"));
         if (xproperty instanceof ListClass) {
             descriptor.setFilter(new FilterDescriptor("list"));
             if (xproperty instanceof LevelsClass) {

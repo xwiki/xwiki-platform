@@ -167,14 +167,14 @@ class LiveTableLiveDataPropertyStoreTest
 
         StringBuilder expectedClassProps = new StringBuilder();
         expectedClassProps.append("{'id':'birthdate','name':'Birthdate','description':'The date when you were born.'"
-            + ",'type':'Date','displayer':{'id':'html'},'filter':{'id':'date','dateFormat':'h:mm a'}},");
+            + ",'type':'Date','displayer':{'id':'xClassProperty'},'filter':{'id':'date','dateFormat':'h:mm a'}},");
         expectedClassProps.append("{'id':'total','name':'Total','description':'The computed total amount.',"
-            + "'type':'Computed','displayer':{'id':'html'}},");
+            + "'type':'Computed','displayer':{'id':'xClassProperty'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
-            + "'type':'List','sortable':false,'displayer':{'id':'html'},"
+            + "'type':'List','sortable':false,'displayer':{'id':'xClassProperty'},"
             + "'filter':{'id':'list','operators':[{'id':'equals'}],"
             + "'searchURL':'/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}'}},");
-        expectedClassProps.append("{'id':'levels','type':'Levels','displayer':{'id':'html'},"
+        expectedClassProps.append("{'id':'levels','type':'Levels','displayer':{'id':'xClassProperty'},"
             + "'filter':{'id':'list','options':['edit','delete']}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();

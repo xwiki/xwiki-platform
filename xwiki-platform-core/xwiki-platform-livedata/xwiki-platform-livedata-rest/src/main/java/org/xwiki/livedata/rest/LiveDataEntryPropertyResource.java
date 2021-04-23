@@ -77,6 +77,6 @@ public interface LiveDataEntryPropertyResource
         @QueryParam("namespace") @DefaultValue("") String namespace,
         @PathParam("entryId") String entryId,
         @PathParam("propertyId") String propertyId,
-        Object value
+        String value
     ) throws Exception;
 }

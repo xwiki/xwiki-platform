@@ -8,3 +8,4 @@ org.xwiki.livedata.internal.livetable.LiveTableRequestHandler
 org.xwiki.livedata.internal.livetable.LiveTableResultsURLDocumentReferenceResolver
 org.xwiki.livedata.internal.livetable.PropertyTypeSupplier
 org.xwiki.livedata.script.livetable.LiveTableScriptService
+org.xwiki.livedata.internal.livetable.XClassPropertyService

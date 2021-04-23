@@ -13,13 +13,14 @@
     "propertyDescriptors": [
       {"id": "doc.name", "type": "String", "editable": false, "displayer": "link"},
       {"id": "doc.title", "type": "String", "displayer": "link"},
+      {"id": "doc.hidden", "type": "Boolean", "displayer": "boolean"},
       {
         "id": "doc.space",
         "type": "String",
         "editable": false,
         "displayer": {"id": "link", "propertyHref": "doc.space_url"}
       },
-      {"id": "doc.location", "type": "String", "editable": false, "displayer": "html"},
+      {"id": "doc.location", "type": "String", "editable": false, "displayer": "xClassProperty"},
       {"id": "doc.fullName", "type": "String", "editable": false, "displayer": "link"},
       {"id": "doc.creationDate", "type": "Date", "editable": false, "displayer": "text"},
       {"id": "doc.date", "type": "Date", "editable": false, "displayer": "text"},
@@ -31,10 +32,10 @@
         "displayer": {"id": "link", "propertyHref": "doc.author_url"}
       },
       {"id": "doc.objectCount", "type": "Number", "sortable": false, "filterable": false, "editable": false},
-      {"id": "_images", "displayer": "html"},
-      {"id": "_attachments", "displayer": "html"},
+      {"id": "_images", "displayer": "xClassProperty"},
+      {"id": "_attachments", "displayer": "xClassProperty"},
       {"id": "_actions", "displayer": {"id": "actions", "actions": ["edit", "delete"]}},
-      {"id": "_avatar", "displayer": "html"}
+      {"id": "_avatar", "displayer": "xClassProperty"}
     ],
 
     "propertyTypes": [
@@ -51,7 +52,7 @@
         "sortable": false,
         "filterable": false,
         "editable": false,
-        "displayer": "html"
+        "displayer": "xClassProperty"
       },
       {
         "id": "DBList",
@@ -80,7 +81,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xClassProperty",
         "filter": "text"
       },
       {
@@ -88,7 +89,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xClassProperty",
         "filter": "list"
       },
       {
@@ -111,7 +112,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xClassProperty",
         "filter": "list"
       },
       {
@@ -139,7 +140,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xClassProperty",
         "filter": "text"
       },
       {
@@ -154,7 +155,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xClassProperty",
         "filter": "list"
       }
     ],

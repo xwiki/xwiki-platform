@@ -79,6 +79,8 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
                     Entry updatedEntry =
                         createEntry(values.get(), updatedEntryId.get(), config.getQuery().getSource(), namespace);
                     return Response.status(Status.ACCEPTED).entity(updatedEntry).build();
+                } else {
+                    return Response.status(Status.ACCEPTED).build();
                 }
             }
         }

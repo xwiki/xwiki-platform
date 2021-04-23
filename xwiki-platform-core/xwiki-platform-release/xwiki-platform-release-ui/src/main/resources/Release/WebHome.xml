@@ -41,7 +41,11 @@
   #set ($shortVersion = $stringtool.replaceChars($request.version, ".-", ""))
   #set ($shortVersion = $stringtool.upperCase($shortVersion))
   #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
-  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
+  $response.sendRedirect($xwiki.getURL(
+    "Release.Release${shortVersion}", 
+    "inline", 
+    "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}")
+  )
 #end
 = Create Release =
 
@@ -78,9 +82,16 @@
   }
 })
 
-{{liveData id="releases"
-  source="liveTable"
-  sourceParameters="className=ReleaseCode.ReleaseClass&amp;selectedColumn=releaseDate&amp;defaultOrder=desc&amp;translationPrefix=release.livetable."
+#set($sourceParameters =
+  'className=ReleaseCode.ReleaseClass' +
+  '&amp;selectedColumn=releaseDate' +
+  '&amp;defaultOrder=desc' +
+  '&amp;translationPrefix=release.livetable.'
+)
+
+{{liveData id='releases'
+  source='liveTable'
+  sourceParameters=''
   properties='version,releaseManagers,releaseDate,releaseNotes'
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>

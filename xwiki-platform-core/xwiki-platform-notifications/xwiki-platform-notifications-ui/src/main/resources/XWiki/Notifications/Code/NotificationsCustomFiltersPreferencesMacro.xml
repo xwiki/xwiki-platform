@@ -480,9 +480,10 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
      */
     self.init = function () {
       // On change
-      self.domElement.on('switchChange.bootstrapSwitch', function(event, state) {
-        setTimeout(function() { self.save(state); }, 1);
-      });
+      self.domElement.off('switchChange.bootstrapSwitch.customFilter')
+        .on('switchChange.bootstrapSwitch.customFilter', function(event, state) {
+          setTimeout(function() { self.save(state); }, 1);
+        });
     };
 
     /**
@@ -630,7 +631,13 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta', 'CustomToggleableFilterPreference', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, CustomToggleableFilterPreference) {
+      <code>require([
+  'jquery',
+  'xwiki-meta',
+  'CustomToggleableFilterPreference',
+  'bootstrap-switch',
+  'xwiki-events-bridge'
+], function ($, xm, CustomToggleableFilterPreference) {
 
   $(document).on('xwiki:livetable:notifications-filters-custom:toggle', function(event, data) {
     var changedRow = $(data.row.isEnabled);
@@ -645,10 +652,11 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
   });
 
   // Globals
-  var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
+  var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
+    XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
   var target = $('.customFilterPreferences').attr('data-target');
-  
+
   var docURL = $('.customFilterPreferences').attr('data-doc-url');
   var postParams = {
     csrf: xm.form_token,
@@ -659,60 +667,66 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
     postParams['user'] = targetUser;
   };
 
-  // Callback on livetable row printing
-  $(document).on('xwiki:livetable:notificationCustomFilterPreferencesLiveTable:newrow', function(event, data) {
+  var enhanceRow = function(row, data) {
     // Delete action
-    $(data.row).find('a.actiondelete').click(function(event) {
+    $(row).find('a.actiondelete').off('click.deleteCustomFilter').on('click.deleteCustomFilter', function(event) {
       event.preventDefault();
       new XWiki.widgets.ConfirmationBox({
         onYes: function() {
-          var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.inProgress'))", 'inprogress');
+          var notif = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+            'notifications.filters.preferences.delete.inProgress')), 'inprogress');
           var params = {
             action: 'deleteFilterPreference',
-            filterPreferenceId: data.data.filterPreferenceId
+            filterPreferenceId: data.filterPreferenceId
           };
           $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
-            notif.hide();
-            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
+            notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+              'notifications.filters.preferences.delete.done')), 'done'));
             window.livetable_notificationCustomFilterPreferencesLiveTable.refresh();
           }).fail(function() {
-            notif.hide();
-            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');
+            notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+              'notifications.filters.preferences.delete.error')), 'error'));
           });
         }
       });
     });
     // Enable / Disable action for classic filter preferences
-    $(data.row).find('.notificationFilterPreferenceCheckbox').on('switchChange.bootstrapSwitch', function(event, state) {
-      // TODO: Translation keys
-      var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
+    $(row).find('.notificationFilterPreferenceCheckbox').off('switchChange.bootstrapSwitch.customFilter')
+    .on('switchChange.bootstrapSwitch.customFilter', function(event, state) {
+      var notif = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        'notifications.filters.preferences.setEnabled.inProgress')), 'inprogress');
       var params = {
         action: 'setFilterPreferenceEnabled',
-        filterPreferenceId: data.data.filterPreferenceId,
+        filterPreferenceId: data.filterPreferenceId,
         enabled: state
       };
       $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
-        notif.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': data.data, 'state': state});
+        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+          'notifications.filters.preferences.setEnabled.done')), 'done'));
+        $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': data, 'state': state});
       }).fail(function() {
-        notif.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+          'notifications.filters.preferences.setEnabled.error')), 'error'));
       });
     });
     // Enable / Disable action for toggleable filter preferences
-    $(data.row).find('.toggleableFilterPreferenceCheckbox').each(function() {
-      new CustomToggleableFilterPreference(this, docURL, data.data);
+    $(row).find('.toggleableFilterPreferenceCheckbox').each(function() {
+      new CustomToggleableFilterPreference(this, docURL, data);
     });
+  };
+
+  // Callback on livetable row printing
+  $(document).on('xwiki:livetable:notificationCustomFilterPreferencesLiveTable:newrow', function(event, data) {
+    enhanceRow(data.row, data.data);
   });
 
   // Initializer
-  $(document).ready(function() {
-    // This script is usually loaded after the livetable is displayed and so the previous callback is not called.
-    // Because of that, we need
-    if (window.livetable_notificationCustomFilterPreferencesLiveTable) {
-      window.livetable_notificationCustomFilterPreferencesLiveTable.refresh();
-    }
+  $(function() {
+    // This script is usually loaded after the live table is displayed and so the previous callback might not be called.
+    $('#notificationCustomFilterPreferencesLiveTable-display &gt; tr[data-index]').each(function() {
+      var data = window.livetable_notificationCustomFilterPreferencesLiveTable.fetchedRows[$(this).data('index')];
+      enhanceRow(this, data);
+    });
   });
 });</code>
     </property>

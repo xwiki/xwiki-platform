@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.manager.ComponentManager;
@@ -132,25 +133,24 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
 
     @Override
     public Block display(NotificationFilter filter, NotificationFilterPreference preference)
-            throws NotificationException
+        throws NotificationException
     {
-        try {
-            setUpContext(scriptContextManager, filter, preference);
+        Map<String, Object> backup = setUpContext(this.scriptContextManager, filter, preference);
 
-            // If we have no template defined, fallback on the default displayer
+        try {
+            // If we have no template defined, fallback on the default displayer.
             if (filterTemplate == null) {
                 return ((NotificationFilterDisplayer) componentManager.getInstance(NotificationFilterDisplayer.class))
-                        .display(filter, preference);
+                    .display(filter, preference);
             }
 
             return templateManager.execute(filterTemplate);
 
         } catch (Exception e) {
-            throw new NotificationException(
-                    String.format("Unable to display the notification filter template for the filters [%s].",
-                            componentHint), e);
+            throw new NotificationException(String
+                .format("Unable to display the notification filter template for the filters [%s].", componentHint), e);
         } finally {
-            cleanUpContext();
+            cleanUpContext(this.scriptContextManager, backup);
         }
     }
 

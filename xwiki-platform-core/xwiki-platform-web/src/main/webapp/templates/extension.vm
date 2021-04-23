@@ -83,7 +83,7 @@
         <span class="buttonwrapper">
           <button class="btn btn-primary" type="submit" id="extensionSearchButton">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
         </span>
-        <button type="button" class="btn btn-default" data-toggle="collapse" data-target=".extension-search-more">$escapetool.xml($services.localization.render('extensions.search.more.label'))</button>
+        <button type="button" id="extensionMoreButton" class="btn btn-default" data-toggle="collapse" data-target=".extension-search-more">$escapetool.xml($services.localization.render('extensions.search.more.label'))</button>
       </div>
 
       <div>

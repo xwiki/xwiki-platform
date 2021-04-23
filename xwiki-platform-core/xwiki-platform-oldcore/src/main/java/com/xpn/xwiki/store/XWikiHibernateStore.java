@@ -460,16 +460,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // In order to avoid trying to issue any SQL query to the DB, we first check if the wiki containing the
         // doc exists. If not, then the doc cannot exist for sure.
         try {
-            if (!this.wikiDescriptorManager.exists(doc.getDocumentReference().getWikiReference().getName())) {
+            if (!this.wikiDescriptorManager.exists(this.wikiDescriptorManager.getCurrentWikiId())) {
                 return false;
             }
         } catch (WikiManagerException e) {
             // An error occurred while retrieving the wiki descriptors. This is an important problem and we shouldn't
             // swallow it and instead we mist let it bubble up.
-            Object[] args = { doc.getDocumentReference() };
+            Object[] args = { this.wikiDescriptorManager.getCurrentWikiId() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC,
-                "Error while checking for existence of [{0}]", e, args);
+                "Error while checking for existence of the [{0}] wiki", e, args);
         }
 
         try {

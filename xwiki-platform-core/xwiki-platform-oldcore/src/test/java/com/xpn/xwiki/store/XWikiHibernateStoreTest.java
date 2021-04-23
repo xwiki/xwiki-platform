@@ -355,13 +355,13 @@ public class XWikiHibernateStoreTest
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getLocale()).thenReturn(Locale.ROOT);
         when(doc.getFullName()).thenReturn(fullName);
-        when(doc.getDocumentReference()).thenReturn(new DocumentReference("wiki", "space", "page"));
 
         Query query = mock(Query.class);
         when(session.createQuery("select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"))
             .thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
         when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
 
         assertTrue(store.exists(doc, xcontext));
@@ -376,7 +376,6 @@ public class XWikiHibernateStoreTest
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getLocale()).thenReturn(Locale.ENGLISH);
         when(doc.getFullName()).thenReturn(fullName);
-        when(doc.getDocumentReference()).thenReturn(new DocumentReference("wiki", "space", "page"));
 
         Query query = mock(Query.class);
         String statement = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"
@@ -384,6 +383,7 @@ public class XWikiHibernateStoreTest
         when(session.createQuery(statement)).thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
         when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
 
         assertTrue(store.exists(doc, xcontext));
@@ -396,8 +396,8 @@ public class XWikiHibernateStoreTest
     void existsWhenDocumentBelongsToNonExistingWiki() throws Exception
     {
         XWikiDocument doc = mock(XWikiDocument.class);
-        when(doc.getDocumentReference()).thenReturn(new DocumentReference("notexisting", "space", "page"));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("notexisting");
         when(this.wikiDescriptorManager.exists("notexisting")).thenReturn(false);
 
         assertFalse(store.exists(doc, xcontext));
@@ -407,12 +407,12 @@ public class XWikiHibernateStoreTest
     void existsWhenFailureToGetDescriptors() throws Exception
     {
         XWikiDocument doc = mock(XWikiDocument.class);
-        when(doc.getDocumentReference()).thenReturn(new DocumentReference("wiki", "space", "page"));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
         when(this.wikiDescriptorManager.exists("wiki")).thenThrow(new WikiManagerException("error"));
 
         Throwable exception = assertThrows(XWikiException.class, () -> store.exists(doc, xcontext));
-        assertEquals("Error number 3236 in 3: Error while checking for existence of [wiki:space.page]",
+        assertEquals("Error number 3236 in 3: Error while checking for existence of the [wiki] wiki",
             exception.getMessage());
         assertEquals("WikiManagerException: error", ExceptionUtils.getRootCauseMessage(exception));
     }

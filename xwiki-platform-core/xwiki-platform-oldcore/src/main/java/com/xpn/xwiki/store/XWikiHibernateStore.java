@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaUpdate;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -79,6 +78,8 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.store.UnexpectedException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -172,6 +173,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named(HINT)
     private AttachmentVersioningStore attachmentArchiveStore;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private Map<String, String[]> validTypesMap = new HashMap<>();
 
@@ -452,6 +456,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean exists(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        // In order to avoid trying to issue any SQL query to the DB, we first check if the wiki containing the
+        // doc exists. If not, then the doc cannot exist for sure.
+        try {
+            if (!this.wikiDescriptorManager.exists(doc.getDocumentReference().getWikiReference().getName())) {
+                return false;
+            }
+        } catch (WikiManagerException e) {
+            // An error occurred while retrieving the wiki descriptors. This is an important problem and we shouldn't
+            // swallow it and instead we mist let it bubble up.
+            Object[] args = { doc.getDocumentReference() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC,
+                "Error while checking for existence of [{0}]", e, args);
+        }
 
         try {
             boolean bTransaction = true;

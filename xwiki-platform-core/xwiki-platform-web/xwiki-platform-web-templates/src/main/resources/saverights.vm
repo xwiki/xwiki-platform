@@ -29,7 +29,6 @@
 #if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   ## In subwikis, users or groups may be referenced by "wiki:Space.Username" or "Space.Username"
-  ## See: XWIKI-18399, XWIKI-9730
   #set ($wikiname = $xcontext.database)
   #if ($wikiname == "xwiki")
     #set ($uorgmatch = "${regextool.quote($fullname)}")

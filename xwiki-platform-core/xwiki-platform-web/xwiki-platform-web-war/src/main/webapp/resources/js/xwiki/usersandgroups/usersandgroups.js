@@ -399,7 +399,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
   var uorg = table.json.uorg;
   // Rights are case insensitive in XWiki security module, and the reference rights defined in rightsUI.vm
   // are lowercase, hence we make sure to convert all applying rights to lowercase before comparing them with the
-  // reference ones (see XWIKI-18556).
+  // reference ones.
   var allows = row.allows.map(entry => entry.toLowerCase());
   var denys = row.denys.map(entry => entry.toLowerCase());
 

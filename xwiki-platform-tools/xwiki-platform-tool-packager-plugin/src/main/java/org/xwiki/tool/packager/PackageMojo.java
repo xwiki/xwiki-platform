@@ -220,7 +220,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             File warDirectory = new File(this.webappsDirectory, getContextPath(warArtifact));
             unzip(warArtifact.getFile(), warDirectory);
             // Only generate the extension.xed descriptor for the distribution war
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
+            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
                 generateDistributionXED(warDirectory, warArtifact);
             }
         }
@@ -518,7 +518,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // If there are no WAR artifacts specified in the list of dependencies then use the default WAR artifacts.
         if (warArtifacts.isEmpty()) {
-            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web",
+            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web-war",
                 getXWikiPlatformVersion(), "", "war"));
             warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
                 "xwiki-platform-tool-rootwebapp", getXWikiPlatformVersion(), "", "war"));
@@ -537,7 +537,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         if (contextPath == null) {
             // Should we put this as default "contextPathMapping" configuration in a parent POM? (and rely on
             // configuration merging)
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
+            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
                 contextPath = "xwiki";
             } else if (warArtifact.getArtifactId().equals("xwiki-platform-tool-rootwebapp")) {
                 contextPath = "root";

@@ -48,7 +48,11 @@
   #end
 #else
   &lt;div class="full column"&gt;
+  #if ($request.extensionId)
+    #handleExtensionRequest()
+  #else
     #extensionUpdater()
+  #end
   &lt;/div&gt;
 #end
 {{/html}}

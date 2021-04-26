@@ -192,6 +192,10 @@
         'mandatory' : {
           'failureMessage' : $services.localization.render('core.validation.required.message')
         },
+        'regex' : {
+          'pattern' : '/^[a-zA-Z0-9_]+$/',
+          'failureMessage' : $services.localization.render('xe.admin.registration.invalidUsername')
+        },
         'programmaticValidation' : {
           'code' : '#nameAvailable($request.get("xwikiname"))',
           'failureMessage' : $services.localization.render('core.register.userAlreadyExists')

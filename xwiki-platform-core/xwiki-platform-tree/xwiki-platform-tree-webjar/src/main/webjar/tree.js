@@ -493,7 +493,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
           $(data.event.target).closest('.jstree-no-links').length === 0) {
         // The node selection was triggered by an user event and links are enabled.
-        window.location.href = selectedNode.a_attr.href;
+        if (data.event.ctrlKey === true) {
+          window.open(selectedNode.a_attr.href, '_blank');
+        } else {
+          window.location.href = selectedNode.a_attr.href;
+        }
       }
 
     }).on('open_node.jstree', function(event, data) {

@@ -33,6 +33,7 @@ import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
+import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -59,19 +60,20 @@ import static org.mockito.Mockito.when;
     // SKin Extensions so that $jsx.* and $ssx.* calls in the vm work.
     SkinExtensionAsync.class
 })
-class DocumentTagsTest extends TemplateTest
+class DocumentTagsTest extends PageTest
 {
     @BeforeEach
     void setUp() throws Exception
     {
         // Enable the Tag plugin
-        oldcore.getSpyXWiki().getPluginManager().addPlugin("tag", TagPlugin.class.getName(), oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().getPluginManager().addPlugin("tag", TagPlugin.class.getName(),
+            this.oldcore.getXWikiContext());
 
         // Enable the ssfx/jsfx plugins
-        oldcore.getSpyXWiki().getPluginManager().addPlugin("ssfx", CssSkinFileExtensionPlugin.class.getName(),
-            oldcore.getXWikiContext());
-        oldcore.getSpyXWiki().getPluginManager().addPlugin("jsfx", JsSkinFileExtensionPlugin.class.getName(),
-            oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().getPluginManager().addPlugin("ssfx", CssSkinFileExtensionPlugin.class.getName(),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().getPluginManager().addPlugin("jsfx", JsSkinFileExtensionPlugin.class.getName(),
+            this.oldcore.getXWikiContext());
 
         // Set up the current doc in the context so that $doc is bound in scripts
         DocumentReference documentReference = new DocumentReference("xwiki", "space", "page");
@@ -87,7 +89,7 @@ class DocumentTagsTest extends TemplateTest
     @Test
     void displayTagsWhenNoEditRightsAndTagPluginAvailableAndNoTags() throws Exception
     {
-        TemplateManager templateManager = oldcore.getMocker().getInstance(TemplateManager.class);
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
@@ -102,9 +104,9 @@ class DocumentTagsTest extends TemplateTest
     void displayTagsWhenEditRightsAndTagPluginAvailableAndNoTags() throws Exception
     {
         // Give edit rights ($hasEdit = true)
-        when(oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
 
-        TemplateManager templateManager = oldcore.getMocker().getInstance(TemplateManager.class);
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 
@@ -128,7 +130,7 @@ class DocumentTagsTest extends TemplateTest
         currentDocument.addXObject(bo);
         this.xwiki.saveDocument(currentDocument, this.context);
 
-        TemplateManager templateManager = oldcore.getMocker().getInstance(TemplateManager.class);
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         // Remove extra spaces to make it easy to assert the result below.
         String result = templateManager.render("documentTags.vm").trim().replaceAll("\\s+", " ");
 

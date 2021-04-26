@@ -19,92 +19,82 @@
  */
 package org.xwiki.web;
 
+import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.page.PageTest;
+import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.tools.EscapeTool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for the {@code macros.vm}.
+ * Integration tests for {@code macros.vm}.
  *
  * @version $Id$
  */
-public class MacrosTest
+class MacrosTest extends PageTest
 {
     private static final String TEMPLATES_PATH = "src/main/webapp/templates";
 
-    private VelocityEngine ve;
-
-    private VelocityContext context;
+    private VelocityManager velocityManager;
 
     @BeforeEach
-    public void setup()
+    void setup() throws Exception
     {
-        this.ve = new VelocityEngine();
-        Properties props = new Properties();
-        props.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, TEMPLATES_PATH);
-        props.setProperty(RuntimeConstants.VM_PERM_INLINE_LOCAL, Boolean.TRUE.toString());
-        props.setProperty(RuntimeConstants.VM_LIBRARY, "macros.vm");
-        this.ve.init(props);
-
-        this.context = new VelocityContext();
-        this.context.put("escapetool", new EscapeTool());
+        this.velocityManager = oldcore.getMocker().getInstance(VelocityManager.class);
+        this.velocityManager.getVelocityContext().put("escapetool", new EscapeTool());
     }
 
     @Test
-    public void addLivetableLocationFilter()
+    void addLivetableLocationFilter() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.ve.evaluate(this.context, writer, "logtag", "\n"
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
             + "#set ($whereQL = '')\n"
             + "#set ($whereParams = [])\n"
             + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox')\n"
-            + "$whereQL $whereParams");
+            + "$whereQL $whereParams"));
         assertEquals("AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!' [%sandbox%]", writer.toString().trim());
     }
 
     @Test
-    public void addLivetableLocationFilterWhenFilteringWebHome()
+    void addLivetableLocationFilterWhenFilteringWebHome() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.ve.evaluate(this.context, writer, "logtag", "\n"
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
             + "#set ($whereQL = '')\n"
             + "#set ($whereParams = [])\n"
             + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true)\n"
-            + "$whereQL $whereParams");
+            + "$whereQL $whereParams"));
         assertEquals("AND ((doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!') OR "
             + "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')) [%sandbox%, %sandbox%]",
             writer.toString().trim());
     }
 
     @Test
-    public void addLivetableLocationFilterWhenCustomWhere()
+    void addLivetableLocationFilterWhenCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.ve.evaluate(this.context, writer, "logtag", "\n"
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
             + "#set ($whereQL = '')\n"
             + "#set ($whereParams = [])\n"
             + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', false, 'SOMETHING')\n"
-            + "$whereQL $whereParams");
+            + "$whereQL $whereParams"));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 
     @Test
-    public void addLivetableLocationFilterWhenFilteringWebHomeAndCustomWhere()
+    void addLivetableLocationFilterWhenFilteringWebHomeAndCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.ve.evaluate(this.context, writer, "logtag", "\n"
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
             + "#set ($whereQL = '')\n"
             + "#set ($whereParams = [])\n"
             + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')\n"
-            + "$whereQL $whereParams");
+            + "$whereQL $whereParams"));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 }

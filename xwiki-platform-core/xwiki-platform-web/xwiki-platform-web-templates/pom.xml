@@ -24,16 +24,40 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-web</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-web</artifactId>
-  <name>XWiki Platform - Web - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Web Resources for the XWiki platform</description>
-  <modules>
-    <!-- Sorted alphabetically -->
-    <module>xwiki-platform-web-templates</module>
-    <module>xwiki-platform-web-war</module>
-  </modules>
+  <artifactId>xwiki-platform-web-templates</artifactId>
+  <name>XWiki Platform - Web - Templates</name>
+  <packaging>jar</packaging>
+  <description>Templates for the XWiki platform</description>
+  <dependencies>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- TODO: move inside pagetest -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Enable the Tag Plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tag-api</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

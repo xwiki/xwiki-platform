@@ -31,6 +31,7 @@
   <name>XWiki Platform - Mentions - Parent POM</name>
   <packaging>pom</packaging>
   <dependencies>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>

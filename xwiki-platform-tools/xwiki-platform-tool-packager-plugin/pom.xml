@@ -133,7 +133,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
+      <artifactId>xwiki-platform-web-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>

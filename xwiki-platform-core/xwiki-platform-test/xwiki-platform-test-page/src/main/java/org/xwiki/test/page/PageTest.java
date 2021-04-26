@@ -335,25 +335,42 @@ public class PageTest
         when(environment.getResource(any(String.class))).thenAnswer(
             (Answer) invocation -> {
                 String resourceName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found let tests be able to override
-                // {@code getEnvironmentResource()}.
+                // Algorithm:
+                // - Try to load the passed resource name from the CL first
+                // - If the resource is a template (ends in .vm) then remove the /skins/flamingo prefix from the
+                //   resource name and try again to load it from the CL
+                // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
                 URL url = getClass().getResource(resourceName);
                 if (url == null) {
-                    url = getEnvironmentResource(resourceName);
+                    url = getClass().getResource(getShortTemplateResourceName(resourceName));
+                    if (url == null) {
+                        url = getEnvironmentResource(resourceName);
+                    }
                 }
                 return url;
             });
         when(environment.getResourceAsStream(any(String.class))).thenAnswer(
             (Answer) invocation -> {
                 String resourceName = (String) invocation.getArguments()[0];
-                // Try to load the resource from the CP first and if not found let tests be able to override
-                // {@code getEnvironmentResourceAsStream()}.
+                // Algorithm:
+                // - Try to load the passed resource name from the CL first
+                // - If the resource is a template (ends in .vm) then remove the /skins/flamingo prefix from the
+                //   resource name and try again to load it from the CL
+                // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
                 InputStream is = getClass().getResourceAsStream(resourceName);
                 if (is == null) {
-                    is = getEnvironmentResourceAsStream(resourceName);
+                    is = getClass().getResourceAsStream(getShortTemplateResourceName(resourceName));
+                    if (is == null) {
+                        is = getEnvironmentResourceAsStream(resourceName);
+                    }
                 }
                 return is;
             });
+    }
+
+    private String getShortTemplateResourceName(String resourceName)
+    {
+        return StringUtils.substringAfter(resourceName, "/skins/flamingo");
     }
 
     protected URL getEnvironmentResource(String resourceName) throws Exception

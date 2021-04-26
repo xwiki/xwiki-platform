@@ -59,10 +59,6 @@
 .extension-status {
   font-size: 0.8em;
 }
-.extension-header .extension-status {
-  float: right;
-  margin: -2em 0 1em;
-}
 
 .extension-authors {
   color: $theme.textSecondaryColor;
@@ -474,4 +470,11 @@ ul.collapsible.document-tree {
   /* Bold is inherited from wiki and space nodes so we need to overwrite it. */
   font-weight: normal;
   padding-right: .3em;
+}
+
+@media (min-width: 992px) {
+  .extension-title-and-status {
+    display: flex;
+    justify-content: space-between;
+  }
 }

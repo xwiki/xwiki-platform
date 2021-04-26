@@ -57,6 +57,16 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <!-- Prevent the WAR from including it (we unpack it). We still need the dependency for ensuring the right
+           reactor order and to make sure that the local repo has the dependency artifact when the dependency plugin
+           executes -->
+      <scope>provided</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

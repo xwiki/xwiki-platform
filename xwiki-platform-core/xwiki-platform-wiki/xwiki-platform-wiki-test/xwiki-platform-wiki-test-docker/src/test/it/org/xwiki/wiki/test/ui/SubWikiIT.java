@@ -80,7 +80,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     extensionOverrides = {
         @ExtensionOverride(
-            extensionId = "org.xwiki.platform:xwiki-platform-web",
+            extensionId = "org.xwiki.platform:xwiki-platform-web-war",
             overrides = {
                 // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
                 // to install on a subwiki by default (which is something we test)

@@ -49,6 +49,8 @@
 #else
   &lt;div class="full column"&gt;
   #if ($request.extensionId)
+    ## When an extension id is present in the request, display extension info in the updater context
+    ## (same approach as in extensionHistory.vm)
     #handleExtensionRequest()
   #else
     #extensionUpdater()

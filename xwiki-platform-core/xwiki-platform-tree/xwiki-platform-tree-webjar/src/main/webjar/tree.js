@@ -493,7 +493,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
           $(data.event.target).closest('.jstree-no-links').length === 0) {
         // The node selection was triggered by an user event and links are enabled.
-        // When pressing Ctrl key and clicking on a document tree entry that is a link, open link in new window / tab
+        // When pressing Ctrl key and clicking on a tree node that has a link, open the link in new window / tab.
         if (data.event.ctrlKey === true) {
           window.open(selectedNode.a_attr.href, '_blank');
         } else {

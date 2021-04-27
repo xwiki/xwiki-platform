@@ -56,9 +56,12 @@ like.likers.title="Нравится" {0} чел.
 like.livetable.column.title=Название
 like.livetable.column.location=Расположение
 like.livetable.column.likes=Понравившиеся страницы
-### Missing: like.configuration.heading=Like Preferences
+like.configuration.heading=Настройки "Нравиться"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Всегда отображать кнопку "Нравится"
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Отображать кнопку, даже если у пользователя нет прав на взаимодействие с ней. Используйте его, если хотите, чтобы счетчик отметок "Нравится" всегда отображался.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Емкость кеш-памяти
-XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравиться" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.</content>
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Количество отметок "Нравиться" хранящихся в кеше. Обратите внимание, что вам необходимо перезапустить XWiki, чтобы это изменение параметра было учтено.
+XWiki.Like.LikeConfigurationClass_enabled=Включить отметки "Нравится"
+XWiki.Like.LikeConfigurationClass_enabled.hint=Если этот флажок не установлен, функция «Нравится» будет отключена, а информация, связанная с оценкой «Нравится», будет скрыта.
+</content>
 </xwikidoc>

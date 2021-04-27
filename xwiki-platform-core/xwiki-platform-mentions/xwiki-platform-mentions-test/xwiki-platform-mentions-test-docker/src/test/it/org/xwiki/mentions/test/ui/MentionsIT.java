@@ -192,51 +192,6 @@ class MentionsIT
     }
 
     /**
-     * This test is similar to {@link #comment(TestUtils, TestReference)} but this time the comment is created on a page
-     * with an empty title. In this case, the link to the page displayed in the mention must have the name of the
-     * document displayed instead of an empty title.
-     */
-    @Test
-    @Order(3)
-    void commentOnPageWithEmptyTitle(TestUtils testUtils, TestReference testReference) throws Exception
-    {
-        runAsSuperAdmin(testUtils, () -> {
-            // create the users.
-            testUtils.createUser(U1_USERNAME, USERS_PWD, null);
-            testUtils.createUser(U2_USERNAME, USERS_PWD, null);
-        });
-
-        runAsUser(testUtils, U1_USERNAME, USERS_PWD, () -> {
-            testUtils.deletePage(testReference);
-            testUtils.createPage(testReference, "", null);
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("author", "xwiki:XWiki.U1");
-            properties.put("date", "17/08/2020 14:55:18");
-            properties
-                .put("comment",
-                    "AAAAA\n\n"
-                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
-                        + "type=\"user\" /}} XYZ\n\nBBBBB");
-            testUtils.addObject(testReference, "XWiki.XWikiComments", properties);
-        });
-
-        runAsUser(testUtils, U2_USERNAME, USERS_PWD, () -> {
-            testUtils.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            // Checks that a notification is well received.
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            MentionNotificationPage mentionNotificationPage =
-                new MentionNotificationPage(tray.getNotificationsButton());
-            mentionNotificationPage.openGroup(0);
-            // Checks that the name of the document is used for the link of the page, and not the empty page title. 
-            assertEquals("mentioned you on a comment on page commentOnPageWithEmptyTitle",
-                mentionNotificationPage.getText(0, 0));
-            tray.clearAllNotifications();
-        });
-    }
-
-    /**
      * Login as some user and perform some actions, then logout.
      *
      * @param setup The test setup.

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -51,24 +51,21 @@ CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Загрузка расшир�
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Некоторые макросы рендеринга отображаются с использованием кода JavaScript. Загрузка кода JavaScript улучшает вид WYSIWYG редактора, но может вызвать проблемы, если код JavaScript мешает коду CKEditor или если он изменяет содержимое вне границ вывода макроса.
 CKEditor.ConfigClass_advanced=Расширенная настройка
 CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}документации CKEditor {1} для получения списка доступных свойств конфигурации.
-
+ckeditor.content.placeholder=Начните печатать здесь...
 ckeditor.admin.saveComment=Настройки CKEditor обновлены администрацией
 ckeditor.admin.reset=Сброс настроек
 ckeditor.admin.reset.hint=Восстановление настроек по умолчанию
 ckeditor.admin.reset.confirmation=Вы уверены, что хотите восстановить настройки по умолчанию? Все ваши изменения будут потеряны.
-
 ckeditor.plugin.link.options=Опции
 ckeditor.plugin.link.anchor=Якорь
 ckeditor.plugin.link.queryString=Строка запроса
 ckeditor.plugin.link.defaultLabel=введите текст ссылки
 ckeditor.plugin.link.openInNewTab=Открыть ссылку в новой вкладке
-
 ckeditor.plugin.macro.placeholder=макрос:{0}
 ckeditor.plugin.macro.buttonHint=XWiki макрос
 ckeditor.plugin.macro.editButtonHint=Редактировать макрос
 ckeditor.plugin.macro.refreshFailed=Не удалось обновить отредактированный контент.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Вставить {0} макрос
-
 ckeditor.plugin.office.importer.title=Импортировать файл Office
 ckeditor.plugin.office.importer.filePath=Путь к файлу
 ckeditor.plugin.office.importer.filePath.hint=Выберите файл для импорта. Файл будет загружен и прикреплен к этой странице, а его содержимое будет вставлено в содержимое страницы.
@@ -83,12 +80,10 @@ ckeditor.plugin.office.importer.done=Файл Office успешно импорт
 ckeditor.plugin.office.importer.fail=Не удалось импортировать файл Office.
 ckeditor.plugin.office.importer.noUploadURL=URL загрузки файла не настроен.
 ckeditor.plugin.office.importer.failedToLoadForm=Не удалось загрузить форму.
-
 ckeditor.plugin.resource.notSpecified=Не указан {0}.
 ckeditor.plugin.save.leaveConfirmationMessage=Есть несохраненные изменения. Вы хотите отменить их?
 ckeditor.plugin.save.failed=Содержимое не может быть сохранено из-за внутренней ошибки CKEditor. Вы должны попытаться скопировать ваши важные изменения и перезагрузить редактор.
 ckeditor.plugin.source.conversionFailed=Не удалось выполнить преобразование.
-
 ckeditor.plugin.toolbar.basicStyles=Основные стили
 ckeditor.plugin.toolbar.lists=Списки
 ckeditor.plugin.toolbar.bulletedlist=Маркированный список
@@ -104,18 +99,14 @@ ckeditor.plugin.toolbar.toc=Оглавление
 ckeditor.plugin.toolbar.include=Вставка
 ckeditor.plugin.toolbar.code=Фрагмент кода
 ckeditor.plugin.toolbar.otherMacros=Другие макросы
-
 ckeditor.plugin.syntax.update.inProgress=Обновление редактора WYSIWYG
 ckeditor.plugin.syntax.update.done=WYSIWYG редактор обновлен
 ckeditor.plugin.syntax.update.failed=Не удалось обновить редактор WYSIWYG
 ckeditor.plugin.syntax.wysiwygModeUnsupported=Режим редактирования WYSIWYG не поддерживается синтаксисом {0}.
-
 ckeditor.inline.failedToInit=Не удалось инициализировать CKEditor.
-
 modal.ok=ОК
 modal.cancel=Отмена
 modal.close=Закрыть
-
 resource.attach.label=Вложение
 resource.attach.placeholder=Путь.К.Странице@вложение.png
 resource.data.label=URI данных
@@ -133,29 +124,25 @@ resource.url.label=URL
 resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Пользователь
 resource.user.placeholder=алиас
-
 resourcePicker.attach.hint=Выберите вложение
 resourcePicker.doc.hint=Выберите страницу
-
 entityResourceSuggester.doc.placeholder=Найти страницу ...
 entityResourceSuggester.attach.placeholder=Найти вложение ...
-
 entityResourcePicker.select=Выбрать
 entityResourcePicker.doc.title=Выбрать страницу
 entityResourcePicker.attach.title=Выбрать вложение
-
 macroSelector.title=Выбрать макрос
 macroSelector.filter.text.placeholder=Введите для отбора
 macroSelector.filter.category.all=Все макросы
 macroSelector.filter.category.other=Прочее
 macroSelector.failedToRetrieveMacros=Не удалось получить список доступных макросов.
 macroSelector.select=Выбрать
-
 macroEditor.title=Редактировать макрос
 macroEditor.more=Еще...
 macroEditor.changeMacro=Изменить макрос
 macroEditor.submit=Подтвердить
 macroEditor.content=Контент
 macroEditor.noParameters=Этот макрос не имеет параметров.
-macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.</content>
+macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.
+</content>
 </xwikidoc>

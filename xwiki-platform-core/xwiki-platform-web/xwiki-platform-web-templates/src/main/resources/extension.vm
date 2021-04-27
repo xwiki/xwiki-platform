@@ -613,10 +613,12 @@ $namespace##
     #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
   <div class="dependency-item extension-item-$dependencyStatus">
-    <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
-    #if ($extensionNamespace.startsWith('wiki:'))
-      <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
-    #end
+    <div class="dependency-item-title">
+      <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
+      #if ($extensionNamespace.startsWith('wiki:'))
+        <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
+      #end
+    </div>
     #if ("$!dependencyStatusMessage" != '')
       <span class="extension-status">$dependencyStatusMessage</span>
     #end

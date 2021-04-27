@@ -79,6 +79,8 @@ notifications.toggle.disabled.hint=Вам нужно включить уведо
 ## Notifications formats
 notifications.format.alert=Оповещение
 notifications.format.email=E-mail
+
+## Filter preferences settings
 notifications.filters.preferences.delete.inProgress=Удаление...
 notifications.filters.preferences.delete.done=Настройки фильтра удалены!
 notifications.filters.preferences.delete.error=Не удалось удалить настройки фильтра
@@ -227,12 +229,10 @@ notifications.switches.changeStatusError=Не удалось изменить с
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-
-## Filter preferences settings
+## until 13.2RC1
 notifications.settings.filters.preferences.title=Фильтры
 notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда события должны создавать уведомления.
 notifications.settings.filters.preferences.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших уведомлений.
-
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Название
 notifications.settings.filters.preferences.table.filterType=Тип фильтра

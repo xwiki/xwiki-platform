@@ -41,11 +41,7 @@
   #set ($shortVersion = $stringtool.replaceChars($request.version, ".-", ""))
   #set ($shortVersion = $stringtool.upperCase($shortVersion))
   #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
-  $response.sendRedirect($xwiki.getURL(
-    "Release.Release${shortVersion}", 
-    "inline", 
-    "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}")
-  )
+  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
 #end
 = Create Release =
 
@@ -63,35 +59,35 @@
 {{/html}}
 
 = Existing Releases =
-#set ($liveDataConfig = {
+#set($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
        {
          'id': 'version', 'displayer': 'link'
        },
        {
-         'id': 'releaseManagers', 'displayer': 'xClassProperty'
+         'id': 'releaseManagers', 'displayer': 'html'
        },
        {
-         'id': 'releaseDate', 'displayer': 'xClassProperty'
+         'id': 'releaseDate', 'displayer': 'html'
        },
        {
-         'id': 'releaseNotes', 'displayer': 'xClassProperty'
+         'id': 'releaseNotes', 'displayer': 'html'
        }
     ]
   }
 })
 
-#set($sourceParameters =
-  'className=ReleaseCode.ReleaseClass' +
-  '&amp;selectedColumn=releaseDate' +
-  '&amp;defaultOrder=desc' +
-  '&amp;translationPrefix=release.livetable.'
-)
+#set($sourceParameters = $escapetool.url({
+  'className': 'ReleaseCode.ReleaseClass',
+  'selectedColumn': 'releaseDate',
+  'defaultOrder': 'desc',
+  'translationPrefix': 'release.livetable.'
+}))
 
 {{liveData id='releases'
   source='liveTable'
-  sourceParameters=''
+  sourceParameters="$sourceParameters"
   properties='version,releaseManagers,releaseDate,releaseNotes'
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>

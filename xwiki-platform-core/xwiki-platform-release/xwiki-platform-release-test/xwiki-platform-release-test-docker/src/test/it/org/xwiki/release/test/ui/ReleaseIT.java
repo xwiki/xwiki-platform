@@ -19,22 +19,28 @@
  */
 package org.xwiki.release.test.ui;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.release.test.po.ReleaseEntryEditPage;
 import org.xwiki.release.test.po.ReleaseHomePage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
- * UI tests for the Release application.
- * 
+ * Docker tests for the Release Application.
+ *
  * @version $Id$
- * @since 5.0M1
+ * @since 13.4RC1
  */
-public class ReleaseIT extends AbstractTest
+@UITest
+class ReleaseIT
 {
     /**
      * Note: we use a dot in the release version name to verify it's supported by the Release application
@@ -47,14 +53,17 @@ public class ReleaseIT extends AbstractTest
     private static final String RELEASE_PAGE_NAME = "Release" + RELEASE_VERSION.replaceAll("\\.", "");
 
     @Test
-    public void testRelease()
+    @Order(1)
+    void release(TestUtils testUtils, TestReference testReference)
     {
+        String testClassName = testReference.getSpaceReferences().get(0).getName();
+
         // Create a user and log in with it so that we test the application with a standard user
         // Note that using the superadmin user would also fail since the uservatar macro doesn't work with it.
-        getUtil().createUserAndLogin(getTestClassName() + "User", "password");
+        testUtils.createUserAndLogin(testClassName + "User", "password");
 
         // Delete pages that we create in the test (we have to be logged in).
-        getUtil().deletePage("Release", RELEASE_PAGE_NAME);
+        testUtils.deletePage("Release", RELEASE_PAGE_NAME);
 
         // Navigate to the Release app by clicking in the Application Panel.
         // This verifies that the Release application is registered in the Applications Panel.
@@ -63,8 +72,8 @@ public class ReleaseIT extends AbstractTest
         ViewPage vp = applicationPanel.clickApplication("Release");
 
         // Verify we're on the right page!
-        Assert.assertEquals(ReleaseHomePage.getSpace(), vp.getMetaDataValue("space"));
-        Assert.assertEquals(ReleaseHomePage.getPage(), vp.getMetaDataValue("page"));
+        assertEquals(ReleaseHomePage.RELEASE_SPACE, vp.getMetaDataValue("space"));
+        assertEquals(ReleaseHomePage.RELEASE_PAGE, vp.getMetaDataValue("page"));
         ReleaseHomePage homePage = new ReleaseHomePage();
 
         // Add new Release
@@ -76,9 +85,9 @@ public class ReleaseIT extends AbstractTest
         homePage.waitUntilPageIsLoaded();
 
         // Assert Livetable:
-        // - verify that the Translation has been applied by checking the Translated livetable column name
-        // - verify that the Livetable contains our new Release entry
-        LiveTableElement lt = homePage.getReleaseLiveTable();
-        Assert.assertTrue(lt.hasRow("Version", RELEASE_VERSION));
+        // - verify that the Livetable contains our new Release entry.
+        LiveDataElement liveDataElement = homePage.getReleaseLiveData();
+        assertTrue(liveDataElement.hasRow("Version", RELEASE_VERSION),
+            String.format("%s expected to be found in column Version.", RELEASE_VERSION));
     }
 }

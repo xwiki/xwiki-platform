@@ -27,43 +27,23 @@
     <artifactId>xwiki-platform-release-test</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-release-test-tests</artifactId>
-  <name>XWiki Platform - Release - Tests - Functional Tests</name>
+  <artifactId>xwiki-platform-release-test-docker</artifactId>
+  <name>XWiki Platform - Release - Test - Functional Docker Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>XWiki Platform - Release - Functional Tests</description>
+  <description>Functional docker tests for the Release Application.</description>
   <properties>
-    <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
-    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
+    <!-- ================================
+       Test only dependencies
+       ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-release-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- Add Panel deps which is optional in xwiki-platform-release-ui in order to test registration in the App
-         panel -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-release-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -73,41 +53,44 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
-         systems go through SLF4J -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-release-test-pageobjects</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- ================================
+       Runtime dependencies
+       ================================ -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-release-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-rest</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- See https://issues.apache.org/jira/browse/MNG-1911 and https://jira.xwiki.org/browse/XWIKI-7683 -->
-      <plugin>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -128,19 +111,19 @@
       </dependencies>
       <build>
         <plugins>
-          <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
-               that have been instrumented with Clover (XWiki oldcore for example) -->
           <plugin>
-            <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-            <version>${project.version}</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.openclover</groupId>
-                <artifactId>clover</artifactId>
-                <version>${clover.version}</version>
-              </dependency>
-            </dependencies>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemProperties combine.children="append">
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <property>
+                  <name>xwiki.test.ui.profiles</name>
+                  <value>clover</value>
+                </property>
+              </systemProperties>
+            </configuration>
           </plugin>
         </plugins>
       </build>

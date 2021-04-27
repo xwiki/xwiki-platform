@@ -66,9 +66,8 @@
     <!-- We need the livetable for the Release Home page that lists all Releases -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livetable-ui</artifactId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <!-- The Panels application is an optional dependency since the Release application can work even if it's not

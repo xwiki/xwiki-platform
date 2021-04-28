@@ -47,7 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,23 +75,15 @@ class MentionTest extends PageTest
     {
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        VelocityContext velocityContext = velocityManager.getVelocityContext();
+        this.componentManager.registerComponent(ScriptService.class, "icon", this.iconManager);
+        this.componentManager.registerComponent(ScriptService.class, "date", this.dateScriptService);
+        this.componentManager.registerComponent(ScriptService.class, "localization", this.localizationScriptService);
 
         DocumentReference page1 = new DocumentReference("xwiki", "XWiki", "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", "YWiki", "Page2");
-
         DocumentReference userPage1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference userPage2 = new DocumentReference("xwiki", "YWiki", "U2");
-
         Date eventDate = new Date();
-
-        DefaultEvent event1 = new DefaultEvent();
-        event1.setDate(eventDate);
-        event1.setUser(userPage1);
-
-        DefaultEvent event2 = new DefaultEvent();
-        event2.setDate(eventDate);
-        event2.setUser(userPage2);
 
         // Create and save page 1 with a title.
         XWikiDocument xWikiDocument1 = this.xwiki.getDocument(page1, this.context);
@@ -100,31 +93,11 @@ class MentionTest extends PageTest
         XWikiDocument xWikiDocument2 = this.xwiki.getDocument(page2, this.context);
         this.xwiki.saveDocument(xWikiDocument2, this.context);
 
-        CompositeEvent value = new CompositeEvent(event1);
-        value.getEvents().add(event2);
-
-        Map<Object, Object> compositeEventParams = new HashMap<>();
-        MentionView mentionView1 = new MentionView()
-            .setAuthorURL("/U1")
-            .setDocumentURL("/page1")
-            .setDocument(xWikiDocument1);
-        compositeEventParams.put(event1, mentionView1);
-        MentionView mentionView2 = new MentionView()
-            .setAuthorURL("/U2")
-            .setDocument(xWikiDocument2)
-            .setDocumentURL("/page2");
-        compositeEventParams.put(event2, mentionView2);
-
-        velocityContext.put("compositeEvent", value);
-        velocityContext.put("compositeEventParams", compositeEventParams);
-
+        // Registration of usefull velocity tools.
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("stringtool", new StringUtils());
 
-        this.componentManager.registerComponent(ScriptService.class, "icon", this.iconManager);
-        this.componentManager.registerComponent(ScriptService.class, "date", this.dateScriptService);
-        this.componentManager.registerComponent(ScriptService.class, "localization", this.localizationScriptService);
-
+        // Mocking of the script services.
         when(this.iconManager.renderHTML("bell")).thenReturn("bell-icon");
         when(this.iconManager.renderHTML("page")).thenReturn("page-icon");
         when(this.dateScriptService.displayTimeAgo(eventDate)).thenReturn("one hundred years ago");
@@ -134,17 +107,35 @@ class MentionTest extends PageTest
             .thenReturn("mentioned you on page");
         when(this.localizationScriptService.render("mentions.event.mention.type")).thenReturn("Mentions");
 
-        String actual = cleanup(templateManager.render("templates/mentions/mention.vm"));
+        // Initialization of the velocity context
+        DefaultEvent event1 = new DefaultEvent();
+        event1.setDate(eventDate);
+        event1.setUser(userPage1);
 
-        String expected =
-            cleanup(IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention.mention.html"),
-                UTF_8));
+        DefaultEvent event2 = new DefaultEvent();
+        event2.setDate(eventDate);
+        event2.setUser(userPage2);
+        VelocityContext velocityContext = velocityManager.getVelocityContext();
+        CompositeEvent value = new CompositeEvent(event1);
+        value.getEvents().add(event2);
+        velocityContext.put("compositeEvent", value);
 
-        assertEquals(expected, actual);
-    }
+        Map<Object, Object> compositeEventParams = new HashMap<>();
+        compositeEventParams.put(event1, new MentionView()
+            .setAuthorURL("/U1")
+            .setDocumentURL("/page1")
+            .setDocument(xWikiDocument1));
+        compositeEventParams.put(event2, new MentionView()
+            .setAuthorURL("/U2")
+            .setDocument(xWikiDocument2)
+            .setDocumentURL("/page2"));
+        velocityContext.put("compositeEventParams", compositeEventParams);
 
-    private String cleanup(String render)
-    {
-        return render.trim().replaceAll("\\s+", " ");
+        // Template rendering.
+        String actual = templateManager.render("templates/mentions/mention.vm");
+        String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention.mention.html"),
+            UTF_8);
+
+        assertThat(actual, equalToCompressingWhiteSpace(expected));
     }
 }

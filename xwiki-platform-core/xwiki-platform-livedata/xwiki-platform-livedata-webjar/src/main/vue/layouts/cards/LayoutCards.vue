@@ -36,17 +36,19 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataDropdownMenu/>
-        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
-        <LivedataRefreshButton/>
+        <LivedataPagination/>
       </template>
       <template #right>
-        <LivedataPagination/>
+        <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
+        <LivedataDropdownMenu/>
       </template>
     </LivedataTopbar>
 
     <!-- Entry selector info bar -->
     <LivedataEntrySelectorInfoBar/>
+
+    <!-- Loading bar -->
+    <LayoutLoader />
 
 
     <!-- Cards layout root -->
@@ -75,12 +77,12 @@
 
 import LivedataTopbar from "../../LivedataTopbar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataRefreshButton from "../../LivedataRefreshButton.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
 
@@ -90,11 +92,11 @@ export default {
     LivedataTopbar,
     LivedataDropdownMenu,
     LivedataEntrySelectorAll,
-    LivedataRefreshButton,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutCardsCard,
     LayoutCardsNewCard,
+    LayoutLoader,
   },
 
   inject: ["logic"],
@@ -120,7 +122,7 @@ export default {
 */
 @supports (display: grid) {
 
-    /* Make the cards 30rem large, and display as many of them on one row */
+  /* Make the cards 30rem large, and display as many of them on one row */
   .layout-cards .layout-table-root {
     display: grid;
     grid-template-columns: repeat(auto-fill, 30rem);
@@ -129,6 +131,11 @@ export default {
     grid-gap: 1.5rem; /* safari */
   }
 
+}
+
+.layout-cards .layout-loader {
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 </style>

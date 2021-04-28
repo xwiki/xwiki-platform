@@ -171,7 +171,6 @@ ul.dependencies li:hover {
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
-  background-position: 0 0.3em;
 }
 .dependency-item {
   line-height: 1.4em;

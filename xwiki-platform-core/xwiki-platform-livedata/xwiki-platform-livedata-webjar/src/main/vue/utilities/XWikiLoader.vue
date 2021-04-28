@@ -37,7 +37,7 @@ export default {
     // delay before showing the loader (in ms)
     delay: {
       type: Number,
-      default: 1000,
+      default: 200,
     },
   },
 
@@ -49,7 +49,7 @@ export default {
 
   mounted () {
     setTimeout(() => { this.show = true; }, this.delay);
-  }
+  },
 
 };
 </script>

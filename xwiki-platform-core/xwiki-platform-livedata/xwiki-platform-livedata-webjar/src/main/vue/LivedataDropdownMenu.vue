@@ -45,9 +45,21 @@
     </a>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
+
+      <!-- Refresh -->
+      <li class="dropdown-header">Actions</li>
+
+      <li>
+        <a href="#" @click.prevent="logic.updateEntries()">
+          <span class="fa fa-repeat"></span> Refresh
+        </a>
+      </li>
+
 
       <!-- Change layout Section -->
+      <li role="separator" class="divider"></li>
+
       <li class="dropdown-header">{{ $t('livedata.dropdownMenu.changeLayout') }}</li>
 
       <!-- Layout options -->
@@ -65,6 +77,8 @@
       </li>
 
       <!-- Advanced panels Section -->
+      <li role="separator" class="divider"></li>
+
       <li class="dropdown-header">{{ $t('livedata.dropdownMenu.header.panels') }}</li>
 
       <!-- Properties Panel -->
@@ -128,6 +142,16 @@ export default {
 
 .livedata-dropdown-menu .btn-default span {
   vertical-align: middle;
+}
+
+/*
+ * The icons are not all the same width,
+ * so we set a fix width for the icons
+ * so that all dropdown options aligned with each others
+ */
+.livedata-dropdown-menu li a .fa {
+  width: 1.4rem;
+  text-align: center;
 }
 
 </style>

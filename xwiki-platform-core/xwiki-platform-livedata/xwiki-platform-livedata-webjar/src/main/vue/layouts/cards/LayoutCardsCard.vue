@@ -86,10 +86,10 @@
 
 
 <script>
-  import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
-  import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
-  import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
-  import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
+import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
+import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
+import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
+import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
 
 export default {
 
@@ -213,6 +213,5 @@ export default {
   }
 
 }
-
 
 </style>

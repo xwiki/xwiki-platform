@@ -1039,15 +1039,13 @@ $namespace##
       #end
     </div>
     <div class="extension-header">
-      <div class="extension-title-and-status">
-        <h2 class="extension-title">
-          <span class="extension-name">#displayExtensionName($extension)</span>
-          <span class="extension-version">$escapetool.xml($extension.id.version)</span>
-        </h2>
+      <h2 class="extension-title">
+        <span class="extension-name">#displayExtensionName($extension)</span>
+        <span class="extension-version">$escapetool.xml($extension.id.version)</span>
         #if ($extensionStatusMessage)
           <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
         #end
-      </div>
+      </h2>
       #displayExtensionActionButtons($extension, $readOnly)
       #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)

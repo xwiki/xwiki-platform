@@ -58,6 +58,12 @@
 
 .extension-status {
   font-size: 0.8em;
+  font-weight: normal;
+  margin: 3px 0 0 0;
+}
+
+h2.extension-title .extension-status {
+  font-size: 0.7em;
 }
 
 .extension-authors {
@@ -165,6 +171,7 @@ ul.dependencies li:hover {
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
+  background-position: 0 0.3em;
 }
 .dependency-item {
   line-height: 1.4em;
@@ -471,13 +478,14 @@ ul.collapsible.document-tree {
 /* Media query for screens wider than Bootstrap @screen-md-min */
 @media (min-width: 992px) {
   /* Display the extension title and status on a single row on md screens */
-  .extension-title-and-status {
+  .extension-title, .dependency-item {
     display: flex;
     justify-content: space-between;
   }
-  .dependency-item {
-    display: flex;
-    justify-content: space-between;
+  .extension-status {
+    flex-grow: 1;
+    text-align: right;
+    margin: 0;
   }
   /* Add margin for the case when the dependency-item has a right border (eg .extension-item-remote-installed). */
   .dependency-item .extension-status {

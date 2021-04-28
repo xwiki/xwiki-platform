@@ -39,7 +39,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
-import org.xwiki.test.page.ScriptServiceComponentList;
+import org.xwiki.test.page.IconManagerScriptServiceComponentList;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.tools.EscapeTool;
@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  */
 @HTML50ComponentList
 @XHTML10ComponentList
-@ScriptServiceComponentList
+@IconManagerScriptServiceComponentList
 class MentionTest extends PageTest
 {
     /**
@@ -74,7 +74,7 @@ class MentionTest extends PageTest
     void setUp() throws Exception
     {
         // Initializes then environment for the icon extension.
-        IconSetup.setUp(this.xwiki, this.context, this.oldcore);
+        IconSetup.setUp(this.oldcore, this);
     }
 
     /**

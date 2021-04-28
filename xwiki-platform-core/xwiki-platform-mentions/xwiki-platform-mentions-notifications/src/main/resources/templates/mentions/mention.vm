@@ -63,7 +63,7 @@
     #if ($compositeEvent.events.size() == 1)
             $services.localization.render('mentions.event.mention.summary.singular')
         #else
-      $services.localization.render('mentions.event.mention.summary.plural', [$compositeEvent.events.size()])
+      $services.localization.render('mentions.event.mention.summary.plural', $compositeEvent.events.size())
     #end
   </div>
   <div><small class="text-muted">$compositeEventDate</small></div>

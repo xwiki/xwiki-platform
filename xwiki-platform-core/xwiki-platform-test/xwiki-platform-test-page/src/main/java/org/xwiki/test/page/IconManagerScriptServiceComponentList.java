@@ -32,7 +32,6 @@ import org.xwiki.icon.internal.DefaultIconSetLoader;
 import org.xwiki.icon.internal.DefaultIconSetManager;
 import org.xwiki.icon.internal.VelocityRenderer;
 import org.xwiki.icon.internal.context.IconSetContext;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.skinx.internal.CssDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsDocumentSkinExtension;
 import org.xwiki.skinx.internal.LinkSkinExtension;
@@ -44,16 +43,15 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Pack of default {@link ScriptService} implementations.
+ * Pack of {@link IconManagerScriptService} and its dependencies.
  *
  * @version $Id$
  * @since 13.4RC1
- */
+ */ 
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
-    // Icon script service.     
     IconManagerScriptService.class,
     DefaultIconManager.class,
     DefaultIconSetManager.class,
@@ -65,9 +63,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     LinkSkinExtension.class,
     JsDocumentSkinExtension.class,
     VelocityRenderer.class
-    // TODO: add more script services below.
 })
 @Inherited
-public @interface ScriptServiceComponentList
+public @interface IconManagerScriptServiceComponentList
 {
 }

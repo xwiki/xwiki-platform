@@ -21,7 +21,7 @@
 
 <template>
   <div
-    :class="['layout-loader', { waiting: loading }]"
+    :class="['layout-loader', { waiting: loading, visible: visible }]"
   >
     <div class="loader-fill"></div>
   </div>
@@ -39,6 +39,7 @@ export default {
     return {
       loadingData: false,
       loadingLayout: false,
+      visible: false,
       delay: 200,
     };
   },
@@ -55,21 +56,24 @@ export default {
 
       this.logic.onEvent(eventBefore, () => {
         clearTimeout(timeoutId);
+        this[propertyName] = true;
+        // Make the loading animation visible with a small delay in order to reduce the perceived loading time.
         timeoutId = setTimeout(() => {
-          this[propertyName] = true;
+          this.visible = true;
         }, this.delay);
       });
 
       this.logic.onEvent(eventAfter, () => {
         clearTimeout(timeoutId);
         this[propertyName] = false;
+        this.visible = this.loading;
       });
 
     }
   },
 
   mounted () {
-    this.watchLoading("loadingData", "beforeentryfetch", "afterentryfetch");
+    this.watchLoading("loadingData", "beforeEntryFetch", "afterEntryFetch");
     this.watchLoading("loadingLayout", "layoutChange", "layoutLoaded");
   }
 
@@ -114,11 +118,11 @@ export default {
   background-color: #3e7cbc;
 }
 
-.layout-loader.waiting {
+.layout-loader.waiting.visible {
   visibility: visible;
 }
 
-.layout-loader.waiting .loader-fill {
+.layout-loader.waiting.visible .loader-fill {
   visibility: visible;
   -webkit-animation: waiting 2s linear infinite;
   animation: waiting 2s linear infinite;

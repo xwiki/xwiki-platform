@@ -177,7 +177,7 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
 
-    getNextvisibleProperty (th) {
+    getNextVisibleProperty (th) {
       while (th.nextElementSibling) {
         th = th.nextElementSibling;
         if (th.style.display !== "none") return th;
@@ -188,7 +188,7 @@ export default {
       const th = e.currentTarget.closest("th");
       e.data.leftColumn = th.querySelector(".column-name");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
-      e.data.rightColumn = this.getNextvisibleProperty(th)?.querySelector(".column-name");
+      e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
       e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
     },
 

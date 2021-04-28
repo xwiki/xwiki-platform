@@ -29,7 +29,7 @@ export const mousedownmove = {
       el.dispatchEvent(mouseDownMoveEvent);
     };
 
-    // On clik, bind event listener
+    // On click, bind event listener
     el.addEventListener("mousedown", e => {
 
       // Object used to store data on click event

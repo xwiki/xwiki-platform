@@ -69,6 +69,7 @@
         -->
         <div
           class="handle"
+          :title="$t('livedata.action.reorder.hint')"
           @click.stop
         >
           <span class="fa fa-ellipsis-v"></span>
@@ -94,7 +95,7 @@
         Use the stop propagation modifier on click event
         to prevent sorting the column unintentionally.
       -->
-      <div class="resize-handle"
+      <div class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
         v-mousedownmove="resizeColumnInit"
         @mousedownmove="resizeColumn"
         @click.stop
@@ -282,6 +283,10 @@ export default {
   cursor: ew-resize;
   user-select: none;
   z-index: 100;
+
+  &:hover {
+    background-color: @breadcrumb-bg;
+  }
 }
 
 /* Responsive mode */
@@ -301,6 +306,11 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+  }
+
+  .layout-table .resize-handle {
+    /* The columns cannot be resized in responsive mode. */
+    display: none;
   }
 }
 

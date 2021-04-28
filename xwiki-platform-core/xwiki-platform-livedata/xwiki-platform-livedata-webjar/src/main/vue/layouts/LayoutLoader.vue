@@ -54,7 +54,6 @@ export default {
       let timeoutId;
 
       this.logic.onEvent(eventBefore, () => {
-        console.log("BEFORE", propertyName, eventBefore, eventAfter);
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           this[propertyName] = true;
@@ -62,7 +61,6 @@ export default {
       });
 
       this.logic.onEvent(eventAfter, () => {
-        console.log("AFTER", propertyName, eventBefore, eventAfter);
         clearTimeout(timeoutId);
         this[propertyName] = false;
       });

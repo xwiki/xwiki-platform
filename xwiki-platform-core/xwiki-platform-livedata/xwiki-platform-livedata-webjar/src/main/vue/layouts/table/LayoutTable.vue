@@ -152,7 +152,7 @@ export default {
 
 /* Responsive mode */
 @media screen and (max-width: @screen-xs-max) {
-  .layout-table > .responsive-table > thead {
+  .layout-table .responsive-table > thead {
     /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
       because we have two rows, property names and filters, that we want to display as two equally sized columns. */
     display: flex;

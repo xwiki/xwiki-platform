@@ -61,7 +61,6 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
 }
 
 .livedata-topbar-left,

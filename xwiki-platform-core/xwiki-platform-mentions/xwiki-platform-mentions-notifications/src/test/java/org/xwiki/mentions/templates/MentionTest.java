@@ -26,11 +26,10 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.eventstream.internal.DefaultEvent;
-import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.mentions.internal.MentionView;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
@@ -38,7 +37,9 @@ import org.xwiki.platform.date.script.DateScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.HTML50ComponentList;
+import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.ScriptServiceComponentList;
 import org.xwiki.test.page.XHTML10ComponentList;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.tools.EscapeTool;
@@ -46,38 +47,50 @@ import org.xwiki.velocity.tools.EscapeTool;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@code mention.vm}.
+ * Tests of the mention notifications template ({@code mention.vm}).
+ * <p>
+ * This test suite assert the html rendered by the mention notification template.
  *
  * @version $Id$
  * @since 13.4RC1
  */
 @HTML50ComponentList
 @XHTML10ComponentList
+@ScriptServiceComponentList
 class MentionTest extends PageTest
 {
-    @Mock
-    private IconManagerScriptService iconManager;
-
+    /**
+     * Needs to be mocked because don't want the test result to be dependent of the current time.
+     */
     @Mock
     private DateScriptService dateScriptService;
 
-    @Mock
-    private LocalizationScriptService localizationScriptService;
+    @BeforeEach
+    void setUp() throws Exception
+    {
+        // Initializes then environment for the icon extension.
+        IconSetup.setUp(this.xwiki, this.context, this.oldcore);
+    }
 
+    /**
+     * Test the html returned by the mention notification template. For a functional test of the mention notification,
+     * see the {@code MentionIT} docker test.
+     * <p>
+     * This test checks the rendering of a group of two mentions. The first mention occurs on a page with a title, the
+     * second mention on a page without a title (in this case the name of the page must be displayed instead of its
+     * title).
+     */
     @Test
-    void mention() throws Exception
+    void mentionNotificationTemplate() throws Exception
     {
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
-        this.componentManager.registerComponent(ScriptService.class, "icon", this.iconManager);
         this.componentManager.registerComponent(ScriptService.class, "date", this.dateScriptService);
-        this.componentManager.registerComponent(ScriptService.class, "localization", this.localizationScriptService);
 
         DocumentReference page1 = new DocumentReference("xwiki", "XWiki", "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", "YWiki", "Page2");
@@ -93,21 +106,14 @@ class MentionTest extends PageTest
         XWikiDocument xWikiDocument2 = this.xwiki.getDocument(page2, this.context);
         this.xwiki.saveDocument(xWikiDocument2, this.context);
 
-        // Registration of usefull velocity tools.
+        // Registration of the required velocity tools.
         registerVelocityTool("escapetool", new EscapeTool());
         registerVelocityTool("stringtool", new StringUtils());
 
-        // Mocking of the script services.
-        when(this.iconManager.renderHTML("bell")).thenReturn("bell-icon");
-        when(this.iconManager.renderHTML("page")).thenReturn("page-icon");
+        // Mocking of the date script service.
         when(this.dateScriptService.displayTimeAgo(eventDate)).thenReturn("one hundred years ago");
-        when(this.localizationScriptService.render("mentions.event.mention.summary.plural", singletonList(2)))
-            .thenReturn("You have received 2 mentions.");
-        when(this.localizationScriptService.render("mentions.event.mention.description"))
-            .thenReturn("mentioned you on page");
-        when(this.localizationScriptService.render("mentions.event.mention.type")).thenReturn("Mentions");
 
-        // Initialization of the velocity context
+        // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();
         event1.setDate(eventDate);
         event1.setUser(userPage1);
@@ -133,7 +139,7 @@ class MentionTest extends PageTest
 
         // Template rendering.
         String actual = templateManager.render("templates/mentions/mention.vm");
-        String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention.mention.html"),
+        String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention.html"),
             UTF_8);
 
         assertThat(actual, equalToCompressingWhiteSpace(expected));

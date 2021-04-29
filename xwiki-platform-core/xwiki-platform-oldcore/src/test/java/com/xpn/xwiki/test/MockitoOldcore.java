@@ -395,8 +395,8 @@ public class MockitoOldcore
                 // this point, the initial context in XWikiStubContextProvider would normally be initialized with an
                 // empty request which would lead to some NPE when ServletRequest is used later on, for example. Thus
                 // we force a request in the context here before the call to stubContextProvider.initialize().
-                // Note that this needs to be refactored to let the test control the context before
-                // stubContextProvider.initialize() is called.
+                // Note that this needs to be refactored to let the test control what to initialize in the initial
+                // context (i.e. before stubContextProvider.initialize() is called).
                 // Also note that setting a non null request forces us to set a non null URL as otherwise it would lead
                 // to another NPE...
                 XWikiRequest originalRequest = getXWikiContext().getRequest();

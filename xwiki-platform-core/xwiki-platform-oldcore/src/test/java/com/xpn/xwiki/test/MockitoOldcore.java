@@ -408,8 +408,8 @@ public class MockitoOldcore
                     getXWikiContext().setURL(new URL("http://localhost:8080"));
                 }
                 stubContextProvider.initialize(getXWikiContext());
-                // Make sure we leave the XWikiContext unchanged (since we temporarily modified the URL and request to
-                // set up the initial context in XWikiStubContextProvider).
+                // Make sure we leave the XWikiContext unchanged (since we just temporarily modified the URL and
+                // request to set up the initial context in XWikiStubContextProvider).
                 getXWikiContext().setURL(originalURL);
                 getXWikiContext().setRequest(originalRequest);
             }

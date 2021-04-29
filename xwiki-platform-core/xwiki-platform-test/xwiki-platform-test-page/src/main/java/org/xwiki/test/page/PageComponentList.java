@@ -92,6 +92,7 @@ import org.xwiki.xml.internal.html.filter.ListFilter;
 import org.xwiki.xml.internal.html.filter.ListItemFilter;
 
 import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
+import com.xpn.xwiki.internal.DefaultXWikiStubContextProvider;
 import com.xpn.xwiki.internal.localization.XWikiLocalizationContext;
 import com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor;
 import com.xpn.xwiki.internal.sheet.ClassSheetBinder;
@@ -130,6 +131,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
+    // Request
+    DefaultXWikiStubContextProvider.class,
+
     // Rendering
     XWikiRenderingContext.class,
     DefaultTransformationManager.class,
@@ -140,7 +144,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultMacroContentParser.class,
     DefaultSyntaxRegistry.class,
 
-    //Resource
+    // Resource
     DefaultResourceReferenceManager.class,
 
     // Plain Syntax

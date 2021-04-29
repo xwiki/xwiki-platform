@@ -21,11 +21,8 @@ package org.xwiki.test.page;
 
 import java.net.URL;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
-
-import static org.mockito.Mockito.doReturn;
 
 /**
  * Set up URL Factory for Page Tests.
@@ -35,8 +32,6 @@ import static org.mockito.Mockito.doReturn;
  */
 public final class URLFactorySetup
 {
-    private static final String XWIKI = "xwiki";
-
     private URLFactorySetup()
     {
         // Utility class and thus no public constructor.
@@ -45,16 +40,12 @@ public final class URLFactorySetup
     /**
      * Sets up a fake base URL and a fake Servlet URL Factory.
      *
-     * @param xwiki the stubbed XWiki instance
      * @param context the stubbed XWikiContext instance
      * @throws Exception when a setup error occurs
      */
-    public static void setUp(XWiki xwiki, XWikiContext context) throws Exception
+    public static void setUp(XWikiContext context) throws Exception
     {
-        doReturn(XWIKI).when(xwiki).getWebAppPath(context);
         context.setURL(new URL("http://localhost:8080/xwiki/bin/Main/WebHome"));
-        doReturn(true).when(xwiki).showViewAction(context);
         context.setURLFactory(new XWikiServletURLFactory(context));
-        doReturn("/bin/").when(xwiki).getServletPath(XWIKI, context);
     }
 }

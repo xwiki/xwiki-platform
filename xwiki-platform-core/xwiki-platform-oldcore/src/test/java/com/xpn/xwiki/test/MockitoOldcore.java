@@ -346,7 +346,7 @@ public class MockitoOldcore
         }
 
         // Set a few standard things in the ExecutionContext
-        econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
+        econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, getXWikiContext());
         this.scriptContext = (ScriptContext) econtext.getProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
         if (this.scriptContext == null) {
             this.scriptContext = new CloneableSimpleScriptContext();
@@ -364,11 +364,11 @@ public class MockitoOldcore
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
             Provider<XWikiContext> xcontextProvider =
                 this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-            when(xcontextProvider.get()).thenReturn(this.context);
+            when(xcontextProvider.get()).thenReturn(getXWikiContext());
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
             if (MockUtil.isMock(xcontextProvider)) {
-                when(xcontextProvider.get()).thenReturn(this.context);
+                when(xcontextProvider.get()).thenReturn(getXWikiContext());
             }
         }
 
@@ -376,11 +376,11 @@ public class MockitoOldcore
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER, "readonly")) {
             Provider<XWikiContext> xcontextProvider =
                 this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
-            when(xcontextProvider.get()).thenReturn(this.context);
+            when(xcontextProvider.get()).thenReturn(getXWikiContext());
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
             if (MockUtil.isMock(xcontextProvider)) {
-                when(xcontextProvider.get()).thenReturn(this.context);
+                when(xcontextProvider.get()).thenReturn(getXWikiContext());
             }
         }
 
@@ -395,17 +395,17 @@ public class MockitoOldcore
                 // refactored to let the test control the context before stubContextProvider.initialize() is called.
                 // Note that setting a non null request also forces us to set a non null URL as otherwise it'll lead
                 // to another NPE...
-                XWikiRequest originalRequest = this.context.getRequest();
-                if (this.context.getRequest() == null) {
-                    this.context.setRequest(new XWikiServletRequestStub());
+                XWikiRequest originalRequest = getXWikiContext().getRequest();
+                if (getXWikiContext().getRequest() == null) {
+                    getXWikiContext().setRequest(new XWikiServletRequestStub());
                 }
-                URL originalURL = this.context.getURL();
-                if (this.context.getURL() == null) {
-                    this.context.setURL(new URL("http://localhost:8080"));
+                URL originalURL = getXWikiContext().getURL();
+                if (getXWikiContext().getURL() == null) {
+                    getXWikiContext().setURL(new URL("http://localhost:8080"));
                 }
-                stubContextProvider.initialize(this.context);
-                this.context.setURL(originalURL);
-                this.context.setRequest(originalRequest);
+                stubContextProvider.initialize(getXWikiContext());
+                getXWikiContext().setURL(originalURL);
+                getXWikiContext().setRequest(originalRequest);
             }
         }
 
@@ -673,13 +673,13 @@ public class MockitoOldcore
                 {
                     XWikiDocument document = invocation.getArgument(0);
 
-                    String currentWiki = context.getWikiId();
+                    String currentWiki = getXWikiContext().getWikiId();
                     try {
-                        context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+                        getXWikiContext().setWikiId(document.getDocumentReference().getWikiReference().getName());
 
-                        return getMockStore().loadXWikiDoc(document, context);
+                        return getMockStore().loadXWikiDoc(document, getXWikiContext());
                     } finally {
-                        context.setWikiId(currentWiki);
+                        getXWikiContext().setWikiId(currentWiki);
                     }
                 }
             }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(XWikiContext.class));
@@ -724,7 +724,8 @@ public class MockitoOldcore
 
                     XWikiDocument originalDocument = document.getOriginalDocument();
                     if (originalDocument == null) {
-                        originalDocument = spyXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
+                        originalDocument =
+                            spyXWiki.getDocument(document.getDocumentReferenceWithLocale(), getXWikiContext());
                         document.setOriginalDocument(originalDocument);
                     }
 
@@ -761,18 +762,18 @@ public class MockitoOldcore
 
                     String currentWiki = null;
 
-                    currentWiki = context.getWikiId();
+                    currentWiki = getXWikiContext().getWikiId();
                     try {
-                        context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+                        getXWikiContext().setWikiId(document.getDocumentReference().getWikiReference().getName());
 
-                        getMockStore().deleteXWikiDoc(document, context);
+                        getMockStore().deleteXWikiDoc(document, getXWikiContext());
 
                         if (notifyDocumentDeletedEvent) {
                             getObservationManager().notify(new DocumentDeletedEvent(document.getDocumentReference()),
                                 document, getXWikiContext());
                         }
                     } finally {
-                        context.setWikiId(currentWiki);
+                        getXWikiContext().setWikiId(currentWiki);
                     }
 
                     return null;

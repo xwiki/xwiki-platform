@@ -86,6 +86,8 @@ public class PageTest
 {
     private static final String SKIN_PROPERTIES_PATH = "/skins/flamingo/skin.properties";
 
+    private static final String SKIN_FLAMINGO_PREFIX_PATH = "/skins/flamingo";
+
     @InjectMockitoOldcore
     protected MockitoOldcore oldcore;
 
@@ -269,7 +271,7 @@ public class PageTest
         when(oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         // Set up URL Factory
-        URLFactorySetup.setUp(xwiki, context);
+        URLFactorySetup.setUp(context);
 
         // Set up Localization
         LocalizationSetup.setUp(componentManager);
@@ -342,7 +344,10 @@ public class PageTest
                 // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
                 URL url = getClass().getResource(resourceName);
                 if (url == null) {
-                    url = getClass().getResource(getShortTemplateResourceName(resourceName));
+                    String shortName = getShortTemplateResourceName(resourceName);
+                    if (shortName != null) {
+                        url = getClass().getResource(shortName);
+                    }
                     if (url == null) {
                         url = getEnvironmentResource(resourceName);
                     }
@@ -359,7 +364,10 @@ public class PageTest
                 // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
                 InputStream is = getClass().getResourceAsStream(resourceName);
                 if (is == null) {
-                    is = getClass().getResourceAsStream(getShortTemplateResourceName(resourceName));
+                    String shortName = getShortTemplateResourceName(resourceName);
+                    if (shortName != null) {
+                        is = getClass().getResourceAsStream(shortName);
+                    }
                     if (is == null) {
                         is = getEnvironmentResourceAsStream(resourceName);
                     }
@@ -370,7 +378,8 @@ public class PageTest
 
     private String getShortTemplateResourceName(String resourceName)
     {
-        return StringUtils.substringAfter(resourceName, "/skins/flamingo");
+        return resourceName.startsWith(SKIN_FLAMINGO_PREFIX_PATH) ?
+            StringUtils.substringAfter(resourceName, SKIN_FLAMINGO_PREFIX_PATH) : null;
     }
 
     protected URL getEnvironmentResource(String resourceName) throws Exception

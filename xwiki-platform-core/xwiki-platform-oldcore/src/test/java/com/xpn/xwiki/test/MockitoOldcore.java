@@ -384,8 +384,9 @@ public class MockitoOldcore
             }
         }
 
-        // Initialize stub context provider. This is to simulate an XWiki runtime, where this is initialized on the
-        // first HTTP request.
+        // Initialize the initial context in the stub context provider (which is then used for all calls to
+        // createStubContext() in the stub context provider). This is to simulate an XWiki runtime, where this is
+        // initialized on the first HTTP request.
         if (this.componentManager.hasComponent(XWikiStubContextProvider.class)) {
             XWikiStubContextProvider stubContextProvider =
                 this.componentManager.getInstance(XWikiStubContextProvider.class);

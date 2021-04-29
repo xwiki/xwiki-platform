@@ -37,8 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class MacrosTest extends PageTest
 {
-    private static final String TEMPLATES_PATH = "src/main/webapp/templates";
-
     private VelocityManager velocityManager;
 
     @BeforeEach

@@ -2,24 +2,27 @@
 .xnotification-container {
   position : fixed;
   bottom: 0;
-  left: 0%;
-  width: 100%;
+  left: 0;
+  right: 0;
+  margin: auto;
   text-align: center;
   z-index: 1200;
   display: block !important;
+  max-width: 40%;
 }
 .xnotification-wrapper {
   padding-top: 1px;
 }
 .xnotification {
   cursor: pointer;
-  display: inline;
+  display: inline-block;
   background: #333 2px center no-repeat;
   border: none;
-  padding: 0px 6px;
+  padding: 14px 28px;
+  border-radius: 3px;
   color: #fff;
-  font-weight: bold;
   line-height: 20px;
+  margin-bottom: 10px;
 }
 
 #set($notificationCustommization = [])
@@ -50,7 +53,8 @@
   border-color:  $textColor;
 #if($imgUrl != '')
   background-image: url($imgUrl);
-  padding-left: 22px;
+  padding-left: 50px;
+  background-position: 2em;
 #end
 }
 #end

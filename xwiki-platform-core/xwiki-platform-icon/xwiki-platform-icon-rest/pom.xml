@@ -20,32 +20,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-icon</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-icon</artifactId>
-  <name>XWiki Platform - Icon - Parent POM</name>
+  <artifactId>xwiki-platform-icon-rest</artifactId>
+  <name>XWiki Platform - Icon - REST - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Icon - Parent POM</description>
+  <description>Services to access XWiki Icons through a RESTful API.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Icon REST Services</xwiki.extension.name>
+  </properties>
   <modules>
-    <module>xwiki-platform-icon-api</module>
-    <module>xwiki-platform-icon-default</module>
-    <module>xwiki-platform-icon-script</module>
-    <module>xwiki-platform-icon-ui</module>
-    <module>xwiki-platform-icon-rest</module>
-    <!-- Icon Themes -->
-    <module>xwiki-platform-icon-fontawesome</module>
+    <module>xwiki-platform-icon-rest-api</module>
+    <module>xwiki-platform-icon-rest-default</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-icon-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

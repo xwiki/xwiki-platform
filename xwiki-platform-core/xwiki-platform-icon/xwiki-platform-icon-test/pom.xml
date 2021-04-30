@@ -20,31 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-icon</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-icon</artifactId>
-  <name>XWiki Platform - Icon - Parent POM</name>
+  <artifactId>xwiki-platform-icon-test</artifactId>
+  <name>XWiki Platform - Icon - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Icon - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-icon-api</module>
-    <module>xwiki-platform-icon-default</module>
-    <module>xwiki-platform-icon-script</module>
-    <module>xwiki-platform-icon-ui</module>
-    <module>xwiki-platform-icon-rest</module>
-    <!-- Icon Themes -->
-    <module>xwiki-platform-icon-fontawesome</module>
-  </modules>
+  <description>XWiki Platform - Icon - Tests - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-icon-test</module>
+        <module>xwiki-platform-icon-test-docker</module>
       </modules>
     </profile>
   </profiles>

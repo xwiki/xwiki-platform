@@ -175,13 +175,11 @@ viewers.Attachments = Class.create({
   },
   /**
    * Registers a listener that watches for the insertion of the Attachments tab and triggers the form enhancement.
-   * After that, the listener removes itself, since it is no longer needed.
    */
   addTabLoadListener : function(event) {
     var listener = function(event) {
       if (event.memo.id == 'Attachments') {
         this.prepareForm();
-        document.stopObserving("xwiki:docextra:loaded", listener);
       }
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);

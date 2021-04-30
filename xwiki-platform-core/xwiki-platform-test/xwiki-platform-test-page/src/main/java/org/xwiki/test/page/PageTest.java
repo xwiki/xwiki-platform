@@ -30,11 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,7 +64,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -273,8 +270,6 @@ public class PageTest
 
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
-
-        initializeSkinEnvironment();
     }
 
     /**
@@ -303,18 +298,5 @@ public class PageTest
     {
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         velocityManager.getVelocityContext().put(name, tool);
-    }
-
-    /**
-     * Initializes a default skin environment for the tests.
-     *
-     * @throws ComponentLookupException in case of error when loading an {@link Environment} instance
-     */
-    private void initializeSkinEnvironment() throws ComponentLookupException
-    {
-        // Load the environment from the test resources. This is needed to access the skins properties.
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        Environment spyEnvironment = spy(environment);
-        when(spyEnvironment.getResource(SKIN_PROPERTIES_PATH)).thenReturn(getClass().getResource(SKIN_PROPERTIES_PATH));
     }
 }

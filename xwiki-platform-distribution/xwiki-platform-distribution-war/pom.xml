@@ -34,7 +34,6 @@
   <properties>
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki</xwiki.extension.name>
-
     <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
   </properties>
   <dependencies>
@@ -44,6 +43,15 @@
      <version>${project.version}</version>
      <type>pom</type>
    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <version>${project.version}</version>
+      <!-- Prevent the WAR from including it (since we unpack it). We still need the dependency for ensuring the right
+           reactor order and to make sure that the local repo has the dependency artifact when the dependency plugin
+           executes -->
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -58,7 +66,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Unpack the Skins (they're packaged as zips) -->
+      <!-- Unpack the Skins resources -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -76,7 +84,8 @@
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
                   <version>${project.version}</version>
-                  <type>zip</type>
+                  <type>jar</type>
+                  <excludes>META-INF/**</excludes>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
               </artifactItems>

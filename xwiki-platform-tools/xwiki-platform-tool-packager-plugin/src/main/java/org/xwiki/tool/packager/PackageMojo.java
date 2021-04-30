@@ -566,7 +566,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             }
         } else {
             Artifact defaultSkin = resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin-resources",
-                getXWikiPlatformVersion(), "zip");
+                getXWikiPlatformVersion(), "jar");
             skinArtifacts.add(defaultSkin);
         }
 

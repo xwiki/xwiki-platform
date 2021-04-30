@@ -99,14 +99,14 @@
   <!-- This filter is used to initialize the XWiki context before processing a request. -->
   <filter>
     <filter-name>XWikiContextInitializationFilter</filter-name>
-    <filter-class>org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</filter-class>
+    <filter-class>com.xpn.xwiki.web.XWikiContextInitializationFilter</filter-class>
   </filter>
 
   <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
   <filter>
-    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
-    <filter-class>org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</filter-class>
-    <!-- A parameter used to identify the request as a an XML-RPC call -->
+    <filter-name>XWikiRESTContextInitializationFilter</filter-name>
+    <filter-class>com.xpn.xwiki.web.XWikiContextInitializationFilter</filter-class>
+    <!-- A parameter used to identify the request as a an XML-RPC/REST call -->
     <init-param>
       <param-name>mode</param-name>
       <param-value>2</param-value>
@@ -183,11 +183,8 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
-  <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
-       "XWikiXmlRpcContextInitializationFilter" points to
-       org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter -->
   <filter-mapping>
-    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
+    <filter-name>XWikiRESTContextInitializationFilter</filter-name>
     <servlet-name>RestletServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>

@@ -919,6 +919,7 @@
                 **/web/ViewrevAction.java,
                 **/web/XWikiAction.java,
                 **/web/XWikiConfigurationService.java,
+                **/web/XWikiContextInitializationFilter.java,
                 **/web/XWikiDefaultURLFactory.java,
                 **/web/XWikiEngineContext.java,
                 **/web/XWikiForm.java,

@@ -39,18 +39,15 @@
   <content>annotations.title=Anotasi
 annotations.menu.loading=Sedang memuat pengaturan anotasi
 annotations.menu.loaderror=Gagal:
-annotations.tab.info.noannotations=Tidak terdapat anotasi untuk halaman ini
-
+annotations.tab.info.noannotations=Tidak ada anotasi di halaman ini
 annotations.settings.display=Tampilkan anotasi
-annotations.settings.error.wrongsyntax=Anotasi tidak tersedia untuk halaman yang ditulis dengan sintaksis XWiki/1.0.
+annotations.settings.error.wrongsyntax=Anotasi tidak tersedia untuk halaman yang ditulis dengan sintaksis XWiki/1.0
 annotations.settings.error.notarget=Tidak ada halaman yang ditentukan untuk mendapatkan pengaturan anotasi.
-
 annotations.annotated.loading=Sedang memuat halaman yang dianotasi
 annotations.annotated.loaderror=Gagal:
 annotations.annotated.loaderror.wrongresponse=Respons server dengan format salah
 annotations.annotated.error.noannotatedelement=Anotasi tidak dapat dimuat karena isi tidak tersedia.
 annotations.annotated.error.wrongsyntax=Anotasi tidak tersedia untuk halaman yang ditulis dengan sintaksis XWiki/1.0.
-
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit notasi
 annotations.action.edit.submit.text=Perbarui
@@ -58,59 +55,53 @@ annotations.action.edit.cancel.text=Batal
 annotations.action.edit.success=Anotasi diperbarui.
 annotations.action.edit.loaderror=Gagal:
 annotations.action.edit.error.notfound=Anotasi ini tidak ada lagi. Harap segarkan halaman untuk tampilan yang diperbarui.
-
 annotations.action.delete.text=[Hapus]
 annotations.action.delete.tooltip=Hapus anotasi
 annotations.action.delete.confirm=Apakah Anda yakin mau menghapus anotasi ini?
 annotations.action.delete.inProgress=Dalam proses penghapusan anotasi...
 annotations.action.delete.done=Anotasi sudah dihapus
 annotations.action.delete.failed=Gagal menghapus anotasi:
-
 annotations.action.create.submit.text=Tambah anotasi
 annotations.action.create.cancel.text=Batal
-### Missing: annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
-### Missing: annotations.action.create.form.loaderror=Failed:
-### Missing: annotations.action.create.success=Annotation added.
-### Missing: annotations.action.create.loaderror=Failed:
-### Missing: annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page.
-### Missing: annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
-### Missing: annotations.action.create.helpmessage=To annotate a piece of text, select it and hit {0}.
-### Missing: annotations.action.create.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
-### Missing: annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
-
-### Missing: annotations.action.view.hide.text=hide
-### Missing: annotations.action.view.form.loaderror=Failed:
-### Missing: annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
-### Missing: annotations.action.view.thread=View thread
-
-### Missing: annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page:
-### Missing: annotations.updated.text=This annotation was automatically repositioned after a page update. Originally:
-### Missing: annotations.action.validate.text=[Validate]
-### Missing: annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
-### Missing: annotations.action.validate.success=Annotation validated.
-### Missing: annotations.action.validate.loaderror=Failed:
-
+annotations.action.create.selection.invalid=Pilih teks yang tidak kosong di konten halaman.
+annotations.action.create.form.loaderror=Gagal:
+annotations.action.create.success=Anotasi ditambahkan.
+annotations.action.create.loaderror=Gagal:
+annotations.action.create.error.unauthorized=Anda tidak diizinkan menambahkan anotasi pada halaman ini.
+annotations.action.create.error.unauthorizedguest=Anda tidak diizinkan menambahkan anotasi pada halaman ini. Cobalah untuk login terlebih dahulu.
+annotations.action.create.helpmessage=Untuk memberi anotasi pada sepotong teks, pilih dan tekan {0}.
+annotations.action.create.error.wrongsyntax=Anotasi tidak tersedia untuk halaman yang ditulis dengan sintaks XWiki/1.0.
+annotations.action.create.error.notarget=Target (halaman) tidak ditentukan yang mana untuk membuat anotasi.
+annotations.action.view.hide.text=sembunyikan
+annotations.action.view.form.loaderror=Gagal:
+annotations.action.view.error.notfound=Anotasi ini sudah tidak ada. Refresh halaman untuk tampilan yang diperbarui.
+annotations.action.view.thread=Lihat utas
+annotations.altered.text=Anotasi ini tidak dapat ditampilkan karena teks beranotasi tidak ditemukan di halaman:
+annotations.updated.text=Anotasi ini secara otomatis diubah posisinya setelah pembaruan halaman. Semula:
+annotations.action.validate.text=[Validasi]
+annotations.action.validate.tooltip=Validasi pembaruan otomatis dari teks yang dipilih dari anotasi ini
+annotations.action.validate.success=Anotasi divalidasi.
+annotations.action.validate.loaderror=Gagal:
 ### Missing: annotations.filters.show=Filter
-### Missing: annotations.filters.nooption=There are no values to filter for "{0}"
-### Missing: annotations.filters.anyvalue=any value
-### Missing: annotations.filters.clearvalue=clear
-
-### Missing: annotations.config.title=Annotations configuration panel
-### Missing: annotations.config.display.title=Annotation display
-### Missing: annotations.config.type.title=Annotation type
-### Missing: annotations.config.activate.title=Annotation activation
-### Missing: annotations.config.activate.explanation=The following two settings allow you to configure which locations annotations are active in. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
-### Missing: annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.
-### Missing: admin.annotations=Annotations
-### Missing: admin.annotations.description=Configure the page annotations
-
-### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
-### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
-### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
-### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
+annotations.filters.nooption=Tidak ada nilai untuk difilter untuk "{0}"
+annotations.filters.anyvalue=nilai apapun
+annotations.filters.clearvalue=bersih
+annotations.config.title=Panel konfigurasi anotasi
+annotations.config.display.title=Tampilan anotasi
+annotations.config.type.title=Tipe anotasi
+annotations.config.activate.title=Aktivasi anotasi
+annotations.config.activate.explanation=Dua pengaturan berikut memungkinkan Anda mengonfigurasi lokasi dimana anotasi yang aktif berada. Pengaturan pertama menentukan aturan umum, sedangkan daftar kedua menentukan lokasi tempat aturan tidak boleh diterapkan. Sebagai contoh, mengaktifkan "ya" dan lokasi pengecualian "XWiki" dan "Utama" berarti bahwa penjelasan akan aktif di semua lokasi kecuali untuk "XWiki" dan "Utama". Sebagai contoh sebaliknya, menggunakan pengaktifan "tidak" dan lokasi pengecualian "Dokumen" berarti bahwa anotasi hanya akan aktif untuk lokasi "Dokument".
+annotations.config.type.explanation=Tambahkan properti ke kelas ini jika Anda menginginkan properti tambahan untuk anotasi Anda.
+admin.annotations=Anotasi
+admin.annotations.description=Konfigurasikan anotasi halaman
+AnnotationCode.AnnotationConfig_activated=Anotasi diaktifkan
+AnnotationCode.AnnotationConfig_activated.hint=Tentukan apakah anotasi aktif di wiki
+AnnotationCode.AnnotationConfig_exceptionSpaces=Kecuali untuk lokasi-lokasi berikut
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Non-aktifkan anotasi untuk subset lokasi berikut ini:
+AnnotationCode.AnnotationConfig_displayed=Tampilkan anotasi secara default
+AnnotationCode.AnnotationConfig_displayed.hint=Tentukan jika anotasi ditampilkan secara default atau hanya ketika "Tampilkan anotasi" dicentang di setiap halaman
+AnnotationCode.AnnotationConfig_displayHighlight=Soroti anotasi secara default
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Tentukan jika penyorotan anotasi harus selalu ditampilkan atau hanya saat mengarahkan kursor ke atas anotasi atau struktur anotasi
+AnnotationCode.AnnotationConfig_annotationClass=Kelas XWiki yang mendefinisikan struktur anotasi
+</content>
 </xwikidoc>

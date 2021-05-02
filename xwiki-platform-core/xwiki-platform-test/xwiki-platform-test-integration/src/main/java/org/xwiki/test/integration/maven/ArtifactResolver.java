@@ -221,7 +221,7 @@ public class ArtifactResolver
         // Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
         // more explanations), we need to add it manually.
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
-            "jar", xwikiVersion);
+            JAR, xwikiVersion);
         dependentArtifacts.add(skinArtifact);
 
         // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.

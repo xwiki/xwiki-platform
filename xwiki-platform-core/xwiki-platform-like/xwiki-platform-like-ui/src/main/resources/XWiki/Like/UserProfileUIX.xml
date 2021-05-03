@@ -166,7 +166,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -254,30 +254,53 @@
     </property>
     <property>
       <content>{{velocity}}
-=$escapetool.xml($services.localization.render("like.userprofile.menu"))=
-#set($columns = ["doc.title", "doc.location", "like"])
+=$escapetool.xml($services.localization.render('like.userprofile.menu'))=
 #set ($docTitleDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.title')))
 #set ($docLocationDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.location')))
 #set ($likesDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.likes')))
-#set($columnsProperties = {
-  "doc.title" : { "displayName": $docTitleDisplayName, "type": "text", "size": 30, "link": "view", "sortable": false, "filterable": false },
-  "doc.location" : { "displayName": $docLocationDisplayName, "type": "text", "size": 30, "html": true, "sortable": false, "filterable": false },
-  "like" : { "displayName": $likesDisplayName, "type" : "number", "sortable": false, "filterable": false }
+#set ($currentUser = $services.model.serialize($doc.documentReference, 'default'))
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+       {
+         'id': 'doc.title',
+         'displayer': 'link',
+         'sortable': false,
+         'filterable': false,
+         'name': $docTitleDisplayName
+       },
+       {
+         'id': 'doc.location',
+         'displayer': 'html',
+         'sortable': false,
+         'filterable': false,
+         'name': $docLocationDisplayName
+       },
+       {
+         'id': 'like',
+         'displayer': 'number',
+         'sortable': false,
+         'filterable': false,
+         'name': $likesDisplayName
+       }
+    ]
+  }
 })
-
-#set ($currentUser = $services.model.serialize($doc.documentReference, "default"))
-#set ($pageToCallReference = $services.model.resolveDocument("XWiki.Like.UserProfileUIX"))
-#set ($pageToCall = $xwiki.getDocument($pageToCallReference))
-#set ($queryParams = {
-  "user": $currentUser,
-  "livetable": "true",
-  "xpage": "plain",
-  "outputSyntax": "plain"
-})
-#set($options = {
-  'url': $pageToCall.getURL('get', $escapetool.url($queryParams))
-})
-#livetable("likedPages" $columns $columnsProperties $options)
+##
+#set ($sourceParameters = $escapetool.url({
+  'resultPage': 'XWiki.Like.UserProfileUIX',
+  'user': $currentUser,
+  'livetable': 'true',
+  'xpage': 'plain',
+  'outputSyntax': 'plain'
+}))
+##
+{{liveData
+  id='likedPages'
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  properties='doc.title,doc.location,like'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
     </property>
     <property>

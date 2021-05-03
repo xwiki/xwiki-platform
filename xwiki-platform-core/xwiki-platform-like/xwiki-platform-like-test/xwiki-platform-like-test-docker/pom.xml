@@ -45,6 +45,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Required to display the like pages user profile UIX. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-ui</artifactId>
+      <type>xar</type>
+      <version>${project.version}</version>
+    </dependency>
     <!-- The content footer UIXP is only defined in flamingo skin.
          Note: We depend on the POM of xwiki-platform-flamingo-skin-resources in order to include its transitive
          dependencies in the generated XWiki runtime -->
@@ -73,6 +80,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -19,20 +19,23 @@
  */
 package org.xwiki.like.test.ui;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.UserProfileLikePagesPage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.like.test.po.UserProfileLikePagesPage.LIKES_COLUMN_NAME;
+import static org.xwiki.like.test.po.UserProfileLikePagesPage.TITLE_COLUMN_NAME;
 
 @UITest(
     properties = {
@@ -49,12 +52,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }, resolveExtraJARs = true)
-public class LikeIT
+class LikeIT
 {
     private static final String USER1 = "LikeUser1";
     private static final String USER2 = "LikeUser2";
     private static final DocumentReference LIKE_CONFIGURATION_REFERENCE =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Like"), "LikeConfiguration");
+        new DocumentReference("xwiki", asList("XWiki", "Like"), "LikeConfiguration");
     private static final String LIKE_CONFIGURATION_CLASSNAME = "XWiki.Like.LikeConfigurationClass";
 
     @BeforeEach
@@ -128,5 +131,29 @@ public class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
+    }
+
+    @Test
+    @Order(3)
+    void userProfileUIXLiveData(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.login(USER1, USER1);
+
+        // Re-creates and likes a page.
+        testUtils.deletePage(testReference);
+        testUtils.createPage(testReference, "", "");
+        LikeButton likeButton = new LikeButton();
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+
+        // Go to the Like Pages user profile tab and assert that the like page is correctly displayed in the live data.
+        UserProfileLikePagesPage userProfileLikePagesPage = new UserProfileLikePagesPage(USER1);
+        userProfileLikePagesPage.gotoPage();
+        LiveDataElement likedPages = userProfileLikePagesPage.getLiveData();
+        likedPages.waitUntilHasContentReady();
+        assertEquals(1, likedPages.countRows());
+        assertTrue(likedPages.hasLinkRow(TITLE_COLUMN_NAME, testReference.getLastSpaceReference().getName(),
+            testUtils.getURL(testReference.getLastSpaceReference())));
+        assertTrue(likedPages.hasRow(LIKES_COLUMN_NAME, "1"));
     }
 }

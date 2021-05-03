@@ -19,12 +19,11 @@
  */
 package org.xwiki.like.test.po;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.BaseElement;
+
+import static java.util.Collections.singletonMap;
 
 /**
  * Provides the operations to interact with the Like Pages tab of a user profile.
@@ -54,7 +53,7 @@ public class UserProfileLikePagesPage extends BaseElement
     /**
      * Default constructor.
      *
-     * @param userName a user name
+     * @param userName a user name, for instance {@code User1}
      */
     public UserProfileLikePagesPage(String userName)
     {
@@ -66,9 +65,8 @@ public class UserProfileLikePagesPage extends BaseElement
      */
     public void gotoPage()
     {
-        Map<String, Object> queryParameters = new HashMap<>();
-        queryParameters.put("category", "org.xwiki.platform.like.userProfileMenu");
-        getUtil().gotoPage(new DocumentReference("xwiki", "XWiki", this.userName), "view", queryParameters);
+        getUtil().gotoPage(new DocumentReference("xwiki", "XWiki", this.userName), "view",
+            singletonMap("category", "org.xwiki.platform.like.userProfileMenu"));
     }
 
     /**

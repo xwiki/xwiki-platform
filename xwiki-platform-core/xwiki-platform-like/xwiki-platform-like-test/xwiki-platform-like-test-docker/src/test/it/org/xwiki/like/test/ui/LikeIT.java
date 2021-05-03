@@ -99,7 +99,7 @@ class LikeIT
 
     @Test
     @Order(2)
-    void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference) throws Exception
+    void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference)
     {
         testUtils.login(USER1, USER1);
         testUtils.createPage(testReference, "some content");
@@ -118,6 +118,16 @@ class LikeIT
         likeButton.clickToLike();
         assertEquals(2, likeButton.getLikeNumber());
 
+        // Goes to the user profile and verify that the liked pages tables displays the liked pages. 
+        UserProfileLikePagesPage userProfileLikePagesPage = new UserProfileLikePagesPage(USER2);
+        userProfileLikePagesPage.gotoPage();
+        LiveDataElement likedPages = userProfileLikePagesPage.getLiveData();
+        likedPages.waitUntilHasContentReady();
+        assertEquals(1, likedPages.countRows());
+        assertTrue(likedPages.hasLinkRow(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+            testUtils.getURL(testReference.getLastSpaceReference())));
+        assertTrue(likedPages.hasRow(LIKES_COLUMN_NAME, "2"));
+
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);
         likeButton = new LikeButton();
@@ -131,29 +141,5 @@ class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
-    }
-
-    @Test
-    @Order(3)
-    void userProfileUIXLiveData(TestUtils testUtils, TestReference testReference)
-    {
-        testUtils.login(USER1, USER1);
-
-        // Re-creates and likes a page.
-        testUtils.deletePage(testReference);
-        testUtils.createPage(testReference, "", "");
-        LikeButton likeButton = new LikeButton();
-        likeButton.clickToLike();
-        assertEquals(1, likeButton.getLikeNumber());
-
-        // Go to the Like Pages user profile tab and assert that the like page is correctly displayed in the live data.
-        UserProfileLikePagesPage userProfileLikePagesPage = new UserProfileLikePagesPage(USER1);
-        userProfileLikePagesPage.gotoPage();
-        LiveDataElement likedPages = userProfileLikePagesPage.getLiveData();
-        likedPages.waitUntilHasContentReady();
-        assertEquals(1, likedPages.countRows());
-        assertTrue(likedPages.hasLinkRow(TITLE_COLUMN_NAME, testReference.getLastSpaceReference().getName(),
-            testUtils.getURL(testReference.getLastSpaceReference())));
-        assertTrue(likedPages.hasRow(LIKES_COLUMN_NAME, "1"));
     }
 }

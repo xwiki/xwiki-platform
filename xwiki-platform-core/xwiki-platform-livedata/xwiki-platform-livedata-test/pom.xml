@@ -20,31 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-livedata</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-livedata</artifactId>
-  <name>XWiki Platform - Live Data</name>
+  <artifactId>xwiki-platform-livedata-test</artifactId>
+  <name>XWiki Platform - Live Data - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Display dynamic lists of data</description>
+  <description>XWiki Platform - Live Data - Tests - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-livedata-api</module>
-    <module>xwiki-platform-livedata-livetable</module>
-    <module>xwiki-platform-livedata-macro</module>
-    <module>xwiki-platform-livedata-rest</module>
-    <module>xwiki-platform-livedata-war</module>
-    <module>xwiki-platform-livedata-webjar</module>
+    <module>xwiki-platform-livedata-test-pageobjects</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-livedata-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

@@ -632,6 +632,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private RenderingContext renderingContext;
 
     /**
+     * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
+     * If you want to create a document for another locale, use {@link #XWikiDocument(DocumentReference, Locale)}.
      * @since 2.2M1
      */
     public XWikiDocument(DocumentReference reference)

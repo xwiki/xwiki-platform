@@ -1036,6 +1036,7 @@ public class XWikiTest
     @Test
     public void atomicRename() throws Exception
     {
+        XWikiContext xWikiContext = this.oldcore.getXWikiContext();
         doAnswer(invocationOnMock -> {
             XWikiDocument sourceDoc = invocationOnMock.getArgument(0);
             DocumentReference targetReference = invocationOnMock.getArgument(1);
@@ -1047,61 +1048,76 @@ public class XWikiTest
         }).when(this.oldcore.getMockStore()).renameXWikiDoc(any(), any(), any());
         this.document.setContent("[[doc:pageinsamespace]]");
         this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(this.document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(this.document, xWikiContext);
+
+        XWikiDocument frenchTranslation =
+            new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        this.xwiki.saveDocument(frenchTranslation, xWikiContext);
+
+        XWikiDocument germanTranslation =
+            new XWikiDocument(this.document.getDocumentReference(), Locale.GERMAN);
+        this.xwiki.saveDocument(germanTranslation, xWikiContext);
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
         doc1.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>doc:" + DOCSPACE + "."
             + DOCNAME + "]] [[doc:" + DOCNAME + "]]");
         doc1.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc1, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc1, xWikiContext);
 
         DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
         XWikiDocument doc2 = new XWikiDocument(reference2);
         doc2.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc2.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc2, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc2, xWikiContext);
 
         DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
         XWikiDocument doc3 = new XWikiDocument(reference3);
         doc3.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc3.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc3, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc3, xWikiContext);
 
         // Test to make sure it also drags children along.
         DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
         XWikiDocument doc4 = new XWikiDocument(reference4);
         doc4.setParent(DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc4, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc4, xWikiContext);
 
         DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
         XWikiDocument doc5 = new XWikiDocument(reference5);
         doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc5, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(doc5, xWikiContext);
 
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
         this.xwiki.renameDocument(this.document.getDocumentReference(),
             targetReference, true,
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5),
-            this.oldcore.getXWikiContext());
+            xWikiContext);
+
+        // ensure document and translations are renamed
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(this.document, targetReference, xWikiContext);
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(frenchTranslation,
+            new DocumentReference(targetReference, Locale.FRENCH), xWikiContext);
+        verify(this.oldcore.getMockStore()).renameXWikiDoc(germanTranslation,
+            new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
         assertEquals("[[doc:Wiki:MilkyWay.pageinsamespace]]",
-            this.xwiki.getDocument(targetReference, this.oldcore.getXWikiContext()).getContent());
+            this.xwiki.getDocument(targetReference, xWikiContext).getContent());
         assertTrue(this.xwiki
-            .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());
+            .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), xWikiContext).isNew());
         assertEquals("[[doc:newwikiname:newspace.newpage]] " + "[[someName>>doc:newwikiname:newspace.newpage]] "
                 + "[[doc:newwikiname:newspace.newpage]]",
-            this.xwiki.getDocument(reference1, this.oldcore.getXWikiContext()).getContent());
+            this.xwiki.getDocument(reference1, xWikiContext).getContent());
         assertEquals("[[doc:newspace.newpage]]",
-            this.xwiki.getDocument(reference2, this.oldcore.getXWikiContext()).getContent());
+            this.xwiki.getDocument(reference2, xWikiContext).getContent());
         assertEquals("[[doc:newpage]]",
-            this.xwiki.getDocument(reference3, this.oldcore.getXWikiContext()).getContent());
+            this.xwiki.getDocument(reference3, xWikiContext).getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage",
-            this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
+            this.xwiki.getDocument(reference4, xWikiContext).getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
-            this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
+            this.xwiki.getDocument(reference5, xWikiContext).getParentReference());
     }
 }

@@ -4753,24 +4753,23 @@ public class XWiki implements EventListener
                     WikiReference wikiReference = context.getWikiReference();
                     context.setWikiReference(sourceDocumentReference.getWikiReference());
 
-                    // Step 1: Simulate creating a document and deleting a document from listeners point of view
-                    // FIXME: currently modifications made by listeners won't be applied
-                    XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
-                    futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
-                    beforeSave(futureTargetDocument, context);
-                    XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
-
-                    // Step 2: Perform atomic rename in DB
                     try {
-                        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+                        // rename main document
+                        this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
+
+                        // handle translations
+                        List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
+                        for (Locale translationLocale : translationLocales) {
+                            DocumentReference translatedSourceReference =
+                                new DocumentReference(sourceDocumentReference, translationLocale);
+                            DocumentReference translatedTargetReference =
+                                new DocumentReference(targetDocumentReference, translationLocale);
+                            XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
+                            this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
+                        }
                     } finally {
                         context.setWikiReference(wikiReference);
                     }
-
-                    // Step 3: Simulate a created document and a deleted document from listeners point of view
-                    targetDocument = this.getDocument(targetDocumentReference, context);
-                    afterDelete(deletedDocument, context);
-                    afterSave(futureTargetDocument, context);
 
                     // Step 4: For each child document, update its parent reference.
                     // Step 5: For each backlink to rename, parse the backlink document and replace the links with
@@ -4785,6 +4784,24 @@ public class XWiki implements EventListener
         }
 
         return result;
+    }
+
+    private void atomicRenameDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference,
+        XWikiContext context) throws XWikiException
+    {
+        // Step 1: Simulate creating a document and deleting a document from listeners point of view
+        // FIXME: currently modifications made by listeners won't be applied
+        XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
+        futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
+        beforeSave(futureTargetDocument, context);
+        XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
+
+        // Step 2: Perform atomic rename in DB
+        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+
+        // Step 3: Simulate a created document and a deleted document from listeners point of view
+        afterDelete(deletedDocument, context);
+        afterSave(futureTargetDocument, context);
     }
 
     private void updateLinksForRename(XWikiDocument sourceDoc, DocumentReference newDocumentReference,

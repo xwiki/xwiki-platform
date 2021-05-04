@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.hibernate.internal.util.collections.ConcurrentReferenceHashMap;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,14 +38,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-public class MapBasedLinkedBlockingQueueTest
+class MapBasedLinkedBlockingQueueTest
 {
     private ConcurrentMap<Long, String> map;
 
     @BeforeEach
     void setup()
     {
-        this.map = new ConcurrentReferenceHashMap();
+        // Note: ConcurrentReferenceHashMap was used previously instead of ConcurrentHashMap, leading to a really rare 
+        // flaky behaviour, where the size of the map was computed as 3 instead of 4 after the four 'put' calls.
+        this.map = new ConcurrentHashMap<>();
         map.put(13L, "Foo");
         map.put(28L, "Bar");
         map.put(0L, "Baz");
@@ -55,7 +57,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void constructor()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         assertEquals("Baz", queue.poll());
         assertEquals("Foo", queue.poll());
@@ -68,7 +70,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void contructorAndOffer()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         assertTrue(queue.offer("Ahaha"));
         assertTrue(queue.offer("Foo"));
@@ -89,8 +91,8 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void putAndPeek() throws Exception
     {
-        ConcurrentReferenceHashMap localMap = new ConcurrentReferenceHashMap();
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        ConcurrentHashMap<Long, String> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(localMap);
         assertTrue(queue.isEmpty());
         queue.put("Something");
         queue.put("Else");
@@ -109,7 +111,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void take() throws Exception
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         assertEquals("Baz", queue.take());
         assertEquals("Foo", queue.take());
@@ -122,7 +124,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void clear()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         assertFalse(queue.isEmpty());
         queue.clear();
@@ -133,8 +135,8 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void addElementAndIterate()
     {
-        ConcurrentReferenceHashMap localMap = new ConcurrentReferenceHashMap();
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        ConcurrentHashMap<Long, String> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(localMap);
         assertTrue(queue.isEmpty());
         queue.add("Something");
         queue.add("Foo");
@@ -166,7 +168,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void retainAll()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         queue.add("Bar");
         assertEquals(5, queue.size());
@@ -190,7 +192,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void removeAll()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         queue.add("Bar");
         assertEquals(5, queue.size());
@@ -213,7 +215,7 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void remove()
     {
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(this.map);
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(this.map);
         assertEquals(4, queue.size());
         queue.add("Bar");
         assertEquals(5, queue.size());
@@ -236,8 +238,8 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void addAll()
     {
-        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        ConcurrentHashMap<Long, String> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(localMap);
         assertTrue(queue.isEmpty());
 
         assertTrue(queue.addAll(Arrays.asList("Baz", "Foo", "buz", "Bar")));
@@ -254,16 +256,16 @@ public class MapBasedLinkedBlockingQueueTest
     @Test
     void pollEmpty()
     {
-        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        ConcurrentHashMap<Long, String> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(localMap);
         assertNull(queue.poll());
     }
 
     @Test
     void peekEmpty()
     {
-        ConcurrentHashMap<Object, Object> localMap = new ConcurrentHashMap<>();
-        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue(localMap);
+        ConcurrentHashMap<Long, String> localMap = new ConcurrentHashMap<>();
+        BlockingQueue<String> queue = new MapBasedLinkedBlockingQueue<>(localMap);
         assertNull(queue.poll());
     }
 }

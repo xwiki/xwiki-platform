@@ -37,20 +37,11 @@
     <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
   </properties>
   <dependencies>
-   <dependency>
-     <groupId>org.xwiki.platform</groupId>
-     <artifactId>${war.dependencies.artifactId}</artifactId>
-     <version>${project.version}</version>
-     <type>pom</type>
-   </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <artifactId>${war.dependencies.artifactId}</artifactId>
       <version>${project.version}</version>
-      <!-- Prevent the WAR from including it (since we unpack it). We still need the dependency for ensuring the right
-           reactor order and to make sure that the local repo has the dependency artifact when the dependency plugin
-           executes -->
-      <scope>provided</scope>
+      <type>pom</type>
     </dependency>
   </dependencies>
   <build>

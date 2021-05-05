@@ -175,14 +175,12 @@
     'propertyDescriptors': [
        {
          'id': 'doc.title',
-         'displayer': 'link',
          'sortable': false,
          'filterable': false,
          'name': $docTitleDisplayName
        },
        {
          'id': 'doc.location',
-         'displayer': 'html',
          'sortable': false,
          'filterable': false,
          'name': $docLocationDisplayName
@@ -201,9 +199,7 @@
 #set ($sourceParameters = $escapetool.url({
   'resultPage': 'XWiki.Like.Code.LiveDataResultPage',
   'user': $currentUser,
-  'livetable': 'true',
-  'xpage': 'plain',
-  'outputSyntax': 'plain'
+  'livetable': 'true'
 }))
 ##
 {{liveData

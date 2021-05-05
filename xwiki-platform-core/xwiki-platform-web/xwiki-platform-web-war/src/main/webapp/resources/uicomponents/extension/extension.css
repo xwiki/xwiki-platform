@@ -175,6 +175,9 @@ ul.dependencies li:hover {
 .dependency-item {
   line-height: 1.4em;
 }
+.dependency-item .extension-status {
+  margin: 0;
+}
 .extension-item-core .extension-title, .extension-item-remote-core .extension-title,
 .dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");

@@ -157,7 +157,9 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
                 try {
                     attachment.setArchive(revisions);
                 } catch (XWikiException e) {
-                    this.logger.error("Failed to set the attachment archive", e);
+                    this.logger.error(
+                        "Failed to set the archive for attachment [{}]. This attachment won't have any history.", name,
+                        e);
                 }
             }
 

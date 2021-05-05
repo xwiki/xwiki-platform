@@ -211,8 +211,9 @@ public class XWikiAttachmentArchive implements Cloneable
         } else {
             try (Reader reader = new StringReader(data)) {
                 this.archive = new Archive(getAttachment().getFilename(), reader);
-            } catch (Exception e) {
-                Object[] args = { getAttachment().getFilename() };
+            } catch (Exception | Error e) {
+                // Contrary to what Archive javadoc indicates JRCS throw Errors for most parsing problems
+                Object[] args = {getAttachment().getFilename()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
             }

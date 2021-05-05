@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @since 11.4RC1
  */
 @UITest
-public class NavigationPanelIT
+class NavigationPanelIT
 {
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
@@ -56,7 +56,7 @@ public class NavigationPanelIT
      *      excluded properly from Navigation Panel on Home page</a>
      */
     @Test
-    public void verifyPanelCaching(TestUtils setup, TestReference testReference)
+    void verifyPanelCaching(TestUtils setup, TestReference testReference)
     {
         // Make sure the application we're about to create doesn't exist.
         String appName = testReference.getSpaceReferences().get(0).getName() + "App";

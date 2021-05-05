@@ -24,27 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-livedata-test</artifactId>
     <version>13.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-livedata</artifactId>
-  <name>XWiki Platform - Live Data</name>
-  <packaging>pom</packaging>
-  <description>Display dynamic lists of data</description>
-  <modules>
-    <module>xwiki-platform-livedata-api</module>
-    <module>xwiki-platform-livedata-livetable</module>
-    <module>xwiki-platform-livedata-macro</module>
-    <module>xwiki-platform-livedata-rest</module>
-    <module>xwiki-platform-livedata-war</module>
-    <module>xwiki-platform-livedata-webjar</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-livedata-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
+  <name>XWiki Platform - Live Data - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Live Data - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

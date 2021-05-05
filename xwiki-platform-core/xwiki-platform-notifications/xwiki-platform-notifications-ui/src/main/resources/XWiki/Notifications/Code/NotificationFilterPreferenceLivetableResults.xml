@@ -62,7 +62,7 @@
 ## when request user is not given we are sending the list of NotificationFilterPreference of the current wiki.
 #else
   #set ($target = $services.wiki.getCurrentWikiReference())
-  #set ($document = $xwiki.getDocument('XWiki.XWikiPreferences'))
+  #set ($document = $xwiki.getDocument('XWiki.Notifications.Code.NotificationAdministration'))
   #set ($userTarget = false)
 #end
 #set ($elements = [])

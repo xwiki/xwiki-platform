@@ -218,11 +218,10 @@ public class ArtifactResolver
             dependentArtifacts.add(artifact);
         }
 
-        // It seems that Maven Resolver is not able to resolve the ZIP dependencies from
-        // xwiki-platform-distribution-war-minimaldependencies for some reason, so we manually ask for resolving the
-        // skin dependency (which of ZIP type).
+        // Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
+        // more explanations), we need to add it manually.
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
-            "zip", xwikiVersion);
+            JAR, xwikiVersion);
         dependentArtifacts.add(skinArtifact);
 
         // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.

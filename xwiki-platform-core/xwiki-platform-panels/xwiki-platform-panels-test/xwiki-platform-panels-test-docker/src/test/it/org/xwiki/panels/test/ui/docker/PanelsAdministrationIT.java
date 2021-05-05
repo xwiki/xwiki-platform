@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.3RC1
  */
 @UITest
-public class PanelsAdministrationIT
+class PanelsAdministrationIT
 {
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
@@ -57,9 +57,11 @@ public class PanelsAdministrationIT
 
     @Order(1)
     @Test
-    public void verifyPanelWizardPresentInAdministration()
+    void verifyPanelWizardPresentInAdministration()
     {
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        // Forces the edition lock when going to the administration because it can be locked by Admin from previous 
+        // tests. 
+        AdministrationPage administrationPage = AdministrationPage.gotoPage(true);
         assertTrue(administrationPage.hasSection("Panels.PanelWizard"));
 
         // Select space administration (XWiki space, since that space exists)
@@ -71,7 +73,7 @@ public class PanelsAdministrationIT
 
     @Order(2)
     @Test
-    public void tabsExist()
+    void tabsExist()
     {
         PanelsAdministrationPage panelsAdministrationPage = PanelsAdministrationPage.gotoPage();
         assertTrue(panelsAdministrationPage.hasPageLayoutTab());
@@ -80,7 +82,7 @@ public class PanelsAdministrationIT
 
     @Order(3)
     @Test
-    public void pageLayout()
+    void pageLayout()
     {
         PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
         PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();
@@ -103,7 +105,7 @@ public class PanelsAdministrationIT
 
     @Order(4)
     @Test
-    public void gotoPanels()
+    void gotoPanels()
     {
         PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
         assertTrue(panelsAdminPage.hasGotoPanelsLink());
@@ -113,7 +115,7 @@ public class PanelsAdministrationIT
 
     @Order(5)
     @Test
-    public void resetPanels()
+    void resetPanels()
     {
         PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
         assertTrue(panelsAdminPage.hasResetLink());
@@ -135,7 +137,7 @@ public class PanelsAdministrationIT
 
     @Order(6)
     @Test
-    public void verifyPanelWizard(TestUtils setup, TestReference testReference)
+    void verifyPanelWizard(TestUtils setup, TestReference testReference)
     {
         PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
         PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();

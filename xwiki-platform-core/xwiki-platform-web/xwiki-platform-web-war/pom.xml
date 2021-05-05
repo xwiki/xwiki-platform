@@ -113,7 +113,7 @@
                   <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/templates</outputDirectory>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
             </configuration>
           </execution>
         </executions>

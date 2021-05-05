@@ -152,7 +152,9 @@ public class WARBuilder
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
+                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
+                    && artifact.getExtension().equals("jar"))
+                {
                     skinDependencies.add(artifact.getFile());
                 } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
                     jarDependencies.add(artifact);

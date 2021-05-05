@@ -113,23 +113,6 @@
           </excludes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <!-- New code should follow checkstyle rules. -->
-              <excludes>
-                <!-- Class Fan-Out Complexity is 24 (max allowed is 20) -->
-                org/xwiki/wysiwyg/filter/XWikiContextInitializationFilter.java
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 </project>

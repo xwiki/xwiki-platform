@@ -236,7 +236,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
             if (!newReference.getWikiReference().equals(originalWikiReference)) {
                 context.setWikiReference(newReference.getWikiReference());
             }
-            XWikiDocument newDoc = new XWikiDocument(newReference);
+            XWikiDocument newDoc = new XWikiDocument(newReference, newReference.getLocale());
             key = getKey(newDoc, context);
             getCache().remove(key);
             getPageExistCache().remove(key);

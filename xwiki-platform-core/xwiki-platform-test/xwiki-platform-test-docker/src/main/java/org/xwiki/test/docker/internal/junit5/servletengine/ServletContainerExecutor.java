@@ -171,7 +171,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // Configure Tomcat logging for debugging. Create a logging.properties file
         File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
         if (!logFile.createNewFile()) {
-            throw new Exception(String.format("Failed to create logging configuration file at [%s]", logFile));
+            throw new Exception(String.format("Logging configuration file already exists at [%s]",
+                logFile.getAbsoluteFile()));
         }
         try (FileWriter writer = new FileWriter(logFile)) {
             IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"

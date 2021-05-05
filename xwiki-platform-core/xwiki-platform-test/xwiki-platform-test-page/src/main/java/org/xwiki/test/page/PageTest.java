@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.page;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +27,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
@@ -132,7 +127,6 @@ public class PageTest
     public void setUpComponentsForPageTest(MockitoComponentManager componentManager) throws Exception
     {
         componentManager.registerMockComponent(JMXBeanRegistration.class);
-        componentManager.registerMockComponent(Environment.class);
         componentManager.registerMockComponent(JobProgressManager.class);
         componentManager.registerMockComponent(RenderingCache.class);
         componentManager.registerMockComponent(EntityResourceActionLister.class);
@@ -269,16 +263,13 @@ public class PageTest
         when(oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         // Set up URL Factory
-        URLFactorySetup.setUp(xwiki, context);
+        URLFactorySetup.setUp(context);
 
         // Set up Localization
         LocalizationSetup.setUp(componentManager);
 
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
-
-        initializeSkinEnvironment();
-        initializeEnvironmentResources();
     }
 
     /**
@@ -307,81 +298,5 @@ public class PageTest
     {
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         velocityManager.getVelocityContext().put(name, tool);
-    }
-
-    /**
-     * Initializes a default skin environment for the tests.
-     *
-     * @throws ComponentLookupException in case of error when loading an {@link Environment} instance
-     */
-    private void initializeSkinEnvironment() throws ComponentLookupException
-    {
-        // Load the environment from the test resources. This is needed to access the skins properties.
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getResource(SKIN_PROPERTIES_PATH)).thenReturn(getClass().getResource(SKIN_PROPERTIES_PATH));
-    }
-
-    /**
-     * Make calls to {@code Environment#getResource*()} work by looking for environment resources in the current
-     * classloader and if not found there, offering the ability for tests to decide from where to serve resources
-     * by implementing {@link}.
-     * <p>
-     * Note that this method is protected in case the test need to completely override how resources are found.
-     */
-    protected void initializeEnvironmentResources() throws Exception
-    {
-        // Environment resources
-        Environment environment = oldcore.getMocker().getInstance(Environment.class);
-        when(environment.getResource(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String resourceName = (String) invocation.getArguments()[0];
-                // Algorithm:
-                // - Try to load the passed resource name from the CL first
-                // - If the resource is a template (ends in .vm) then remove the /skins/flamingo prefix from the
-                //   resource name and try again to load it from the CL
-                // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
-                URL url = getClass().getResource(resourceName);
-                if (url == null) {
-                    url = getClass().getResource(getShortTemplateResourceName(resourceName));
-                    if (url == null) {
-                        url = getEnvironmentResource(resourceName);
-                    }
-                }
-                return url;
-            });
-        when(environment.getResourceAsStream(any(String.class))).thenAnswer(
-            (Answer) invocation -> {
-                String resourceName = (String) invocation.getArguments()[0];
-                // Algorithm:
-                // - Try to load the passed resource name from the CL first
-                // - If the resource is a template (ends in .vm) then remove the /skins/flamingo prefix from the
-                //   resource name and try again to load it from the CL
-                // - If not found, then let tests be able to override {@code getEnvironmentResource()}.
-                InputStream is = getClass().getResourceAsStream(resourceName);
-                if (is == null) {
-                    is = getClass().getResourceAsStream(getShortTemplateResourceName(resourceName));
-                    if (is == null) {
-                        is = getEnvironmentResourceAsStream(resourceName);
-                    }
-                }
-                return is;
-            });
-    }
-
-    private String getShortTemplateResourceName(String resourceName)
-    {
-        return StringUtils.substringAfter(resourceName, "/skins/flamingo");
-    }
-
-    protected URL getEnvironmentResource(String resourceName) throws Exception
-    {
-        // Tests should override this if they need to serve the resource from a location other than the classloader
-        return null;
-    }
-
-    protected InputStream getEnvironmentResourceAsStream(String resourceName) throws Exception
-    {
-        // Tests should override this if they need to serve the resource from a location other than the classloader
-        return null;
     }
 }

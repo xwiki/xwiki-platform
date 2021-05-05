@@ -20,30 +20,45 @@
 
 
 <!--
-  The LivedataRefreshButton is button that simply refresh data
-  according to current configuration
+  DisplayerNumber is a custom displayer that displays the entry value as numbers.
+  As this is very simple, it uses the BaseDisplayer default widgets
 -->
 <template>
-  <div
-    class="livedata-refresh-button"
-    @click="logic.updateEntries()"
-    :title="$t('livedata.refresh')"
+  <!--
+    Uses the BaseDisplayer as root element, as it handles for us
+    all the displayer default behavior
+  -->
+  <BaseDisplayer
+    class="displayer-number"
+    :property-id="propertyId"
+    :entry="entry"
   >
-    <span class="fa fa-repeat"></span>
-  </div>
+
+    <!-- Keep the default Viewer widget -->
+    <template #viewer></template>
+
+    <!-- Keep the default Editor widget -->
+    <template #editor></template>
+
+  </BaseDisplayer>
 </template>
 
 
 <script>
+
+import displayerMixin from "./displayerMixin.js";
+import BaseDisplayer from "./BaseDisplayer.vue";
+
 export default {
 
-  name: "LivedataRefreshButton",
+  name: "displayer-number",
 
-  inject: ["logic"],
-
-  computed: {
-    data () { return this.logic.data; },
+  components: {
+    BaseDisplayer,
   },
+
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
+  mixins: [displayerMixin],
 
 };
 </script>
@@ -51,14 +66,8 @@ export default {
 
 <style>
 
-.livedata-refresh-button {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  border-radius: @border-radius-base;
-
-  &:hover, &:active {
-    background-color: @component-active-bg;
-  }
+.livedata-displayer.displayer-number {
+  text-align: right;
 }
 
 </style>

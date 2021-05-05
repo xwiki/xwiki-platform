@@ -31,8 +31,9 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.mock;
@@ -77,8 +78,9 @@ class HelpTest extends PageTest
         when(sq.execute()).thenReturn(Arrays.asList("XWiki.XWikiSyntaxLinks"));
 
         String result = renderPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntax"));
-        assertTrue(result.contains("<h3 id=\"HXWikiSyntax2.1LinkSpecification\""),
-            "$subHeading should have been evaluated and replaced by '==='");
-        assertFalse(result.contains("$subHeading"), "$subHeading should have been evaluated and replaced by '==='");
+        assertThat("$subHeading should have been evaluated and replaced by '==='", result,
+            containsString("<h3 id=\"HXWikiSyntax2.1LinkSpecification\""));
+        assertThat("$subHeading should have been evaluated and replaced by '==='", result,
+            not(containsString("$subHeading")));
     }
 }

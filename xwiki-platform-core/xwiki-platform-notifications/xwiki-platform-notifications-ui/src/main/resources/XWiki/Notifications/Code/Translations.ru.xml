@@ -67,32 +67,11 @@ notifications.filters.description.minorEventAlertNotificationFilter=Скрыть
 notifications.filters.name.minorEventEmailNotificationFilter=Незначительное событие (электронная почта)
 notifications.filters.description.minorEventEmailNotificationFilter=Скрыть уведомления о незначительных изменениях на страницах
 
-## Filter Types
-notifications.filters.type.inclusive=Включено
-notifications.filters.type.exclusive=Исключая
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Фильтр области уведомлений
 notifications.filters.preferences.scopeNotificationFilter.page=Только страница
 notifications.filters.preferences.scopeNotificationFilter.space=Страница и дочерние
 notifications.filters.preferences.scopeNotificationFilter.wiki=Вики
-
-notifications.filters.preferences.allEvents=-
-
-notifications.filters.preferences.addPreference.filterType.inclusive=Включительно
-notifications.filters.preferences.addPreference.filterType.exclusive=Исключая
-notifications.filters.preferences.addPreference.notificationFormat.label=Формат уведомления
-notifications.filters.preferences.addPreference.notificationFormat.hint=На какой формат уведомления должен применяться фильтр?
-notifications.filters.preferences.addPreference.eventType.label=Тип события
-notifications.filters.preferences.addPreference.eventType.hint=На какой тип события назначить фильтр?
-notifications.filters.preferences.addPreference.location.label=Область применения фильтра
-notifications.filters.preferences.addPreference.location.hint=На какую страницу назначить фильтр?
-notifications.filters.preferences.delete.inProgress=Удаление...
-notifications.filters.preferences.delete.done=Настройки фильтра удалены!
-notifications.filters.preferences.delete.error=Не удалось удалить настройки фильтра
-notifications.filters.preferences.setEnabled.inProgress=Сохранение...
-notifications.filters.preferences.setEnabled.done=Настройки фильтра сохранены!
-notifications.filters.preferences.setEnabled.error=Не удалось сохранить настройки фильтра
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках
@@ -102,18 +81,47 @@ notifications.format.alert=Оповещение
 notifications.format.email=E-mail
 
 ## Filter preferences settings
-notifications.settings.filters.preferences.title=Фильтры
-notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда события должны создавать уведомления.
-notifications.settings.filters.preferences.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших уведомлений.
+notifications.filters.preferences.delete.inProgress=Удаление...
+notifications.filters.preferences.delete.done=Настройки фильтра удалены!
+notifications.filters.preferences.delete.error=Не удалось удалить настройки фильтра
+notifications.filters.preferences.setEnabled.inProgress=Сохранение...
+notifications.filters.preferences.setEnabled.done=Настройки фильтра сохранены!
+notifications.filters.preferences.setEnabled.error=Не удалось сохранить настройки фильтра
+notifications.filters.preferences.allEvents=Все события (даже отключенные)
 
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Системные фильтры
+notifications.settings.filters.preferences.system.hint=Системные фильтры, которые вы можете переключать, чтобы иметь более точный контроль над уведомлениями, которые вы хотите получать.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Название
-notifications.settings.filters.preferences.table.filterType=Тип фильтра
-notifications.settings.filters.preferences.table.eventTypes=События
-notifications.settings.filters.preferences.table.notificationFormats=Форматы
-notifications.settings.filters.preferences.table.isEnabled=Включено?
-notifications.settings.filters.preferences.table._actions=Действия
+notifications.settings.filters.preferences.system.table.name=Название
+notifications.settings.filters.preferences.system.table.filterType=Описание
+notifications.settings.filters.preferences.system.table.notificationFormats=Форматы
+notifications.settings.filters.preferences.system.table.isEnabled=Включено?
 
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Пользовательские фильтры
+notifications.settings.filters.preferences.custom.hint=Создавайте фильтры для управления уведомлениями, которые вы хотите получать.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Расположение
+notifications.settings.filters.preferences.custom.table.filterType=Действие фильтра
+notifications.settings.filters.preferences.custom.table.eventTypes=События
+notifications.settings.filters.preferences.custom.table.notificationFormats=Форматы
+notifications.settings.filters.preferences.custom.table.isEnabled=Включено?
+notifications.settings.filters.preferences.custom.table._actions=Действия
+notifications.filters.type.custom.inclusive=Уведомить о событии
+notifications.filters.type.custom.exclusive=Игнорировать событие
+notifications.settings.addFilter=Добавить фильтр
+notifications.settings.addFilter.hint=Создайте фильтр для событий, происходящих в определенных местах. Фильтр может инициировать отправку уведомления или предотвращать отправку, в зависимости от события и канала уведомления.
+notifications.filters.preferences.custom.addFilter.location.label=Расположение
+notifications.filters.preferences.custom.addFilter.location.hint=Этот фильтр применяется к событиям, происходящим в выбранных здесь местах. Выберите одно или несколько мест.
+notifications.filters.preferences.custom.addFilter.type.label=Действие
+notifications.filters.preferences.custom.addFilter.type.hint=Этот фильтр может либо уведомлять, либо игнорировать события, происходящие в выбранных местах. Выберите действие, которое вы хотите предпринять для событий.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Уведомить о событии
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Игнорировать событие
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Канал
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Этот фильтр применяется только к уведомлениям, отправленным по каналам связи, выбранным ниже. Выберите один или несколько каналов связи.
+notifications.filters.preferences.custom.addFilter.eventType.label=События
+notifications.filters.preferences.custom.addFilter.eventType.hint=Этот фильтр применяется к событиям, выбранным здесь, в местах, выбранных выше. Выберите одно или несколько событий.
 notifications.menu.header=Уведомления
 notifications.menu.header.settings=Настройки
 notifications.menu.clear=Очистить все
@@ -135,7 +143,6 @@ notifications.settings.saving=Ваши настройки сохраняются
 notifications.settings.saved=Сохранено!
 notifications.settings.savingfailed=Не удалось сохранить настройки
 notifications.settings.filters=Фильтры ({0})
-notifications.settings.addFilter=Добавить фильтр
 notifications.settings.errorFilterWiki=Ошибка: вы должны выбрать Вики, а не страницу
 notifications.settings.preferences=Настройки
 notifications.settings.preferences.hint=Фиксирует происходящие события и доставляет их в потоке или по E-mail.
@@ -182,6 +189,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Кажд
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Каждый раз, когда я делаю значимые изменения
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Только при создании новой страницы
 
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=Данная пользовательская ссылка не поддерживается, пока поддерживается только DocumentUserReference.
+notifications.settings.error.userReferenceAdminForbidden=У вас нет прав администратора для данного пользователя: {0}.
+notifications.settings.error.badCSRF=Неверный CSRF токен.
+notifications.settings.badParameters=Неверные параметры запроса.
+
 ## User profile
 notifications.userprofile.following=Следить
 notifications.userprofile.notfollowing=Не следить
@@ -196,7 +209,6 @@ rendering.macro.notificationsApplicationsPreferences.name=Настройки П�
 rendering.macro.notificationsApplicationsPreferences.description=Отображение предпочтений текущего пользователя в отношении приложений уведомлений.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Цель
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Цель макроса (может быть "user" для текущего пользователя или "wiki" для текущей Вики)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Настройки уведомлений Автонаблюдения
 rendering.macro.notificationsAutoWatchPreferences.description=Отображение предпочтений текущего пользователя в отношении Автонаблюдения за страницами.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Цель
@@ -212,5 +224,36 @@ notifications.switches.tooltip.page=Наблюдение за этой стра�
 notifications.switches.tooltip.pageAndChildren=Наблюдение за этой страницей и дочерними
 notifications.switches.tooltip.space=Наблюдение за родительской страницей и дочерними
 notifications.switches.tooltip.wiki=Наблюдение за всей Вики
-notifications.switches.changeStatusError=Не удалось изменить состояние уведомлений.</content>
+notifications.switches.changeStatusError=Не удалось изменить состояние уведомлений.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+notifications.settings.filters.preferences.title=Фильтры
+notifications.settings.filters.preferences.hint=Создайте фильтры, чтобы более точно контролировать, когда события должны создавать уведомления.
+notifications.settings.filters.preferences.forGuest=Войдите в систему или зарегистрируйтесь для настройки ваших уведомлений.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Название
+notifications.settings.filters.preferences.table.filterType=Тип фильтра
+notifications.settings.filters.preferences.table.eventTypes=События
+notifications.settings.filters.preferences.table.notificationFormats=Форматы
+notifications.settings.filters.preferences.table.isEnabled=Включено?
+notifications.settings.filters.preferences.table._actions=Действия
+notifications.filters.preferences.addPreference.filterType.inclusive=Включительно
+notifications.filters.preferences.addPreference.filterType.exclusive=Исключая
+notifications.filters.preferences.addPreference.notificationFormat.label=Формат уведомления
+notifications.filters.preferences.addPreference.notificationFormat.hint=На какой формат уведомления должен применяться фильтр?
+notifications.filters.preferences.addPreference.eventType.label=Тип события
+notifications.filters.preferences.addPreference.eventType.hint=На какой тип события назначить фильтр?
+notifications.filters.preferences.addPreference.location.label=Область применения фильтра
+notifications.filters.preferences.addPreference.location.hint=На какую страницу назначить фильтр?
+
+## Filter Types
+notifications.filters.type.inclusive=Включено
+notifications.filters.type.exclusive=Исключая
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

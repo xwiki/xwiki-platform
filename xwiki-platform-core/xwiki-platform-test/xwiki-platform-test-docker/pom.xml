@@ -153,6 +153,25 @@
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
+     more explanations), we need to add a dependency to it since we need to unpack it -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <version>${project.version}</version>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
     <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
          they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
@@ -185,13 +204,6 @@
       <artifactId>xwiki-commons-extension-repository-maven</artifactId>
       <version>${commons.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

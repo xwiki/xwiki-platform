@@ -135,11 +135,12 @@ define('xwiki-livedata', [
       prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
-        "dropdownMenu.changeLayout",
-        "dropdownMenu.header.panels",
+        "dropdownMenu.actions",
+        "dropdownMenu.layouts",
+        "dropdownMenu.panels",
         "dropdownMenu.panels.properties",
-        "dropdownMenu.panels.sorting",
-        "dropdownMenu.panels.filtering",
+        "dropdownMenu.panels.sort",
+        "dropdownMenu.panels.filter",
         "selection.selectInAllPages",
         "selection.infoBar.selectedCount",
         "selection.infoBar.allSelected",
@@ -151,8 +152,10 @@ define('xwiki-livedata', [
         "pagination.previous",
         "pagination.next",
         "pagination.last",
-        "refresh",
-        "addEntry",
+        "action.refresh",
+        "action.addEntry",
+        "action.reorder.hint",
+        "action.resizeColumn.hint",
         "panel.filter.title",
         "panel.filter.noneFilterable",
         "panel.filter.addConstraint",
@@ -449,7 +452,15 @@ define('xwiki-livedata', [
 
 
     fetchEntries () {
-      return liveDataSource.getEntries(this.data.query);
+      // Before fetch event
+      this.triggerEvent("beforeEntryFetch");
+      // Fetch entries from data source
+      return liveDataSource.getEntries(this.data.query)
+        .then(data => {
+          // After fetch event
+          this.triggerEvent("afterEntryFetch");
+          return data
+        });
     },
 
 

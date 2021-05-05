@@ -37,4 +37,10 @@ class AllITs
     class NestedTranslationsRestIT extends TranslationsRestIT
     {
     }
+    
+    @Nested
+    @DisplayName("Language change tests")
+    class NestedLanguageIT extends LanguageIT
+    {
+    }
 }

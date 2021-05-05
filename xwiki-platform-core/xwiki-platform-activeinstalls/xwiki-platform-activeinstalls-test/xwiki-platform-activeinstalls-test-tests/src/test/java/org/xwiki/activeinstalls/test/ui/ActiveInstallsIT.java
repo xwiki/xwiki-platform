@@ -65,7 +65,7 @@ public class ActiveInstallsIT extends AbstractTest
             // in the older format.
             ElasticSearchRunner.esSetup.execute(index("installs", "install", "156231f3-705b-44c6-afe3-e191bcc4b746")
                 .withSource("{ \"formatVersion\": \"1.0\", \"distributionVersion\": \"5.2\", "
-                    + "\"distributionId\": \"org.xwiki.platform:xwiki-platform-web\", "
+                    + "\"distributionId\": \"org.xwiki.platform:xwiki-platform-web-war\", "
                     + "\"date\": \"2013-09-16T20:00:34.277Z\", \"extensions\": [ ] }"));
         }
 
@@ -96,7 +96,7 @@ public class ActiveInstallsIT extends AbstractTest
         assertEquals("0", vp.getContent());
 
         // Configure the Active Installs feature to count SNAPSHOTs and to count
-        // "org.xwiki.platform:xwiki-platform-web" distribution ids.
+        // "org.xwiki.platform:xwiki-platform-web-war" distribution ids.
         getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,
             "snapshots", true);
 
@@ -137,7 +137,7 @@ public class ActiveInstallsIT extends AbstractTest
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Distributions Active Installs Count\\r?\\n"
-                + "org.xwiki.platform:xwiki-platform-web 1"));
+                + "org.xwiki.platform:xwiki-platform-web-war 1"));
 
         // Verify top 10 XWiki versions data
         getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData");

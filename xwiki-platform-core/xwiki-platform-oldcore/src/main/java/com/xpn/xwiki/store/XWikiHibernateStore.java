@@ -830,11 +830,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private long countAllDocuments(SpaceReference spaceReference, Session session, String extraWhere,
+    private boolean hasDocuments(SpaceReference spaceReference, Session session, String extraWhere,
         Map<String, ?> parameters)
     {
         StringBuilder builder = new StringBuilder(
-            "select count(*) from XWikiDocument as xwikidoc where (space = :space OR space LIKE :like)");
+            "select distinct xwikidoc.space from XWikiDocument as xwikidoc where (space = :space OR space LIKE :like)");
 
         if (StringUtils.isNotEmpty(extraWhere)) {
             builder.append(" AND ");
@@ -843,18 +843,27 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             builder.append(')');
         }
 
-        Query<Long> query = session.createQuery(builder.toString(), Long.class);
+        Query<String> query = session.createQuery(builder.toString(), String.class);
 
         String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+        String localSpaceReferencePrefix = localSpaceReference + '.';
 
         query.setParameter("space", localSpaceReference);
-        query.setParameter("like", localSpaceReference + ".%");
+        query.setParameter("like", localSpaceReferencePrefix + "%");
 
         if (parameters != null) {
             parameters.forEach(query::setParameter);
         }
 
-        return query.uniqueResult();
+        // Leading and trailing white spaces are not taken into account in SQL comparisons so we have to make sure the
+        // matched spaces really are the expected ones
+        for (String result : query.getResultList()) {
+            if (result.equals(localSpaceReference) || result.startsWith(localSpaceReferencePrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -873,7 +882,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             parameters = null;
         }
 
-        return !(countAllDocuments(spaceReference, session, builder.toString(), parameters) > 0);
+        return !hasDocuments(spaceReference, session, builder.toString(), parameters);
     }
 
     private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
@@ -1255,9 +1264,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)
     {
-        if (countAllDocuments(spaceReference, session,
+        if (!hasDocuments(spaceReference, session,
             "fullName <> :deletedDocument AND (language IS NULL OR language = '')",
-            Collections.singletonMap("deletedDocument", deletedDocument)) == 0) {
+            Collections.singletonMap("deletedDocument", deletedDocument))) {
             // The document was the last document in the space
             XWikiSpace space = new XWikiSpace(spaceReference, this);
 

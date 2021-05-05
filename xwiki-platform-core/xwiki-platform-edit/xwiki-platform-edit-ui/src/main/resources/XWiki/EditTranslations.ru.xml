@@ -37,14 +37,29 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>edit.inplace.close=Закрыть
-
 edit.inplace.page.lockFailed=Не удалось заблокировать страницу.
 edit.inplace.page.loadFailed=Не удалось загрузить страницу.
 edit.inplace.page.renderFailed=Не удалось отрисовать страницу.
+edit.inplace.page.translate.messageBefore=Вы редактируете перевод {0} этой страницы (ее исходную версию), поскольку эта страница еще не была переведена на {1} (текущий языковой стандарт).
+edit.inplace.page.translate.messageAfter=Вы редактируете перевод {0}. Начните с перевода заголовка страницы.
 
+edit.inplace.actionButtons.loadFailed=Не удалось загрузить кнопки действий.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 12.10.5, 13.1
+#######################################
 edit.inplace.page.original=Вы редактируете исходную страницу ({0})
 edit.inplace.page.translation=Вы редактируете следующий перевод: {0}.
 
-
-edit.inplace.actionButtons.loadFailed=Не удалось загрузить кнопки действий.</content>
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

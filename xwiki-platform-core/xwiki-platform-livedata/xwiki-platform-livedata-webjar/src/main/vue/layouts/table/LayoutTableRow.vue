@@ -87,10 +87,6 @@ export default {
 
 <style>
 
-.layout-table .cell {
-  height: 100%;
-}
-
 .layout-table .livedata-entry-selector {
   align-items: flex-start;
   padding: 10px 2rem;

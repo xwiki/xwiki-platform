@@ -663,23 +663,6 @@
     </dependency>
 
     <!-- ********************************************************************** -->
-    <!-- Skin -->
-
-    <!-- Skins
-         Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
-         practice to put them here since they are real dependencies
-
-         Note: This dependency is already present in the minimal war but it's not inherited (most likely because of
-         the zip type) -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- ********************************************************************** -->
     <!-- Base UI (to get the JARs) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

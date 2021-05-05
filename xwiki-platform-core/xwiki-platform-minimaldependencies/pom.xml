@@ -328,15 +328,16 @@
     <!-- ********************************************************************** -->
     <!-- Skin -->
 
-    <!-- Skins
-         Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
-         practice to put them here since they are real dependencies -->
+    <!-- Flamingo Skin -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <type>zip</type>
-      <scope>runtime</scope>
+      <!-- Use the pom type so that transitive dependencies are included in modules depending on this module and at the
+           same time the flamingo resources won't be included in WEB-INF/lib in any WAR packaging module depending on
+           it. OTOH this means that any module building an XWiki distribution will need to add a JAR dependency on
+           xwiki-platform-flamingo-skin-resources and unjar it in the WAR. -->
+      <type>pom</type>
     </dependency>
 
     <!-- ********************************************************************** -->

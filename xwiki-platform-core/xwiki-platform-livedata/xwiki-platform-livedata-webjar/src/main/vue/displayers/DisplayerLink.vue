@@ -103,7 +103,7 @@ export default {
 
 <style>
 
-.livedata-displayer .explicit-empty-value {
+.livedata-displayer.displayer-link .explicit-empty-value {
   font-style: italic;
   color: grey;
 }

@@ -49,4 +49,10 @@ class AllITs
     class NestedNavigationPanelAdministrationIT extends NavigationPanelAdministrationIT
     {
     }
+
+    @Nested
+    @DisplayName("Panels Tests")
+    class NestedPanelIT extends PanelIT
+    {
+    }
 }

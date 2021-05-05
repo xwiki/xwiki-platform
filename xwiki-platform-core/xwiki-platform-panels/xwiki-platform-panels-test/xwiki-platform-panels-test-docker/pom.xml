@@ -38,13 +38,14 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- ================================
-         Dependencies for tested features
-         ================================ -->
+    <!-- =========================================
+         Runtime Dependencies for tested features.
+         ========================================= -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- Some content for the NavigationPanelAdministrationIT tests -->
@@ -52,6 +53,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-panels-test-content</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <dependency>
@@ -67,6 +69,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- We depend on the App Within Minutes because we want to test the integration with the Navigation Panel. -->
@@ -74,6 +77,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- ================================

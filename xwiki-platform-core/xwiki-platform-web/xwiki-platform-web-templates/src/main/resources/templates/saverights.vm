@@ -29,26 +29,22 @@
 #if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 ## Convert the user or group identifier present in the request to a DocumentReference relative to the current wiki
 ## if no wiki is specified.
-#set ($userOrGroupReference = $services.model.resolveDocument($fullname, 'current'))
+#set ($userOrGroupReference = $services.model.resolveDocument($fullname))
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set ($pers = "$!obj.getValue($uorg)")
   ## Convert the user or group identifiers contained in the current access rule to an array of DocumentReferences
   ## in order to compare these references to the reference of the user or group for which the rights may need to
-  ## be updated. User or groups can be separated by a comma or a pipe (but not both in the same string),
-  ## so we split the string once for each.
-  #set ($userOrGroupIdentifiers = $pers.split(','))
-  #if ($$userOrGroupIdentifiers.length == 1)
-    #set ($userOrGroupIdentifiers = $ids[0].split('|'))
-  #end
+  ## be updated. User or groups can be separated by a comma or a pipe (but not both in the same string).
+  #set ($userOrGroupIdentifiers = $stringtool.split($pers, ',|'))
   #set ($ruleUserOrGroupReferences = [])
   #foreach ($userOrGroupIdentifier in $userOrGroupIdentifiers)
-    #set ($reference = $services.model.resolveDocument($userOrGroupIdentifier, 'current'))
+    #set ($reference = $services.model.resolveDocument($userOrGroupIdentifier))
     #set ($discard = $ruleUserOrGroupReferences.add($reference))
   #end
   #if ($ruleUserOrGroupReferences.size() == 1 && $ruleUserOrGroupReferences.contains($userOrGroupReference))
     ## Found the rule containing the given user or group and this user or group only
-    #set($levels = "$obj.getValue('levels')") ## get the levels
-    #if($obj.getValue('allow') == 1) ## found allow rule
+    #set ($levels = "$obj.getValue('levels')") ## get the levels
+    #if ($obj.getValue('allow') == 1) ## found allow rule
       ### if action = allow, add the right to the allow rule, if it does not exist; 
       ### if action = deny, remove the right from the allow rule, if exists;
       ### if action = clear, remove the right from the allow rule, if exists
@@ -107,7 +103,7 @@
         #end
       #end
     #end ## end get property
-  #elseif($ruleUserOrGroupReferences.contains($userOrGroupReference))
+  #elseif ($ruleUserOrGroupReferences.contains($userOrGroupReference))
     ## The given user or group is in a multiple selection rule, remove it from there.
     #set ($discard = $ruleUserOrGroupReferences.remove($userOrGroupReference))
     #set ($userOrGroupIdentifiers = [])

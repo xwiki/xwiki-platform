@@ -8,7 +8,7 @@
   text-align: center;
   z-index: 1200;
   display: block !important;
-  max-width: 40%;
+  max-width: 80%;
 }
 .xnotification-wrapper {
   padding-top: 1px;
@@ -18,8 +18,8 @@
   display: inline-block;
   background: #333 2px center no-repeat;
   border: none;
-  padding: 14px 28px;
-  border-radius: 3px;
+  padding: 8px 15px;
+  border-radius: 4px;
   color: #fff;
   line-height: 20px;
   margin-bottom: 10px;
@@ -53,8 +53,14 @@
   border-color:  $textColor;
 #if($imgUrl != '')
   background-image: url($imgUrl);
-  padding-left: 50px;
-  background-position: 2em;
+  padding-left: 40px;
+  background-position: 14px;
 #end
 }
 #end
+
+@media (min-width: 992px) { /* should be: @screen-md-min */
+  .xnotification-container {
+    max-width: 40%;
+  }
+}

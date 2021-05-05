@@ -53,7 +53,7 @@
   border-color:  $textColor;
 #if($imgUrl != '')
   background-image: url($imgUrl);
-  padding-left: 40px;
+  padding-left: 38px;
   background-position: 14px;
 #end
 }

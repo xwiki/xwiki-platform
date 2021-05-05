@@ -482,6 +482,7 @@ ul.collapsible.document-tree {
   /* Display the extension title and status on a single row on md screens */
   .extension-title, .dependency-item {
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
   .extension-status {

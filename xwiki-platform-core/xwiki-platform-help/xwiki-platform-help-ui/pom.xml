@@ -285,4 +285,27 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <!-- Add the Clover JAR to the XMLDoc Update plugin runtime classpath since the XMLDoc Update plugin uses java
+               classes that have been instrumented with Clover (XWiki oldcore for example) -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+            <version>${project.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.openclover</groupId>
+                <artifactId>clover</artifactId>
+                <version>${clover.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

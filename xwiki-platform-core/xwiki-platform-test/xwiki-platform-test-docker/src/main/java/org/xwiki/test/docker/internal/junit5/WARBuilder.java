@@ -147,12 +147,14 @@ public class WARBuilder
                 if (artifact.getExtension().equalsIgnoreCase("war")) {
                     warDependencies.add(artifact.getFile());
                     // Generate the XED file for the main WAR
-                    if (artifact.getArtifactId().equals("xwiki-platform-web")) {
+                    if (artifact.getArtifactId().equals("xwiki-platform-web-war")) {
                         File xedFile = new File(this.targetWARDirectory, "META-INF/extension.xed");
                         xedFile.getParentFile().mkdirs();
                         generateXED(artifact, xedFile, this.mavenResolver);
                     }
-                } else if (artifact.getExtension().equalsIgnoreCase("zip")) {
+                } else if (artifact.getArtifactId().equals("xwiki-platform-flamingo-skin-resources")
+                    && artifact.getExtension().equals("jar"))
+                {
                     skinDependencies.add(artifact.getFile());
                 } else if (artifact.getExtension().equalsIgnoreCase(JAR)) {
                     jarDependencies.add(artifact);

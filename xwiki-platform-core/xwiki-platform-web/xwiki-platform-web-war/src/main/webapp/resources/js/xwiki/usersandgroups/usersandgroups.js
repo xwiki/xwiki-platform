@@ -397,8 +397,11 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 {
   var userurl = row.userurl;
   var uorg = table.json.uorg;
-  var allows = row.allows;
-  var denys = row.denys;
+  // Rights are case insensitive in XWiki security module, and the reference rights defined in rightsUI.vm
+  // are lowercase, hence we make sure to convert all applying rights to lowercase before comparing them with the
+  // reference ones.
+  var allows = row.allows.map(entry => entry.toLowerCase());
+  var denys = row.denys.map(entry => entry.toLowerCase());
 
   // targetDocument is an optional parameter, which set on which document we save the rights
   if (targetDocument === undefined) {

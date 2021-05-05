@@ -35,48 +35,52 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataDropdownMenu/>
-        <LivedataRefreshButton/>
+        <LivedataPagination />
       </template>
       <template #right>
-        <LivedataPagination/>
+        <LivedataDropdownMenu />
       </template>
     </LivedataTopbar>
 
     <!-- Entry selector info bar -->
-    <LivedataEntrySelectorInfoBar/>
+    <LivedataEntrySelectorInfoBar />
 
+    <!-- Loading bar -->
+    <LayoutLoader />
 
     <!-- Table layout root -->
-    <table class="layout-table-root responsive-table">
+    <div class="layout-table-wrapper">
+      <table class="layout-table-root responsive-table">
 
-      <!--
-        Table Header
-        Implement quick sort, filter, and property reorder
-      -->
-      <thead>
-        <!-- Table property names -->
-        <LayoutTableHeaderNames/>
+        <!--
+          Table Header
+          Implement quick sort, filter, and property reorder
+        -->
+        <thead>
+          <!-- Table property names -->
+          <LayoutTableHeaderNames />
 
-        <!-- Table filters -->
-        <LayoutTableHeaderFilters/>
-      </thead>
+          <!-- Table filters -->
+          <LayoutTableHeaderFilters />
+        </thead>
 
 
-      <!-- Table Body -->
-      <tbody>
-        <!-- The rows (= the entries) -->
-        <LayoutTableRow
-          v-for="entry in entries"
-          :key="logic.getEntryId(entry)"
-          :entry="entry"
-        />
+        <!-- Table Body -->
+        <tbody>
+          <!-- The rows (= the entries) -->
+          <LayoutTableRow
+            v-for="entry in entries"
+            :key="logic.getEntryId(entry)"
+            :entry="entry"
+          />
 
-        <!-- Component to create a new entry -->
-        <LayoutTableNewRow v-if="canAddEntry"/>
-      </tbody>
+          <!-- Component to create a new entry -->
+          <LayoutTableNewRow v-if="canAddEntry"/>
 
-    </table>
+        </tbody>
+
+      </table>
+    </div>
 
   </div>
 </template>
@@ -85,13 +89,13 @@
 <script>
 import LivedataTopbar from "../../LivedataTopbar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataRefreshButton from "../../LivedataRefreshButton.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
+import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
 
@@ -100,13 +104,13 @@ export default {
   components: {
     LivedataTopbar,
     LivedataDropdownMenu,
-    LivedataRefreshButton,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutTableHeaderNames,
     LayoutTableHeaderFilters,
     LayoutTableRow,
     LayoutTableNewRow,
+    LayoutLoader,
   },
 
   inject: ["logic"],
@@ -122,6 +126,10 @@ export default {
 
 
 <style>
+
+.layout-table-wrapper {
+  overflow: auto;
+}
 
 .layout-table {
 
@@ -144,7 +152,7 @@ export default {
 
 /* Responsive mode */
 @media screen and (max-width: @screen-xs-max) {
-  .layout-table > .responsive-table > thead {
+  .layout-table .responsive-table > thead {
     /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
       because we have two rows, property names and filters, that we want to display as two equally sized columns. */
     display: flex;

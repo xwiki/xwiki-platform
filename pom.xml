@@ -89,7 +89,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.30.Final</hibernate.version>
+    <hibernate.version>5.4.31.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -164,6 +164,20 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Liquibase -->
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>4.3.5</version>
+        <exclusions>
+          <!-- Not the right id -->
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
       <dependency>

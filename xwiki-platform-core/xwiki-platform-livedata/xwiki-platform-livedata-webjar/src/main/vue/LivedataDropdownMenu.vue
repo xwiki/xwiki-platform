@@ -45,10 +45,23 @@
     </a>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
 
-      <!-- Change layout Section -->
-      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.changeLayout') }}</li>
+      <!-- Actions -->
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.actions') }}</li>
+
+      <li>
+        <!-- Refresh -->
+        <a href="#" @click.prevent="logic.updateEntries()">
+          <span class="fa fa-repeat"></span> {{ $t('livedata.action.refresh') }}
+        </a>
+      </li>
+
+
+      <!-- Layouts -->
+      <li role="separator" class="divider"></li>
+
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.layouts') }}</li>
 
       <!-- Layout options -->
       <li
@@ -64,8 +77,10 @@
         </a>
       </li>
 
-      <!-- Advanced panels Section -->
-      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.header.panels') }}</li>
+      <!-- Panels -->
+      <li role="separator" class="divider"></li>
+
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</li>
 
       <!-- Properties Panel -->
       <li>
@@ -77,14 +92,14 @@
       <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sorting') }}
+          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sort') }}
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filtering') }}
+          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filter') }}
         </a>
       </li>
 
@@ -128,6 +143,16 @@ export default {
 
 .livedata-dropdown-menu .btn-default span {
   vertical-align: middle;
+}
+
+/*
+ * The icons are not all the same width,
+ * so we set a fix width for the icons
+ * so that all dropdown options aligned with each others
+ */
+.livedata-dropdown-menu li a .fa {
+  width: 1.4rem;
+  text-align: center;
 }
 
 </style>

@@ -41,7 +41,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-uiextension-api</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
     </dependency>
   </dependencies>
   <build>

@@ -58,10 +58,12 @@
 
 .extension-status {
   font-size: 0.8em;
+  font-weight: normal;
+  margin: 3px 0 0 0;
 }
-.extension-header .extension-status {
-  float: right;
-  margin: -2em 0 1em;
+
+h2.extension-title .extension-status {
+  font-size: 0.7em;
 }
 
 .extension-authors {
@@ -173,6 +175,9 @@ ul.dependencies li:hover {
 .dependency-item {
   line-height: 1.4em;
 }
+.dependency-item .extension-status {
+  margin: 0;
+}
 .extension-item-core .extension-title, .extension-item-remote-core .extension-title,
 .dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
@@ -194,10 +199,6 @@ ul.dependencies li:hover {
 }
 .dependency-item.extension-item-unknown {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
-}
-.dependency-item .extension-status {
-  position: absolute;
-  right: 1.5em;
 }
 
 .extension-item-core,
@@ -474,4 +475,23 @@ ul.collapsible.document-tree {
   /* Bold is inherited from wiki and space nodes so we need to overwrite it. */
   font-weight: normal;
   padding-right: .3em;
+}
+
+/* Media query for screens wider than Bootstrap @screen-md-min */
+@media (min-width: 992px) {
+  /* Display the extension title and status on a single row on md screens */
+  .extension-title, .dependency-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .extension-status {
+    flex-grow: 1;
+    text-align: right;
+    margin: 0;
+  }
+  /* Add margin for the case when the dependency-item has a right border (eg .extension-item-remote-installed). */
+  .dependency-item .extension-status {
+    padding-right: 1em;
+  }
 }

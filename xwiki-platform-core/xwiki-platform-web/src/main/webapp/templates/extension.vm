@@ -602,7 +602,7 @@ $namespace##
       <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
-      <span class="extension-status">$dependencyStatusMessage</span>
+      <p class="extension-status">$dependencyStatusMessage</p>
     #end
   </div>
 #end
@@ -1024,10 +1024,10 @@ $namespace##
       <h2 class="extension-title">
         <span class="extension-name">#displayExtensionName($extension)</span>
         <span class="extension-version">$escapetool.xml($extension.id.version)</span>
+        #if ($extensionStatusMessage)
+          <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
+        #end
       </h2>
-      #if ($extensionStatusMessage)
-        <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
-      #end
       #displayExtensionActionButtons($extension, $readOnly)
       #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)

@@ -202,7 +202,7 @@
                   <code>java.class.nonFinalClassInheritsFromNewClass</code>
                   <old>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</old>
                   <new>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</new>
-                  <justification>Not a breakage</justification>
+                  <justification>Not a breakage, the old XWikiContextInitializationFilter content has been moved to a new class of the same name in a new package and old class now inherits from the new one</justification>
                 </item>
                 <item>
                   <code>java.method.removed</code>

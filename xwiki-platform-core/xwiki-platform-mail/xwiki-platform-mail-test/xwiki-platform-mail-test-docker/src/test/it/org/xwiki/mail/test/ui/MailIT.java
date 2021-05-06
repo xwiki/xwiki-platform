@@ -31,9 +31,11 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,7 +45,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -86,11 +87,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-scheduler-api"
     }
 )
-public class MailIT
+class MailIT
 {
     private GreenMail mail;
 
-    private List<String> alreadyAssertedMessages = new ArrayList<>();
+    private final List<String> alreadyAssertedMessages = new ArrayList<>();
 
     private String testClassName;
 
@@ -121,7 +122,8 @@ public class MailIT
     }
 
     @Test
-    public void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
+    @Order(1)
+    void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
         throws Exception
     {
         // Log in as superadmin
@@ -234,10 +236,12 @@ public class MailIT
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
-        LiveTableElement liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_success");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        // We don't wait for the first filters because we don't need to inspect the content of the live data before 
+        // the last filter is set.
+        tableLayout.filterColumn(3, "Test", false);
+        tableLayout.filterColumn(5, "send_success", false);
+        tableLayout.filterColumn(6, "xwiki");
 
         // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
         // but the last mail's status in the database may not have been updated yet. Note that The first 2 are
@@ -245,11 +249,11 @@ public class MailIT
         // database after sending each mail.
         // TODO: waitUntilRowCountGreaterThan(3) is timing out on some CI agents from time to time. Increasing the
         // timeout to verify if that's the issues. To be removed if the issue is still present.
-        liveTableElement.waitUntilRowCountGreaterThan(3, webDriver.getTimeout() * 10);
+        tableLayout.waitUntilRowCountGreaterThan(3, webDriver.getTimeout() * 10);
 
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
-        assertTrue(liveTableElement.getRowCount() > 0);
-        assertTrue(liveTableElement.hasRow("Error", ""));
+        tableLayout.filterColumn(4, "john@doe.com");
+        assertTrue(tableLayout.countRows() > 0);
+        assertTrue(tableLayout.hasRow("Error", ""));
 
         // Step 8: Verify that the Resend button in the Mail Status LT works fine by trying to resend the mail in error
         // now that the mail server is set correctly.
@@ -262,16 +266,16 @@ public class MailIT
     private void verifyIndividualResend()
     {
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
-        LiveTableElement liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_error");
-        liveTableElement.clickAction("mailsendingaction_resend", 1);
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn(5, "send_error");
+        tableLayout.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();
-        liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "to@doe.com");
-        assertEquals(1, liveTableElement.getRowCount());
-        assertEquals("send_success", liveTableElement.getCell(1, 5).getText());
+        tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn(4, "to@doe.com");
+        assertEquals(1, tableLayout.countRows());
+        assertEquals("send_success", tableLayout.getCell(1, 5).getText());
     }
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
@@ -346,9 +350,9 @@ public class MailIT
 
         // Verify that we have a mail in the prepare_success state
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
-        LiveTableElement liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "prepare_success");
-        assertEquals(1, liveTableElement.getRowCount());
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn(5, "prepare_success");
+        assertEquals(1, tableLayout.countRows());
     }
 
     private void sendTemplateMailToEmail(TestUtils setup, String requestURLPrefix)

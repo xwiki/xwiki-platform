@@ -82,7 +82,7 @@ public class ReleaseHomePage extends ViewPage
     @Override
     public ReleaseHomePage waitUntilPageIsLoaded()
     {
-        getReleaseLiveData().waitUntilHasContentReady();
+        getReleaseLiveData().getTableLayout().waitUntilReady();
         return this;
     }
 }

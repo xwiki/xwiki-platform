@@ -21,7 +21,7 @@ package org.xwiki.release.test.ui;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.release.test.po.ReleaseEntryEditPage;
 import org.xwiki.release.test.po.ReleaseHomePage;
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ReleaseIT
 {
     /**
-     * Note: we use a dot in the release version name to verify it's supported by the Release application
+     * Note: we use a dot in the release version name to verify it's supported by the Release application.
      */
     private static final String RELEASE_VERSION = "4.5.1";
 
@@ -86,7 +86,7 @@ class ReleaseIT
 
         // Assert Livetable:
         // - verify that the Livetable contains our new Release entry.
-        LiveDataElement liveDataElement = homePage.getReleaseLiveData();
+        TableLayoutElement liveDataElement = homePage.getReleaseLiveData().getTableLayout();
         assertTrue(liveDataElement.hasRow("Version", RELEASE_VERSION),
             String.format("%s expected to be found in column Version.", RELEASE_VERSION));
     }

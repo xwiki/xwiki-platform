@@ -59,36 +59,20 @@
 {{/html}}
 
 = Existing Releases =
+
 #set($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
-       {
-         'id': 'version', 'displayer': 'link'
-       },
-       {
-         'id': 'releaseManagers', 'displayer': 'html'
-       },
-       {
-         'id': 'releaseDate', 'displayer': 'html'
-       },
-       {
-         'id': 'releaseNotes', 'displayer': 'html'
-       }
+       { 'id': 'version', 'displayer': 'link' },
+       { 'id': 'releaseDate', 'name': $services.localization.render('release.livetable.releaseDate') }
     ]
   }
 })
-
-#set($sourceParameters = $escapetool.url({
-  'className': 'ReleaseCode.ReleaseClass',
-  'selectedColumn': 'releaseDate',
-  'defaultOrder': 'desc',
-  'translationPrefix': 'release.livetable.'
-}))
-
 {{liveData id='releases'
   source='liveTable'
-  sourceParameters="$sourceParameters"
+  sourceParameters='className=ReleaseCode.ReleaseClass&amp;translationPrefix=release.livetable.'
   properties='version,releaseManagers,releaseDate,releaseNotes'
+  sort='releaseDate:desc'
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
 </xwikidoc>

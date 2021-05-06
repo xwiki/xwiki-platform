@@ -33,7 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllITs
 {
     @Nested
-    @DisplayName("Overall AWM LiveTable test")
+    @DisplayName("Overall Release test")
     class NestedReleaseIT extends ReleaseIT
     {
     }

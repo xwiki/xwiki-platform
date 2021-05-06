@@ -56,10 +56,7 @@
 })
 #set ($sourceParameters = $escapetool.url({
   'className': 'Panels.PanelClass',
-  'selectedColumn': 'name',
-  'defaultOrder': 'asc',
   'translationPrefix' : 'panels.',
-  'rowCount': 30,
   'queryFilters': 'currentlanguage'
 }))
 
@@ -68,6 +65,7 @@
   source='liveTable'
   sourceParameters="$sourceParameters"
   properties='name,description,type,category,_actions'
+  limit=30
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}
 </content>

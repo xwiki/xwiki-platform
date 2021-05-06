@@ -46,7 +46,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

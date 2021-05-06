@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.panels.test.po.PageLayoutTabContent;
@@ -107,13 +107,12 @@ class PanelIT
 
         // Checks that the new panel is listed in the Panels home live data.
         PanelsHomePage panelsHomePage = PanelsHomePage.gotoPage();
-        LiveDataElement liveData = panelsHomePage.getLiveData();
-        liveData.waitUntilHasContentReady();
-        liveData.filterColumn(1, panelName);
-        liveData.waitUntilRowCountEqualsTo(1);
-        liveData.hasRow("Description", "Panel Description");
-        liveData.hasRow("Panel type", "view");
-        liveData.hasRow("Category", "Information");
+        TableLayoutElement tableLayoutElement = panelsHomePage.getLiveData().getTableLayout();
+        tableLayoutElement.filterColumn(1, panelName);
+        tableLayoutElement.waitUntilRowCountEqualsTo(1);
+        tableLayoutElement.hasRow("Description", "Panel Description");
+        tableLayoutElement.hasRow("Panel type", "view");
+        tableLayoutElement.hasRow("Category", "Information");
 
         // Add the panel to the right column from the administration.
         setRightPanelInAdministration("Is # & ţ triky\"? c:\\\\windows /root $util");

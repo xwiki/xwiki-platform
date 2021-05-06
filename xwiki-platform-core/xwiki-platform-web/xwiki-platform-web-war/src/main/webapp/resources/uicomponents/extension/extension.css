@@ -60,6 +60,7 @@
   font-size: 0.8em;
   font-weight: normal;
   margin: 3px 0 0 0;
+  display: block;
 }
 
 h2.extension-title .extension-status {

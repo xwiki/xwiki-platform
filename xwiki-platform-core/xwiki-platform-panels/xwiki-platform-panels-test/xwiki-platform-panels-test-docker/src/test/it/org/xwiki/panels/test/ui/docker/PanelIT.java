@@ -109,7 +109,7 @@ class PanelIT
         PanelsHomePage panelsHomePage = PanelsHomePage.gotoPage();
         TableLayoutElement tableLayoutElement = panelsHomePage.getLiveData().getTableLayout();
         tableLayoutElement.filterColumn(1, panelName);
-        tableLayoutElement.waitUntilRowCountEqualsTo(1);
+        assertEquals(1, tableLayoutElement.countRows());
         tableLayoutElement.hasRow("Description", "Panel Description");
         tableLayoutElement.hasRow("Panel type", "view");
         tableLayoutElement.hasRow("Category", "Information");

@@ -42,11 +42,12 @@
     This is where the specific filter component gets injected
   -->
   <component
-    class="livedata-filter"
+    :class="['livedata-filter', isFiltering? 'filtering': '']"
     v-if="filterComponent"
     :is="filterComponent"
     :property-id="propertyId"
     :index="index"
+    :is-filtering.sync="isFiltering"
   ></component>
 
   <!--
@@ -83,6 +84,7 @@ export default {
       // The filter component used to filter the property
       // It is set to `undefined before it is resolved
       filterComponent: undefined,
+      isFiltering: false
     };
   },
 

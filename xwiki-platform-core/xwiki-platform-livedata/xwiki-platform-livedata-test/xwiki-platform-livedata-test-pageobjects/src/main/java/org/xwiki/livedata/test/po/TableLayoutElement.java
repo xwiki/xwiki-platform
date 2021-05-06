@@ -74,8 +74,9 @@ public class TableLayoutElement extends BaseElement
     public void waitUntilReady()
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded(), 20);
+        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(), 20);
     }
+
 
     /**
      * Waits until a minimal number of rows are displayed in the live data.
@@ -270,6 +271,16 @@ public class TableLayoutElement extends BaseElement
     {
         return !getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
     }
+
+    /**
+     * @return {@code true} if no filters is currently in a filtering state (in other words, when the value currently
+     *     set in the filter has not been taken into account), otherwise {@code false}
+     */
+    private boolean noFiltering()
+    {
+        return this.liveDataRoot.findElements(By.cssSelector(".column-filters .livedata-filter.filtering")).isEmpty();
+    }
+
 
     /**
      * @return the text of the columns currently displayed in the live data

@@ -71,8 +71,15 @@ export default {
   methods: {
     // This method should be used to apply filter
     // As only the newValue has to be specified it is less error prone
-    applyFilter (newValue) {
-      this.logic.filter(this.propertyId, this.index, { value: newValue });
+    applyFilter: function (newValue) {
+      // Once a filter is applied, the filtering state is switched to true.
+      // The filtering state is switched to false only once the filtering is finished.
+      this.$emit('update:isFiltering', true);
+      this.logic.filter(this.propertyId, this.index, {value: newValue})
+        .finally(() => {
+          // Whatever the filter promise result, the filtering state is switched to false.
+          this.$emit('update:isFiltering', false);
+        });
     },
 
     // Call applyFilter method, but using a delay
@@ -80,6 +87,9 @@ export default {
     applyFilterWithDelay (newValue) {
       // Clear existing timeout
       clearTimeout(this._applyFilterTimeoutId);
+      // Once a filter is applied, the filtering state is switched to true.
+      // The filtering state is switched to false only once the filtering is finished.
+      this.$emit('update:isFiltering', true);
       // Set a 250 milliseconds timeout before calling applyFilter method
       const timeoutDelay = 250;
       this._applyFilterTimeoutId = setTimeout(() => {

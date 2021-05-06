@@ -39,7 +39,7 @@
     <dependency>
       <!-- Needed to display the Sandbox in the Applications panel list -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-uiextension-ui</artifactId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

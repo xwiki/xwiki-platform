@@ -49,6 +49,7 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,7 +124,8 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getIconSet("testTheme")).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.getIconNames()).thenReturn(asList("iconA", "iconB", "iconC"));
+        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -165,7 +167,8 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.getIconNames()).thenReturn(asList("iconA", "iconB", "iconC"));
+        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -195,14 +198,14 @@ class DefaultIconThemesResourceTest
     void getIconsIconManagerException() throws Exception
     {
         IconException iconException = new IconException("icon error", null);
-        
-        when(this.iconManager.getIconNames()).thenThrow(iconException);
+
+        when(this.iconManager.hasIcon(any())).thenThrow(iconException);
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
 
-        WebApplicationException webApplicationException = assertThrows(WebApplicationException.class,
-            () -> this.iconThemesResource.getIcons("wikiTest", asList("iconA",
-                "unknownIcon", "iconB")));
-        
+        List<String> names = asList("iconA", "unknownIcon", "iconB");
+        WebApplicationException webApplicationException =
+            assertThrows(WebApplicationException.class, () -> this.iconThemesResource.getIcons("wikiTest", names));
+
         assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), webApplicationException.getResponse().getStatus());
         assertEquals(iconException, webApplicationException.getCause());
 

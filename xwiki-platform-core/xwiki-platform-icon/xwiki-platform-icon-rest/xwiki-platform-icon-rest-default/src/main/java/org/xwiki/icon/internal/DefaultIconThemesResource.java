@@ -94,10 +94,9 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
             String iconSetName = iconSet.getName();
             ObjectFactory objectFactory = new ObjectFactory();
             Icons icons = objectFactory.createIcons();
-            List<String> knownIconNames = this.iconManager.getIconNames();
             for (String iconName : iconNames) {
                 // First checks if the icon name is known.
-                if (knownIconNames.contains(iconName)) {
+                if (this.iconManager.hasIcon(iconName)) {
                     Map<String, Object> metaData = this.iconManager.getMetaData(iconName, iconSetName);
                     icons.getIcons().add(convertMapToIcon(objectFactory, metaData, iconName, iconSetName));
                 } else if (iconName != null) {

@@ -261,8 +261,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Call "updateCount" when the attachment tab content gets loaded, in order to make sure that the counter
    * reflects the actual number of attachments, which may have changed since the initial page load.
    */
-  document.observe("xwiki:docextra:loaded", function(event) {
-    if (event.memo.id == 'Attachments') {
+  $(document).on('xwiki:docextra:loaded', function(event, data) {
+    if (data.id === 'Attachments') {
       updateCount();
     }
   });

@@ -27,11 +27,24 @@
 #set($foundd = false)
 
 #if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+## Convert the user or group identifier present in the request to a DocumentReference relative to the current wiki
+## if no wiki is specified.
+#set ($userOrGroupReference = $services.model.resolveDocument($fullname))
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
-  #set($pers = "$!obj.getProperty($uorg).getValue()")
-  #if($pers.matches("${regextool.quote($fullname)},?")) ## found the rule containing that person
-    #set($levels = "$obj.getProperty('levels').getValue()") ## get the levels
-    #if($obj.getProperty('allow').getValue() == 1) ## found allow rule
+  #set ($pers = "$!obj.getValue($uorg)")
+  ## Convert the user or group identifiers contained in the current access rule to an array of DocumentReferences
+  ## in order to compare these references to the reference of the user or group for which the rights may need to
+  ## be updated. User or groups can be separated by a comma or a pipe (but not both in the same string).
+  #set ($userOrGroupIdentifiers = $stringtool.split($pers, ',|'))
+  #set ($ruleUserOrGroupReferences = [])
+  #foreach ($userOrGroupIdentifier in $userOrGroupIdentifiers)
+    #set ($reference = $services.model.resolveDocument($userOrGroupIdentifier))
+    #set ($discard = $ruleUserOrGroupReferences.add($reference))
+  #end
+  #if ($ruleUserOrGroupReferences.size() == 1 && $ruleUserOrGroupReferences.contains($userOrGroupReference))
+    ## Found the rule containing the given user or group and this user or group only
+    #set ($levels = "$obj.getValue('levels')") ## get the levels
+    #if ($obj.getValue('allow') == 1) ## found allow rule
       ### if action = allow, add the right to the allow rule, if it does not exist; 
       ### if action = deny, remove the right from the allow rule, if exists;
       ### if action = clear, remove the right from the allow rule, if exists
@@ -90,10 +103,14 @@
         #end
       #end
     #end ## end get property
-  #elseif($pers.matches("^(.*,)?${regextool.quote($fullname)}(,.*)?$")) ## The person is in a multiple selection rule, remove it from there.
-    #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
-    #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
-    $doc.getObject($clsname, $obj.number).set($uorg, $pers)
+  #elseif ($ruleUserOrGroupReferences.contains($userOrGroupReference))
+    ## The given user or group is in a multiple selection rule, remove it from there.
+    #set ($discard = $ruleUserOrGroupReferences.remove($userOrGroupReference))
+    #set ($userOrGroupIdentifiers = [])
+    #foreach ($reference in $ruleUserOrGroupReferences)
+      #set ($discard = $userOrGroupIdentifiers.add($services.model.serialize($reference, 'compactwiki')))
+    #end
+    $doc.getObject($clsname, $obj.number).set($uorg, $stringtool.join($userOrGroupIdentifiers, ','))
 
 ##5. person: $pers
   #end

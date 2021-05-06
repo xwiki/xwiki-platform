@@ -26,12 +26,12 @@ import org.xwiki.test.ui.po.BaseElement;
 import static java.util.Collections.singletonMap;
 
 /**
- * Provides the operations to interact with the Like Pages tab of a user profile.
+ * Provides the operations to interact with the Liked Pages tab of a user profile.
  *
  * @version $Id$
  * @since 13.4RC1
  */
-public class UserProfileLikePagesPage extends BaseElement
+public class UserProfileLikedPagesPage extends BaseElement
 {
     /**
      * The Title column name.
@@ -55,7 +55,7 @@ public class UserProfileLikePagesPage extends BaseElement
      *
      * @param userName a user name, for instance {@code User1}
      */
-    public UserProfileLikePagesPage(String userName)
+    public UserProfileLikedPagesPage(String userName)
     {
         this.userName = userName;
     }

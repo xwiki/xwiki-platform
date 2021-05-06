@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Like.Code.LiveDataResultPage" locale="">
+<xwikidoc version="1.4" reference="XWiki.Like.Code.LiveTableResultPage" locale="">
   <web>XWiki.Like.Code</web>
-  <name>LiveDataResultPage</name>
+  <name>LiveTableResultPage</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -37,12 +37,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($request.livetable == "true")
+#if ($xcontext.action == 'get')
   #template('hierarchy_macros.vm')
   #if("$!{request.xpage}" == 'plain')
     $response.setContentType('application/json')
   #end
-  #set ($documentReference = $services.model.resolveDocument($request.user))
+  #if($request.user)
+    #set ($userReference = $services.model.resolveDocument($request.user))
+  #else
+    #set ($userReference = $services.model.resolveDocument($xcontext.userReference)) 
+  #end
   ##==============================
   ## Offset = item # at which to start displaying data
   ##==============================
@@ -56,8 +60,8 @@
   ## Limit = # of items to display
   ##==================
   #set($limit = $numbertool.toNumber($request.get('limit')))
-  #set ($likedPages = $services.like.getUserLikes($documentReference, $offset, $limit))
-  #set ($optUserLikes = $services.like.countUserLikes($documentReference))
+  #set ($likedPages = $services.like.getUserLikes($userReference, $offset, $limit))
+  #set ($optUserLikes = $services.like.countUserLikes($userReference))
   #if ($optUserLikes.isPresent())
     #set ($totalRows = $optUserLikes.get())
   #else
@@ -96,9 +100,11 @@
       #set ($discard = $row.put('doc_location', $location))
       #set ($discard = $row.put('doc_space', $likedDoc.space))
       #set ($discard = $row.put('doc_url', $xwiki.getURL($likedDoc)))
-      #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!likedDoc.wiki, $!likedDoc.space, 'WebHome'))))
+      #set ($discard = $row.put('doc_space_url', 
+        $xwiki.getURL($services.model.createDocumentReference($!likedDoc.wiki, $!likedDoc.space, 'WebHome'))))
       #set ($discard = $row.put('doc_wiki', $likedDoc.wiki))
-      #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $likedDoc.documentReference.extractReference('WIKI')))))
+      #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', 
+        $likedDoc.documentReference.extractReference('WIKI')))))
       #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
       #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
       #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))

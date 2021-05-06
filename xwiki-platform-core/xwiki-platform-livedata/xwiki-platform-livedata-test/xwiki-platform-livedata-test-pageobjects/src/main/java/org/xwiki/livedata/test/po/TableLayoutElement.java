@@ -211,6 +211,27 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Checks if the column contains a link with the given name and url.
+     *
+     * @param columnName the column name
+     * @param text the text of the link to be found in the column
+     * @param link the href value of the link to be found in the column
+     * @return {@code true} if a cell of the column has a link with the expected text and link
+     */
+    public boolean hasCellWithLink(String columnName, String text, String link)
+    {
+        return getValues(columnName)
+            .stream()
+            .anyMatch(it -> {
+                boolean hasExpectedText = it.getText().equals(text);
+                // URL equality, possibly adding a trailing / to the passed link if missing.
+                String hrefValue = it.findElement(By.tagName("a")).getAttribute("href");
+                boolean hasExpectedLink = hrefValue.equals(link) || hrefValue.equals(link + '/');
+                return hasExpectedText && hasExpectedLink;
+            });
+    }
+
+    /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest
      * column.
      *

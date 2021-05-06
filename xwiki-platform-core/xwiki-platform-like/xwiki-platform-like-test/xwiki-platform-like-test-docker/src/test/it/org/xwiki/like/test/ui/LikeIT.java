@@ -23,8 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
-import org.xwiki.like.test.po.UserProfileLikePagesPage;
-import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.like.test.po.UserProfileLikedPagesPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -34,8 +34,8 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.like.test.po.UserProfileLikePagesPage.LIKES_COLUMN_NAME;
-import static org.xwiki.like.test.po.UserProfileLikePagesPage.TITLE_COLUMN_NAME;
+import static org.xwiki.like.test.po.UserProfileLikedPagesPage.LIKES_COLUMN_NAME;
+import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME;
 
 @UITest(
     properties = {
@@ -119,14 +119,13 @@ class LikeIT
         assertEquals(2, likeButton.getLikeNumber());
 
         // Goes to the user profile and verify that the liked pages tables displays the liked pages. 
-        UserProfileLikePagesPage userProfileLikePagesPage = new UserProfileLikePagesPage(USER2);
-        userProfileLikePagesPage.gotoPage();
-        LiveDataElement likedPages = userProfileLikePagesPage.getLiveData();
-        likedPages.waitUntilHasContentReady();
-        assertEquals(1, likedPages.countRows());
-        assertTrue(likedPages.hasLinkRow(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+        UserProfileLikedPagesPage userProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
+        userProfileLikedPagesPage.gotoPage();
+        TableLayoutElement tableLayout = userProfileLikedPagesPage.getLiveData().getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        assertTrue(tableLayout.hasCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
             testUtils.getURL(testReference.getLastSpaceReference())));
-        assertTrue(likedPages.hasRow(LIKES_COLUMN_NAME, "2"));
+        assertTrue(tableLayout.hasRow(LIKES_COLUMN_NAME, "2"));
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);

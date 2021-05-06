@@ -92,7 +92,7 @@ public class DependencyPane extends BaseElement
         }
         // Unknown dependency, with no link.
         String innerText = container.getText();
-        return innerText.substring(0, innerText.indexOf(getVersion()));
+        return innerText.substring(0, innerText.indexOf(getVersion())).trim();
     }
 
     /**

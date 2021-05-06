@@ -187,10 +187,11 @@ public class ExtensionPane extends BaseElement
      */
     private String getXPath()
     {
-        String nameAndVersion =
-            getDriver().findElementWithoutWaiting(container, By.className("extension-title")).getText();
+        String name = getDriver().findElementWithoutWaiting(container, By.className("extension-name")).getText();
+        String version = getDriver().findElementWithoutWaiting(container, By.className("extension-version")).getText();
         return String.format("//form[contains(@class, 'extension-item') and descendant::*["
-            + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion);
+            + "contains(@class, 'extension-name') and normalize-space(.) = '%s'] and descendant::*["
+            + "contains(@class, 'extension-version') and normalize-space(.) = '%s']]", name, version);
     }
 
     /**

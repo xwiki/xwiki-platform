@@ -71,9 +71,10 @@ public class SearchResultsPane extends BaseElement
      */
     public ExtensionPane getExtension(String name, String version)
     {
-        String selector = String.format("//form[contains(@class, 'extension-item') and descendant::*["
-            + "contains(@class, 'extension-name') and normalize-space(.) = '%s'] and descendant::*["
-            + "contains(@class, 'extension-version') and normalize-space(.) = '%s']]", name, version);
+        String selector = String.format("//form[contains(@class, 'extension-item') and "
+            + ".//*[@class = 'extension-header'][.//*[@class = 'extension-name'][normalize-space() = '%s'] and "
+            + ".//*[@class = 'extension-version'][normalize-space() = '%s']]]", name, version);
+
         By xpath = By.xpath(selector);
         List<WebElement> found = getDriver().findElementsWithoutWaiting(xpath);
         return found.size() == 1 ? new ExtensionPane(found.get(0)) : null;

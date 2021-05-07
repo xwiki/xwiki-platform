@@ -19,20 +19,23 @@
  */
 package org.xwiki.like.test.ui;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.UserProfileLikedPagesPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.like.test.po.UserProfileLikedPagesPage.LIKES_COLUMN_NAME;
+import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME;
 
 @UITest(
     properties = {
@@ -49,12 +52,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // The Solr store is not ready yet to be installed as extension
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }, resolveExtraJARs = true)
-public class LikeIT
+class LikeIT
 {
     private static final String USER1 = "LikeUser1";
     private static final String USER2 = "LikeUser2";
     private static final DocumentReference LIKE_CONFIGURATION_REFERENCE =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Like"), "LikeConfiguration");
+        new DocumentReference("xwiki", asList("XWiki", "Like"), "LikeConfiguration");
     private static final String LIKE_CONFIGURATION_CLASSNAME = "XWiki.Like.LikeConfigurationClass";
 
     @BeforeEach
@@ -96,7 +99,7 @@ public class LikeIT
 
     @Test
     @Order(2)
-    void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference) throws Exception
+    void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference)
     {
         testUtils.login(USER1, USER1);
         testUtils.createPage(testReference, "some content");
@@ -114,6 +117,15 @@ public class LikeIT
         assertEquals(1, likeButton.getLikeNumber());
         likeButton.clickToLike();
         assertEquals(2, likeButton.getLikeNumber());
+
+        // Goes to the user profile and verify that the liked pages tables displays the liked pages. 
+        UserProfileLikedPagesPage userProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
+        userProfileLikedPagesPage.gotoPage();
+        TableLayoutElement tableLayout = userProfileLikedPagesPage.getLiveData().getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        assertTrue(tableLayout.hasCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+            testUtils.getURL(testReference.getLastSpaceReference())));
+        assertTrue(tableLayout.hasRow(LIKES_COLUMN_NAME, "2"));
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);

@@ -59,7 +59,7 @@ public class LiveDataElement extends BaseElement
      */
     public TableLayoutElement getTableLayout()
     {
-        TableLayoutElement tableLayoutElement = new TableLayoutElement(getLiveData());
+        TableLayoutElement tableLayoutElement = new TableLayoutElement(this.id);
         tableLayoutElement.waitUntilReady();
         return tableLayoutElement;
     }
@@ -69,21 +69,6 @@ public class LiveDataElement extends BaseElement
      */
     public CardLayoutElement getCardLayout()
     {
-        return new CardLayoutElement(getLiveData());
-    }
-
-    /**
-     * Get the livedata of this page object. The corresponding {@link WebElement} is initialized on the first call to
-     * this method and stored in a field. Subsequents calls to this methods returns the value of the field.
-     *
-     * @return the livedata of this page object
-     */
-    @Nonnull
-    private WebElement getLiveData()
-    {
-        if (this.root != null) {
-            this.root = getDriver().findElementById(this.id);
-        }
-        return Objects.requireNonNull(this.root);
+        return new CardLayoutElement(this.id);
     }
 }

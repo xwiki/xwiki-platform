@@ -48,5 +48,27 @@
       <artifactId>xwiki-platform-like-notifications</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Runtime dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Required to display the like pages user profile UIX. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-ui</artifactId>
+      <type>xar</type>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>

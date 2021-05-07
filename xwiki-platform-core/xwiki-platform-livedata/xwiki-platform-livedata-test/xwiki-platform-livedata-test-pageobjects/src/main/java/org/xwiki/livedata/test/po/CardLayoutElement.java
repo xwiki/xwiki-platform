@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.test.po;
 
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -32,15 +31,15 @@ public class CardLayoutElement extends BaseElement
 {
     // TODO: implements the operations for this layout.
 
-    private final WebElement liveDataRoot;
+    private final String liveDataId;
 
     /**
      * Default constructor. Initializes a live data card layout page object.
      *
-     * @param liveDataRoot the live data root
+     * @param liveDataId the live data id
      */
-    public CardLayoutElement(WebElement liveDataRoot)
+    public CardLayoutElement(String liveDataId)
     {
-        this.liveDataRoot = liveDataRoot;
+        this.liveDataId = liveDataId;
     }
 }

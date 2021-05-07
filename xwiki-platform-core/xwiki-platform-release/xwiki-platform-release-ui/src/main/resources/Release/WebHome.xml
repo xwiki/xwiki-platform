@@ -63,8 +63,7 @@
 #set($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
-       { 'id': 'version', 'displayer': 'link' },
-       { 'id': 'releaseDate', 'name': $services.localization.render('release.livetable.releaseDate') }
+       { 'id': 'version', 'displayer': 'link' }
     ]
   }
 })

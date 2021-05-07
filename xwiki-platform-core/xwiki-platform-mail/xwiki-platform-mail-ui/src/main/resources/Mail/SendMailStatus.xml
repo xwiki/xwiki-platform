@@ -85,13 +85,8 @@
 #set ($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
-      { 'id': 'date', 'displayer': 'text' },
-      { 'id': 'batchId', 'displayer': 'text' },
-      { 'id': 'type', 'displayer': 'text' },
+      { 'id': 'date', 'filterable': false },
       { 'id': 'recipients', 'displayer': 'html' },
-      { 'id': 'state', 'displayer': 'text' },
-      { 'id': 'wiki', 'displayer': 'text' },
-      { 'id': 'error', 'displayer': 'text' },
       { 'id': 'actions', 'displayer': 'html', 'filterable': false, 'sortable': false }
     ]
   }

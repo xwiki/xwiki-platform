@@ -241,16 +241,7 @@ class MailIT
         // the last filter is set.
         tableLayout.filterColumn(3, "Test", false);
         tableLayout.filterColumn(5, "send_success", false);
-        tableLayout.filterColumn(6, "xwiki");
-
-        // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
-        // but the last mail's status in the database may not have been updated yet. Note that The first 2 are
-        // guaranteed to have been updated since we send mail in one thread one after another and we update the
-        // database after sending each mail.
-        // TODO: waitUntilRowCountGreaterThan(3) is timing out on some CI agents from time to time. Increasing the
-        // timeout to verify if that's the issues. To be removed if the issue is still present.
-        tableLayout.waitUntilRowCountGreaterThan(3, webDriver.getTimeout() * 10);
-
+        tableLayout.filterColumn(6, "xwiki", false);
         tableLayout.filterColumn(4, "john@doe.com");
         assertTrue(tableLayout.countRows() > 0);
         assertTrue(tableLayout.hasRow("Error", ""));

@@ -38,16 +38,16 @@ public class TableLayoutElement extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
-    private final WebElement liveDataRoot;
+    private final String liveDataId;
 
     /**
      * Default constructor. Initializes a live data table layout page object.
      *
-     * @param liveDataRoot the live data root
+     * @param liveDataId the live data id
      */
-    public TableLayoutElement(WebElement liveDataRoot)
+    public TableLayoutElement(String liveDataId)
     {
-        this.liveDataRoot = liveDataRoot;
+        this.liveDataId = liveDataId;
     }
 
     /**
@@ -165,7 +165,7 @@ public class TableLayoutElement extends BaseElement
     public void filterColumn(int columnIndex, String content, boolean wait)
     {
         // TODO: adapt for other types of filters
-        WebElement element = this.liveDataRoot
+        WebElement element = getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) > input", columnIndex)));
         element.clear();
         element.sendKeys(content);
@@ -179,7 +179,7 @@ public class TableLayoutElement extends BaseElement
      */
     public int countRows()
     {
-        return this.liveDataRoot.findElements(By.cssSelector("tbody tr td:first-child")).size();
+        return getRoot().findElements(By.cssSelector("tbody tr td:first-child")).size();
     }
 
     /**
@@ -193,7 +193,7 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement getCell(int rowNumber, int columnNumber)
     {
-        return this.liveDataRoot.findElement(
+        return getRoot().findElement(
             By.cssSelector(String.format("tbody tr:nth-child(%d) td:nth-child(%d)", rowNumber, columnNumber)));
     }
 
@@ -205,7 +205,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        this.liveDataRoot.findElement(By.cssSelector(
+        getRoot().findElement(By.cssSelector(
             String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
             .click();
     }
@@ -252,7 +252,7 @@ public class TableLayoutElement extends BaseElement
     private List<WebElement> getValues(String columnLabel)
     {
         int columnIndex = getColumnIndex(columnLabel);
-        return this.liveDataRoot.findElements(By.cssSelector(String.format("tr td:nth-child(%d)", columnIndex)));
+        return getRoot().findElements(By.cssSelector(String.format("tr td:nth-child(%d)", columnIndex)));
     }
 
     /**
@@ -260,7 +260,7 @@ public class TableLayoutElement extends BaseElement
      */
     private boolean areCellsLoaded()
     {
-        return this.liveDataRoot.findElements(By.cssSelector("tbody tr td.cell .xwiki-loader")).isEmpty();
+        return getRoot().findElements(By.cssSelector("tbody tr td.cell .xwiki-loader")).isEmpty();
     }
 
     /**
@@ -268,7 +268,7 @@ public class TableLayoutElement extends BaseElement
      */
     private boolean hasLines()
     {
-        return !this.liveDataRoot.findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
+        return !getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
     }
 
     /**
@@ -276,9 +276,14 @@ public class TableLayoutElement extends BaseElement
      */
     private List<String> getColumnsLabels()
     {
-        return this.liveDataRoot.findElements(By.cssSelector(".column-name .property-name"))
+        return getRoot().findElements(By.cssSelector(".column-name .property-name"))
             .stream()
             .map(WebElement::getText)
             .collect(Collectors.toList());
+    }
+
+    private WebElement getRoot()
+    {
+        return getDriver().findElementById(this.liveDataId);
     }
 }

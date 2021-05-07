@@ -43,9 +43,9 @@
     $response.setContentType('application/json')
   #end
   #if($request.user)
-    #set ($userReference = $services.model.resolveDocument($request.user))
+    #set ($userReference = $request.user)
   #else
-    #set ($userReference = $services.model.resolveDocument($xcontext.userReference)) 
+    #set ($userReference = $services.user.currentUserReference) 
   #end
   ##==============================
   ## Offset = item # at which to start displaying data

@@ -50,8 +50,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
  * Default implementation of {@link MacroRefactoring}.
  * This implementation tries to parse the macro content if it's of type

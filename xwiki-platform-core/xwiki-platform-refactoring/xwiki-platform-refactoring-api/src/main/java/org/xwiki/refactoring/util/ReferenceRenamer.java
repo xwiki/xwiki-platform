@@ -39,6 +39,8 @@ public interface ReferenceRenamer
      * @param currentDocumentReference the current document reference
      * @param oldTarget the previous reference of the renamed document
      * @param newTarget the new reference of the renamed document
+     * @param relative {@code true} if the link should be serialized relatively to the current document
+     *      (see {@link org.xwiki.refactoring.internal.LinkRefactoring#updateRelativeLinks})
      * @return true if the passed {@link XDOM} was modified
      */
     boolean renameReferences(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,

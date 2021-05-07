@@ -19,7 +19,6 @@
  */
 package org.xwiki.refactoring.internal.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -37,14 +36,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.refactoring.util.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
@@ -59,8 +51,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 import org.xwiki.rendering.syntax.Syntax;
-
-import static com.xpn.xwiki.XWiki.DEFAULT_SPACE_HOMEPAGE;
 
 /**
  * Helper to rename references in various context (link, image, etc. ).
@@ -85,19 +75,6 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
     ));
 
     @Inject
-    private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
-
-    @Inject
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-
-    @Inject
-    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
-
-    @Inject
-    private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
-
-    @Inject
     private Provider<MacroRefactoring> macroRefactoringProvider;
 
     @Inject
@@ -109,6 +86,9 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    private ResourceReferenceRenamer resourceReferenceRenamer;
 
     @Override
     public boolean renameReferences(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,
@@ -192,83 +172,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
             // We are currently only interested in Document or Space references.
             return false;
         } else {
-            return this.updateResourceReference(reference, oldReference, newReference, currentDocumentReference,
-                relative);
+            return this.resourceReferenceRenamer.updateResourceReference(reference, oldReference, newReference,
+                currentDocumentReference, relative);
         }
-    }
-
-    private boolean updateResourceReference(ResourceReference resourceReference,
-        DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative)
-    {
-        boolean result = false;
-
-        EntityReference linkEntityReference;
-
-        if (relative) {
-            linkEntityReference = this.entityReferenceResolver.resolve(resourceReference, null, newReference);
-        } else {
-            linkEntityReference =
-                this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
-        }
-
-        if (relative && newReference.equals(linkEntityReference.extractReference(EntityType.DOCUMENT))) {
-            // If the link is relative to the containing document we don't modify it
-            return false;
-        }
-
-        // current link, use the old document's reference to fill in blanks.
-        EntityReference oldLinkReference =
-            this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
-
-        DocumentReference linkTargetDocumentReference =
-            this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-        EntityReference newTargetReference = newReference;
-        ResourceType newResourceType = resourceReference.getType();
-
-        // If the new and old link references don`t match, then we must update the relative link.
-        if (relative && !linkEntityReference.equals(oldLinkReference)) {
-            // Serialize the old (original) link relative to the new document's location, in compact form.
-            String serializedLinkReference =
-                this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
-            resourceReference.setReference(serializedLinkReference);
-            result = true;
-        }
-        // If the link targets the old (renamed) document reference, we must update it.
-        else if (linkTargetDocumentReference.equals(oldReference)) {
-            // If the link was resolved to a space...
-            if (EntityType.SPACE.equals(linkEntityReference.getType())) {
-                if (DEFAULT_SPACE_HOMEPAGE.equals(newReference.getName())) {
-                    // If the new document reference is also a space (non-terminal doc), be careful to keep it
-                    // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
-                    // (i.e. with ".WebHome").
-                    newTargetReference = oldReference.getLastSpaceReference();
-                } else {
-                    // If the new target is a non-terminal document, we can not use a "space:" resource type to access
-                    // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
-                    newResourceType = ResourceType.DOCUMENT;
-                }
-            }
-
-            // If the link was resolved to a page...
-            if (EntityType.PAGE.equals(linkEntityReference.getType())) {
-                // Be careful to keep it serialized as a page still and not serialize it as a doc by mistake
-                newTargetReference = this.defaultReferencePageReferenceResolver.resolve(newReference);
-            }
-
-            // If the link was resolved as an attachment
-            if (EntityType.ATTACHMENT.equals(linkEntityReference.getType())) {
-                // Make sure to serialize an attachment reference and not just the document
-                newTargetReference = new AttachmentReference(linkEntityReference.getName(), newReference);
-            }
-
-            String newReferenceString =
-                this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
-
-            resourceReference.setReference(newReferenceString);
-            resourceReference.setType(newResourceType);
-            result = true;
-        }
-        return result;
     }
 }

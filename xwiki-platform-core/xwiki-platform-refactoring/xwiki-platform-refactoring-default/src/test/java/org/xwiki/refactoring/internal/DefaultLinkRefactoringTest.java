@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,6 +33,7 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,6 +46,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.util.DefaultReferenceRenamer;
+import org.xwiki.refactoring.internal.util.ResourceReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -53,17 +56,20 @@ import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -79,6 +85,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -92,6 +99,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 // @formatter:off
 @ComponentList({
+    ResourceReferenceRenamer.class,
     DefaultReferenceRenamer.class
 })
 // @formatter:on
@@ -114,8 +122,14 @@ class DefaultLinkRefactoringTest
     private Provider<XWikiContext> xcontextProvider;
 
     @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    Provider<MacroRefactoring> macroRefactoringProvider;
 
     @MockComponent
     private ContentParser contentParser;
@@ -136,6 +150,12 @@ class DefaultLinkRefactoringTest
     private XWikiContext xcontext = mock(XWikiContext.class);
 
     int logIndex = 0;
+
+    @BeforeComponent
+    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
+    {
+        mockitoComponentManager.registerComponent(ComponentManager.class, "context", mockitoComponentManager);
+    }
 
     @BeforeEach
     void beforeEach()
@@ -522,7 +542,7 @@ class DefaultLinkRefactoringTest
     }
 
     @Test
-    void renameLinksFromMacros() throws Exception
+    void renameLinksFromMacros(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -559,16 +579,27 @@ class DefaultLinkRefactoringTest
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
+        MacroRefactoring includeMacroRefactoring =
+            componentManager.registerMockComponent(MacroRefactoring.class, "include");
+        MacroRefactoring displayMacroRefactoring =
+            componentManager.registerMockComponent(MacroRefactoring.class, "display");
+        when(displayMacroRefactoring.replaceReference(any(), any(), any(), any(), any(), anyBoolean()))
+            .thenReturn(Optional.of(displayMacroBlock));
+        when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
         this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
 
-        assertEquals("X.Y", includeMacroBlock1.getParameter("reference"));
-        assertEquals("X.Y", includeMacroBlock2.getParameter("document"));
-        assertEquals("X.Y", displayMacroBlock.getParameter("reference"));
+        verify(includeMacroRefactoring).replaceReference(includeMacroBlock1, oldLinkTarget, newLinkTarget,
+            documentReference, Syntax.XWIKI_2_1, false);
+        verify(includeMacroRefactoring).replaceReference(includeMacroBlock2, oldLinkTarget, newLinkTarget,
+            documentReference, Syntax.XWIKI_2_1, false);
+        verify(displayMacroRefactoring).replaceReference(displayMacroBlock, oldLinkTarget, newLinkTarget,
+            documentReference, Syntax.XWIKI_2_1, false);
+
         verifyDocumentSave(document, "Renamed back-links.", false, false);
     }
 
     @Test
-    void renameLinksFromLinksAndMacros() throws Exception
+    void renameLinksFromLinksAndMacros(MockitoComponentManager componentManager) throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -598,9 +629,13 @@ class DefaultLinkRefactoringTest
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
+        MacroRefactoring includeMacroRefactoring =
+            componentManager.registerMockComponent(MacroRefactoring.class, "include");
+        when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
         this.refactoring.renameLinks(documentReference, oldLinkTarget, newLinkTarget);
 
-        assertEquals("X.Y", includeMacroBlock.getParameter("reference"));
+        verify(includeMacroRefactoring).replaceReference(includeMacroBlock, oldLinkTarget, newLinkTarget,
+        documentReference, Syntax.XWIKI_2_1, false);
         assertEquals("X.Y", documentLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         verifyDocumentSave(document, "Renamed back-links.", false, false);
@@ -615,13 +650,13 @@ class DefaultLinkRefactoringTest
         verify(document).setMetaDataDirty(true);
         verify(this.xcontext.getWiki()).saveDocument(document, comment, minorEdit, this.xcontext);
         ILoggingEvent logEvent = this.logCapture.getLogEvent(this.logIndex++);
-        assertEquals(Level.INFO, logEvent.getLevel());
         if (relative) {
             assertEquals("Updated the relative links from [{}].", logEvent.getMessage());
         } else {
             assertEquals("The links from [{}] that were targeting [{}] have been updated to target [{}].",
                 logEvent.getMessage());
         }
+        assertEquals(Level.INFO, logEvent.getLevel());
     }
 
     @Test

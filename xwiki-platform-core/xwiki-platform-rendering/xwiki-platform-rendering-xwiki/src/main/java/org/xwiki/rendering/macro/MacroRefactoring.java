@@ -46,7 +46,9 @@ public interface MacroRefactoring
      * @param macroBlock the macro block in which to replace the reference.
      * @param sourceReference the reference to replace.
      * @param targetReference the reference to use as replacement.
+     * @param currentDocumentReference the reference of the document in which the block is located
      * @param syntax the syntax of the document where the macro block is.
+     * @param relative if {@code true} indicate that the reference should be resolved relatively to the current document
      * @return an optional containing the new macro block with proper information if it needs to be updated, else
      *         an empty optional.
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.

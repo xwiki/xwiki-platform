@@ -43,6 +43,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.util.DefaultReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -68,7 +69,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -92,8 +92,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 // @formatter:off
 @ComponentList({
-    LinkedResourceHelper.class,
-    ReferenceRenamer.class
+    DefaultReferenceRenamer.class
 })
 // @formatter:on
 class DefaultLinkRefactoringTest

@@ -36,6 +36,14 @@
     <xwiki.extension.name>Refactoring Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- xwiki-platform-refactoring-api is a soft dependency: while the UI does not use it directly, having the
+     UI installed without the API is pointless. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

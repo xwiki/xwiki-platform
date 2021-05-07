@@ -77,7 +77,6 @@ public class TableLayoutElement extends BaseElement
         getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(), 20);
     }
 
-
     /**
      * Waits until a minimal number of rows are displayed in the live data.
      *
@@ -278,7 +277,7 @@ public class TableLayoutElement extends BaseElement
      */
     private boolean noFiltering()
     {
-        return this.liveDataRoot.findElements(By.cssSelector(".column-filters .livedata-filter.filtering")).isEmpty();
+        return getRoot().findElements(By.cssSelector(".column-filters .livedata-filter.filtering")).isEmpty();
     }
 
 

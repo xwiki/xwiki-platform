@@ -19,16 +19,22 @@
  */
 package org.xwiki.release.test.ui;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Runs all functional tests found in the classpath.
+ * Runs all the Release Application functional tests.
  *
  * @version $Id$
- * @since 13.0
+ * @since 13.4RC1
  */
-@RunWith(PageObjectSuite.class)
-public class AllITs
+@UITest
+class AllITs
 {
+    @Nested
+    @DisplayName("Overall Release test")
+    class NestedReleaseIT extends ReleaseIT
+    {
+    }
 }

@@ -17,40 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.panels.test.ui;
+package org.xwiki.panels.test.ui.docker;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.panels.test.po.PageLayoutTabContent;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsAdministrationPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.EditRightsPane.Right;
-import org.xwiki.test.ui.po.EditRightsPane.State;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.text.StringUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Various Panel tests.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 13.4RC1
  */
-public class PanelIT extends AbstractTest
+@UITest
+class PanelIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    private static final String SPECIAL_CONTENT = "Is # & \\u0163 triky\\\"? c:\\\\windows /root $util";
+
+    private static final String SPECIAL_TITLE = "Is # & \u0163 triky\"? c:\\windows /root $util";
+
+    @BeforeEach
+    void setUp(TestUtils testUtils)
+    {
+        testUtils.loginAsSuperAdmin();
+    }
 
     @Test
-    public void verifyApplicationsPanelEntry()
+    @Order(1)
+    void verifyApplicationsPanelEntry(TestUtils testUtils)
     {
         // Navigate to the Panels app by clicking in the Application Panel.
         // This verifies that the Panels application is registered in the Applications Panel.
@@ -63,7 +76,7 @@ public class PanelIT extends AbstractTest
         assertEquals(PanelsHomePage.getPage(), vp.getMetaDataValue("page"));
 
         // Now log out to verify that the Panels entry is not displayed for non admin users
-        getUtil().forceGuestUser();
+        testUtils.forceGuestUser();
         // Navigate again to the Application Panels page to perform the verification
         applicationPanel = ApplicationsPanel.gotoPage();
         assertFalse(applicationPanel.containsApplication("Panels"));
@@ -73,71 +86,91 @@ public class PanelIT extends AbstractTest
      * @see "XWIKI-8591: Cannot use a panel with a name containing spaces"
      */
     @Test
-    public void addPanelWithSpacesAndSymbolsInName()
+    @Order(2)
+    void addPanelWithSpacesAndSymbolsInName(TestUtils testUtils, TestReference testReference)
     {
+        String testMethodName = testReference.getLastSpaceReference().getName();
+        String testClassName = testReference.getSpaceReferences().get(0).getName();
+
         // Delete panel that will be created by the test
-        String panelName = "Is # & \u0163 triky\"? c:\\windows /root $util";
-        getUtil().deletePage("Panels", panelName);
+        String panelName = SPECIAL_TITLE;
+        testUtils.deletePage("Panels", panelName);
 
         // Create a panel whose name contain spaces.
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
 
         // We cannot reuse the panel name since we need special escapes.
         panelEditPage.setContent(
-            String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, "Is # & \\u0163 triky\\\"? c:\\\\windows /root $util",
-                getTestMethodName()));
+            String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, SPECIAL_CONTENT,
+                testMethodName));
         panelEditPage.clickSaveAndContinue();
+
+        // Checks that the new panel is listed in the Panels home live data.
+        PanelsHomePage panelsHomePage = PanelsHomePage.gotoPage();
+        TableLayoutElement tableLayoutElement = panelsHomePage.getLiveData().getTableLayout();
+        tableLayoutElement.filterColumn(1, panelName);
+        assertEquals(1, tableLayoutElement.countRows());
+        tableLayoutElement.hasRow("Description", "Panel Description");
+        tableLayoutElement.hasRow("Panel type", "view");
+        tableLayoutElement.hasRow("Category", "Information");
 
         // Add the panel to the right column from the administration.
         setRightPanelInAdministration("Is # & ţ triky\"? c:\\\\windows /root $util");
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        testUtils.gotoPage(testClassName, testMethodName);
 
-        assertTrue(new PageWithPanels().hasPanel("Is # & \\u0163 triky\\\"? c:\\\\windows /root $util"));
+        assertTrue(new PageWithPanels().hasPanel(SPECIAL_CONTENT));
     }
 
     /**
      * @see "XWIKI-9126: Show panel only if the user has the view right on the panel page"
      */
     @Test
-    public void limitPanelViewRight()
+    @Order(3)
+    void limitPanelViewRight(TestUtils testUtils, TestReference testReference)
     {
+        String testMethodName = testReference.getLastSpaceReference().getName();
+        String testClassName = testReference.getSpaceReferences().get(0).getName();
+
         // Delete panel that will be created by the test
-        String panelName = getTestMethodName();
-        getUtil().deletePage("Panels", panelName);
+        testUtils.deletePage("Panels", testMethodName);
 
         // Create a user for the test so that we can give view rights to the panel page to that user.
-        String userName = String.format("%s%s", getTestClassName(), getTestMethodName());
-        getUtil().createUser(userName, "password", getUtil().getURLToNonExistentPage());
+        String userName = String.format("%s%s", testClassName, testMethodName);
+        testUtils.createUser(userName, "password", testUtils.getURLToNonExistentPage());
 
         // Create new Panel
-        PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
-        panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
+        PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(testMethodName);
+        panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, testMethodName, "Panel content."));
         panelEditPage.clickSaveAndContinue();
 
         // Add the panel to the right column from the administration. This also proves that the Panel Admin UI is
         // displayed fine and can be modified.
-        setRightPanelInAdministration(panelName);
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        setRightPanelInAdministration(testMethodName);
+        testUtils.gotoPage(testClassName, testMethodName);
 
         // The panel should be visible for the administrator.
-        assertTrue(new PageWithPanels().hasPanel(panelName));
+        assertTrue(new PageWithPanels().hasPanel(testMethodName));
 
         // Force the guest user to verify the Panel is also visible for Guests.
-        getUtil().forceGuestUser();
-        assertTrue(new PageWithPanels().hasPanel(panelName));
+        testUtils.forceGuestUser();
+        assertTrue(new PageWithPanels().hasPanel(testMethodName));
 
         // Login and limit the view right on the panel document to the test user.
-        this.authenticationRule.authenticate();
-        RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
-        rightsEditor.switchToUsers();
-        // Explicit view right for the test user.
-        rightsEditor.setRight(userName, Right.VIEW, State.ALLOW);
+        testUtils.loginAsSuperAdmin();
+        testUtils.setRights(new DocumentReference("xwiki", "Panels", testMethodName), null, "XWiki." + userName,
+            "view", true);
 
         // Check again the panel visibility for the test user and then for guest
-        getUtil().loginAndGotoPage(userName, "password", getUtil().getURL(getTestClassName(), getTestMethodName()));
-        assertTrue(new PageWithPanels().hasPanel(panelName));
-        getUtil().forceGuestUser();
-        assertFalse(new PageWithPanels().hasPanel(panelName));
+        testUtils.loginAndGotoPage(userName, "password", testUtils.getURL(testClassName, testMethodName));
+        assertTrue(new PageWithPanels().hasPanel(testMethodName));
+        testUtils.forceGuestUser();
+        assertFalse(new PageWithPanels().hasPanel(testMethodName));
+
+        // Cleanups the pages created in these tests because it is interfering with the navigation panel administration
+        // tests.
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(new DocumentReference("xwiki", "Panels", testMethodName));
+        testUtils.deletePage(new DocumentReference("xwiki", "Panels", SPECIAL_TITLE));
     }
 
     private void setRightPanelInAdministration(String panelName)
@@ -149,7 +182,7 @@ public class PanelIT extends AbstractTest
         String rightPanels = pageLayout.getRightPanels();
         String newPanelString = "Panels." + panelName;
         if (!rightPanels.contains(newPanelString)) {
-            pageLayout.setRightPanels(StringUtils.join(new Object[] {rightPanels, newPanelString}, ','));
+            pageLayout.setRightPanels(StringUtils.join(new Object[] { rightPanels, newPanelString }, ','));
         }
         panelsAdminPage.clickSave();
     }

@@ -40,8 +40,11 @@
       class="pagination-current-entries"
       v-if="data.meta.pagination.showEntryRange"
     >
-      Entries {{ logic.getFirstIndexOfPage() + 1 }} - {{ logic.getLastIndexOfPage() + 1 }}
-      out of {{ data.data.count }}
+      {{ $t('livedata.pagination.currentEntries', [
+        logic.getFirstIndexOfPage() + 1,
+        logic.getLastIndexOfPage() + 1,
+        data.data.count,
+      ])}}
     </span>
 
     <!--
@@ -53,7 +56,7 @@
       class="pagination-page-size"
       v-if="data.meta.pagination.showPageSizeDropdown"
     >
-      per page of
+      {{ $t('livedata.pagination.pageSize') }}
       <select
         @change="logic.setPageSize(+$event.target.value)"
       >
@@ -75,7 +78,7 @@
       Arrows can be shown to go to first, last, previous, next page.
     -->
     <nav class="pagination-indexes">
-      Page
+      {{ $t('livedata.pagination.page') }}
       <!--
         Go to First Page button
         Can be shown / hiden by the `pagination.showFirstLast` property
@@ -86,6 +89,7 @@
           'disabled': isFirstPage,
         }]"
         v-if="data.meta.pagination.showFirstLast"
+        :title="$t('livedata.pagination.first')"
         href="#"
         @click.prevent="!isFirstPage && logic.setPageIndex(0)"
       >
@@ -102,6 +106,7 @@
           'disabled': isFirstPage,
         }]"
         v-if="data.meta.pagination.showNextPrevious"
+        :title="$t('livedata.pagination.previous')"
         href="#"
         @click.prevent="!isFirstPage && logic.setPageIndex(logic.getPageIndex() - 1)"
       >
@@ -152,6 +157,7 @@
           'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showNextPrevious"
+        :title="$t('livedata.pagination.next')"
         href="#"
         @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageIndex() + 1)"
       >
@@ -168,6 +174,7 @@
           'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showFirstLast"
+        :title="$t('livedata.pagination.last')"
         href="#"
         @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageCount() - 1)"
       >
@@ -308,5 +315,23 @@ export default {
   padding: 2px 4px;
 }
 
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  /* Stack the pagination elements vertically. */
+  .livedata-pagination {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+  }
+
+  /* Hide the page size element. */
+  .livedata-pagination .pagination-page-size {
+    display: none;
+  }
+
+  .livedata-pagination .pagination-indexes {
+    margin-left: 0;
+  }
+}
 
 </style>

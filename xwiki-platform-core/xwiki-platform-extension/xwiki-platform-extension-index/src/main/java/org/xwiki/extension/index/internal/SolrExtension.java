@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
+import org.xwiki.extension.ExtensionComponent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.ResolveException;
@@ -224,6 +225,16 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     {
         this.overwrites.put(FIELD_AUTHORS,
             authors != null ? Collections.unmodifiableCollection(authors) : Collections.emptyList());
+    }
+
+    /**
+     * @param components the components provided by the extension
+     * @since 13.3RC1
+     */
+    public void setComponents(Collection<? extends ExtensionComponent> components)
+    {
+        this.overwrites.put(FIELD_COMPONENTS,
+            components != null ? Collections.unmodifiableCollection(components) : Collections.emptyList());
     }
 
     // RemoteExtension

@@ -30,6 +30,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
+import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
@@ -45,7 +46,6 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 13.2RC1
  */
-@Unstable
 public abstract class AbstractNotificationsSettingsPage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
@@ -72,6 +72,9 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
 
     @FindBy(className = "notificationEmailDiffType")
     private WebElement notificationEmailDiffTypeSelect;
+
+    @FindBy(className = "btn-addfilter")
+    private WebElement addFilterButton;
 
     private Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
 
@@ -304,7 +307,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @return the system notification filter preferences.
      * @since 13.2RC1
      */
-    @Unstable
     public List<SystemNotificationFilterPreference> getSystemNotificationFilterPreferences()
     {
         List<SystemNotificationFilterPreference> preferences = new ArrayList<>();
@@ -318,7 +320,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @return the custom notification filter preferences
      * @since 13.2RC1
      */
-    @Unstable
     public List<CustomNotificationFilterPreference> getCustomNotificationFilterPreferences()
     {
         List<CustomNotificationFilterPreference> preferences = new ArrayList<>();
@@ -332,7 +333,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @return the value of the email details of change.
      * @since 13.2RC1
      */
-    @Unstable
     public EmailDiffType getNotificationEmailDiffType()
     {
         return EmailDiffType.valueOf(
@@ -344,7 +344,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @param value the diff type to set.
      * @since 13.2RC1
      */
-    @Unstable
     public void setNotificationEmailDiffType(EmailDiffType value)
     {
         new Select(this.notificationEmailDiffTypeSelect).selectByValue(value.name());
@@ -355,7 +354,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @return the value of the autowatch mode.
      * @since 13.2RC1
      */
-    @Unstable
     public AutowatchMode getAutoWatchModeValue()
     {
         return AutowatchMode.valueOf(
@@ -367,10 +365,22 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * @param value the autowatch mode to set.
      * @since 13.2RC1
      */
-    @Unstable
     public void setAutoWatchMode(AutowatchMode value)
     {
         new Select(this.notificationAutoWatchModeSelect).selectByValue(value.name());
         waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+    }
+
+    /**
+     * Open the modal to add a new custom filter.
+      * @return the modal to manipulate.
+     * @since 13.3RC1
+     */
+    public CustomNotificationFilterModal clickAddCustomFilter()
+    {
+        CustomNotificationFilterModal result = new CustomNotificationFilterModal();
+        this.addFilterButton.click();
+        getDriver().waitUntilCondition(driver -> result.isDisplayed());
+        return result;
     }
 }

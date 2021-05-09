@@ -43,10 +43,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
     }
 )
-public class NavigationPanelAdministrationIT
+class NavigationPanelAdministrationIT
 {
     @Test
-    public void testNavigationPanelAdministration(TestUtils setup, XWikiWebDriver driver)
+    void navigationPanelAdministration(TestUtils setup, XWikiWebDriver driver)
     {
         setup.loginAsSuperAdmin();
         // By default the AdminGroup doesn't have "admin" right, so give it since we're going to create the Admin

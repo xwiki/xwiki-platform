@@ -51,6 +51,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -91,6 +92,10 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ResetPasswordManager resetPasswordManager;
+
+    @Inject
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @Inject
     private Logger logger;
@@ -170,7 +175,7 @@ public class AuthenticationScriptService implements ScriptService
                 }
             }
             ExtendedURL extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
-            return extendedURL.serialize();
+            return this.urlNormalizer.normalize(extendedURL).serialize();
         } catch (IllegalArgumentException | SerializeResourceReferenceException
             | UnsupportedResourceReferenceException e)
         {

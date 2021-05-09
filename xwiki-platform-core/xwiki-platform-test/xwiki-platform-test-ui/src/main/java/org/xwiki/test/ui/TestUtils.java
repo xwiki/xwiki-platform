@@ -704,10 +704,7 @@ public class TestUtils
 
     public void gotoPage(String url)
     {
-        // Only navigate if the current URL is different from the one to go to, in order to improve performances.
-        if (!getDriver().getCurrentUrl().equals(url)) {
-            getDriver().get(url);
-        }
+        getDriver().get(url);
     }
 
     public String getURLToDeletePage(String space, String page)

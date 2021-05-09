@@ -35,7 +35,7 @@
     <!-- Drowpdown open / close button-->
     <a
       class="btn btn-default dropdown-toggle"
-      title="More Actions"
+      :title="$t('livedata.dropdownMenu.title')"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="true"
@@ -45,10 +45,23 @@
     </a>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
 
-      <!-- Change layout Section -->
-      <li class="dropdown-header">Change Layout</li>
+      <!-- Actions -->
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.actions') }}</li>
+
+      <li>
+        <!-- Refresh -->
+        <a href="#" @click.prevent="logic.updateEntries()">
+          <span class="fa fa-repeat"></span> {{ $t('livedata.action.refresh') }}
+        </a>
+      </li>
+
+
+      <!-- Layouts -->
+      <li role="separator" class="divider"></li>
+
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.layouts') }}</li>
 
       <!-- Layout options -->
       <li
@@ -64,27 +77,29 @@
         </a>
       </li>
 
-      <!-- Advanced panels Section -->
-      <li class="dropdown-header">Actions</li>
+      <!-- Panels -->
+      <li role="separator" class="divider"></li>
+
+      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</li>
 
       <!-- Properties Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> Advanced Properties
+          <span class="fa fa-list-ul"></span> {{ $t('livedata.dropdownMenu.panels.properties') }}
         </a>
       </li>
 
       <!-- Sort Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> Advanced Sorting
+          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sort') }}
         </a>
       </li>
 
       <!-- Filter Panel -->
       <li>
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> Advanced Filtering
+          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filter') }}
         </a>
       </li>
 
@@ -128,6 +143,16 @@ export default {
 
 .livedata-dropdown-menu .btn-default span {
   vertical-align: middle;
+}
+
+/*
+ * The icons are not all the same width,
+ * so we set a fix width for the icons
+ * so that all dropdown options aligned with each others
+ */
+.livedata-dropdown-menu li a .fa {
+  width: 1.4rem;
+  text-align: center;
 }
 
 </style>

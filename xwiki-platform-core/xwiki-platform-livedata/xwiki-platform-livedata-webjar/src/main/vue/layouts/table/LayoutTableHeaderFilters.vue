@@ -93,16 +93,18 @@ export default {
   padding: 2px;
   font-weight: normal;
   vertical-align: middle;
-  /*
-    This width is used to make the filters take up globally the same space
-    inside the table header, because by default the table display allocate
-    size according to its cell content (but in a way we don't want because
-    this could stretch a cell more than half of the table width, which is ugly)
-  */
-  width: 100vw;
 }
 .layout-table .column-filters th.entry-selector {
   width: 0;
+}
+
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .layout-table .column-filters th {
+    /* Overwrite the filters width so they don't overflow the table. */
+    width: 100%;
+    border-top: none;
+  }
 }
 
 </style>

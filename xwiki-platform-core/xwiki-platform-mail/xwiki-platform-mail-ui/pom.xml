@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <packaging>xar</packaging>
   <artifactId>xwiki-platform-mail-ui</artifactId>
@@ -64,6 +64,19 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Runtime dependencies for Live Data. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

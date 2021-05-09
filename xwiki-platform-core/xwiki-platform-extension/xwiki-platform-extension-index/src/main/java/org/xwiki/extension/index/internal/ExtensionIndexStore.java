@@ -21,7 +21,6 @@ package org.xwiki.extension.index.internal;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +49,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
+import org.xwiki.extension.ExtensionComponent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.RemoteExtension;
@@ -66,6 +66,13 @@ import org.xwiki.extension.repository.search.ExtensionQuery.Filter;
 import org.xwiki.extension.repository.search.ExtensionQuery.SortClause;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -135,10 +142,10 @@ public class ExtensionIndexStore implements Initializable
         SEARCH_FIELD_MAPPING.put(Extension.FIELD_FEATURES, SEARCH_FIELD_MAPPING.get(Extension.FIELD_EXTENSIONFEATURES));
     }
 
-    private static final String BOOST =
-        ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 " + Extension.FIELD_NAME + "^9.0 "
-            + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX + "^8.0 " + Extension.FIELD_SUMMARY
-            + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
+    private static final String BOOST = ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + "^10.0 "
+        + Extension.FIELD_NAME + "^9.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX
+        + "^8.0 " + Extension.FIELD_SUMMARY + "^7.0 " + ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPONENTS_INDEX
+        + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
 
     @Inject
     private Solr solr;
@@ -419,7 +426,6 @@ public class ExtensionIndexStore implements Initializable
     }
 
     /**
-     * @param remoteExtension the {@link RemoteExtension} version of the extension
      * @param extension the extension to add to the index
      * @param last true if it's the last version of this extension id
      * @throws IOException If there is a low-level I/O error.
@@ -451,14 +457,19 @@ public class ExtensionIndexStore implements Initializable
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
             extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
 
+        this.utils.setString(Extension.FIELD_COMPONENTS, extension.getComponents(), ExtensionComponent.class, document);
+        for (ExtensionComponent component : extension.getComponents()) {
+            document.addField(ExtensionIndexSolrCoreInitializer.toComponentFieldName(component.getRoleType()),
+                component.getRoleHint());
+        }
+
         this.utils.setString(Extension.FIELD_EXTENSIONFEATURES, extension.getExtensionFeatures(), ExtensionId.class,
             document);
-        ArrayList<String> indexedFeatures = new ArrayList<>(extension.getExtensionFeatures().size() * 2);
         for (ExtensionId feature : extension.getExtensionFeatures()) {
-            indexedFeatures.add(feature.getId());
-            indexedFeatures.add(ExtensionIdConverter.toString(feature));
+            document.addField(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX, feature.getId());
+            document.addField(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX,
+                ExtensionIdConverter.toString(feature));
         }
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONFEATURES_INDEX, indexedFeatures, document);
 
         // TODO: add dependencies
         // TODO: add managed dependencies
@@ -541,6 +552,8 @@ public class ExtensionIndexStore implements Initializable
         extension.setAverageVote(this.utils.get(RatingExtension.FIELD_AVERAGE_VOTE, document, 0f));
 
         extension.setAuthors(this.utils.getCollection(Extension.FIELD_AUTHORS, document, ExtensionAuthor.class));
+        extension
+            .setComponents(this.utils.getCollection(Extension.FIELD_COMPONENTS, document, ExtensionComponent.class));
         extension.setExtensionFeatures(
             this.utils.getCollection(Extension.FIELD_EXTENSIONFEATURES, document, ExtensionId.class));
 
@@ -586,6 +599,23 @@ public class ExtensionIndexStore implements Initializable
             // the Standard Query Parser)
             solrQuery.set("defType", "edismax");
             solrQuery.set("qf", BOOST);
+
+            // Add aliases for well known components roles
+            // TODO: make it extensible
+            solrQuery.set("f.component_macro.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Macro.class.getName()));
+            solrQuery.set("f.component_scriptservice.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(ScriptService.class.getName()));
+            solrQuery.set("f.component_parser.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(Parser.class.getName()));
+            solrQuery.set("f.component_renderer.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(PrintRendererFactory.class.getName()));
+            solrQuery.set("f.component_blockrenderer.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(BlockRenderer.class.getName()));
+            solrQuery.set("f.component_inputFilter.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(InputFilterStreamFactory.class.getName()));
+            solrQuery.set("f.component_outputFilter.qf",
+                ExtensionIndexSolrCoreInitializer.toComponentFieldName(OutputFilterStreamFactory.class.getName()));
         }
 
         // Pagination
@@ -733,7 +763,6 @@ public class ExtensionIndexStore implements Initializable
      *
      * @param params an object holding all key/value parameters to send along the request
      * @return a {@link org.apache.solr.client.solrj.response.QueryResponse} containing the response from the server
-     * @throws SearchException when failing to execute the Solr query
      * @throws IOException If there is a low-level I/O error.
      * @throws SolrServerException if there is an error on the server
      */

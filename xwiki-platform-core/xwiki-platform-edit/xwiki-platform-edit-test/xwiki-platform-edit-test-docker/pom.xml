@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-edit-test</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-edit-test-docker</artifactId>
   <name>XWiki Platform - Edit - Tests - Functional Docker Tests</name>
@@ -66,6 +66,13 @@
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-ckeditor-ui</artifactId>
       <type>xar</type>
+      <exclusions>
+        <!-- Exclude to avoid conflicts with older versions of XWiki platform deps drawn by the contrib dependency -->
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- ================================
          Test only dependencies

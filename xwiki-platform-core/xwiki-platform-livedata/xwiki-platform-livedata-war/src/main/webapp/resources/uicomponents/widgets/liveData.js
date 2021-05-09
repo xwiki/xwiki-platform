@@ -25,13 +25,16 @@
     'xwiki-livedata': $liveDataPath,
     'xwiki-livedata-vue': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'xwiki-livedata-vue.umd.min'),
-    'Vue': $services.webjars.url('vue', 'vue.min'),
+    'vue': $services.webjars.url('vue', 'vue.min'),
+    'vue-i18n': $services.webjars.url('org.webjars.npm:vue-i18n', 'dist/vue-i18n.min'),
     'moment': $services.webjars.url('momentjs', 'moment.js'),
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js'),
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
   },
   'css': {
+    'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'xwiki-livedata-vue.umd.min.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
     'selectize': [
       $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
@@ -50,8 +53,12 @@ require.config({
   paths: paths.js,
   map: {
     '*': {
+      'xwiki-livedata-vue': 'xwiki-livedata-vue-with-css',
       daterangepicker: 'daterangepicker-with-css',
       'xwiki-selectize': 'xwiki-selectize-with-css'
+    },
+    'xwiki-livedata-vue-with-css': {
+      'xwiki-livedata-vue': 'xwiki-livedata-vue'
     },
     'daterangepicker-with-css': {
       daterangepicker: 'daterangepicker'
@@ -82,14 +89,22 @@ define('loadCSS', function() {
   };
 });
 
+define('xwiki-livedata-vue-with-css', ['loadCSS', 'xwiki-livedata-vue'], function(loadCSS) {
+  // Load the CSS for the live data.
+  loadCSS(paths.css.liveData);
+  return arguments[1];
+});
+
 define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
   // Load the CSS for the date range picker.
   loadCSS(paths.css.dateRangePicker);
+  return arguments[1];
 });
 
 define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
   // Load the CSS for the suggest picker.
   loadCSS(paths.css.selectize);
+  return arguments[1];
 });
 
 window.liveDataBaseURL = paths.liveDataBasePath;

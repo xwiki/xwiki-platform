@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -77,6 +78,12 @@ public class SimpleSearchPane extends BaseElement
     private WebElement advancedSearchLink;
 
     /**
+     * The button to show/hide the advanced search options.
+     */
+    @FindBy(id = "extensionMoreButton")
+    private WebElement moreButton;
+
+    /**
      * @return the text input used to specify the search keywords
      */
     public WebElement getSearchInput()
@@ -112,8 +119,37 @@ public class SimpleSearchPane extends BaseElement
      */
     public AdvancedSearchPane clickAdvancedSearch()
     {
+        // Make sure advanced search is visible
+        showMore();
+
         advancedSearchLink.click();
         return new AdvancedSearchPane();
+    }
+
+    /**
+     * Make sure advanced search options are hidden.
+     * 
+     * @since 13.3
+     * @since 12.10.7
+     */
+    public void showMore()
+    {
+        if (getDriver().findElements(By.linkText("Advanced search")).isEmpty()) {
+            this.moreButton.click();
+        }
+    }
+
+    /**
+     * Make sure advanced search options are hidden.
+     * 
+     * @since 13.3
+     * @since 12.10.7
+     */
+    public void hideMore()
+    {
+        if (!getDriver().findElements(By.linkText("Advanced search")).isEmpty()) {
+            this.moreButton.click();
+        }
     }
 
     /**
@@ -137,6 +173,9 @@ public class SimpleSearchPane extends BaseElement
 
     private void setChecked(WebElement checkBox, boolean enabled)
     {
+        // Make sure advanced search is visible
+        showMore();
+
         if (enabled) {
             if (checkBox.getAttribute("checked") == null) {
                 checkBox.click();

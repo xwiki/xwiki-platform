@@ -912,6 +912,23 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     }
 
     /**
+     * Add a copy field.
+     * 
+     * @param source the source field name
+     * @param dest the collection of the destination field names
+     * @throws SolrException when failing to add the field
+     * @since 13.3RC1
+     */
+    protected void addCopyField(String source, String... dest) throws SolrException
+    {
+        try {
+            new SchemaRequest.AddCopyField(source, Arrays.asList(dest)).process(this.client);
+        } catch (Exception e) {
+            throw new SolrException("Failed to add a copy field in the Solr core", e);
+        }
+    }
+
+    /**
      * Add a field type in the Solr schema.
      * 
      * @param name the name of the field type

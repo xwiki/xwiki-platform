@@ -79,7 +79,7 @@
       <!-- Select all entries matching current config -->
       <li>
         <a href="#" @click.prevent="logic.setEntrySelectGlobal(true)">
-          Select in all pages
+          {{ $t('livedata.selection.selectInAllPages') }}
         </a>
       </li>
     </ul>

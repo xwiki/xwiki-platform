@@ -22,6 +22,7 @@ package org.xwiki.security.authentication.internal;
 import java.net.URL;
 import java.util.Arrays;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.internet.InternetAddress;
 
@@ -40,6 +41,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -87,6 +89,10 @@ class DefaultResetPasswordManagerTest
 
     @MockComponent
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer;
+
+    @MockComponent
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @MockComponent
     private UserReferenceSerializer<String> referenceSerializer;
@@ -214,8 +220,12 @@ class DefaultResetPasswordManagerTest
         String verificationCode = "foobar4242";
         resourceReference.addParameter("u", "user:Foobar");
         resourceReference.addParameter("v", verificationCode);
-        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
-            new ExtendedURL(Arrays.asList("authenticate", "reset"), resourceReference.getParameters()));
+        ExtendedURL firstExtendedURL =
+            new ExtendedURL(Arrays.asList("authenticate", "reset"), resourceReference.getParameters());
+        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(firstExtendedURL);
+        when(this.urlNormalizer.normalize(firstExtendedURL)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "authenticate", "reset"), resourceReference.getParameters())
+        );
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
         when(this.context.getURLFactory()).thenReturn(urlFactory);
         when(urlFactory.getServerURL(this.context)).thenReturn(new URL("http://xwiki.org"));
@@ -226,7 +236,7 @@ class DefaultResetPasswordManagerTest
                 verificationCode);
         this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
         verify(this.resetPasswordMailSender).sendResetPasswordEmail("Foo Bar", email,
-            new URL("http://xwiki.org/authenticate/reset?u=user%3AFoobar&v=foobar4242"));
+            new URL("http://xwiki.org/xwiki/authenticate/reset?u=user%3AFoobar&v=foobar4242"));
     }
 
     @Test

@@ -35,12 +35,13 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{box cssClass="floatinginfobox"}}
 {{toc start="2" /}}
 {{/box}}
 
 {{velocity}}
+#set ($exoPrefix = 'https://extensions.xwiki.org/xwiki/bin/view/Extension')
 $services.localization.render('help.macros.box.description1', ['**','**']) [[$services.localization.render('help.more.label')&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro]]
 
 $services.localization.render('help.macros.box.description2')

@@ -25,12 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions</artifactId>
   <name>XWiki Platform - Mentions - Parent POM</name>
   <packaging>pom</packaging>
   <dependencies>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>

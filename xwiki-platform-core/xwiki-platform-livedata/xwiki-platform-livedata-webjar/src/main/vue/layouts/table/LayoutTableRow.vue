@@ -41,6 +41,7 @@
       v-for="property in properties"
       :key="property.id"
       v-show="logic.isPropertyVisible(property.id)"
+      :data-title="property.name"
     >
       <LivedataDisplayer
         :property-id="property.id"
@@ -85,10 +86,6 @@ export default {
 
 
 <style>
-
-.layout-table .cell {
-  height: 100%;
-}
 
 .layout-table .livedata-entry-selector {
   align-items: flex-start;

@@ -51,8 +51,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
 
     /**
      * Default URL to use when none is specified.
+     * 
+     * @since 13.3RC1
+     * @since 12.10.7
      */
-    public static final String DEFAULT_REMOTE_URL = "http://localhost:8983/solr/";
+    public static final String DEFAULT_BASE_URL = "http://localhost:8983/solr";
 
     /**
      * The name of the core containing the XWiki search index.
@@ -67,15 +70,33 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
-
-        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", null);
 
         // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
             this.clients.put(SolrClientInstance.CORE_NAME, new HttpSolrClient.Builder(searchCoreURL).build());
+
+            // If the base URL is not provided try to guess it from the search core URL
+            if (baseURL == null) {
+                baseURL = searchCoreURL.substring(0, searchCoreURL.lastIndexOf('/'));
+
+                this.logger.warn("[solr.remote.url] property in xwiki.properties file is deprecated, "
+                    + "use [solr.remote.baseURL] instead");
+            }
         }
+
+        // Fallback on the default base URL
+        if (baseURL == null) {
+            baseURL = DEFAULT_BASE_URL;
+        }
+
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+    }
+
+    HttpSolrClient getRootClient()
+    {
+        return this.rootClient;
     }
 
     @Override

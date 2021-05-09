@@ -30,11 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
@@ -69,8 +67,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests that wishes to unit test wiki page should extend this class and call {@link #loadPage} or
- * {@link #renderPage} to load and render a page located in the classpath.
+ * A testing framework to write integration tests for wiki pages. The philosophy is that these tests will use the real
+ * code / components to the max and tests should only need to mock the environment (database, file system, REST calls,
+ * remote SOLR, etc). Tests should extend this class and call {@link #loadPage} or {@link #renderPage} to load and
+ * render a page located in the classpath.
  *
  * @version $Id$
  * @since 7.3M1
@@ -127,7 +127,6 @@ public class PageTest
     public void setUpComponentsForPageTest(MockitoComponentManager componentManager) throws Exception
     {
         componentManager.registerMockComponent(JMXBeanRegistration.class);
-        componentManager.registerMockComponent(Environment.class);
         componentManager.registerMockComponent(JobProgressManager.class);
         componentManager.registerMockComponent(RenderingCache.class);
         componentManager.registerMockComponent(EntityResourceActionLister.class);
@@ -235,7 +234,7 @@ public class PageTest
      * @throws Exception in case of errors
      */
     @BeforeEach
-    public void setUpForPageTest() throws Exception
+    void setUpForPageTest() throws Exception
     {
         // Configure mocks from OldcoreRule
         context = oldcore.getXWikiContext();
@@ -264,15 +263,13 @@ public class PageTest
         when(oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         // Set up URL Factory
-        URLFactorySetup.setUp(xwiki, context);
+        URLFactorySetup.setUp(context);
 
         // Set up Localization
         LocalizationSetup.setUp(componentManager);
 
         // Set up Skin Extensions
         SkinExtensionSetup.setUp(xwiki, context);
-
-        initSkinEnvironment();
     }
 
     /**
@@ -281,7 +278,7 @@ public class PageTest
      * @throws Exception in case of errors
      */
     @AfterEach
-    public void tearDown() throws Exception
+    void tearDown() throws Exception
     {
         MutableRenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
         if (this.syntaxPushedInRenderingContext) {
@@ -301,17 +298,5 @@ public class PageTest
     {
         VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         velocityManager.getVelocityContext().put(name, tool);
-    }
-
-    /**
-     * Initializes a default skin environment for the tests.
-     *
-     * @throws ComponentLookupException in case of error when loading an {@link Environment} instance
-     */
-    private void initSkinEnvironment() throws ComponentLookupException
-    {
-        // Load the environment from the test resources. This is needed to access the skins properties.
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getResource(SKIN_PROPERTIES_PATH)).thenReturn(getClass().getResource(SKIN_PROPERTIES_PATH));
     }
 }

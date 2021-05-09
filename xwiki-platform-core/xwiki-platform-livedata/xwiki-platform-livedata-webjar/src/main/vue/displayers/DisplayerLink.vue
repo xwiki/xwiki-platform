@@ -37,9 +37,15 @@
 
     <!-- Provide the Link Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <!-- If there is no value but still a link the user should still be able to click the link so we create an
-        explicit "no value" message in that case. -->
-      <a :href="href" :class="{'explicit-empty-value': !htmlValue}" v-html="htmlValue || '(no value)'"></a>
+      <!--
+        If there is no value but still a link, the user should still be able to click the link,
+        so we create an explicit "no value" message in that case
+      -->
+      <a
+        :href="href"
+        :class="{'explicit-empty-value': !htmlValue}"
+        v-html="htmlValue || $t('livedata.displayer.link.noValue')"
+      ></a>
     </template>
 
 
@@ -78,7 +84,7 @@ export default {
       return values.map(value => this.entry[value]).find(value => value) || '#';
     },
 
-    htmlValue() {
+    htmlValue () {
       const container = document.createElement('div');
       container[this.config.html ? 'innerHTML' : 'textContent'] = this.value;
       // Remove the interactive content because it isn't allowed inside an anchor element.
@@ -97,7 +103,7 @@ export default {
 
 <style>
 
-.livedata-displayer .explicit-empty-value {
+.livedata-displayer.displayer-link .explicit-empty-value {
   font-style: italic;
   color: grey;
 }

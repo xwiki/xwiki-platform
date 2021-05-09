@@ -150,7 +150,7 @@ public final class HttpServletUtils
             }
         }
 
-        // Apache stuff, old de-facto standard: X-Forwarded-Host
+        // Apache stuff, old de-facto standard: X-Forwarded-Proto.
         String proxyProto = getFirstHeaderValue(request, HEADER_X_FORWARDED_PROTO);
         if (proxyProto != null) {
             builder.append(proxyProto);
@@ -180,7 +180,7 @@ public final class HttpServletUtils
             }
         }
 
-        // Apache stuff, old de-facto standard: X-Forwarded-Proto
+        // Apache stuff, old de-facto standard: X-Forwarded-Host
         String proxyHost = getFirstHeaderValue(request, HEADER_X_FORWARDED_HOST);
         if (proxyHost != null) {
             builder.append(proxyHost);

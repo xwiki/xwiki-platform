@@ -36,96 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if ($request.livetable == "true")
-  #template('hierarchy_macros.vm')
-  #if("$!{request.xpage}" == 'plain')
-    $response.setContentType('application/json')
-  #end
-  #set ($documentReference = $services.model.resolveDocument($request.user))
-  ##==============================
-  ## Offset = item # at which to start displaying data
-  ##==============================
-  #set($offset = $numbertool.toNumber($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
-  #set($offset = $offset - 1)
-  #if($offset &lt; 0)
-    #set($offset = 0)
-  #end
-  ##==================
-  ## Limit = # of items to display
-  ##==================
-  #set($limit = $numbertool.toNumber($request.get('limit')))
-  #set ($likedPages = $services.like.getUserLikes($documentReference, $offset, $limit))
-  #set ($optUserLikes = $services.like.countUserLikes($documentReference))
-  #if ($optUserLikes.isPresent())
-    #set ($totalRows = $optUserLikes.get())
-  #else
-    #set ($totalRows = $likedPages.size())
-  #end
-  ##==========
-  ## Sort direction
-  ##==========
-  #set($order = "$!request.sort")
-  #if($order != '')
-    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
-    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
-      #set($orderDirection = 'desc')
-    #end
-  #end
-  #set ($pagesRows = [])
-  #foreach($likedPage in $likedPages)
-    #set ($likedDoc = $xwiki.getDocument($likedPage))
-    #set ($optDocumentLikes = $services.like.getLikes($likedPage))
-    #if ($optDocumentLikes.isPresent())
-      #set ($documentLikes = $optDocumentLikes.get())
-    #else
-      #set ($documentLikes = "N/A")
-    #end
-    ## code inspired from getdocuments.vm
-    #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, $services.model.serialize($likedPage, "default")))
-    #set ($row = {'doc_viewable' : $viewable})
-    #if (!$viewable)
-      #set ($discard = $row.put('doc_fullName', $likedDoc.fullName))
-    #else
-      #set ($translatedDoc = $likedDoc.translatedDocument)
-      #set ($fullname = $services.model.serialize($likedDoc.documentReference, 'default'))
-      #set ($discard = $row.put('doc_name', $likedDoc.documentReference.name))
-      #set ($discard = $row.put('doc_fullName', $fullname))
-      #set ($location = "#hierarchy($likedDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
-      #set ($discard = $row.put('doc_location', $location))
-      #set ($discard = $row.put('doc_space', $likedDoc.space))
-      #set ($discard = $row.put('doc_url', $xwiki.getURL($likedDoc)))
-      #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!likedDoc.wiki, $!likedDoc.space, 'WebHome'))))
-      #set ($discard = $row.put('doc_wiki', $likedDoc.wiki))
-      #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $likedDoc.documentReference.extractReference('WIKI')))))
-      #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
-      #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
-      #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))
-      #set ($rawTitle = $translatedDoc.title)
-      #if ($rawTitle != $row['doc_title'])
-        #set ($discard = $row.put('doc_title_raw', $rawTitle))
-      #end
-      #set ($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
-      #set ($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
-      #set ($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
-    #end
-    #set ($discard = $row.put('like', $documentLikes))
-    #set ($discard = $pagesRows.add($row))
-  #end
-  #set ($newOffset = $offset + 1)
-  ## ===
-  ## JSON
-  ## ===
-  {
-    "totalrows": $totalRows,
-    "returnedrows":  $pagesRows.size(),
-    "offset": $newOffset,
-    "reqNo": $numbertool.toNumber($request.reqNo),
-    "rows": $jsontool.serialize($pagesRows)
-  }
-#end
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.Like.UserProfileUIX</name>
     <number>0</number>
@@ -166,7 +77,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -254,30 +165,42 @@
     </property>
     <property>
       <content>{{velocity}}
-=$escapetool.xml($services.localization.render("like.userprofile.menu"))=
-#set($columns = ["doc.title", "doc.location", "like"])
+=$escapetool.xml($services.localization.render('like.userprofile.menu'))=
 #set ($docTitleDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.title')))
 #set ($docLocationDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.location')))
 #set ($likesDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.likes')))
-#set($columnsProperties = {
-  "doc.title" : { "displayName": $docTitleDisplayName, "type": "text", "size": 30, "link": "view", "sortable": false, "filterable": false },
-  "doc.location" : { "displayName": $docLocationDisplayName, "type": "text", "size": 30, "html": true, "sortable": false, "filterable": false },
-  "like" : { "displayName": $likesDisplayName, "type" : "number", "sortable": false, "filterable": false }
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+       {
+         'id': 'doc.title',
+         'sortable': false,
+         'filterable': false,
+         'name': $docTitleDisplayName
+       },
+       {
+         'id': 'doc.location',
+         'sortable': false,
+         'filterable': false,
+         'name': $docLocationDisplayName
+       },
+       {
+         'id': 'like',
+         'displayer': 'number',
+         'sortable': false,
+         'filterable': false,
+         'name': $likesDisplayName
+       }
+    ]
+  }
 })
-
-#set ($currentUser = $services.model.serialize($doc.documentReference, "default"))
-#set ($pageToCallReference = $services.model.resolveDocument("XWiki.Like.UserProfileUIX"))
-#set ($pageToCall = $xwiki.getDocument($pageToCallReference))
-#set ($queryParams = {
-  "user": $currentUser,
-  "livetable": "true",
-  "xpage": "plain",
-  "outputSyntax": "plain"
-})
-#set($options = {
-  'url': $pageToCall.getURL('get', $escapetool.url($queryParams))
-})
-#livetable("likedPages" $columns $columnsProperties $options)
+##
+{{liveData
+  id='likedPages'
+  source='liveTable'
+  sourceParameters='resultPage=XWiki.Like.Code.LiveTableResultPage'
+  properties='doc.title,doc.location,like'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</content>
     </property>
     <property>

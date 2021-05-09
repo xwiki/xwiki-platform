@@ -77,8 +77,24 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     return Promise.resolve($.post(getEntriesURL(source), entry).then(entry => entry.values));
   };
 
+  var getTranslations = function(locale, prefix, keys) {
+    const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
+    return Promise.resolve($.getJSON(translationsURL, $.param({
+      locale: locale,
+      prefix: prefix,
+      key: keys
+    }, true)).then(toTranslationsMap));
+  };
+
+  var toTranslationsMap = function(responseJSON) {
+    var translationsMap = {};
+    responseJSON.translations?.forEach(translation => translationsMap[translation.key] = translation.rawSource);
+    return translationsMap;
+  };
+
   return {
-    getEntries: getEntries,
-    addEntry: addEntry
+    getEntries,
+    addEntry,
+    getTranslations
   };
 });

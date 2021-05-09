@@ -530,10 +530,11 @@ $$('.applicationPanelMoreButton').each(function(button) {
 .panel-width-Large .applicationsPanel li .application-img {
   display: block;
   float: left;
+  width: 20px;
 }
 
 .applicationsPanel li .application-label {
-  margin-left: 0.5em;
+  margin-left: 0.1em;
 }
 
 .applicationPanelMoreContainer ul {

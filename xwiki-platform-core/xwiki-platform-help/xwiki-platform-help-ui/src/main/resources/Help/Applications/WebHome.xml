@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
@@ -143,7 +143,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="$exoPrefixn/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;$services.localization.render('help.applications.link')&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="$exoPrefix/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;$services.localization.render('help.applications.link')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

@@ -236,7 +236,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * @return the list of Rendering Syntaxes that are configured for the current wiki (i.e. that are proposed to the
-     *         user when editing wik pages)
+     *         user when editing wiki pages). These are input Syntaxes only (i.e. Syntaxes having a Parser for them).
      * @since 8.2M1
      */
     public List<Syntax> getConfiguredSyntaxes()

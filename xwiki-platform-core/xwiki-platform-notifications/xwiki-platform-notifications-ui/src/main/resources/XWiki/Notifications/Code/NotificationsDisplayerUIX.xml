@@ -160,9 +160,9 @@ Get the actual notifications.
   #if ("$!request.currentDoc" != '')
     #set ($currentDoc = $services.model.resolveDocument($request.currentDoc))
     #set ($states = {
-      'document': $services.notification.watch.isLocationWatched($currentDoc),
-      'space': $services.notification.watch.isLocationWatched($currentDoc.lastSpaceReference),
-      'wiki': $services.notification.watch.isLocationWatched($currentDoc.wikiReference)
+      'document': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc),
+      'space': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc.lastSpaceReference),
+      'wiki': $services.notification.watch.isLocationWatchedWithAllEventTypes($currentDoc.wikiReference)
     })
     #set ($discard = $response.setContentType('application/json'))
     $jsontool.serialize($states)

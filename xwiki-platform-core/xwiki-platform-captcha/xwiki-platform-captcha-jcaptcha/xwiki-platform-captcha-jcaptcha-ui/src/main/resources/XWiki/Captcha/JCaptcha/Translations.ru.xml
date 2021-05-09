@@ -62,5 +62,4 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Ho
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Простой список
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Простой математический вопрос</content>
-  
 </xwikidoc>

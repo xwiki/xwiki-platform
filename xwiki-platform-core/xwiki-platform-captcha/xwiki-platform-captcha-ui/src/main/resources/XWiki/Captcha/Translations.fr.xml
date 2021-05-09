@@ -39,5 +39,4 @@
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=CAPTCHA par défaut
 captcha.admin.defaultCaptchaName.hint=Le CAPTCHA à proposer par défaut. Utilisez le Gestionnaire d'extension pour rechercher et installer d'autres types de CAPTCHA.</content>
-  
 </xwikidoc>

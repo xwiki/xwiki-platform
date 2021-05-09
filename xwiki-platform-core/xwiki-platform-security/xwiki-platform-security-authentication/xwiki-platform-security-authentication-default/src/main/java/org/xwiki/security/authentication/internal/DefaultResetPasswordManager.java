@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
@@ -42,6 +43,7 @@ import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -97,6 +99,10 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
     @Inject
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer;
+
+    @Inject
+    @Named("contextpath")
+    private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @Inject
     private UserReferenceSerializer<String> referenceSerializer;
@@ -195,6 +201,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         ExtendedURL extendedURL = null;
         try {
             extendedURL = this.resourceReferenceSerializer.serialize(resourceReference);
+            extendedURL = this.urlNormalizer.normalize(extendedURL);
             URL serverURL = context.getURLFactory().getServerURL(context);
             URL externalVerificationURL = new URL(serverURL, extendedURL.serialize());
 

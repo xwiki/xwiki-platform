@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
@@ -70,7 +70,7 @@
     'url': $browseMacrosURL
   }, {
     'label': $services.localization.render('help.more.label'),
-    'url': 'https://platform.xwiki.org/xwiki/bin/view/DevGuide/WikiMacroTutorial'
+    'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/WritingMacros/WikiMacroTutorial/'
   }]
 }])
 

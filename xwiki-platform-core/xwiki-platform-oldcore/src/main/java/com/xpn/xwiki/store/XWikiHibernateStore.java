@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaUpdate;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -79,6 +78,8 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.store.UnexpectedException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -172,6 +173,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named(HINT)
     private AttachmentVersioningStore attachmentArchiveStore;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private Map<String, String[]> validTypesMap = new HashMap<>();
 
@@ -452,6 +456,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean exists(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        // In order to avoid trying to issue any SQL query to the DB, we first check if the wiki containing the
+        // doc exists. If not, then the doc cannot exist for sure.
+        try {
+            if (!this.wikiDescriptorManager.exists(this.wikiDescriptorManager.getCurrentWikiId())) {
+                return false;
+            }
+        } catch (WikiManagerException e) {
+            // An error occurred while retrieving the wiki descriptors. This is an important problem and we shouldn't
+            // swallow it and instead we mist let it bubble up.
+            Object[] args = { this.wikiDescriptorManager.getCurrentWikiId() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC,
+                "Error while checking for existence of the [{0}] wiki", e, args);
+        }
 
         try {
             boolean bTransaction = true;
@@ -811,11 +830,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private long countAllDocuments(SpaceReference spaceReference, Session session, String extraWhere,
+    private boolean hasDocuments(SpaceReference spaceReference, Session session, String extraWhere,
         Map<String, ?> parameters)
     {
         StringBuilder builder = new StringBuilder(
-            "select count(*) from XWikiDocument as xwikidoc where (space = :space OR space LIKE :like)");
+            "select distinct xwikidoc.space from XWikiDocument as xwikidoc where (space = :space OR space LIKE :like)");
 
         if (StringUtils.isNotEmpty(extraWhere)) {
             builder.append(" AND ");
@@ -824,18 +843,27 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             builder.append(')');
         }
 
-        Query<Long> query = session.createQuery(builder.toString(), Long.class);
+        Query<String> query = session.createQuery(builder.toString(), String.class);
 
         String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+        String localSpaceReferencePrefix = localSpaceReference + '.';
 
         query.setParameter("space", localSpaceReference);
-        query.setParameter("like", localSpaceReference + ".%");
+        query.setParameter("like", localSpaceReferencePrefix + "%");
 
         if (parameters != null) {
             parameters.forEach(query::setParameter);
         }
 
-        return query.uniqueResult();
+        // Leading and trailing white spaces are not taken into account in SQL comparisons so we have to make sure the
+        // matched spaces really are the expected ones
+        for (String result : query.getResultList()) {
+            if (result.equals(localSpaceReference) || result.startsWith(localSpaceReferencePrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -854,7 +882,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             parameters = null;
         }
 
-        return !(countAllDocuments(spaceReference, session, builder.toString(), parameters) > 0);
+        return !hasDocuments(spaceReference, session, builder.toString(), parameters);
     }
 
     private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
@@ -1236,9 +1264,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)
     {
-        if (countAllDocuments(spaceReference, session,
+        if (!hasDocuments(spaceReference, session,
             "fullName <> :deletedDocument AND (language IS NULL OR language = '')",
-            Collections.singletonMap("deletedDocument", deletedDocument)) == 0) {
+            Collections.singletonMap("deletedDocument", deletedDocument))) {
             // The document was the last document in the space
             XWikiSpace space = new XWikiSpace(spaceReference, this);
 

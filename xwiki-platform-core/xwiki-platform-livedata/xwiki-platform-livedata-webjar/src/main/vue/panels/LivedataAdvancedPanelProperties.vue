@@ -37,7 +37,8 @@
   >
     <!-- Provide the panel name and icon to the `header` slot -->
     <template #header>
-      <span class="fa fa-list-ul"></span> Properties
+      <span class="fa fa-list-ul"></span>
+      {{ $t('livedata.panel.properties.title') }}
     </template>
 
     <!-- Define panel content inside the `body` slot -->
@@ -158,6 +159,14 @@ export default {
 
 .livedata-advanced-panel-properties .property-name {
   padding: 6px 0px;
+}
+
+/* Responsive mode */
+@media screen and (max-width: @screen-xs-max) {
+  .livedata-advanced-panel-properties .handle {
+    /* Always show the drag handler on small screens because we cannot rely on hover. */
+    opacity: 1;
+  }
 }
 
 </style>

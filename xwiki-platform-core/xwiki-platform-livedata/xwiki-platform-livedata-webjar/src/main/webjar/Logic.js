@@ -20,17 +20,25 @@
 
 
 define('xwiki-livedata', [
-  "Vue",
+  "vue",
+  "vue-i18n",
   "xwiki-livedata-vue",
   "xwiki-livedata-source",
   "xwiki-json-merge",
   "xwiki-livedata-polyfills"
 ], function (
   Vue,
+  VueI18n,
   XWikiLivedata,
   liveDataSource,
   jsonMerge
 ) {
+
+  /**
+   * Make vue use the i18n plugin
+   */
+  Vue.use(VueI18n);
+
 
   /**
    * Map the element to its data object
@@ -77,6 +85,15 @@ define('xwiki-livedata', [
     this.openedPanels = [];
 
     element.removeAttribute("data-config");
+
+    const locale = document.documentElement.getAttribute('lang');
+
+    const i18n = new VueI18n({
+      locale: locale,
+      messages: {},
+      silentFallbackWarn: true,
+    });
+
     // create Vuejs instance
     new Vue({
       el: this.element,
@@ -84,9 +101,76 @@ define('xwiki-livedata', [
         "XWikiLivedata": XWikiLivedata,
       },
       template: "<XWikiLivedata :logic='logic'></XWikiLivedata>",
+      i18n: i18n,
       data: {
         logic: this,
       },
+    });
+
+
+    /**
+     * Load given translations from the server
+     *
+     * @param {object} parameters
+     * @param {string} componentName The name component who needs the translations
+     * Used to avoid loading the same translations several times
+     * @param {string} prefix The translation keys prefix
+     * @param {string[]} keys
+     */
+    this.loadTranslations = async function ({ componentName, prefix, keys }) {
+      // If translations were already loaded, return.
+      if (this.loadTranslations[componentName]) return;
+      this.loadTranslations[componentName] = true;
+      // Fetch translation and load them.
+      try {
+        const translations = await liveDataSource.getTranslations(locale, prefix, keys);
+        i18n.mergeLocaleMessage(locale, translations)
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Load needed translations for the Livedata
+    this.loadTranslations({
+      prefix: "livedata.",
+      keys: [
+        "dropdownMenu.title",
+        "dropdownMenu.actions",
+        "dropdownMenu.layouts",
+        "dropdownMenu.panels",
+        "dropdownMenu.panels.properties",
+        "dropdownMenu.panels.sort",
+        "dropdownMenu.panels.filter",
+        "selection.selectInAllPages",
+        "selection.infoBar.selectedCount",
+        "selection.infoBar.allSelected",
+        "selection.infoBar.allSelectedBut",
+        "pagination.currentEntries",
+        "pagination.pageSize",
+        "pagination.page",
+        "pagination.first",
+        "pagination.previous",
+        "pagination.next",
+        "pagination.last",
+        "action.refresh",
+        "action.addEntry",
+        "action.reorder.hint",
+        "action.resizeColumn.hint",
+        "panel.filter.title",
+        "panel.filter.noneFilterable",
+        "panel.filter.addConstraint",
+        "panel.filter.addProperty",
+        "panel.filter.delete",
+        "panel.filter.deleteAll",
+        "panel.properties.title",
+        "panel.sort.title",
+        "panel.sort.noneSortable",
+        "panel.sort.direction.ascending",
+        "panel.sort.direction.descending",
+        "panel.sort.add",
+        "panel.sort.delete",
+        "displayer.link.noValue"
+      ],
     });
 
     // Fetch the data if we don't have any.
@@ -368,7 +452,15 @@ define('xwiki-livedata', [
 
 
     fetchEntries () {
-      return liveDataSource.getEntries(this.data.query);
+      // Before fetch event
+      this.triggerEvent("beforeEntryFetch");
+      // Fetch entries from data source
+      return liveDataSource.getEntries(this.data.query)
+        .then(data => {
+          // After fetch event
+          this.triggerEvent("afterEntryFetch");
+          return data
+        });
     },
 
 

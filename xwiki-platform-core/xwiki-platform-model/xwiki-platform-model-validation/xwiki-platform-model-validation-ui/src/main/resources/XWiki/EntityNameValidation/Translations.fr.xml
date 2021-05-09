@@ -72,5 +72,4 @@ entitynamevalidation.replacementCharacter.remove.done=Le caractère interdit a �
 entitynamevalidation.replacementCharacter.remove.failed=Erreur lors de la suppression du caractère interdit.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Aucun
 entitynamevalidation.admin.heading=Stratégies de nommage</content>
-  
 </xwikidoc>

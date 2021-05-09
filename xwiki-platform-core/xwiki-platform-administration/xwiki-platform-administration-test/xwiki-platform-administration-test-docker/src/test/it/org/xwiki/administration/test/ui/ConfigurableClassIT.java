@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.3RC1
  */
 @UITest
-public class ConfigurableClassIT
+class ConfigurableClassIT
 {
     @BeforeEach
     public void setUp(TestUtils setup)
@@ -59,13 +59,13 @@ public class ConfigurableClassIT
         setup.loginAsSuperAdmin();
     }
 
-    /*
+    /**
      * Verify that if a value is specified for the {@code linkPrefix} xproperty, then a link is generated with
      * linkPrefix + prettyName of the property from the configuration class.
      */
     @Test
     @Order(1)
-    public void labelLinkGeneration(TestUtils setup, TestReference testReference)
+    void labelLinkGeneration(TestUtils setup, TestReference testReference)
     {
         // Fixture
         setupConfigurableApplication(setup, testReference,
@@ -85,7 +85,7 @@ public class ConfigurableClassIT
         assertTrue(asp.hasLink("TheLinkPrefixSelect"));
     }
 
-    /*
+    /**
      * Creates a document with 2 configurable objects, one gets configured globally in one section and displays
      * 2 configuration fields, the other is configured in the space in another section and displays the other 2
      * fields. Fails if they are not displayed as they should be.
@@ -94,7 +94,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(2)
-    public void testApplicationConfiguredInMultipleSections(TestUtils setup, TestReference testReference)
+    void testApplicationConfiguredInMultipleSections(TestUtils setup, TestReference testReference)
     {
         String app1Section = testReference.getLastSpaceReference().getName() + "_1";
         String app2Section = testReference.getLastSpaceReference().getName() + "_2";
@@ -164,14 +164,14 @@ public class ConfigurableClassIT
         assertFalse(formContainerElement.hasField(By.name(fullName + "_0_Boolean")));
     }
 
-    /*
+    /**
      * If CodeToExecute is defined in a configurable app, then it should be evaluated.
      * Also header should be evaluated and not just printed.
      * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
      */
     @Test
     @Order(3)
-    public void testCodeToExecutionAndAutoSandboxing(TestUtils setup, TestReference testReference) throws Exception
+    void testCodeToExecutionAndAutoSandboxing(TestUtils setup, TestReference testReference) throws Exception
     {
         // fixture
         String codeToExecute = "#set($code = 's sh')"
@@ -226,7 +226,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(4)
-    public void testAddConfigurableApplicationInExistingSection(TestUtils setup, TestReference testReference)
+    void testAddConfigurableApplicationInExistingSection(TestUtils setup, TestReference testReference)
     {
         String section = "presentation";
         // Fixture
@@ -296,7 +296,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(5)
-    public void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
+    void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
     {
         String section = testReference.getLastSpaceReference().getName();
 
@@ -343,7 +343,7 @@ public class ConfigurableClassIT
      */
     @Test
     @Order(6)
-    public void testConfigurableCreatedByUnauthorizedWillNotExecute(TestUtils setup, TestReference testReference)
+    void testConfigurableCreatedByUnauthorizedWillNotExecute(TestUtils setup, TestReference testReference)
     {
         // Make sure the configurable page doesn't exist because otherwise we may fail to overwrite it with a
         // non-administrator user.
@@ -369,13 +369,13 @@ public class ConfigurableClassIT
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
     }
 
-    /*
+    /**
      * Proves that ConfigurationClass#codeToExecute is not rendered inline even if there is no
      * custom configuration class and the only content is custom content.
      */
     @Test
     @Order(7)
-    public void testCodeToExecuteNotInlineIfNoConfigurationClass(TestUtils setup, TestReference testReference)
+    void testCodeToExecuteNotInlineIfNoConfigurationClass(TestUtils setup, TestReference testReference)
     {
         String fullName = setup.serializeReference(testReference).split(":")[1];
         String helloDiv = String.format("%s_%s", fullName, "hello");
@@ -391,17 +391,17 @@ public class ConfigurableClassIT
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
         asp.waitUntilActionButtonIsLoaded();
-        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
-    /*
+    /**
      * Proves that ConfigurationClass#codeToExecute is not rendered inline whether it's at the top of the
      * form or inside of the form.
      */
     @Test
     @Order(8)
-    public void testCodeToExecuteNotInline(TestUtils setup, TestReference testReference)
+    void testCodeToExecuteNotInline(TestUtils setup, TestReference testReference)
     {
         String fullName = setup.serializeReference(testReference).split(":")[1];
         String helloDiv = String.format("%s_%s", fullName, "hello");
@@ -425,17 +425,17 @@ public class ConfigurableClassIT
 
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
         asp.waitUntilActionButtonIsLoaded();
-        assertFalse(setup.getDriver().hasElement(By.className("xwikirenderingerror")));
+        assertFalse(asp.hasRenderingError());
         assertTrue(setup.getDriver().hasElementWithoutWaiting(By.id(helloDiv)));
     }
 
-    /*
+    /**
      * Make sure html macros and pre tags are not being stripped
-     * @see: https://jira.xwiki.org/browse/XAADMINISTRATION-141
+     * @see <a href="https://jira.xwiki.org/browse/XAADMINISTRATION-141">XAADMINISTRATION-141</a>
      */
     @Test
     @Order(9)
-    public void testNotStrippingHtmlMacros(TestUtils setup, TestReference testReference)
+    void testNotStrippingHtmlMacros(TestUtils setup, TestReference testReference)
     {
         String test = "{{html}} <pre> {{html clean=\"false\"}} </pre> {{/html}}";
         String section = testReference.getLastSpaceReference().getName();
@@ -460,13 +460,13 @@ public class ConfigurableClassIT
         assertEquals(test, formContainerElement.getFieldValue(By.name(fullName + "_0_String")));
     }
 
-    /*
+    /**
      * Fails unless XWiki.ConfigurableClass locks each page on view and unlocks any other configurable page.
      * Also fails if codeToExecute is not being evaluated.
      */
     @Test
     @Order(10)
-    public void testLockingAndUnlocking(TestUtils setup, TestReference testReference)
+    void testLockingAndUnlocking(TestUtils setup, TestReference testReference)
     {
         // Fixture
         DocumentReference page1 = new DocumentReference("TestConfigurable1", testReference.getLastSpaceReference());

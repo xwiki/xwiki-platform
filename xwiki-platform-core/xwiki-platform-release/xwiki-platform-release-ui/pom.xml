@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-release</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-release-ui</artifactId>
   <name>XWiki Platform - Release - UI</name>
@@ -64,6 +64,18 @@
       <scope>runtime</scope>
     </dependency>
     <!-- We need the livetable for the Release Home page that lists all Releases -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livetable-ui</artifactId>

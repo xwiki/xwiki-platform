@@ -981,6 +981,12 @@ public abstract class XWikiAction implements LegacyAction
         return false;
     }
 
+    /**
+     * Perform a redirect to the given URL.
+     * @param response the response to use to perform the redirect
+     * @param url the location of the redirect
+     * @throws XWikiException in case of IOException when performing the redirect.
+     */
     protected void sendRedirect(XWikiResponse response, String url) throws XWikiException
     {
         try {
@@ -1145,6 +1151,7 @@ public abstract class XWikiAction implements LegacyAction
             context.getResponse().setStatus(status);
             context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
             context.getResponse().getWriter().print(jsonAnswerAsString);
+            context.setResponseSent(true);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);
         }

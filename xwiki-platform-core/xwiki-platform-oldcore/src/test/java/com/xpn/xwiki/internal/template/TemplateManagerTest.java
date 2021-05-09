@@ -49,8 +49,10 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.StringReaderMatcher;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -83,6 +85,9 @@ class TemplateManagerTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private URLConfiguration urlConfiguration;
 
     @AfterComponent
     void afterComponent() throws Exception

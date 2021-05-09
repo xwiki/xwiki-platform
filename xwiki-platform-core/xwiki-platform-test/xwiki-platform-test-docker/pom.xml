@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
@@ -33,7 +33,7 @@
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <testcontainers.version>1.15.2</testcontainers.version>
+    <testcontainers.version>1.15.3</testcontainers.version>
     <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
@@ -153,6 +153,25 @@
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
+     more explanations), we need to add a dependency to it since we need to unpack it -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <version>${project.version}</version>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
+           stop the chain -->
+      <scope>provided</scope>
+    </dependency>
     <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
          they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
@@ -185,13 +204,6 @@
       <artifactId>xwiki-commons-extension-repository-maven</artifactId>
       <version>${commons.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

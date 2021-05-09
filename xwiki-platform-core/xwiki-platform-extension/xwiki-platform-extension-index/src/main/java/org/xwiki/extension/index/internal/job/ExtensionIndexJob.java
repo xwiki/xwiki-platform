@@ -94,7 +94,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     /**
      * Type of the job.
      */
-    public static final String JOB_TYPE = "extendion.index";
+    public static final String JOB_TYPE = "extension.index";
 
     private static final int SEARCH_BATCH_SIZE = 100;
 

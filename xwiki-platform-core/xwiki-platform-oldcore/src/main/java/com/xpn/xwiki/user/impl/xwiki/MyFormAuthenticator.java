@@ -26,6 +26,10 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -35,14 +39,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
+import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiResponse;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
+
+    private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
+
+    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier()
+    {
+        if ( this.userAuthenticatedEventNotifier == null ) {
+            this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+        }
+        return this.userAuthenticatedEventNotifier;
+    }
 
     /**
      * Show the login page.
@@ -156,6 +169,9 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                     }
 
                     request.setUserPrincipal(principal);
+
+                    this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
                     request.setUserPrincipal(null);
@@ -225,10 +241,13 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
 
             request.setUserPrincipal(principal);
+
+            this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
-                String continueToURL = getContinueToURL(request);
                 // This is the url that the user was initially accessing before being prompted for login.
+                String continueToURL = getContinueToURL(request);
                 response.sendRedirect(response.encodeRedirectURL(continueToURL));
             }
         } else {
@@ -293,3 +312,4 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return result;
     }
 }
+

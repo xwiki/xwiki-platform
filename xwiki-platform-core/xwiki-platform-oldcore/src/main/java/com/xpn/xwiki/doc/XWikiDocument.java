@@ -141,6 +141,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -386,6 +387,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
     }
 
+    /**
+     * Used to convert a syntax defined as String into a Syntax object.
+     */
+    private static SyntaxRegistry getSyntaxRegistry()
+    {
+        return Utils.getComponent(SyntaxRegistry.class);
+    }
+
     private String title;
 
     /**
@@ -623,6 +632,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private RenderingContext renderingContext;
 
     /**
+     * Create a document for the given reference, with the {@link Locale#ROOT} even if the reference contains a locale.
+     * If you want to create a document for another locale, use {@link #XWikiDocument(DocumentReference, Locale)}.
      * @since 2.2M1
      */
     public XWikiDocument(DocumentReference reference)
@@ -3876,13 +3887,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Set the Syntax id if defined
         String syntaxId = eform.getSyntaxId();
         if (syntaxId != null) {
-            setSyntaxId(syntaxId);
+            setSyntax(resolveSyntax(syntaxId));
         }
 
         // Read the hidden checkbox from the form
         if (eform.getHidden() != null) {
             setHidden("1".equals(eform.getHidden()));
         }
+    }
+
+    private Syntax resolveSyntax(String syntaxId)
+    {
+        Syntax syntax;
+        try {
+            syntax = getSyntaxRegistry().resolveSyntax(syntaxId);
+        } catch (ParseException e) {
+            syntax = getDefaultDocumentSyntax();
+            LOGGER.warn("Failed to set syntax [{}] for [{}], setting syntax [{}] instead.", syntaxId,
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), syntax.toIdString(), e);
+        }
+        return syntax;
     }
 
     /**
@@ -7372,14 +7396,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (StringUtils.isBlank(syntaxId)) {
             syntax = Syntax.XWIKI_1_0;
         } else {
-            try {
-                syntax = Syntax.valueOf(syntaxId);
-            } catch (ParseException e) {
-                syntax = getDefaultDocumentSyntax();
-                LOGGER.warn("Failed to set syntax [" + syntaxId + "] for ["
-                    + getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) + "], setting syntax ["
-                    + syntax.toIdString() + "] instead.", e);
-            }
+            syntax = resolveSyntax(syntaxId);
         }
 
         setSyntax(syntax);

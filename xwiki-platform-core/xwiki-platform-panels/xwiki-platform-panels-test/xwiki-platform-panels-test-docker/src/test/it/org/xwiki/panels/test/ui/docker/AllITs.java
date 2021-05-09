@@ -30,7 +30,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 11.3RC1
  */
 @UITest
-public class AllITs
+class AllITs
 {
     @Nested
     @DisplayName("Panels Administration Tests")
@@ -41,6 +41,18 @@ public class AllITs
     @Nested
     @DisplayName("Navigation Panel Tests")
     class NestedNavigationPanelIT extends NavigationPanelIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Navigation Panel Administration Tests")
+    class NestedNavigationPanelAdministrationIT extends NavigationPanelAdministrationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Panels Tests")
+    class NestedPanelIT extends PanelIT
     {
     }
 }

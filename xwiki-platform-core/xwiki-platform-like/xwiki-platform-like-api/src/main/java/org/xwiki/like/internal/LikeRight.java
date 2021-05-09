@@ -48,7 +48,7 @@ public final class LikeRight implements RightDescription
     @Override
     public String getName()
     {
-        return "Like";
+        return "like";
     }
 
     @Override

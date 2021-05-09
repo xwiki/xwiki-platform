@@ -62,7 +62,7 @@
 ## when request user is not given we are sending the list of NotificationFilterPreference of the current wiki.
 #else
   #set ($target = $services.wiki.getCurrentWikiReference())
-  #set ($document = $xwiki.getDocument('XWiki.XWikiPreferences'))
+  #set ($document = $xwiki.getDocument('XWiki.Notifications.Code.NotificationAdministration'))
   #set ($userTarget = false)
 #end
 #set ($elements = [])
@@ -223,8 +223,9 @@ $jsontool.serialize({
   &lt;/ul&gt;
 #end
 #macro (displayNotificationFormatsList $formatList)
+  #set ($sortedFormatList = $collectiontool.sort($formatList))
   &lt;ul class="list-unstyled"&gt;
-  #foreach ($notificationFormat in $formatList)
+  #foreach ($notificationFormat in $sortedFormatList)
     &lt;li&gt;$services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()")&lt;/li&gt;
   #end
   &lt;/ul&gt;

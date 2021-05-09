@@ -19,10 +19,13 @@
  */
 package org.xwiki.extension.index.internal;
 
+import java.util.regex.Pattern;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
@@ -51,14 +54,21 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     public static final String INDEX_SUFFIX = "_index";
 
     /**
-     * Indicate the list of features in a search friendly manner.
+     * Index the list of features in a full text search friendly manner.
      */
     public static final String SOLR_FIELD_EXTENSIONFEATURES_INDEX = Extension.FIELD_EXTENSIONFEATURES + INDEX_SUFFIX;
 
     /**
-     * Indicate the list of authors in a search friendly manner.
+     * Index the list of authors in a full text search friendly manner.
      */
     public static final String SOLR_FIELD_AUTHORS_INDEX = Extension.FIELD_AUTHORS + INDEX_SUFFIX;
+
+    /**
+     * Index the list of components in a full text search friendly manner.
+     * 
+     * @since 13.3RC1
+     */
+    public static final String SOLR_FIELD_COMPONENTS_INDEX = Extension.FIELD_COMPONENTS + INDEX_SUFFIX;
 
     /**
      * We can't use {@link Extension#FIELD_ID} because it collide with {@link #SOLR_FIELD_ID}.
@@ -85,12 +95,16 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SOLR_FIELD_INDEX_DATE = "s_indexDate";
 
+    private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
+
     private static final long SCHEMA_VERSION_12_9 = 120900000;
+
+    private static final long SCHEMA_VERSION_13_3 = 130300000;
 
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_9;
+        return SCHEMA_VERSION_13_3;
     }
 
     @Override
@@ -134,11 +148,36 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
         setStringField(SOLR_FIELD_COMPATIBLE_NAMESPACES, true, false);
         setStringField(SOLR_FIELD_INCOMPATIBLE_NAMESPACES, true, false);
+
+        migrateSchema(SCHEMA_VERSION_12_9);
     }
 
     @Override
     protected void migrateSchema(long cversion) throws SolrException
     {
-        // No change yet
+        if (cversion < SCHEMA_VERSION_13_3) {
+            // Store all components
+            setStringField(Extension.FIELD_COMPONENTS, true, false);
+            setTextGeneralField(SOLR_FIELD_COMPONENTS_INDEX, true, false, SOLR_FIELD_STORED, false);
+            addCopyField(Extension.FIELD_COMPONENTS, SOLR_FIELD_COMPONENTS_INDEX);
+
+            // Store hints for each component type
+            setStringField(toComponentFieldName("*"), true, true);
+        }
+    }
+
+    /**
+     * @param componentType the type of the component
+     * @return the name of the Solr field where to store this component hints
+     */
+    public static String toComponentFieldName(String componentType)
+    {
+        String cannonicalType = DefaultExtensionComponent.toCanonicalComponentType(componentType);
+
+        // It's a pity but I cannot find any way to escape < > and , in a Solr query so replacing them
+        // Conflict is theorically possible but highly unlikely, especially since it's only about component roles
+        cannonicalType = COMPONENT_SPECIAL_CHARS.matcher(cannonicalType).replaceAll("_");
+
+        return Extension.FIELD_COMPONENTS + "__" + cannonicalType;
     }
 }

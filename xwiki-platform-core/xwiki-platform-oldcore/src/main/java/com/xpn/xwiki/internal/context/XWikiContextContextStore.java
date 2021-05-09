@@ -183,11 +183,6 @@ public class XWikiContextContextStore extends AbstractContextStore
     private static final DocumentReference SUPERADMIN_REFERENCE =
         new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
 
-    protected interface SubContextStore
-    {
-        void save(String key, String subkey);
-    }
-
     @Inject
     private Provider<XWikiContext> writeProvider;
 

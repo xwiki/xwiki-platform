@@ -19,6 +19,9 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -57,6 +60,16 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
     private static final EntityReference INTERVAL_OBJECT =
         BaseObjectReference.any("XWiki.Notifications.Code.NotificationEmailPreferenceClass");
 
+    private static final List<Event> EVENT_LIST = Arrays.asList(
+        new XObjectAddedEvent(USER_OBJECT),
+        new XObjectDeletedEvent(USER_OBJECT),
+        new XObjectUpdatedEvent(USER_OBJECT),
+        new XObjectAddedEvent(INTERVAL_OBJECT),
+        new XObjectUpdatedEvent(INTERVAL_OBJECT),
+        new XObjectDeletedEvent(INTERVAL_OBJECT),
+        new WikiDeletedEvent()
+    );
+
     @Inject
     private IntervalUsersManager users;
 
@@ -65,8 +78,7 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
      */
     public IntervalUsersManagerInvalidator()
     {
-        super(NAME, new XObjectAddedEvent(USER_OBJECT), new XObjectDeletedEvent(USER_OBJECT),
-            new XObjectUpdatedEvent(USER_OBJECT), new XObjectUpdatedEvent(INTERVAL_OBJECT), new WikiDeletedEvent());
+        super(NAME, EVENT_LIST);
     }
 
     @Override

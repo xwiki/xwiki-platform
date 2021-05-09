@@ -24,9 +24,28 @@ module.exports = {
   // __webpack_public_path__ variable (see https://webpack.js.org/configuration/output/#outputpublicpath).
   publicPath: '',
   filenameHashing: false,
+
+  configureWebpack: config => {
+    // Skip LESS parsing because we want the LESS code to be evaluated at runtime, on the server, in the context of the
+    // XWiki skin so that we can use skin and color theme variables.
+    const lessRules = config.module.rules.find(rule => /less/.test(rule.test));
+    lessRules.oneOf.forEach(context => {
+      const loaders = context.use;
+      const lessLoaderIndex = loaders.findIndex(loader => /less-loader/.test(loader.loader));
+      if (lessLoaderIndex !== -1) {
+        loaders.splice(lessLoaderIndex, 1);
+      }
+    });
+    // Export all styles as LESS files to be included in the WebJar.
+    const miniCssExtractPlugin = config.plugins.find(plugin => plugin.constructor.name === "MiniCssExtractPlugin");
+    miniCssExtractPlugin.options.filename = "[name].less";
+    miniCssExtractPlugin.options.chunkFilename = "less/[name].less?evaluate=true";
+  },
+
   chainWebpack: config => {
     // Provided dependencies (that shouldn't be bundled).
     config.externals({
+      "vue-i18n": "vue-i18n",
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",
       "moment": "moment",
@@ -35,6 +54,8 @@ module.exports = {
     })
   },
   css: {
-    extract: false,
+    // We want to extract the styles as LESS files in order to be able to evaluate them at rutime in the context of the
+    // XWiki skin and color theme.
+    extract: true,
   },
 };

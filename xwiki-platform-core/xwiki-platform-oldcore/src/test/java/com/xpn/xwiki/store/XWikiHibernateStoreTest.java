@@ -29,6 +29,7 @@ import java.util.Locale;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -56,9 +57,12 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
@@ -67,6 +71,8 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -136,6 +142,9 @@ public class XWikiHibernateStoreTest
     @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -342,7 +351,7 @@ public class XWikiHibernateStoreTest
     @Test
     void existsWithRootLocale() throws Exception
     {
-        String fullName = "foo";
+        String fullName = "space.page";
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getLocale()).thenReturn(Locale.ROOT);
         when(doc.getFullName()).thenReturn(fullName);
@@ -352,6 +361,9 @@ public class XWikiHibernateStoreTest
             .thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
+
         assertTrue(store.exists(doc, xcontext));
 
         verify(query).setParameter("fullName", fullName);
@@ -360,7 +372,7 @@ public class XWikiHibernateStoreTest
     @Test
     void existsWithNonRootLocale() throws Exception
     {
-        String fullName = "bar";
+        String fullName = "space.page";
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getLocale()).thenReturn(Locale.ENGLISH);
         when(doc.getFullName()).thenReturn(fullName);
@@ -371,10 +383,38 @@ public class XWikiHibernateStoreTest
         when(session.createQuery(statement)).thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
+
         assertTrue(store.exists(doc, xcontext));
 
         verify(query).setParameter("fullName", fullName);
         verify(query).setParameter("language", Locale.ENGLISH.toString());
+    }
+
+    @Test
+    void existsWhenDocumentBelongsToNonExistingWiki() throws Exception
+    {
+        XWikiDocument doc = mock(XWikiDocument.class);
+
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("notexisting");
+        when(this.wikiDescriptorManager.exists("notexisting")).thenReturn(false);
+
+        assertFalse(store.exists(doc, xcontext));
+    }
+
+    @Test
+    void existsWhenFailureToGetDescriptors() throws Exception
+    {
+        XWikiDocument doc = mock(XWikiDocument.class);
+
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.exists("wiki")).thenThrow(new WikiManagerException("error"));
+
+        Throwable exception = assertThrows(XWikiException.class, () -> store.exists(doc, xcontext));
+        assertEquals("Error number 3236 in 3: Error while checking for existence of the [wiki] wiki",
+            exception.getMessage());
+        assertEquals("WikiManagerException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 
     @Test

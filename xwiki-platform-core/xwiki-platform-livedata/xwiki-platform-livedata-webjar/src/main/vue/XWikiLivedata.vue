@@ -25,7 +25,7 @@
   totally autonomous.
 -->
 <template>
-  <div class="xwiki-livedata">
+  <div class="xwiki-livedata" :id="data.id">
 
       <!-- Import the Livedata advanced configuration panels -->
       <LivedataAdvancedPanels/>

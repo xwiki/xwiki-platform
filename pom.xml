@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>13.3-SNAPSHOT</version>
+  <version>13.4-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -49,7 +49,7 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.5.1</hsqldb.version>
+    <hsqldb.version>2.5.2</hsqldb.version>
 
     <!-- Dependencies versions -->
     <ckeditor.version>1.53.2</ckeditor.version>
@@ -67,7 +67,7 @@
     <jetty.version>9.4.29.v20200521</jetty.version>
 
     <!-- Netty version -->
-    <netty.version>4.1.62.Final</netty.version>
+    <netty.version>4.1.63.Final</netty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -89,14 +89,14 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.30.Final</hibernate.version>
+    <hibernate.version>5.4.31.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>8.0.23</mysql.version>
+    <mysql.version>8.0.24</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>2.7.2</mariadb.version>
@@ -105,7 +105,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.19</pgsql.version>
+    <pgsql.version>42.2.20</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -164,6 +164,20 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Liquibase -->
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>4.3.5</version>
+        <exclusions>
+          <!-- Not the right id -->
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
       <dependency>
@@ -1178,7 +1192,7 @@
         <pluginRepository>
           <id>xwiki-snapshots</id>
           <name>XWiki Nexus Plugin Snapshot Repository Proxy</name>
-          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -1189,7 +1203,7 @@
         <pluginRepository>
           <id>xwiki-releases</id>
           <name>XWiki Nexus Plugin Releases Repository Proxy</name>
-          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <url>https://nexus.xwiki.org/nexus/content/groups/public</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -1202,7 +1216,7 @@
         <repository>
           <id>xwiki-snapshots</id>
           <name>XWiki Nexus Snapshot Repository Proxy</name>
-          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -1213,7 +1227,7 @@
         <repository>
           <id>xwiki-releases</id>
           <name>XWiki Nexus Releases Repository Proxy</name>
-          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <url>https://nexus.xwiki.org/nexus/content/groups/public</url>
           <releases>
             <enabled>true</enabled>
           </releases>

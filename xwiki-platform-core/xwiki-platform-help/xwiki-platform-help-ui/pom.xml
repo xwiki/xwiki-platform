@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-help</artifactId>
-    <version>13.3-SNAPSHOT</version>
+    <version>13.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-help-ui</artifactId>
   <name>XWiki Platform - Help - UI</name>
@@ -195,8 +195,27 @@
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
           <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/Help/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Contributors/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Applications/Movies/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Box/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Chart/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Gallery/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Notifications/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/ToC/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Macros/Tree/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Videos/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Help/Templates/WebHome\.xml</visibleTechnicalPage>
             <visibleTechnicalPage>.*/XWiki/XWikiSyntax\.xml</visibleTechnicalPage>
           </visibleTechnicalPages>
+          <contentPages>
+            <contentPage>.*/Help/Applications/Contributors/Charlie Chaplin\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Contributors/Frank Capra\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Meet John Doe\.xml</contentPage>
+            <contentPage>.*/Help/Applications/Movies/Modern Times\.xml</contentPage>
+          </contentPages>
         </configuration>
       </plugin>
       <!-- Attach resources to the corresponding wiki pages. -->
@@ -266,4 +285,27 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <!-- Add the Clover JAR to the XMLDoc Update plugin runtime classpath since the XMLDoc Update plugin uses java
+               classes that have been instrumented with Clover (XWiki oldcore for example) -->
+          <plugin>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
+            <version>${project.version}</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.openclover</groupId>
+                <artifactId>clover</artifactId>
+                <version>${clover.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

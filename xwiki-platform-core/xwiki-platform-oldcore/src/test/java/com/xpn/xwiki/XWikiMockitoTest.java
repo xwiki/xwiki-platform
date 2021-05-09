@@ -80,11 +80,14 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.mockito.OldcoreMatchers;
+import com.xpn.xwiki.test.mockito.XWikiDocumentMatcher;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -520,6 +523,29 @@ public class XWikiMockitoTest
             this.xwiki.getDocument(pageReference, this.context).getDocumentReference());
         assertEquals(webhomeDocumentReference,
             this.xwiki.getDocument(pageObjectReference, this.context).getDocumentReference());
+    }
+
+    @Test
+    public void getExistsWithPageReference() throws Exception
+    {
+        PageReference pageReference = new PageReference("wiki", "Main", "Space");
+        DocumentReference webhomeDocumentReference =
+            new DocumentReference("wiki", Arrays.asList("Main", "Space"), "WebHome");
+        DocumentReference finalDocumentReference = new DocumentReference("wiki", "Main", "Space");
+
+        assertFalse(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(finalDocumentReference), same(context))).thenReturn(true);
+
+        assertTrue(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(finalDocumentReference), same(context))).thenReturn(false);
+
+        assertFalse(this.xwiki.exists(pageReference, this.context));
+
+        when(this.store.exists(OldcoreMatchers.isDocument(webhomeDocumentReference), same(context))).thenReturn(true);
+
+        assertTrue(this.xwiki.exists(pageReference, this.context));
     }
 
     @Test

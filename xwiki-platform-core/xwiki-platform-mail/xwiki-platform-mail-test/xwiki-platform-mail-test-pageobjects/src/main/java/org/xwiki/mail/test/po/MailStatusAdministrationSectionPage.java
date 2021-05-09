@@ -20,7 +20,7 @@
 package org.xwiki.mail.test.po;
 
 import org.xwiki.administration.test.po.AdministrationSectionPage;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the actions possible on the Mail Status Administration Page.
@@ -42,12 +42,10 @@ public class MailStatusAdministrationSectionPage extends AdministrationSectionPa
     }
 
     /**
-     * @return the status live table
+     * @return the status live data
      */
-    public LiveTableElement getLiveTable()
+    public LiveDataElement getLiveData()
     {
-        LiveTableElement lt = new LiveTableElement("sendmailstatus");
-        lt.waitUntilReady();
-        return lt;
+        return new LiveDataElement("sendmailstatus");
     }
 }

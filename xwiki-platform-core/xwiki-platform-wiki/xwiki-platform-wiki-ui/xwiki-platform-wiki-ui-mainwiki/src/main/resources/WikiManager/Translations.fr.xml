@@ -85,7 +85,7 @@ platform.wiki.create.button=Créer un wiki
 platform.wiki.create.title=Créer un nouveau wiki
 platform.wiki.create.members=MEMBRES
 platform.wiki.create.prettyname.empty=Le nom d'affichage ne peut pas être vide
-platform.wiki.create.error=Échec de la création du wiki "{0}": {1}.
+platform.wiki.create.error=Échec de création du wiki "{0}" : {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Une base de données avec cet identifiant existe déjà
 platform.wiki.create.error.wikiname.wikialreadyexists=Cet identifiant existe déjà
 platform.wiki.create.error.wikiname.empty=L'identifiant ne peut pas être vide
@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.dw=Après avoir cliqué sur "créer", le wiki s
 platform.wiki.create.wizard.step.previous=Étape précédente
 platform.wiki.create.wizard.step.next=Étape suivante
 platform.wiki.create.wizard.step.create=Créer
-
 platform.wiki.create.wizard.step.creation=Création du wiki
 platform.wiki.create.wizard.step.creation.wait=Merci de patienter pendant la création du wiki.
 platform.wiki.create.wizard.step.creation.complete=Le wiki {0} a été créé avec succès. Vous pouvez dès à présent y accéder.
@@ -303,5 +302,6 @@ platform.wiki.delete.confirmation.yes=Oui, supprimer ce wiki !
 platform.wiki.delete.confirmation.no=Non, revenir en arrière !
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

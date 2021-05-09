@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -91,5 +91,4 @@ index.documentTree.more={0} mehr ...
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Kinddokumente anzeigen
 rendering.macro.documentTree.parameter.showChildDocuments.description=Ob die untergeordneten Dokumente basierend auf dem übergeordneten Feld des Dokuments angezeigt werden sollen.</content>
-  
 </xwikidoc>

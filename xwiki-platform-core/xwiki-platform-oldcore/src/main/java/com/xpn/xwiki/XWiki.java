@@ -109,7 +109,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
-import org.xwiki.extension.event.ExtensionInitializedEvent;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -399,9 +398,6 @@ public class XWiki implements EventListener
     private static final String VERSION_FILE_PROPERTY = "version";
 
     private static XWikiInitializerJob job;
-
-    /** List of configured syntax ids. */
-    private List<String> configuredSyntaxes;
 
     /** Used to convert a proper Document Reference to string (standard form). */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
@@ -1320,10 +1316,6 @@ public class XWiki implements EventListener
 
             String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
-
-            // Save the configured syntaxes
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/1.0");
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
             getObservationManager().addListener(this);
         } finally {
@@ -4761,24 +4753,23 @@ public class XWiki implements EventListener
                     WikiReference wikiReference = context.getWikiReference();
                     context.setWikiReference(sourceDocumentReference.getWikiReference());
 
-                    // Step 1: Simulate creating a document and deleting a document from listeners point of view
-                    // FIXME: currently modifications made by listeners won't be applied
-                    XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
-                    futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
-                    beforeSave(futureTargetDocument, context);
-                    XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
-
-                    // Step 2: Perform atomic rename in DB
                     try {
-                        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+                        // rename main document
+                        this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
+
+                        // handle translations
+                        List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
+                        for (Locale translationLocale : translationLocales) {
+                            DocumentReference translatedSourceReference =
+                                new DocumentReference(sourceDocumentReference, translationLocale);
+                            DocumentReference translatedTargetReference =
+                                new DocumentReference(targetDocumentReference, translationLocale);
+                            XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
+                            this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
+                        }
                     } finally {
                         context.setWikiReference(wikiReference);
                     }
-
-                    // Step 3: Simulate a created document and a deleted document from listeners point of view
-                    targetDocument = this.getDocument(targetDocumentReference, context);
-                    afterDelete(deletedDocument, context);
-                    afterSave(futureTargetDocument, context);
 
                     // Step 4: For each child document, update its parent reference.
                     // Step 5: For each backlink to rename, parse the backlink document and replace the links with
@@ -4793,6 +4784,24 @@ public class XWiki implements EventListener
         }
 
         return result;
+    }
+
+    private void atomicRenameDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference,
+        XWikiContext context) throws XWikiException
+    {
+        // Step 1: Simulate creating a document and deleting a document from listeners point of view
+        // FIXME: currently modifications made by listeners won't be applied
+        XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
+        futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
+        beforeSave(futureTargetDocument, context);
+        XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
+
+        // Step 2: Perform atomic rename in DB
+        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+
+        // Step 3: Simulate a created document and a deleted document from listeners point of view
+        afterDelete(deletedDocument, context);
+        afterSave(futureTargetDocument, context);
     }
 
     private void updateLinksForRename(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
@@ -6586,6 +6595,32 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * Returns whether a page exists or not.
+     * 
+     * @param reference the reference of the page to check for its existence
+     * @return true if the page exists, false if not
+     * @since 13.3RC1
+     * @since 12.10.7
+     */
+    @Unstable
+    public boolean exists(PageReference reference, XWikiContext context)
+    {
+        // Try as space
+        DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
+        if (exists(documentReference, context)) {
+            return true;
+        }
+
+        // Try as document
+        if (documentReference.getParent().getParent().getType() == EntityType.SPACE) {
+            return exists(new DocumentReference(documentReference.getParent().getName(),
+                documentReference.getParent().getParent(), documentReference.getParameters()), context);
+        }
+
+        return false;
+    }
+
     public String getAdType(XWikiContext context)
     {
         String adtype = "";
@@ -7667,18 +7702,6 @@ public class XWiki implements EventListener
         }
 
         return document;
-    }
-
-    /**
-     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
-     *         {@code mediawiki/1.0}, etc)
-     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
-     *             instead
-     */
-    @Deprecated
-    public List<String> getConfiguredSyntaxes()
-    {
-        return this.configuredSyntaxes;
     }
 
     /**

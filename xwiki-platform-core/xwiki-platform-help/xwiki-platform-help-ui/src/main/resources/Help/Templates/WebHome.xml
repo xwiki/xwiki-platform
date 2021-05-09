@@ -35,17 +35,17 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
-#set ($plaformPrefix = 'https://platform.xwiki.org/xwiki/bin/view/Features')
+#set ($featuresPrefix = 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features')
 #set ($exoPrefix = 'https://extensions.xwiki.org/xwiki/bin/view/Extension')
 #set ($actionCards = [{
   'title': $services.localization.render('help.templates.useTemplates.title'),
   'description': $services.localization.render('help.templates.useTemplates.description'),
   'tip': $services.localization.render('help.templates.useTemplates.tip',
-    ["&lt;a href='$plaformPrefix/DocumentLifecycle#HCreate' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
+    ["&lt;a href='$featuresPrefix/DocumentLifecycle#HCreate' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'Template',
   'actions': [{
     'label': $services.localization.render('help.try.label'),

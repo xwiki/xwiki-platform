@@ -22,11 +22,8 @@ package org.xwiki.livetable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,10 +36,8 @@ import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
-import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.velocity.tools.RegexTool;
@@ -58,7 +53,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -79,21 +73,6 @@ public class LiveTableResultsTest extends PageTest
     @SuppressWarnings("deprecation")
     public void setUp() throws Exception
     {
-        // The LiveTableResults page uses Velocity macros from the macros.vm template. We need to overwrite the Velocity
-        // configuration in order to use the ClasspathResourceLoader for loading the macros.vm template from the class
-        // path.
-        VelocityConfiguration velocityConfiguration = this.oldcore.getMocker().getInstance(VelocityConfiguration.class);
-        Properties velocityConfigProps = velocityConfiguration.getProperties();
-        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADERS, "class");
-        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER + ".class." + RuntimeConstants.RESOURCE_LOADER_CLASS,
-            ClasspathResourceLoader.class.getName());
-        velocityConfigProps.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
-        velocityConfiguration = this.oldcore.getMocker().registerMockComponent(VelocityConfiguration.class);
-        when(velocityConfiguration.getProperties()).thenReturn(velocityConfigProps);
-
-        // The LiveTableResultsMacros page includes the hierarchy_macros.vm template.
-        this.oldcore.getMocker().registerMockComponent(TemplateManager.class);
-
         // The LiveTableResultsMacros page expects that the HTTP query is done with the "get" action and asking for
         // plain output.
         setOutputSyntax(Syntax.PLAIN_1_0);

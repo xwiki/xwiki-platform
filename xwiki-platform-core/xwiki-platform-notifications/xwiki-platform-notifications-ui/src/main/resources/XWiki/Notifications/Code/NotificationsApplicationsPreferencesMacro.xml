@@ -720,15 +720,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-.notifPreferences tbody {
+      <code>.notifPreferences tbody {
   margin-top: 2em;
 }
 .notifPreferences .appOdd {
-  background-color: $theme.menuContentBackgroundColor;
+  background: #e5e5e5;
 }
 .notifPreferences .appEven {
-  background-color: $theme.menuContentGradientColor;
+  background: #fafafa;
 }
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
@@ -753,7 +752,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <name>NotificationPreferencesTable</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse/>
     </property>
     <property>
       <use>currentPage</use>

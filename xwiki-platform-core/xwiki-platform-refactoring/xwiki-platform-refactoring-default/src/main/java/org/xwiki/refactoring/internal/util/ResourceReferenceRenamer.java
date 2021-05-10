@@ -85,12 +85,9 @@ public class ResourceReferenceRenamer
     {
         boolean result = false;
 
+        // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
                 this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
-
-        // current link, use the old document's reference to fill in blanks.
-        EntityReference oldLinkReference =
-            this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);

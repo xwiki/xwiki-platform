@@ -132,6 +132,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for RenamePageIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

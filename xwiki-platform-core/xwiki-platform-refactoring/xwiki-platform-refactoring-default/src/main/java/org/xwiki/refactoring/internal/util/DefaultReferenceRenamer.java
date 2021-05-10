@@ -64,7 +64,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
 {
     private static final List<BlockMatcher> DEFAULT_BLOCK_MATCHERS = Arrays.asList(
         new ClassBlockMatcher(LinkBlock.class),
-        new ClassBlockMatcher(ImageBlock.class)
+        new ClassBlockMatcher(ImageBlock.class),
+        new ClassBlockMatcher(MacroBlock.class)
     );
 
     private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES = new HashSet<>(Arrays.asList(

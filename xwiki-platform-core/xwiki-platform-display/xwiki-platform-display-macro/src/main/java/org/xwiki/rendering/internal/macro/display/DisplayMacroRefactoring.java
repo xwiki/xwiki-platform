@@ -27,6 +27,7 @@ import org.xwiki.rendering.internal.macro.include.IncludeMacroRefactoring;
 
 /**
  * Implementation of reference refactoring operation for display macro.
+ * Note that this refactoring component entirely relies on the implementation of {@link IncludeMacroRefactoring}.
  *
  * @version $Id$
  * @since 13.4RC1

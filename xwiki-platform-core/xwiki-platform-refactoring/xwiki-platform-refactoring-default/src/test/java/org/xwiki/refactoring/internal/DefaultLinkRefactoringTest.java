@@ -53,6 +53,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -123,6 +124,9 @@ class DefaultLinkRefactoringTest
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
     @MockComponent
     @Named("context")

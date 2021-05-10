@@ -25,8 +25,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroRefactoring;
@@ -44,30 +46,45 @@ import org.xwiki.rendering.syntax.Syntax;
 @Named("include")
 public class IncludeMacroRefactoring implements MacroRefactoring
 {
-    private static final String DOCUMENT_MACRO_PARAMETER = "document";
-    private static final String REFERENCE_MACRO_PARAMETER = "reference";
+    protected static final String DOCUMENT_MACRO_PARAMETER = "document";
+    protected static final String REFERENCE_MACRO_PARAMETER = "reference";
 
     @Inject
     @Named("compact")
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference sourceReference,
         DocumentReference targetReference, DocumentReference currentDocumentReference, Syntax syntax, boolean relative)
         throws MacroRefactoringException
     {
-        MacroBlock result = (MacroBlock) macroBlock.clone();
-        String oldReference = this.stringEntityReferenceSerializer.serialize(sourceReference, currentDocumentReference);
-        String newReference = this.stringEntityReferenceSerializer.serialize(targetReference, currentDocumentReference);
-        boolean modified = false;
-        if (oldReference.equals(result.getParameter(DOCUMENT_MACRO_PARAMETER))) {
-            result.setParameter(DOCUMENT_MACRO_PARAMETER, newReference);
-            modified = true;
+        String referenceParameter = macroBlock.getParameter(REFERENCE_MACRO_PARAMETER);
+        String documentParameter = macroBlock.getParameter(DOCUMENT_MACRO_PARAMETER);
+
+        String parameterName = null;
+        if (!StringUtils.isEmpty(referenceParameter)) {
+            DocumentReference reference = this.documentReferenceResolver.resolve(referenceParameter);
+            if (sourceReference.equals(reference)) {
+                parameterName = REFERENCE_MACRO_PARAMETER;
+            }
+        } else if (!StringUtils.isEmpty(documentParameter)) {
+            DocumentReference reference = this.documentReferenceResolver.resolve(documentParameter);
+            if (sourceReference.equals(reference)) {
+                parameterName = DOCUMENT_MACRO_PARAMETER;
+            }
         }
-        if (oldReference.equals(result.getParameter(REFERENCE_MACRO_PARAMETER))) {
-            result.setParameter(REFERENCE_MACRO_PARAMETER, newReference);
-            modified = true;
+
+        if (parameterName != null) {
+            MacroBlock result = (MacroBlock) macroBlock.clone();
+            String newReference =
+                this.stringEntityReferenceSerializer.serialize(targetReference, currentDocumentReference);
+            result.setParameter(parameterName, newReference);
+            return Optional.of(result);
+        } else {
+            return Optional.empty();
         }
-        return (modified) ? Optional.of(result) : Optional.empty();
     }
 }

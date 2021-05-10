@@ -34,7 +34,6 @@ import org.xwiki.refactoring.util.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -47,7 +46,6 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -67,9 +65,6 @@ public class DefaultMacroRefactoring implements MacroRefactoring
 
     @Inject
     private MacroContentParser macroContentParser;
-
-    @Inject
-    private SyntaxRegistry syntaxRegistry;
 
     @Inject
     private Provider<ReferenceRenamer> referenceRenamerProvider;
@@ -94,34 +89,21 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         }
     }
 
-    private Syntax getSyntax(MacroBlock macroBlock, Syntax fallbackSyntax)
-    {
-        Syntax resultSyntax = fallbackSyntax;
-        String metadataSyntax = macroBlock.getParameter(MetaData.SYNTAX);
-
-        if (metadataSyntax != null) {
-            resultSyntax = syntaxRegistry.getSyntax(metadataSyntax).orElse(fallbackSyntax);
-        }
-        return resultSyntax;
-    }
-
-    private XDOM parseMacroContent(MacroBlock macroBlock, Syntax syntax) throws MacroExecutionException
+    private MacroTransformationContext getTransformationContext(MacroBlock macroBlock, Syntax syntax)
     {
         MacroTransformationContext macroTransformationContext = new MacroTransformationContext();
         macroTransformationContext.setId("refactoring_" + macroBlock.getId());
         macroTransformationContext.setCurrentMacroBlock(macroBlock);
-        macroTransformationContext.setSyntax(getSyntax(macroBlock, syntax));
+        // fallback syntax: macro content parser search by default for the XDOM syntax.
+        macroTransformationContext.setSyntax(syntax);
         macroTransformationContext.setInline(macroBlock.isInline());
-
-        return this.macroContentParser
-            .parse(macroBlock.getContent(), macroTransformationContext, true, macroBlock.isInline());
+        return macroTransformationContext;
     }
 
     private MacroBlock renderMacroBlock(MacroBlock originalBlock, XDOM newXDOMContent, Syntax syntax)
         throws ComponentLookupException
     {
-        Syntax contentSyntax = this.getSyntax(originalBlock, syntax);
-        BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, contentSyntax.toIdString());
+        BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntax.toIdString());
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         renderer.render(newXDOMContent, printer);
         String content = printer.toString();
@@ -136,11 +118,14 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         Macro<?> macro = this.getMacro(macroBlock, syntax);
         if (this.shouldMacroContentBeParsed(macro)) {
             try {
-                XDOM xdom = this.parseMacroContent(macroBlock, syntax);
+                MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock, syntax);
+                XDOM xdom = this.macroContentParser
+                    .parse(macroBlock.getContent(), transformationContext, true, macroBlock.isInline());
                 boolean updated = this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
                     sourceReference, targetReference, relative);
                 if (updated) {
-                    return Optional.of(this.renderMacroBlock(macroBlock, xdom, syntax));
+                    Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
+                    return Optional.of(this.renderMacroBlock(macroBlock, xdom, renderingSyntax));
                 }
             } catch (MacroExecutionException e) {
                 throw new MacroRefactoringException("Error while parsing macro content for reference replacement", e);

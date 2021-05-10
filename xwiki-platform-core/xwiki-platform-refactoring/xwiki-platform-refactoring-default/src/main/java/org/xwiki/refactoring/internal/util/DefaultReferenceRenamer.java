@@ -42,10 +42,10 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.OrBlockMatcher;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
@@ -90,36 +90,39 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
     @Inject
     private ResourceReferenceRenamer resourceReferenceRenamer;
 
+    @Inject
+    private ExtendedRenderingConfiguration extendedRenderingConfiguration;
+
     @Override
-    public boolean renameReferences(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget, boolean relative)
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
     {
-        List<Block> blocks = xdom.getBlocks(new OrBlockMatcher(DEFAULT_BLOCK_MATCHERS), Block.Axes.DESCENDANT);
+        List<Block> blocks = block.getBlocks(new OrBlockMatcher(DEFAULT_BLOCK_MATCHERS), Block.Axes.DESCENDANT);
 
         boolean modified = false;
 
-        for (Block block : blocks) {
-            if (block instanceof MacroBlock) {
-                MacroBlock macroBlock = (MacroBlock) block;
+        for (Block matchingBlock : blocks) {
+            if (matchingBlock instanceof MacroBlock) {
+                MacroBlock macroBlock = (MacroBlock) matchingBlock;
                 Optional<MacroBlock> optionalMacroBlock = this.handleMacroBlock(macroBlock, currentDocumentReference,
                     oldTarget, newTarget, relative);
                 if (optionalMacroBlock.isPresent()) {
-                    xdom.replaceChild(optionalMacroBlock.get(), macroBlock);
+                    block.replaceChild(optionalMacroBlock.get(), macroBlock);
                     modified = true;
                 }
             } else {
                 ResourceReference reference;
-                if (block instanceof LinkBlock) {
-                    LinkBlock linkBlock = (LinkBlock) block;
+                if (matchingBlock instanceof LinkBlock) {
+                    LinkBlock linkBlock = (LinkBlock) matchingBlock;
                     reference = linkBlock.getReference();
 
-                } else if (block instanceof ImageBlock) {
-                    ImageBlock imageBlock = (ImageBlock) block;
+                } else if (matchingBlock instanceof ImageBlock) {
+                    ImageBlock imageBlock = (ImageBlock) matchingBlock;
                     reference = imageBlock.getReference();
                 } else {
                     throw new IllegalArgumentException(String.format(
                         "Only LinkBlock and ImageBlock can be processed and given class was: [%s]",
-                        block.getClass().getName()));
+                        matchingBlock.getClass().getName()));
                 }
                 modified |= this.renameResourceReference(reference, oldTarget, newTarget,
                     currentDocumentReference, relative);
@@ -142,6 +145,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                     macroBlock.getId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
+
+        // the document syntax will be used as a fallback syntax if the XDOM syntax cannot be found
         Syntax syntax;
         try {
             syntax = this.documentAccessBridge.getDocumentInstance(currentDocumentReference).getSyntax();
@@ -149,8 +154,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
             logger.warn("Error while trying to get syntax of the current document reference [{}]: "
                 + "[{}]", currentDocumentReference, ExceptionUtils.getRootCauseMessage(e));
 
-            // FIXME: probably not a good way to fallback
-            syntax = Syntax.XWIKI_2_1;
+            // last fallback in the unlikely case of there's no document syntax
+            syntax = this.extendedRenderingConfiguration.getDefaultContentSyntax();
         }
         try {
             return macroRefactoring

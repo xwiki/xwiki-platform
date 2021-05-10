@@ -21,7 +21,7 @@ package org.xwiki.refactoring.util;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -35,14 +35,14 @@ import org.xwiki.stability.Unstable;
 public interface ReferenceRenamer
 {
     /**
-     * @param xdom the {@link XDOM} to modify
+     * @param block the {@link Block} to modify
      * @param currentDocumentReference the current document reference
      * @param oldTarget the previous reference of the renamed document
      * @param newTarget the new reference of the renamed document
      * @param relative {@code true} if the link should be serialized relatively to the current document
      *      (see {@link org.xwiki.refactoring.internal.LinkRefactoring#updateRelativeLinks})
-     * @return true if the passed {@link XDOM} was modified
+     * @return true if the given {@link Block} was modified
      */
-    boolean renameReferences(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,
+    boolean renameReferences(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
         DocumentReference newTarget, boolean relative);
 }

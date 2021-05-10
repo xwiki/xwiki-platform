@@ -7,5 +7,8 @@ set -e
 # Restart Tomcat
 #########################
 
-# Restart tomcat9 service if it's active
-systemctl -q is-active tomcat9.service && service tomcat9 restart
+# Restart tomcat9 service (only if it's active)
+if systemctl -q is-active tomcat9.service
+then
+ service tomcat9 restart
+fi

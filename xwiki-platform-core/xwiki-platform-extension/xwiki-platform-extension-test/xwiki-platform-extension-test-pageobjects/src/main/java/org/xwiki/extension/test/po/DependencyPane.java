@@ -86,13 +86,7 @@ public class DependencyPane extends BaseElement
      */
     public String getName()
     {
-        WebElement link = getLink();
-        if (link != null) {
-            return link.getText();
-        }
-        // Unknown dependency, with no link.
-        String innerText = container.getText();
-        return innerText.substring(0, innerText.indexOf(getVersion()));
+        return getDriver().findElementWithoutWaiting(container, By.className("extension-name")).getText();
     }
 
     /**

@@ -34,6 +34,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -243,5 +244,25 @@ public class DefaultIconManagerTest
 
         // Verify
         assertTrue(metadata.isEmpty());
+    }
+
+    @Test
+    void hasIcon() throws Exception
+    {
+        IconSet testIconSet = new IconSet("testIconSet");
+        testIconSet.addIcon("iconA", null);
+        when(this.iconSetManager.getCurrentIconSet()).thenReturn(testIconSet);
+        assertTrue(this.iconManager.hasIcon("iconA"));
+        assertFalse(this.iconManager.hasIcon("iconB"));
+    }
+
+    @Test
+    void hasIconWithIconSet() throws Exception
+    {
+        IconSet testIconSet = new IconSet("testIconSet");
+        testIconSet.addIcon("iconA", null);
+        when(this.iconSetManager.getIconSet("testIconSet")).thenReturn(testIconSet);
+        assertTrue(this.iconManager.hasIcon("testIconSet", "iconA"));
+        assertFalse(this.iconManager.hasIcon("testIconSet", "iconB"));
     }
 }

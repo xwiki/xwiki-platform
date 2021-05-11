@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component to render an icon, depending on the current icon theme set on the preferences.
@@ -195,4 +196,33 @@ public interface IconManager
      * @since 6.4M1
      */
     List<String> getIconNames(String iconSetName) throws IconException;
+
+    /**
+     * Checks if the provided icon name exists in the current icon set.
+     *
+     * @param iconName an icon name (for instance, {@code add})
+     * @return {@code true} if the icon name exists in the current icon set, {@code false} otherwise
+     * @throws IconException in case of error when accessing the current icon set
+     * @since 13.4RC1
+     */
+    @Unstable
+    default boolean hasIcon(String iconName) throws IconException
+    {
+        return getIconNames().contains(iconName);
+    }
+
+    /**
+     * Checks if the provided icon name exists in the a given icon set.
+     *
+     * @param iconSetName an icon set name (for instance, {@code Silk})
+     * @param iconName an icon name (for instance, {@code add})
+     * @return {@code true} if the icon name exists in the current icon set, {@code false} otherwise
+     * @throws IconException in case of error when accessing the current icon set
+     * @since 13.4RC1
+     */
+    @Unstable
+    default boolean hasIcon(String iconSetName, String iconName) throws IconException
+    {
+        return getIconNames(iconSetName).contains(iconName);
+    }
 }

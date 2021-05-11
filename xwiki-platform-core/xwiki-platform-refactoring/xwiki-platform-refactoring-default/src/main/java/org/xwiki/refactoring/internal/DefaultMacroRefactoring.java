@@ -83,9 +83,9 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         return Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
     }
 
-    private Macro<?> getMacro(MacroBlock macroBlock) throws MacroRefactoringException
+    private Macro<?> getMacro(MacroBlock macroBlock, Syntax syntax) throws MacroRefactoringException
     {
-        MacroId macroId = new MacroId(macroBlock.getId(), this.renderingContext.getDefaultSyntax());
+        MacroId macroId = new MacroId(macroBlock.getId(), syntax);
         try {
             return this.macroManager.getMacro(macroId);
         } catch (MacroLookupException e) {
@@ -119,16 +119,16 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
-        Macro<?> macro = this.getMacro(macroBlock);
+        MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
+        Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
+        Macro<?> macro = this.getMacro(macroBlock, renderingSyntax);
         if (this.shouldMacroContentBeParsed(macro)) {
             try {
-                MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
                 XDOM xdom = this.macroContentParser
                     .parse(macroBlock.getContent(), transformationContext, true, macroBlock.isInline());
                 boolean updated = this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
                     sourceReference, targetReference, relative);
                 if (updated) {
-                    Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
                     return Optional.of(this.renderMacroBlock(macroBlock, xdom, renderingSyntax));
                 }
             } catch (MacroExecutionException e) {

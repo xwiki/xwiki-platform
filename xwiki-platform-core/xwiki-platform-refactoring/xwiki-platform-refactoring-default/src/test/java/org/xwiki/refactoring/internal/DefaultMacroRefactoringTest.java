@@ -134,6 +134,14 @@ class DefaultMacroRefactoringTest
     void replaceReferenceUnparseableMacro() throws MacroRefactoringException
     {
         when(this.contentDescriptor.getType()).thenReturn(String.class);
+        when(this.macroContentParser.getCurrentSyntax(any())).thenAnswer(invocationOnMock -> {
+            MacroTransformationContext transformationContext = invocationOnMock.getArgument(0);
+            assertEquals(transformationContext.getId(), "refactoring_" + macroId);
+            assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
+            assertEquals(this.syntax, transformationContext.getSyntax());
+            assertFalse(transformationContext.isInline());
+            return this.syntax;
+        });
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
                 this.sourceReference, this.targetReference, true));
@@ -152,6 +160,14 @@ class DefaultMacroRefactoringTest
         when(this.macroBlock.getContent()).thenReturn(macroContent);
 
         XDOM xdom = mock(XDOM.class);
+        when(this.macroContentParser.getCurrentSyntax(any())).thenAnswer(invocationOnMock -> {
+            MacroTransformationContext transformationContext = invocationOnMock.getArgument(0);
+            assertEquals(transformationContext.getId(), "refactoring_" + macroId);
+            assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
+            assertEquals(this.syntax, transformationContext.getSyntax());
+            assertFalse(transformationContext.isInline());
+            return this.syntax;
+        });
         when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false)))
             .thenAnswer(invocationOnMock -> {
             MacroTransformationContext transformationContext = invocationOnMock.getArgument(1);

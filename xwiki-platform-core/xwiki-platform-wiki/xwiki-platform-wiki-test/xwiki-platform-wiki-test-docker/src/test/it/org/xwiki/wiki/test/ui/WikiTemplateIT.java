@@ -21,11 +21,14 @@ package org.xwiki.wiki.test.ui;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wiki.test.po.AdminWikisTemplatesSheetPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.CreateWikiPageStepUser;
 import org.xwiki.wiki.test.po.DeleteWikiPage;
@@ -101,7 +104,7 @@ class WikiTemplateIT
         setup.loginAsSuperAdmin();
 
         // Create the template.
-        createTemplateWiki();
+        createTemplateWiki(setup);
 
         // Create the wiki from the template
         createWikiFromTemplate();
@@ -115,7 +118,7 @@ class WikiTemplateIT
             "CSRFToken: Secret token verification failed");
     }
 
-    private void createTemplateWiki() throws Exception
+    private void createTemplateWiki(TestUtils setup) throws Exception
     {
         // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
@@ -154,6 +157,14 @@ class WikiTemplateIT
         }
         assertThat(wikiLink.getURL(), endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
 
+        // Verify the wiki template is displayed the admin wiki templates list.
+        TableLayoutElement tableLayout = AdminWikisTemplatesSheetPage.goToPage().getLiveData().getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertCellWithLink("Wiki pretty name", "My new template",
+            setup.getURL(new DocumentReference("xwiki", "XWiki", "XWikiServerMynewtemplate")));
+        tableLayout.assertRow("Description", "This is the template I do for the tests");
+        tableLayout.assertRow("Owner", "superadmin");
+        tableLayout.assertRow("Membership Type", "Open for any user to join");
     }
 
     private void deleteTemplateWiki() throws Exception

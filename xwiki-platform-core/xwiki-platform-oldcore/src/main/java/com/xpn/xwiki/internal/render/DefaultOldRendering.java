@@ -37,7 +37,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.refactoring.util.ReferenceRenamer;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.velocity.VelocityEngine;

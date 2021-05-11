@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
 
@@ -51,12 +50,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryExecutor;
-import org.xwiki.refactoring.util.ReferenceRenamer;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 

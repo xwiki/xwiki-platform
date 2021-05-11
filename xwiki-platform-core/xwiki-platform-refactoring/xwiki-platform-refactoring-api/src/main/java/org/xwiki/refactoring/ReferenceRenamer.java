@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.util;
+package org.xwiki.refactoring;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -25,7 +25,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
- * Utility tool to replace references during rename/move refactoring operations.
+ * Allow to replace references during rename/move refactoring operations.
  *
  * @version $Id$
  * @since 13.4RC1
@@ -35,6 +35,8 @@ import org.xwiki.stability.Unstable;
 public interface ReferenceRenamer
 {
     /**
+     * Change references of the given block so that the references pointing to the old target points to the new target.
+     *
      * @param block the {@link Block} to modify
      * @param currentDocumentReference the current document reference
      * @param oldTarget the previous reference of the renamed document

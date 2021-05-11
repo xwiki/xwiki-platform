@@ -45,8 +45,6 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.refactoring.internal.util.DefaultReferenceRenamer;
-import org.xwiki.refactoring.internal.util.ResourceReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;

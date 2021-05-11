@@ -87,7 +87,6 @@ class ReleaseIT
         // Assert Livetable:
         // - verify that the Livetable contains our new Release entry.
         TableLayoutElement liveDataElement = homePage.getReleaseLiveData().getTableLayout();
-        assertTrue(liveDataElement.hasRow("Version", RELEASE_VERSION),
-            String.format("%s expected to be found in column Version.", RELEASE_VERSION));
+        liveDataElement.assertRow("Version", RELEASE_VERSION);
     }
 }

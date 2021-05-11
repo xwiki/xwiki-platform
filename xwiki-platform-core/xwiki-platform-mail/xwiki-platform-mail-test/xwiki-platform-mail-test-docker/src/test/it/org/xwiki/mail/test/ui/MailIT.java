@@ -239,12 +239,12 @@ class MailIT
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         // We don't wait for the first filters because we don't need to inspect the content of the live data before 
         // the last filter is set.
-        tableLayout.filterColumn(3, "Test", false);
-        tableLayout.filterColumn(5, "send_success", false);
-        tableLayout.filterColumn(6, "xwiki", false);
-        tableLayout.filterColumn(4, "john@doe.com");
+        tableLayout.filterColumn("Type", "Test", false);
+        tableLayout.filterColumn("Status", "send_success", false);
+        tableLayout.filterColumn("Wiki", "xwiki", false);
+        tableLayout.filterColumn("Recipients", "john@doe.com");
         assertTrue(tableLayout.countRows() > 0);
-        assertTrue(tableLayout.hasRow("Error", ""));
+        tableLayout.assertRow("Error", "");
 
         // Step 8: Verify that the Resend button in the Mail Status LT works fine by trying to resend the mail in error
         // now that the mail server is set correctly.
@@ -258,13 +258,13 @@ class MailIT
     {
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
-        tableLayout.filterColumn(5, "send_error");
+        tableLayout.filterColumn("Status", "send_error");
         tableLayout.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();
         tableLayout = statusPage.getLiveData().getTableLayout();
-        tableLayout.filterColumn(4, "to@doe.com");
+        tableLayout.filterColumn("Recipients", "to@doe.com");
         assertEquals(1, tableLayout.countRows());
         assertEquals("send_success", tableLayout.getCell(1, 5).getText());
     }
@@ -342,7 +342,7 @@ class MailIT
         // Verify that we have a mail in the prepare_success state
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
-        tableLayout.filterColumn(5, "prepare_success");
+        tableLayout.filterColumn("Status", "prepare_success");
         assertEquals(1, tableLayout.countRows());
     }
 

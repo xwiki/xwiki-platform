@@ -109,11 +109,11 @@ class PanelIT
         // Checks that the new panel is listed in the Panels home live data.
         PanelsHomePage panelsHomePage = PanelsHomePage.gotoPage();
         TableLayoutElement tableLayoutElement = panelsHomePage.getLiveData().getTableLayout();
-        tableLayoutElement.filterColumn(1, panelName);
+        tableLayoutElement.filterColumn("Name", panelName);
         assertEquals(1, tableLayoutElement.countRows());
-        tableLayoutElement.hasRow("Description", "Panel Description");
-        tableLayoutElement.hasRow("Panel type", "view");
-        tableLayoutElement.hasRow("Category", "Information");
+        tableLayoutElement.assertRow("Description", "Panel Description");
+        tableLayoutElement.assertRow("Panel type", "view");
+        tableLayoutElement.assertRow("Category", "Information");
 
         // Add the panel to the right column from the administration.
         setRightPanelInAdministration(SPECIAL_TITLE);

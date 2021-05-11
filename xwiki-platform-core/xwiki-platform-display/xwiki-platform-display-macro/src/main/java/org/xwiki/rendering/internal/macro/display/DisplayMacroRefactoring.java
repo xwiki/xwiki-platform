@@ -17,39 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro;
+package org.xwiki.rendering.internal.macro.display;
 
-import org.junit.jupiter.api.Test;
-import org.xwiki.model.EntityType;
-import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.macro.include.IncludeMacroRefactoring;
 
 /**
- * Validate {@link IncludeMacroParameters}.
- * 
+ * Implementation of reference refactoring operation for display macro.
+ * Note that this refactoring component entirely relies on the implementation of {@link IncludeMacroRefactoring}.
+ *
  * @version $Id$
+ * @since 13.4RC1
  */
-public class IncludeMacroParametersTest
+@Component
+@Singleton
+@Named("display")
+public class DisplayMacroRefactoring extends IncludeMacroRefactoring
 {
-    @Test
-    public void setPage()
-    {
-        IncludeMacroParameters parameters = new IncludeMacroParameters();
-
-        parameters.setPage("page");
-
-        assertSame(EntityType.PAGE, parameters.getType());
-    }
-    
-    @Test
-    public void setExcludeFirstHeading() 
-    {
-        IncludeMacroParameters parameters = new IncludeMacroParameters();
-
-        parameters.setExcludeFirstHeading(true);
-
-        assertTrue(parameters.isExcludeFirstHeading());
-    }
 }

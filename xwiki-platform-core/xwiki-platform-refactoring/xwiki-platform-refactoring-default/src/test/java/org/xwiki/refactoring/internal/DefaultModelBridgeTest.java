@@ -61,6 +61,7 @@ import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -132,12 +133,16 @@ class DefaultModelBridgeTest
     @Mock
     private AbstractCheckRightsRequest request;
 
+    @Mock
+    private XWikiRightService xWikiRightService;
+
     @BeforeEach
     void configure(MockitoComponentManager componentManager) throws Exception
     {
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(xwiki.getRecycleBinStore()).thenReturn(this.recycleBin);
         when(xwiki.getStore()).thenReturn(this.store);
+        when(xwiki.getRightService()).thenReturn(this.xWikiRightService);
 
         Provider<XWikiContext> xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
@@ -154,8 +159,8 @@ class DefaultModelBridgeTest
     private void assertLog(Level level, String message, Object... arguments)
     {
         ILoggingEvent log = this.logCapture.getLogEvent(0);
-        assertEquals(level, log.getLevel());
         assertEquals(message, log.getMessage());
+        assertEquals(level, log.getLevel());
         assertArrayEquals(arguments, log.getArgumentArray());
     }
 
@@ -576,6 +581,40 @@ class DefaultModelBridgeTest
 
         verify(recycleBin).deleteFromRecycleBin(deletedDocumentId, xcontext, true);
         assertLog(Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
+    }
+
+    @Test
+    void permanentlyDeleteDeletedDocumentWrongRights() throws Exception
+    {
+        long deletedDocumentId = 42;
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        String documentFullName = "fullName";
+        when(deletedDocument.getFullName()).thenReturn("");
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+        when(request.isCheckAuthorRights()).thenReturn(true);
+        when(request.isCheckRights()).thenReturn(false);
+        String username = "myUser";
+        when(this.xcontext.getUser()).thenReturn(username);
+        when(this.xWikiRightService.hasAccessLevel("delete", username, documentFullName, this.xcontext))
+            .thenReturn(false);
+
+        assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
+
+        verify(recycleBin, never()).deleteFromRecycleBin(deletedDocumentId, xcontext, true);
+
+        assertLog(1, Level.ERROR, "The author [{}] of this script is not allowed to permanently deleted document [{}] "
+            + "with id [{}]", null, documentReference, deletedDocumentId);
+
+        // this could be improved later: right now we don't get the rights in the test because the components are not
+        // all properly loaded from oldcore.
+        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
+            deletedDocumentId);
     }
 
     @Test

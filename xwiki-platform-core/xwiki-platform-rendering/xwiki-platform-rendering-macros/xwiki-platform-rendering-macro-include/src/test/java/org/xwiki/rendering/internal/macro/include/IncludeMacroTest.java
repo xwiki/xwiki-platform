@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro;
+package org.xwiki.rendering.internal.macro.include;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -50,7 +50,6 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
@@ -120,10 +119,6 @@ public class IncludeMacroTest
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
-    // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
-    @MockComponent
-    private WikiModel wikiModel;
-
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
@@ -154,6 +149,9 @@ public class IncludeMacroTest
 
         when(this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+
+        // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
+        this.componentManager.registerMockComponent(WikiModel.class);
     }
 
     @Test

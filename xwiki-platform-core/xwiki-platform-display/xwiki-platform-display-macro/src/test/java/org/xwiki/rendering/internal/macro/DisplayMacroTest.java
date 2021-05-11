@@ -115,10 +115,6 @@ public class DisplayMacroTest
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
-    // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
-    @MockComponent
-    private WikiModel wikiModel;
-
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
@@ -149,6 +145,8 @@ public class DisplayMacroTest
 
         when(this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
         when(this.contextualAuthorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
+        this.componentManager.registerMockComponent(WikiModel.class);
     }
 
     @Test

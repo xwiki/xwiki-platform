@@ -104,5 +104,4 @@ annotations.config.activate.title=주석 활성화
 ### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
 ### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure
 </content>
-  
 </xwikidoc>

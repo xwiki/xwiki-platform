@@ -72,5 +72,4 @@ entitynamevalidation.replacementCharacter.remove.done=Запрещенный с�
 entitynamevalidation.replacementCharacter.remove.failed=Ошибка при удалении запрещенного символа.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Пусто
 ### Missing: entitynamevalidation.admin.heading=Name Strategies</content>
-  
 </xwikidoc>

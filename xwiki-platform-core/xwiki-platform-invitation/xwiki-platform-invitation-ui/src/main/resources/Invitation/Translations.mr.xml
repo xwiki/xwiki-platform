@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -45,5 +45,4 @@ Invitation.WebHome_smtp_server_username.hint=एसएमटीपी सर्�
 Invitation.WebHome_smtp_port.hint=वापरण्यासाठी एसएमटीपी सर्व्हरचे पोर्ट.
 Invitation.WebHome_smtp_server.hint=पाठविण्यासाठी एसएमटीपी सर्व्हर.
 Invitation.WebHome_javamail_extra_props.hint=वापरण्यासाठी अतिरिक्त जावामेल गुणधर्मांची यादी.</content>
-  
 </xwikidoc>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -44,5 +44,4 @@ dashboard.gadgetEditor.changeGadget.label=가젯 변경
 dashboard.gadgetEditor.gadgetTitle.label=가젯 제목
 ### Missing: dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).
 ### Missing: dashboard.initialization.saveMessage=Initialize default dashboard user setup</content>
-  
 </xwikidoc>

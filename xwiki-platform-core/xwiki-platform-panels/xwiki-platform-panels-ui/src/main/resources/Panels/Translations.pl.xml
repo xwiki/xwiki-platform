@@ -49,5 +49,4 @@ panels.documentInformation.configureSyntaxes=skonfiguruj więcej składni
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Czy chcesz również przekonwertować zawartość dokumentu i obiekty na wybraną składnię? Wybranie 'anuluj' zresetuje składnie do poprzedniej i nic więcej nie zrobi. Zwróć uwagę, że jeśli wybierzesz 'ok' stracisz modyfikacje i twój dokument zostanie zapisany automatycznie, możesz anulować modyfikację poprzez pójście do interfejsu historii dokumentu i cofnięcie do ostatniej wersji.
 ### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
 ### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.</content>
-  
 </xwikidoc>

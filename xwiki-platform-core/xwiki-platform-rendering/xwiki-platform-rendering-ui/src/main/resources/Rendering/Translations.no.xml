@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -40,5 +40,4 @@
 admin.syntaxes.description=Velg standard sidesyntax og konfigurer de tilgjengelige merkesyntaxene.
 Rendering.RenderingConfigClass_disabledSyntaxes=Deaktiverte syntakser
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste med markeringssyntakser som sider ikke kan bruke</content>
-  
 </xwikidoc>

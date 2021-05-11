@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -66,5 +66,4 @@ rendering.macro.tree.parameter.limit.name=Límite
 rendering.macro.tree.parameter.limit.description=El número máximo de nodos secundarios que se mostrarán al expandir un nodo padre por primera vez. El resto de los nodos hijo son accesibles a través de un enlace "más...". Este parámetro se utiliza básicamente para paginar los nodos hijo y, por lo tanto, ayuda a escalar el árbol cuando el número de nodos hijo es grande. El árbol pasa este parámetro a la fuente del árbol, por lo que sólo funciona con árboles dinámicos cuya fuente implementa el límite de recuento de hijos.
 rendering.macro.tree.content.description=Puede utilizar listas desordenadas HTML anidadas para describir la estructura de árbol. Visite http://www.jstree.com/docs/html/ para obtener más información.
 tree.macro.editModeWarning=Este árbol no se puede mostrar en el modo de edición.</content>
-  
 </xwikidoc>

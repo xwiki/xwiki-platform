@@ -113,5 +113,4 @@ AnnotationCode.AnnotationConfig_displayed.hint=Zdecyduj, czy adnotacje mają by�
 AnnotationCode.AnnotationConfig_displayHighlight=Domyślnie zaznacz adnotacje
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Zdecyduj, czy wyróżnienie adnotacji powinno być wyświetlane zawsze, czy tylko po najechaniu kursorem na adnotację lub strukturę adnotacji
 AnnotationCode.AnnotationConfig_annotationClass=Klasa XWiki definiująca strukturę adnotacji</content>
-  
 </xwikidoc>

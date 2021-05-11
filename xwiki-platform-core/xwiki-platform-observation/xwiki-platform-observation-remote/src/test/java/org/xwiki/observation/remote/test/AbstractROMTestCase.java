@@ -32,7 +32,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 /**
- * Base class to easily emulate two instances of observation manager communicate with each other by network.
+ * Base class to easily emulate two instances of observation manager communicating with each other by network.
  * 
  * @version $Id$
  */

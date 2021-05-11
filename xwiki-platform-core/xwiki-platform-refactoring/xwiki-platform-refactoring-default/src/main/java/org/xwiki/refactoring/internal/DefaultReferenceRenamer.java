@@ -46,11 +46,13 @@ import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.OrBlockMatcher;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
  * Helper to rename references in various context (link, image, etc. ).
@@ -93,6 +95,9 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
 
     @Inject
     private ExtendedRenderingConfiguration extendedRenderingConfiguration;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
@@ -158,13 +163,23 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
             // last fallback in the unlikely case of there's no document syntax
             syntax = this.extendedRenderingConfiguration.getDefaultContentSyntax();
         }
+        if (this.renderingContext instanceof MutableRenderingContext) {
+            // Set the default syntax
+            ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                this.renderingContext.getXDOM(), syntax, this.renderingContext.getTransformationId(),
+                this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
+        }
         try {
             return macroRefactoring
-                .replaceReference(macroBlock, oldTarget, newTarget, currentDocumentReference, syntax,
-                    relative);
+                .replaceReference(macroBlock, currentDocumentReference, oldTarget, newTarget, relative);
         } catch (MacroRefactoringException e) {
             logger.warn("Error while trying to refactor reference from [{}] to [{}] in macro [{}] of "
                 + "document [{}]", oldTarget, newTarget, macroBlock.getId(), currentDocumentReference);
+        } finally {
+            // don't forget to pop the rendering context.
+            if (this.renderingContext instanceof MutableRenderingContext) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
         }
         return Optional.empty();
     }

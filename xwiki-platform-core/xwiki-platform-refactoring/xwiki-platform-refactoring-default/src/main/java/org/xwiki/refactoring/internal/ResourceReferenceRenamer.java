@@ -94,7 +94,7 @@ public class ResourceReferenceRenamer
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
 
-            // If the link targets the old (renamed) document reference, we must update it.
+        // If the link targets the old (renamed) document reference, we must update it.
         if (linkTargetDocumentReference.equals(oldReference)) {
             // If the link was resolved to a space...
             if (EntityType.SPACE.equals(linkEntityReference.getType())) {

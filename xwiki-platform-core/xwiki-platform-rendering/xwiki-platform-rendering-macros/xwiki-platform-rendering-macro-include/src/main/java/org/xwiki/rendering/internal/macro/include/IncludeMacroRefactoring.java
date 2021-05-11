@@ -33,7 +33,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
-import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Implementation of reference refactoring operation for include macro.
@@ -57,8 +56,8 @@ public class IncludeMacroRefactoring implements MacroRefactoring
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
-    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference sourceReference,
-        DocumentReference targetReference, DocumentReference currentDocumentReference, Syntax syntax, boolean relative)
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
         String referenceParameter = macroBlock.getParameter(REFERENCE_MACRO_PARAMETER);

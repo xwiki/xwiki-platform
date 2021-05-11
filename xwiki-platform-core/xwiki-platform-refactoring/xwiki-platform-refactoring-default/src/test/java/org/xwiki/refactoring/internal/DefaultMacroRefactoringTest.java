@@ -33,6 +33,7 @@ import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
@@ -45,6 +46,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -69,7 +71,7 @@ import static org.mockito.Mockito.when;
  * @since 13.4RC1
  */
 @ComponentTest
-public class DefaultMacroRefactoringTest
+class DefaultMacroRefactoringTest
 {
     @InjectMockComponents
     private DefaultMacroRefactoring macroRefactoring;
@@ -82,6 +84,9 @@ public class DefaultMacroRefactoringTest
 
     @MockComponent
     private Provider<ReferenceRenamer> referenceRenamerProvider;
+
+    @MockComponent
+    private RenderingContext renderingContext;
 
     private ReferenceRenamer referenceRenamer;
     private MacroBlock macroBlock;
@@ -122,18 +127,19 @@ public class DefaultMacroRefactoringTest
         String syntaxId = "syntaxId";
         when(this.syntax.toIdString()).thenReturn(syntaxId);
         this.blockRenderer = componentManager.registerMockComponent(BlockRenderer.class, syntaxId);
+        when(this.renderingContext.getDefaultSyntax()).thenReturn(syntax);
     }
 
     @Test
-    void replaceReferenceUnparseableMacro() throws MacroLookupException, MacroRefactoringException
+    void replaceReferenceUnparseableMacro() throws MacroRefactoringException
     {
         when(this.contentDescriptor.getType()).thenReturn(String.class);
         assertEquals(Optional.empty(),
-            this.macroRefactoring.replaceReference(this.macroBlock, this.sourceReference, this.targetReference,
-                this.currentDocumentReference, this.syntax, true));
+            this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
+                this.sourceReference, this.targetReference, true));
         assertEquals(Optional.empty(),
-            this.macroRefactoring.replaceReference(this.macroBlock, this.sourceReference, this.targetReference,
-                this.currentDocumentReference, this.syntax, false));
+            this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
+                this.sourceReference, this.targetReference, false));
         verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(), any(), anyBoolean());
     }
 
@@ -146,7 +152,8 @@ public class DefaultMacroRefactoringTest
         when(this.macroBlock.getContent()).thenReturn(macroContent);
 
         XDOM xdom = mock(XDOM.class);
-        when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false))).thenAnswer(invocationOnMock -> {
+        when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false)))
+            .thenAnswer(invocationOnMock -> {
             MacroTransformationContext transformationContext = invocationOnMock.getArgument(1);
             assertEquals(transformationContext.getId(), "refactoring_" + macroId);
             assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
@@ -157,8 +164,8 @@ public class DefaultMacroRefactoringTest
         when(this.referenceRenamer.renameReferences(xdom, this.currentDocumentReference, this.sourceReference,
             this.targetReference, true)).thenReturn(false);
         assertEquals(Optional.empty(),
-            this.macroRefactoring.replaceReference(this.macroBlock, this.sourceReference, this.targetReference,
-                this.currentDocumentReference, this.syntax, true));
+            this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference, this.sourceReference,
+                this.targetReference, true));
         verify(this.blockRenderer, never()).render(any(Block.class), any());
     }
 
@@ -199,8 +206,7 @@ public class DefaultMacroRefactoringTest
         when(macroBlock.getParameters()).thenReturn(parameters);
         MacroBlock expectedBlock = new MacroBlock(this.macroId, parameters, expectedContent, false);
         assertEquals(Optional.of(expectedBlock),
-            this.macroRefactoring.replaceReference(this.macroBlock, this.sourceReference, this.targetReference,
-            this.currentDocumentReference, this.syntax, true));
-
+            this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference, this.sourceReference,
+                this.targetReference, true));
     }
 }

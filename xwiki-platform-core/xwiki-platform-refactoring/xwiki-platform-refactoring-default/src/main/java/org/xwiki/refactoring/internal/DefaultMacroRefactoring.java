@@ -47,6 +47,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
  * Default implementation of {@link MacroRefactoring}.
@@ -73,15 +74,18 @@ public class DefaultMacroRefactoring implements MacroRefactoring
     @Named("context")
     private ComponentManager componentManager;
 
+    @Inject
+    private RenderingContext renderingContext;
+
     private boolean shouldMacroContentBeParsed(Macro<?> macro)
     {
         ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
         return Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
     }
 
-    private Macro<?> getMacro(MacroBlock macroBlock, Syntax syntax) throws MacroRefactoringException
+    private Macro<?> getMacro(MacroBlock macroBlock) throws MacroRefactoringException
     {
-        MacroId macroId = new MacroId(macroBlock.getId(), syntax);
+        MacroId macroId = new MacroId(macroBlock.getId(), this.renderingContext.getDefaultSyntax());
         try {
             return this.macroManager.getMacro(macroId);
         } catch (MacroLookupException e) {
@@ -89,13 +93,13 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         }
     }
 
-    private MacroTransformationContext getTransformationContext(MacroBlock macroBlock, Syntax syntax)
+    private MacroTransformationContext getTransformationContext(MacroBlock macroBlock)
     {
         MacroTransformationContext macroTransformationContext = new MacroTransformationContext();
         macroTransformationContext.setId("refactoring_" + macroBlock.getId());
         macroTransformationContext.setCurrentMacroBlock(macroBlock);
         // fallback syntax: macro content parser search by default for the XDOM syntax.
-        macroTransformationContext.setSyntax(syntax);
+        macroTransformationContext.setSyntax(this.renderingContext.getDefaultSyntax());
         macroTransformationContext.setInline(macroBlock.isInline());
         return macroTransformationContext;
     }
@@ -111,14 +115,14 @@ public class DefaultMacroRefactoring implements MacroRefactoring
     }
 
     @Override
-    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference sourceReference,
-        DocumentReference targetReference, DocumentReference currentDocumentReference, Syntax syntax, boolean relative)
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
         throws MacroRefactoringException
     {
-        Macro<?> macro = this.getMacro(macroBlock, syntax);
+        Macro<?> macro = this.getMacro(macroBlock);
         if (this.shouldMacroContentBeParsed(macro)) {
             try {
-                MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock, syntax);
+                MacroTransformationContext transformationContext = this.getTransformationContext(macroBlock);
                 XDOM xdom = this.macroContentParser
                     .parse(macroBlock.getContent(), transformationContext, true, macroBlock.isInline());
                 boolean updated = this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,

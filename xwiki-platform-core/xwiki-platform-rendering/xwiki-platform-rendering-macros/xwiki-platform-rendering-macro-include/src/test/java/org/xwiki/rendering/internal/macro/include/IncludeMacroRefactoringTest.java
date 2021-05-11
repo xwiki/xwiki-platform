@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -41,13 +40,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link IncludeMacroRefactoring}
+ * Tests for {@link IncludeMacroRefactoring}.
  *
  * @version $Id$
  * @since 13.4RC1
  */
 @ComponentTest
-public class IncludeMacroRefactoringTest
+class IncludeMacroRefactoringTest
 {
     @InjectMockComponents
     private IncludeMacroRefactoring includeMacroRefactoring;
@@ -75,13 +74,13 @@ public class IncludeMacroRefactoringTest
     void replaceReferenceNoOrEmptyParameter() throws MacroRefactoringException
     {
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(this.macroBlock,
-            this.sourceReference, this.targetReference, this.currentDocumentReference, null, false));
+            this.currentDocumentReference, this.sourceReference, this.targetReference, false));
         when(this.macroBlock.getParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER))
             .thenReturn("");
         when(this.macroBlock.getParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER))
             .thenReturn("");
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(this.macroBlock,
-            this.sourceReference, this.targetReference, this.currentDocumentReference, null, false));
+            this.currentDocumentReference, this.sourceReference, this.targetReference, false));
     }
 
     @Test
@@ -98,7 +97,7 @@ public class IncludeMacroRefactoringTest
         MacroBlock expectedBlock = mock(MacroBlock.class);
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
-            this.sourceReference, this.targetReference, this.currentDocumentReference, null, false));
+            this.currentDocumentReference, this.sourceReference, this.targetReference, false));
         verify(expectedBlock).setParameter(IncludeMacroRefactoring.REFERENCE_MACRO_PARAMETER, targetReference);
     }
 
@@ -116,7 +115,7 @@ public class IncludeMacroRefactoringTest
         MacroBlock expectedBlock = mock(MacroBlock.class);
         when(this.macroBlock.clone()).thenReturn(expectedBlock);
         assertEquals(Optional.of(expectedBlock), this.includeMacroRefactoring.replaceReference(this.macroBlock,
-            this.sourceReference, this.targetReference, this.currentDocumentReference, null, false));
+            this.currentDocumentReference, this.sourceReference, this.targetReference, false));
         verify(expectedBlock).setParameter(IncludeMacroRefactoring.DOCUMENT_MACRO_PARAMETER, targetReference);
     }
 }

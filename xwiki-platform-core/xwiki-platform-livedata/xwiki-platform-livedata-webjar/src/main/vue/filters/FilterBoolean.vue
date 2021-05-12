@@ -23,8 +23,8 @@
 <template>
   <select :value="filterValue" class="xwiki-selectize livedata-selectize" ref="input">
     <option value=""></option>
-    <option value="1">Yes</option>
-    <option value="0">No</option>
+    <option :value="getTrueValue()">Yes</option>
+    <option :value="getFalseValue()">No</option>
   </select>
 </template>
 
@@ -42,6 +42,25 @@ export default {
   data() {
     return {
       filterValue: undefined
+    }
+  },
+
+  methods: {
+    getTrueValue()
+    {
+      if (this.propertyId === 'doc.hidden') {
+        return 'true';
+      } else {
+        return '1'
+      }
+    },
+    getFalseValue()
+    {
+      if (this.propertyId === 'doc.hidden') {
+        return 'false';
+      } else {
+        return '0'
+      }
     }
   },
 

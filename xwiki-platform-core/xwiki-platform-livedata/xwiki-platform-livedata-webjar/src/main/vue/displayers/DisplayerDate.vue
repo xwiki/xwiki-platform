@@ -32,11 +32,18 @@
     class="displayer-date"
     :property-id="propertyId"
     :entry="entry"
+    :is-view.sync="isView"
+    @saveEdit="genericSave"
   >
 
     <!-- Provide the Date Viewer widget to the `viewer` slot -->
     <template #viewer>
-        <div>{{ valueFormatted }}</div>
+      <div v-if="valueFormatted">{{ valueFormatted }}</div>
+      <!--
+      Includes a non breakable space in the div if the date is empty to allow the dblclick listener to be triggered.
+      It is impossible to click on a block of size 0x0.
+      -->
+      <div v-else>&nbsp;</div>
     </template>
 
     <!-- Provide the Date Editor widget to the `editor` slot -->
@@ -61,6 +68,7 @@
 <script>
 
 import displayerMixin from "./displayerMixin.js";
+import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
 import "daterangepicker";
 import moment from "moment";
@@ -74,14 +82,17 @@ export default {
     BaseDisplayer,
   },
 
-  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin],
+  props: {
+    format: {
+      type: String,
+      default: "YYYY/MM/DD HH:mm"
+    }
+  },
 
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
+  mixins: [displayerMixin, displayerStatesMixin],
 
   computed: {
-    format () {
-      return "YYYY/MM/DD HH:mm";
-    },
     // Date formatted to be human-readable
     valueFormatted () {
       return moment(+this.value).format(this.format);
@@ -146,7 +157,7 @@ export default {
       return daterangepicker.startDate.format(this.format);
     },
 
-    applyDate () {
+    applyDate() {
       const daterangepicker = $(this.$refs.editorDate).data("daterangepicker");
       const value = this.getValue(daterangepicker);
       const valueTimestamps = +moment(value, this.format);

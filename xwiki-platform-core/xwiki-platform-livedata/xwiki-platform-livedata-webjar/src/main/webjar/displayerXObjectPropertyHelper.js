@@ -18,11 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-define('xwiki-livedata-xClassPropertyHelper', ['jquery', 'xwiki-meta', 'entityReference'], function($, xcontext) {
+define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-entityReference'], function($, xcontext, XWiki) {
   'use strict';
 
-  function computeTargetUrl(documentName, mode) {
-    return new XWiki.Document(XWiki.Model.resolve(documentName, XWiki.EntityType.DOCUMENT)).getURL(mode);
+  /**
+   * Resolve the url of the document reference in the given mode.
+   * @param documentReference the document reference
+   * @param mode the mode
+   * @returns {*} the computed relative url
+   */
+  function computeTargetUrl(documentReference, mode) {
+    return new XWiki.Document(XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT)).getURL(mode);
   }
 
   function computeProperty(property, className) {
@@ -46,9 +52,9 @@ define('xwiki-livedata-xClassPropertyHelper', ['jquery', 'xwiki-meta', 'entityRe
       return existingSkinExtensions.indexOf(url) < 0;
     }).appendTo('head');
   }
-
-  function load(mode, documentName, property, className) {
-    const targetUrl = computeTargetUrl(documentName, 'get');
+  
+  function load(mode, documentReference, property, className) {
+    const targetUrl = computeTargetUrl(documentReference, 'get');
     const computedProperty = computeProperty(property, className);
     return new Promise((resolve, reject) => {
       $.get(targetUrl, {
@@ -63,19 +69,33 @@ define('xwiki-livedata-xClassPropertyHelper', ['jquery', 'xwiki-meta', 'entityRe
         // Update the viewer.
         resolve(html);
       }).fail(() => {
-        // TODO: translate and improve error message
-        new XWiki.widgets.Notification('Failed to retrieve the edit field.', 'error');
+        // TODO: translate
+        new XWiki.widgets.Notification(`Failed to retrieve the ${mode} field.`, 'error');
         reject();
       })
     });
   }
 
-  function edit(documentName, className, property) {
-    return load('edit', documentName, property, className);
+  /**
+   * Load an XObject property field in edit mode.
+   * @param documentReference the reference of the document containing the XObject
+   * @param className the class name of the XObject
+   * @param property the XObject property to display
+   * @returns {*} the XObject property field html content in edit mode
+   */
+  function edit(documentReference, className, property) {
+    return load('edit', documentReference, property, className);
   }
 
-  function view(documentName, className, property) {
-    return load('view', documentName, property, className);
+  /**
+   * Load an XObject property field in view mode.
+   * @param documentReference the reference of the document containing the XObject
+   * @param className the class name of the XObject
+   * @param property the XObject property to display
+   * @returns {*} the XObject property field html content in view mode
+   */
+  function view(documentReference, className, property) {
+    return load('view', documentReference, property, className);
   }
 
   return {edit, view};

@@ -91,7 +91,7 @@ class LiveTableLiveDataConfigurationResolverTest
         assertEquals(output, objectMapper.writeValueAsString(liveDataConfig));
     }
 
-    private static Stream<String[]> getTestData() throws Exception
+    private static Stream<String[]> getTestData()
     {
         File inputFolder = new File("src/test/resources/liveTableConfigHelper");
         return Stream.of(inputFolder.listFiles(file -> file.getName().endsWith(".test")))

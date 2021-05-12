@@ -61,6 +61,7 @@ export default {
 
   props: {
     logic: Object,
+    editBus: Object
   },
 
   computed: {
@@ -77,6 +78,7 @@ export default {
   provide () {
     return {
       logic: this.logic,
+      editBus: this.editBus
     };
   },
 

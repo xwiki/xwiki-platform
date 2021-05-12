@@ -27,9 +27,10 @@
  */
 export default {
 
-  inject: ["logic"],
+  inject: ["logic", "editBus"],
 
   directives: {
+    // Only used by the date displayer.
     onInserted: {
       inserted (el, binding) {
         const handler = binding.value;
@@ -40,7 +41,7 @@ export default {
       }
     },
     // This directive autofocus the element that has it
-    // This can be usefull in order to autofocus the input in the Editor widget
+    // This can be useful in order to autofocus the input in the Editor widget
     // right after the user switched from the Viewer widget
     autofocus: {
       inserted (el) { el.focus(); }
@@ -58,7 +59,7 @@ export default {
     value () {
       return this.entry[this.propertyId];
     },
-    // The property descriptor of `this.propetyId`
+    // The property descriptor of `this.propertyId`
     propertyDescriptor () {
       return this.logic.getPropertyDescriptor(this.propertyId);
     },
@@ -73,27 +74,11 @@ export default {
   },
 
   methods: {
-    // This method should be used to apply edit and go back to view mode
-    // It validate the entered value, ensuring that is is valid for the server
-    applyEdit (newValue) {
-      this.logic.setValue({
-        entry: this.entry,
-        propertyId: this.propertyId,
-        value: newValue
-      });
-      // Go back to view mode
-      // (there might be a cleaner way to do this)
-      this.$el.__vue__.view();
-    },
-
-    // This method should be used to cancel edit and go back to view mode
-    // This is like applyEdit but it does not save the entered value
-    cancelEdit () {
-      // Go back to view mode
-      // (there might be a cleaner way to do this)
-      this.$el.__vue__.view();
-    },
-
-  },
-
+    /**
+     * Generic save operation where the saved value is the 
+     */
+    genericSave() {
+      this.editBus.save(this.entry, this.propertyId, [{[this.propertyId]: this.editedValue}])
+    }
+  }
 };

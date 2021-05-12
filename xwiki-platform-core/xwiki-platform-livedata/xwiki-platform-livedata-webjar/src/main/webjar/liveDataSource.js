@@ -50,13 +50,32 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
 
   var getEntriesURL = function(source) {
     var entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
+    return addSourcePathParameters(source, entriesURL);
+  };
+
+  function addSourcePathParameters(source, url) {
     var parameters = {
       // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
       timestamp: new Date().getTime()
     };
     addSourceParameters(parameters, source);
-    return entriesURL + '?' + $.param(parameters, true);
-  };
+    return `${url}?${$.param(parameters, true)}`;
+  }
+
+  function getEntryPropertyURL(source, entryId, propertyId) {
+    const encodedSourceId = encodeURIComponent(source.id);
+    const encodedEntryId = encodeURIComponent(entryId);
+    const encodedPropertyId = encodeURIComponent(propertyId);
+    const url = `${baseURL}${encodedSourceId}/entries/${encodedEntryId}/properties/${encodedPropertyId}`
+    return addSourcePathParameters(source, url);
+  }
+  
+  function getEntryURL(source, entryId) {
+    const encodedSourceId = encodeURIComponent(source.id);
+    const encodedEntryId = encodeURIComponent(entryId);
+    const url = `${baseURL}${encodedSourceId}/entries/${encodedEntryId}`
+    return addSourcePathParameters(source, url);
+  }
 
   var addSourceParameters = function(parameters, source) {
     $.each(source, (key, value) => {
@@ -74,8 +93,17 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   };
 
   var addEntry = function(source, entry) {
-    return Promise.resolve($.post(getEntriesURL(source), entry).then(entry => entry.values));
+    return Promise.resolve($.post(getEntriesURL(source), entry).then(e => e.values));
   };
+  
+  function updateEntry(source, entryId, values) {
+    return Promise.resolve($.ajax({
+      type: 'PUT',
+      url: getEntryURL(source, entryId),
+      contentType: 'application/json',
+      data: JSON.stringify({values})
+    }));
+  }
 
   var getTranslations = function(locale, prefix, keys) {
     const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
@@ -92,9 +120,20 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     return translationsMap;
   };
 
+  function updateEntryProperty(source, entryId, propertyId, propertyValue) {
+    return Promise.resolve($.ajax({
+      type: 'PUT',
+      url: getEntryPropertyURL(source, entryId, propertyId),
+      contentType: 'text/plain',
+      data: `${propertyValue}`
+    }))
+  }
+
   return {
     getEntries,
     addEntry,
+    updateEntry, 
+    updateEntryProperty,
     getTranslations
   };
 });

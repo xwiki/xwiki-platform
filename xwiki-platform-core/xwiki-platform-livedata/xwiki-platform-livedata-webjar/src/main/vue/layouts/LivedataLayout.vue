@@ -59,7 +59,11 @@ export default {
 
   name: "LivedataLayout",
 
-  inject: ["logic"],
+  inject: ["logic", "editBus"],
+
+  created: function() {
+    this.editBus.init(this.logic);
+  },
 
   props: {
     // The id of the layout to load
@@ -79,7 +83,7 @@ export default {
   },
 
 
-  // On mounted and whener the `layoutId` prop change,
+  // On mounted and when the `layoutId` prop change,
   // try to load the layout corresponding to the layoutId
   // or the default one as fallback
   watch: {

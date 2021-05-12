@@ -32,8 +32,7 @@
       @saveEdit="genericSave">
 
     <template #viewer>
-      <!-- Should be configurable and/or based on translations. -->
-      <div>{{ value ? trueLabel : falseLabel }}</div>
+      <div>{{ $t(value ? trueLabelKey : falseLabelKey) }}</div>
     </template>
 
     <template #editor>
@@ -55,13 +54,13 @@ export default {
   mixins: [displayerMixin, displayerStatesMixin],
 
   props: {
-    trueLabel: {
+    trueLabelKey: {
       type: String,
-      default: 'True'
+      default: 'livedata.displayer.boolean.true'
     },
-    falseLabel: {
+    falseLabelKey: {
       type: String,
-      default: 'False'
+      default: 'livedata.displayer.boolean.false'
     }
   },
 

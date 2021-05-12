@@ -56,7 +56,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Converts the Live Table configuration into Live Data configuration.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -105,7 +105,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     @Inject
     private LiveTableResultsURLDocumentReferenceResolver urlDocumentReferenceResolver;
 
-    private URLQueryStringParser urlQueryStringParser = new URLQueryStringParser();
+    private final URLQueryStringParser urlQueryStringParser = new URLQueryStringParser();
 
     @Override
     public LiveDataConfiguration resolve(LiveTableConfiguration liveTableConfig) throws LiveDataException
@@ -134,7 +134,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         queryConfig.setProperties(columns);
         queryConfig.setSource(getSourceConfig(options));
         processExtraParams(options, queryConfig);
-        queryConfig.setSort(getSortConfig(columns, options));
+        queryConfig.setSort(getSortConfig(options));
 
         JsonNode rowCount = options.path("rowCount");
         if (rowCount.isNumber()) {
@@ -234,7 +234,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         }
     }
 
-    private List<SortEntry> getSortConfig(List<String> columns, ObjectNode options)
+    private List<SortEntry> getSortConfig(ObjectNode options)
     {
         JsonNode selectedColumn = options.path("selectedColumn");
         JsonNode defaultOrder = options.path("defaultOrder");
@@ -267,7 +267,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
     {
         LiveDataPropertyDescriptor propertyDescriptor = new LiveDataPropertyDescriptor();
         propertyDescriptor.setId(column);
-        propertyDescriptor.setName(getPropertyName(column, columnProperties, options));
+        propertyDescriptor.setName(getPropertyName(columnProperties));
         propertyDescriptor.setType(getPropertyType(column, columnProperties, options));
 
         // The live table macro considers all columns, except for "actions", as sortable by default.
@@ -275,7 +275,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
         // All columns are visible by default, unless explicitly marked as hidden.
         propertyDescriptor.setVisible(!HIDDEN.equals(columnProperties.path(TYPE).asText()));
-        propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties));
+        propertyDescriptor.setDisplayer(getDisplayerConfig(column, columnProperties, options));
 
         // The live table macro considers all columns, except for "actions", as filterable by default.
         propertyDescriptor.setFilterable(columnProperties.path("filterable").asBoolean(!columnProperties.has(ACTIONS)));
@@ -286,7 +286,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         return propertyDescriptor;
     }
 
-    private String getPropertyName(String column, ObjectNode columnProperties, ObjectNode options)
+    private String getPropertyName(ObjectNode columnProperties)
     {
         JsonNode displayName = columnProperties.path("displayName");
         return displayName.isTextual() ? displayName.asText() : null;
@@ -308,7 +308,16 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         return this.propertyTypeSupplier.getPropertyType(column, className.asText());
     }
 
-    private DisplayerDescriptor getDisplayerConfig(String column, ObjectNode columnProperties)
+    /**
+     * Identifies the column's displayer according to the column's livetable properties and the livetable's options.
+     *
+     * @param column the column to analyse
+     * @param columnProperties the properties of the column
+     * @param options the properties of the livetable
+     * @return the displayer descriptor selected for the column
+     */
+    private DisplayerDescriptor getDisplayerConfig(String column, ObjectNode columnProperties,
+        ObjectNode options)
     {
         DisplayerDescriptor displayerConfig = new DisplayerDescriptor();
         if (columnProperties.path(ACTIONS).isArray()) {
@@ -319,7 +328,11 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
             displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
             displayerConfig.setParameter(HTML, columnProperties.path(HTML).booleanValue());
         } else if (columnProperties.path(HTML).booleanValue()) {
-            displayerConfig.setId(HTML);
+            if (StringUtils.isNotEmpty(options.path(CLASS_NAME).textValue())) {
+                displayerConfig.setId("xObjectProperty");
+            } else {
+                displayerConfig.setId(HTML);
+            }
         } else {
             displayerConfig = null;
         }

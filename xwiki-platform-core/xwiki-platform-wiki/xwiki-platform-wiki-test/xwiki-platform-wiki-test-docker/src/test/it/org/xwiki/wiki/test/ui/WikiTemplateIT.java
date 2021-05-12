@@ -22,13 +22,12 @@ package org.xwiki.wiki.test.ui;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.test.po.TableLayoutElement;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-import org.xwiki.wiki.test.po.AdminWikisTemplatesSheetPage;
+import org.xwiki.wiki.test.po.AdminWikiTemplatesPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.CreateWikiPageStepUser;
 import org.xwiki.wiki.test.po.DeleteWikiPage;
@@ -157,11 +156,11 @@ class WikiTemplateIT
         }
         assertThat(wikiLink.getURL(), endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
 
-        // Verify the wiki template is displayed the admin wiki templates list.
-        TableLayoutElement tableLayout = AdminWikisTemplatesSheetPage.goToPage().getLiveData().getTableLayout();
+        // Verify the wiki template is displayed in the admin wiki templates list.
+        TableLayoutElement tableLayout = AdminWikiTemplatesPage.goToPage().getLiveData().getTableLayout();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertCellWithLink("Wiki pretty name", "My new template",
-            setup.getURL(new DocumentReference("xwiki", "XWiki", "XWikiServerMynewtemplate")));
+            setup.getBaseURL() + "wiki/mynewtemplate/view/Main/");
         tableLayout.assertRow("Description", "This is the template I do for the tests");
         tableLayout.assertRow("Owner", "superadmin");
         tableLayout.assertRow("Membership Type", "Open for any user to join");

@@ -19,6 +19,9 @@
  */
 package org.xwiki.wiki.test.po;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
@@ -29,17 +32,20 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 13.4RC1
  */
-public class AdminWikisTemplatesSheetPage extends ViewPage
+public class AdminWikiTemplatesPage extends ViewPage
 {
     /**
-     * Goes to the Wiki Template administration page sheet.
+     * Goes to the Wiki Template administration page.
      *
      * @return a Wiki Template administration page object
      */
-    public static AdminWikisTemplatesSheetPage goToPage()
+    public static AdminWikiTemplatesPage goToPage()
     {
-        getUtil().gotoPage(new DocumentReference("xwiki", "WikiManager", "AdminWikisTemplatesSheet"));
-        return new AdminWikisTemplatesSheetPage();
+        Map<String, Object> queryParameters = new HashMap<>();
+        queryParameters.put("editor", "globaladmin");
+        queryParameters.put("section", "wikis.templates");
+        getUtil().gotoPage(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"), "admin", queryParameters);
+        return new AdminWikiTemplatesPage();
     }
 
     /**

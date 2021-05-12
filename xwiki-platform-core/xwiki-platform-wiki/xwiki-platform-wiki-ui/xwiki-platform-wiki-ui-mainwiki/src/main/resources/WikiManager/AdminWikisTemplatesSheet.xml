@@ -48,12 +48,11 @@
 #set ($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
-      { 'id': 'wikiprettyname', 'displayer': 'link' },
+      { 'id': 'wikiprettyname', 'displayer': { 'id': 'link', 'propertyHref': 'wikiprettyname_url' } },
       { 'id': 'membershipType', 'sortable': false, 'filterable': false }
     ]
   }
 })
-## TODO: onlyTemplates=1'?
 #set ($sourceParameters = $escapetool.url({
   'className': 'XWiki.XWikiServerClass',
   'resultPage': 'WikiManager.WikisLiveTableResults',

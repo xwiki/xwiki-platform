@@ -266,7 +266,7 @@ class MailIT
         tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Recipients", "to@doe.com");
         assertEquals(1, tableLayout.countRows());
-        assertEquals("send_success", tableLayout.getCell(1, 5).getText());
+        assertEquals("send_success", tableLayout.getCell("Status", 1).getText());
     }
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception

@@ -48,11 +48,15 @@ public class ExtendedViewPage extends ViewPage
     }
 
     /**
-     * @since 6.0M1
+     * Goes to the wiki index and delete a wiki by filtering the Live Data by the wikis by pretty names and clicking on
+     * the delete action.
+     *
+     * @param wikiName the pretty name of the wiki to remove
+     * @return the delete wiki page object of the wiki to remove
+     * @since 13.4RC1
      */
-    public DeleteWikiPage deleteWiki()
+    public DeleteWikiPage deleteWiki(String wikiName)
     {
-        String currentWiki = getHTMLMetaDataValue("wiki");
-        return goToWikiIndex().deleteWiki(currentWiki);
+        return goToWikiIndex().deleteWiki(wikiName);
     }
 }

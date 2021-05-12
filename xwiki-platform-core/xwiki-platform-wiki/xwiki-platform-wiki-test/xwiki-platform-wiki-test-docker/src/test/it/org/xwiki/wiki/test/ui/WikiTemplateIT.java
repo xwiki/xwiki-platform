@@ -19,6 +19,7 @@
  */
 package org.xwiki.wiki.test.ui;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
@@ -33,6 +34,8 @@ import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -92,19 +95,20 @@ class WikiTemplateIT
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
     @Test
+    @Order(1)
     void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
 
-        // Create the template
+        // Create the template.
         createTemplateWiki();
 
         // Create the wiki from the template
         createWikiFromTemplate();
-        // Do it twice to check if we can create a wiki with the name of a deleted one
+        // Do it twice to check if we can create a wiki with the name of a deleted one.
         createWikiFromTemplate();
 
-        // Delete the template wiki
+        // Delete the template wiki.
         deleteTemplateWiki();
 
         logCaptureConfiguration.registerExcludes(
@@ -113,32 +117,32 @@ class WikiTemplateIT
 
     private void createTemplateWiki() throws Exception
     {
-        // Go to the wiki creation wizard
+        // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
 
-        // Full the first step
+        // Full the first step.
         createWikiPage.setPrettyName("My new template");
         String wikiName = createWikiPage.getComputedName();
         assertEquals(TEMPLATE_WIKI_ID, wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
 
-        // Second step
+        // Second step.
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
 
-        // Creation step
-        // Creation step + click Finalize button
+        // Creation step.
+        // Creation step + click Finalize button.
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
-        // Go to the created subwiki, and modify the home page content
+        // Go to the created subwiki, and modify the home page content.
         wikiHomePage.edit();
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(TEMPLATE_CONTENT);
         wikiEditPage.clickSaveAndView();
         wikiEditPage.waitUntilPageIsLoaded();
 
-        // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard
+        // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard.
         createWikiPage = wikiHomePage.createWiki();
         assertTrue(createWikiPage.getTemplateList().contains("mynewtemplate"));
 
@@ -148,32 +152,32 @@ class WikiTemplateIT
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
+        assertThat(wikiLink.getURL(), endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
 
     }
 
     private void deleteTemplateWiki() throws Exception
     {
-        // Go to the template wiki
+        // Go to the template wiki.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(TEMPLATE_WIKI_ID).confirm(TEMPLATE_WIKI_ID);
+        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki("My new template").confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
-        // Verify the wiki has been deleted
+        // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new template"));
     }
 
     private void createWikiFromTemplate()
     {
-        // Go to the wiki creation wizard
+        // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
 
-        // First step
+        // First step.
         createWikiPage.setPrettyName("My new wiki");
         String wikiName = createWikiPage.getComputedName();
         assertEquals("mynewwiki", wikiName);
@@ -181,17 +185,17 @@ class WikiTemplateIT
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
 
-        // Second step
+        // Second step.
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
 
-        // Creation step + click Finalize button
+        // Creation step + click Finalize button.
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
-        // Go the created subwiki and verify the content of the main page is the same than in the template
+        // Go the created subwiki and verify the content of the main page is the same than in the template.
         assertEquals(TEMPLATE_CONTENT, wikiHomePage.getContent());
 
         // Delete the wiki
-        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki();
+        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki("My new wiki");
         deleteWikiPage = deleteWikiPage.confirm("");
         assertTrue(deleteWikiPage.hasUserErrorMessage());
         assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput(""));
@@ -203,7 +207,7 @@ class WikiTemplateIT
         deleteWikiPage = deleteWikiPage.confirm("mynewwiki");
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
-        // Verify the wiki has been deleted
+        // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new wiki"));
     }
@@ -218,11 +222,10 @@ class WikiTemplateIT
         // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
         // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
         wikiCreationPage.waitForFinalizeButton(60 * 5);
-        // Ensure there is no error in the log
+        // Ensure there is no error in the log.
         assertFalse(wikiCreationPage.hasLogError());
 
-        // Finalization
-        WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
-        return wikiHomePage;
+        // Finalization.
+        return wikiCreationPage.finalizeCreation();
     }
 }

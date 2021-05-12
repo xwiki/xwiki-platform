@@ -19,26 +19,23 @@
  */
 package org.xwiki.wiki.test.po;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 
 /**
  * Represents actions that can be done on the WikiManager.WebHome page.
- * 
+ *
  * @version $Id$
  */
 public class WikiIndexPage extends ExtendedViewPage
 {
+    private static final String WIKI_NAME_COLUMN_LABEL = "Wiki pretty name";
+
     @FindBy(id = "wikis")
     private WebElement wikisTable;
-
-    @FindBy(xpath = "//table[@id='wikis']//td[@class='wikiprettyname linkfield typetext']/a\n")
-    private List<WebElement> wikiPrettyNames;
 
     @FindBy(id = "tmCreateWiki")
     private WebElement createWikiMenuButton;
@@ -46,7 +43,7 @@ public class WikiIndexPage extends ExtendedViewPage
     /**
      * The wiki index live table.
      */
-    private LiveTableElement liveTable = new LiveTableElement("wikis");
+    private final LiveDataElement liveData = new LiveDataElement("wikis");
 
     /**
      * Opens the home page.
@@ -57,33 +54,28 @@ public class WikiIndexPage extends ExtendedViewPage
         return new WikiIndexPage();
     }
 
-    public List<WikiLink> getWikiPrettyNames()
-    {
-        List<WikiLink> list = new ArrayList<>();
-        for (WebElement prettyName : wikiPrettyNames) {
-            list.add(new WikiLink(prettyName));
-        }
-        return list;
-    }
-
     /**
+     * Get a wiki link from its name.
+     *
+     * @param wikiName the name of the wiki
+     * @return {@code null} if the wiki is not found, a {@link WikiLink} of the link of the wiki otherwise
      * @since 6.0M1
      */
     public WikiLink getWikiLink(String wikiName)
     {
-        for (WikiLink link : getWikiPrettyNames()) {
-            if (link.getWikiName().equals(wikiName)) {
-                return link;
-            }
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        if (tableLayout.countRows() == 0) {
+            return null;
+        } else {
+            return new WikiLink(tableLayout.getCell(WIKI_NAME_COLUMN_LABEL, 1).findElement(By.tagName("a")));
         }
-        // We have not found the wiki in the list
-        return null;
     }
 
     @Override
     public WikiIndexPage waitUntilPageIsLoaded()
     {
-        this.liveTable.waitUntilReady();
+        this.liveData.getTableLayout().waitUntilReady();
         return this;
     }
 
@@ -97,16 +89,17 @@ public class WikiIndexPage extends ExtendedViewPage
     }
 
     /**
+     * Click on the delete action of a wiki.
+     *
+     * @param wikiName the name of the wiki to remove
+     * @return the delete wiki page of the requested wiki
      * @since 8.4.3
      */
     public DeleteWikiPage deleteWiki(String wikiName)
     {
-        // Note: this can work only if there is not a lot of wikis otherwise the wiki might not be present in the index
-        // because of the pagination.
-        // TODO: improve this by filtering on the livetable first
-        WebElement deleteWikiLink = getDriver().findElement(
-                By.xpath(String.format("//a[contains(@class, 'actiondelete') and contains(@href, '%s')]", wikiName)));
-        deleteWikiLink.click();
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        tableLayout.findElementInRow(1, By.cssSelector("a.action_delete")).click();
         return new DeleteWikiPage();
     }
 }

@@ -138,7 +138,8 @@ public class TableLayoutElement extends BaseElement
     public void waitUntilReady()
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(), 20);
+        getDriver().waitUntilCondition(webDriver -> (!hasLines() || hasLines() && areCellsLoaded()) && noFiltering(),
+            20);
     }
 
     /**
@@ -251,13 +252,13 @@ public class TableLayoutElement extends BaseElement
      * Return the {@link WebElement} of a cell by its row and column numbers. For instance the second row of the first
      * column is {@code (2, 1)}
      *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
      * @param rowNumber the cell row number to get, starting at 1. For instance the second column has the number 2
-     * @param columnNumber the cell column number to get, starting at 1. For instance the third row has the number
-     *     3
      * @return the {@link WebElement} of the requested cell
      */
-    public WebElement getCell(int rowNumber, int columnNumber)
+    public WebElement getCell(String columnLabel, int rowNumber)
     {
+        int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElement(
             By.cssSelector(String.format("tbody tr:nth-child(%d) td:nth-child(%d)", rowNumber, columnNumber)));
     }
@@ -273,6 +274,20 @@ public class TableLayoutElement extends BaseElement
         getRoot().findElement(By.cssSelector(
             String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
             .click();
+    }
+
+    /**
+     * Returns a single {@link WebElement} found by passing {@code by} to {@link WebElement#findElement(By)} on the
+     * {@link WebElement} of the requested row.
+     *
+     * @param rowNumber the requested row by its row number, the first row has the number {@code 1}
+     * @param by the selector to apply on the row web element
+     * @return the {@link WebElement} found on the row
+     */
+    public WebElement findElementInRow(int rowNumber, By by)
+    {
+        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
+            .findElement(by);
     }
 
     /**

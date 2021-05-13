@@ -40,11 +40,6 @@ public class LiveDataElement extends BaseElement
     private final String id;
 
     /**
-     * Lazily initialized the first time {@link #getLiveData()} is called.
-     */
-    private WebElement root;
-
-    /**
      * Default constructor. Initializes a Live Data page object by its id.
      *
      * @param id the live data id

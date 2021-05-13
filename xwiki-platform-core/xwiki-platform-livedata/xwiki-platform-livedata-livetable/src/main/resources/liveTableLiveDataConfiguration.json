@@ -13,6 +13,7 @@
     "propertyDescriptors": [
       {"id": "doc.name", "type": "String", "editable": false, "displayer": "link"},
       {"id": "doc.title", "type": "String", "displayer": "link"},
+      {"id": "doc.hidden", "type": "Boolean"},
       {
         "id": "doc.space",
         "type": "String",
@@ -80,7 +81,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "text"
       },
       {
@@ -88,7 +89,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       },
       {
@@ -111,7 +112,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       },
       {
@@ -138,8 +139,8 @@
         "id": "TextArea",
         "sortable": true,
         "filterable": true,
-        "editable": true,
-        "displayer": "html",
+        "editable": false,
+        "displayer": "xObjectProperty",
         "filter": "text"
       },
       {
@@ -154,7 +155,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       }
     ],

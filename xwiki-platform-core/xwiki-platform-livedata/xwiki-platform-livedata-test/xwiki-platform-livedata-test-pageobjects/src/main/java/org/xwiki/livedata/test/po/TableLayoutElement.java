@@ -26,9 +26,11 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,6 +91,8 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
+    private static final String SELECT_CELLS_BY_COLUMN_INDEX = "tr td:nth-child(%d)";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
     private final String liveDataId;
@@ -138,7 +142,7 @@ public class TableLayoutElement extends BaseElement
     public void waitUntilReady()
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> (!hasLines() || hasLines() && areCellsLoaded()) && noFiltering(),
+        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(),
             20);
     }
 
@@ -277,6 +281,47 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Set a new value to a field in the nth cell of a column. Waits for the cell to be successfully edited before
+     * continuing.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to update (the first line is number 1)
+     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param newValue the new value of the StaticList
+     */
+    public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+
+        // Double click on the cell.
+        new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();
+
+        // Selector of the edited field.
+        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        
+        // Waits for the text input to be displayed.
+        getDriver().waitUntilCondition(input -> !element.findElements(selector).isEmpty());
+
+        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
+        // displayed in the live data (they are the same as the one of the inline edit mode).
+        new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
+            .setFieldValue(element.findElement(selector), newValue);
+
+        // Clicks somewhere outside the edited cell.
+        new Actions(getDriver().getWrappedDriver()).click(getRoot()).perform();
+
+        // Waits for the field to be reload before continuing.
+        getDriver().waitUntilCondition(input -> {
+            // Nothing is loading.
+            boolean noLoader = element.findElements(By.cssSelector(".xwiki-loader")).isEmpty();
+            // And the edited field is not displayed anymore.
+            boolean noInput = element.findElements(selector).isEmpty();
+            return noLoader && noInput;
+        });
+    }
+
+    /**
      * Returns a single {@link WebElement} found by passing {@code by} to {@link WebElement#findElement(By)} on the
      * {@link WebElement} of the requested row.
      *
@@ -311,7 +356,7 @@ public class TableLayoutElement extends BaseElement
     private List<WebElement> getValues(String columnLabel)
     {
         int columnIndex = getColumnIndex(columnLabel);
-        return getRoot().findElements(By.cssSelector(String.format("tr td:nth-child(%d)", columnIndex)));
+        return getRoot().findElements(By.cssSelector(String.format(SELECT_CELLS_BY_COLUMN_INDEX, columnIndex)));
     }
 
     /**
@@ -366,5 +411,10 @@ public class TableLayoutElement extends BaseElement
             }
         }
         return index;
+    }
+
+    private List<WebElement> getCellsByColumnIndex(int columnIndex)
+    {
+        return getRoot().findElements(By.cssSelector(String.format(SELECT_CELLS_BY_COLUMN_INDEX, columnIndex)));
     }
 }

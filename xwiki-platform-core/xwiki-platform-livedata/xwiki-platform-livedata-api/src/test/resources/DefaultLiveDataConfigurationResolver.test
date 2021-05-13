@@ -148,7 +148,9 @@
       {"id":"text"},
       {"id":"link"},
       {"id":"html"},
-      {"id":"actions"}
+      {"id":"xObjectProperty"},
+      {"id":"actions"},
+      {"id":"boolean"}
     ],
     "defaultDisplayer":"text",
     "pagination":{

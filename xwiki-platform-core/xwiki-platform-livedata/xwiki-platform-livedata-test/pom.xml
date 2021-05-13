@@ -41,4 +41,12 @@
   <modules>
     <module>xwiki-platform-livedata-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-livedata-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

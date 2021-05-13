@@ -32,11 +32,13 @@
     class="displayer-date"
     :property-id="propertyId"
     :entry="entry"
+    :is-view.sync="isView"
+    @saveEdit="genericSave"
   >
 
     <!-- Provide the Date Viewer widget to the `viewer` slot -->
     <template #viewer>
-        <div>{{ valueFormatted }}</div>
+      <div class="displayed-date">{{ valueFormatted }}</div>
     </template>
 
     <!-- Provide the Date Editor widget to the `editor` slot -->
@@ -61,6 +63,7 @@
 <script>
 
 import displayerMixin from "./displayerMixin.js";
+import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
 import "daterangepicker";
 import moment from "moment";
@@ -74,14 +77,17 @@ export default {
     BaseDisplayer,
   },
 
-  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin],
+  props: {
+    format: {
+      type: String,
+      default: "YYYY/MM/DD HH:mm"
+    }
+  },
 
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
+  mixins: [displayerMixin, displayerStatesMixin],
 
   computed: {
-    format () {
-      return "YYYY/MM/DD HH:mm";
-    },
     // Date formatted to be human-readable
     valueFormatted () {
       return moment(+this.value).format(this.format);
@@ -146,7 +152,7 @@ export default {
       return daterangepicker.startDate.format(this.format);
     },
 
-    applyDate () {
+    applyDate() {
       const daterangepicker = $(this.$refs.editorDate).data("daterangepicker");
       const value = this.getValue(daterangepicker);
       const valueTimestamps = +moment(value, this.format);
@@ -162,6 +168,11 @@ export default {
 
 .livedata-displayer .editor-date {
   width: 100%;
+}
+
+.displayed-date {
+  min-width: 100%;
+  min-height: 100%;
 }
 
 </style>

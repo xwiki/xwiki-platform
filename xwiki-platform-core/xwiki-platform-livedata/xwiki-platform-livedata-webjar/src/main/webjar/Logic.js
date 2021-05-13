@@ -25,13 +25,15 @@ define('xwiki-livedata', [
   "xwiki-livedata-vue",
   "xwiki-livedata-source",
   "xwiki-json-merge",
+  "edit-bus",
   "xwiki-livedata-polyfills"
-], function (
+], function(
   Vue,
   VueI18n,
   XWikiLivedata,
   liveDataSource,
-  jsonMerge
+  jsonMerge,
+  editBus
 ) {
 
   /**
@@ -100,13 +102,14 @@ define('xwiki-livedata', [
       components: {
         "XWikiLivedata": XWikiLivedata,
       },
-      template: "<XWikiLivedata :logic='logic'></XWikiLivedata>",
+      template: "<XWikiLivedata :logic='logic'/>",
       i18n: i18n,
       data: {
-        logic: this,
+        logic: this
       },
     });
 
+    editBus.init(this);
 
     /**
      * Load given translations from the server
@@ -169,7 +172,13 @@ define('xwiki-livedata', [
         "panel.sort.direction.descending",
         "panel.sort.add",
         "panel.sort.delete",
-        "displayer.link.noValue"
+        "displayer.link.noValue",
+        "displayer.boolean.true",
+        "displayer.boolean.false",
+        "displayer.xObjectProperty.missingDocumentName.errorMessage",
+        "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "filter.boolean.yes",
+        "filter.boolean.no"
       ],
     });
 
@@ -288,7 +297,6 @@ define('xwiki-livedata', [
       }
       return entry[idProperty];
     },
-
 
     /*
       As Sets are not reactive in Vue 2.x, if we want to create
@@ -428,7 +436,7 @@ define('xwiki-livedata', [
      * @param {String} propertyId
      * @returns {Object}
      */
-    getFilterDescriptor (propertyId) {
+    getFilterDescriptor(propertyId) {
       // Property descriptor config
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       // Property type descriptor config
@@ -451,7 +459,11 @@ define('xwiki-livedata', [
      */
 
 
-    fetchEntries () {
+    /**
+     * Fetch the entries of the current page according to the query configuration.
+     * @returns the fetched entries
+     */
+    fetchEntries() {
       // Before fetch event
       this.triggerEvent("beforeEntryFetch");
       // Fetch entries from data source
@@ -485,7 +497,7 @@ define('xwiki-livedata', [
       // TODO: Ensure property is valid (need other current PR)
 
       // Check if the edit entry action is available.
-      if (!this.data.meta.actions.find(action => action.id === "editEntry")) {
+      if (!this.data.meta.actions.find(action => action.id === "edit")) {
         return false;
       }
 
@@ -505,7 +517,7 @@ define('xwiki-livedata', [
      * @returns {Boolean}
      */
     isEntryEditable (entry) {
-      return this.isActionAllowed('editEntry', entry);
+      return this.isActionAllowed('edit', entry);
     },
 
     /**
@@ -528,12 +540,31 @@ define('xwiki-livedata', [
      * @param {number} parameters.propertyId The property id we want to modify in the entry
      * @param {string} parameters.value The new value of entry property
      */
-    setValue ({ entry, propertyId, value }) {
+    setValue({entry, propertyId, value}) {
       // TODO: Ensure entry is valid (need other current PR)
       // TODO: Ensure property is valid (need other current PR)
-      if (!this.isEditable({ entry, propertyId })) { return; }
+      if (!this.isEditable({entry, propertyId})) {
+        return;
+      }
       entry[propertyId] = value;
-      // TODO: push value to server
+      const source = this.data.query.source;
+      const entryId = this.getEntryId(entry);
+      // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other 
+      // properties of the entry, but also possibly on other entriers, or in the way they are sorted.
+      liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
+        .then(() => this.updateEntries());
+    },
+
+    /**
+     * Update the entry with the values object passed in parameter and s
+     * @param {Object} entry the current entry
+     * @param {Object} values the entry's values to update
+     */
+    setValues({entryId, values}) {
+      const source = this.data.query.source;
+      return liveDataSource.updateEntry(source, entryId, values)
+        .then(() => this.updateEntries());
+
     },
 
 
@@ -1336,10 +1367,14 @@ define('xwiki-livedata', [
         this.updateEntries().then(resolve, reject);
       });
     },
+    
+    //
+    // Edit Bus
+    //
 
-
-
-
+    getEditBus() {
+      return editBus;
+    }
   };
 
 

@@ -46,6 +46,18 @@ public class LiveDataException extends Exception
     }
 
     /**
+     * Constructs a new live data exception with the specified detail message.
+     *
+     * @param message the detail message
+     * @since 13.4RC1
+     */
+    @Unstable
+    public LiveDataException(String message)
+    {
+        super(message);
+    }
+
+    /**
      * Creates a new instance with the specified message and source.
      *
      * @param message message to store in the exception

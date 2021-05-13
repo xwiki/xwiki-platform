@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  * @since 13.4RC1
- * @since 12.10.8
  */
 class LiveDataEntryStoreTest
 {

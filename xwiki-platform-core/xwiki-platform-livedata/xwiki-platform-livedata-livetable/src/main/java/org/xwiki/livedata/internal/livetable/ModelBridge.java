@@ -56,7 +56,6 @@ import static java.util.Collections.singletonMap;
  *
  * @version $Id$
  * @since 13.4RC1
- * @since 12.10.8
  */
 @Component(roles = { ModelBridge.class })
 @Singleton
@@ -140,7 +139,7 @@ public class ModelBridge
      * {@code doc.}, or from the first xobject instance of the specified type (class reference) found on the document;
      * to update another XObject, see {@link #updateAll(Map, DocumentReference, DocumentReference, int)}
      *
-     * @param entry the entry to update
+     * @param properties the properties to update
      * @param documentReference the document to update
      * @param classReference the type of XObject to update
      * @throws AccessDeniedException in case the current user is not allow to edit the document
@@ -148,10 +147,10 @@ public class ModelBridge
      * @throws LiveDataException in case of error when validating the document
      * @see #updateAll(Map, DocumentReference, DocumentReference, int)
      */
-    public void updateAll(Map<String, Object> entry, DocumentReference documentReference,
+    public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
         DocumentReference classReference) throws AccessDeniedException, XWikiException, LiveDataException
     {
-        updateAll(entry, documentReference, classReference, 0);
+        updateAll(properties, documentReference, classReference, 0);
     }
 
     /**
@@ -159,7 +158,7 @@ public class ModelBridge
      * prefixed with {@code doc.}, or from an XObject instance of the specified type (class reference). The XObject at
      * the provided index number is updated.
      *
-     * @param entry the entry to update
+     * @param properties the properties to update
      * @param documentReference the document to update
      * @param classReference the type of XObject to update
      * @param objectNumber the index of the XObject to update
@@ -168,7 +167,7 @@ public class ModelBridge
      * @throws LiveDataException in case of error when validating the document
      * @see #updateAll(Map, DocumentReference, DocumentReference)
      */
-    public void updateAll(Map<String, Object> entry, DocumentReference documentReference,
+    public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
         DocumentReference classReference, int objectNumber)
         throws AccessDeniedException, XWikiException, LiveDataException
     {
@@ -180,32 +179,33 @@ public class ModelBridge
             throw new LiveDataException(NEW_DOCUMENT_UPDATE_ERROR);
         }
 
-        convertPropertiesFromHtml(entry, this.localSerializer.serialize(classReference), objectNumber);
+        convertPropertiesFromHtml(properties, this.localSerializer.serialize(classReference), objectNumber);
 
-        for (Map.Entry<String, Object> property : entry.entrySet()) {
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
             this.updateProperty(property.getKey(), property.getValue(), classReference, objectNumber, document);
         }
 
         saveDocument(document);
     }
 
-    private void convertPropertiesFromHtml(Map<String, Object> entry, String className, int objectNumber)
+    private void convertPropertiesFromHtml(Map<String, Object> properties, String className, int objectNumber)
     {
-        if (entry.containsKey(REQUIRES_HTML_CONVERSION)) {
-            String requiresHTMLConversion = (String) entry.get(REQUIRES_HTML_CONVERSION);
-            entry.remove(REQUIRES_HTML_CONVERSION);
+        if (properties.containsKey(REQUIRES_HTML_CONVERSION)) {
+            String requiresHTMLConversion = (String) properties.get(REQUIRES_HTML_CONVERSION);
+            properties.remove(REQUIRES_HTML_CONVERSION);
             for (String requiresHTMLConversionProperty : requiresHTMLConversion.split(",")) {
                 // Removes the class name and object index from the conversion property.
                 String propertyName = requiresHTMLConversionProperty.replace(className, "")
                     .replaceFirst(String.format("_%d_", objectNumber), "");
                 String syntaxKey = propertyName + "_syntax";
                 String cacheKey = propertyName + "_cache";
-                if (entry.containsKey(propertyName)) {
-                    String property = (String) entry.get(propertyName);
-                    entry.put(propertyName, this.htmlConverter.fromHTML(property, (String) entry.get(syntaxKey)));
+                if (properties.containsKey(propertyName)) {
+                    String property = (String) properties.get(propertyName);
+                    properties
+                        .put(propertyName, this.htmlConverter.fromHTML(property, (String) properties.get(syntaxKey)));
                 }
-                entry.remove(syntaxKey);
-                entry.remove(cacheKey);
+                properties.remove(syntaxKey);
+                properties.remove(cacheKey);
             }
         }
     }

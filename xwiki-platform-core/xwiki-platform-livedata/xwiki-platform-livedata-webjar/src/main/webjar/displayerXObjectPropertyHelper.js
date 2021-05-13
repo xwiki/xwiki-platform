@@ -22,12 +22,20 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   'use strict';
 
   /**
+   * Pass the vue-i18n helper to the module to allow error messages to be localized.
+   * @param $t the vue-i18n localization helper
+   */
+  function setLocalization($t) {
+    this.$t = $t;
+  }
+  
+  /**
    * Resolve the url of the document reference in the given mode.
    * @param documentReference the document reference
    * @param mode the mode
    * @returns {*} the computed relative url
    */
-  function computeTargetUrl(documentReference, mode) {
+  function computeTargetURL(documentReference, mode) {
     return new XWiki.Document(XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT)).getURL(mode);
   }
 
@@ -54,7 +62,7 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   }
   
   function load(mode, documentReference, property, className) {
-    const targetUrl = computeTargetUrl(documentReference, 'get');
+    const targetUrl = computeTargetURL(documentReference, 'get');
     const computedProperty = computeProperty(property, className);
     return new Promise((resolve, reject) => {
       $.get(targetUrl, {
@@ -70,7 +78,8 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
         resolve(html);
       }).fail(() => {
         // TODO: translate
-        new XWiki.widgets.Notification(`Failed to retrieve the ${mode} field.`, 'error');
+        new XWiki.widgets.Notification(
+          this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', {mode}), 'error');
         reject();
       })
     });
@@ -98,5 +107,5 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
     return load('view', documentReference, property, className);
   }
 
-  return {edit, view};
+  return {edit, view, setLocalization};
 });

@@ -104,9 +104,9 @@ class LiveDataIT
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_A);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
-        tableLayout.editCell(NAME_COLUMN, NAME_COLUMN, 1, NAME_CHARLY);
-        tableLayout.editCell(CHOICE_COLUMN, CHOICE_COLUMN, 2, CHOICE_C);
-        tableLayout.editCell(BIRTHDAY_COLUMN, BIRTHDAY_COLUMN, 1, BIRTHDAY_DATETIME);
+        tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, NAME_CHARLY);
+        tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
+        tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         assertEquals(2, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);

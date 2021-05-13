@@ -60,8 +60,7 @@ export default {
   },
 
   props: {
-    logic: Object,
-    editBus: Object
+    logic: Object
   },
 
   computed: {
@@ -77,8 +76,7 @@ export default {
   // `inject: ["logic"]` in their component definition
   provide () {
     return {
-      logic: this.logic,
-      editBus: this.editBus
+      logic: this.logic
     };
   },
 

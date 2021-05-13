@@ -47,7 +47,7 @@
   <!--
     This is where the specific displayer component gets injected.
     The timestamp props if an optional and do not have to be declared in the injected component.
-    It can be watched in order to force the upgrade the the component when the content is not passed using the props.
+    It can be watched in order to force the upgrade of the component when the content is not passed using the props.
     For instance, it is used by the DisplayerXObjectProperty component in order to fetch an updated view content when
     the table is refreshed.
   -->

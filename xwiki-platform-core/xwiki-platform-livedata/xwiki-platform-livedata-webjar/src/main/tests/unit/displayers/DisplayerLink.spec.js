@@ -27,19 +27,19 @@ describe('DisplayerLink.vue', () => {
     const wrapper = initWrapper(DisplayerLink, {
       props: {
         entry: {
-          propertyIdTest: 'entryA1',
-          propertyIdTestHref: 'entryLink'
+          color: 'yellow',
+          colorHref: 'entryLink'
         }
       },
       logic: {
         getDisplayerDescriptor() {
           return {
-            propertyHref: 'propertyIdTestHref'
+            propertyHref: 'colorHref'
           };
         }
       }
     });
-    expect(wrapper.text()).toMatch('entryA1')
+    expect(wrapper.text()).toMatch('yellow')
     expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
   })
 
@@ -47,7 +47,7 @@ describe('DisplayerLink.vue', () => {
     const wrapper = initWrapper(DisplayerLink, {});
     const viewerDiv = wrapper.find('div[tabindex="0"]');
     await viewerDiv.trigger('dblclick');
-    expect(wrapper.find('input').element.value).toBe("entryA1")
+    expect(wrapper.find('input').element.value).toBe("red")
   })
 
   it('Send events after the end of the edit', async () => {
@@ -71,13 +71,13 @@ describe('DisplayerLink.vue', () => {
 
     let inputField = wrapper.find('input');
 
-    await inputField.setValue('New Value');
+    await inputField.setValue('blue');
     await wrapper.find('div[tabindex="0"]').trigger('keypress.enter');
 
     expect(values).toMatchObject([{
-      propertyIdTest: [{
-        propertyIdTest: "New Value",
-      }]
+      color: {
+        color: "blue",
+      }
     }]);
   })
 })

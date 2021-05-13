@@ -24,7 +24,7 @@ describe('BaseDisplayer.vue', () => {
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(BaseDisplayer, {});
 
-    expect(wrapper.text()).toMatch('entryA1')
+    expect(wrapper.text()).toMatch('red')
   })
 
   it('Send event on double click', async () => {
@@ -43,7 +43,7 @@ describe('BaseDisplayer.vue', () => {
       }
     });
 
-    expect(wrapper.find('input').element.value).toMatch('entryA1')
+    expect(wrapper.find('input').element.value).toMatch('red')
   })
 
   it('Send an event on save', async () => {

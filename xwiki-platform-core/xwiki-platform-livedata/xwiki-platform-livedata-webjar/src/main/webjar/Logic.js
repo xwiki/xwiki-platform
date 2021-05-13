@@ -102,15 +102,14 @@ define('xwiki-livedata', [
       components: {
         "XWikiLivedata": XWikiLivedata,
       },
-      template: "<XWikiLivedata :logic='logic' " +
-        ":editBus='editBus' />",
+      template: "<XWikiLivedata :logic='logic'/>",
       i18n: i18n,
       data: {
-        logic: this,
-        editBus
+        logic: this
       },
     });
 
+    editBus.init(this);
 
     /**
      * Load given translations from the server
@@ -176,7 +175,10 @@ define('xwiki-livedata', [
         "displayer.link.noValue",
         "displayer.boolean.true",
         "displayer.boolean.false",
-        "displayer.xObjectProperty.missingDocumentName.errorMessage"
+        "displayer.xObjectProperty.missingDocumentName.errorMessage",
+        "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "filter.boolean.yes",
+        "filter.boolean.no"
       ],
     });
 
@@ -295,16 +297,6 @@ define('xwiki-livedata', [
       }
       return entry[idProperty];
     },
-
-    /**
-     * Return the object number of the given entry.
-     * @param {Object} entry the entry
-     * @returns {String} the object number of the entry, if the value is not found, 0 is returned
-     */
-    getEntryObjectNumber(entry) {
-      return entry['_objectNumber'] || 0;
-    },
-
 
     /*
       As Sets are not reactive in Vue 2.x, if we want to create
@@ -1375,10 +1367,14 @@ define('xwiki-livedata', [
         this.updateEntries().then(resolve, reject);
       });
     },
+    
+    //
+    // Edit Bus
+    //
 
-
-
-
+    getEditBus() {
+      return editBus;
+    }
   };
 
 

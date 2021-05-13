@@ -38,12 +38,7 @@
 
     <!-- Provide the Date Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <div v-if="valueFormatted">{{ valueFormatted }}</div>
-      <!--
-      Includes a non breakable space in the div if the date is empty to allow the dblclick listener to be triggered.
-      It is impossible to click on a block of size 0x0.
-      -->
-      <div v-else>&nbsp;</div>
+      <div class="displayed-date">{{ valueFormatted }}</div>
     </template>
 
     <!-- Provide the Date Editor widget to the `editor` slot -->
@@ -173,6 +168,11 @@ export default {
 
 .livedata-displayer .editor-date {
   width: 100%;
+}
+
+.displayed-date {
+  min-width: 100%;
+  min-height: 100%;
 }
 
 </style>

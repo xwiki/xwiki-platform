@@ -24,6 +24,6 @@ import {initWrapper} from "./displayerTestsHelper";
 describe('DisplayerText.vue', () => {
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(DisplayerText, {})
-    expect(wrapper.text()).toMatch('entryA1')
+    expect(wrapper.text()).toMatch('red')
   })
 })

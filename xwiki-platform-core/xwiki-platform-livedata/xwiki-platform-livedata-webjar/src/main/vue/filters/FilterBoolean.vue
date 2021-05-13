@@ -23,8 +23,8 @@
 <template>
   <select :value="filterValue" class="xwiki-selectize livedata-selectize" ref="input">
     <option value=""></option>
-    <option :value="getTrueValue()">Yes</option>
-    <option :value="getFalseValue()">No</option>
+    <option :value="getTrueValue()">$t('livedata.filter.boolean.yes')</option>
+    <option :value="getFalseValue()">$('livedata.filter.boolean.no')</option>
   </select>
 </template>
 

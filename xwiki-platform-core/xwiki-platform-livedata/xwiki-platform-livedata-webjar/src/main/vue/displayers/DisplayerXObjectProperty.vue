@@ -85,33 +85,45 @@ export default {
         new XWiki.widgets.Notification(this.$t('livedata.displayer.xObjectProperty.missingDocumentName.errorMessage'),
           'error');
       } else {
-        document.fire('xwiki:actions:beforeSave');
+        $(document).trigger('xwiki:actions:beforeSave');
         const content = $(this.$refs.xObjectPropertyEdit).find(':input').serializeArray();
         const className = this.data.query.source.className;
 
-        const newContents = [];
+        const newContents = {};
         for (const key in content) {
           if (content.hasOwnProperty(key)) {
             const value = content[key];
-            if (value['name']) {
-              var newName = value['name'];
+            if (value.name) {
+              var newName = value.name;
 
               if (newName.startsWith(className)) {
                 newName = newName.replace(className, '');
               }
 
               newName = newName.replace(/_\d+_/, '');
-              newContents.push({[newName]: value['value']})
+              // Aggregates the attributes with the same name in an array.
+              // If the an attributes is found only once it is stored alone.
+              if(newContents[newName]) {
+                if(!Array.isArray(newContents[newName])) {
+                  newContents[newName] = [newContents[newName]];
+                }
+
+                newContents[newName].push(value.value)
+                
+              } else {
+                newContents[newName] = value.value;
+              }
             }
           }
         }
 
-        this.editBus.save(this.entry, this.propertyId, newContents)
+        this.logic.getEditBus().save(this.entry, this.propertyId, newContents)
       }
     },
 
     /**
-     * Takes an update method retrieve its content.
+     * Takes an update method and retrieves its content.
+     * 
      * @param {method} updateMethod the method dedicate to the update of a given aspect of the displayer. For instance,
      *  the view or edit html content
      * @returns {*} a `Promise` with the content of the updated view
@@ -143,7 +155,7 @@ export default {
 
         })
         .catch(() => {
-          // Stop the loader and switch to view mode. 
+          // Stop the loader. 
           this.isLoading = false;
         })
     },
@@ -207,6 +219,8 @@ export default {
     }
   },
   mounted() {
+    // Pass the vue-i18n localization helper to the XObjectPropertyHelper to allow error messages to be localized.
+    xObjectPropertyHelper.setLocalization(this.$t);
     if (!this.viewField) {
       this.updateView();
     }

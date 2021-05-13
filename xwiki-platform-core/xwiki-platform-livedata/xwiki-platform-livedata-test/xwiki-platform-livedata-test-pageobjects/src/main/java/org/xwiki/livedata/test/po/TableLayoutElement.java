@@ -142,7 +142,7 @@ public class TableLayoutElement extends BaseElement
     public void waitUntilReady()
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> (!hasLines() || hasLines() && areCellsLoaded()) && noFiltering(),
+        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(),
             20);
     }
 
@@ -281,18 +281,18 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Set a new value to a type StaticList field in the nth cell of a column. Waits for the cell to be successfully
-     * edited before continuing.
+     * Set a new value to a field in the nth cell of a column. Waits for the cell to be successfully edited before
+     * continuing.
      *
      * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to update (the first line is number 1)
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
-     * @param cellIndex the cell index (starts at 1)
      * @param newValue the new value of the StaticList
      */
-    public void editCell(String columnLabel, String fieldName, int cellIndex, String newValue)
+    public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
         int columnIndex = getColumnIndex(columnLabel);
-        WebElement element = getCellsByColumnIndex(columnIndex).get(cellIndex - 1);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
         // Double click on the cell.
         new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();

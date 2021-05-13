@@ -21,34 +21,33 @@
 import {mount} from '@vue/test-utils'
 
 /**
- * Generic Vue component initializer for the displayers tests. Calls `mount()` from `@vue/test-utils` with
- * preconfigured
+ * Generic Vue component initializer for the displayers tests. Calls `mount()` from `@vue/test-utils` with preconfigured
  * values. All the preconfigured properties can be overloaded using the named optional parameters (`props`, `logic`,
- * `editBus`, and `mocks`) described below.
+ * and `mocks`) described below.
  *
  * The default `propData` parameter of `mount()` is:
  * ```javascript
- * { viewOnly: false, isView: true, propertyId: 'propertyIdTest', entry: { propertyIdTest: 'entryA1', propertyIdTest2:
- * 'entryB1' } }
+ * { viewOnly: false, isView: true, propertyId: 'color', entry: { color: 'red', age: 13 } }
  * ```
  * and is merged with the `props` parameter.
  *
- * The default `provide` parameter of `mount()` has two keys: `logic` and `editBus`, respectively merged with the
- * `logic` and `editBus` parameters.
+ * The default `provide` parameter of `mount()` has one key: `logic`, merged with the `logic` parameter.
  *
  * `provide.logic` is an object with the following keys:
  * * `isEditable()`, returns the constant `true`
- * * `getDisplayerDescriptor()` returns the constant `{ actions: ['action1', 'action2'] }`
- * * `isActionAllowed(action)` returns `true` when `action` is equals to `"action1"`, `false` otherwise
+ * * `getDisplayerDescriptor()` returns the constant `{ actions: ['jump', 'dance'] }`
+ * * `isActionAllowed(action)` returns `true` when `action` is equals to `"jump"`, `false` otherwise
  * * `getActionDescriptor(action)` returns 
  * ```
- * { name: 'action1', icon: { iconSetName: 'Font Awesome', cssClass: 'fa fa-table', iconSetType: 'FONT', url: '' } }
+ * { name: 'jump', icon: { iconSetName: 'Font Awesome', cssClass: 'fa fa-table', iconSetType: 'FONT', url: '' } }
  * ```
- * when `action` is equals to `"action1"`, `undefined` otherwise.
+ * * `getEditBus` returns the edit bus.
+ * when `action` is equals to `"jump"`, `undefined` otherwise.
  *
- * `provide.editBus` is an object with the following keys:
+ * The `getEditBus()` method returns an object with the following keys:
  * * `start()` does nothing
  * * `isEditable()` returns the constant `true`
+ * The returns object is merged with the `editBus` parameter.
  *
  * The default `mock` parameter of `mount()` is an object with a single `$t()` key which returns the constant 
  * `"default test translation value"`
@@ -67,10 +66,10 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
     propsData: Object.assign({
       viewOnly: false,
       isView: true,
-      propertyId: 'propertyIdTest',
+      propertyId: 'color',
       entry: {
-        propertyIdTest: 'entryA1',
-        propertyIdTest2: 'entryB1'
+        color: 'red',
+        age: '13'
       }
     }, props),
     provide: {
@@ -82,18 +81,18 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
         getDisplayerDescriptor()
         {
           return {
-            actions: ['action1', 'action2']
+            actions: ['jump', 'dance']
           };
         },
         isActionAllowed(action)
         {
-          return action === 'action1';
+          return action === 'jump';
         },
         getActionDescriptor(action)
         {
           return {
-            action1: {
-              name: 'action1',
+            jump: {
+              name: 'jump',
               icon: {
                 iconSetName: 'Font Awesome',
                 cssClass: 'fa fa-table',
@@ -103,16 +102,18 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
             }
           }[action];
         },
-      }, logic),
-      editBus: Object.assign({
-        start()
-        {
-        },
-        isEditable()
-        {
-          return true;
+        getEditBus() {
+          return Object.assign({
+            start()
+            {
+            },
+            isEditable()
+            {
+              return true;
+            }
+          }, editBus)
         }
-      }, editBus),
+      }, logic),
     },
     mocks: Object.assign({
       $t: () => 'default test translation value'

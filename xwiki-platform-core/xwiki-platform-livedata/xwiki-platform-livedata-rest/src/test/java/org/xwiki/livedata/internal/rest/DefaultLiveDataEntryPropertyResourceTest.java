@@ -65,7 +65,6 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  * @since 13.4RC1
- * @since 12.10.8
  */
 @ComponentTest
 class DefaultLiveDataEntryPropertyResourceTest

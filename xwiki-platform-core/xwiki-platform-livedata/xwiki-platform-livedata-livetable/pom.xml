@@ -64,6 +64,8 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed in order to save the rich text that is edited through the live data macro (e.g., the value of a 
+    TextArea property).-->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-api</artifactId>

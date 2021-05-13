@@ -27,7 +27,7 @@
  */
 export default {
 
-  inject: ["logic", "editBus"],
+  inject: ["logic"],
 
   directives: {
     // Only used by the date displayer.
@@ -71,14 +71,45 @@ export default {
     data () {
       return this.logic.data;
     },
+    // The base value uses the value provided in the props the initial value of the form input.
+    // Once the form is edited, `this.editedValue` is defined and is used instead.
+    // This is needed in order to have a initial value (this.value) computed by `displayerMixing` while 
+    // being able to bind the edited value of the input tag in the template to a data attribute (editedValue) that will
+    // be updated at runtime without changing the initial `this.value`.
+    baseValue: {
+      get() {
+        return this.editedValue || this.value;
+      },
+      set(value) {
+        this.editedValue = value;
+      }
+    }
   },
 
   methods: {
     /**
-     * Generic save operation where the saved value is the 
+     * Generic save operation.
+     * 
+     * @param value of a value is provided, it is used for saving the property, otherwise `this.editedValue` is used
      */
-    genericSave() {
-      this.editBus.save(this.entry, this.propertyId, [{[this.propertyId]: this.editedValue}])
+    genericSave(value) {
+      const savedValue =  value || this.editedValue;
+      this.logic.getEditBus().save(this.entry, this.propertyId, {[this.propertyId]: savedValue})
+    }
+  },
+  
+  data() {
+    return {
+      editedValue: undefined
+    }
+  },
+
+  watch: {
+    isView: function(newIsView) {
+      if (newIsView) {
+        // When we switch back to view mode, the edited value is reset.
+        this.editedValue = undefined;
+      }
     }
   }
 };

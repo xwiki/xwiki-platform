@@ -32,7 +32,7 @@ describe("displayerMixin.js", () => {
   describe('computed', function () {
     it('value()', () => {
       const wrapper = initWrapper(TestComponent, {});
-      expect(wrapper.vm.value).toBe('entryA1')
+      expect(wrapper.vm.value).toBe('red')
     })
     it('propertyDescriptor()', () => {
       const wrapper = initWrapper(TestComponent, {
@@ -42,7 +42,7 @@ describe("displayerMixin.js", () => {
           },
         }
       });
-      expect(wrapper.vm.propertyDescriptor).toBe('returnPropertyDescriptor propertyIdTest')
+      expect(wrapper.vm.propertyDescriptor).toBe('returnPropertyDescriptor color')
     })
     it('config()', () => {
       const wrapper = initWrapper(TestComponent, {
@@ -52,7 +52,7 @@ describe("displayerMixin.js", () => {
           }
         }
       });
-      expect(wrapper.vm.config).toBe('returnConfig propertyIdTest')
+      expect(wrapper.vm.config).toBe('returnConfig color')
     })
     it('data()', () => {
       const wrapper = initWrapper(TestComponent, {

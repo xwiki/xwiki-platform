@@ -41,7 +41,7 @@ describe('DisplayerBoolean.vue', () => {
 
   it('Renders a false entry in view mode', () => {
     const wrapper = initWrapper(DisplayerBoolean, {
-      props: {entry: {propertyIdTest: false}},
+      props: {entry: {color: false}},
       mocks: {$t: defaultTranslationsMock}
     });
     expect(wrapper.text()).toMatch('False')
@@ -61,7 +61,7 @@ describe('DisplayerBoolean.vue', () => {
   })
 
   it('Renders a false entry in edit mode', async () => {
-    const wrapper = initWrapper(DisplayerBoolean, {props: {entry: {propertyIdTest: false}}});
+    const wrapper = initWrapper(DisplayerBoolean, {props: {entry: {color: false}}});
 
     const viewerDiv = wrapper.find('div[tabindex="0"]');
     await viewerDiv.trigger('dblclick')
@@ -92,9 +92,9 @@ describe('DisplayerBoolean.vue', () => {
     await wrapper.find('div[tabindex="0"]').trigger('keypress.enter');
 
     expect(values).toMatchObject([{
-      propertyIdTest: [{
-        propertyIdTest: false,
-      }]
+      color: {
+        color: false,
+      }
     }]);
   })
 

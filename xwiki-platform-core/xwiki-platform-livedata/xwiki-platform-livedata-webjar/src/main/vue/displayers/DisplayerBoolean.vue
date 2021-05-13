@@ -36,7 +36,7 @@
     </template>
 
     <template #editor>
-      <input type="checkbox" v-model="currentBoolValue"/>
+      <input type="checkbox" v-model="baseValue"/>
     </template>
   </BaseDisplayer>
 </template>
@@ -61,34 +61,6 @@ export default {
     falseLabelKey: {
       type: String,
       default: 'livedata.displayer.boolean.false'
-    }
-  },
-
-  data() {
-    return {
-      editedValue: undefined
-    }
-  },
-
-  computed: {
-    // Uses `this.value` as the default value to initialize the input field.
-    // Once the field value has been changed at least once, `this.editedValue` is used instead.
-    // This way, a props is used as a default value and the component can still have a internal state. 
-    currentBoolValue: {
-      get() {
-        return this.editedValue || this.value;
-      }, set(value) {
-        this.editedValue = value;
-      }
-    }
-  },
-
-  watch: {
-    isView: function(newIsView) {
-      if (newIsView) {
-        // When we switch back to view mode, the edited value is reset.
-        this.editedValue = undefined;
-      }
     }
   }
 }

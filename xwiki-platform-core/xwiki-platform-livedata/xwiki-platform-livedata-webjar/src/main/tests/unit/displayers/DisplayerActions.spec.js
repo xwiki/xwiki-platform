@@ -24,6 +24,6 @@ import {initWrapper} from "./displayerTestsHelper";
 describe('DisplayerActions.vue', () => {
   it('Renders an entry in view mode', () => {
     const wrapper = initWrapper(DisplayerActions, {})
-    expect(wrapper.text()).toMatch('action1')
+    expect(wrapper.text()).toMatch('jump')
   })
 })

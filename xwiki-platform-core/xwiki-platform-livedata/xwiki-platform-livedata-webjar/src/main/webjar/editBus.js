@@ -25,35 +25,13 @@
  * - start-editing-entry({entryId, propertyId}): when an entry passes in edit mode
  * - cancel-editing-entry({entryId, propertyId}): when an entry goes out of edit mode without saving its edits
  * - save-editing-entry({entryId, propertyId, content}): when an entry goes out of edit model and wants to save its
- *   edits. The content is an arbitrary value specific to the property's displayer type.
+ *   edits. The content is an object mapping the keys and values of the cell form attributes.
  */
 define('edit-bus', ['vue'], (Vue) => {
 
   var _logic = undefined;
   var _editBus = new Vue();
   var _editBusService = undefined;
-
-  /**
-   * Utility method to aggregate the provided content into a vals object.
-   * For each key of the content object, a corresponding key is created in vals. If the key is found only once, the
-   * corresponding value is assigned in vals. If the key is found more than once, an array of the found values is
-   * set for the corresponding key in vals.
-   * @param content the content to add to vals
-   * @param vals the object in which to aggregate the provided content.
-   */
-  function aggregate(content, vals) {
-    for (const key in content) {
-      const value = content[key];
-      if (!vals[key]) {
-        vals[key] = value;
-      } else {
-        if (!Array.isArray(vals[key])) {
-          vals[key] = [vals[key]];
-        }
-        vals[key].push(value);
-      }
-    }
-  }
 
   /**
    * Centralizes the edition event listeners and maintain a centralized state of the edition states and results for the
@@ -71,7 +49,6 @@ define('edit-bus', ['vue'], (Vue) => {
     constructor(editBus, logic) {
       this.editBus = editBus;
       this.editStates = {};
-      this.editStatesTimeouts = {};
       this.logic = logic;
     }
 
@@ -132,14 +109,11 @@ define('edit-bus', ['vue'], (Vue) => {
         if (canBeSaved) break;
       }
 
-      // If a cell to save is found, we aggegrate the content to save and save it. 
+      // If a cell to save is found, we get its content and save it. 
       if (canBeSaved && keyEntry) {
         // Aggregates the content of the form values of each property.
 
-        const vals = {};
-        values[keyEntry].content.forEach((content) => {
-          aggregate(content, vals);
-        })
+        const vals = values[keyEntry].content;
 
         this.logic.setValues({entryId, values: vals})
           .then(() => {
@@ -206,8 +180,7 @@ define('edit-bus', ['vue'], (Vue) => {
    * after this notification.
    * @param entry the entry of the edit row
    * @param propertyId the property id of the edited cell
-   * @param content the content of the edited cell, an array of objects with a single key and value pair,
-   *                for instance `[{"staticList1":"comedy"},{"staticList1":"romance"},{"staticList1":""}]
+   * @param content the attributes of the edit cell form, in the form of an object
    `
    */
   function save(entry, propertyId, content) {

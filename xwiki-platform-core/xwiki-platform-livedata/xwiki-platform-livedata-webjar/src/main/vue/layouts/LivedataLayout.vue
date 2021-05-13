@@ -59,11 +59,7 @@ export default {
 
   name: "LivedataLayout",
 
-  inject: ["logic", "editBus"],
-
-  created: function() {
-    this.editBus.init(this.logic);
-  },
+  inject: ["logic"],
 
   props: {
     // The id of the layout to load

@@ -114,12 +114,6 @@ export default {
     }
   },
 
-  data() {
-    return {
-      editedValue: undefined,
-    };
-  },
-
   computed: {
     // Checks if the property value is allowed to be edited and if the livedata is in a state where the displayer can
     // be edited.
@@ -129,22 +123,10 @@ export default {
         propertyId: this.propertyId,
       });
       // Checks that no other property is currently being edited.
-      const noOtherEditing = this.editBus.isEditable()
+      const noOtherEditing = this.logic.getEditBus().isEditable()
       return editable && noOtherEditing;
     },
-    // The base value uses the value provided in the props the initial value of the form input.
-    // Once the form is edited, `this.editedValue` is defined and is used instead.
-    // This is needed in order to have a initial value (this.value) computed by `displayerMixing` while 
-    // being able to bind the edited value of the input tag in the template to a data attribute (editedValue) that will
-    // be updated at runtime without changing the initial `this.value`.
-    baseValue: {
-      get() {
-        return this.editedValue || this.value;
-      },
-      set(value) {
-        this.editedValue = value;
-      }
-    }
+    
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -154,7 +136,7 @@ export default {
     setEdit() {
       if (this.isEditable) {
         this.$emit('update:isView', false);
-        this.editBus.start(this.entry, this.propertyId)
+        this.logic.getEditBus().start(this.entry, this.propertyId)
       }
     },
 
@@ -174,7 +156,7 @@ export default {
     cancelEdit() {
       // Notifies the edit bus that the entry edition is canceled (consequently, the edited value must not be persisted,
       // and should not be considered as edited anymore).
-      this.editBus.cancel(this.entry, this.propertyId)
+      this.logic.getEditBus().cancel(this.entry, this.propertyId)
 
       // Switches to view mode.
       this.$emit('update:isView', true);
@@ -186,15 +168,10 @@ export default {
     document.addEventListener("click", (evt) => {
       if (!this.isView) {
         const editBlock = this.$refs['editBlock'];
-        var targetElement = evt.target;
 
-        do {
-          if (targetElement === editBlock) {
-            return;
-          }
-
-          targetElement = targetElement.parentNode;
-        } while (targetElement);
+        if (editBlock.contains(evt.target)) {
+          return;
+        }
 
         // Wait a little before switching back to view mode, otherwise the change case cause a column width change 
         // and make the user click on the wrong column, for instance when trying to edit the next column by double 

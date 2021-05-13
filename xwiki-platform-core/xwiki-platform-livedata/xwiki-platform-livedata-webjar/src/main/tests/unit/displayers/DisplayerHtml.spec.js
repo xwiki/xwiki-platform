@@ -23,7 +23,14 @@ import {initWrapper} from "./displayerTestsHelper";
 
 describe('DisplayerHtml.vue', () => {
   it('Renders an entry in view mode', () => {
-    const wrapper = initWrapper(DisplayerHtml, {})
-    expect(wrapper.text()).toMatch('entryA1')
+    const wrapper = initWrapper(DisplayerHtml, {
+      props: {
+        entry: {
+          color: '<strong>some content</strong>'
+        }
+      }
+    })
+    expect(wrapper.find('.html-wrapper').html())
+      .toBe('<div class="html-wrapper"><strong>some content</strong></div>')
   })
 })

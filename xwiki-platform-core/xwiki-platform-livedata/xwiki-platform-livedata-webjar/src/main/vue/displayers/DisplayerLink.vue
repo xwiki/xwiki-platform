@@ -34,7 +34,7 @@
     :property-id="propertyId"
     :entry="entry"
     :is-view.sync="isView"
-    @saveEdit="saveLink"
+    @saveEdit="genericSave"
   >
 
     <!-- Provide the Link Viewer widget to the `viewer` slot -->
@@ -99,12 +99,6 @@ export default {
       return container.innerHTML.trim();
     }
   },
-
-  methods: {
-    saveLink(value) {
-      this.editBus.save(this.entry, this.propertyId, [{[this.propertyId]: value}])
-    }
-  }
 };
 </script>
 

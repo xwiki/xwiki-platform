@@ -23,8 +23,8 @@
 <template>
   <select :value="filterValue" class="xwiki-selectize livedata-selectize" ref="input">
     <option value=""></option>
-    <option :value="getTrueValue()">$t('livedata.filter.boolean.yes')</option>
-    <option :value="getFalseValue()">$('livedata.filter.boolean.no')</option>
+    <option :value="trueValue">{{ $t('livedata.displayer.boolean.true') }}</option>
+    <option :value="falseValue">{{ $t('livedata.displayer.boolean.false') }}</option>
   </select>
 </template>
 
@@ -45,22 +45,12 @@ export default {
     }
   },
 
-  methods: {
-    getTrueValue()
-    {
-      if (this.propertyId === 'doc.hidden') {
-        return 'true';
-      } else {
-        return '1'
-      }
+  computed: {
+    trueValue() {
+      return this.config.hasOwnProperty('trueValue') ? this.config.trueValue : 'true';
     },
-    getFalseValue()
-    {
-      if (this.propertyId === 'doc.hidden') {
-        return 'false';
-      } else {
-        return '0'
-      }
+    falseValue() {
+      return this.config.hasOwnProperty('falseValue') ? this.config.falseValue : 'false';
     }
   },
 

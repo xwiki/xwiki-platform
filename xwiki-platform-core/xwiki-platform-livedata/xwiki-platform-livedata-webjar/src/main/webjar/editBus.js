@@ -111,8 +111,6 @@ define('edit-bus', ['vue'], (Vue) => {
 
       // If a cell to save is found, we get its content and save it. 
       if (canBeSaved && keyEntry) {
-        // Aggregates the content of the form values of each property.
-
         const vals = values[keyEntry].content;
 
         this.logic.setValues({entryId, values: vals})

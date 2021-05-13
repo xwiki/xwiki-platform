@@ -59,9 +59,11 @@ describe('DisplayerLink.vue', () => {
             html: false
           };
         }
-      }, editBus: {
+      },
+      editBus: {
         start() {
-        }, save(entry, propertyId, v) {
+        },
+        save(entry, propertyId, v) {
           values.push({[propertyId]: v})
         }
       }

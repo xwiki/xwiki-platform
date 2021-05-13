@@ -39,9 +39,13 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
     return new XWiki.Document(XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT)).getURL(mode);
   }
 
-  function computeProperty(property, className) {
-    const noDocPrefixProperty = property.replace('doc.', '');
-    return className + '[0].' + noDocPrefixProperty;
+  function getPropertyReference(propertyName, className) {
+    if (propertyName.startsWith('doc.')) {
+      return propertyName.substring('doc.'.length);
+    } else {
+      // We target the first object of the specified type (class name).
+      return className + '[0].' + propertyName;
+    }
   }
 
   // TODO: fix duplicate.
@@ -63,13 +67,12 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   
   function load(mode, documentReference, property, className) {
     const targetUrl = computeTargetURL(documentReference, 'get');
-    const computedProperty = computeProperty(property, className);
     return new Promise((resolve, reject) => {
       $.get(targetUrl, {
         xpage: 'display',
         mode: mode,
         // TODO: handle the object index when provided
-        property: computedProperty,
+        property: getPropertyReference(property, className),
         type: property.startsWith('doc.') ? 'document' : 'object',
         language: xcontext.locale
       }).done((html, textStatus, jqXHR) => {
@@ -77,9 +80,8 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
         // Update the viewer.
         resolve(html);
       }).fail(() => {
-        // TODO: translate
         new XWiki.widgets.Notification(
-          this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', {mode}), 'error');
+          this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
         reject();
       })
     });

@@ -177,8 +177,6 @@ define('xwiki-livedata', [
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
-        "filter.boolean.yes",
-        "filter.boolean.no"
       ],
     });
 

@@ -86,38 +86,33 @@ export default {
           'error');
       } else {
         $(document).trigger('xwiki:actions:beforeSave');
-        const content = $(this.$refs.xObjectPropertyEdit).find(':input').serializeArray();
+        const fields = $(this.$refs.xObjectPropertyEdit).find(':input').serializeArray();
         const className = this.data.query.source.className;
 
-        const newContents = {};
-        for (const key in content) {
-          if (content.hasOwnProperty(key)) {
-            const value = content[key];
-            if (value.name) {
-              var newName = value.name;
+        const data = {};
+        fields.forEach(field => {
+          var newName = field.name;
 
-              if (newName.startsWith(className)) {
-                newName = newName.replace(className, '');
-              }
-
-              newName = newName.replace(/_\d+_/, '');
-              // Aggregates the attributes with the same name in an array.
-              // If the an attributes is found only once it is stored alone.
-              if(newContents[newName]) {
-                if(!Array.isArray(newContents[newName])) {
-                  newContents[newName] = [newContents[newName]];
-                }
-
-                newContents[newName].push(value.value)
-                
-              } else {
-                newContents[newName] = value.value;
-              }
-            }
+          if (newName.startsWith(className)) {
+            // Remove the class name and the object number in order to keep only the property name.
+            newName = newName.substring(className.length);
+            newName = newName.replace(/^_\d+_/, '');
           }
-        }
 
-        this.logic.getEditBus().save(this.entry, this.propertyId, newContents)
+          // Aggregates the fields with the same name in an array. If a field is found only once it is stored alone.
+          if (data[newName]) {
+            if (!Array.isArray(data[newName])) {
+              data[newName] = [data[newName]];
+            }
+
+            data[newName].push(field.value);
+            
+          } else {
+            data[newName] = field.value;
+          }
+        });
+
+        this.logic.getEditBus().save(this.entry, this.propertyId, data);
       }
     },
 

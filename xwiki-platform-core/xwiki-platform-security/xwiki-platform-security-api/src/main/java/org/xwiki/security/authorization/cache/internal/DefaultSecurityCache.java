@@ -408,7 +408,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (!disposed) {
                 disposed = true;
 
-                // Try to limit the conflicts cause by cache invalidation.
+                // Try to limit the conflicts caused by cache invalidation.
                 // There is still one entry removed from the cache but retries should help deal with that.
                 suspendInvalidation();
                 try {

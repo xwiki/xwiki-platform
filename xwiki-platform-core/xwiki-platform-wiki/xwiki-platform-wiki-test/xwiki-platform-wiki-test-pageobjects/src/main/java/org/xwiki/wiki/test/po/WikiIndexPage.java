@@ -59,12 +59,32 @@ public class WikiIndexPage extends ExtendedViewPage
      *
      * @param wikiName the name of the wiki
      * @return {@code null} if the wiki is not found, a {@link WikiLink} of the link of the wiki otherwise
+     * @see #getWikiLink(String, boolean)
      * @since 6.0M1
      */
     public WikiLink getWikiLink(String wikiName)
     {
+        return getWikiLink(wikiName, true);
+    }
+    
+    /**
+     * Get a wiki link from its name.
+     *
+     * @param wikiName the name of the wiki
+     * @param expectRows when {@code true}, waits for rows to be displayed and loaded, otherwise does not wait for
+     *     rows before continuing
+     * @return {@code null} if the wiki is not found, a {@link WikiLink} of the link of the wiki otherwise
+     * @since 13.4RC1
+     * @see #getWikiLink(String) 
+     */
+    public WikiLink getWikiLink(String wikiName, boolean expectRows)
+    {
         TableLayoutElement tableLayout = this.liveData.getTableLayout();
-        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        // Skips the wait in the filter, but still waits for the Live Data to be updated without, eventually without 
+        // waiting for its content to be loaded if no rows are expected. This prevents the tests to timeout when no
+        // rows are expected after filtering.
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName, false);
+        tableLayout.waitUntilReady(expectRows);
         if (tableLayout.countRows() == 0) {
             return null;
         } else {

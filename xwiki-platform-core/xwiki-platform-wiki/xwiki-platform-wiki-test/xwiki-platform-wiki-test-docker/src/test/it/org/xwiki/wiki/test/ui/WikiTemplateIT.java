@@ -178,7 +178,7 @@ class WikiTemplateIT
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink("My new template"));
+        assertNull(wikiIndexPage.getWikiLink("My new template", false));
     }
 
     private void createWikiFromTemplate()
@@ -219,7 +219,7 @@ class WikiTemplateIT
 
         // Verify the wiki has been deleted.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink("My new wiki"));
+        assertNull(wikiIndexPage.getWikiLink("My new wiki", false));
     }
 
     private WikiHomePage executeCreationStepAndFinalize(CreateWikiPageStepUser createWikiPageStepUser)

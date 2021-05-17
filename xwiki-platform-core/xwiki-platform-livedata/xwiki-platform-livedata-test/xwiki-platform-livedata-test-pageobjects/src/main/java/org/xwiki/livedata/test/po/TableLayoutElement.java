@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata.test.po;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,14 +137,38 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until the table has content displayed and loaded. Do not use this method if you expect the livedata to be
-     * displayed without content.
+     * Waits until the table has content displayed and loaded. If you expect the Live Data to be displayed without
+     * content, see {@link #waitUntilReady(boolean)}.
+     *
+     * @see #waitUntilReady(boolean)
      */
     public void waitUntilReady()
     {
+        waitUntilReady(true);
+    }
+
+    /**
+     * Waits until the table has content displayed and loaded. Use {@link #waitUntilReady()} for the default behavior.
+     *
+     * @param expectRows when {@code true} waits for rows to be displayed and loaded, when {@code false} continue
+     *     without waiting for the content
+     * @see #waitUntilReady()
+     */
+    public void waitUntilReady(boolean expectRows)
+    {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> hasLines() && areCellsLoaded() && noFiltering(),
-            20);
+        getDriver().waitUntilCondition(webDriver -> {
+            boolean isWaiting = Arrays
+                .asList(getRoot().findElement(By.cssSelector(".layout-loader")).getAttribute("class").split("\\s+"))
+                .contains("waiting");
+            if (isWaiting) {
+                return false;
+            }
+            if (!noFiltering()) {
+                return false;
+            }
+            return !expectRows || hasLines() && areCellsLoaded();
+        }, 20);
     }
 
     /**

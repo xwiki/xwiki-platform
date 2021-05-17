@@ -185,7 +185,7 @@ class SubWikiIT
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME));
+        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME, false));
         setup.forceGuestUser();
     }
 }

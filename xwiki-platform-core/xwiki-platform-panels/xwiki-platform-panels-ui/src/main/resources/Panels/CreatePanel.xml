@@ -57,7 +57,8 @@
 #end
 
 #macro (createPanel $title)
-  #set ($newPanelDoc = $xwiki.getDocument($services.model.createDocumentReference('', '', $title)))
+  #set ($pageName = $services.modelvalidation.transformName($title))
+  #set ($newPanelDoc = $xwiki.getDocument($services.model.createDocumentReference('', '', $pageName)))
   #if (!$newPanelDoc.isNew())
     #set ($redirecturl = $newPanelDoc.getURL('view', 'xpage=docalreadyexists'))
   #else

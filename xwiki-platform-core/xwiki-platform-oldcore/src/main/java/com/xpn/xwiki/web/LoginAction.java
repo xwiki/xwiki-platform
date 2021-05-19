@@ -48,7 +48,6 @@ public class LoginAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        context.getResponse().setStatus(401);
         return "login";
     }
 }

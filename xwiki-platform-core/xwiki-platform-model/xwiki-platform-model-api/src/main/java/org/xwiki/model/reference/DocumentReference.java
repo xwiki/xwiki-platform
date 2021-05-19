@@ -368,6 +368,16 @@ public class DocumentReference extends AbstractLocalizedEntityReference
         return this.localDocumentReference;
     }
 
+    /**
+     * @return this document reference but without the locale if it contains any
+     * @since 13.4RC1
+     * @since 12.10.8
+     */
+    public DocumentReference withoutLocale()
+    {
+        return getLocale() != null ? new DocumentReference(this, (Locale) null) : this;
+    }
+
     @Override
     public String toString()
     {

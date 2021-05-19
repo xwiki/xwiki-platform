@@ -102,12 +102,23 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
 
     protected void excludeFirstHeading(XDOM xdom)
     {
-        xdom.getChildren().stream().findFirst().filter(block -> block instanceof SectionBlock)
-            .ifPresent(sectionBlock -> {
-                List<Block> sectionChildren = sectionBlock.getChildren();
-                sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
-                    .ifPresent(headerBlock ->
-                        xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()), sectionBlock));
+        // We handle 2 cases:
+        // - case 1: Including a document. In this case we're expecting the first block to be a SectionBlock.
+        // - case 2: Including a document section. In this case we're expecting the first block to be a HeaderBlock
+        //   since the include is returning what's inside the SectionBlock.
+        xdom.getChildren().stream().findFirst().filter(
+                block -> block instanceof SectionBlock || block instanceof HeaderBlock)
+            .ifPresent(sectionOrHeaderBlock -> {
+                if (sectionOrHeaderBlock instanceof SectionBlock) {
+                    List<Block> sectionChildren = sectionOrHeaderBlock.getChildren();
+                    sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
+                        .ifPresent(headerBlock ->
+                            xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()),
+                                sectionOrHeaderBlock));
+                } else {
+                    List<Block> headerChildren = sectionOrHeaderBlock.getChildren();
+                    xdom.replaceChild(headerChildren.subList(1, headerChildren.size()), sectionOrHeaderBlock);
+                }
             });
     }
 

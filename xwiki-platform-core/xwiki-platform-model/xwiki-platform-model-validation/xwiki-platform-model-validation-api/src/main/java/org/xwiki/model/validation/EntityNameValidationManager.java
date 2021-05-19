@@ -54,6 +54,7 @@ public interface EntityNameValidationManager
     /**
      * @return the list of available {@link EntityNameValidation} components.
      * @since 13.4
+     * @since 12.10.8
      */
     List<EntityNameValidation> getAvailableEntityNameValidationsComponents();
 }

@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  * @since 13.4
+ * @since 12.10.8
  */
 @ComponentTest
 class EntityNameValidationConfigurationListenerTest

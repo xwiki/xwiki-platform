@@ -4,4 +4,5 @@ org.xwiki.model.validation.internal.EntityNameValidationConfigurationSource
 org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidation
 org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration
 org.xwiki.model.validation.internal.SlugEntityNameValidation
+org.xwiki.model.validation.internal.EntityNameValidationConfigurationListener
 org.xwiki.model.validation.script.ModelValidationScriptService

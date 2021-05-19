@@ -27,86 +27,128 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
+/**
+ * Tests of {@link ReplaceCharacterEntityNameValidation}.
+ */
 @ComponentTest
-public class ReplaceCharacterEntityNameValidationTest
+class ReplaceCharacterEntityNameValidationTest
 {
     @InjectMockComponents
     private ReplaceCharacterEntityNameValidation replaceCharacterValidator;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
     @BeforeEach
-    public void setup()
+    void setUp()
     {
-        this.replaceCharacterValidator.setReplacementCharacters(Collections.emptyMap());
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
     }
 
     @Test
-    public void transformation()
+    void transformEmptyCharacterReplacementMap()
     {
-        assertEquals("test", replaceCharacterValidator.transform("test"));
-        assertEquals("tést", replaceCharacterValidator.transform("tést"));
+        assertEquals("test", this.replaceCharacterValidator.transform("test"));
+        assertEquals("tést", this.replaceCharacterValidator.transform("tést"));
         assertEquals("test with âccents/and.special%characters",
-            replaceCharacterValidator.transform("test with âccents/and.special%characters"));
-
-        this.replaceCharacterValidator.setReplacementCharacters(Collections.singletonMap("/", " "));
-        assertEquals("test", replaceCharacterValidator.transform("test"));
-        assertEquals("tést", replaceCharacterValidator.transform("tést"));
-        assertEquals("test with âccents and.special%characters",
-            replaceCharacterValidator.transform("test with âccents/and.special%characters"));
-
-        this.replaceCharacterValidator.setReplacementCharacters(Collections.singletonMap("/", null));
-        assertEquals("test", replaceCharacterValidator.transform("test"));
-        assertEquals("tést", replaceCharacterValidator.transform("tést"));
-        assertEquals("test with âccentsand.special%characters",
-            replaceCharacterValidator.transform("test with âccents/and.special%characters"));
-
-        Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("/", null);
-        replaceMap.put(" ", "-");
-        replaceMap.put("%", "-");
-        this.replaceCharacterValidator.setReplacementCharacters(replaceMap);
-        assertEquals("test", replaceCharacterValidator.transform("test"));
-        assertEquals("tést", replaceCharacterValidator.transform("tést"));
-        assertEquals("test-with-âccentsand.special-characters",
-            replaceCharacterValidator.transform("test with âccents/and.special%characters"));
+            this.replaceCharacterValidator.transform("test with âccents/and.special%characters"));
     }
 
     @Test
-    public void isValid()
+    void transform1EntryCharacterReplacementMap()
     {
-        assertTrue(replaceCharacterValidator.isValid("test"));
-        assertTrue(replaceCharacterValidator.isValid("tést"));
-        assertTrue(replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
-        assertTrue(replaceCharacterValidator.isValid("test with accents and special characters"));
-        assertTrue(replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(Collections.singletonMap("/", " "));
+        assertEquals("test", this.replaceCharacterValidator.transform("test"));
+        assertEquals("tést", this.replaceCharacterValidator.transform("tést"));
+        assertEquals("test with âccents and.special%characters",
+            this.replaceCharacterValidator.transform("test with âccents/and.special%characters"));
+    }
 
-        this.replaceCharacterValidator.setReplacementCharacters(Collections.singletonMap("/", " "));
-        assertTrue(replaceCharacterValidator.isValid("test"));
-        assertTrue(replaceCharacterValidator.isValid("tést"));
-        assertFalse(replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
-        assertTrue(replaceCharacterValidator.isValid("test with accents and special characters"));
-        assertTrue(replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    @Test
+    void transform1EntryWithNullValueCharacterReplacementMap()
+    {
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(Collections.singletonMap("/", null));
+        assertEquals("test", this.replaceCharacterValidator.transform("test"));
+        assertEquals("tést", this.replaceCharacterValidator.transform("tést"));
+        assertEquals("test with âccentsand.special%characters",
+            this.replaceCharacterValidator.transform("test with âccents/and.special%characters"));
+    }
 
-        this.replaceCharacterValidator.setReplacementCharacters(Collections.singletonMap("/", null));
-        assertTrue(replaceCharacterValidator.isValid("test"));
-        assertTrue(replaceCharacterValidator.isValid("tést"));
-        assertFalse(replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
-        assertTrue(replaceCharacterValidator.isValid("test with accents and special characters"));
-        assertTrue(replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    @Test
+    void transform3EntriesCharacterReplacementMap()
+    {
+        Map<String, String> replacementMap = new HashMap<>();
+        replacementMap.put("/", null);
+        replacementMap.put(" ", "-");
+        replacementMap.put("%", "-");
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(replacementMap);
+        assertEquals("test", this.replaceCharacterValidator.transform("test"));
+        assertEquals("tést", this.replaceCharacterValidator.transform("tést"));
+        assertEquals("test-with-âccentsand.special-characters",
+            this.replaceCharacterValidator.transform("test with âccents/and.special%characters"));
+    }
 
-        Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("/", null);
-        replaceMap.put(" ", "-");
-        replaceMap.put("%", "-");
-        this.replaceCharacterValidator.setReplacementCharacters(replaceMap);
-        assertTrue(replaceCharacterValidator.isValid("test"));
-        assertTrue(replaceCharacterValidator.isValid("tést"));
-        assertFalse(replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
-        assertFalse(replaceCharacterValidator.isValid("test with accents and special characters"));
-        assertTrue(replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    @Test
+    void isValidEmptyReplacementMap()
+    {
+        assertTrue(this.replaceCharacterValidator.isValid("test"));
+        assertTrue(this.replaceCharacterValidator.isValid("tést"));
+        assertTrue(this.replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test with accents and special characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    }
+
+    @Test
+    void isValid1EntryReplacementMap()
+    {
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(Collections.singletonMap("/", " "));
+        assertTrue(this.replaceCharacterValidator.isValid("test"));
+        assertTrue(this.replaceCharacterValidator.isValid("tést"));
+        assertFalse(this.replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test with accents and special characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    }
+
+    @Test
+    void isValid1EntryWithNullValueReplacementMap()
+    {
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(Collections.singletonMap("/", null));
+        assertTrue(this.replaceCharacterValidator.isValid("test"));
+        assertTrue(this.replaceCharacterValidator.isValid("tést"));
+        assertFalse(this.replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test with accents and special characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
+    }
+
+    @Test
+    void isValid3EntriesReplacementMap()
+    {
+        Map<String, String> replacementMap = new HashMap<>();
+        replacementMap.put("/", null);
+        replacementMap.put(" ", "-");
+        replacementMap.put("%", "-");
+        when(this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap())
+            .thenReturn(replacementMap);
+        assertTrue(this.replaceCharacterValidator.isValid("test"));
+        assertTrue(this.replaceCharacterValidator.isValid("tést"));
+        assertFalse(this.replaceCharacterValidator.isValid("test with âccents/and.special%characters"));
+        assertFalse(this.replaceCharacterValidator.isValid("test with accents and special characters"));
+        assertTrue(this.replaceCharacterValidator.isValid("test-with-accents-and-special-characters"));
     }
 }

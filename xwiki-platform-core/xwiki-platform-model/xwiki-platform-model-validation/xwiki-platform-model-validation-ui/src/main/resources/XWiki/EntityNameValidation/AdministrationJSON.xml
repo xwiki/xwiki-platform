@@ -103,7 +103,6 @@
   #setVariable("$json" {
       "success": true
   })
-  #set($discard = $nameStrategyManager.resetStrategies())
 #end
 
 #if ($request.outputSyntax == "plain")

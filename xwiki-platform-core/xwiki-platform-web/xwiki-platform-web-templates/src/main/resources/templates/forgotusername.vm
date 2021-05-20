@@ -107,7 +107,7 @@
             #forgotUsernameBoxStart("success")
             $services.localization.render('xe.admin.forgotUsername.emailSent', ["$escapetool.xml($email)"])
             <div>
-                <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')">$services.localization.render('xe.admin.forgotUsername.login')</a>
+                <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', 'loginLink=1')">$services.localization.render('xe.admin.forgotUsername.login')</a>
             </div>
             #forgotUsernameBoxEnd()
           #end

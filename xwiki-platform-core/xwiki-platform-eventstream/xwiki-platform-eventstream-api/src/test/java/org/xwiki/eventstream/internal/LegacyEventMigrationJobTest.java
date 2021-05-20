@@ -106,7 +106,7 @@ public class LegacyEventMigrationJobTest
             .thenThrow(new ComponentLookupException("Error when looking for myStore"));
 
         this.migrationJob.runInternal();
-        assertEquals("Failed to get the configured store", logCapture.getMessage(2));
+        assertEquals("Failed to get the configured event store [myStore]", logCapture.getMessage(2));
         verify(this.componentManager).getInstance(EventStore.class, "myStore");
         verify(this.eventStream, never()).countEvents();
     }

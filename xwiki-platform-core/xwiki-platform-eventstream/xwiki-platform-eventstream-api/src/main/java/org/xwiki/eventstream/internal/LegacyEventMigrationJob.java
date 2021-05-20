@@ -108,7 +108,7 @@ public class LegacyEventMigrationJob
         try {
             this.eventStore = this.componentManager.getInstance(EventStore.class, this.configuration.getEventStore());
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get the configured store", e);
+            this.logger.error("Failed to get the configured event store [{}]", this.configuration.getEventStore(), e);
 
             return;
         }

@@ -98,19 +98,21 @@ public class DefaultEventStore implements EventStore, Initializable
                     this.store =
                         this.componentManager.getInstance(EventStore.class, this.configuration.getEventStore());
                 } catch (ComponentLookupException e) {
-                    throw new InitializationException("Failed to get the configured store", e);
+                    throw new InitializationException(
+                        String.format("Failed to get the configured event store [%s]", hint, e));
                 }
             }
         }
 
-        // retro compatibility: make sure to synchronize the old storage until the new store covers everything we
+        // Retro compatibility: make sure to synchronize the old storage until the new store covers everything we
         // want it to cover
         String legacyHint = this.store != null ? "legacy" : "legacy/verbose";
         if (this.componentManager.hasComponent(EventStore.class, legacyHint)) {
             try {
                 this.legacyStore = this.componentManager.getInstance(EventStore.class, legacyHint);
             } catch (ComponentLookupException e) {
-                throw new InitializationException("Failed to get the legacy event stream", e);
+                throw new InitializationException(
+                    String.format("Failed to get the legacy event stream [%s]", legacyHint, e));
             }
         }
     }

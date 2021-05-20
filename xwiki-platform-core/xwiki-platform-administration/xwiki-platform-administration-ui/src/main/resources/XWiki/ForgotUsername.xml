@@ -113,7 +113,7 @@
 
         {{html}}
         &lt;div&gt;
-          &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login')"&gt;$services.localization.render('xe.admin.forgotUsername.login')&lt;/a&gt;
+          &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', 'loginLink=1')"&gt;$services.localization.render('xe.admin.forgotUsername.login')&lt;/a&gt;
         &lt;/div&gt;
         {{/html}}
 

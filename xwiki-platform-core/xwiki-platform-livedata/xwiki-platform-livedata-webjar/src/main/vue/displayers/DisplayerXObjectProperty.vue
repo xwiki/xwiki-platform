@@ -35,7 +35,7 @@
 
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <div :class="[html-wrapper, isLoading ? disabled : '']" v-html="viewField" ref="xObjectPropertyView"></div>
+      <div :class="['html-wrapper', isLoading ? 'disabled' : '']" v-html="value" ref="xObjectPropertyView"></div>
     </template>
 
     <!-- Provide the Html Editor widget to the `editor` slot -->
@@ -57,7 +57,7 @@ import xObjectPropertyHelper from "xwiki-livedata-xObjectPropertyHelper";
 
 export default {
 
-  name: "displayer-xlass-property",
+  name: "displayer-xobject-property",
 
   inject: ["logic"],
 
@@ -71,7 +71,6 @@ export default {
   data() {
     return {
       editField: undefined,
-      viewField: undefined,
     }
   },
 
@@ -132,93 +131,42 @@ export default {
     },
 
     /**
-     * Updates the content of the viewer slot.
-     */
-    updateView() {
-      this.update(xObjectPropertyHelper.view)
-        .then((html) => {
-          this.isLoading = false;
-          this.viewField = html;
-
-          // Wait for the rendering to be finished after viewField is updated, to have access to xObjectPropertyView
-          // and be able to send the trigger event.
-          this.$nextTick().then(() => {
-            if (this.$refs.xObjectPropertyView) {
-              $(document).trigger('xwiki:dom:updated', {'elements': [this.$refs.xObjectPropertyView]});
-            }
-          })
-
-        })
-        .catch(() => {
-          // Stop the loader. 
-          this.isLoading = false;
-        })
-    },
-
-    /**
      * Update the content of the editor slot.
      */
-    updateEdit(forced) {
-      // Reload only if the edit field has not been already initialized, unless the update if forced.
-      if (this.editField === undefined || forced) {
-        this.update(xObjectPropertyHelper.edit)
-          .then((html) => {
-            this.isLoading = false;
+    updateEdit() {
+      this.update(xObjectPropertyHelper.edit)
+        .then((html) => {
+          this.isLoading = false;
 
-            this.editField = html;
+          this.editField = html;
 
-            // Wait for the rendering to be finished after editField is updated, to have access to  xObjectPropertyEdit
-            // and be able to send the trigger event.
-            this.$nextTick().then(() => {
-              if (this.$refs.xObjectPropertyEdit) {
-                $(document).trigger('xwiki:dom:updated', {'elements': [this.$refs.xObjectPropertyEdit]});
-              }
-            })
+          // Wait for the rendering to be finished after editField is updated, to have access to  xObjectPropertyEdit
+          // and be able to send the trigger event.
+          this.$nextTick().then(() => {
+            if (this.$refs.xObjectPropertyEdit) {
+              $(document).trigger('xwiki:dom:updated', {'elements': [this.$refs.xObjectPropertyEdit]});
+            }
           })
-          .catch(() => {
-            // Stop the loader and switch to view mode. 
-            this.isLoading = false;
-            this.isView = true;
-          })
-      }
-    },
-    /**
-     * Reload the edit or view field according the new editor state.
-     * When forced is false, the field value will not be reloaded if it has already been initialized.
-     * @param isView if true the view field must be updated, if false the edit field must be updated
-     * @param forced if true the updated field will be reloaded even if it already has a value, if false the field will
-     * only be updated if it undefined
-     */
-    refreshXObjectProperty({isView, forced}) {
-      if (!isView) {
-        // Updates the edit form when passing edit mode.
-        this.updateEdit(forced);
-      } else {
-        // Updates the view form when passing in view mode.
-        this.updateView();
-      }
+        })
+        .catch(() => {
+          // Stop the loader and switch to view mode.
+          this.isLoading = false;
+          this.isView = true;
+        })
     }
   },
 
   watch: {
-    // Refreshes the edit or view field when the view mode changes.
+    // Refreshes the edit field when the view mode switched to edit.
     isView: function(isView) {
-      this.refreshXObjectProperty({isView, forced: false})
-    },
-    // Watches the timestamp change to force a full refresh of the edit and view fields when the 
-    // whole livedata is reloaded.
-    timestamp: function(timestamp) {
-      // Reset the edit field and force the reload of the view field when the component is re-rendered.
-      this.editField = undefined
-      this.refreshXObjectProperty({isView: this.isView, forced: true});
+      if (!isView) {
+        this.updateEdit();
+      }
     }
   },
   mounted() {
     // Pass the vue-i18n localization helper to the XObjectPropertyHelper to allow error messages to be localized.
     xObjectPropertyHelper.setLocalization(this.$t);
-    if (!this.viewField) {
-      this.updateView();
-    }
   }
 };
 

@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.function.Function;
@@ -63,9 +64,12 @@ import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
+import org.hibernate.internal.util.StringHelper;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
+import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -1119,12 +1123,36 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         String columnName = null;
 
         if (propertyName != null) {
-            Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+            // FIXME: remove when https://hibernate.atlassian.net/browse/HHH-14627
+            // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
+            KeyValue identifier = persistentClass.getIdentifier();
+            if (identifier instanceof org.hibernate.mapping.Component) {
+                Iterator<Property> it = ((org.hibernate.mapping.Component) identifier).getPropertyIterator();
 
-            return getConfiguredColumnName(column);
+                while (it.hasNext()) {
+                    Property property = it.next();
+
+                    if (property.getName().equals(propertyName)) {
+                        return getConfiguredColumnName(property);
+                    }
+                }
+            }
+
+            return getConfiguredColumnName(persistentClass.getProperty(propertyName));
         }
 
         return columnName;
+    }
+
+    /**
+     * @since 13.4
+     * @since 12.10.8
+     */
+    public String getConfiguredColumnName(Property property)
+    {
+        Column column = (Column) property.getColumnIterator().next();
+
+        return getConfiguredColumnName(column);
     }
 
     /**

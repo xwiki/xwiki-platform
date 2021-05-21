@@ -511,7 +511,8 @@ var init = function() {
       // We do it like this because we want to wait for the reply while blocking (window.confirm) the save event
       // handler so that we can eventually stop the event itself instead of having to re-submit the form in an asynch
       // callback (Confirm Widget).
-      var confirmed = window.confirm("$services.localization.render('platform.wiki.admin.wiki.ownerProblemConfirmation')");
+      var confirmed = window.confirm($jsontool.serialize($services.localization.render(
+        'platform.wiki.admin.wiki.ownerProblemConfirmation')));
       if (!confirmed) {
         event.stop();
         if (event.memo) {

@@ -141,7 +141,7 @@
       // Update also the source document syntax.
       contentTypeField.nextAll().filter(function() {
         return $(this).attr('name') === contentTypeField.val() + '_syntax';
-      }).val(editor.element.getAttribute('data-sourceDocumentSyntax'));
+      }).val(editor.element && editor.element.getAttribute('data-sourceDocumentSyntax'));
     },
 
     getContentTypeField: function(editor) {

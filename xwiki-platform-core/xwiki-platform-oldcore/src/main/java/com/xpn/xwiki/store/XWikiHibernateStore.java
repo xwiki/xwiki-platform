@@ -2255,19 +2255,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 links.add(wikiLink);
             }
 
-            // Get link size limit
-            int linkMaxSize = getLimitSize(context, XWikiLink.class, "link");
+            if (!links.isEmpty()) {
+                // Get link size limit
+                int linkMaxSize = getLimitSize(context, XWikiLink.class, "link");
 
-            // Save the links.
-            for (XWikiLink wikiLink : links) {
-                // Verify that the link reference isn't larger than the maximum size of the field since otherwise that
-                // would lead to a DB error that would result in a fatal error, and the user would have a hard time
-                // understanding why his page failed to be saved.
-                if (wikiLink.getLink().length() <= linkMaxSize) {
-                    session.save(wikiLink);
-                } else {
-                    this.logger.warn("Could not store backlink [{}] because the link reference [{}] is too big",
-                        wikiLink, wikiLink.getLink());
+                // Save the links.
+                for (XWikiLink wikiLink : links) {
+                    // Verify that the link reference isn't larger than the maximum size of the field since otherwise
+                    // that
+                    // would lead to a DB error that would result in a fatal error, and the user would have a hard time
+                    // understanding why his page failed to be saved.
+                    if (wikiLink.getLink().length() <= linkMaxSize) {
+                        session.save(wikiLink);
+                    } else {
+                        this.logger.warn("Could not store backlink [{}] because the link reference [{}] is too big",
+                            wikiLink, wikiLink.getLink());
+                    }
                 }
             }
         } catch (Exception e) {

@@ -60,6 +60,34 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <!-- Lock down plugin version for build reproducibility -->
+        <version>1.5.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skip>${xwiki.minification.skip}</skip>
+          <!-- We use it only to minify the CSS. For JavaScript we use the Closure Compiler. -->
+          <includes>
+            <include>**/*.css</include>
+          </includes>
+          <excludes>
+            <exclude>**/*.min.*</exclude>
+          </excludes>
+          <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
+          <jswarn>false</jswarn>
+          <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
+            currently more widely used on the web. -->
+          <suffix>.min</suffix>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>

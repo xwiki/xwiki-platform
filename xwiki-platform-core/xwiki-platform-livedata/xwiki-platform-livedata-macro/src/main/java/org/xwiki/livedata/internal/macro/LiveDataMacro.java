@@ -99,6 +99,13 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     private SkinExtension jsfx;
 
     /**
+     * The component used to load the CSS code of the Live Data widget.
+     */
+    @Inject
+    @Named("ssfx")
+    private SkinExtension ssfx;
+
+    /**
      * Default constructor.
      */
     public LiveDataMacro()
@@ -116,9 +123,11 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         // Load the JavaScript code of the Live Data widget.
         Map<String, Object> skinExtensionParameters = Collections.singletonMap("forceSkinAction", Boolean.TRUE);
         this.jsfx.use("uicomponents/widgets/liveData.js", skinExtensionParameters);
+        // Load the CSS code of the Live Data widget.
+        this.ssfx.use("uicomponents/widgets/liveData.css");
 
         GroupBlock output = new GroupBlock();
-        output.setParameter("class", "liveData");
+        output.setParameter("class", "liveData loading");
         if (parameters.getId() != null) {
             output.setParameter("id", parameters.getId());
         }

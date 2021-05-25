@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultLiveDataConfigurationResolver}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -67,18 +67,18 @@ class DefaultLiveDataConfigurationResolverTest
     @Named("liveTable")
     private Provider<LiveDataPropertyDescriptorStore> propertyStoreProvider;
 
-    @Mock(extraInterfaces = {LiveDataPropertyDescriptorStore.class})
+    @Mock(extraInterfaces = { LiveDataPropertyDescriptorStore.class })
     private WithParameters propertyStore;
 
     @MockComponent
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
-    private LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
+    private final LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
 
-    private LiveDataConfiguration config = new LiveDataConfiguration();
+    private final LiveDataConfiguration config = new LiveDataConfiguration();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void configure()
@@ -203,7 +203,7 @@ class DefaultLiveDataConfigurationResolverTest
     }
 
     /**
-     * This test asserts that the translation is used for the name of a property, even if the property has a defined 
+     * This test asserts that the translation is used for the name of a property, even if the property has a defined
      * pretty name.
      */
     @Test
@@ -220,14 +220,13 @@ class DefaultLiveDataConfigurationResolverTest
 
         when(this.l10n.getTranslationPlain("release.livetable." + "releaseDate")).thenReturn("Released On");
 
-
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
         assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Released On\"}]",
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
     }
 
     /**
-     * This test asserts that the default name is kept for the name of a property, even if the property has a defined 
+     * This test asserts that the default name is kept for the name of a property, even if the property has a defined
      * pretty name, or if a translation exists for the property.
      */
     @Test
@@ -247,7 +246,7 @@ class DefaultLiveDataConfigurationResolverTest
             .thenReturn(singletonList(propertyDescriptorReleaseDate));
 
         when(this.l10n.getTranslationPlain("release.livetable." + "releaseDate")).thenReturn("Released On");
-        
+
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
         assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Date of release\"}]",
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));

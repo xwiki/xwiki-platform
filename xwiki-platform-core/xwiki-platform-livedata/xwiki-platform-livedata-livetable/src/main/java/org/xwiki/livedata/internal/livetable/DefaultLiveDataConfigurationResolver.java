@@ -49,7 +49,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
- * 
+ *
  * @version $Id$
  * @since 12.10.4
  * @since 13.0
@@ -80,7 +80,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     /**
      * Used to merge the default configuration with the provided configuration.
      */
-    private JSONMerge jsonMerge = new JSONMerge();
+    private final JSONMerge jsonMerge = new JSONMerge();
 
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
@@ -138,9 +138,10 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
             Optional<String> firstNonSpecialProperty = query.getProperties().stream().filter(Objects::nonNull)
                 .filter(property -> !property.startsWith("_")).findFirst();
             if (firstNonSpecialProperty.isPresent()
-                && isPropertySortable(firstNonSpecialProperty.get(), config.getMeta())) {
+                && isPropertySortable(firstNonSpecialProperty.get(), config.getMeta()))
+            {
                 if (query.getSort() == null) {
-                    query.setSort(new ArrayList<SortEntry>());
+                    query.setSort(new ArrayList<>());
                 }
                 if (query.getSort().isEmpty()) {
                     // The sort is not specified.
@@ -179,7 +180,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     {
         Collection<LiveDataPropertyDescriptor> propertyDescriptors = config.getMeta().getPropertyDescriptors();
         Set<String> propertiesWithDescriptor = propertyDescriptors.stream().filter(Objects::nonNull)
-            .map(propertyDescriptor -> propertyDescriptor.getId()).collect(Collectors.toSet());
+            .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
                 .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());

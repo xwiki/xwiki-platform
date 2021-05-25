@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.wiki.test.po.WikiIndexPage.WIKI_NAME_COLUMN_LABEL;
 
 /**
  * UI tests for the wiki templates feature of the Wiki application.
@@ -159,7 +160,7 @@ class WikiTemplateIT
         // Verify the wiki template is displayed in the admin wiki templates list.
         TableLayoutElement tableLayout = AdminWikiTemplatesPage.goToPage().getLiveData().getTableLayout();
         assertEquals(1, tableLayout.countRows());
-        tableLayout.assertCellWithLink("Wiki pretty name", "My new template",
+        tableLayout.assertCellWithLink(WIKI_NAME_COLUMN_LABEL, "My new template",
             setup.getBaseURL() + "wiki/mynewtemplate/view/Main/");
         tableLayout.assertRow("Description", "This is the template I do for the tests");
         tableLayout.assertRow("Owner", "superadmin");

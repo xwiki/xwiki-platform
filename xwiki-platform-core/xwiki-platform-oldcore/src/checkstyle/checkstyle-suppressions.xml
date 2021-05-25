@@ -27,5 +27,4 @@
 <suppressions>
   <suppress checks="FanOutComplexity" files="HqlQueryExecutor.java"/>
   <suppress checks="FanOutComplexity" files="FOPXSLFORenderer.java"/>
-  <suppress checks="FanOutComplexity" files="R121001000XWIKI18145DataMigration.java"/>
 </suppressions>

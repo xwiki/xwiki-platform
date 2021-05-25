@@ -112,7 +112,7 @@ class PanelIT
         tableLayoutElement.filterColumn("Name", panelName);
         assertEquals(1, tableLayoutElement.countRows());
         tableLayoutElement.assertRow("Description", "Panel Description");
-        tableLayoutElement.assertRow("Panel type", "view");
+        tableLayoutElement.assertRow("Type", "view");
         tableLayoutElement.assertRow("Category", "Information");
 
         // Add the panel to the right column from the administration.

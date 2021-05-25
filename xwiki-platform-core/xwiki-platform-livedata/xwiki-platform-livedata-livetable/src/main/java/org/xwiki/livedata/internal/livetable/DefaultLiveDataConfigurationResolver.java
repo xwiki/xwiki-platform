@@ -99,7 +99,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         setDefaultSort(mergedConfig);
 
         // Translate using the context locale.
-        return translate(mergedConfig);
+        return translate(mergedConfig, config);
     }
 
     private LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration config) throws LiveDataException
@@ -199,12 +199,27 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return propertyDescriptor;
     }
 
-    private LiveDataConfiguration translate(LiveDataConfiguration config)
+    /**
+     * Updates the {@code mergedConfig} with translated property names and descriptions.
+     *
+     * @param mergedConfig the configuration to update
+     * @param config the live data configuration provided by the user through the live data macro
+     * @return the updated {@code mergedConfig}
+     */
+    private LiveDataConfiguration translate(LiveDataConfiguration mergedConfig, LiveDataConfiguration config)
     {
-        String translationPrefix = (String) config.getQuery().getSource().getParameters().get("translationPrefix");
-        for (LiveDataPropertyDescriptor property : config.getMeta().getPropertyDescriptors()) {
-            if (property.getName() == null) {
-                property.setName(this.l10n.getTranslationPlain(translationPrefix + property.getId()));
+        String translationPrefix =
+            (String) mergedConfig.getQuery().getSource().getParameters().get("translationPrefix");
+        for (LiveDataPropertyDescriptor property : mergedConfig.getMeta().getPropertyDescriptors()) {
+            // If the property name is not set then we default on the configured translation key or the property id.
+            // Otherwise, if the property name is set but not by the user (i.e., the name comes from the default source
+            // configuration) then we want to give priority to the configured translation key if available.
+            if (property.getName() == null || !hasDefaultName(config, property.getId())) {
+                String translationPlain = this.l10n.getTranslationPlain(translationPrefix + property.getId());
+                // Prevents to override the field pretty name if it has been set previously. 
+                if (translationPlain != null) {
+                    property.setName(translationPlain);
+                }
                 if (property.getName() == null) {
                     property.setName(property.getId());
                 }
@@ -213,6 +228,22 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
                 property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
             }
         }
-        return config;
+        return mergedConfig;
+    }
+
+    /**
+     * Checks if a property has a name defined in the inspected configuration.
+     *
+     * @param config the configuration to inspect
+     * @param propertyId the if of the property to check
+     * @return {@code true} if the property has a name defined in the configuration, {@code false} otherwise
+     */
+    private boolean hasDefaultName(LiveDataConfiguration config, String propertyId)
+    {
+        if (config == null || config.getMeta() == null || config.getMeta().getPropertyDescriptors() == null) {
+            return false;
+        }
+        return config.getMeta().getPropertyDescriptors().stream()
+            .anyMatch(it -> Objects.equals(it.getId(), propertyId) && it.getName() != null);
     }
 }

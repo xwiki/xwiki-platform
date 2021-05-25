@@ -32,7 +32,10 @@ import org.xwiki.livedata.test.po.TableLayoutElement;
  */
 public class WikiIndexPage extends ExtendedViewPage
 {
-    private static final String WIKI_NAME_COLUMN_LABEL = "Wiki pretty name";
+    /**
+     * Label of the wiki name column.
+     */
+    public static final String WIKI_NAME_COLUMN_LABEL = "Name";
 
     @FindBy(id = "wikis")
     private WebElement wikisTable;

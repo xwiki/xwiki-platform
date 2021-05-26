@@ -40,18 +40,6 @@
     <!-- ================================
          Dependencies for tested features
          ================================ -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-rest-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- The tested localization REST API implementation. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-rest-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Required for LanguageIT. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

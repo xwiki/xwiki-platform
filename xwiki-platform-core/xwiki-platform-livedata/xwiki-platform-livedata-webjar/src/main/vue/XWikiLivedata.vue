@@ -37,7 +37,7 @@
     <LivedataPersistentConfiguration v-if="data.id"/>
     
     <!-- Displays a loader until the component is fully mounted. -->
-    <div v-if="!layoutLoaded" class="liveData loading"></div>
+    <div v-if="!layoutLoaded" class="loading"></div>
     
   </div>
 </template>

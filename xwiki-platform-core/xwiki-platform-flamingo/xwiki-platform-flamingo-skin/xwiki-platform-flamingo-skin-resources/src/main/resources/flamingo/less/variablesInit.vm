@@ -260,4 +260,5 @@
 @xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
 @xwiki-icon-edit-section:             "\f040";
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
+@xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";

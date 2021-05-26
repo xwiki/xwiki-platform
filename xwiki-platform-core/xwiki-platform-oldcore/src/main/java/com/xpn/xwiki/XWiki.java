@@ -55,6 +55,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
@@ -3910,13 +3911,13 @@ public class XWiki implements EventListener
                 return -8;
             }
             try {
-                if (!context.getUtil().match(getConfiguration().getProperty("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"),
+                if (!Pattern.matches(getConfiguration().getProperty("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"),
                     xwikiname)) {
                     return -4;
                 }
             } catch (RuntimeException ex) {
                 LOGGER.warn("Invalid regular expression for xwiki.validusername", ex);
-                if (!context.getUtil().match("/^[a-zA-Z0-9_]+$/", xwikiname)) {
+                if (!Pattern.matches("/^[a-zA-Z0-9_]+$/", xwikiname)) {
                     return -4;
                 }
             }

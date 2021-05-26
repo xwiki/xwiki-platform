@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import javax.script.ScriptContext;
 
@@ -689,7 +690,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
         String value = ((property == null) || (property.getValue() == null)) ? "" : property.getValue().toString();
         try {
-            if (context.getUtil().match(regexp, value)) {
+            if (Pattern.matches(regexp, value)) {
                 return true;
             }
             XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject().getName(), getName(),

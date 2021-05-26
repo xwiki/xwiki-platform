@@ -39,7 +39,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
-import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,14 +50,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.oro.text.PatternCache;
-import org.apache.oro.text.PatternCacheLRU;
-import org.apache.oro.text.perl.Perl5Util;
-import org.apache.oro.text.regex.MalformedPatternException;
-import org.apache.oro.text.regex.MatchResult;
-import org.apache.oro.text.regex.Pattern;
-import org.apache.oro.text.regex.PatternMatcherInput;
-import org.apache.oro.text.regex.Perl5Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -67,7 +60,6 @@ import org.xwiki.xml.XMLUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -81,59 +73,20 @@ public class Util
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
-    private static PatternCache patterns = new PatternCacheLRU(200);
-
-    private Perl5Matcher matcher = new Perl5Matcher();
-
-    private Perl5Util p5util = new Perl5Util(getPatterns());
-
-    public String substitute(String pattern, String text)
+    public List<String> getAllMatches(String content, String spattern, int group)
     {
-        return getP5util().substitute(pattern, text);
-    }
+        Pattern pattern = Pattern.compile(spattern);
+        Matcher matcher = pattern.matcher(content);
 
-    public boolean match(String pattern, String text)
-    {
-        return getP5util().match(pattern, text);
-    }
-
-    public boolean matched()
-    {
-        return (getP5util().getMatch() != null);
-    }
-
-    public String substitute(String pattern, String substitution, String text)
-    {
-        WikiSubstitution subst = new WikiSubstitution(this, pattern);
-        subst.setSubstitution(substitution);
-        return subst.substitute(text);
-    }
-
-    public Perl5Matcher getMatcher()
-    {
-        return this.matcher;
-    }
-
-    public Perl5Util getP5util()
-    {
-        return this.p5util;
-    }
-
-    public List<String> getAllMatches(String content, String spattern, int group) throws MalformedPatternException
-    {
-        List<String> list = new ArrayList<String>();
-        PatternMatcherInput input = new PatternMatcherInput(content);
-        Pattern pattern = patterns.addPattern(spattern);
-        while (this.matcher.contains(input, pattern)) {
-            MatchResult result = this.matcher.getMatch();
-            String smatch = result.group(group);
-            list.add(smatch);
+        List<String> list = new ArrayList<>();
+        while (matcher.find()) {
+            list.add(matcher.group(group));
         }
 
         return list;
     }
 
-    public List<String> getUniqueMatches(String content, String spattern, int group) throws MalformedPatternException
+    public List<String> getUniqueMatches(String content, String spattern, int group)
     {
         // Remove duplicate entries
         Set<String> uniqueMatches = new HashSet<String>();
@@ -192,11 +145,6 @@ public class Util
         return result;
     }
 
-    public static PatternCache getPatterns()
-    {
-        return patterns;
-    }
-
     public static Map<String, String[]> getObject(XWikiRequest request, String prefix)
     {
         @SuppressWarnings("unchecked")
@@ -224,14 +172,6 @@ public class Util
         int i = fullname.lastIndexOf(".");
 
         return fullname.substring(0, i);
-    }
-
-    public Vector<String> split(String pattern, String text)
-    {
-        Vector<String> results = new Vector<String>();
-        getP5util().split(results, pattern, text);
-
-        return results;
     }
 
     public static boolean contains(String name, String list, String sep)

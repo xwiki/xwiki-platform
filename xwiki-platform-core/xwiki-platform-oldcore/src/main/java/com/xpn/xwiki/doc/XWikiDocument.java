@@ -3982,7 +3982,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Cleanup in case we use HTMLAREA
             // content = context.getUtil().substitute("s/<br class=\\\"htmlarea\\\"\\/>/\\r\\n/g",
             // content);
-            content = context.getUtil().substitute("s/<br class=\"htmlarea\" \\/>/\r\n/g", content);
+            content = content.replace("<br class=\"htmlarea\" \\/>", "\n");
             setContent(content);
         }
         String title = eform.getTitle();

@@ -1384,9 +1384,10 @@ public class Document extends Api
     public String getXMLContent() throws XWikiException
     {
         String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                xml));
+        xml = xml.replaceAll("<email>.*?<\\/email>", "<email>********<\\/email>");
+        xml = xml.replaceAll("<password>.*?<\\/password>", "<password>********<\\/password>");
+
+        return xml;
     }
 
     public String toXML() throws XWikiException

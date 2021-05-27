@@ -58,6 +58,7 @@ describe('DisplayerBoolean.vue', () => {
     const checkbox = wrapper.find('input');
 
     expect(checkbox.element.checked).toBe(true)
+    expect(checkbox.element).toHaveFocus()
   })
 
   it('Renders a false entry in edit mode', async () => {

@@ -21,6 +21,9 @@
 import DisplayerXObjectProperty from "../../../displayers/DisplayerXObjectProperty.vue";
 import {initWrapper} from "./displayerTestsHelper";
 import Vue from "vue";
+import $ from 'jquery';
+
+global.$ = global.jQuery = $;
 
 jest.mock("xwiki-livedata-xObjectPropertyHelper", function () {
   return {
@@ -28,7 +31,7 @@ jest.mock("xwiki-livedata-xObjectPropertyHelper", function () {
     },
     edit() {
       return new Promise(resolve => {
-        resolve('<form id="editForm"></form>');
+        resolve('<form id="editForm"><input type="text" id="editField" /></form>');
       })
     }
   }
@@ -67,6 +70,13 @@ describe('DisplayerXObjectProperty.vue', () => {
       }
     })
 
+    // The :visible filter does not work in the context of jest. To mitigate that issue we spy on jquery filter
+    // method and return the expected result (the #editField input).
+    const jQuerySpy = jest.spyOn($.fn, "filter", );
+    jQuerySpy.mockImplementation(() => {
+      return $(wrapper.element).find('#editField')
+    })
+
     const viewerDiv = wrapper.find('div[tabindex="0"]');
     // Send the edit event and wait for the asynchronous operation to finish before testing.
     await viewerDiv.trigger('dblclick')
@@ -74,5 +84,6 @@ describe('DisplayerXObjectProperty.vue', () => {
 
     // Checks that the edition form is properly retrieved and displayed.
     expect(wrapper.find('#editForm').exists()).toBe(true);
+    expect(wrapper.find('#editField').element).toHaveFocus();
   })
 })

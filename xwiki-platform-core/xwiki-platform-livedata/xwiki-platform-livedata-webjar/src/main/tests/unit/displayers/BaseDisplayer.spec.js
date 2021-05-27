@@ -44,6 +44,7 @@ describe('BaseDisplayer.vue', () => {
     });
 
     expect(wrapper.find('input').element.value).toMatch('red')
+    expect(wrapper.find('input').element).toHaveFocus()
   })
 
   it('Send an event on save', async () => {

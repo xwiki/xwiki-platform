@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -109,19 +111,32 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Assert if the a column contains a value.
+     * Assert if the column contains a value. See {@link #assertRow(String, Matcher)} to use another matcher on the
+     * column values.
      *
      * @param columnLabel a column label (for instance {@code Title})
      * @param value the value to be found in the column
+     * @see #assertRow(String, Matcher)
      */
     public void assertRow(String columnLabel, String value)
     {
-        // TODO: currently only equality of the cell's text value is supported, this might not be convenient for some
+        assertRow(columnLabel, hasItem(value));
+    }
+
+    /**
+     * Calls a {@code Matcher} on the column values.
+     *
+     * @param columnLabel a column label (for instance {@code Title})
+     * @param matcher the matcher to apply on the values of the column
+     * @see #assertRow(String, String)
+     */
+    public void assertRow(String columnLabel, Matcher<Iterable<? super String>> matcher)
+    {
         List<String> columnTextValues = getValues(columnLabel)
             .stream()
             .map(WebElement::getText)
             .collect(Collectors.toList());
-        assertThat(columnTextValues, hasItem(value));
+        assertThat(columnTextValues, matcher);
     }
 
     /**
@@ -312,37 +327,30 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
-     * @param newValue the new value of the StaticList
+     * @param newValue the new value of the field
      */
     public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
-        int columnIndex = getColumnIndex(columnLabel);
-        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
+            // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
+            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
+        });
+    }
 
-        // Double click on the cell.
-        new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();
-
-        // Selector of the edited field.
-        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
-        
-        // Waits for the text input to be displayed.
-        getDriver().waitUntilCondition(input -> !element.findElements(selector).isEmpty());
-
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
-        // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
-            .setFieldValue(element.findElement(selector), newValue);
-
-        // Clicks somewhere outside the edited cell.
-        new Actions(getDriver().getWrappedDriver()).click(getRoot()).perform();
-
-        // Waits for the field to be reload before continuing.
-        getDriver().waitUntilCondition(input -> {
-            // Nothing is loading.
-            boolean noLoader = element.findElements(By.cssSelector(".xwiki-loader")).isEmpty();
-            // And the edited field is not displayed anymore.
-            boolean noInput = element.findElements(selector).isEmpty();
-            return noLoader && noInput;
+    /**
+     * Starts editing a cell, input a value, but cancel the edition (by pressing escape) instead of saving.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to update (the first line is number 1)
+     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param newValue the new value set of the field, but never saved because we cancel the edition
+     * @since 13.5RC1
+     */
+    public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
+    {
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
+            // Press escape to cancel the edition.
+            new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
         });
     }
 
@@ -441,5 +449,49 @@ public class TableLayoutElement extends BaseElement
     private List<WebElement> getCellsByColumnIndex(int columnIndex)
     {
         return getRoot().findElements(By.cssSelector(String.format(SELECT_CELLS_BY_COLUMN_INDEX, columnIndex)));
+    }
+
+    /**
+     * Does the steps for the edition of a cell, until the {@code newValue} is set on the requested field. Then call an
+     * {@code userAction} (for instance a click outside of the cell, or pressing escape). The {@code userAction} is
+     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally,
+     * waits for the result of the user action to be completed before continuing.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to update (the first line is number 1)
+     * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
+     * @param newValue the new value set of the field, but never saved because we cancel the edition
+     * @param userAction an user action to perform after the field values has been set. This action is expected to
+     *     bring the Live Data back to the view mode
+     */
+    private void internalEdit(String columnLabel, int rowNumber, String fieldName, String newValue, Runnable userAction)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+
+        // Double click on the cell.
+        new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();
+
+        // Selector of the edited field.
+        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+
+        // Waits for the text input to be displayed.
+        getDriver().waitUntilCondition(input -> !element.findElements(selector).isEmpty());
+
+        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
+        // displayed in the live data (they are the same as the one of the inline edit mode).
+        new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
+            .setFieldValue(element.findElement(selector), newValue);
+
+        userAction.run();
+
+        // Waits for the field to be reload before continuing.
+        getDriver().waitUntilCondition(input -> {
+            // Nothing is loading.
+            boolean noLoader = element.findElements(By.cssSelector(".xwiki-loader")).isEmpty();
+            // And the edited field is not displayed anymore.
+            boolean noInput = element.findElements(selector).isEmpty();
+            return noLoader && noInput;
+        });
     }
 }

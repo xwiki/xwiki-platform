@@ -36,6 +36,8 @@ import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -66,6 +68,8 @@ class LiveDataIT
     private static final String BIRTHDAY_COLUMN = "birthday";
 
     private static final String BIRTHDAY_DATETIME = "11/05/2021 16:00:00";
+
+    private static final String CANCELED_BIRTHDAY_DATETIME = "11/05/2021 16:00:10";
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
@@ -107,12 +111,15 @@ class LiveDataIT
         tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, NAME_CHARLY);
         tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
         tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
+        tableLayout.editAndCancel(BIRTHDAY_COLUMN, 2, BIRTHDAY_COLUMN, CANCELED_BIRTHDAY_DATETIME);
         assertEquals(2, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
         tableLayout.assertRow(BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
+        // The canceled birthday date shouldn't appear on the table since it has been canceled. 
+        tableLayout.assertRow(BIRTHDAY_COLUMN, not(hasItem(CANCELED_BIRTHDAY_DATETIME)));
     }
 
     private void addXObject(TestUtils testUtils, DocumentReference documentReference,

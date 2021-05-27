@@ -36,7 +36,7 @@
     </template>
 
     <template #editor>
-      <input type="checkbox" v-model="baseValue"/>
+      <input type="checkbox" v-model="baseValue" v-autofocus/>
     </template>
   </BaseDisplayer>
 </template>

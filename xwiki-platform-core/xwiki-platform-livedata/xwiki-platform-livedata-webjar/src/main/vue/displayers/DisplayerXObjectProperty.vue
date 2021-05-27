@@ -145,6 +145,8 @@ export default {
           this.$nextTick().then(() => {
             if (this.$refs.xObjectPropertyEdit) {
               $(document).trigger('xwiki:dom:updated', {'elements': [this.$refs.xObjectPropertyEdit]});
+              // Focuses on the first visible field of the loaded form.
+              $(this.$refs.xObjectPropertyEdit).find(':input').filter(':visible').focus();
             }
           })
         })

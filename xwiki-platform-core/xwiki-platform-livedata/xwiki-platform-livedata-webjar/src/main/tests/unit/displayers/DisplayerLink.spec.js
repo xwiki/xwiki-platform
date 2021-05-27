@@ -48,6 +48,7 @@ describe('DisplayerLink.vue', () => {
     const viewerDiv = wrapper.find('div[tabindex="0"]');
     await viewerDiv.trigger('dblclick');
     expect(wrapper.find('input').element.value).toBe("red")
+    expect(wrapper.find('input').element).toHaveFocus()
   })
 
   it('Send events after the end of the edit', async () => {

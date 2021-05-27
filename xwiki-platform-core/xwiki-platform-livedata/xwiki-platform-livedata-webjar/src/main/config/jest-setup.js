@@ -18,8 +18,5 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-module.exports = {
-  preset: '@vue/cli-plugin-unit-jest/presets/no-babel',
-  modulePaths: ['tests/mocks'],
-  setupFilesAfterEnv: ['<rootDir>/jest-setup.js']
-}
+// Setup jest-dom to register new jest assertions (see https://github.com/testing-library/jest-dom#installation)
+import '@testing-library/jest-dom'

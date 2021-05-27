@@ -62,7 +62,15 @@ import {mount} from '@vue/test-utils'
  */
 export function initWrapper(displayer, {props, logic, editBus, mocks})
 {
+  // Creates a div in the document body. It will be used as the attach point when mounting the Vue component.
+  // This is useful for some assertions, for instance when testing which element is on focus.
+  const elem = document.createElement('div')
+  if (document.body) {
+    document.body.appendChild(elem)
+  }
+
   return mount(displayer, {
+    attachTo: elem,
     propsData: Object.assign({
       viewOnly: false,
       isView: true,

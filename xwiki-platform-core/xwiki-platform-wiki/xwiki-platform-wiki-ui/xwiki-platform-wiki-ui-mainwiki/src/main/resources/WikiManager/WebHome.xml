@@ -54,11 +54,58 @@
   #set($discard = $columns.add('_actions'))
 #end
 
+## Note: the name properties of the actions can be removed once the translationPrefix is taken into account for the 
+## actions labels.
+## TODO: Remove the action name definitions when XWIKI-18701 is closed.
 #set ($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
       { 'id': 'wikiprettyname', 'displayer': { 'id': 'link', 'propertyHref': 'wikiprettyname_url' } },
-      { 'id': 'membershipType', 'sortable': false, 'filterable': false }
+      { 'id': 'membershipType', 'sortable': false, 'filterable': false },
+      { 
+        'id': '_actions',
+        'displayer': {
+          'id': 'actions', 
+          'actions': ['join', 'leave', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'edit', 'delete']
+        }
+      }
+    ],
+    'actions': [
+      { 
+        'id': 'join',
+        'icon': 'user_add',
+        'allowProperty': 'doc.hasjoin',
+        'urlProperty': 'doc.join_url',
+        'name': "$services.localization.render('platform.wiki.browse._actions.join')"
+      },
+      {
+        'id': 'leave',
+        'icon': 'user_delete',
+        'allowProperty': 'doc.hasleave',
+        'urlProperty': 'doc.leave_url',
+        'name': "$services.localization.render('platform.wiki.browse._actions.leave')"
+      },
+      {
+        'id': 'requestJoin',
+        'icon': 'bell',
+        'allowProperty': 'doc.hasrequestJoin',
+        'urlProperty': 'doc.requestJoin_url',
+        'name': "$services.localization.render('platform.wiki.browse._actions.requestJoin')"
+      },
+      {
+        'id': 'cancelJoinRequest',
+        'icon': 'bell_delete',
+        'allowProperty': 'doc.hascancelJoinRequest',
+        'urlProperty': 'doc.cancelJoinRequest_url',
+        'name': "$services.localization.render('platform.wiki.browse._actions.cancelJoinRequest')"
+      },
+      {
+        'id': 'viewInvitation',
+        'icon': 'envelope',
+        'allowProperty': 'doc.hasviewInvitation',
+        'urlProperty': 'doc.viewInvitation_url',
+        'name': "$services.localization.render('platform.wiki.browse._actions.viewInvitation')"
+      }
     ]
   }
 })

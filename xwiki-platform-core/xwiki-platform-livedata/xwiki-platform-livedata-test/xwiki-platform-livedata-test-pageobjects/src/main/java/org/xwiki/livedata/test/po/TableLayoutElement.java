@@ -21,6 +21,7 @@ package org.xwiki.livedata.test.po;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
@@ -71,11 +72,12 @@ public class TableLayoutElement extends BaseElement
         @Override
         protected boolean matchesSafely(WebElement item)
         {
-            boolean hasExpectedText = item.getText().equals(this.text);
-            // URL equality, possibly adding a trailing / to the passed link if missing.
-            String hrefValue = item.findElement(By.tagName("a")).getAttribute("href");
-            boolean hasExpectedLink = hrefValue.equals(this.link) || hrefValue.equals(this.link + '/');
-            return hasExpectedText && hasExpectedLink;
+            String hrefAttribute = "href";
+            return item.findElements(By.tagName("a"))
+                .stream()
+                .anyMatch(aTag -> Objects.equals(aTag.getText(), this.text)
+                    && (Objects.equals(aTag.getAttribute(hrefAttribute), this.link) 
+                    || Objects.equals(aTag.getAttribute(hrefAttribute), this.link + '/')));
         }
 
         @Override
@@ -91,6 +93,28 @@ public class TableLayoutElement extends BaseElement
             description.appendValue(this.text);
             description.appendText(" and link ");
             description.appendValue(this.link);
+        }
+    }
+
+    private static class WebElementTextMatcher extends TypeSafeMatcher<WebElement>
+    {
+        private final String value;
+
+        WebElementTextMatcher(String value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        protected boolean matchesSafely(WebElement item)
+        {
+            return item.getText().equals(this.value);
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendValue(this.value);
         }
     }
 
@@ -120,7 +144,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void assertRow(String columnLabel, String value)
     {
-        assertRow(columnLabel, hasItem(value));
+        assertRow(columnLabel, hasItem(getWebElementTextMatcher(value)));
     }
 
     /**
@@ -130,13 +154,9 @@ public class TableLayoutElement extends BaseElement
      * @param matcher the matcher to apply on the values of the column
      * @see #assertRow(String, String)
      */
-    public void assertRow(String columnLabel, Matcher<Iterable<? super String>> matcher)
+    public void assertRow(String columnLabel, Matcher<Iterable<? super WebElement>> matcher)
     {
-        List<String> columnTextValues = getValues(columnLabel)
-            .stream()
-            .map(WebElement::getText)
-            .collect(Collectors.toList());
-        assertThat(columnTextValues, matcher);
+        assertThat(getValues(columnLabel), matcher);
     }
 
     /**
@@ -148,7 +168,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void assertCellWithLink(String columnName, String text, String link)
     {
-        assertThat(getValues(columnName), hasItem(new CellWithLinkMatcher(text, link)));
+        assertThat(getValues(columnName), hasItem(getWebElementCellWithLinkMatcher(text, link)));
     }
 
     /**
@@ -367,6 +387,36 @@ public class TableLayoutElement extends BaseElement
         return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
             .findElement(by);
     }
+
+    /**
+     * Return a hamcrest {@link Matcher} on the text of a {@link WebElement}. For instance the {@link Matcher} will
+     * match on the web element containing the following html source {@code <p>Te<i>st</i></p>} for the value {@code
+     * "Test"}.
+     *
+     * @param value the expected value of the text returned by {@link WebElement#getText()}
+     * @return a matcher instance
+     * @since 13.5RC1
+     */
+    public Matcher<WebElement> getWebElementTextMatcher(String value)
+    {
+        return new WebElementTextMatcher(value);
+    }
+
+    /**
+     * Return a hamcrest {@link Matcher} on the links of a {@link WebElement}. This matcher matches when a link is found
+     * on the {@link WebElement} with the expected text and link. For instance, the {@link Matcher} will match on the
+     * web element containing the following html source {@code <p>Links: <a href="/path">label</a>, <a
+     * href="/path2">label2</a></p>} for the text {@code "label"} and the link {@code "/path"}.
+     *
+     * @param text the expected text
+     * @param link the expected link
+     * @return a matcher instance
+     * @since 13.5RC1
+     */
+    public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
+    {
+        return new CellWithLinkMatcher(text, link);
+    } 
 
     /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest

@@ -54,9 +54,6 @@
   #set($discard = $columns.add('_actions'))
 #end
 
-## Note: the name properties of the actions can be removed once the translationPrefix is taken into account for the 
-## actions labels.
-## TODO: Remove the action name definitions when XWIKI-18701 is closed.
 #set ($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
@@ -75,36 +72,31 @@
         'id': 'join',
         'icon': 'user_add',
         'allowProperty': 'doc.hasjoin',
-        'urlProperty': 'doc.join_url',
-        'name': "$services.localization.render('platform.wiki.browse._actions.join')"
+        'urlProperty': 'doc.join_url'
       },
       {
         'id': 'leave',
         'icon': 'user_delete',
         'allowProperty': 'doc.hasleave',
-        'urlProperty': 'doc.leave_url',
-        'name': "$services.localization.render('platform.wiki.browse._actions.leave')"
+        'urlProperty': 'doc.leave_url'
       },
       {
         'id': 'requestJoin',
         'icon': 'bell',
         'allowProperty': 'doc.hasrequestJoin',
-        'urlProperty': 'doc.requestJoin_url',
-        'name': "$services.localization.render('platform.wiki.browse._actions.requestJoin')"
+        'urlProperty': 'doc.requestJoin_url'
       },
       {
         'id': 'cancelJoinRequest',
         'icon': 'bell_delete',
         'allowProperty': 'doc.hascancelJoinRequest',
-        'urlProperty': 'doc.cancelJoinRequest_url',
-        'name': "$services.localization.render('platform.wiki.browse._actions.cancelJoinRequest')"
+        'urlProperty': 'doc.cancelJoinRequest_url'
       },
       {
         'id': 'viewInvitation',
         'icon': 'envelope',
         'allowProperty': 'doc.hasviewInvitation',
-        'urlProperty': 'doc.viewInvitation_url',
-        'name': "$services.localization.render('platform.wiki.browse._actions.viewInvitation')"
+        'urlProperty': 'doc.viewInvitation_url'
       }
     ]
   }

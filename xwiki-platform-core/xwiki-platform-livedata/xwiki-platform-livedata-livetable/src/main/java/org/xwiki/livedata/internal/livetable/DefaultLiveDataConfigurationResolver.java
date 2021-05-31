@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
@@ -212,39 +213,80 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         String translationPrefix =
             (String) mergedConfig.getQuery().getSource().getParameters().get("translationPrefix");
         for (LiveDataPropertyDescriptor property : mergedConfig.getMeta().getPropertyDescriptors()) {
-            // If the property name is not set then we default on the configured translation key or the property id.
-            // Otherwise, if the property name is set but not by the user (i.e., the name comes from the default source
-            // configuration) then we want to give priority to the configured translation key if available.
-            if (property.getName() == null || !hasDefaultName(config, property.getId())) {
-                String translationPlain = this.l10n.getTranslationPlain(translationPrefix + property.getId());
-                // Prevents to override the field pretty name if it has been set previously. 
-                if (translationPlain != null) {
-                    property.setName(translationPlain);
-                }
-                if (property.getName() == null) {
-                    property.setName(property.getId());
-                }
-            }
-            if (property.getDescription() == null) {
-                property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
-            }
+            translateProperty(config, translationPrefix, property);
+        }
+
+        for (LiveDataActionDescriptor action : mergedConfig.getMeta().getActions()) {
+            translateAction(config, translationPrefix, action);
         }
         return mergedConfig;
+    }
+
+    private void translateProperty(LiveDataConfiguration config, String translationPrefix,
+        LiveDataPropertyDescriptor property)
+    {
+        // If the property name is not set then we default on the configured translation key or the property id.
+        // Otherwise, if the property name is set but not by the user (i.e., the name comes from the default source
+        // configuration) then we want to give priority to the configured translation key if available.
+        if (property.getName() == null || !propertyHasDefaultName(config, property.getId())) {
+            String translationPlain = this.l10n.getTranslationPlain(translationPrefix + property.getId());
+            if (translationPlain != null) {
+                property.setName(translationPlain);
+            }
+            if (property.getName() == null) {
+                property.setName(property.getId());
+            }
+        }
+        if (property.getDescription() == null) {
+            property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
+        }
+    }
+
+    private void translateAction(LiveDataConfiguration config, String translationPrefix,
+        LiveDataActionDescriptor action)
+    {
+        // If the action name is not set then we default on the configured translation key or the action id.
+        // Otherwise, if the action name is set but not by the user (i.e., the name comes from the default source
+        // configuration) then we want to give priority to the configured translation key if available.
+        if (action.getName() == null && !actionHasDefaultName(config, action.getId())) {
+            String translationPlain =
+                this.l10n.getTranslationPlain(translationPrefix + "_actions." + action.getId());
+            if (translationPlain != null) {
+                action.setName(translationPlain);
+            }
+        }
     }
 
     /**
      * Checks if a property has a name defined in the inspected configuration.
      *
      * @param config the configuration to inspect
-     * @param propertyId the if of the property to check
+     * @param propertyId the id of the property to check
      * @return {@code true} if the property has a name defined in the configuration, {@code false} otherwise
      */
-    private boolean hasDefaultName(LiveDataConfiguration config, String propertyId)
+    private boolean propertyHasDefaultName(LiveDataConfiguration config, String propertyId)
     {
         if (config == null || config.getMeta() == null || config.getMeta().getPropertyDescriptors() == null) {
             return false;
         }
         return config.getMeta().getPropertyDescriptors().stream()
             .anyMatch(it -> Objects.equals(it.getId(), propertyId) && it.getName() != null);
+    }
+
+    /**
+     * Checks if an action has a name defined in the inspected configuration.
+     *
+     * @param config the configuration to inspect
+     * @param actionId the id of the action to check
+     * @return {@code true} if the property has a name defined in the configuration, {@code false} otherwise
+     */
+    private boolean actionHasDefaultName(LiveDataConfiguration config, String actionId)
+    {
+        if (config == null || config.getMeta() == null || config.getMeta().getActions() == null) {
+            return false;
+        }
+
+        return config.getMeta().getActions().stream()
+            .anyMatch(it -> Objects.equals(it.getId(), actionId) && it.getName() != null);
     }
 }

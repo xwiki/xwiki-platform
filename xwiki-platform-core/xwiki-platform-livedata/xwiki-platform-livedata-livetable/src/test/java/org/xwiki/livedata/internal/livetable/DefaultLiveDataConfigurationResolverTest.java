@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
@@ -218,7 +219,7 @@ class DefaultLiveDataConfigurationResolverTest
         when(((LiveDataPropertyDescriptorStore) this.propertyStore).get())
             .thenReturn(singletonList(propertyDescriptorReleaseDate));
 
-        when(this.l10n.getTranslationPlain("release.livetable." + "releaseDate")).thenReturn("Released On");
+        when(this.l10n.getTranslationPlain("release.livetable.releaseDate")).thenReturn("Released On");
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
         assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Released On\"}]",
@@ -245,10 +246,40 @@ class DefaultLiveDataConfigurationResolverTest
         when(((LiveDataPropertyDescriptorStore) this.propertyStore).get())
             .thenReturn(singletonList(propertyDescriptorReleaseDate));
 
-        when(this.l10n.getTranslationPlain("release.livetable." + "releaseDate")).thenReturn("Released On");
+        when(this.l10n.getTranslationPlain("release.livetable.releaseDate")).thenReturn("Released On");
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
         assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Date of release\"}]",
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
+    }
+
+    @Test
+    void actionNameIsTranslationKey() throws Exception
+    {
+        this.defaultConfig.getQuery().getSource().setParameter("translationPrefix", "platform.wiki.browse.");
+
+        this.config.getMeta().getActions().add(new LiveDataActionDescriptor("join"));
+
+        when(this.l10n.getTranslationPlain("platform.wiki.browse._actions.join")).thenReturn("Join");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"join\",\"name\":\"Join\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getActions()));
+    }
+
+    @Test
+    void actionNameIsDefaultValue() throws Exception
+    {
+        this.defaultConfig.getQuery().getSource().setParameter("translationPrefix", "platform.wiki.browse.");
+
+        LiveDataActionDescriptor join = new LiveDataActionDescriptor("join");
+        join.setName("Join the wiki");
+        this.config.getMeta().getActions().add(join);
+
+        when(this.l10n.getTranslationPlain("platform.wiki.browse._actions.join")).thenReturn("Join");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"join\",\"name\":\"Join the wiki\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getActions()));
     }
 }

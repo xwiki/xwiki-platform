@@ -125,4 +125,13 @@ public class WikiIndexPage extends ExtendedViewPage
         tableLayout.findElementInRow(1, By.cssSelector("a.action_delete")).click();
         return new DeleteWikiPage();
     }
+
+    /**
+     * @return the Wiki Index Live Data page object
+     * @since 13.5RC1
+     */
+    public LiveDataElement getLiveData()
+    {
+        return this.liveData;
+    }
 }

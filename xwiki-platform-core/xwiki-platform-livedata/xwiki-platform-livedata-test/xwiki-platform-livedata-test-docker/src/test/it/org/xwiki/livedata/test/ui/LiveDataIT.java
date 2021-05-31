@@ -119,7 +119,8 @@ class LiveDataIT
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
         tableLayout.assertRow(BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         // The canceled birthday date shouldn't appear on the table since it has been canceled. 
-        tableLayout.assertRow(BIRTHDAY_COLUMN, not(hasItem(CANCELED_BIRTHDAY_DATETIME)));
+        tableLayout
+            .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
     }
 
     private void addXObject(TestUtils testUtils, DocumentReference documentReference,

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -41,6 +42,7 @@ import org.xwiki.wiki.test.po.WikiCreationPage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -98,6 +100,13 @@ class SubWikiIT
     void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
     {
         createSubWiki(setup);
+
+        // Checks that a non-admin user has the Join action proposed for the new sub-wiki.
+        setup.createUserAndLogin("U1", "U1");
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
+        TableLayoutElement tableLayout = wikiIndexPage.getLiveData().getTableLayout();
+        tableLayout.assertRow("Actions", hasItem(tableLayout.getWebElementCellWithLinkMatcher("Join",
+            setup.getURL(new DocumentReference("xwiki", "WikiManager", "JoinWiki"), "view", "wikiId=subwiki"))));
 
         setup.loginAsSuperAdmin();
         DocumentReference mainWikiLinkPage = new DocumentReference("xwiki", "Test", "Link");

@@ -27,7 +27,7 @@
   instead of reimplementing the whole displayer logic each time.
 -->
 <template>
-  <div :class="{view: isView, edit: !isView}" ref="displayerRoot">
+  <div :class="{view: isView, edit: !isView}" ref="displayerRoot" @dblclick="setEdit" @keypress.self.enter="setEdit">
     <!--
       The base displayer contains three slots: `viewer`, `editor`, and `loading`.
       It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is false,
@@ -35,10 +35,7 @@
     -->
 
     <!-- The slot containing the displayer Viewer widget -->
-    <div @dblclick="setEdit"
-         @keypress.self.enter="setEdit"
-         tabindex="0"
-         v-if="isView && !isLoading">
+    <div tabindex="0" v-if="isView && !isLoading">
       <slot name="viewer">
         <!--
           Default Viewer widget
@@ -134,7 +131,7 @@ export default {
   methods: {
     // Switches the displayer to edit mode.
     setEdit() {
-      if (this.isEditable) {
+      if (this.isEditable && this.isView) {
         this.$emit('update:isView', false);
         this.logic.getEditBus().start(this.entry, this.propertyId)
       }

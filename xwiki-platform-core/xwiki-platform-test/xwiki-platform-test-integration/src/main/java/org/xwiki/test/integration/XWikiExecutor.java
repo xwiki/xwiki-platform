@@ -338,7 +338,7 @@ public class XWikiExecutor
         WatchdogResponse response = this.watchdog.isXWikiStarted(getURL(), timeout);
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
-                timeout, response.responseCode, new String(response.responseBody));
+                timeout, response.responseCode, response.responseBody);
             LOGGER.info(message);
             stop();
             throw new RuntimeException(message);

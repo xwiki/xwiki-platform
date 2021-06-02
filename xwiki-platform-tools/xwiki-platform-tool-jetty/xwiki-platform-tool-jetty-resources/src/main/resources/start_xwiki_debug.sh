@@ -38,6 +38,7 @@ usage() {
   echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
   echo "    is started. Defaults to /var/tmp."
   echo "-j, --jmx: Allows monitoring/managing Jetty through JMX."
+  echo "-ni, --noninteractive: Don't ask questions to the user. Useful when called in an automated script."
   echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
   echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
   echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
@@ -102,6 +103,11 @@ while [[ $# > 0 ]]; do
       ;;
     -j|--jmx)
       JETTY_OPTS="$JETTY_OPTS --module=jmx"
+      shift
+      ;;
+    -ni|--noninteractive)
+      XWIKI_NONINTERACTIVE=true
+      shift
       ;;
     -yp|--yourkitpath)
       YOURKIT_PATH="$1"
@@ -199,51 +205,52 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.http.port=$JETTY_PORT"
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
-# Check version of Java
-
-# Returns the Java version.
-# 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
-java_version() {
-  local result
-  local java_cmd
-  if [[ -n $(type -p java) ]]; then
-    java_cmd=java
-  elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
-    java_cmd="$JAVA_HOME/bin/java"
-  fi
-  local IFS=$'\n'
-  # remove \r for Cygwin
-  local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
-  if [[ -z $java_cmd ]]; then
-    result=no_java
-  else
-    for line in $lines; do
-      if [[ (-z $result) && ($line = *"version \""*) ]]; then
-        local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
-        # on macOS, sed doesn't support '?'
-        if [[ $ver = "1."* ]]; then
-          result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
-        else
-          result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+# Check version of Java (when in non-interactive mode)
+if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
+  # Returns the Java version.
+  # 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
+  java_version() {
+    local result
+    local java_cmd
+    if [[ -n $(type -p java) ]]; then
+      java_cmd=java
+    elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
+      java_cmd="$JAVA_HOME/bin/java"
+    fi
+    local IFS=$'\n'
+    # remove \r for Cygwin
+    local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+    if [[ -z $java_cmd ]]; then
+      result=no_java
+    else
+      for line in $lines; do
+        if [[ (-z $result) && ($line = *"version \""*) ]]; then
+          local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+          # on macOS, sed doesn't support '?'
+          if [[ $ver = "1."* ]]; then
+            result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+          else
+            result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+          fi
         fi
-      fi
-    done
-  fi
-  echo "$result"
-}
-JAVA_VERSION="$(java_version)"
-if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
-  echo "No Java found. You need Java installed for XWiki to work."
-  exit 0
-fi
-if [ "$JAVA_VERSION" -lt 8 ]; then
-  echo This version of XWiki requires Java 8 or greater.
-  exit 0
-fi
-if [ "$JAVA_VERSION" -gt 11 ]; then
-  read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      done
+    fi
+    echo "$result"
+  }
+  JAVA_VERSION="$(java_version)"
+  if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
+    echo "No Java found. You need Java installed for XWiki to work."
     exit 0
+  fi
+  if [ "$JAVA_VERSION" -lt 8 ]; then
+    echo This version of XWiki requires Java 8 or greater.
+    exit 0
+  fi
+  if [ "$JAVA_VERSION" -gt 11 ]; then
+    read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 0
+    fi
   fi
 fi
 

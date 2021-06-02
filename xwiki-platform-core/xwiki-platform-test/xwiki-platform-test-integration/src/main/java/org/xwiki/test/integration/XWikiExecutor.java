@@ -526,7 +526,7 @@ public class XWikiExecutor
             } else {
                 String debugParams = DEBUG ? String.format("-dp %d --suspend", debugPort) : "";
                 startCommand =
-                    String.format("bash %s.sh -p %s -sp %s %s", scriptNamePrefix, port, stopPort, debugParams);
+                    String.format("bash %s.sh -p %s -sp %s %s -ni", scriptNamePrefix, port, stopPort, debugParams);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

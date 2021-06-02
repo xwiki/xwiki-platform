@@ -44,7 +44,7 @@
           However, this is useful if a custom displayer only implement
           its Editor widget, as a default Viewer widget would still be provided
         -->
-        {{ value }}
+        <span>{{ value }}</span>
       </slot>
     </div>
 

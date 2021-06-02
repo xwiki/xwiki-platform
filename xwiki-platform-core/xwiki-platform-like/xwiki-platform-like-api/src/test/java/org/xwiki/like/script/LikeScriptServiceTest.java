@@ -88,9 +88,6 @@ public class LikeScriptServiceTest
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
-    @MockComponent
-    private AsyncRendererCache asyncRendererCache;
-
     @Mock
     private Right likeRight;
 
@@ -273,18 +270,6 @@ public class LikeScriptServiceTest
         when(this.likeManager.isLiked(userReference, entityReference)).thenThrow(new LikeException("Problem"));
         assertFalse(this.likeScriptService.isLiked(entityReference));
         assertEquals("Error while checking if [xwiki:Foo.Foo] is liked by [userReference]", logCapture.getMessage(0));
-    }
-
-    @Test
-    void cleanCache()
-    {
-        when(this.xWikiContext.getWikiReference()).thenReturn(new WikiReference("foo"));
-        this.likeScriptService.cleanCacheUIX();
-
-        // The Locale is important here since the AsyncRendererCache works with references containing a Locale.
-        DocumentReference uixReference = new DocumentReference("foo", Arrays.asList("XWiki", "Like"), "LikeUIX",
-            Locale.ROOT);
-        verify(this.asyncRendererCache).cleanCache(uixReference);
     }
 
     @Test

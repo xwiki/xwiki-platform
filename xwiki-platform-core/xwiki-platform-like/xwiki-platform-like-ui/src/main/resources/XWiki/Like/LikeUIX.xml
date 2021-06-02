@@ -41,7 +41,6 @@
   #set ($documentReference = $services.model.resolveDocument($request.document))
   #set ($newCounterOptional = $services.like.like($documentReference))
   #if ($newCounterOptional.isPresent())
-    #set ($discard = $services.like.cleanCacheUIX())
     #jsonResponse({
       'counter': $newCounterOptional.get()
     })
@@ -50,7 +49,6 @@
     #set ($documentReference = $services.model.resolveDocument($request.document))
     #set ($newCounterOptional = $services.like.unlike($documentReference))
     #if ($newCounterOptional.isPresent())
-    #set ($discard = $services.like.cleanCacheUIX())
       #jsonResponse({
         'counter': $newCounterOptional.get()
       })

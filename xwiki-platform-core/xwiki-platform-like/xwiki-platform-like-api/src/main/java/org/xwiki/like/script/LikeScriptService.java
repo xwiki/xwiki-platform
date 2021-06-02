@@ -19,10 +19,8 @@
  */
 package org.xwiki.like.script;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -38,8 +36,6 @@ import org.xwiki.like.LikeException;
 import org.xwiki.like.LikeManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.rendering.async.internal.AsyncRendererCache;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -61,9 +57,6 @@ import com.xpn.xwiki.XWikiContext;
 @Unstable
 public class LikeScriptService implements ScriptService
 {
-    private static final LocalDocumentReference UIX_REFERENCE =
-        new LocalDocumentReference(new LocalDocumentReference(Arrays.asList("XWiki", "Like"), "LikeUIX"), Locale.ROOT);
-
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -79,9 +72,6 @@ public class LikeScriptService implements ScriptService
     @Inject
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
-
-    @Inject
-    private AsyncRendererCache asyncRendererCache;
 
     @Inject
     private Logger logger;
@@ -282,15 +272,5 @@ public class LikeScriptService implements ScriptService
             this.logger.warn("Error while checking getting likers for [{}]", target, ExceptionUtils.getRootCause(e));
         }
         return Collections.emptyList();
-    }
-
-    /**
-     * Clean the async rendering cache for the Like UIX.
-     */
-    public void cleanCacheUIX()
-    {
-        DocumentReference localUIXReference = new DocumentReference(UIX_REFERENCE,
-            contextProvider.get().getWikiReference());
-        this.asyncRendererCache.cleanCache(localUIXReference);
     }
 }

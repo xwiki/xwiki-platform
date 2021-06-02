@@ -24,6 +24,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -95,7 +99,7 @@ class LiveDataIT
         String className = testUtils.serializeReference(testReference);
 
         // Initializes the page content.
-        createsLiveDataPage(testUtils, testReference, className);
+        createClassNameLiveDataPage(testUtils, testReference, className);
 
         // Creates the XClass.
         createXClass(testUtils, testReference);
@@ -134,6 +138,31 @@ class LiveDataIT
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
     }
 
+    @Test
+    @Order(2)
+    void livedataLivetableTableLayoutResultPage(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        // Login as super admin because guest user cannot remove pages.
+        testUtils.loginAsSuperAdmin();
+        // Wipes the test space.
+        testUtils.deletePage(testReference, true);
+
+        DocumentReference resultPageDocumentReference =
+            new DocumentReference("resultPage", testReference.getLastSpaceReference());
+
+        initResultPage(testUtils, resultPageDocumentReference);
+
+        String resultPage = testUtils.serializeReference(resultPageDocumentReference).replaceFirst("xwiki:", "");
+
+        createResultPageLiveDataPage(testUtils, testReference, resultPage);
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("count", "1");
+        tableLayout.assertRow("label", "first result");
+    }
+
     private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception
     {
         DocumentReference translationDocumentReference =
@@ -163,7 +192,7 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
     }
 
-    private void createsLiveDataPage(TestUtils testUtils, TestReference testReference, String className)
+    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference, String className)
         throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
@@ -177,5 +206,39 @@ class LiveDataIT
             + "}}{{/liveData}}\n"
             + "{{/velocity}}");
         rest.save(page);
+    }
+
+    private void createResultPageLiveDataPage(TestUtils testUtils, TestReference testReference, String resultPage)
+        throws Exception
+    {
+        TestUtils.RestTestUtils rest = testUtils.rest();
+        Page page = rest.page(testReference);
+        page.setContent("{{velocity}}\n"
+            + "#set ($liveDataConfig={'meta': {'propertyDescriptors':[{'id': 'count', 'type': 'Number'}]}})\n"
+            + "\n"
+            + "{{liveData\n"
+            + "  id=\"test\"\n"
+            + "  properties=\"count,label\"\n"
+            + "  source=\"liveTable\"\n"
+            + "  sourceParameters=\"translationPrefix=&resultPage=" + resultPage + "\"\n"
+            + "}}$jsontool.serialize($liveDataConfig){{/liveData}}\n"
+            + "{{/velocity}}");
+        rest.save(page);
+    }
+
+    private void initResultPage(TestUtils testUtils, DocumentReference resultPageDocumentReference)
+        throws JsonProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("totalrows", 1);
+        objectNode.put("returnedrows", 1);
+        objectNode.put("offset", 1);
+        objectNode.put("reqNo", 1);
+        ArrayNode rows = objectNode.putArray("rows");
+        ObjectNode jsonNodes = rows.addObject();
+        jsonNodes.put("count", 1);
+        jsonNodes.put("label", "first result");
+        testUtils.createPage(resultPageDocumentReference, objectMapper.writeValueAsString(objectNode));
     }
 }

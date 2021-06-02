@@ -47,6 +47,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class TableLayoutElement extends BaseElement
 {
+    private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
+
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
      * tag with the expected text and link.
@@ -76,14 +78,14 @@ public class TableLayoutElement extends BaseElement
             return item.findElements(By.tagName("a"))
                 .stream()
                 .anyMatch(aTag -> Objects.equals(aTag.getText(), this.text)
-                    && (Objects.equals(aTag.getAttribute(hrefAttribute), this.link) 
+                    && (Objects.equals(aTag.getAttribute(hrefAttribute), this.link)
                     || Objects.equals(aTag.getAttribute(hrefAttribute), this.link + '/')));
         }
 
         @Override
         protected void describeMismatchSafely(WebElement item, Description mismatchDescription)
         {
-            mismatchDescription.appendText(item.getAttribute("innerHTML"));
+            mismatchDescription.appendText(item.getAttribute(INNER_HTML_ATTRIBUTE));
         }
 
         @Override
@@ -109,6 +111,12 @@ public class TableLayoutElement extends BaseElement
         protected boolean matchesSafely(WebElement item)
         {
             return item.getText().equals(this.value);
+        }
+
+        @Override
+        protected void describeMismatchSafely(WebElement item, Description mismatchDescription)
+        {
+            mismatchDescription.appendText(item.getAttribute(INNER_HTML_ATTRIBUTE));
         }
 
         @Override

@@ -19,11 +19,6 @@
  */
 package org.xwiki.livedata.test.po;
 
-import java.util.Objects;
-
-import javax.annotation.Nonnull;
-
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**

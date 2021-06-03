@@ -46,6 +46,7 @@
       -->
       <a v-if="linkContent && hasViewRight"
         :href="href"
+        @click.prevent
         :class="{'explicit-empty-value': !html && !htmlValue}"
         v-html="linkContent"
       ></a>

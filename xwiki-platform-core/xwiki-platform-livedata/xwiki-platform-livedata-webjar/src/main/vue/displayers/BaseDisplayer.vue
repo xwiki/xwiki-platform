@@ -27,64 +27,74 @@
   instead of reimplementing the whole displayer logic each time.
 -->
 <template>
-  <div :class="{view: isView, edit: !isView}" ref="displayerRoot" @dblclick="setEdit" @keypress.self.enter="setEdit">
-    <!--
-      The base displayer contains three slots: `viewer`, `editor`, and `loading`.
-      It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is false,
-      and `loading` otherwise.
-    -->
-
-    <!-- The slot containing the displayer Viewer widget -->
-    <div tabindex="0" v-if="isView && !isLoading">
-      <slot name="viewer">
+  <Popover :popover-root="this.$refs.displayerRoot">
+    <template #default>
+      <div :class="{view: isView, edit: !isView}" ref="displayerRoot" @dblclick="setEdit"
+           @keypress.self.enter="setEdit">
         <!--
-          Default Viewer widget
-          Normally this should rarely be used, as the default displayer
-          should provide a default viewer if no displayer is specified
-          However, this is useful if a custom displayer only implement
-          its Editor widget, as a default Viewer widget would still be provided
+          The base displayer contains three slots: `viewer`, `editor`, and `loading`.
+          It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is 
+          false, and `loading` otherwise.
         -->
-        <span>{{ value }}</span>
-      </slot>
-      <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
+
+        <!-- The slot containing the displayer Viewer widget -->
+        <div tabindex="0" v-if="isView && !isLoading">
+          <slot name="viewer">
+            <!--
+              Default Viewer widget
+              Normally this should rarely be used, as the default displayer
+              should provide a default viewer if no displayer is specified
+              However, this is useful if a custom displayer only implement
+              its Editor widget, as a default Viewer widget would still be provided
+            -->
+            <span>{{ value }}</span>
+          </slot>
+        <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
     </div>
 
-    <!-- The slot containing the displayer Editor widget -->
-    <div @keypress.enter="applyEdit"
-         @keydown.esc="cancelEdit"
-         v-if="!isView && !isLoading"
-         tabindex="0"
-         ref="editBlock"
-    >
-      <slot name="editor">
-        <!--
-          Default Editor widget
-          Normally this should rarely be used, as the default displayer
-          should provide a default editor if no displayer is specified
-          However, this is useful if a custom displayer only implement
-          its Viewer widget, as a default Editor widget would still be provided
-        -->
-        <input
-          class="default-input"
-          type="text"
-          size="1"
-          v-autofocus
-          v-model="baseValue"
-        />
-      </slot>
-    </div>
+        <!-- The slot containing the displayer Editor widget -->
+        <div @keypress.enter="applyEdit"
+             @keydown.esc="cancelEdit"
+             v-if="!isView && !isLoading"
+             tabindex="0"
+             ref="editBlock"
+        >
+          <slot name="editor">
+            <!--
+              Default Editor widget
+              Normally this should rarely be used, as the default displayer
+              should provide a default editor if no displayer is specified
+              However, this is useful if a custom displayer only implement
+              its Viewer widget, as a default Editor widget would still be provided
+            -->
+            <input
+              class="default-input"
+              type="text"
+              size="1"
+              v-autofocus
+              v-model="baseValue"
+            />
+          </slot>
+        </div>
 
-    <slot name="loading" v-if="isLoading">
-      <XWikiLoader></XWikiLoader>
-    </slot>
-
-  </div>
+        <slot name="loading" v-if="isLoading">
+          <XWikiLoader></XWikiLoader>
+        </slot>
+      </div>
+    </template>
+    <template #popover v-if="isEditable && isView">
+      <SelectAllAction :target="$refs.displayerRoot" :title="$t('TODO')"/>
+      <slot name="popover-actions"></slot>
+    </template>
+  </Popover>
 </template>
 
 
 <script>
 import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import Popover from "./popover/Popover";
+import SelectAllAction from "./popover/actions/SelectAllAction";
 
 export default {
 
@@ -94,6 +104,8 @@ export default {
   mixins: [displayerMixin],
 
   components: {
+    SelectAllAction,
+    Popover,
     XWikiLoader,
   },
 
@@ -128,7 +140,7 @@ export default {
       const noOtherEditing = this.logic.getEditBus().isEditable()
       return editable && noOtherEditing;
     },
-    isViewable() {
+isViewable() {
       var empty = this.isEmpty;
       if (empty === undefined) {
         empty = !this.value
@@ -228,6 +240,11 @@ export default {
 /* style for the default input */
 .livedata-displayer .default-input {
   width: 100%;
+}
+
+.livedata-displayer .popover {
+  width: auto;
+  height: auto;
 }
 
 </style>

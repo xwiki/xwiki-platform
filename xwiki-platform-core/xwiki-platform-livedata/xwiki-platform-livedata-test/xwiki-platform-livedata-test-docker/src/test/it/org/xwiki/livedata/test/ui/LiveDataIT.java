@@ -36,6 +36,7 @@ import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +66,8 @@ class LiveDataIT
 
     private static final String CHOICE_C = "value3";
 
+    private static final String CHOICE_D = "value4";
+
     private static final String BIRTHDAY_COLUMN = "birthday";
 
     private static final String BIRTHDAY_DATETIME = "11/05/2021 16:00:00";
@@ -83,11 +86,12 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         // Wipes the test space.
         testUtils.deletePage(testReference, true);
+
+        initLocalization(testUtils, testReference);
+
         // Become guest because the tests does not need specific rights. 
         testUtils.forceGuestUser();
 
-        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
-        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
         String className = testUtils.serializeReference(testReference);
 
         // Initializes the page content.
@@ -97,13 +101,17 @@ class LiveDataIT
         createXClass(testUtils, testReference);
 
         // Creates corresponding XObjects.
-        addXObject(testUtils, o1, className, NAME_LYNDA, CHOICE_A);
-        addXObject(testUtils, o2, className, NAME_ESTHER, CHOICE_B);
+        addXObject(testUtils, new DocumentReference("O1", (SpaceReference) testReference.getParent()), className,
+            NAME_LYNDA, CHOICE_A);
+        addXObject(testUtils, new DocumentReference("O2", (SpaceReference) testReference.getParent()), className,
+            NAME_ESTHER, CHOICE_B);
+        addXObject(testUtils, new DocumentReference("O3", (SpaceReference) testReference.getParent()), className,
+            "Nikolay", "");
 
         testUtils.gotoPage(testReference);
 
         TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
-        assertEquals(2, tableLayout.countRows());
+        assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_A);
@@ -112,7 +120,9 @@ class LiveDataIT
         tableLayout.editCell(CHOICE_COLUMN, 2, CHOICE_COLUMN, CHOICE_C);
         tableLayout.editCell(BIRTHDAY_COLUMN, 1, BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
         tableLayout.editAndCancel(BIRTHDAY_COLUMN, 2, BIRTHDAY_COLUMN, CANCELED_BIRTHDAY_DATETIME);
-        assertEquals(2, tableLayout.countRows());
+        // Edits the choice column of Nikolay, to assert that an cell with an empty content can be edited. 
+        tableLayout.editCell(CHOICE_COLUMN, 3, CHOICE_COLUMN, CHOICE_D);
+        assertEquals(3, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
@@ -121,6 +131,16 @@ class LiveDataIT
         // The canceled birthday date shouldn't appear on the table since it has been canceled. 
         tableLayout
             .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
+        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+    }
+
+    private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        DocumentReference translationDocumentReference =
+            new DocumentReference("Translation", testReference.getLastSpaceReference());
+        testUtils.addObject(translationDocumentReference, "XWiki.TranslationDocumentClass",
+            singletonMap("scope", "WIKI"));
+        testUtils.rest().savePage(translationDocumentReference, "emptyvalue=\n", "translation");
     }
 
     private void addXObject(TestUtils testUtils, DocumentReference documentReference,
@@ -138,7 +158,7 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, CHOICE_COLUMN, "StaticList");
         ClassEditPage classEditPage = new ClassEditPage();
         StaticListClassEditElement propertyList = classEditPage.getStaticListClassEditElement(CHOICE_COLUMN);
-        propertyList.setValues(StringUtils.joinWith("|", CHOICE_A, CHOICE_B, CHOICE_C));
+        propertyList.setValues(StringUtils.joinWith("|", CHOICE_A, CHOICE_B, CHOICE_C, CHOICE_D));
         classEditPage.clickSaveAndView();
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
     }
@@ -153,7 +173,7 @@ class LiveDataIT
             + "  id=\"test\"\n"
             + "  properties=\"" + NAME_COLUMN + "," + CHOICE_COLUMN + "," + BIRTHDAY_COLUMN + "\"\n"
             + "  source=\"liveTable\"\n"
-            + "  sourceParameters=\"className=" + className.replace("xwiki:", "") + "\"\n"
+            + "  sourceParameters=\"translationPrefix=&className=" + className.replace("xwiki:", "") + "\"\n"
             + "}}{{/liveData}}\n"
             + "{{/velocity}}");
         rest.save(page);

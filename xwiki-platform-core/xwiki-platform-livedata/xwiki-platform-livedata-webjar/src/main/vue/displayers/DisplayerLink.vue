@@ -45,6 +45,7 @@
       -->
       <a
         :href="href"
+        @click.prevent
         :class="{'explicit-empty-value': !htmlValue}"
         v-html="htmlValue || $t('livedata.displayer.link.noValue')"
       ></a>

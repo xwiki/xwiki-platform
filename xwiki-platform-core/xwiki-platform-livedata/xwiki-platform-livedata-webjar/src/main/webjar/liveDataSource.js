@@ -114,6 +114,13 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }, true)).then(toTranslationsMap));
   };
 
+  const getIcon = function(iconName) {
+    const iconURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons`
+    return Promise.resolve($.getJSON(iconURL, {
+      'name': iconName
+    }))
+  }
+
   var toTranslationsMap = function(responseJSON) {
     var translationsMap = {};
     responseJSON.translations?.forEach(translation => translationsMap[translation.key] = translation.rawSource);
@@ -134,6 +141,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     addEntry,
     updateEntry, 
     updateEntryProperty,
-    getTranslations
+    getTranslations,
+    getIcon
   };
 });

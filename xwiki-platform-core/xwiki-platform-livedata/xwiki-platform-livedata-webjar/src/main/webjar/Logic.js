@@ -1372,6 +1372,14 @@ define('xwiki-livedata', [
 
     getEditBus() {
       return editBus;
+    },
+    
+    //
+    // Icons
+    //
+    
+    getIconByName(name) {
+      return liveDataSource.getIcon(name).then(response => response.icons.find(it => it.name === name));
     }
   };
 

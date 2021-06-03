@@ -220,6 +220,12 @@
                   <old>class com.xpn.xwiki.store.migration.hibernate.R121001000XWIKI18145DataMigration</old>
                   <justification>Migrations classes are not meant to be referenced from Java and there is no point in keeping a migration which became useless.</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
+                  <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

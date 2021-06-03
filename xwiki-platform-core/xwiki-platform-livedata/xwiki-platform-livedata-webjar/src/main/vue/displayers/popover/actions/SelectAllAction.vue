@@ -1,5 +1,7 @@
 <template>
-  <a title="Edit" role="button" class="btn btn-default btn-xs" rel="nofollow" @click="selectAndCopy">
+  <!-- TODO: the click event is not triggered in practice because the html is copy-pasted in a new place, outside of 
+  Vue. Consequently the event listener is not copied along... -->
+  <a :title="title" role="button" class="btn btn-default btn-xs" rel="nofollow" @click="selectAndCopy">
     <XWikiIcon :icon-descriptor="iconDescriptor"/>
   </a>
 </template>

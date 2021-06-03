@@ -1057,18 +1057,7 @@ public class XWiki implements EventListener
 
     public static URL getRequestURL(XWikiRequest request) throws XWikiException
     {
-        try {
-            StringBuffer requestURL = request.getRequestURL();
-            String qs = request.getQueryString();
-            if ((qs != null) && (!qs.equals(""))) {
-                return new URL(requestURL.toString() + "?" + qs);
-            } else {
-                return new URL(requestURL.toString());
-            }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                "Exception while getting URL from request", e);
-        }
+        return HttpServletUtils.getSourceURL(request);
     }
 
     public static Object callPrivateMethod(Object obj, String methodName)

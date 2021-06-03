@@ -214,6 +214,12 @@
                   <old>method java.util.List&lt;java.lang.String&gt; com.xpn.xwiki.api.XWiki::getConfiguredSyntaxes()</old>
                   <justification>Not a runtime breakage since that method has been moved to the oldcore legacy module</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
+                  <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

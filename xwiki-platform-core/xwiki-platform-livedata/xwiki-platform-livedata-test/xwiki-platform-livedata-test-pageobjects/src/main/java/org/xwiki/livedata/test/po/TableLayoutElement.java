@@ -161,6 +161,8 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel a column label (for instance {@code Title})
      * @param matcher the matcher to apply on the values of the column
      * @see #assertRow(String, String)
+     * @since 13.5RC1
+     * @since 13.4.1
      */
     public void assertRow(String columnLabel, Matcher<Iterable<? super WebElement>> matcher)
     {
@@ -373,6 +375,7 @@ public class TableLayoutElement extends BaseElement
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @since 13.5RC1
+     * @since 13.4.1
      */
     public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
@@ -404,6 +407,7 @@ public class TableLayoutElement extends BaseElement
      * @param value the expected value of the text returned by {@link WebElement#getText()}
      * @return a matcher instance
      * @since 13.5RC1
+     * @since 13.4.1
      */
     public Matcher<WebElement> getWebElementTextMatcher(String value)
     {
@@ -420,6 +424,7 @@ public class TableLayoutElement extends BaseElement
      * @param link the expected link
      * @return a matcher instance
      * @since 13.5RC1
+     * @since 13.4.1
      */
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {

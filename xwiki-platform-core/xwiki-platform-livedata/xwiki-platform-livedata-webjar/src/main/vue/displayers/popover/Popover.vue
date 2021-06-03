@@ -4,7 +4,7 @@
       <slot></slot>
     </div>
     <div v-show="false" ref="content">
-      <div class="popover btn-group">
+      <div class="popover-btn btn-group">
         <slot name="popover"></slot>
       </div>
     </div>
@@ -40,17 +40,18 @@ export default {
     }
   },
   mounted() {
-    // TODO: needs to be saved because popover sets his own this when calling content
+    // Needs to be saved because popover sets his own this when calling content.
+    // TODO: checks if this is really the best way to do it + check if nextTick is needed or not.
     var that = this;
-    this.$nextTick(() => {
-      $(this.$refs.body).popover({
-        'html': this.html,
-        'content': () => that.$refs.content.innerHTML,
-        'placement': this.placement,
-        // 'trigger': this.trigger,
-        'delay': this.delay
-      })
+    // this.$nextTick(() => {
+    $(this.$refs.body).popover({
+      'html': this.html,
+      'content': () => that.$refs.content.innerHTML,
+      'placement': this.placement,
+      // 'trigger': this.trigger,
+      'delay': this.delay
     })
+    // })
   },
   beforeDestroy() {
     $(this.popoverRoot).popover('destroy')
@@ -59,7 +60,7 @@ export default {
 </script>
 
 <style scoped>
-.popover.btn-group .btn {
+.popover-btn.btn-group .btn {
   border: 0;
   background: inherit;
 }

@@ -61,7 +61,7 @@
     <keypress.version>2.1.5</keypress.version>
 
     <!-- CSS4J/Carte -->
-    <css4j.version>3.2.0</css4j.version>
+    <css4j.version>3.5.1</css4j.version>
 
     <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
@@ -581,16 +581,26 @@
         <version>1.0.2</version>
       </dependency>
 
-      <!-- CSS4J -->
-      <dependency>
-        <groupId>io.sf.carte</groupId>
-        <artifactId>xml-dtd</artifactId>
-        <version>${css4j.version}</version>
-      </dependency>
+      <!-- Carte CSS4J -->
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <version>${css4j.version}</version>
+      </dependency>
+
+      <!-- Carte XML DTD -->
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>xml-dtd</artifactId>
+        <!-- Note: has a different release cycle than CSS4J -->
+        <version>3.5.1</version>
+        <exclusions>
+          <!-- We're using a more recent version pulled from css4j -->
+          <exclusion>
+            <groupId>io.sf.carte</groupId>
+            <artifactId>carte-util</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- Restlet -->

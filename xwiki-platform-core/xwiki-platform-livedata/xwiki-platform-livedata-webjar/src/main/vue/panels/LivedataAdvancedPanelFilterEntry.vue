@@ -52,6 +52,7 @@
     <LivedataFilter
       :property-id="propertyId"
       :index="filterIndex"
+      :is-advanced="true"
     />
 
     <!-- Delete filter entry button -->

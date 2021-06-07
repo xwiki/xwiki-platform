@@ -235,14 +235,23 @@ public class LiveTableRequestHandler
         List<String> values = filter.getConstraints().stream().filter(Objects::nonNull).map(Constraint::getValue)
             .filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
         if (!values.isEmpty()) {
-            requestParams.put(filter.getProperty(), values.toArray(new String[values.size()]));
+            requestParams.put(filter.getProperty(), values.toArray(new String[0]));
             requestParams.put(filter.getProperty() + "/join_mode", new String[] {filter.isMatchAll() ? "AND" : "OR"});
 
             List<String> matchType = filter.getConstraints().stream()
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
                 .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
                 .collect(Collectors.toList());
-            requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
+            requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[0]));
+
+            // Add a value to the empty fields since otherwise they are dismissed by LiveTableResultMacros.
+            // Changing the handling of empty values in the result templates is dangerous and could lead to regressions 
+            // when the livetable clients expected empty values to simply be dismissed.
+            for (int i = 0; i < matchType.size(); i++) {
+                if (matchType.get(i).equals("empty")) {
+                    requestParams.get(filter.getProperty())[i] = "-";
+                }
+            }
         }
     }
 }

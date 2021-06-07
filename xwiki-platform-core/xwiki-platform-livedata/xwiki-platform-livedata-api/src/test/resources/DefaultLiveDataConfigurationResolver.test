@@ -139,7 +139,8 @@
         "operators":[
           {"id":"equals","name":"Equals"},
           {"id":"startsWith","name":"startsWith"},
-          {"id":"contains","name":"contains"}
+          {"id":"contains","name":"contains"},
+          {"id":"empty","name":"empty"}
         ]
       }
     ],

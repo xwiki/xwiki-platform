@@ -250,13 +250,17 @@ public class ViewPage extends BasePage
     }
 
     /**
-     * Scrolls to the top of the screen.
+     * Instantaneously scrolls to the top of the screen.
      *
      * @since 13.3RC1
      * @since 12.10.7
      */
     public void scrollToTop()
     {
+        // scrollTo allows to move the view to the top of the page instantaneously, allowing to safely continue the
+        // browser interactions without risks of seeing the screen moving up during the following test steps.
+        // Note: this action was previously performed by sending a home key pressed event, which was not synchronous on 
+        // Chrome, leading to flickering tests, notably when the scroll was followed by a drag and drop action.
         getDriver().scrollTo(0, 0);
     }
 

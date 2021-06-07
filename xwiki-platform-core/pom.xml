@@ -157,47 +157,8 @@
                  </revapi.differences>
             -->
             <revapi.differences>
-              <!-- Start of Revapi possible bug -->
-              <justification>Possibly a bug in Revapi, see https://github.com/revapi/revapi/issues/221#issuecomment-832626011</justification>
               <criticality>highlight</criticality>
               <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.oldClass</code>
-                  <old>missing-class javax.servlet.http.Cookie</old>
-                  <new>missing-class javax.servlet.http.Cookie</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.newClass</code>
-                  <old>missing-class javax.servlet.http.Cookie</old>
-                  <new>missing-class javax.servlet.http.Cookie</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.oldClass</code>
-                  <old>missing-class javax.servlet.http.HttpServletRequest</old>
-                  <new>missing-class javax.servlet.http.HttpServletRequest</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.newClass</code>
-                  <old>missing-class javax.servlet.http.HttpServletRequest</old>
-                  <new>missing-class javax.servlet.http.HttpServletRequest</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.oldClass</code>
-                  <old>missing-class javax.servlet.http.HttpServletResponse</old>
-                  <new>missing-class javax.servlet.http.HttpServletResponse</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.missing.newClass</code>
-                  <old>missing-class javax.servlet.http.HttpServletResponse</old>
-                  <new>missing-class javax.servlet.http.HttpServletResponse</new>
-                </item>
-                <!-- End of Revapi possible bug -->
                 <item>
                   <code>java.class.nonFinalClassInheritsFromNewClass</code>
                   <old>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</old>

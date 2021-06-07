@@ -22,8 +22,6 @@ package org.xwiki.like.internal;
 import java.util.Arrays;
 import java.util.Locale;
 
-import javax.xml.ws.soap.MTOM;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.LikeManager;
 import org.xwiki.model.reference.DocumentReference;

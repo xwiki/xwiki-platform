@@ -44,6 +44,10 @@
       <artifactId>xwiki-commons-stability</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

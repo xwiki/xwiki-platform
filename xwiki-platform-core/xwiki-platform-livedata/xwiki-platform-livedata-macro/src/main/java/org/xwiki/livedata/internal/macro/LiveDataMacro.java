@@ -118,7 +118,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         this.jsfx.use("uicomponents/widgets/liveData.js", skinExtensionParameters);
 
         GroupBlock output = new GroupBlock();
-        output.setParameter("class", "liveData");
+        output.setParameter("class", "liveData loading");
         if (parameters.getId() != null) {
             output.setParameter("id", parameters.getId());
         }

@@ -652,8 +652,8 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
-     * Scrolls to the given coordinates inside the web page. If you want to scroll to a specific {@link WebElement}, see
-     * {@link #scrollTo(WebElement)}.
+     * Instantaneously scrolls to the given coordinates inside the web page. If you want to scroll to a specific {@link
+     * WebElement}, see {@link #scrollTo(WebElement)}.
      *
      * @param xCoord is the pixel along the horizontal axis of the web page that you want displayed in the upper
      *     left
@@ -666,6 +666,8 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void scrollTo(int xCoord, int yCoord)
     {
+        // This action is instantaneous, allowing to continue testing while knowing precisely the browser's view of the 
+        // web page.
         executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 

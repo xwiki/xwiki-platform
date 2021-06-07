@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
   <description>XWiki Platform - Skin - Skin Extensions</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

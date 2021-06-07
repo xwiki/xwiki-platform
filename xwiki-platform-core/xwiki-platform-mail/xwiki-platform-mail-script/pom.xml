@@ -32,7 +32,7 @@
   <name>XWiki Platform - Mail - Mail Script API</name>
   <description>Mail Script API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Script API</xwiki.extension.name>
   </properties>

@@ -31,6 +31,9 @@
   <name>XWiki Platform - Extension - Cluster</name>
   <packaging>jar</packaging>
   <description>Makes the Extension Manager work properly in a cluster environment.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

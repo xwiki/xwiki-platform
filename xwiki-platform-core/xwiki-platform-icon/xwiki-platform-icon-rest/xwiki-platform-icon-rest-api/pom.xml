@@ -33,6 +33,7 @@
   <description>The API of the Icon REST services.</description>
   <properties>
     <xwiki.extension.name>Icon REST Services API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

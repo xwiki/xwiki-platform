@@ -428,7 +428,9 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             }
 
             // Try installing it
-            return validate(tryId, namespace, indexedVersions);
+            if (validate(tryId, namespace, indexedVersions)) {
+                return true;
+            }
         }
 
         return false;

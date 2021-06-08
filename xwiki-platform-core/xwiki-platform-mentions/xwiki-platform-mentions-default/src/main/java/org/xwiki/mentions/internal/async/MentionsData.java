@@ -49,7 +49,7 @@ public class MentionsData implements Serializable
 
     private String wikiId;
 
-    private final boolean stop;
+    private final boolean stopFlag;
 
     private long attempts;
 
@@ -58,16 +58,17 @@ public class MentionsData implements Serializable
      */
     public MentionsData()
     {
-        this.stop = false;
+        this.stopFlag = false;
     }
 
     /**
      * Private constructor for the {@link MentionsData#STOP} static object.
-     * @param stop stop flag.
+     *
+     * @param stopFlag the stop flag
      */
-    private MentionsData(boolean stop)
+    private MentionsData(boolean stopFlag)
     {
-        this.stop = stop;
+        this.stopFlag = stopFlag;
     }
 
     /**
@@ -159,7 +160,7 @@ public class MentionsData implements Serializable
      */
     public boolean isDeprecated()
     {
-        return this.stop && this != STOP;
+        return this.stopFlag && this != STOP;
     }
 
     /**

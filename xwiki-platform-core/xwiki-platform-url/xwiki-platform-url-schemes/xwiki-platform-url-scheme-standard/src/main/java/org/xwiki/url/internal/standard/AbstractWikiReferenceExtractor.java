@@ -26,6 +26,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Commons code for Wiki Reference Extractors.
  *
@@ -45,6 +47,11 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
 
     @Inject
     private Execution execution;
+
+    protected boolean isContextAvailable()
+    {
+        return execution.getContext() != null && execution.getContext().hasProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    }
 
     /**
      * Check if there's a descriptor for the passed wiki and if not and the configuration option to redirect to
@@ -70,7 +77,7 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
         // Note: We also support not having an Execution Context available. This allows this code to work at request
         // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
         // as the first thing along with Database initialization.
-        if (this.execution.getContext() == null) {
+        if (!this.isContextAvailable()) {
             return null;
         }
 
@@ -86,7 +93,7 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
         // Note: We also support not having an Execution Context available. This allows this code to work at request
         // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
         // as the first thing along with Database initialization.
-        if (this.execution.getContext() == null) {
+        if (!this.isContextAvailable()) {
             return null;
         }
 

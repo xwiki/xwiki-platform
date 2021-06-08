@@ -23,9 +23,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -46,6 +45,10 @@ import org.xwiki.resource.resources.ResourcesResourceReference;
 import org.xwiki.resource.skins.SkinsResourceReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
@@ -58,7 +61,9 @@ import org.xwiki.url.internal.standard.resources.ResourcesResourceReferenceResol
 import org.xwiki.url.internal.standard.skins.SkinsResourceReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
+import com.xpn.xwiki.XWikiContext;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -67,6 +72,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.1M1
  */
+@ComponentTest
 @ComponentList({
     DefaultResourceTypeResolver.class,
     DefaultResourceReferenceResolver.class,
@@ -83,62 +89,61 @@ import static org.mockito.Mockito.when;
     ResourcesResourceReferenceResolver.class,
     SkinsResourceReferenceResolver.class
 })
-public class IntegrationTest
+class IntegrationTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
-
     private ResourceTypeResolver<ExtendedURL> resourceTypeResolver;
 
     private ResourceReferenceResolver<ExtendedURL> resourceReferenceResolver;
 
     @BeforeComponent
-    public void setUpComponents() throws Exception
+    public void setUpComponents(MockitoComponentManager componentManager) throws Exception
     {
         // Isolate from xwiki configuration file
-        URLConfiguration urlConfiguration = this.componentManager.registerMockComponent(URLConfiguration.class);
+        URLConfiguration urlConfiguration = componentManager.registerMockComponent(URLConfiguration.class);
         when(urlConfiguration.getURLFormatId()).thenReturn("standard");
 
         // Isolate from xwiki configuration file
-        StandardURLConfiguration standardURLConfiguration = this.componentManager.registerMockComponent(
+        StandardURLConfiguration standardURLConfiguration = componentManager.registerMockComponent(
             StandardURLConfiguration.class);
         when(standardURLConfiguration.getEntityPathPrefix()).thenReturn("bin");
         when(standardURLConfiguration.getWikiPathPrefix()).thenReturn("wiki");
         when(standardURLConfiguration.isViewActionHidden()).thenReturn(false);
 
         // Isolate from xwiki configuration file
-        ModelConfiguration modelConfiguration = this.componentManager.registerMockComponent(ModelConfiguration.class);
+        ModelConfiguration modelConfiguration = componentManager.registerMockComponent(ModelConfiguration.class);
         when(modelConfiguration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn("xwiki");
 
         // Isolate from xwiki's model
         WikiDescriptorManager wikiDescriptorManager =
-            this.componentManager.registerMockComponent(WikiDescriptorManager.class);
+            componentManager.registerMockComponent(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
         // Isolate from Environment
         EntityResourceActionLister actionLister =
-            this.componentManager.registerMockComponent(EntityResourceActionLister.class);
+            componentManager.registerMockComponent(EntityResourceActionLister.class);
         when(actionLister.listActions()).thenReturn(Arrays.asList("view"));
 
         // Simulate a configured Execution Context
-        Execution execution = this.componentManager.registerMockComponent(Execution.class);
-        when(execution.getContext()).thenReturn(new ExecutionContext());
+        Execution execution = componentManager.registerMockComponent(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, "something");
+        when(execution.getContext()).thenReturn(executionContext);
 
         // For test simplicity consider that Context CM == CM
-        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
-        this.resourceTypeResolver = this.componentManager.getInstance(
+        this.resourceTypeResolver = componentManager.getInstance(
             new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
-        this.resourceReferenceResolver = this.componentManager.getInstance(
+        this.resourceReferenceResolver = componentManager.getInstance(
             new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
     }
 
     @Test
-    public void extractResourceReference() throws Exception
+    void extractResourceReference() throws Exception
     {
         // Entity Resource References
         assertURL("http://localhost:8080/xwiki/bin/view/space/page", EntityResourceReference.TYPE,

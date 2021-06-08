@@ -103,8 +103,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
     }
 
     @Override
-    public SyndFeed retrieveFeed(URL feedUrl)
-        throws IllegalArgumentException, IOException, FeedException, FetcherException
+    public SyndFeed retrieveFeed(URL feedUrl) throws IOException, FeedException, FetcherException
     {
         return retrieveFeed(feedUrl, 0);
     }
@@ -112,8 +111,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
     /**
      * @see com.sun.syndication.fetcher.FeedFetcher#retrieveFeed(java.net.URL)
      */
-    public SyndFeed retrieveFeed(URL feedUrl, int timeout)
-        throws IllegalArgumentException, IOException, FeedException, FetcherException
+    public SyndFeed retrieveFeed(URL feedUrl, int timeout) throws IOException, FeedException, FetcherException
     {
         if (feedUrl == null) {
             throw new IllegalArgumentException("null is not a valid URL");

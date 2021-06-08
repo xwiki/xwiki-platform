@@ -58,14 +58,17 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultLiveDataConfigurationResolver}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @ComponentTest
 @ComponentList(StringLiveDataConfigurationResolver.class)
-class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigurationResolverTest
+class DefaultLiveDataConfigurationResolverTest
 {
+    private static final ConfigurationResolverTestDataProvider DATA_PROVIDER =
+        new ConfigurationResolverTestDataProvider();
+
     @InjectMockComponents
     private DefaultLiveDataConfigurationResolver resolver;
 
@@ -79,9 +82,9 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private JSONMerge jsonMerge = new JSONMerge();
+    private final JSONMerge jsonMerge = new JSONMerge();
 
     @BeforeEach
     void before(MockitoComponentManager componentManager) throws Exception
@@ -157,6 +160,6 @@ class DefaultLiveDataConfigurationResolverTest extends AbstractLiveDataConfigura
 
     private static Stream<String[]> getTestData() throws Exception
     {
-        return getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));
+        return DATA_PROVIDER.getTestData(new File("src/test/resources/DefaultLiveDataConfigurationResolver.test"));
     }
 }

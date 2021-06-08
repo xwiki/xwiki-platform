@@ -40,20 +40,23 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link StringLiveDataConfigurationResolver}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @ComponentTest
-class StringLiveDataConfigurationResolverTest extends AbstractLiveDataConfigurationResolverTest
+class StringLiveDataConfigurationResolverTest
 {
+    private static final ConfigurationResolverTestDataProvider DATA_PROVIDER =
+        new ConfigurationResolverTestDataProvider();
+
     @InjectMockComponents
     private StringLiveDataConfigurationResolver resolver;
 
     @MockComponent
     private IconManager iconManager;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void before() throws Exception
@@ -83,6 +86,6 @@ class StringLiveDataConfigurationResolverTest extends AbstractLiveDataConfigurat
 
     private static Stream<String[]> getTestData() throws Exception
     {
-        return getTestData(new File("src/test/resources/StringLiveDataConfigurationResolver.test"));
+        return DATA_PROVIDER.getTestData(new File("src/test/resources/StringLiveDataConfigurationResolver.test"));
     }
 }

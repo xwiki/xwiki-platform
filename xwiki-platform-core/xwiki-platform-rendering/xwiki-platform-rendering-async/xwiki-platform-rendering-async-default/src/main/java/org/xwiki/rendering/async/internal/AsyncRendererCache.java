@@ -43,6 +43,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
+import org.xwiki.security.authorization.AuthorizationManager;
 
 /**
  * Share cache containing the results of the {@link AsyncRenderer} executions.

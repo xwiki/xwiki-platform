@@ -104,6 +104,7 @@ class EditFormTest
         parameterMap.put("XWiki.XWikiRights_1_foo", paramValue2);
         parameterMap.put("XWiki.XWikiRights_1_bar", paramValue3);
         parameterMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome_0_prop", paramValue1);
+        parameterMap.put("Space.Some-Class_12_prop-erty", paramValue3);
         parameterMap.put("foobar_18_buz", paramValue1);
         parameterMap.put("foo_48bar_buz", paramValue1);
 
@@ -134,6 +135,10 @@ class EditFormTest
         treeMap = new TreeMap<>();
         treeMap.put(0, Collections.singletonMap("prop", paramValue1));
         expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", treeMap);
+
+        treeMap = new TreeMap<>();
+        treeMap.put(12, Collections.singletonMap("prop-erty", paramValue3));
+        expectedMap.put("Space.Some-Class", treeMap);
 
         assertEquals(expectedMap, this.editForm.getUpdateOrCreateMap());
     }

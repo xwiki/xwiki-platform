@@ -42,8 +42,10 @@ import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSo
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,6 +63,9 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
 {
     @InjectMockComponents
     private WikiPreferencesConfigurationSource source;
+
+    @MockComponent
+    private ConverterManager converterManager;
 
     @Override
     protected ConfigurationSource getConfigurationSource()
@@ -204,7 +209,10 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         this.source.setProperties(properties);
 
         assertEquals("value", this.source.getProperty("textKey"));
-        assertEquals(1, this.source.getProperty("booleanKey", Boolean.class));
+
+        // Simulate the conversion from Integer to Boolean
+        when(this.converterManager.convert(Boolean.class, new Integer(1))).thenReturn(true);
+        assertEquals(true, this.source.getProperty("booleanKey", Boolean.class));
     }
 
     @Test

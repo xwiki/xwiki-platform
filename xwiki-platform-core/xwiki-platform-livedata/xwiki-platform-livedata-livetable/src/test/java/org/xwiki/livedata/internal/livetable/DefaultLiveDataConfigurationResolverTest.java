@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
@@ -43,6 +44,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,7 +52,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultLiveDataConfigurationResolver}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -66,18 +68,18 @@ class DefaultLiveDataConfigurationResolverTest
     @Named("liveTable")
     private Provider<LiveDataPropertyDescriptorStore> propertyStoreProvider;
 
-    @Mock(extraInterfaces = {LiveDataPropertyDescriptorStore.class})
+    @Mock(extraInterfaces = { LiveDataPropertyDescriptorStore.class })
     private WithParameters propertyStore;
 
     @MockComponent
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
-    private LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
+    private final LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
 
-    private LiveDataConfiguration config = new LiveDataConfiguration();
+    private final LiveDataConfiguration config = new LiveDataConfiguration();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void configure()
@@ -199,5 +201,85 @@ class DefaultLiveDataConfigurationResolverTest
             this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
 
         assertEquals("test.liveData.", propertyStoreParams.get("translationPrefix"));
+    }
+
+    /**
+     * This test asserts that the translation is used for the name of a property, even if the property has a defined
+     * pretty name.
+     */
+    @Test
+    void propertyNameIsTranslationKey() throws Exception
+    {
+        this.config.getQuery().getProperties().add("releaseDate");
+        this.defaultConfig.getQuery().getSource().setParameter("translationPrefix", "release.livetable.");
+
+        LiveDataPropertyDescriptor propertyDescriptorReleaseDate = new LiveDataPropertyDescriptor();
+        propertyDescriptorReleaseDate.setId("releaseDate");
+        propertyDescriptorReleaseDate.setName("Release Date");
+        when(((LiveDataPropertyDescriptorStore) this.propertyStore).get())
+            .thenReturn(singletonList(propertyDescriptorReleaseDate));
+
+        when(this.l10n.getTranslationPlain("release.livetable.releaseDate")).thenReturn("Released On");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Released On\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
+    }
+
+    /**
+     * This test asserts that the default name is kept for the name of a property, even if the property has a defined
+     * pretty name, or if a translation exists for the property.
+     */
+    @Test
+    void propertyNameIsDefaultValue() throws Exception
+    {
+        this.config.getQuery().getProperties().add("releaseDate");
+        this.config.getQuery().getSource().setParameter("translationPrefix", "release.livetable.");
+        LiveDataPropertyDescriptor e = new LiveDataPropertyDescriptor();
+        e.setId("releaseDate");
+        e.setName("Date of release");
+        this.config.getMeta().getPropertyDescriptors().add(e);
+
+        LiveDataPropertyDescriptor propertyDescriptorReleaseDate = new LiveDataPropertyDescriptor();
+        propertyDescriptorReleaseDate.setId("releaseDate");
+        propertyDescriptorReleaseDate.setName("Release Date");
+        when(((LiveDataPropertyDescriptorStore) this.propertyStore).get())
+            .thenReturn(singletonList(propertyDescriptorReleaseDate));
+
+        when(this.l10n.getTranslationPlain("release.livetable.releaseDate")).thenReturn("Released On");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"releaseDate\",\"name\":\"Date of release\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getPropertyDescriptors()));
+    }
+
+    @Test
+    void actionNameIsTranslationKey() throws Exception
+    {
+        this.defaultConfig.getQuery().getSource().setParameter("translationPrefix", "platform.wiki.browse.");
+
+        this.config.getMeta().getActions().add(new LiveDataActionDescriptor("join"));
+
+        when(this.l10n.getTranslationPlain("platform.wiki.browse._actions.join")).thenReturn("Join");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"join\",\"name\":\"Join\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getActions()));
+    }
+
+    @Test
+    void actionNameIsDefaultValue() throws Exception
+    {
+        this.defaultConfig.getQuery().getSource().setParameter("translationPrefix", "platform.wiki.browse.");
+
+        LiveDataActionDescriptor join = new LiveDataActionDescriptor("join");
+        join.setName("Join the wiki");
+        this.config.getMeta().getActions().add(join);
+
+        when(this.l10n.getTranslationPlain("platform.wiki.browse._actions.join")).thenReturn("Join");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+        assertEquals("[{\"id\":\"join\",\"name\":\"Join the wiki\"}]",
+            this.objectMapper.writeValueAsString(actualConfig.getMeta().getActions()));
     }
 }

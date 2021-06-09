@@ -146,6 +146,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
@@ -214,7 +215,6 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
-import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
@@ -1063,18 +1063,7 @@ public class XWiki implements EventListener
 
     public static URL getRequestURL(XWikiRequest request) throws XWikiException
     {
-        try {
-            StringBuffer requestURL = request.getRequestURL();
-            String qs = request.getQueryString();
-            if ((qs != null) && (!qs.equals(""))) {
-                return new URL(requestURL.toString() + "?" + qs);
-            } else {
-                return new URL(requestURL.toString());
-            }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                "Exception while getting URL from request", e);
-        }
+        return HttpServletUtils.getSourceURL(request);
     }
 
     public static Object callPrivateMethod(Object obj, String methodName)
@@ -4843,52 +4832,13 @@ public class XWiki implements EventListener
         if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, sourceDoc.getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
 
-            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
+            ReferenceRenamer referenceRenamer = Utils.getComponent(ReferenceRenamer.class);
 
             DocumentReference oldDocumentReference = sourceDoc.getDocumentReference();
-
             XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
-
-            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
-            // xwiki-platform-refactoring-default
-            boolean modified = false;
-            for (Block block : blocks) {
-                org.xwiki.rendering.listener.reference.ResourceReference resourceReference =
-                    linkedResourceHelper.getResourceReference(block);
-                if (resourceReference == null) {
-                    // Skip invalid blocks.
-                    continue;
-                }
-
-                org.xwiki.rendering.listener.reference.ResourceType resourceType = resourceReference.getType();
-
-                // TODO: support ATTACHMENT as well.
-                if (!org.xwiki.rendering.listener.reference.ResourceType.DOCUMENT.equals(resourceType) &&
-                    !org.xwiki.rendering.listener.reference.ResourceType.SPACE.equals(resourceType)) {
-                    // We are currently only interested in Document or Space references.
-                    continue;
-                }
-
-                // current link, use the old document's reference to fill in blanks.
-                EntityReference oldLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, oldDocumentReference);
-                // new link, use the new document's reference to fill in blanks.
-                EntityReference newLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, newDocumentReference);
-
-                // If the new and old link references don`t match, then we must update the relative link.
-                if (!newLinkReference.equals(oldLinkReference)) {
-                    modified = true;
-
-                    // Serialize the old (original) link relative to the new document's location, in compact form.
-                    String serializedLinkReference =
-                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
-
-                    // Update the reference in the XDOM.
-                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
-                }
-            }
+            boolean modified = referenceRenamer
+                .renameReferences(newDocumentXDOM, newDocumentReference, oldDocumentReference, newDocumentReference,
+                    false);
 
             // Set the new content and save document if needed
             if (modified) {

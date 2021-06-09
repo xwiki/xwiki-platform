@@ -136,6 +136,18 @@ public class DefaultIconManager implements IconManager
         return iconSetManager.getIconSet(iconSetName).getIconNames();
     }
 
+    @Override
+    public boolean hasIcon(String iconName) throws IconException
+    {
+        return this.iconSetManager.getCurrentIconSet().hasIcon(iconName);
+    }
+
+    @Override
+    public boolean hasIcon(String iconSetName, String iconName) throws IconException
+    {
+        return this.iconSetManager.getIconSet(iconSetName).hasIcon(iconName);
+    }
+
     /**
      * @param iconName name of the icon
      * @return the current icon set if the icon name is inside, otherwise the default icon set

@@ -123,9 +123,9 @@ class LikeIT
         userProfileLikedPagesPage.gotoPage();
         TableLayoutElement tableLayout = userProfileLikedPagesPage.getLiveData().getTableLayout();
         assertEquals(1, tableLayout.countRows());
-        assertTrue(tableLayout.hasCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
-            testUtils.getURL(testReference.getLastSpaceReference())));
-        assertTrue(tableLayout.hasRow(LIKES_COLUMN_NAME, "2"));
+        tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+            testUtils.getURL(testReference.getLastSpaceReference()));
+        tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization-rest</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-rest-api</artifactId>
   <name>XWiki Platform - Localization - REST - API</name>
@@ -33,6 +33,7 @@
   <description>The API of the Localization REST services.</description>
   <properties>
     <xwiki.extension.name>Localization REST Services API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

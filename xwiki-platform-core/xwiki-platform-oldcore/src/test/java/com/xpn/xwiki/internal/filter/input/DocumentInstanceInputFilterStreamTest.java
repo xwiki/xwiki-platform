@@ -33,12 +33,12 @@ import com.xpn.xwiki.internal.filter.output.DocumentInstanceOutputFilterStream;
  * 
  * @version $Id$
  */
-public class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInputFilterStreamTest
+class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInputFilterStreamTest
 {
     // Tests
 
     @Test
-    public void testImportDocumentsPreserveVersion() throws FilterException, IOException
+    void testImportDocumentsPreserveVersion() throws FilterException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
         outputProperties.setVerbose(false);

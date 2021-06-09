@@ -306,13 +306,18 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
       var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
 
+      var eventTypesSelected = self.eventTypeSelector.val();
+      var eventTypes;
+      if (eventTypesSelected != null &amp;&amp; eventTypesSelected.length &gt; 0) {
+        eventTypes = eventTypesSelected.join(',');
+      }
       var params = {
         action: 'createScopeFilterPreference',
         target: 'user',
         user: self.modal.data('user'),
         filterType: self.filterTypeSelector.val(),
         filterFormats: self.notificationFormatSelector.val().join(','),
-        eventTypes: self.eventTypeSelector.val().join(','),
+        eventTypes: eventTypes,
         csrf: xm.form_token,
         wiki: [],
         space: [],

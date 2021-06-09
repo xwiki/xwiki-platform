@@ -206,7 +206,8 @@ public class MavenResolver
      * @throws Exception in case the POM model cannot be resolved
      * @since 12.5RC1
      */
-    public List<Artifact> convertToArtifacts(List<ArtifactCoordinate> artifactCoordinates, boolean resolveExtraJARs)
+    public List<Artifact> convertToArtifacts(Collection<ArtifactCoordinate> artifactCoordinates,
+        boolean resolveExtraJARs)
         throws Exception
     {
         List<Artifact> artifacts = new ArrayList<>();

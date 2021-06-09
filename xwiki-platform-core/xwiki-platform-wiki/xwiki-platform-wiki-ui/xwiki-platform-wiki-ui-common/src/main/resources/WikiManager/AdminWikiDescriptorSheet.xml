@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="WikiManager.AdminWikiDescriptorSheet" locale="">
   <web>WikiManager</web>
   <name>AdminWikiDescriptorSheet</name>
   <language/>
@@ -210,7 +210,7 @@
       <codeToExecute>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -235,10 +235,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -427,8 +427,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -442,7 +445,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -474,6 +479,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -491,43 +498,38 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function() {
-var init = function() {
-  // We only need this behavior in the admin (administration) and view modes.
-  if (XWiki.contextaction != 'admin' &amp;&amp; XWiki.contextaction != 'view') {
-    return;
-  }
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  'use strict';
 
-  // Listen for the save &amp; continue event (that we reuse with our button).
-  document.observe("xwiki:actions:save", function(event) {
-    // Rename the save button so that XWiki's action filter does not get in our way and send our request somewhere else
-    // rather than the form's action.
-    if ($$("input[name='action_saveandcontinue']")[0]) {
-      $$("input[name='action_saveandcontinue']")[0].name = 'xaction_saveandcontinue';
-    }
+  var init = function() {
+    $('input[name="action_saveandcontinue"]').on('xwiki:actions:beforeSave', function(event) {
+      // Rename the save button so that XWiki's action filter does not get in our way and send our request somewhere
+      // else rather than the form's action.
+      $(this).attr('name', 'xaction_saveandcontinue');
 
-    // Ask for confirmation when the new owner does not exist and is entered by hand.
-    if ($$("input[name='owner']")[0] &amp;&amp; !$$("input[name='owner'][type='hidden']")[0]) {
-      // We do it like this because we want to wait for the reply while blocking (window.confirm) the save event
-      // handler so that we can eventually stop the event itself instead of having to re-submit the form in an asynch
-      // callback (Confirm Widget).
-      var confirmed = window.confirm("$services.localization.render('platform.wiki.admin.wiki.ownerProblemConfirmation')");
-      if (!confirmed) {
-        event.stop();
-        if (event.memo) {
-          event.memo.originalEvent.stop();
+      // Ask for confirmation when the new owner does not exist and is entered by hand.
+      var ownerSelectize = $('#owner')[0]?.selectize;
+      var ownerDoesNotExist = ownerSelectize &amp;&amp; ownerSelectize.items.some(function(ownerId) {
+        var owner = ownerSelectize.options[ownerId];
+        return !owner.icon &amp;&amp; owner.label === owner.value;
+      });
+      if (ownerDoesNotExist) {
+        // We do it like this because we want to wait for the reply while blocking (window.confirm) the save event
+        // handler so that we can eventually stop the event itself instead of having to re-submit the form in an asynch
+        // callback (Confirm Widget).
+        if (!window.confirm($jsontool.serialize($services.localization.render(
+            'platform.wiki.admin.wiki.ownerProblemConfirmation')))) {
+          event.preventDefault();
         }
       }
-    }
-  });
-};
+    });
+  };
 
-// Register on xwiki:dom:loading because we want to register a handler for xwiki:actions:save before the default
-// handler gets registered, otherwise our handler will be called after the default, thus after the AJAX request
-// is sent, and we don`t want that.
-(XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loading', init);
-
-})();</code>
+  // We only need this behavior in the administration and view modes.
+  if (XWiki.contextaction === 'admin' || XWiki.contextaction === 'view') {
+    $(init);
+  }
+});</code>
     </property>
     <property>
       <name>Script</name>
@@ -555,8 +557,11 @@ var init = function() {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -570,7 +575,9 @@ var init = function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -583,6 +590,8 @@ var init = function() {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -618,6 +627,8 @@ var init = function() {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

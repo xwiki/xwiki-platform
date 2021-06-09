@@ -98,4 +98,9 @@ export default {
   width: 0;
 }
 
+.layout-table td.cell {
+  /* Sets the height to 100% to allow children div to use the full cell height 
+  (see https://stackoverflow.com/a/18488334/657524). */
+  height: 100%;
+}
 </style>

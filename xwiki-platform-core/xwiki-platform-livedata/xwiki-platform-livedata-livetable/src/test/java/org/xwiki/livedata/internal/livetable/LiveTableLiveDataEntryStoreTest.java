@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.inject.Named;
@@ -31,7 +32,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,17 +54,20 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LiveTableLiveDataEntryStore}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -86,13 +93,29 @@ class LiveTableLiveDataEntryStoreTest
     @MockComponent
     private LiveTableRequestHandler liveTableRequestHandler;
 
+    @MockComponent
+    private ModelBridge modelBridge;
+
+    @MockComponent
+    @Named("liveTable")
+    private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
+
     @Mock
     private XWikiContext xcontext;
 
     @Mock
     private XWiki xwiki;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Mock
+    private LiveDataConfiguration liveDataConfiguration;
+
+    @Mock
+    private LiveDataMeta liveDataMeta;
+
+    @Mock
+    private LiveDataEntryDescriptor entryDescriptor;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @SuppressWarnings("unchecked")
     @BeforeEach
@@ -103,6 +126,10 @@ class LiveTableLiveDataEntryStoreTest
 
         when(this.liveTableRequestHandler.getLiveTableResults(any(), any()))
             .thenAnswer(invocation -> ((Supplier<String>) invocation.getArgument(1)).get());
+        when(this.liveDataConfigurationProvider.get()).thenReturn(this.liveDataConfiguration);
+        when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);
+        when(this.liveDataMeta.getEntryDescriptor()).thenReturn(this.entryDescriptor);
+        when(this.entryDescriptor.getIdProperty()).thenReturn("doc.fullName");
     }
 
     @Test
@@ -213,5 +240,80 @@ class LiveTableLiveDataEntryStoreTest
         } catch (LiveDataException e) {
             assertEquals("Failed to execute the live data query.", e.getMessage());
         }
+    }
+
+    @Test
+    void updateUndefinedClassName() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "propName";
+        Object value = "theValue";
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.update(entryId, property, value));
+        assertEquals("Can't update object properties if the object type (class name) is undefined.",
+            liveDataException.getMessage());
+    }
+
+    @Test
+    void updateXClassField() throws Exception
+    {
+        String entryId = "testEntry";
+        String property = "propName";
+        Object value = "theValue";
+        String docName = "MyApp.MyClass";
+        DocumentReference documentEntityReference = new DocumentReference("xwiki", "MyApp", "testEntry");
+        DocumentReference documentClassReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        this.entryStore.getParameters().put("className", docName);
+        when(this.currentDocumentReferenceResolver.resolve(entryId)).thenReturn(documentEntityReference);
+        when(this.currentDocumentReferenceResolver.resolve(docName)).thenReturn(documentClassReference);
+
+        this.entryStore.update(entryId, property, value);
+        verify(this.modelBridge).update(property, value, documentEntityReference, documentClassReference);
+    }
+
+    @Test
+    void saveXClassUndefined()
+    {
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.hidden", "true");
+        entry.put("myProperty", asList("1", "0"));
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
+        assertEquals("Can't update object properties if the object type (class name) is undefined.",
+            liveDataException.getMessage());
+    }
+
+    @Test
+    void saveEntryIdUndefined()
+    {
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.hidden", "true");
+        entry.put("myProperty", asList("1", "0"));
+        this.entryStore.getParameters().put("className", "MyTest.MyClass");
+        LiveDataException liveDataException =
+            assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
+        assertEquals("Entry id [doc.fullName] missing. Can't load the document to update.",
+            liveDataException.getMessage());
+    }
+
+    @Test
+    void save() throws Exception
+    {
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.hidden", "true");
+        entry.put("myProperty", asList("1", "0"));
+        entry.put("doc.fullName", "MyTest.MyObject");
+        DocumentReference objectDocumentReference = new DocumentReference("xwiki", "MyTest", "MyObject");
+        DocumentReference classDocumentReference = new DocumentReference("xwiki", "MyTest", "MyClass");
+
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyObject")).thenReturn(objectDocumentReference);
+        when(this.currentDocumentReferenceResolver.resolve("MyTest.MyClass")).thenReturn(classDocumentReference);
+
+        this.entryStore.getParameters().put("className", "MyTest.MyClass");
+        Optional<Object> save = this.entryStore.save(entry);
+
+        assertEquals(Optional.of("MyTest.MyObject"), save);
+        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference);
     }
 }

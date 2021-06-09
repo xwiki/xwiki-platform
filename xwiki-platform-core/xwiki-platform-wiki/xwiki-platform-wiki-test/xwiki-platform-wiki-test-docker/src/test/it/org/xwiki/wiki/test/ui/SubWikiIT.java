@@ -21,9 +21,9 @@ package org.xwiki.wiki.test.ui;
 
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -39,10 +39,10 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.DeleteWikiPage;
 import org.xwiki.wiki.test.po.WikiCreationPage;
-import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -91,15 +91,67 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         )
     }
 )
-public class SubWikiIT
+class SubWikiIT
 {
     private static final String SUBWIKI_NAME = "subwiki";
 
-    private WikiHomePage wikiHomePage;
+    @Test
+    @Order(1)
+    void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
+    {
+        createSubWiki(setup);
 
-    // We create the subwiki as first global action before running tests.
-    @BeforeAll
-    public void createSubWiki(TestUtils setup)
+        // Checks that a non-admin user has the Join action proposed for the new sub-wiki.
+        setup.createUserAndLogin("U1", "U1");
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
+        TableLayoutElement tableLayout = wikiIndexPage.getLiveData().getTableLayout();
+        tableLayout.assertRow("Actions", hasItem(tableLayout.getWebElementCellWithLinkMatcher("Join",
+            setup.getURL(new DocumentReference("xwiki", "WikiManager", "JoinWiki"), "view", "wikiId=subwiki"))));
+
+        setup.loginAsSuperAdmin();
+        DocumentReference mainWikiLinkPage = new DocumentReference("xwiki", "Test", "Link");
+
+        // Ensure that the page does not exist before the test.
+        setup.rest().delete(mainWikiLinkPage);
+
+        String space = testReference.getSpaceReferences()
+            .stream().map(SpaceReference::getName).collect(Collectors.joining("."));
+
+        // The page that will be moved.
+        setup.createPage(testReference, "Some content", "My Page");
+
+        // For checking the link update.
+        setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
+
+        // Move the page to subwiki.
+        ViewPage viewPage = setup.gotoPage(testReference);
+        RenamePage renamePage = viewPage.rename();
+        renamePage.setUpdateLinks(true);
+        renamePage.getDocumentPicker().setWiki(SUBWIKI_NAME);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+
+        // Ensure the move has been properly done.
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        DocumentReference movedPageReference = testReference.setWikiReference(new WikiReference(SUBWIKI_NAME));
+        assertTrue(setup.rest().exists(movedPageReference));
+        viewPage = renameStatusPage.gotoNewPage();
+        assertEquals(
+            String.format("/%s/%s/%s", SUBWIKI_NAME, testReference.getLastSpaceReference().extractFirstReference(
+                EntityType.SPACE).getName(), "My Page"), viewPage.getBreadcrumbContent());
+        assertEquals("Some content", viewPage.getContent());
+
+        // Check the link is updated.
+        viewPage = setup.gotoPage(mainWikiLinkPage);
+        WikiEditPage wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format("[[subwiki:%s.WebHome]]", space), wikiEditPage.getContent());
+
+        deleteSubWiki(setup);
+    }
+
+    /**
+     * We create the subwiki as first action before running the test.
+     */
+    private void createSubWiki(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
@@ -118,17 +170,18 @@ public class SubWikiIT
         // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
         // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
         wikiCreationPage.waitForFinalizeButton(60 * 5);
-        // Ensure there is no error in the log
+        // Ensure there is no error in the log.
         assertFalse(wikiCreationPage.hasLogError());
 
-        // Finalization
-       this.wikiHomePage = wikiCreationPage.finalizeCreation();
-       setup.forceGuestUser();
+        // Finalization.
+        wikiCreationPage.finalizeCreation();
+        setup.forceGuestUser();
     }
 
-    // We delete the subwiki once all tests are finished.
-    @AfterAll
-    public void deleteSubWiki(TestUtils setup) throws Exception
+    /**
+     * We delete the subwiki at the end of the tests.
+     */
+    private void deleteSubWiki(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
         // Go to the template wiki
@@ -141,47 +194,7 @@ public class SubWikiIT
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
-        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME));
+        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME, false));
         setup.forceGuestUser();
-    }
-
-    @Test
-    public void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.loginAsSuperAdmin();
-        DocumentReference mainWikiLinkPage = new DocumentReference("xwiki", "Test", "Link");
-
-        // ensure that the page does not exist before the test
-        setup.rest().delete(mainWikiLinkPage);
-
-        String space = testReference.getSpaceReferences()
-            .stream().map(SpaceReference::getName).collect(Collectors.joining("."));
-
-        // the page that will be moved
-        setup.createPage(testReference, "Some content", "My Page");
-
-        // for checking the link update
-        setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
-
-        // move the page to subwiki
-        ViewPage viewPage = setup.gotoPage(testReference);
-        RenamePage renamePage = viewPage.rename();
-        renamePage.setUpdateLinks(true);
-        renamePage.getDocumentPicker().setWiki(SUBWIKI_NAME);
-        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
-
-        // Ensure the move has been properly done
-        assertEquals("Done.", renameStatusPage.getInfoMessage());
-        DocumentReference movedPageReference = testReference.setWikiReference(new WikiReference(SUBWIKI_NAME));
-        assertTrue(setup.rest().exists(movedPageReference));
-        viewPage = renameStatusPage.gotoNewPage();
-        assertEquals(String.format("/%s/%s/%s", SUBWIKI_NAME, testReference.getLastSpaceReference().extractFirstReference(
-            EntityType.SPACE).getName(), "My Page"), viewPage.getBreadcrumbContent());
-        assertEquals("Some content", viewPage.getContent());
-
-        // Check the link is updated
-        viewPage = setup.gotoPage(mainWikiLinkPage);
-        WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format("[[subwiki:%s.WebHome]]", space), wikiEditPage.getContent());
     }
 }

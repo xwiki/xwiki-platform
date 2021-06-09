@@ -81,4 +81,12 @@ public class ArtifactCoordinateTest
         assertEquals("artifactid", artifact.getArtifactId());
         assertEquals("version", artifact.getVersion());
     }
+
+    @Test
+    void toStringTest()
+    {
+        ArtifactCoordinate coordinate = ArtifactCoordinate.parseArtifacts("groupid:artifactid:type:version1");
+        assertEquals("groupId = [groupid], artifactId = [artifactid], type = [type], version = [version1]",
+            coordinate.toString());
+    }
 }

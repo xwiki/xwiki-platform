@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-core</artifactId>
   <name>XWiki Platform - Search - SOLR - Server - Core</name>
   <packaging>jar</packaging>
   <description>A package containing a SOLR core for XWiki</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <!-- This is needed at runtime by solrconfig.xml which is why we package below in the lib/ directory of the

@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.render;
 
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -33,22 +32,18 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -94,7 +89,7 @@ public class DefaultOldRendering implements OldRendering
     protected Logger logger;
 
     @Inject
-    protected LinkedResourceHelper linkedResourceHelper;
+    protected ReferenceRenamer referenceRenamer;
 
     @Override
     public void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldReference,
@@ -121,64 +116,8 @@ public class DefaultOldRendering implements OldRendering
     private void refactorDocumentLinks(XWikiDocument document, DocumentReference oldDocumentReference,
         DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
-        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
-        // xwiki-platform-refactoring-default
-
-        DocumentReference currentDocumentReference = document.getDocumentReference();
-
-        XDOM xdom = document.getXDOM();
-        List<Block> blocks = linkedResourceHelper.getBlocks(xdom);
-
-        for (Block block : blocks) {
-            ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
-            if (resourceReference == null) {
-                // Skip invalid blocks.
-                continue;
-            }
-
-            ResourceType resourceType = resourceReference.getType();
-
-            // TODO: support ATTACHMENT as well.
-            if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-                // We are currently only interested in Document or Space references.
-                continue;
-            }
-
-            // Resolve the resource reference.
-            EntityReference linkEntityReference =
-                resourceReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
-            // Resolve the document of the reference.
-            DocumentReference linkTargetDocumentReference =
-                defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-            EntityReference newTargetReference = newDocumentReference;
-            ResourceType newResourceType = resourceType;
-
-            // If the link was resolved to a space...
-            if (EntityType.SPACE.equals(linkEntityReference.getType())) {
-                if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newDocumentReference.getName())) {
-                    // If the new document reference is also a space (non-terminal doc), be careful to keep it
-                    // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
-                    // (i.e. with ".WebHome").
-                    newTargetReference = newDocumentReference.getLastSpaceReference();
-                } else {
-                    // If the new target is a non-terminal document, we can not use a "space:" resource type to access
-                    // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
-                    newResourceType = ResourceType.DOCUMENT;
-                }
-            }
-
-            // If the link targets the old (renamed) document reference, we must update it.
-            if (linkTargetDocumentReference.equals(oldDocumentReference)) {
-                String newReferenceString =
-                    this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
-
-                // Update the reference in the XDOM.
-                linkedResourceHelper.setResourceReferenceString(block, newReferenceString);
-                linkedResourceHelper.setResourceType(block, newResourceType);
-            }
-        }
-
-        document.setContent(xdom);
+        this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
+            oldDocumentReference, newDocumentReference, false);
     }
 
     @Override

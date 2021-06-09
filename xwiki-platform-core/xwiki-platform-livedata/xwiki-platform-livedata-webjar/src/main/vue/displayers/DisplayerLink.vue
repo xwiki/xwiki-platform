@@ -21,7 +21,7 @@
 
 <!--
   DisplayerLink is a custom displayer that displays the entry value as link.
-  It uses the `propertyHref` proprety of the displayer descriptor,
+  It uses the `propertyHref` property of the displayer descriptor,
   which refers to the property in the entries holding the displayer href
 -->
 <template>
@@ -33,6 +33,8 @@
     class="displayer-link"
     :property-id="propertyId"
     :entry="entry"
+    :is-view.sync="isView"
+    @saveEdit="genericSave"
   >
 
     <!-- Provide the Link Viewer widget to the `viewer` slot -->
@@ -58,6 +60,7 @@
 
 <script>
 import displayerMixin from "./displayerMixin.js";
+import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
 
 export default {
@@ -69,7 +72,7 @@ export default {
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin],
+  mixins: [displayerMixin, displayerStatesMixin],
 
   computed: {
     // The link href taken from the propertyHref property of the entry
@@ -96,7 +99,6 @@ export default {
       return container.innerHTML.trim();
     }
   },
-
 };
 </script>
 

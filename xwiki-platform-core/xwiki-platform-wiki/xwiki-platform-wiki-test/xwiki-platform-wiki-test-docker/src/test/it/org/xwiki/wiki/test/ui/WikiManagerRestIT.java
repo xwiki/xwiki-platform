@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
@@ -40,15 +41,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @UITest
-public class WikiManagerRestIT
+class WikiManagerRestIT
 {
     @Test
-    public void testCreateWiki(TestUtils setup) throws Exception
+    @Order(1)
+    void testCreateWiki(TestUtils setup) throws Exception
     {
-        String WIKI_ID = "foo";
+        String wikiId = "foo";
 
         Wiki wiki = new Wiki();
-        wiki.setId(WIKI_ID);
+        wiki.setId(wikiId);
 
         // Need admin right to create a wiki
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
@@ -58,7 +60,7 @@ public class WikiManagerRestIT
         try (InputStream stream = postMethod.getResponseBodyAsStream()) {
             wiki = setup.rest().toResource(stream);
         }
-        assertEquals(WIKI_ID, wiki.getId());
+        assertEquals(wikiId, wiki.getId());
 
         // Back to guest
         setup.setDefaultCredentials(null);
@@ -66,7 +68,7 @@ public class WikiManagerRestIT
 
         boolean found = false;
         for (Wiki w : wikis.getWikis()) {
-            if (WIKI_ID.equals(w.getId())) {
+            if (wikiId.equals(w.getId())) {
                 found = true;
                 break;
             }

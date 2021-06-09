@@ -19,11 +19,6 @@
  */
 package org.xwiki.livedata.test.po;
 
-import java.util.Objects;
-
-import javax.annotation.Nonnull;
-
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -38,11 +33,6 @@ public class LiveDataElement extends BaseElement
     // TODO: add the operations to switch between the layouts.
 
     private final String id;
-
-    /**
-     * Lazily initialized the first time {@link #getLiveData()} is called.
-     */
-    private WebElement root;
 
     /**
      * Default constructor. Initializes a Live Data page object by its id.

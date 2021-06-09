@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,13 +30,18 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
@@ -269,5 +275,68 @@ public class RenamePageIT
             freePageName);
         viewPage = setup.gotoPage(newFreePage);
         assertTrue(viewPage.exists());
+    }
+
+    /**
+     * Test renaming a page whose reference is used in another page content, for links and inside macro content and
+     * macro parameters.
+     *
+     * @since 13.4RC1
+     */
+    @Order(4)
+    @Test
+    void renamePageUsedInMacroContentAndParameters(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // FIXME: Using WebHome locations and not terminal page, since it's not properly supported yet.
+        // Improve the test whenever XWIKI-18634 is fixed
+        String sourcePageLocation = RenamePageIT.class.getSimpleName() + ".SourceTestPageToBeLinked";
+        String sourcePageName = "WebHome";
+        String sourcePage = sourcePageLocation + "." + sourcePageName;
+
+        String targetPageSubSpace = RenamePageIT.class.getSimpleName() + ".SubSpace";
+        String targetPageLastSpace = "TargetTestPageToBeLinked";
+        String targetPage = targetPageSubSpace + "." + targetPageLastSpace + ".WebHome";
+
+        EntityReference sourcePageReference = setup.resolveDocumentReference(sourcePage);
+        EntityReference targetPageReference = setup.resolveDocumentReference(targetPage);
+        setup.rest().delete(sourcePageReference);
+        setup.rest().delete(targetPageReference);
+        setup.rest().delete(testReference);
+
+        ViewPage pageToBeLinked = setup.createPage(sourcePageReference, "Some content to be included");
+        AttachmentsPane attachmentsPane = pageToBeLinked.openAttachmentsDocExtraPane();
+        File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
+        attachmentsPane.setFileToUpload(image.getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish("image.gif");
+
+        String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "\n"
+            + "{{warning}}\n"
+            + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "\n"
+            + "{{error}}\n"
+            + "And in nested macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
+            + "{{/error}}\n"
+            + "\n"
+            + " \n"
+            + "{{/warning}}\n"
+            + "\n"
+            + "Picture: [[image:%1$s@image.gif]]\n"
+            + "Display macro:\n"
+            + "\n"
+            + "{{include reference=\"%1$s\"/}}";
+        setup.createPage(testReference, String.format(testPageContent, sourcePage, sourcePageLocation));
+        ViewPage viewPage = setup.gotoPage(sourcePageReference);
+        RenamePage rename = viewPage.rename();
+        DocumentPicker documentPicker = rename.getDocumentPicker();
+        documentPicker.setParent(targetPageSubSpace);
+        documentPicker.setName(targetPageLastSpace);
+        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.clickRenameButton().waitUntilFinished();
+        viewPage = setup.gotoPage(testReference);
+        WikiEditPage wikiEditPage = viewPage.editWiki();
+        assertEquals(String.format(testPageContent, targetPage),
+            wikiEditPage.getContent());
     }
 }

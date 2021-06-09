@@ -27,17 +27,18 @@ import java.util.ListIterator;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
 
 /**
- * Base class for {@link LiveDataConfigurationResolver} tests.
- * 
+ * Provides the test data for the configuration resolver tests.
+ *
  * @version $Id$
- * @since 12.10
+ * @since 13.5RC1
+ * @since 13.4.1
+ * @since 12.10.8
  */
-class AbstractLiveDataConfigurationResolverTest
+class ConfigurationResolverTestDataProvider
 {
-    protected static Stream<String[]> getTestData(File file) throws Exception
+    public Stream<String[]> getTestData(File file) throws Exception
     {
         List<String[]> testData = new ArrayList<>();
         ListIterator<String> linesIterator = IOUtils.readLines(new FileReader(file)).listIterator();
@@ -45,12 +46,12 @@ class AbstractLiveDataConfigurationResolverTest
             String message = readTestMessage(linesIterator);
             String input = readTestInput(linesIterator);
             String output = readTestOutput(linesIterator);
-            testData.add(new String[] {message, input, output});
+            testData.add(new String[] { message, input, output });
         }
         return testData.stream();
     }
 
-    private static String readTestMessage(ListIterator<String> linesIterator)
+    private String readTestMessage(ListIterator<String> linesIterator)
     {
         StringBuilder message = new StringBuilder();
         while (linesIterator.hasNext()) {
@@ -65,7 +66,7 @@ class AbstractLiveDataConfigurationResolverTest
         return message.toString();
     }
 
-    private static String readTestInput(ListIterator<String> linesIterator)
+    private String readTestInput(ListIterator<String> linesIterator)
     {
         StringBuilder input = new StringBuilder();
         while (linesIterator.hasNext()) {
@@ -79,7 +80,7 @@ class AbstractLiveDataConfigurationResolverTest
         return input.toString();
     }
 
-    private static String readTestOutput(ListIterator<String> linesIterator)
+    private String readTestOutput(ListIterator<String> linesIterator)
     {
         StringBuilder output = new StringBuilder();
         while (linesIterator.hasNext()) {

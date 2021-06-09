@@ -19,22 +19,22 @@
  */
 package org.xwiki.query.jpql.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.query.internal.jpql.node.Start;
 
-public class JPQLParserTest
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Unit tests for {@link JPQLParser}.
+ *
+ * @version $Id$
+ */
+class JPQLParserTest
 {
     private JPQLParser parser = new JPQLParser();
 
     @Test
-    public void testStartSpeed() throws Exception
-    {
-        // heat up parser engine for more accuracy test timing
-        // this is needed because of much static data in the parser
-        parser.parse("select a from A as a");
-    }
-
-    @Test
-    public void testJPQL() throws Exception
+    void parseVariousJPQL() throws Exception
     {
         // quotes
         parser.parse("select a from A as a where a.f='str'");
@@ -58,7 +58,7 @@ public class JPQLParserTest
     }
 
     @Test
-    public void testXWQLExtensions() throws Exception
+    void parseXWQLExtensions() throws Exception
     {
         // object() in from clause
         parser.parse("select doc from Document as doc, doc.object('XWiki.Test') as test where test.some=1");
@@ -70,11 +70,15 @@ public class JPQLParserTest
     }
 
     @Test
-    public void parseMethodsInLike() throws Exception
+    void parseMethodsInLike() throws Exception
     {
-        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj " 
+        Start result = this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
             + "where obj.first_name like LOWER('%DMIN%')");
-        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj " 
+        assertEquals("SELECT doc.fullName FROM Document doc , doc.object ( XWiki.XWikiUsers ) obj where "
+            + "obj.first_name like LOWER ( '%DMIN%' )  ", result.toString());
+        result = this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
             + "where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))");
+        assertEquals("SELECT doc.fullName FROM Document doc , doc.object ( XWiki.XWikiUsers ) obj where "
+            + "obj.first_name like LOWER ( CONCAT ( '%' , 'DMIN%' ) )  ", result.toString());
     }
 }

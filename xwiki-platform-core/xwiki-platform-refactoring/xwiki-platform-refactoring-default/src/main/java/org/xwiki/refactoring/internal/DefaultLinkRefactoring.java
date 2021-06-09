@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -76,8 +77,6 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
     /**
      * Used to get a {@link BlockRenderer} dynamically.
-     *
-     * @see #updateRelativeLinks(XWikiDocument, DocumentReference)
      */
     @Inject
     @Named("context")
@@ -202,11 +201,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     private boolean renameLinks(XDOM xdom, DocumentReference currentDocumentReference, DocumentReference oldTarget,
         DocumentReference newTarget, boolean relative)
     {
-        if (relative) {
-            return this.renamer.updateRelativeReferences(xdom, oldTarget, newTarget);
-        }
-
-        return this.renamer.renameReferences(xdom, currentDocumentReference, oldTarget, newTarget);
+        return this.renamer.renameReferences(xdom, currentDocumentReference, oldTarget, newTarget, relative);
     }
 
     private boolean renameLinks(BaseObject xobject, XWikiDocument document, DocumentReference oldTarget,

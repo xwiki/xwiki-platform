@@ -24,8 +24,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represents an artifact coordinate but with optional version (the {@link DefaultArtifact} implementation doesn't
@@ -168,5 +170,16 @@ public class ArtifactCoordinate
             .append(getType(), rhs.getType())
             .append(getVersion(), rhs.getVersion())
             .isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("groupId", getGroupId() == null ? null : getGroupId());
+        builder.append("artifactId", getArtifactId() == null ? null : getArtifactId());
+        builder.append("type", getType() == null ? null : getType());
+        builder.append("version", getVersion() == null ? null : getVersion());
+        return builder.toString();
     }
 }

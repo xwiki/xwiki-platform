@@ -21,9 +21,12 @@ package org.xwiki.test.docker.junit5;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
@@ -103,7 +106,7 @@ public class TestConfiguration
 
     private List<ExtensionOverride> extensionOverrides;
 
-    private List<ArtifactCoordinate> extraJARs;
+    private Set<ArtifactCoordinate> extraJARs;
 
     private boolean resolveExtraJARs;
 
@@ -480,16 +483,16 @@ public class TestConfiguration
 
     private void resolveExtraJARs()
     {
-        List<ArtifactCoordinate> artifactCoordinates = new ArrayList<>();
+        Set<ArtifactCoordinate> artifactCoordinates = new LinkedHashSet<>();
         for (String coordinate : this.uiTestAnnotation.extraJARs()) {
             artifactCoordinates.add(ArtifactCoordinate.parseArtifacts(coordinate));
         }
         this.extraJARs = artifactCoordinates;
     }
 
-    private void mergeExtraJARs(List<ArtifactCoordinate> extraJARs)
+    private void mergeExtraJARs(Collection<ArtifactCoordinate> extraJARs)
     {
-        List<ArtifactCoordinate> mergedExtraJARs = getExtraJARs();
+        Set<ArtifactCoordinate> mergedExtraJARs = getExtraJARs();
         mergedExtraJARs.addAll(extraJARs);
         this.extraJARs = mergedExtraJARs;
     }
@@ -700,7 +703,7 @@ public class TestConfiguration
      * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory
      * @since 10.11RC1
      */
-    public List<ArtifactCoordinate> getExtraJARs()
+    public Set<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
     }

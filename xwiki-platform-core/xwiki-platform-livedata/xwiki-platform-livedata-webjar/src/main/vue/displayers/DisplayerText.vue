@@ -33,6 +33,8 @@
     class="displayer-text"
     :property-id="propertyId"
     :entry="entry"
+    :is-view.sync="isView"
+    @saveEdit="genericSave"
   >
 
     <!-- Keep the default Viewer widget -->
@@ -49,6 +51,7 @@
 
 import displayerMixin from "./displayerMixin.js";
 import BaseDisplayer from "./BaseDisplayer.vue";
+import displayerStatesMixin from "./displayerStatesMixin";
 
 export default {
 
@@ -59,8 +62,7 @@ export default {
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin],
-
+  mixins: [displayerMixin, displayerStatesMixin],
 };
 </script>
 

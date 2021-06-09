@@ -37,7 +37,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 public interface SortableEventQuery extends EventQuery
 {
     /**
-     * The sort close to apply to the found events.
+     * The sort clause to apply to the found events.
      * 
      * @version $Id$
      */
@@ -65,6 +65,10 @@ public interface SortableEventQuery extends EventQuery
 
         private final Order order;
 
+        /**
+         * @param property see {@link #getProperty}
+         * @param order see {@link #getOrder}
+         */
         public SortClause(String property, Order order)
         {
             this.property = property;
@@ -80,7 +84,7 @@ public interface SortableEventQuery extends EventQuery
         }
 
         /**
-         * @return the order to apply
+         * @return the order to apply (ascending or descending)
          */
         public Order getOrder()
         {
@@ -121,7 +125,7 @@ public interface SortableEventQuery extends EventQuery
     }
 
     /**
-     * @return the sort closes
+     * @return the sort clauses
      */
     List<SortClause> getSorts();
 }

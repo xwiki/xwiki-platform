@@ -49,7 +49,7 @@
 
     <!--
       Select the pagination size (number of entries per page)
-      Can be shown / hiden by the `pagination.showPageSizeDropdown` property
+      Can be shown / hidden by the `pagination.showPageSizeDropdown` property
       in the Livedata meta config
     -->
     <span
@@ -62,7 +62,7 @@
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
-          v-for="pageSize in data.meta.pagination.pageSizes"
+          v-for="pageSize in pageSizes"
           :key="pageSize"
           :value="pageSize"
           :selected="pageSize === data.query.limit"
@@ -267,6 +267,20 @@ export default {
       return indexesAndDots;
     },
 
+    /**
+     * Merges and sort the pages sizes from the pagination as well as the configured limit.
+     * @returns {number[]} the list of page sizes
+     */
+    pageSizes() {
+      const pageSizesSet = new Set();
+      this.data.meta.pagination.pageSizes.forEach(it => pageSizesSet.add(it));
+      const limit = this.data.query.limit;
+      if (limit) {
+        pageSizesSet.add(limit);
+      }
+      // Converts the set of page size values into an array and sorts them in ascending numerical order.
+      return Array.from(pageSizesSet).sort((a, b) => a - b);
+    }
   },
 
 };

@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-include</artifactId>
   <name>XWiki Platform - Rendering - Macro - Include</name>
   <description>Include an entity (document, property, etc.)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Include Macro</xwiki.extension.name>
     <xwiki.extension.category>macro</xwiki.extension.category>
@@ -69,6 +69,11 @@
       <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

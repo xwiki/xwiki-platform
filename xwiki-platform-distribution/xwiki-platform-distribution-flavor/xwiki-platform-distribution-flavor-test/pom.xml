@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -410,7 +410,7 @@
         </os>
       </activation>
       <properties>
-        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport} -ni</xwikiExecutionStartCommand>
         <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
@@ -422,7 +422,7 @@
         </os>
       </activation>
       <properties>
-        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport} -ni</xwikiExecutionStartCommand>
         <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
@@ -445,8 +445,8 @@
     <profile>
       <id>macprofiler</id>
       <properties>
-        <xwikiExecutionStartCommand>sh start_xwiki_debug.sh ${port} ${stopport} profiler "${profilerPath}"</xwikiExecutionStartCommand>
-        <xwikiExecutionStopCommand>sh stop_xwiki.sh ${stopport}</xwikiExecutionStopCommand>
+        <xwikiExecutionStartCommand>sh start_xwiki_debug.sh -p ${port} -sp ${stopport} -yp "${profilerPath}" -ni</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>sh stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
       </properties>
     </profile>
     <profile>

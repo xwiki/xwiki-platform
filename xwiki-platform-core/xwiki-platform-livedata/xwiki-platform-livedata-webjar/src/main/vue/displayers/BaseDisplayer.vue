@@ -24,57 +24,57 @@
   specific displayer that pass to it a `viewer` and `editor` slot.
   In that way, specific displayers only care about implementing
   the formatting of its content (view mode and edit mode)
-  instead of reimplemting the whole displayer logic each time.
+  instead of reimplementing the whole displayer logic each time.
 -->
 <template>
-  <div
-    :class="isView ? 'view' : 'edit'"
-    @dblclick="edit"
-    @keypress.self.enter="edit"
-    :tabindex="isEditable ? 0 : ''"
-  >
+  <div :class="{view: isView, edit: !isView}" ref="displayerRoot" @dblclick="setEdit" @keypress.self.enter="setEdit">
     <!--
-      The base displayer contains two slots: `viewer` and `editor`.
-      It displays the one according to its current state: `this.isView`.
+      The base displayer contains three slots: `viewer`, `editor`, and `loading`.
+      It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is false,
+      and `loading` otherwise.
     -->
 
     <!-- The slot containing the displayer Viewer widget -->
-    <slot
-      name="viewer"
-      v-if="isView"
-    >
-      <!--
-        Default Viewer widget
-        Normally this should rarely be used, as the default displayer
-        should provide a default viewer if no displayer is specified
-        However, this is usefull if a custom displayer only implement
-        its Editor widget, as a default Viewer widget would still be provided
-      -->
-      <div>{{ value }}</div>
-    </slot>
+    <div tabindex="0" v-if="isView && !isLoading">
+      <slot name="viewer">
+        <!--
+          Default Viewer widget
+          Normally this should rarely be used, as the default displayer
+          should provide a default viewer if no displayer is specified
+          However, this is useful if a custom displayer only implement
+          its Editor widget, as a default Viewer widget would still be provided
+        -->
+        <span>{{ value }}</span>
+      </slot>
+    </div>
 
     <!-- The slot containing the displayer Editor widget -->
-    <slot
-      name="editor"
-      v-if="!isView"
+    <div @keypress.enter="applyEdit"
+         @keydown.esc="cancelEdit"
+         v-if="!isView && !isLoading"
+         tabindex="0"
+         ref="editBlock"
     >
-      <!--
-        Default Editor widget
-        Normally this should rarely be used, as the default displayer
-        should provide a default editor if no displayer is specified
-        However, this is usefull if a custom displayer only implement
-        its Viewer widget, as a default Editor widget would still be provided
-      -->
-      <input
-        class="default-input"
-        type="text"
-        size="1"
-        v-autofocus
-        :value="value"
-        @focusout="applyEdit($event.target.value)"
-        @keypress.enter="applyEdit($event.target.value)"
-        @keydown.esc="cancelEdit"
-      />
+      <slot name="editor">
+        <!--
+          Default Editor widget
+          Normally this should rarely be used, as the default displayer
+          should provide a default editor if no displayer is specified
+          However, this is useful if a custom displayer only implement
+          its Viewer widget, as a default Editor widget would still be provided
+        -->
+        <input
+          class="default-input"
+          type="text"
+          size="1"
+          v-autofocus
+          v-model="baseValue"
+        />
+      </slot>
+    </div>
+
+    <slot name="loading" v-if="isLoading">
+      <XWikiLoader></XWikiLoader>
     </slot>
 
   </div>
@@ -83,6 +83,7 @@
 
 <script>
 import displayerMixin from "./displayerMixin.js";
+import XWikiLoader from "../utilities/XWikiLoader.vue";
 
 export default {
 
@@ -91,55 +92,91 @@ export default {
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
   mixins: [displayerMixin],
 
+  components: {
+    XWikiLoader,
+  },
 
   props: {
     viewOnly: {
       type: Boolean,
       default: false,
     },
-  },
-
-  data () {
-    return {
-      // Whether the displayer is in view or edit mode
-      isView: true,
-    };
+    isView: {
+      type: Boolean,
+      default: true,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    }
   },
 
   computed: {
-    isEditable () {
-      return this.logic.isEditable({
+    // Checks if the property value is allowed to be edited and if the livedata is in a state where the displayer can
+    // be edited.
+    isEditable() {
+      const editable = this.logic.isEditable({
         entry: this.entry,
         propertyId: this.propertyId,
       });
-    }
+      // Checks that no other property is currently being edited.
+      const noOtherEditing = this.logic.getEditBus().isEditable()
+      return editable && noOtherEditing;
+    },
+    
   },
 
   // The following methods are only used by the BaseDisplayer component
   // The methods for specific displayers can be found in the displayerMixin
   methods: {
-
-    // Trigger View mode (switch from Editor widget to Viewer widget)
-    // This should rarely be used directly as it does not validate modified data
-    // Used the `applyEdit` method instead (found in the displayerMixin)
-    // which call this view function after validating data
-    view () {
-      if (this.isView) { return; }
-      this.isView = true;
-      this.$el.focus();
+    // Switches the displayer to edit mode.
+    setEdit() {
+      if (this.isEditable && this.isView) {
+        this.$emit('update:isView', false);
+        this.logic.getEditBus().start(this.entry, this.propertyId)
+      }
     },
 
-    // Trigger Edit mode (switch from Editor widget to Viewer widget)
-    // This function is only used for the baseDisplayer logic
-    // and should not be used inside a specific displayer
-    edit () {
-      if (!this.isEditable) { return; }
-      if (!this.isView) { return; }
-      this.isView = false;
+    // This method should be used to apply edit and go back to view mode.
+    // The validation of the edited property is done once the whole entry is done editing.
+    applyEdit() {
+      // When the #edit slot is not the default, the editValue field is overloaded and is always undefined.
+      // When receiving a saveEdit event, the passed value can then be ignored since the overloaded slot has it own 
+      // field.
+      this.$emit('saveEdit', this.editedValue);
+      // Go back to view mode
+      this.$emit('update:isView', true);
     },
 
+    // This method should be used to cancel edit and go back to view mode.
+    // This is like applyEdit but it does not save the entered value
+    cancelEdit() {
+      // Notifies the edit bus that the entry edition is canceled (consequently, the edited value must not be persisted,
+      // and should not be considered as edited anymore).
+      this.logic.getEditBus().cancel(this.entry, this.propertyId)
+
+      // Switches to view mode.
+      this.$emit('update:isView', true);
+    }
   },
+  mounted() {
+    // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of 
+    // the current cell.
+    document.addEventListener("click", (evt) => {
+      if (!this.isView) {
+        const editBlock = this.$refs['editBlock'];
 
+        if (editBlock.contains(evt.target)) {
+          return;
+        }
+
+        // Wait a little before switching back to view mode, otherwise the change case cause a column width change 
+        // and make the user click on the wrong column, for instance when trying to edit the next column by double 
+        // clicking on it.
+        setTimeout(() => this.applyEdit(), 200);
+      }
+    })
+  }
 };
 
 </script>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org/icon"
+  xmlns:icon="http://www.xwiki.org/icon" elementFormDefault="qualified">
+
+  <!--
+  *
+  * Types
+  *
+  -->
+
+  <complexType name="Icon">
+    <annotation>
+      <documentation>Stores an icon metatada.</documentation>
+    </annotation>
+    <sequence>
+      <element name="name" type="string"/>
+      <element name="iconSetType" type="string"/>
+      <element name="iconSetName" type="string"/>
+      <element name="cssClass" type="string" minOccurs="0"/>
+      <element name="url" type="string" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="Icons">
+    <annotation>
+      <documentation>Stores a collection of icons metadatas.</documentation>
+    </annotation>
+    <sequence>
+      <!-- A collection of resolved translations. -->
+      <element name="icon" type="icon:Icon" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="missingIcons" type="string" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <!--
+  *
+  * Elements
+  *
+  -->
+
+  <element name="icons" type="icon:Icons"/>
+</schema>

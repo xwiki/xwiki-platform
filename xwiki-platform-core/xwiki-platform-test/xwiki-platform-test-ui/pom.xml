@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
@@ -44,6 +44,10 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-integration</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>

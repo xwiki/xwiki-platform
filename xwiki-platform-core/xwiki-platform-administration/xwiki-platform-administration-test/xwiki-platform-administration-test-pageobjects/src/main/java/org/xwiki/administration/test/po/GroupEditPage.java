@@ -107,7 +107,9 @@ public class GroupEditPage extends InlinePage
     public static GroupEditPage gotoPage(DocumentReference groupReference)
     {
         getUtil().gotoPage(groupReference, "edit");
-        return new GroupEditPage();
+        GroupEditPage groupEditPage = new GroupEditPage();
+        groupEditPage.getMembersTable().waitUntilReady();
+        return groupEditPage;
     }
 
     public LiveTableElement getMembersTable()

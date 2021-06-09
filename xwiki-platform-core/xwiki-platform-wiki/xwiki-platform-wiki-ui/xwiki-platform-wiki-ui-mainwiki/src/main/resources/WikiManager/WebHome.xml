@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="WikiManager.WebHome" locale="">
+<xwikidoc version="1.4" reference="WikiManager.WebHome" locale="">
   <web>WikiManager</web>
   <name>WebHome</name>
   <language/>
@@ -38,39 +38,82 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 {{html}}
-#set ($createWikiDocReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'CreateWiki'))
-#if ($hasCreateWiki&amp;&amp; $xwiki.exists($createWikiDocReference)&amp;&amp; $services.security.authorization.hasAccess('view', $createWikiDocReference))
-  &lt;p&gt;&lt;a href="$xwiki.getURL('WikiManager.CreateWiki')" class="button button-success" id="tmCreateWiki"&gt;$services.icon.renderHTML('add') $services.localization.render('platform.wiki.create.button')&lt;/a&gt;&lt;/p&gt;
+#set ($createWikiDocReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 
+  'WikiManager', 'CreateWiki'))
+#if ($hasCreateWiki &amp;&amp; $xwiki.exists($createWikiDocReference) 
+  &amp;&amp; $services.security.authorization.hasAccess('view', $createWikiDocReference))
+  &lt;p&gt;
+    &lt;a href="$xwiki.getURL('WikiManager.CreateWiki')" class="button button-success" id="tmCreateWiki"&gt;
+      $services.icon.renderHTML('add') $services.localization.render('platform.wiki.create.button')
+    &lt;/a&gt;
+  &lt;/p&gt;
 #end
 {{/html}}
 #set($columns = ['wikiprettyname', 'description', 'owner', 'doc.creationDate', 'membershipType'])
-#set($columnsProperties = {
-    'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
-    'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
-    'owner' : { 'html' : 'true' },
-    'membershipType' : { 'sortable': false, 'filterable': false},
-    'doc.creationDate' : { 'type' : 'date', 'size' : 10, 'html' : 'false' }
-})
-#set($options = {
-   'className' : 'XWiki.XWikiServerClass',
-   'rowCount' : 10,
-   'resultPage' : 'WikiManager.WikisLiveTableResults',
-   'translationPrefix' : 'platform.wiki.browse.'
-})
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))
-  #set($discard = $columnsProperties.put('_actions', {
-    'actions': [
-      {'id': 'join', 'icon': 'user_add'},
-      {'id': 'leave', 'icon': 'user_delete'},
-      {'id': 'requestJoin', 'icon': 'bell'},
-      {'id': 'cancelJoinRequest', 'icon': 'bell_delete'},
-      {'id': 'viewInvitation', 'icon': 'envelope'},
-      'edit', 'delete'
-    ]
-  }))
 #end
-#livetable('wikis', $columns, $columnsProperties, $options)
+
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      { 'id': 'wikiprettyname', 'displayer': { 'id': 'link', 'propertyHref': 'wikiprettyname_url' } },
+      { 'id': 'membershipType', 'sortable': false, 'filterable': false },
+      { 
+        'id': '_actions',
+        'displayer': {
+          'id': 'actions', 
+          'actions': ['join', 'leave', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'edit', 'delete']
+        }
+      }
+    ],
+    'actions': [
+      { 
+        'id': 'join',
+        'icon': 'user_add',
+        'allowProperty': 'doc.hasjoin',
+        'urlProperty': 'doc.join_url'
+      },
+      {
+        'id': 'leave',
+        'icon': 'user_delete',
+        'allowProperty': 'doc.hasleave',
+        'urlProperty': 'doc.leave_url'
+      },
+      {
+        'id': 'requestJoin',
+        'icon': 'bell',
+        'allowProperty': 'doc.hasrequestJoin',
+        'urlProperty': 'doc.requestJoin_url'
+      },
+      {
+        'id': 'cancelJoinRequest',
+        'icon': 'bell_delete',
+        'allowProperty': 'doc.hascancelJoinRequest',
+        'urlProperty': 'doc.cancelJoinRequest_url'
+      },
+      {
+        'id': 'viewInvitation',
+        'icon': 'envelope',
+        'allowProperty': 'doc.hasviewInvitation',
+        'urlProperty': 'doc.viewInvitation_url'
+      }
+    ]
+  }
+})
+#set ($sourceParameters = $escapetool.url({
+  'className' : 'XWiki.XWikiServerClass',
+  'resultPage' : 'WikiManager.WikisLiveTableResults',
+  'translationPrefix' : 'platform.wiki.browse.'
+
+}))
+{{liveData
+  id='wikis'
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  properties="$stringtool.join($columns, ',')"
+  limit=10
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 #set($docextras=[])
 {{/velocity}}</content>
 </xwikidoc>

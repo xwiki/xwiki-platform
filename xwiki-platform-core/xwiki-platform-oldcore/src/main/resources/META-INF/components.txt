@@ -125,7 +125,6 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
 com.xpn.xwiki.internal.pdf.FOPXSLFORenderer
-com.xpn.xwiki.internal.render.LinkedResourceHelper
 com.xpn.xwiki.internal.resource.DefaultEntityResourceActionLister
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
@@ -206,7 +205,6 @@ com.xpn.xwiki.store.migration.hibernate.R911000XWIKI14889DataMigration
 com.xpn.xwiki.store.migration.hibernate.R911001XWIKI14895DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1008010XWIKI10092DataMigration
 com.xpn.xwiki.store.migration.hibernate.R1138000XWIKI16709DataMigration
-com.xpn.xwiki.store.migration.hibernate.R121001000XWIKI18145DataMigration
 com.xpn.xwiki.store.migration.hibernate.R130200000XWIKI17200DataMigration
 com.xpn.xwiki.store.migration.hibernate.R130200001XWIKI18429DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore

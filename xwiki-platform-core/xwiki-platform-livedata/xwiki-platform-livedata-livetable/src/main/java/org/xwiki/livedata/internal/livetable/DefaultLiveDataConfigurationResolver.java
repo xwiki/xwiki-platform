@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
@@ -49,7 +50,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
- * 
+ *
  * @version $Id$
  * @since 12.10.4
  * @since 13.0
@@ -80,7 +81,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     /**
      * Used to merge the default configuration with the provided configuration.
      */
-    private JSONMerge jsonMerge = new JSONMerge();
+    private final JSONMerge jsonMerge = new JSONMerge();
 
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
@@ -99,7 +100,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         setDefaultSort(mergedConfig);
 
         // Translate using the context locale.
-        return translate(mergedConfig);
+        return translate(mergedConfig, config);
     }
 
     private LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration config) throws LiveDataException
@@ -138,9 +139,10 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
             Optional<String> firstNonSpecialProperty = query.getProperties().stream().filter(Objects::nonNull)
                 .filter(property -> !property.startsWith("_")).findFirst();
             if (firstNonSpecialProperty.isPresent()
-                && isPropertySortable(firstNonSpecialProperty.get(), config.getMeta())) {
+                && isPropertySortable(firstNonSpecialProperty.get(), config.getMeta()))
+            {
                 if (query.getSort() == null) {
-                    query.setSort(new ArrayList<SortEntry>());
+                    query.setSort(new ArrayList<>());
                 }
                 if (query.getSort().isEmpty()) {
                     // The sort is not specified.
@@ -179,7 +181,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     {
         Collection<LiveDataPropertyDescriptor> propertyDescriptors = config.getMeta().getPropertyDescriptors();
         Set<String> propertiesWithDescriptor = propertyDescriptors.stream().filter(Objects::nonNull)
-            .map(propertyDescriptor -> propertyDescriptor.getId()).collect(Collectors.toSet());
+            .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
                 .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());
@@ -199,20 +201,92 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return propertyDescriptor;
     }
 
-    private LiveDataConfiguration translate(LiveDataConfiguration config)
+    /**
+     * Updates the {@code mergedConfig} with translated property names and descriptions.
+     *
+     * @param mergedConfig the configuration to update
+     * @param config the live data configuration provided by the user through the live data macro
+     * @return the updated {@code mergedConfig}
+     */
+    private LiveDataConfiguration translate(LiveDataConfiguration mergedConfig, LiveDataConfiguration config)
     {
-        String translationPrefix = (String) config.getQuery().getSource().getParameters().get("translationPrefix");
-        for (LiveDataPropertyDescriptor property : config.getMeta().getPropertyDescriptors()) {
-            if (property.getName() == null) {
-                property.setName(this.l10n.getTranslationPlain(translationPrefix + property.getId()));
-                if (property.getName() == null) {
-                    property.setName(property.getId());
-                }
+        String translationPrefix =
+            (String) mergedConfig.getQuery().getSource().getParameters().get("translationPrefix");
+        for (LiveDataPropertyDescriptor property : mergedConfig.getMeta().getPropertyDescriptors()) {
+            translateProperty(config, translationPrefix, property);
+        }
+
+        for (LiveDataActionDescriptor action : mergedConfig.getMeta().getActions()) {
+            translateAction(config, translationPrefix, action);
+        }
+        return mergedConfig;
+    }
+
+    private void translateProperty(LiveDataConfiguration config, String translationPrefix,
+        LiveDataPropertyDescriptor property)
+    {
+        // If the property name is not set then we default on the configured translation key or the property id.
+        // Otherwise, if the property name is set but not by the user (i.e., the name comes from the default source
+        // configuration) then we want to give priority to the configured translation key if available.
+        if (property.getName() == null || !propertyHasDefaultName(config, property.getId())) {
+            String translationPlain = this.l10n.getTranslationPlain(translationPrefix + property.getId());
+            if (translationPlain != null) {
+                property.setName(translationPlain);
             }
-            if (property.getDescription() == null) {
-                property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
+            if (property.getName() == null) {
+                property.setName(property.getId());
             }
         }
-        return config;
+        if (property.getDescription() == null) {
+            property.setDescription(this.l10n.getTranslationPlain(translationPrefix + property.getId() + ".hint"));
+        }
+    }
+
+    private void translateAction(LiveDataConfiguration config, String translationPrefix,
+        LiveDataActionDescriptor action)
+    {
+        // If the action name is not set then we default on the configured translation key or the action id.
+        // Otherwise, if the action name is set but not by the user (i.e., the name comes from the default source
+        // configuration) then we want to give priority to the configured translation key if available.
+        if (action.getName() == null && !actionHasDefaultName(config, action.getId())) {
+            String translationPlain =
+                this.l10n.getTranslationPlain(translationPrefix + "_actions." + action.getId());
+            if (translationPlain != null) {
+                action.setName(translationPlain);
+            }
+        }
+    }
+
+    /**
+     * Checks if a property has a name defined in the inspected configuration.
+     *
+     * @param config the configuration to inspect
+     * @param propertyId the id of the property to check
+     * @return {@code true} if the property has a name defined in the configuration, {@code false} otherwise
+     */
+    private boolean propertyHasDefaultName(LiveDataConfiguration config, String propertyId)
+    {
+        if (config == null || config.getMeta() == null || config.getMeta().getPropertyDescriptors() == null) {
+            return false;
+        }
+        return config.getMeta().getPropertyDescriptors().stream()
+            .anyMatch(it -> Objects.equals(it.getId(), propertyId) && it.getName() != null);
+    }
+
+    /**
+     * Checks if an action has a name defined in the inspected configuration.
+     *
+     * @param config the configuration to inspect
+     * @param actionId the id of the action to check
+     * @return {@code true} if the property has a name defined in the configuration, {@code false} otherwise
+     */
+    private boolean actionHasDefaultName(LiveDataConfiguration config, String actionId)
+    {
+        if (config == null || config.getMeta() == null || config.getMeta().getActions() == null) {
+            return false;
+        }
+
+        return config.getMeta().getActions().stream()
+            .anyMatch(it -> Objects.equals(it.getId(), actionId) && it.getName() != null);
     }
 }

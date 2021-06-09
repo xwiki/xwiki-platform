@@ -14,6 +14,15 @@
       {"id": "doc.name", "type": "String", "editable": false, "displayer": "link"},
       {"id": "doc.title", "type": "String", "displayer": "link"},
       {
+        "id": "doc.hidden",
+        "type": "Boolean",
+        "filter": {
+          "id": "boolean",
+          "trueValue": true,
+          "falseValue": false
+        }
+      },
+      {
         "id": "doc.space",
         "type": "String",
         "editable": false,
@@ -44,7 +53,11 @@
         "filterable": true,
         "editable": true,
         "displayer": "boolean",
-        "filter": "boolean"
+        "filter": {
+          "id": "boolean",
+          "trueValue": 1,
+          "falseValue": 0
+        }
       },
       {
         "id": "ComputedField",
@@ -80,7 +93,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "text"
       },
       {
@@ -88,7 +101,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       },
       {
@@ -111,7 +124,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       },
       {
@@ -138,8 +151,8 @@
         "id": "TextArea",
         "sortable": true,
         "filterable": true,
-        "editable": true,
-        "displayer": "html",
+        "editable": false,
+        "displayer": "xObjectProperty",
         "filter": "text"
       },
       {
@@ -154,7 +167,7 @@
         "sortable": true,
         "filterable": true,
         "editable": true,
-        "displayer": "html",
+        "displayer": "xObjectProperty",
         "filter": "list"
       }
     ],

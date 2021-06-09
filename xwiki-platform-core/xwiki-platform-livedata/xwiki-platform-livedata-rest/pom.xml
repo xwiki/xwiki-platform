@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-rest</artifactId>
@@ -36,6 +36,7 @@
     <checkstyle.suppressions.location>
       ${basedir}/src/checkstyle/checkstyle-suppressions.xml
     </checkstyle.suppressions.location>
+    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -58,6 +59,12 @@
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

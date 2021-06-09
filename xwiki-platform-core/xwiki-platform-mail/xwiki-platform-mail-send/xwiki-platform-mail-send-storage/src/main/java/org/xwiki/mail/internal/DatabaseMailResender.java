@@ -165,6 +165,14 @@ public class DatabaseMailResender implements MailResender
     @FunctionalInterface
     private interface SingleMailResender
     {
+        /**
+         * Resends single message.
+         * 
+         * @param batchId batchId of single message. 
+         * @param messageId messageId of single message.
+         * @return single message that is to be resent.
+         * @throws MailStoreException If an exception occurs.
+         */
         MailStatusResult resendSingleMessage(String batchId, String messageId) throws MailStoreException;
     }
 }

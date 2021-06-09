@@ -347,6 +347,15 @@ public class MailStorageScriptService extends AbstractMailScriptService
     @FunctionalInterface
     private interface MultipleMailResender
     {
+        /**
+         * Resends messages.
+         * 
+         * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+         * @param offset the number of rows to skip (0 means don't skip any row)
+         * @param count the number of rows to return. If 0 then all rows are returned
+         * @return the mail results for the resent mails.
+         * @throws MailStoreException If an exception occurs.
+         */
         List<Pair<MailStatus, MailStatusResult>> resendMessages(Map<String, Object> filterMap, int offset, int count)
             throws MailStoreException;
     }

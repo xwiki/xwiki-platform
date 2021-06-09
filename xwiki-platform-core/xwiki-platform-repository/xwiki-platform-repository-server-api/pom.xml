@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>13.4-SNAPSHOT</version>
+    <version>13.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
   <name>XWiki Platform - Repository - Server API</name>
@@ -36,6 +36,7 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-extension-repository-xwiki-server-api</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Extension Repository Server</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

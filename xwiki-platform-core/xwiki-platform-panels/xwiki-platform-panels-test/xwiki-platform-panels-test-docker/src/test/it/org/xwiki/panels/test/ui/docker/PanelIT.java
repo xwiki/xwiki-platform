@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PanelIT
 {
 
-    // TODO: The backslash character is removed from SPECIAL_CONTENT and SPECIAL_TITLE until XWIKI-18632 is fixed.
+    // TODO: The backslash character is removed from SPECIAL_CONTENT and SPECIAL_TITLE until XWIKI-18653 is fixed.
     private static final String SPECIAL_CONTENT = "Is # & \\u0163 triky\\\"? c:windows /root $util";
 
     private static final String SPECIAL_TITLE = "Is # & \u0163 triky\"? c:windows /root $util";
@@ -109,11 +109,11 @@ class PanelIT
         // Checks that the new panel is listed in the Panels home live data.
         PanelsHomePage panelsHomePage = PanelsHomePage.gotoPage();
         TableLayoutElement tableLayoutElement = panelsHomePage.getLiveData().getTableLayout();
-        tableLayoutElement.filterColumn(1, panelName);
+        tableLayoutElement.filterColumn("Name", panelName);
         assertEquals(1, tableLayoutElement.countRows());
-        tableLayoutElement.hasRow("Description", "Panel Description");
-        tableLayoutElement.hasRow("Panel type", "view");
-        tableLayoutElement.hasRow("Category", "Information");
+        tableLayoutElement.assertRow("Description", "Panel Description");
+        tableLayoutElement.assertRow("Type", "view");
+        tableLayoutElement.assertRow("Category", "Information");
 
         // Add the panel to the right column from the administration.
         setRightPanelInAdministration(SPECIAL_TITLE);

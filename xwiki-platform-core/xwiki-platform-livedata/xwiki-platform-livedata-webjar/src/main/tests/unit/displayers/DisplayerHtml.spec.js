@@ -17,39 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro;
 
-import org.junit.jupiter.api.Test;
-import org.xwiki.model.EntityType;
-import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import DisplayerHtml from "../../../displayers/DisplayerHtml.vue";
+import {initWrapper} from "./displayerTestsHelper";
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-/**
- * Validate {@link IncludeMacroParameters}.
- * 
- * @version $Id$
- */
-public class IncludeMacroParametersTest
-{
-    @Test
-    public void setPage()
-    {
-        IncludeMacroParameters parameters = new IncludeMacroParameters();
-
-        parameters.setPage("page");
-
-        assertSame(EntityType.PAGE, parameters.getType());
-    }
-    
-    @Test
-    public void setExcludeFirstHeading() 
-    {
-        IncludeMacroParameters parameters = new IncludeMacroParameters();
-
-        parameters.setExcludeFirstHeading(true);
-
-        assertTrue(parameters.isExcludeFirstHeading());
-    }
-}
+describe('DisplayerHtml.vue', () => {
+  it('Renders an entry in view mode', () => {
+    const wrapper = initWrapper(DisplayerHtml, {
+      props: {
+        entry: {
+          color: '<strong>some content</strong>'
+        }
+      }
+    })
+    expect(wrapper.find('.html-wrapper').html())
+      .toBe('<div class="html-wrapper"><strong>some content</strong></div>')
+  })
+})

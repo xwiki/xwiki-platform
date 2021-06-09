@@ -74,7 +74,14 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
             LiveDataEntryStore entryStore = source.get().getEntries();
             Optional<Object> updatedEntryId = entryStore.save(entry.getValues());
             if (updatedEntryId.isPresent()) {
-                Optional<Map<String, Object>> values = entryStore.get(updatedEntryId.get());
+                Optional<Map<String, Object>> values;
+                try {
+                    values = entryStore.get(updatedEntryId.get());
+                } catch (UnsupportedOperationException e) {
+                    // Returns a success response without an entity when the entry store does not implement the get 
+                    // operation (for instance the liveTable source).
+                    return Response.status(Status.ACCEPTED).build();
+                }
                 if (values.isPresent()) {
                     Entry updatedEntry =
                         createEntry(values.get(), updatedEntryId.get(), config.getQuery().getSource(), namespace);

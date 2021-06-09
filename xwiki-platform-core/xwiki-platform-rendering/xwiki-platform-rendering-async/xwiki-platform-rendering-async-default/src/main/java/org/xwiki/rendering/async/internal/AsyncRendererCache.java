@@ -43,6 +43,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
+import org.xwiki.security.authorization.AuthorizationManager;
 
 /**
  * Share cache containing the results of the {@link AsyncRenderer} executions.
@@ -54,9 +55,8 @@ import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
 @Singleton
 public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererJobStatus>
 {
-    // TODO: put back when https://jira.xwiki.org/browse/XWIKI-16381 is fixed
-    //@Inject
-    //private AuthorizationManager authorization;
+    // @Inject
+    private AuthorizationManager authorization;
 
     @Inject
     private CacheManager cacheManager;
@@ -296,15 +296,11 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
     private void checkRight(RightEntry right, Set<String> keys)
     {
-        // TODO: we are supposed to make sure the right check result changed here but it seems to trigger a bug in the
-        // security cache that need to be fixed before we can do that.
-        // In the meantime we don't have much other choice than removing all async result which are impacted by a right
-        // check. See https://jira.xwiki.org/browse/XWIKI-16381.
-        // if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
-        //     right.getEntityReference()) != right.isAllowed()) {
-        //     clean(keys);
-        // }
-        clean(keys);
+        // Make sure the right check result changed
+        if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
+            right.getEntityReference()) != right.isAllowed()) {
+            clean(keys);
+        }
     }
 
     /**

@@ -55,7 +55,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 @Singleton
 public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererJobStatus>
 {
-    // @Inject
+    @Inject
     private AuthorizationManager authorization;
 
     @Inject

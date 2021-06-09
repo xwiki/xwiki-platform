@@ -19,6 +19,9 @@
  */
 package org.xwiki.livedata.test.po;
 
+import java.util.Arrays;
+
+import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -42,6 +45,7 @@ public class LiveDataElement extends BaseElement
     public LiveDataElement(String id)
     {
         this.id = id;
+        waitUntilReady();
     }
 
     /**
@@ -60,5 +64,23 @@ public class LiveDataElement extends BaseElement
     public CardLayoutElement getCardLayout()
     {
         return new CardLayoutElement(this.id);
+    }
+
+    private void waitUntilReady()
+    {
+        // First the Live Data macro displays a simple div with the loading class.
+        // This div is replaced by the Live Data Vue template once vue is loaded.
+        getDriver().waitUntilCondition(
+            input -> {
+                String[] classes = getDriver().findElement(By.id(this.id)).getAttribute("class").split("\\s+");
+                return !Arrays.asList(classes).contains("loading");
+            });
+
+        // Then, once the Vue template is loaded, a div with the loading class is inserted until the rest of the data 
+        // and components required to display the Live Data are loaded too. 
+        getDriver().waitUntilCondition(
+            input -> getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
+                .isEmpty()
+        );
     }
 }

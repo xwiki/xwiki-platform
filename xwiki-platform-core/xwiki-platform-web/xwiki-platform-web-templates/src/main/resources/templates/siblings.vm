@@ -25,6 +25,9 @@
 #######################################################
 ##                   HEADER
 #######################################################
+##!source.syntax=xwiki/2.1
+{{velocity}}
+{{html wiki='true'}}
 #if($request.xpage == 'siblings')
   #template("startpage.vm")
     <div class="main layoutsubsection">
@@ -42,28 +45,37 @@
 ##
 ## List the sibling documents using a livetable
 ##
-#set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
-#set ($colprops = {
-  'doc.title'    : { 'link' : 'view' },
-  'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
-  'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
-  '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
-})
 #set ($parent = $services.model.serialize($doc.documentReference.lastSpaceReference, 'local'))
-#set ($queryFilters = "unique")
+#set ($queryFilters = 'unique')
 #if ("$!request.displayHidden" == '')
   #set ($queryFilters = "${queryFilters},hidden")
 #end
-#set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($parent)&exclude=$escapetool.url($doc.fullName)&queryFilters=$queryFilters")
-#set ($options = { 
-  'url' : "$doc.getURL('get', $urlParameters)",
-  'translationPrefix' : 'platform.index.',
-  'selectedColumn' : 'doc.location',
-  'outputOnlyHtml' : true
+## Sets allowProperty to the empty value for the copy action to preserve the livetable behavior where an action with an
+## undefined rights was implicitly allowed as long as it was not an admin action (admin, rename, or rights).
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      { 'id': '_actions', 'displayer': { 'id': 'actions', 'actions': ['copy', 'rename', 'rights', 'delete'] } }
+    ],
+    'actions': [ { 'id': 'copy', 'allowProperty': '' } ]
+  }
 })
-#livetable('siblingsIndex' $collist $colprops $options)
-## Load the hierarchy JS file because the locations of documents in the livetable results are displayed as hierarchy
-#set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+## childrenOf, exclude and $doc are variables used when rendering getdocuments.vm 
+#set ($sourceParameters = $escapetool.url({
+  'template' : 'getdocuments.vm',
+  'translationPrefix' : 'platform.index.',
+  'queryFilters': $queryFilters,
+  'childrenOf': $parent,
+  'exclude': $doc.fullName,
+  '$doc': $doc.documentReference
+}))
+{{liveData
+  id='siblingsIndex'
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  properties='doc.title,doc.location,doc.date,doc.author,_actions'
+  sort='doc.location:asc'
+  }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #######################################################
 ##                   FOOTER
 #######################################################
@@ -71,5 +83,7 @@
         </div> ## xcontent
       </div> ## mainContentArea
     </div> ## main
-  #template("endpage.vm")
+  #template('endpage.vm')
 #end
+{{/html}}
+{{/velocity}}

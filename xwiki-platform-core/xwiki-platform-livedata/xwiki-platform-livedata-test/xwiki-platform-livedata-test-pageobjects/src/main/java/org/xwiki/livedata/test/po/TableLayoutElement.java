@@ -126,6 +126,29 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
+    private static class DatePatternMatcher extends TypeSafeMatcher<WebElement>
+    {
+        private static final String REGEX = "\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}";
+
+        @Override
+        protected boolean matchesSafely(WebElement item)
+        {
+            return item.getText().matches(REGEX);
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendValue(String.format("Regex %s", REGEX));
+        }
+
+        @Override
+        protected void describeMismatchSafely(WebElement item, Description mismatchDescription)
+        {
+            mismatchDescription.appendText(item.getAttribute(INNER_HTML_ATTRIBUTE));
+        }
+    }
+
     private static final String SELECT_CELLS_BY_COLUMN_INDEX = "tr td:nth-child(%d)";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
@@ -408,6 +431,17 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementTextMatcher(String value)
     {
         return new WebElementTextMatcher(value);
+    }
+
+    /**
+     * Return a hamcrest {@link Matcher}. This matcher assert that the text of a {@link WebElement} matches the date
+     * pattern {@code YYYY/MM/DD HH:mm}.
+     *
+     * @return 13.5RC1
+     */
+    public Matcher<WebElement> getDatePatternMatcher()
+    {
+        return new DatePatternMatcher();
     }
 
     /**

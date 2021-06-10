@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -156,7 +157,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     public List<Event> getEvents()
     {
         return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
-            new WikiDeletedEvent());
+            new WikiDeletedEvent(), new DocumentVersionRangeDeletedEvent());
     }
 
     private void initListener()

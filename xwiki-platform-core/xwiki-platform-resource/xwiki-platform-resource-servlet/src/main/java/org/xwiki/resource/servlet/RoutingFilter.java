@@ -38,9 +38,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.CreateResourceReferenceException;
+import org.xwiki.resource.NotFoundResourceHandlerException;
 import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -142,7 +144,21 @@ public class RoutingFilter implements Filter
         // Handler Servlet!
         request.setAttribute(RESOURCE_TYPE_NAME, resourceType);
         request.setAttribute(RESOURCE_EXTENDEDURL, extendedURL);
-        this.servletContext.getNamedDispatcher("resourceReferenceHandler").forward(request, response);
+        try {
+            this.servletContext.getNamedDispatcher("resourceReferenceHandler").forward(request, response);
+        } catch (ServletException e) {
+
+            // if we found a handler for an entityresourcereference, but we got a NotFoundResourceHandlerException
+            // it probably means that we want to fallback on the legacy action, so we need to continue the chain
+            // filtering.
+            // FIXME: this should be removed once all legacy actions are refactored to use resource reference handlers
+            if (e.getRootCause() instanceof NotFoundResourceHandlerException
+                && EntityResourceReference.TYPE.equals(resourceType)) {
+                chain.doFilter(request, response);
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override

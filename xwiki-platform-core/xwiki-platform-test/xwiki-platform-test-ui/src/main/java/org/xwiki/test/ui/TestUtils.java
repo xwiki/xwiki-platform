@@ -395,7 +395,10 @@ public class TestUtils
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
                 throw new RuntimeException(
-                    String.format("Login failed with credentials: %s / %s.", username, password));
+                    String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
+                        + "was on [%s]. Page source is [%s]", username, password, destUrl,
+                        getDriver().getCurrentUrl(), getDriver().getPageSource()));
+
             }
             recacheSecretTokenWhenOnRegisterPage();
             if (pageURL != null) {

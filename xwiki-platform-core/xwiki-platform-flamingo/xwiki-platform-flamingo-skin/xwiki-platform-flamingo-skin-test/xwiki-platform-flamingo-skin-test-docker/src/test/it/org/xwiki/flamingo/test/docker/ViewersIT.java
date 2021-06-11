@@ -89,8 +89,7 @@ class ViewersIT
             testUtils.getURL(childADocumentReference, "view", "xpage=copy"));
         adminTableLayoutElement.assertCellWithLink(SiblingsPage.LIVE_DATA_ACTIONS, "Rename",
             testUtils.getURL(childADocumentReference, "view", "xpage=rename&step=1"));
-        adminTableLayoutElement.assertCellWithLink(SiblingsPage.LIVE_DATA_ACTIONS, "Delete",
-            testUtils.getURL(childADocumentReference, "delete", "").replaceAll("\\?form_token=.+$", ""));
+        adminTableLayoutElement.assertCellWithDeleteAction(SiblingsPage.LIVE_DATA_ACTIONS, childADocumentReference);
     }
 
     /**
@@ -145,8 +144,7 @@ class ViewersIT
         adminTableLayoutElement.assertCellWithLink(ChildrenPage.LIVE_DATA_ACTIONS, "Rename",
             testUtils.getURL(childADocumentReference, "view", "xpage=rename&step=1"));
         // Removes the form_token parameter from the expected URL because it is not found in the URL of the delete 
-        // action. 
-        adminTableLayoutElement.assertCellWithLink(ChildrenPage.LIVE_DATA_ACTIONS, "Delete",
-            testUtils.getURL(childADocumentReference, "delete", "").replaceAll("\\?form_token=.+$", ""));
+        // action.
+        adminTableLayoutElement.assertCellWithDeleteAction(ChildrenPage.LIVE_DATA_ACTIONS, childADocumentReference);
     }
 }

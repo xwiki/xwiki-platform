@@ -34,6 +34,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -204,6 +205,30 @@ public class TableLayoutElement extends BaseElement
     public void assertCellWithLink(String columnName, String text, String link)
     {
         assertThat(getValues(columnName), hasItem(getWebElementCellWithLinkMatcher(text, link)));
+    }
+
+    /**
+     * Assert if the column contains a delete action.
+     *
+     * @param columnName the column name
+     * @param documentReference the document reference subject of the delete action
+     * @since 13.5RC1
+     */
+    public void assertCellWithDeleteAction(String columnName, DocumentReference documentReference)
+    {
+        assertCellWithLink(columnName, "Delete", urlWithoutFormToken(documentReference, "delete"));
+    }
+
+    /**
+     * Assert if the column contains an edit action.
+     *
+     * @param columnName the column name
+     * @param documentReference the document reference subject of the edit action
+     * @since 13.5RC1
+     */
+    public void assertCellWithEditAction(String columnName, DocumentReference documentReference)
+    {
+        assertCellWithLink(columnName, "Edit", urlWithoutFormToken(documentReference, "edit"));
     }
 
     /**
@@ -604,5 +629,10 @@ public class TableLayoutElement extends BaseElement
     private String[] getClasses(WebElement element)
     {
         return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
+    }
+
+    private String urlWithoutFormToken(DocumentReference documentReference, String edit)
+    {
+        return getUtil().getURL(documentReference, edit, "").replaceAll("\\?form_token=.+$", "");
     }
 }

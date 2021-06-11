@@ -126,14 +126,7 @@
               </item>
             </revapi.ignore>
             -->
-            <revapi.ignore>
-              <item>
-                <ignore>true</ignore>
-                <code>java.method.removed</code>
-                <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
-                <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
-              </item>
-            </revapi.ignore>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

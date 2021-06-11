@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.mockito.Mockito.mock;
@@ -83,6 +84,8 @@ public class UserAddedEventListenerTest
         XWikiDocument userDoc = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "User");
         when(userDoc.getDocumentReference()).thenReturn(documentReference);
+        when(userDoc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE))
+            .thenReturn(mock(BaseObject.class));
         WikiReference wikiReference = new WikiReference("foo");
         WikiReference currentWikiReference = new WikiReference("current");
         when(this.xWikiContext.getWikiReference()).thenReturn(currentWikiReference);
@@ -132,7 +135,6 @@ public class UserAddedEventListenerTest
         verify(this.notificationFilterPreferenceManager).saveFilterPreferences(documentReference, expectedSet);
         verify(userDoc).addXObject(obj1bis);
         verify(userDoc).addXObject(obj2bis);
-        verify(this.xWiki).saveDocument(userDoc, this.xWikiContext);
         verify(this.xWikiContext).setWikiReference(wikiReference);
         verify(this.xWikiContext).setWikiReference(currentWikiReference);
     }

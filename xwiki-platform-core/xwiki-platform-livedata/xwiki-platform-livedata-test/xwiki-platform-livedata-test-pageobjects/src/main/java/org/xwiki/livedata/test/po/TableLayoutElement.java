@@ -31,10 +31,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormContainerElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,6 +50,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TableLayoutElement extends BaseElement
 {
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
+
+    private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -203,9 +207,8 @@ public class TableLayoutElement extends BaseElement
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
         getDriver().waitUntilCondition(webDriver -> {
-            boolean isWaiting = Arrays
-                .asList(getRoot().findElement(By.cssSelector(".layout-loader")).getAttribute("class").split("\\s+"))
-                .contains("waiting");
+            boolean isWaiting =
+                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader")))).contains("waiting");
             if (isWaiting) {
                 return false;
             }
@@ -303,12 +306,23 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
-        // TODO: adapt for other types of filters
         int columnIndex = findColumnIndex(columnLabel);
         WebElement element = getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) > input", columnIndex)));
-        element.clear();
-        element.sendKeys(content);
+
+        List<String> classes = Arrays.asList(getClasses(element));
+        if (classes.contains("filter-list")) {
+            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+                suggestInputElement.sendKeys(content).selectTypedText();
+            } else {
+                new Select(element).selectByVisibleText(content);
+            }
+        } else if (classes.contains("filter-text")) {
+            element.clear();
+            element.sendKeys(content);
+        }
+
         if (wait) {
             waitUntilReady();
         }
@@ -556,5 +570,10 @@ public class TableLayoutElement extends BaseElement
             boolean noInput = element.findElements(selector).isEmpty();
             return noLoader && noInput;
         });
+    }
+
+    private String[] getClasses(WebElement element)
+    {
+        return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
     }
 }

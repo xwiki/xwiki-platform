@@ -74,6 +74,8 @@ class LiveDataIT
 
     private static final String BIRTHDAY_COLUMN = "birthday";
 
+    private static final String USER_COLUMN = "user";
+
     private static final String BIRTHDAY_DATETIME = "11/05/2021 16:00:00";
 
     private static final String CANCELED_BIRTHDAY_DATETIME = "11/05/2021 16:00:10";
@@ -88,6 +90,8 @@ class LiveDataIT
     {
         // Login as super admin because guest user cannot remove pages.
         testUtils.loginAsSuperAdmin();
+        testUtils.createUser("U1", "U1", null);
+        testUtils.createUser("U2", "U2", null);
         // Wipes the test space.
         testUtils.deletePage(testReference, true);
 
@@ -106,11 +110,11 @@ class LiveDataIT
 
         // Creates corresponding XObjects.
         addXObject(testUtils, new DocumentReference("O1", (SpaceReference) testReference.getParent()), className,
-            NAME_LYNDA, CHOICE_A);
+            NAME_LYNDA, CHOICE_A, "U1");
         addXObject(testUtils, new DocumentReference("O2", (SpaceReference) testReference.getParent()), className,
-            NAME_ESTHER, CHOICE_B);
+            NAME_ESTHER, CHOICE_B, "U2");
         addXObject(testUtils, new DocumentReference("O3", (SpaceReference) testReference.getParent()), className,
-            "Nikolay", "");
+            "Nikolay", "", null);
 
         testUtils.gotoPage(testReference);
 
@@ -136,6 +140,15 @@ class LiveDataIT
         tableLayout
             .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+        tableLayout
+            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
+        tableLayout
+            .assertCellWithLink(USER_COLUMN, "U2", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U2")));
+        tableLayout.assertRow(USER_COLUMN, "");
+        tableLayout.filterColumn(USER_COLUMN, "U1");
+        assertEquals(1, tableLayout.countRows());
+        tableLayout
+            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
     }
 
     @Test
@@ -172,12 +185,25 @@ class LiveDataIT
         testUtils.rest().savePage(translationDocumentReference, "emptyvalue=\n", "translation");
     }
 
-    private void addXObject(TestUtils testUtils, DocumentReference documentReference,
-        String className, String name, String choice)
+    /**
+     * Creates an XObject of type {@code className} and stores it in {@code documentReference}.
+     *
+     * @param testUtils the {@link TestUtils} instance of the test
+     * @param documentReference the reference of the document storing the created XObject
+     * @param className the type of the created XObject
+     * @param name the value of the name field
+     * @param choice the value of the choice field
+     * @param username the username of the user field (e.g., {@code "U1"})
+     */
+    private void addXObject(TestUtils testUtils, DocumentReference documentReference, String className, String name,
+        String choice, String username)
     {
         Map<String, Object> properties = new HashMap<>();
         properties.put(NAME_COLUMN, name);
         properties.put(CHOICE_COLUMN, choice);
+        if (username != null) {
+            properties.put(USER_COLUMN, "XWiki." + username);
+        }
         testUtils.addObject(documentReference, className, properties);
     }
 
@@ -190,6 +216,7 @@ class LiveDataIT
         propertyList.setValues(StringUtils.joinWith("|", CHOICE_A, CHOICE_B, CHOICE_C, CHOICE_D));
         classEditPage.clickSaveAndView();
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
+        testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
     }
 
     private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference, String className)
@@ -197,10 +224,11 @@ class LiveDataIT
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
         Page page = rest.page(testReference);
+        String properties = StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN);
         page.setContent("{{velocity}}\n"
             + "{{liveData\n"
             + "  id=\"test\"\n"
-            + "  properties=\"" + NAME_COLUMN + "," + CHOICE_COLUMN + "," + BIRTHDAY_COLUMN + "\"\n"
+            + "  properties=\"" + properties + "\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + className.replace("xwiki:", "") + "\"\n"
             + "}}{{/liveData}}\n"

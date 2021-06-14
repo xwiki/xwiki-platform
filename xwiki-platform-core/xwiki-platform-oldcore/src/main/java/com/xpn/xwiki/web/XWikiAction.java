@@ -153,6 +153,9 @@ public abstract class XWikiAction implements LegacyAction
     @Inject
     protected Execution execution;
 
+    @Inject
+    protected ObservationManager observation;
+
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
@@ -342,8 +345,6 @@ public abstract class XWikiAction implements LegacyAction
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
         DefaultJobProgress actionProgress = null;
-        ObservationManager om = Utils.getComponent(ObservationManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
         String docName = "";
 
         boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
@@ -354,12 +355,12 @@ public abstract class XWikiAction implements LegacyAction
             String action = context.getAction();
 
             // Start progress
-            if (debug && om != null && execution != null) {
+            if (debug) {
                 actionProgress = new DefaultJobProgress(context.getURL().toExternalForm());
-                om.addListener(new WrappedThreadEventListener(actionProgress));
+                this.observation.addListener(new WrappedThreadEventListener(actionProgress));
 
                 // Register the action progress in the context
-                ExecutionContext econtext = execution.getContext();
+                ExecutionContext econtext = this.execution.getContext();
                 if (econtext != null) {
                     econtext.setProperty(XWikiAction.ACTION_PROGRESS, actionProgress);
                 }
@@ -524,7 +525,7 @@ public abstract class XWikiAction implements LegacyAction
                 // and there won't be a need for the context.
                 try {
                     ActionExecutingEvent event = new ActionExecutingEvent(context.getAction());
-                    om.notify(event, context.getDoc(), context);
+                    this.observation.notify(event, context.getDoc(), context);
                     eventSent = true;
                     if (event.isCanceled()) {
                         // Action has been canceled
@@ -698,7 +699,7 @@ public abstract class XWikiAction implements LegacyAction
                     // changed in the future, when the whole platform will be written using components
                     // and there won't be a need for the context.
                     try {
-                        om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
+                        this.observation.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                     } catch (Throwable ex) {
                         LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
                             + context.getAction() + "]", ex);
@@ -727,7 +728,7 @@ public abstract class XWikiAction implements LegacyAction
             if (actionProgress != null) {
                 getProgress().popLevelProgress(this);
 
-                om.removeListener(actionProgress.getName());
+                this.observation.removeListener(actionProgress.getName());
             }
 
             if (fileupload != null) {

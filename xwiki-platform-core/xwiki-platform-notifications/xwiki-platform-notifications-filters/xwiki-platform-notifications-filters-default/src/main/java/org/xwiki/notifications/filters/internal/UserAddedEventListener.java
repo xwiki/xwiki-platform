@@ -31,6 +31,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -43,10 +44,8 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Automatically copy the wiki filter preferences to newly created users.
@@ -84,20 +83,24 @@ public class UserAddedEventListener extends AbstractEventListener
      */
     public UserAddedEventListener()
     {
-        super(NAME,
-            new XObjectAddedEvent(BaseObjectReference.any(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING)));
+        // We're listening on a DocumentCreatingEvent because we cannot listen properly on an XObjectAddedEvent
+        // without avoiding some recursivity issues. This should be improved with a XObjectAddingEvent or even better
+        // with a UserCreatingEvent.
+        super(NAME, new DocumentCreatingEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument userDoc = (XWikiDocument) source;
-        DocumentReference userDocReference = userDoc.getDocumentReference();
-        try {
-            this.copyFilterPreferences(userDocReference);
-            this.copyToggleableFilterPreferences(userDoc);
-        } catch (Exception e) {
-            logger.error("Error while trying to copy filter preferences to new user", e);
+        if (userDoc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null) {
+            DocumentReference userDocReference = userDoc.getDocumentReference();
+            try {
+                this.copyFilterPreferences(userDocReference);
+                this.copyToggleableFilterPreferences(userDoc);
+            } catch (Exception e) {
+                logger.error("Error while trying to copy filter preferences to new user", e);
+            }
         }
     }
 
@@ -132,9 +135,6 @@ public class UserAddedEventListener extends AbstractEventListener
 
                 for (BaseObject xObject : xObjects) {
                     userDocument.addXObject(xObject.duplicate());
-                }
-                if (!xObjects.isEmpty()) {
-                    xWikiContext.getWiki().saveDocument(userDocument, xWikiContext);
                 }
             }
         } finally {

@@ -2,7 +2,7 @@
 
 [XWiki Platform](https://www.xwiki.org/xwiki/bin/view/Documentation/) is a generic wiki platform offering runtime services for applications built on top of it.
 
-XWiki Commons, XWiki Rendering and XWiki Platform are part of the [XWiki.org](http://www.xwiki.org/) software forge. They are released together and share the same version.
+XWiki Commons, XWiki Rendering, and XWiki Platform are part of the [XWiki.org](http://www.xwiki.org/) software forge. They are released together and share the same version.
 
 ## Documentation
 * [API](https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/API/)

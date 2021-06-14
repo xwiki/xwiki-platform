@@ -20,6 +20,7 @@
 package org.xwiki.resource.servlet;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,12 @@ class AbstractServletResourceReferenceHandlerTest
     @Mock
     private InputStream filterStream;
 
+    @Mock
+    private Response response;
+
+    @Mock
+    private OutputStream outputStream;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
@@ -90,7 +97,7 @@ class AbstractServletResourceReferenceHandlerTest
         @Override
         protected InputStream getResourceStream(ResourceReference resourceReference)
         {
-            return inputStream;
+            return this.inputStream;
         }
 
         @Override
@@ -102,40 +109,41 @@ class AbstractServletResourceReferenceHandlerTest
         @Override
         protected InputStream filterResource(ResourceReference resourceReference, InputStream resourceStream)
         {
-            return filterStream;
+            return this.filterStream;
         }
     }
 
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
+        when(this.container.getResponse()).thenReturn(this.response);
+        when(this.response.getOutputStream()).thenReturn(this.outputStream);
+
         // Initialize the reference handler with input stream mocks in order to be able to verify them in the tests.
         this.referenceHandler.inputStream = this.inputStream;
         this.referenceHandler.filterStream = this.filterStream;
     }
 
     /**
-     * Verify that the input and filter steams are closed after use.
+     * Verify that the input and filter streams are closed after use.
      */
     @Test
-    void handleSteamClosed() throws Exception
+    void handleStreamClosed() throws Exception
     {
-        when(this.container.getResponse()).thenReturn(mock(Response.class));
-
         this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
 
-        verify(inputStream).close();
-        verify(filterStream).close();
+        verify(this.inputStream).close();
+        verify(this.filterStream).close();
     }
 
     /**
      * Verify that the resources are closed even if an error occurs during the execution.
      */
     @Test
-    void handleSteamClosedWhenErrorOnServeResource() throws Exception
+    void handleStreamClosedWhenErrorOnServeResource() throws Exception
     {
         // Fail at first call in serveResource, then return a result in sendError
-        when(this.container.getResponse()).thenThrow(new RuntimeException()).thenReturn(mock(Response.class));
+        when(this.container.getResponse()).thenThrow(new RuntimeException()).thenReturn(this.response);
 
         this.referenceHandler
             .handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
@@ -152,11 +160,9 @@ class AbstractServletResourceReferenceHandlerTest
      * Verify the resources are closed even when filterResource returns the same stream as getResourceStream.
      */
     @Test
-    void handleFilteredSteamUnchanged() throws Exception
+    void handleFilteredStreamUnchanged() throws Exception
     {
         this.referenceHandler.filterStream = this.inputStream;
-
-        when(this.container.getResponse()).thenReturn(mock(Response.class));
 
         this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
 

@@ -110,4 +110,10 @@ public class AllITs
     class NestedInformationIT extends InformationIT
     {
     }
+
+    @Nested
+    @DisplayName("Page viewers tests")
+    class NestedViewersIT extends ViewersIT
+    {
+    }
 }

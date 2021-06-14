@@ -111,21 +111,26 @@ def builds = [
     )
   },
   'Quality' : {
+    // Run the quality checks.
+    // Sonar notes:
+    // - we need sonar:sonar to perform the analysis
+    // - we need sonar = true to push the analysis to Sonarcloud
+    // - we need jacoco:report to execute jacoco and compute test coverage
+    // - we need -Pcoverage and -Dxwiki.jacoco.itDestFile to tell Jacoco to compute a single global Jacoco
+    //   coverage for the full reactor (so that the coverage percentage computed takes into account module tests
+    //   which cover code in other modules)
     build(
       name: 'Quality',
-      goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy'
-    )
-  },
-  'Sonar' : {
-    // Note: ideally, this should be part of the 'Quality' build but last time we tried it was using too much memory
-    // so until we make it work, we're testing Sonar in a separate build to not fail the 'Quality' one.
-    build(
-      name: 'Sonar',
       goals: 'clean install jacoco:report sonar:sonar',
-      profiles: 'legacy',
-      properties: '-Dxwiki.revapi.skip=true -Dxwiki.spoon.skip=true -Dxwiki.checkstyle.skip=true',
-      sonar: true
+      profiles: '-repository-all,quality,legacy,coverage',
+      // Note: We specify the "jvm" system property to to execute the tests with Java 8 in order to limit problems
+      // with more recent versions of Java. In the future, we'll need to be able to also execute the tests with
+      // Java 14+. Remove that when we support it. See for example https://jira.xwiki.org/browse/XCOMMONS-2136
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec -Djvm=/home/hudsonagent/java8/bin/java',
+      sonar: true,
+      // Build with Java 14 since Sonar requires Java 11+ and we want at the same time to verify that XWiki builds
+      // with the latest Java version.
+      javaTool: 'java14'
     )
   }
 ]
@@ -209,12 +214,12 @@ private void buildStandardAll(builds)
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
 
-			parallel(
-			  'integration-tests' : {
-			  	// Run all integration tests, with each module in its own node to parallelize the work.
-					runIntegrationTests()
-			  },
-			  'distribution' : {
+      parallel(
+        'integration-tests' : {
+          // Run all integration tests, with each module in its own node to parallelize the work.
+          runIntegrationTests()
+        },
+        'distribution' : {
           // Note: We want the following behavior:
           // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
           //   happen since Jenkins will throw an exception and we don't catch it.
@@ -225,45 +230,45 @@ private void buildStandardAll(builds)
           // Build the distributions
           builds['Distribution'].call()
 
-					// Building the various functional tests, after the distribution has been built successfully.
+          // Building the various functional tests, after the distribution has been built successfully.
 
-					// Build the Flavor Test POM, required for the pageobjects module below.
-					builds['Flavor Test - POM'].call()
+          // Build the Flavor Test POM, required for the pageobjects module below.
+          builds['Flavor Test - POM'].call()
 
-					// Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-					builds['Flavor Test - PageObjects'].call()
+          // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
+          builds['Flavor Test - PageObjects'].call()
 
-					// Now run all tests in parallel
-					parallel(
-						'flavor-test-ui': {
-							// Run the Flavor UI tests
-							builds['Flavor Test - UI'].call()
-						},
-						'flavor-test-misc': {
-							// Run the Flavor Misc tests
-							builds['Flavor Test - Misc'].call()
-						},
-						'flavor-test-storage': {
-							// Run the Flavor Storage tests
-							builds['Flavor Test - Storage'].call()
-						},
-						'flavor-test-escaping': {
-							// Run the Flavor Escaping tests
-							builds['Flavor Test - Escaping'].call()
-						},
-						'flavor-test-webstandards': {
-							// Run the Flavor Webstandards tests
-							// Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
-							// Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-							builds['Flavor Test - Webstandards'].call()
-						},
-						'flavor-test-upgrade': {
-							// Run the Flavor Upgrade tests
-							builds['Flavor Test - Upgrade'].call()
-						}
-					)
-			  }
-			)
+          // Now run all tests in parallel
+          parallel(
+            'flavor-test-ui': {
+              // Run the Flavor UI tests
+              builds['Flavor Test - UI'].call()
+            },
+            'flavor-test-misc': {
+              // Run the Flavor Misc tests
+              builds['Flavor Test - Misc'].call()
+            },
+            'flavor-test-storage': {
+              // Run the Flavor Storage tests
+              builds['Flavor Test - Storage'].call()
+            },
+            'flavor-test-escaping': {
+              // Run the Flavor Escaping tests
+              builds['Flavor Test - Escaping'].call()
+            },
+            'flavor-test-webstandards': {
+              // Run the Flavor Webstandards tests
+              // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
+              // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
+              builds['Flavor Test - Webstandards'].call()
+            },
+            'flavor-test-upgrade': {
+              // Run the Flavor Upgrade tests
+              builds['Flavor Test - Upgrade'].call()
+            }
+          )
+        }
+      )
     },
     'testrelease': {
       // Simulate a release and verify all is fine, in preparation for the release day.
@@ -273,16 +278,6 @@ private void buildStandardAll(builds)
       // Run the quality checks
       builds['Quality'].call()
     }
-    /* TODO: 27/4/2020: Disable sonar build to check the hypothesis that it's causing kills on agents by using too
-       much memory.
-       TODO: 1/2/2021: Also disabled because sonarcloud.io now requires that XWiki be built with Java 11 to work. See
-       https://jira.xwiki.org/browse/XCOMMONS-2120
-    ,
-    'sonar': {
-      // Sonar analysis + push to Sonarcloud.io
-      builds['Sonar'].call()
-    }
-    */
   )
 }
 
@@ -293,8 +288,8 @@ private void runIntegrationTests()
   node() {
     // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
     checkout skipChangeLog: true, scm: scm
-		itModuleList = itModules()
-		customJobProperties = getCustomJobProperties()
+    itModuleList = itModules()
+    customJobProperties = getCustomJobProperties()
   }
 
   xwikiITBuild {
@@ -388,6 +383,9 @@ private void buildInsideNode(map)
       // Avoid duplicate changelogs in jenkins job execution UI page
       if (map.name != 'Main') {
         skipChangeLog = true
+      }
+      if (map.javaTool != null) {
+        javaTool = map.javaTool
       }
     }
 }

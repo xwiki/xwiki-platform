@@ -31,10 +31,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormContainerElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,6 +51,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TableLayoutElement extends BaseElement
 {
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
+
+    private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -126,6 +131,29 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
+    private static class DatePatternMatcher extends TypeSafeMatcher<WebElement>
+    {
+        private static final String REGEX = "\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}";
+
+        @Override
+        protected boolean matchesSafely(WebElement item)
+        {
+            return item.getText().matches(REGEX);
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendValue(String.format("Regex %s", REGEX));
+        }
+
+        @Override
+        protected void describeMismatchSafely(WebElement item, Description mismatchDescription)
+        {
+            mismatchDescription.appendText(item.getAttribute(INNER_HTML_ATTRIBUTE));
+        }
+    }
+
     private static final String SELECT_CELLS_BY_COLUMN_INDEX = "tr td:nth-child(%d)";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
@@ -180,6 +208,30 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Assert if the column contains a delete action.
+     *
+     * @param columnName the column name
+     * @param documentReference the document reference subject of the delete action
+     * @since 13.5RC1
+     */
+    public void assertCellWithDeleteAction(String columnName, DocumentReference documentReference)
+    {
+        assertCellWithLink(columnName, "Delete", urlWithoutFormToken(documentReference, "delete"));
+    }
+
+    /**
+     * Assert if the column contains an edit action.
+     *
+     * @param columnName the column name
+     * @param documentReference the document reference subject of the edit action
+     * @since 13.5RC1
+     */
+    public void assertCellWithEditAction(String columnName, DocumentReference documentReference)
+    {
+        assertCellWithLink(columnName, "Edit", urlWithoutFormToken(documentReference, "edit"));
+    }
+
+    /**
      * Waits until the table has content displayed and loaded. If you expect the Live Data to be displayed without
      * content, see {@link #waitUntilReady(boolean)}.
      *
@@ -201,9 +253,8 @@ public class TableLayoutElement extends BaseElement
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
         getDriver().waitUntilCondition(webDriver -> {
-            boolean isWaiting = Arrays
-                .asList(getRoot().findElement(By.cssSelector(".layout-loader")).getAttribute("class").split("\\s+"))
-                .contains("waiting");
+            boolean isWaiting =
+                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader")))).contains("waiting");
             if (isWaiting) {
                 return false;
             }
@@ -301,12 +352,23 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
-        // TODO: adapt for other types of filters
         int columnIndex = findColumnIndex(columnLabel);
         WebElement element = getRoot()
             .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) > input", columnIndex)));
-        element.clear();
-        element.sendKeys(content);
+
+        List<String> classes = Arrays.asList(getClasses(element));
+        if (classes.contains("filter-list")) {
+            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+                suggestInputElement.sendKeys(content).selectTypedText();
+            } else {
+                new Select(element).selectByVisibleText(content);
+            }
+        } else if (classes.contains("filter-text")) {
+            element.clear();
+            element.sendKeys(content);
+        }
+
         if (wait) {
             waitUntilReady();
         }
@@ -408,6 +470,17 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementTextMatcher(String value)
     {
         return new WebElementTextMatcher(value);
+    }
+
+    /**
+     * Return a hamcrest {@link Matcher}. This matcher assert that the text of a {@link WebElement} matches the date
+     * pattern {@code YYYY/MM/DD HH:mm}.
+     *
+     * @return 13.5RC1
+     */
+    public Matcher<WebElement> getDatePatternMatcher()
+    {
+        return new DatePatternMatcher();
     }
 
     /**
@@ -551,5 +624,15 @@ public class TableLayoutElement extends BaseElement
             boolean noInput = element.findElements(selector).isEmpty();
             return noLoader && noInput;
         });
+    }
+
+    private String[] getClasses(WebElement element)
+    {
+        return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
+    }
+
+    private String urlWithoutFormToken(DocumentReference documentReference, String edit)
+    {
+        return getUtil().getURL(documentReference, edit, "").replaceAll("\\?form_token=.+$", "");
     }
 }

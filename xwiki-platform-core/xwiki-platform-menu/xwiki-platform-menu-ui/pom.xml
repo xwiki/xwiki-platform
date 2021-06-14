@@ -99,6 +99,19 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
+    <!-- Required by the live data macro. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- The Panels application is an optional dependency since the Menu application can work even if it's not present
          but if it's there then it'll register in it. -->
     <dependency>

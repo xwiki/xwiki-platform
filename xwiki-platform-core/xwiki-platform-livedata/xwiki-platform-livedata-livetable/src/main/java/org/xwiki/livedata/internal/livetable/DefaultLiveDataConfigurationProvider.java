@@ -101,8 +101,9 @@ public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataCo
         if (!StringUtils.isEmpty(dateFormat)) {
             Optional<FilterDescriptor> dateFilter =
                 meta.getFilters().stream().filter(filter -> "date".equals(filter.getId())).findFirst();
-            // We expect the date filter to be present in liveTableLiveDataConfiguration.json
-            dateFilter.get().setParameter("dateFormat", dateFormat);
+            if (dateFilter.isPresent()) {
+                dateFilter.get().setParameter("dateFormat", dateFormat);
+            }
         }
     }
 

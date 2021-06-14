@@ -25,8 +25,11 @@
 #######################################################
 ##                   HEADER
 #######################################################
+##!source.syntax=xwiki/2.1
+{{velocity}}
+{{html wiki='true'}}
 #if($request.xpage == 'children')
-  #template("startpage.vm")
+  #template('startpage.vm')
     <div class="main layoutsubsection">
       <div id="mainContentArea">
         <div class="xcontent">
@@ -60,27 +63,34 @@
     ##
     ## List the children documents using a livetable
     ##
-    #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
-    #set ($colprops = {
-      'doc.title'    : { 'link' : 'view' },
-      'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
-      'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
-      '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
-    })
-    #set ($queryFilters = "unique")
+    #set ($queryFilters = 'unique')
     #if ("$!request.displayHidden" == '')
       #set ($queryFilters = "${queryFilters},hidden")
     #end
-    #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=$queryFilters")
-    #set ($options = { 
-      'url' : "$doc.getURL('get', $urlParameters)",
-      'selectedColumn' : 'doc.location',
-      'translationPrefix' : 'platform.index.',
-      'outputOnlyHtml' : true
+    ## Sets allowProperty to the empty value for the copy action to preserve the livetable behavior where an action with an
+    ## undefined rights was implicitly allowed as long as it was not an admin action (admin, rename, or rights).
+    #set ($liveDataConfig = {
+      'meta': {
+      'propertyDescriptors': [
+        { 'id': '_actions', 'displayer': { 'id': 'actions', 'actions': ['copy', 'rename', 'rights', 'delete'] } }
+        ],
+        'actions': [ { 'id': 'copy', 'allowProperty': '' } ]
+      }
     })
-    #livetable('childrenIndex' $collist $colprops $options)
-    ## Load the hierarchy JS file because the locations of documents in the livetable results are displayed as hierarchy
-    #set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+    #set ($sourceParameters = $escapetool.url({
+      'template' : 'getdocuments.vm',
+      'translationPrefix' : 'platform.index.',
+      'queryFilters': $queryFilters,
+      'childrenOf': $doc.space,
+      '$doc': $doc.documentReference
+    }))
+    {{liveData
+      id='childrenIndex'
+      source='liveTable'
+      sourceParameters="$sourceParameters"
+      properties='doc.title,doc.location,doc.date,doc.author,_actions'
+      sort='doc.location:asc'
+      }}$jsontool.serialize($liveDataConfig){{/liveData}}
   #end
 #end
 #######################################################
@@ -112,3 +122,5 @@
     </div> ## main
   #template("endpage.vm")
 #end
+{{/html}}
+{{/velocity}}

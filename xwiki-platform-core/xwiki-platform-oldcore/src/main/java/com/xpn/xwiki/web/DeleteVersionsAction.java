@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
 
@@ -67,8 +68,17 @@ public class DeleteVersionsAction extends XWikiAction
         Version v2 = versions[1];
 
         if (v1 != null && v2 != null) {
+            // Find the lower and upper bounds
+            Version upperBound = v1;
+            Version lowerBound = v2;
+            if (upperBound.compareVersions(lowerBound) < 0) {
+                Version tmp = upperBound;
+                upperBound = lowerBound;
+                lowerBound = tmp;
+            }
+
             // Remove the versions
-            archive.removeVersions(v1, v2, context);
+            archive.removeVersions(upperBound, lowerBound, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             tdoc.setDocumentArchive(archive);
 
@@ -91,6 +101,10 @@ public class DeleteVersionsAction extends XWikiAction
                 if (!tdoc.getRCSVersion().equals(previousVersion)) {
                     context.getWiki().rollback(tdoc, previousVersion.toString(), false, context);
                 }
+
+                // Notify about versions delete
+                this.observation.notify(new DocumentVersionRangeDeletedEvent(tdoc.getDocumentReferenceWithLocale(),
+                    lowerBound.toString(), upperBound.toString()), tdoc, context);
             }
         }
         sendRedirect(context);

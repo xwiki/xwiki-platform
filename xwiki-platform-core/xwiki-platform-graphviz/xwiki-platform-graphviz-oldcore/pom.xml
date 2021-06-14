@@ -29,13 +29,15 @@
   </parent>
   <artifactId>xwiki-platform-graphviz-oldcore</artifactId>
   <name>XWiki Platform - GraphViz - Old Core</name>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-graphviz-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

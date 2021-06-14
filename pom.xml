@@ -57,11 +57,11 @@
     <batik.version>1.14</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.26</tika.version>
-    <pdfbox.version>2.0.23</pdfbox.version>
+    <pdfbox.version>2.0.24</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- CSS4J/Carte -->
-    <css4j.version>3.2.0</css4j.version>
+    <css4j.version>3.5.1</css4j.version>
 
     <!-- Jetty version -->
     <jetty.version>9.4.29.v20200521</jetty.version>
@@ -105,7 +105,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.20</pgsql.version>
+    <pgsql.version>42.2.21</pgsql.version>
     <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
     <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
@@ -113,7 +113,7 @@
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
-    <libreoffice.version>7.0.5.2</libreoffice.version>
+    <libreoffice.version>7.0.6.2</libreoffice.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -168,7 +168,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.3.5</version>
+        <version>4.4.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -558,12 +558,12 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.10.1</version>
+        <version>0.10.2</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -573,7 +573,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.6</version>
+        <version>3.1.7</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -581,16 +581,26 @@
         <version>1.0.2</version>
       </dependency>
 
-      <!-- CSS4J -->
-      <dependency>
-        <groupId>io.sf.carte</groupId>
-        <artifactId>xml-dtd</artifactId>
-        <version>${css4j.version}</version>
-      </dependency>
+      <!-- Carte CSS4J -->
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <version>${css4j.version}</version>
+      </dependency>
+
+      <!-- Carte XML DTD -->
+      <dependency>
+        <groupId>io.sf.carte</groupId>
+        <artifactId>xml-dtd</artifactId>
+        <!-- Note: has a different release cycle than CSS4J -->
+        <version>3.5.1</version>
+        <exclusions>
+          <!-- We're using a more recent version pulled from css4j -->
+          <exclusion>
+            <groupId>io.sf.carte</groupId>
+            <artifactId>carte-util</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- Restlet -->

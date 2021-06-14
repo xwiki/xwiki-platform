@@ -27,15 +27,18 @@
 <template>
   <div class="xwiki-livedata" :id="data.id">
 
-      <!-- Import the Livedata advanced configuration panels -->
-      <LivedataAdvancedPanels/>
+    <!-- Import the Livedata advanced configuration panels -->
+    <LivedataAdvancedPanels/>
 
-      <!-- Where the layouts are going to be displayed -->
-      <LivedataLayout :layout-id="layoutId"/>
+    <!-- Where the layouts are going to be displayed -->
+    <LivedataLayout :layout-id="layoutId"/>
 
-      <!-- Persitent configuration module (if supported by the config) -->
-      <LivedataPersistentConfiguration v-if="data.id"/>
-
+    <!-- Persistent configuration module (if supported by the config) -->
+    <LivedataPersistentConfiguration v-if="data.id"/>
+    
+    <!-- Displays a loader until the component is fully mounted. -->
+    <div v-if="!layoutLoaded" class="loading"></div>
+    
   </div>
 </template>
 
@@ -79,6 +82,19 @@ export default {
       logic: this.logic
     };
   },
+  
+  data() {
+    return {
+      layoutLoaded: false
+    }
+  },
+  
+  mounted() {
+    // Waits for the layout to be (lazily) loaded before hiding the loader.  
+    this.logic.onEvent("layoutLoaded", () => {
+      this.layoutLoaded = true;
+    });
+  }
 
 };
 </script>

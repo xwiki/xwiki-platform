@@ -226,6 +226,9 @@ public class ScriptXWikiServletRequestTest
     @Test
     void getRequestURL()
     {
-        this.scriptRequest.getRequestURL();
+        StringBuffer buffer = new StringBuffer();
+        when(this.request.getRequestURL()).thenReturn(buffer);
+
+        assertSame(buffer, this.scriptRequest.getRequestURL());
     }
 }

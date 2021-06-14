@@ -179,9 +179,16 @@ class XWikiContextContextStoreTest
     }
 
     @Test
-    void restoreEmpty()
+    void restoreEmpty() throws MalformedURLException
     {
+        XWikiServletRequestStub request = new XWikiServletRequestStub(new URL("http://stub"),
+            Collections.singletonMap("parameter", new String[] {"value"}));
+
+        this.oldcore.getXWikiContext().setRequest(request);
+
         this.store.restore(new HashMap<>());
+
+        assertTrue(((XWikiServletRequestStub) this.oldcore.getXWikiContext().getRequest()).isDaemon());
     }
 
     @Test

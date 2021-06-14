@@ -35,14 +35,15 @@ import org.xwiki.appwithinminutes.test.po.ApplicationsLiveTableElement;
 import org.xwiki.appwithinminutes.test.po.ClassFieldEditPane;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
+import org.xwiki.flamingo.skin.test.po.ChildrenPage;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LiveTableElement;
-import org.xwiki.test.ui.po.PagesLiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.EMPTY_CANVAS_HINT;
 import static org.xwiki.appwithinminutes.test.po.ApplicationCreatePage.APP_NAME_USED_WARNING_MESSAGE;
+import static org.xwiki.flamingo.skin.test.po.ChildrenPage.LIVE_DATA_TITLE;
 
 /**
  * Tests the application wizard.
@@ -214,10 +216,9 @@ class WizardIT
 
         // Assert that only the entry we have just created is listed as child of the application home page. The rest of
         // the documents (class, template, sheet, preferences) should be marked as hidden.
-        PagesLiveTableElement childrenLiveTable = homePage.viewChildren().getLiveTable();
-        childrenLiveTable.waitUntilReady();
-        assertEquals(1, childrenLiveTable.getRowCount());
-        assertTrue(childrenLiveTable.hasPageWithTitle(firstEntryName));
+        TableLayoutElement childrenTableLayout = ChildrenPage.clickOnChildrenMenu().getLiveData().getTableLayout();
+        assertEquals(1, childrenTableLayout.countRows());
+        childrenTableLayout.assertRow(LIVE_DATA_TITLE, firstEntryName);
 
         // Go back to the application home edit page.
         testUtils

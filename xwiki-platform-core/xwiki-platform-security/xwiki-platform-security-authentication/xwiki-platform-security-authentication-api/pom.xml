@@ -33,6 +33,7 @@
   <properties>
     <!-- Skipping revapi since xwiki-platform-legacy-security-authentication-api wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

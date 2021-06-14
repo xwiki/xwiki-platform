@@ -30,6 +30,9 @@
   <artifactId>xwiki-platform-chart-plugin</artifactId>
   <name>XWiki Platform - Chart - Chart Plugin</name>
   <description>Old Plugin used for displaying charts and Chart Wizard</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

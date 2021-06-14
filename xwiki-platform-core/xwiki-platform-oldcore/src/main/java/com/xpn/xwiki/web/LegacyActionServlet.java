@@ -91,23 +91,30 @@ public class LegacyActionServlet extends HttpServlet
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         String actionName = getActionName(req);
-
+        LegacyAction action;
         if (this.rootComponentManager.hasComponent(LegacyAction.class, actionName)) {
-            LegacyAction action;
             try {
                 action = this.rootComponentManager.getInstance(LegacyAction.class, actionName);
             } catch (ComponentLookupException e) {
                 throw new ServletException("Failed to lookup the action with name [" + actionName + "]", e);
             }
-
-            try {
-                action.execute(req, resp);
-            } catch (Exception e) {
-                throw new ServletException("Failed to execute the action with name [" + actionName + "]", e);
-            }
         } else {
-            resp.setStatus(404);
-            resp.getWriter().write("No action could be find for name [" + actionName + "]");
+            try {
+                // we change the name just for the logger in case of problem.
+                actionName = "unknown";
+                // if a component cannot be found with the given action name, we fallback on the default action
+                // which is the UnkwownAction. This one is supposed to display an exception, but note that
+                // XWikiAction also provides currently a fallback to the EntityResourceReferenceHandler if there
+                // is an existing one for the given action.
+                action = this.rootComponentManager.getInstance(LegacyAction.class);
+            } catch (ComponentLookupException e) {
+                throw new ServletException("Failed to lookup the default action", e);
+            }
+        }
+        try {
+            action.execute(req, resp);
+        } catch (Exception e) {
+            throw new ServletException("Failed to execute the action with name [" + actionName + "]", e);
         }
     }
 

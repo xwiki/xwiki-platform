@@ -95,7 +95,7 @@ class LiveDataMacroTest
     void executeWithoutParams() throws Exception
     {
         String expectedConfig = json("{'query':{'source':{}},'meta':{'pagination':{}}}");
-        String expected = "<div class=\"liveData\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
+        String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);
         assertBlocks(expected, blocks, this.rendererFactory);
@@ -133,7 +133,7 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData\" id=\"test\" data-config=\""
+        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
             + escapeXML(json(expectedConfig.toString())) + "\"></div>";
 
         LiveDataMacroParameters parameters = new LiveDataMacroParameters();
@@ -192,7 +192,7 @@ class LiveDataMacroTest
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
-        String expected = "<div class=\"liveData\" id=\"test\" data-config=\""
+        String expected = "<div class=\"liveData loading\" id=\"test\" data-config=\""
             + escapeXML(json(expectedConfig.toString())) + "\"></div>";
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", null);

@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
  * @since 12.10
  */
 @ComponentTest
-public class LiveTableRequestHandlerTest
+class LiveTableRequestHandlerTest
 {
     @InjectMockComponents
     private LiveTableRequestHandler handler;
@@ -195,6 +195,28 @@ public class LiveTableRequestHandlerTest
         }));
 
         verify(this.xcontext).setFinished(false);
+    }
+
+    @Test
+    void getLiveTableResultsEmptyFilter()
+    {
+        Map<String, String[]> expectedRequestParams = new HashMap<>();
+        expectedRequestParams.put("title/join_mode", new String[] { "OR" });
+        expectedRequestParams.put("reqNo", new String[] { "1" });
+        expectedRequestParams.put("outputSyntax", new String[] { "plain" });
+        expectedRequestParams.put("title", new String[] { "-" });
+        expectedRequestParams.put("title_match", new String[] { "empty" });
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        liveDataQuery.setFilters(Collections.singletonList(new Filter("title", "empty", "")));
+        this.handler.getLiveTableResults(liveDataQuery, () -> null);
+
+        ArgumentCaptor<XWikiRequest> requestCaptor = ArgumentCaptor.forClass(XWikiRequest.class);
+        verify(this.xcontext, times(2)).setRequest(requestCaptor.capture());
+        List<XWikiRequest> requests = requestCaptor.getAllValues();
+
+        assertRequestParameters(expectedRequestParams, requests.get(0).getParameterMap());
+        assertSame(this.originalRequest, requests.get(1));
     }
 
     private void assertRequestParameters(Map<String, String[]> expectedParams, Map<String, String[]> actualParams)

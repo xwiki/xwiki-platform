@@ -43,4 +43,10 @@ public class AllITs
     class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
     {
     }
+
+    @Nested
+    @DisplayName("Orphaned Pages Page UI")
+    class NestedOrphanedPagesIT extends OrphanedPagesIT
+    {
+    }
 }

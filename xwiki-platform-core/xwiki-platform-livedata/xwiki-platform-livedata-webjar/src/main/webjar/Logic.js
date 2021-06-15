@@ -165,7 +165,6 @@ define('xwiki-livedata', [
         "panel.filter.addProperty",
         "panel.filter.delete",
         "panel.filter.deleteAll",
-        "panel.filter.emptyLabel",
         "panel.properties.title",
         "panel.sort.title",
         "panel.sort.noneSortable",
@@ -178,6 +177,7 @@ define('xwiki-livedata', [
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "filter.list.emptyLabel",
       ],
     });
 

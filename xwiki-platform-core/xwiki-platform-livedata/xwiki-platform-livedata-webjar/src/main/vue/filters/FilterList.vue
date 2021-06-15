@@ -73,8 +73,8 @@ export default {
             // When no values are selected, simply remove the filter.
             this.removeFilter();
           } else if (value !== this.value) {
-            // If the selected value has an empty value, than use the empty filter, other use the equals filter.
-            this.applyFilter(value, value === '' ? 'empty' : 'equals');
+            // If the selected value has an empty value, than use the empty filter, otherwise use the contains filter.
+            this.applyFilter(value, value === '' ? 'empty' : 'contains');
           }
         },
       };
@@ -102,30 +102,30 @@ export default {
       return (text, callback) => {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace('{encodedQuery}', encodeURIComponent(text));
-        $.getJSON(searchURL, searchParams).then(this.getResultsAdapter()).done(callback).fail(callback);
+        $.getJSON(searchURL, searchParams)
+          .done((results) => callback(this.getResultsAdapter(results)))
+          .fail(() => callback(this.getResultsAdapter()));
       };
     },
 
-    getResultsAdapter() {
-      return results => {
-        let adaptedResults = [];
-        if (Array.isArray(results)) {
-          adaptedResults = results;
-        } else if (Array.isArray(results?.propertyValues)) {
-          adaptedResults = results.propertyValues.map(this.getSuggestion);
-        }
+    getResultsAdapter(results) {
+      let adaptedResults = [];
+      if (Array.isArray(results)) {
+        adaptedResults = results;
+      } else if (Array.isArray(results?.propertyValues)) {
+        adaptedResults = results.propertyValues.map(this.getSuggestion);
+      }
 
-        // An empty option is automatically added to the results only when hasEmptyOperator is true, no empty 
-        // option is already found, and we are not in an advanced filter panel.
-        if (!this.isAdvanced && this.hasEmptyOperator && !adaptedResults.some((value) => value.value === '')) {
-          adaptedResults.unshift({
-            value: '',
-            label: this.$t('livedata.panel.filter.emptyLabel')
-          })
-        }
+      // An empty option is automatically added to the results only when hasEmptyOperator is true, no empty 
+      // option is already found, and we are not in an advanced filter panel.
+      if (!this.isAdvanced && this.hasEmptyOperator && !adaptedResults.some((value) => value.value === '')) {
+        adaptedResults.unshift({
+          value: '',
+          label: this.$t('livedata.filter.list.emptyLabel')
+        })
+      }
 
-        return adaptedResults;
-      };
+      return adaptedResults;
     },
 
     // Convert the fetched data to the format expected by the selectize widget.

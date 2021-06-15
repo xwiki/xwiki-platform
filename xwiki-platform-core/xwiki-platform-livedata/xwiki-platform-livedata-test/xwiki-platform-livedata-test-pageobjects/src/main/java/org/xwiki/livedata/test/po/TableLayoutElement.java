@@ -19,11 +19,15 @@
  */
 package org.xwiki.livedata.test.po;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -34,7 +38,10 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -64,6 +71,8 @@ public class TableLayoutElement extends BaseElement
 
         private final String link;
 
+        private final URI linkUri;
+
         /**
          * Initializes the matcher with the expected text and link.
          *
@@ -74,6 +83,7 @@ public class TableLayoutElement extends BaseElement
         {
             this.text = text;
             this.link = link;
+            this.linkUri = URI.create(this.link);
         }
 
         @Override
@@ -83,8 +93,27 @@ public class TableLayoutElement extends BaseElement
             return item.findElements(By.tagName("a"))
                 .stream()
                 .anyMatch(aTag -> Objects.equals(aTag.getText(), this.text)
-                    && (Objects.equals(aTag.getAttribute(hrefAttribute), this.link)
-                    || Objects.equals(aTag.getAttribute(hrefAttribute), this.link + '/')));
+                    && Objects.equals(linkUri, removeTrailingSlash(aTag.getAttribute(hrefAttribute))));
+        }
+
+        private URI removeTrailingSlash(String href)
+        {
+            URI initialUri = URI.create(href);
+            URIBuilder uriBuilder = new URIBuilder(initialUri);
+            List<String> pathSegments = uriBuilder.getPathSegments();
+            URI uri;
+            if (pathSegments.get(pathSegments.size() - 1).equals("")) {
+                pathSegments.remove(pathSegments.size() - 1);
+                try {
+                    uri = uriBuilder.setPathSegments(pathSegments).build();
+                } catch (URISyntaxException e) {
+                    uri = initialUri;
+                }
+            } else {
+                uri = initialUri;
+            }
+
+            return uri;
         }
 
         @Override
@@ -211,24 +240,64 @@ public class TableLayoutElement extends BaseElement
      * Assert if the column contains a delete action.
      *
      * @param columnName the column name
-     * @param documentReference the document reference subject of the delete action
+     * @param entityReference the entity reference subject of the delete action
      * @since 13.5RC1
      */
-    public void assertCellWithDeleteAction(String columnName, DocumentReference documentReference)
+    public void assertCellWithDeleteAction(String columnName, EntityReference entityReference)
     {
-        assertCellWithLink(columnName, "Delete", urlWithoutFormToken(documentReference, "delete"));
+        assertCellWithLink(columnName, "Delete", urlWithoutFormToken(entityReference, "delete"));
     }
 
     /**
      * Assert if the column contains an edit action.
      *
      * @param columnName the column name
-     * @param documentReference the document reference subject of the edit action
+     * @param entityReference the entity reference subject of the edit action
      * @since 13.5RC1
      */
-    public void assertCellWithEditAction(String columnName, DocumentReference documentReference)
+    public void assertCellWithEditAction(String columnName, EntityReference entityReference)
     {
-        assertCellWithLink(columnName, "Edit", urlWithoutFormToken(documentReference, "edit"));
+        assertCellWithLink(columnName, "Edit", urlWithoutFormToken(entityReference, "edit"));
+    }
+
+    /**
+     * Assert if the column contains an edit action.
+     *
+     * @param columnName the column name
+     * @param entity the entity reference subject of the edit action
+     * @since 13.5RC1
+     */
+    public void assertCellWithCopyAction(String columnName, EntityReference entity)
+    {
+        assertCellWithLink(columnName, "Copy", getUtil().getURL(entity, "view", "xpage=copy"));
+    }
+
+    /**
+     * Assert if the column contains an edit action.
+     *
+     * @param columnName the column name
+     * @param entityReference the entity reference subject of the edit action
+     * @since 13.5RC1
+     */
+    public void assertCellWithRenameAction(String columnName, EntityReference entityReference)
+    {
+        assertCellWithLink(columnName, "Rename", getUtil().getURL(entityReference, "view", "xpage=rename&step=1"));
+    }
+
+    /**
+     * Assert if the column contains an edit action.
+     *
+     * @param columnName the column name
+     * @param entityReference the entity reference subject of the edit action
+     * @since 13.5RC1
+     */
+    public void assertCellWithRightsAction(String columnName, EntityReference entityReference)
+    {
+        DocumentReference webPreferencesReference = new DocumentReference("WebPreferences",
+            (SpaceReference) entityReference.extractReference(EntityType.SPACE));
+        assertCellWithLink(columnName, "Rights",
+            urlWithoutFormToken(
+                getUtil().getURL(webPreferencesReference, "admin", "editor=spaceadmin&section=PageRights")));
     }
 
     /**
@@ -631,8 +700,31 @@ public class TableLayoutElement extends BaseElement
         return element.getAttribute(CLASS_HTML_ATTRIBUTE).split("\\s+");
     }
 
-    private String urlWithoutFormToken(DocumentReference documentReference, String edit)
+    private String urlWithoutFormToken(EntityReference entityReference, String action)
     {
-        return getUtil().getURL(documentReference, edit, "").replaceAll("\\?form_token=.+$", "");
+        return urlWithoutFormToken(getUtil().getURL(entityReference, action, ""));
+    }
+
+    /**
+     * Remove the {@code form_token} path parameter from an url.
+     *
+     * @param url the url to clean up
+     * @return the cleanup url, without the {@code form_token} path parameter
+     */
+    private String urlWithoutFormToken(String url)
+    {
+        URI initialUri = URI.create(url);
+        URIBuilder uriBuilder = new URIBuilder(initialUri);
+        List<NameValuePair> cleanedUpParams = uriBuilder.getQueryParams().stream()
+            .filter(it -> !Objects.equals(it.getName(), "form_token"))
+            .collect(Collectors.toList());
+        uriBuilder.setParameters(cleanedUpParams);
+        URI uri;
+        try {
+            uri = uriBuilder.build();
+        } catch (URISyntaxException e) {
+            uri = initialUri;
+        }
+        return uri.toASCIIString();
     }
 }

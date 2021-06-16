@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.AdminCustomRightsSheet" locale="">
+<xwikidoc version="1.4" reference="XWiki.AdminExtensionRightsSheet" locale="">
   <web>XWiki</web>
-  <name>AdminCustomRightsSheet</name>
+  <name>AdminExtensionRightsSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>AdminCustomRightsSheet</title>
+  <title>AdminExtensionRightsSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -50,7 +50,7 @@
 {{/html}}
 {{/velocity}}</content>
   <object>
-    <name>XWiki.AdminCustomRightsSheet</name>
+    <name>XWiki.AdminExtensionRightsSheet</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>bad3af00-4a01-48b8-94ca-2111b758d219</guid>
@@ -265,7 +265,7 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute>{{include reference="XWiki.AdminCustomRightsSheet" /}}</codeToExecute>
+      <codeToExecute>{{include reference="XWiki.AdminExtensionRightsSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -280,7 +280,7 @@
       <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
-      <displayInSection>usersgroups.customrights</displayInSection>
+      <displayInSection>usersgroups.extensionrights</displayInSection>
     </property>
     <property>
       <heading/>

@@ -43,7 +43,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #set ($standardRights = ['view', 'comment', 'edit', 'script', 'delete', 'admin', 'register', 'programming', 'login',
   'createwiki'])
 #set ($sectionWikiRights = "wikis.rights")
-#set ($sectionExtensionRights = "usersgroups.customrights")
+#set ($sectionExtensionRights = "usersgroups.extensionrights")
+#set ($isStandardRights = false)
 #if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
@@ -62,6 +63,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
   #set ($allowWins = [5, 6, 7])
+  #set ($isStandardRights = true)
 #end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
@@ -250,7 +252,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   ## Global settings: mandatory authentication for view/edit, captcha
   #set ($guest_comment_captcha_prop = $targetDocument.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
   #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop)
-  && $request.section != $sectionWikiRights && $request.section != $sectionExtensionRights)
+  && $isStandardRights)
     <dl class="rights-settings">
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
@@ -357,11 +359,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin' && $request.section != $sectionWikiRights && $request.section != $sectionExtensionRights)
+    #if("$!editor" == 'globaladmin' && $isStandardRights)
       Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
-    #if($guest_comment_captcha_prop && $request.section != 'wikis.rights')
+    #if($guest_comment_captcha_prop && $isStandardRights)
       Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
       return true;

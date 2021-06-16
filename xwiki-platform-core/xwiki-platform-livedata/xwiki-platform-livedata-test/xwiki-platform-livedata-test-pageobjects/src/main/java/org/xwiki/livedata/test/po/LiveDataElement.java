@@ -22,6 +22,8 @@ package org.xwiki.livedata.test.po;
 import java.util.Arrays;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -72,8 +74,17 @@ public class LiveDataElement extends BaseElement
         // This div is replaced by the Live Data Vue template once vue is loaded.
         getDriver().waitUntilCondition(
             input -> {
-                String[] classes = getDriver().findElement(By.id(this.id)).getAttribute("class").split("\\s+");
-                return !Arrays.asList(classes).contains("loading");
+                try {
+                    String[] classes =
+                        getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class")
+                            .split("\\s+");
+                    return !Arrays.asList(classes).contains("loading");
+                } catch (NoSuchElementException | StaleElementReferenceException e) {
+                    // If there is no such element that mean the Live data is not loaded yet (or is missing).
+                    // If the element is stale, that means the element was removed from the DOM in the meantime, because
+                    // the initial div produced by the live data macro was replaced by the Vue template.
+                    return false;
+                }
             });
 
         // Then, once the Vue template is loaded, a div with the loading class is inserted until the rest of the data 

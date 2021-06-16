@@ -242,7 +242,7 @@ public class LiveTableRequestHandler
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
                 .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
                 .collect(Collectors.toList());
-            requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[values.size()]));
+            requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
 
             // Add a value to the empty fields since otherwise they are dismissed by LiveTableResultMacros.
             // Changing the handling of empty values in the result templates is dangerous and could lead to regressions 

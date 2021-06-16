@@ -246,6 +246,11 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   var isSelectizeValueUpToDate = function(input) {
     var expectedValues = $(input).val();
+    if (expectedValues === null && $(input).attr('multiple')) {
+      // Prior to jQuery 3.0 the returned value is null when the select input has multiple selection and there's no
+      // value selected.
+      expectedValues = [];
+    }
     var actualValues = input.selectize.getValue();
     if (Array.isArray(expectedValues)) {
       return Array.isArray(actualValues) && actualValues.length === expectedValues.length &&

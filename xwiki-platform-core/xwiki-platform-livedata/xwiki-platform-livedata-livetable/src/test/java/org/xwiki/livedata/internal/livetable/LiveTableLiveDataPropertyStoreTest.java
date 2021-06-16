@@ -172,10 +172,10 @@ class LiveTableLiveDataPropertyStoreTest
             + "'type':'Computed','displayer':{'id':'xObjectProperty'}},");
         expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
             + "'type':'List','sortable':false,'displayer':{'id':'xObjectProperty'},"
-            + "'filter':{'id':'list','operators':[{'id':'equals'}],"
+            + "'filter':{'id':'list','operators':[{'id':'empty'},{'id':'equals'}],"
             + "'searchURL':'/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}'}},");
         expectedClassProps.append("{'id':'levels','type':'Levels','displayer':{'id':'xObjectProperty'},"
-            + "'filter':{'id':'list','options':['edit','delete']}}");
+            + "'filter':{'id':'list','operators':[{'id':'empty'}],'options':['edit','delete']}}");
 
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 

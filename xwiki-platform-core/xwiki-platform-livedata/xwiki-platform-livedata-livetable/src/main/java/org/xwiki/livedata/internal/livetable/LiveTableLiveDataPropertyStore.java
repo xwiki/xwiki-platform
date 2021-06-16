@@ -41,7 +41,6 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
-import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.model.reference.DocumentReference;
@@ -146,6 +145,7 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         descriptor.setDisplayer(new DisplayerDescriptor("xObjectProperty"));
         if (xproperty instanceof ListClass) {
             descriptor.setFilter(new FilterDescriptor("list"));
+            descriptor.getFilter().addOperator("empty", null);
             if (xproperty instanceof LevelsClass) {
                 descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext));
             } else {
@@ -155,7 +155,7 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
                 // The default live table results page currently supports only exact matching for list properties with
                 // multiple selection and no relational storage (selected values are stored concatenated on a single
                 // database column).
-                descriptor.getFilter().setOperators(Collections.singletonList(new OperatorDescriptor("equals", null)));
+                descriptor.getFilter().addOperator("equals", null);
             }
         } else if (xproperty instanceof DateClass) {
             String dateFormat = ((DateClass) xproperty).getDateFormat();

@@ -23,7 +23,9 @@
 -->
 <template>
   <!-- A simple text input that will be enhanced by the selectize widget. -->
-  <input :value="value" class="filter-list" ref="input"/>
+  <span v-show="isVisible">
+    <input :value="value" class="filter-list livedata-filter" ref="input"/>
+  </span>
 </template>
 
 <script>
@@ -37,6 +39,13 @@ export default {
 
   // Add the filterMixin to get access to all the generic filter methods and computed properties inside this component.
   mixins: [filterMixin],
+
+  props: {
+    isAdvanced: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   computed: {
     // Current value of the filter entry.
@@ -60,8 +69,12 @@ export default {
         // * the user can still add more values by adding more constraints from the advanced filtering panel
         maxItems: 1,
         onChange: value => {
-          if (value !== this.value) {
-            this.applyFilter(value);
+          if (this.$refs.input.selectize.items.length === 0) {
+            // When no values are selected, simply remove the filter.
+            this.removeFilter();
+          } else if (value !== this.value) {
+            // If the selected value has an empty value, than use the empty filter, otherwise use the contains filter.
+            this.applyFilter(value, value === '' ? 'empty' : 'contains');
           }
         },
       };
@@ -73,6 +86,14 @@ export default {
       }
       return settings;
     },
+
+    isVisible() {
+      // We do not show this component when the type of filter is 'Empty' and we are in the advanced filtering panel.  
+      return this.filterEntry.operator !== 'empty' || !this.isAdvanced
+    },
+    hasEmptyOperator() {
+      return this.config.operators.some(it => it.id === 'empty');
+    }
   },
 
   methods: {
@@ -81,20 +102,30 @@ export default {
       return (text, callback) => {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace('{encodedQuery}', encodeURIComponent(text));
-        $.getJSON(searchURL, searchParams).then(this.getResultsAdapter()).done(callback).fail(callback);
+        $.getJSON(searchURL, searchParams)
+          .done((results) => callback(this.getResultsAdapter(results)))
+          .fail(() => callback(this.getResultsAdapter()));
       };
     },
 
-    getResultsAdapter () {
-      return results => {
-        if (Array.isArray(results)) {
-          return results;
-        } else if (Array.isArray(results?.propertyValues)) {
-          return results.propertyValues.map(this.getSuggestion);
-        } else {
-          return [];
-        }
-      };
+    getResultsAdapter(results) {
+      let adaptedResults = [];
+      if (Array.isArray(results)) {
+        adaptedResults = results;
+      } else if (Array.isArray(results?.propertyValues)) {
+        adaptedResults = results.propertyValues.map(this.getSuggestion);
+      }
+
+      // An empty option is automatically added to the results only when hasEmptyOperator is true, no empty 
+      // option is already found, and we are not in an advanced filter panel.
+      if (!this.isAdvanced && this.hasEmptyOperator && !adaptedResults.some((value) => value.value === '')) {
+        adaptedResults.unshift({
+          value: '',
+          label: this.$t('livedata.filter.list.emptyLabel')
+        })
+      }
+
+      return adaptedResults;
     },
 
     // Convert the fetched data to the format expected by the selectize widget.

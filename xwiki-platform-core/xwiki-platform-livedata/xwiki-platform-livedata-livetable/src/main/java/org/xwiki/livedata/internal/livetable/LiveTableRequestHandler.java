@@ -243,6 +243,15 @@ public class LiveTableRequestHandler
                 .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
                 .collect(Collectors.toList());
             requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
+
+            // Add a value to the empty fields since otherwise they are dismissed by LiveTableResultMacros.
+            // Changing the handling of empty values in the result templates is dangerous and could lead to regressions 
+            // when the livetable clients expected empty values to simply be dismissed.
+            for (int i = 0; i < matchType.size(); i++) {
+                if (Objects.equals(matchType.get(i), "empty")) {
+                    requestParams.get(filter.getProperty())[i] = "-";
+                }
+            }
         }
     }
 }

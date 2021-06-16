@@ -423,7 +423,7 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = findColumnIndex(columnLabel);
         WebElement element = getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) > input", columnIndex)));
+            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
 
         List<String> classes = Arrays.asList(getClasses(element));
         if (classes.contains("filter-list")) {

@@ -69,15 +69,24 @@ export default {
   },
 
   methods: {
-    // This method should be used to apply filter
-    // As only the newValue has to be specified it is less error prone
-    applyFilter: function (newValue) {
+    // This method should be used to apply filter.
+    // Since only the newValue has to be specified it is less error prone.
+    applyFilter: function (newValue, filterOperator=undefined) {
       // Once a filter is applied, the filtering state is switched to true.
       // The filtering state is switched to false only once the filtering is finished.
       this.$emit('update:isFiltering', true);
-      this.logic.filter(this.propertyId, this.index, {value: newValue})
+      this.logic.filter(this.propertyId, this.index, {value: newValue}, {filterOperator})
         .finally(() => {
           // Whatever the filter promise result, the filtering state is switched to false.
+          this.$emit('update:isFiltering', false);
+        });
+    },
+
+    removeFilter: function () {
+      this.$emit('update:isFiltering', true);
+      this.logic.removeFilter(this.propertyId, this.index)
+        .finally(() => {
+          // Whatever the removeFilter promise result, the filtering state is switched to false.
           this.$emit('update:isFiltering', false);
         });
     },

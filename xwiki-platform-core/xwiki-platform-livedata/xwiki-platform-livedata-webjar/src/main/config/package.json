@@ -13,7 +13,8 @@
     "vue-i18n": "8.15.5",
     "lz-string": "^1.4.4",
     "u-node": "^0.0.2",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^2.24.3",
+    "vue-tippy": "^4.10.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.11",

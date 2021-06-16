@@ -50,11 +50,18 @@
 // eslint-disable-next-line camelcase
 __webpack_public_path__ = window.liveDataBaseURL;
 
+import Vue from "vue";
+import VueTippy from "vue-tippy";
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
 import LivedataFootnotes from "./footnotes/LivedataFootnotes";
 
+// Declare vue plugins here
+// We can't declare vue plugins during initialization inside logic.js
+// because we are using in logic.js external webjars dependencies from RequireJs,
+// and not dependencies from nodejs package.json
+Vue.use(VueTippy);
 
 export default {
 

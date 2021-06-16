@@ -160,4 +160,18 @@
     <allowUser type="login" name="userA" />
     <allowUser type="script" name="userA" />
   </wiki>
+  <wiki name="wikiGroupAllowAdminUserDeny" alt="a wiki with a conflicting of groupA allow Admin/userA deny all but Admin">
+    <user name="userA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+    <allowGroup type="admin" name="groupA" />
+    <denyUser type="view" name="userA" />
+    <denyUser type="edit" name="userA" />
+    <denyUser type="comment" name="userA" />
+    <denyUser type="delete" name="userA" />
+    <denyUser type="register" name="userA" />
+    <denyUser type="login" name="userA" />
+    <denyUser type="script" name="userA" />
+  </wiki>
 </wikis>

@@ -53,6 +53,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
     {
         Set<Right> enabledRights = Right.getEnabledRights(entry.getReference().getSecurityType());
         Set<Right> fromUser = new RightSet();
+        Set<Right> fromGroup = new RightSet();
         Set<Right> allowed = new RightSet();
 
         XWikiSecurityAccess access = new XWikiSecurityAccess();
@@ -64,9 +65,9 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
                     if (rule.getState() == ALLOW) {
                         allowed.add(right);
                     }
-                    resolveLevel(right, user, groups, rule, access, policies, fromUser);
+                    resolveLevel(right, user, groups, rule, access, policies, fromUser, fromGroup);
                     if (access.get(right) == ALLOW) {
-                        implyRights(right, access, enabledRights, policies, fromUser);
+                        implyRights(right, access, enabledRights, policies, fromUser, fromGroup);
                     }
                 }
             }
@@ -92,7 +93,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
      * @param fromUser the set of right that have been set by a user rule.
      */
     private void implyRights(Right right, XWikiSecurityAccess access, Set<Right> enabledRights, Policies policies,
-        Set<Right> fromUser)
+        Set<Right> fromUser, Set<Right> fromGroup)
     {
         Set<Right> impliedRights = right.getImpliedRights();
         if (impliedRights != null) {
@@ -100,13 +101,22 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
                 if (impliedRights.contains(enabledRight)) {
                     // set the policies of the implied right to the policies of the original right
                     policies.set(enabledRight, right);
-                    if (fromUser.contains(enabledRight) == fromUser.contains(right)) {
+                    // FIXME: this check alone is not correct since if a group declare rules, but not the user
+                    // they will never be taken into account.
+                    // I tried to introduce the fromGroup set to fix that, but it's not working as I'd expect
+                    // Note that the original check "fromUser.contains(enabledRight) == fromUser.contains(right)"
+                    // is fundamentally wrong since it doesn't take into account the fact that some rules
+                    // can be defined at group level
+                    if (fromUser.contains(enabledRight)) {
                         // Conflict Implied user/group right, user/group right
                         resolveConflict(ALLOW, enabledRight, access, policies);
                     } else if (fromUser.contains(right)) {
                         // Implied user right win over group right
                         access.set(enabledRight, ALLOW);
                         fromUser.add(enabledRight);
+                    } else if (fromGroup.contains(right)) {
+                        // Conflict Implied user/group right, user/group right
+                        resolveConflict(ALLOW, enabledRight, access, policies);
                     }
                 }
             }
@@ -126,7 +136,7 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
      * @param fromUser the set of right that have been set by a user rule.
      */
     private void resolveLevel(Right right, UserSecurityReference user, Collection<GroupSecurityReference> groups,
-        SecurityRule rule, XWikiSecurityAccess access, Policies policies, Set<Right> fromUser)
+        SecurityRule rule, XWikiSecurityAccess access, Policies policies, Set<Right> fromUser, Set<Right> fromGroup)
     {
         RuleState state = rule.getState();
 
@@ -148,6 +158,9 @@ public class DefaultAuthorizationSettler extends AbstractAuthorizationSettler
                 if (rule.match(group)) {
                     // Conflict between group rights
                     resolveConflict(state, right, access, policies);
+                    if (access.get(right) == ALLOW) {
+                        fromGroup.add(right);
+                    }
                     break;
                 }
             }

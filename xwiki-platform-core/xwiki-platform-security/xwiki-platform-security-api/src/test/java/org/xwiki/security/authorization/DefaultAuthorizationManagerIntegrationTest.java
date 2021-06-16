@@ -591,6 +591,8 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(null, getUser("userA", "wikiGroupUserAllowDenyNoAdmin"), getWiki("wikiGroupUserAllowDenyNoAdmin"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI, getUser("userA", "wikiGroupUserDenyAllowNoAdmin"),
             getWiki("wikiGroupUserDenyAllowNoAdmin"));
+        assertAccess(ALL_RIGHTS, getUser("userA", "wikiGroupAllowAdminUserDeny"),
+            getWiki("wikiGroupAllowAdminUserDeny"));
     }
 
     @Test

@@ -70,7 +70,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     const url = `${baseURL}${encodedSourceId}/entries/${encodedEntryId}/properties/${encodedPropertyId}`
     return addSourcePathParameters(source, url);
   }
-  
+
   function getEntryURL(source, entryId) {
     const encodedSourceId = encodeURIComponent(source.id);
     const encodedEntryId = encodeURIComponent(entryId);
@@ -96,7 +96,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   var addEntry = function(source, entry) {
     return Promise.resolve($.post(getEntriesURL(source), entry).then(e => e.values));
   };
-  
+
   function updateEntry(source, entryId, values) {
     return Promise.resolve($.ajax({
       type: 'PUT',

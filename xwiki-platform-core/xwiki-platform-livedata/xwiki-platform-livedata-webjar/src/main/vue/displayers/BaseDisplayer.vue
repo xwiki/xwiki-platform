@@ -27,13 +27,27 @@
   instead of reimplementing the whole displayer logic each time.
 -->
 <template>
-  <Popover :popover-root="this.$refs.displayerRoot">
-    <template #default>
-      <div :class="{view: isView, edit: !isView}" ref="displayerRoot" @dblclick="setEdit"
-           @keypress.self.enter="setEdit">
+  <TippyComponent
+    class="displayer-actions-popover"
+    interactive
+    trigger="manual"
+    theme="light-border"
+    placement="bottom-start"
+    arrow
+    :visible="isPopoverVisible"
+  >
+    <template #trigger>
+
+      <div
+        :class="{ view: isView, edit: !isView }"
+        ref="displayerRoot"
+        @click="showPopover = !showPopover"
+        @dblclick="setEdit"
+        @keypress.self.enter="setEdit"
+      >
         <!--
           The base displayer contains three slots: `viewer`, `editor`, and `loading`.
-          It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is 
+          It displays `viewer` or `loading` according to its current state: `this.isView` when `this.isLoading` is
           false, and `loading` otherwise.
         -->
 
@@ -82,19 +96,29 @@
         </slot>
       </div>
     </template>
-    <template #popover v-if="isEditable && isView">
-      <SelectAllAction :target="$refs.displayerRoot" :title="$t('TODO')"/>
-      <slot name="popover-actions"></slot>
+
+    <!-- Popover content -->
+    <template>
+      <div class="displayer-action-list">
+        <ActionEdit
+          :displayer="{
+            isEditable,
+            setEdit: () => void setEdit()
+          }"
+        />
+        <slot name="popover-actions"></slot>
+      </div>
     </template>
-  </Popover>
+
+  </TippyComponent>
 </template>
 
 
 <script>
+import { TippyComponent } from "vue-tippy";
 import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
-import Popover from "./popover/Popover";
-import SelectAllAction from "./popover/actions/SelectAllAction";
+import ActionEdit from "./actions/ActionEdit.vue";
 
 export default {
 
@@ -104,9 +128,15 @@ export default {
   mixins: [displayerMixin],
 
   components: {
-    SelectAllAction,
-    Popover,
     XWikiLoader,
+    TippyComponent,
+    ActionEdit,
+  },
+
+  data () {
+    return {
+      showPopover: false,
+    };
   },
 
   props: {
@@ -140,7 +170,7 @@ export default {
       const noOtherEditing = this.logic.getEditBus().isEditable()
       return editable && noOtherEditing;
     },
-isViewable() {
+    isViewable() {
       var empty = this.isEmpty;
       if (empty === undefined) {
         empty = !this.value
@@ -150,7 +180,17 @@ isViewable() {
         this.logic.footnotes.put('*', 'livedata.footnotes.propertyNotViewable');
       }
       return isViewable;
+    },
+    hasActions () {
+      return this.isEditable || this.$slots["popover-actions"];
+    },
+
+    isPopoverVisible () {
+      if (!this.isView) return false;
+      if (!this.hasActions) return false;
+      return this.showPopover;
     }
+
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -168,7 +208,7 @@ isViewable() {
     // The validation of the edited property is done once the whole entry is done editing.
     applyEdit() {
       // When the #edit slot is not the default, the editValue field is overloaded and is always undefined.
-      // When receiving a saveEdit event, the passed value can then be ignored since the overloaded slot has it own 
+      // When receiving a saveEdit event, the passed value can then be ignored since the overloaded slot has it own
       // field.
       this.$emit('saveEdit', this.editedValue);
       // Go back to view mode
@@ -184,26 +224,35 @@ isViewable() {
 
       // Switches to view mode.
       this.$emit('update:isView', true);
+    },
+
+    outsideClickHandler (e) {
+      if (this.isView) { return; }
+      const editBlock = this.$refs['editBlock'];
+      if (editBlock.contains(e.target)) { return; }
+      // Wait a little before switching back to view mode, otherwise the change case cause a column width change
+      // and make the user click on the wrong column, for instance when trying to edit the next column by double
+      // clicking on it.
+      setTimeout(() => this.applyEdit(), 200);
+    },
+  },
+
+  watch: {
+    isView (isView) {
+      // Monitors clicks outside of the current cell.
+      // We switch back to view mode whenever a click is done outside of the current cell.
+      // The handler is bound dynamically when the display pass to edit mode for two reasons:
+      // - we don't have a event listener bound on document for every displayer of the livedata at the same time
+      // - We don't immediately leave edit mode by losing focus when we click on the edit action button
+      console.log("isview?", isView);
+      if (isView) {
+        document.removeEventListener("click", this.outsideClickHandler);
+      } else {
+        document.addEventListener("click", this.outsideClickHandler);
+      }
     }
   },
-  mounted() {
-    // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of 
-    // the current cell.
-    document.addEventListener("click", (evt) => {
-      if (!this.isView) {
-        const editBlock = this.$refs['editBlock'];
 
-        if (editBlock.contains(evt.target)) {
-          return;
-        }
-
-        // Wait a little before switching back to view mode, otherwise the change case cause a column width change 
-        // and make the user click on the wrong column, for instance when trying to edit the next column by double 
-        // clicking on it.
-        setTimeout(() => this.applyEdit(), 200);
-      }
-    })
-  }
 };
 
 </script>
@@ -245,6 +294,28 @@ isViewable() {
 .livedata-displayer .popover {
   width: auto;
   height: auto;
+}
+
+</style>
+
+<!--
+  We make a separate style tag for styling the tippy actions popover
+  to differentiate as it is styling an external component of the livedata,
+  and also because the popover is append inside the body tag of the page
+  so if one day we refactor this SPA to make the style tags using the `scoped` attribute
+  the displayer-actions-popover styles should not be scoped with the rest of the component
+-->
+<style lang="less">
+
+.displayer-actions-popover .tippy-content {
+  font-size: 1.3rem;
+
+  .displayer-action-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: right;
+  }
 }
 
 </style>

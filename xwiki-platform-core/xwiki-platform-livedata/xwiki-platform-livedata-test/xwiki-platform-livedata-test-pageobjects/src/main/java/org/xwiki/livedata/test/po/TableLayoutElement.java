@@ -92,8 +92,12 @@ public class TableLayoutElement extends BaseElement
             String hrefAttribute = "href";
             return item.findElements(By.tagName("a"))
                 .stream()
-                .anyMatch(aTag -> Objects.equals(aTag.getText(), this.text)
-                    && Objects.equals(linkUri, removeTrailingSlash(aTag.getAttribute(hrefAttribute))));
+                .anyMatch(aTag -> {
+                    String href = aTag.getAttribute(hrefAttribute);
+                    return Objects.equals(aTag.getText(), this.text)
+                        && (Objects.equals(linkUri, URI.create(href))
+                        || Objects.equals(linkUri, removeTrailingSlash(href)));
+                });
         }
 
         private URI removeTrailingSlash(String href)
@@ -566,7 +570,7 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {
         return new CellWithLinkMatcher(text, link);
-    } 
+    }
 
     /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest
@@ -654,8 +658,8 @@ public class TableLayoutElement extends BaseElement
     /**
      * Does the steps for the edition of a cell, until the {@code newValue} is set on the requested field. Then call an
      * {@code userAction} (for instance a click outside of the cell, or pressing escape). The {@code userAction} is
-     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally,
-     * waits for the result of the user action to be completed before continuing.
+     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally, waits for the
+     * result of the user action to be completed before continuing.
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)

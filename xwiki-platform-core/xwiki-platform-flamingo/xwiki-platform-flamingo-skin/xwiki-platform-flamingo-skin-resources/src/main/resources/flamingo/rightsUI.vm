@@ -42,8 +42,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 ## for admin, register, programming and createwiki, allow preceedes over deny
 #set ($standardRights = ['view', 'comment', 'edit', 'script', 'delete', 'admin', 'register', 'programming', 'login',
   'createwiki'])
-#set ($sectionWikiRights = "wikis.rights")
-#set ($sectionExtensionRights = "usersgroups.extensionrights")
+#set ($sectionWikiRights = 'wikis.rights')
+#set ($sectionExtensionRights = 'usersgroups.extensionrights')
 #set ($isStandardRights = false)
 #if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})

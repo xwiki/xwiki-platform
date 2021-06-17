@@ -630,8 +630,6 @@ XWiki.Annotation = Class.create({
   displayingAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
-  // flag specifying if the annotations are displayed by default or not
-  displayedByDefault : false,
   // whether the annotations should be displayed as highlighted or only the icons
   displayHighlight : true,
   // add annotation shortcuts
@@ -651,12 +649,11 @@ XWiki.Annotation = Class.create({
   initialize : function (displayHighlighted, annotatedElt, displayedByDefault) {
     this.displayHighlight = displayHighlighted;
     this.annotatedElement = annotatedElt;
-    this.displayedByDefault = displayedByDefault;
 
     // if the annotated element does not exist, don't load anything
     if (!this.annotatedElement) {
       // and show a warning if the annotations should be shown by default
-      if (this.displayedByDefault) {
+      if (displayedByDefault) {
         new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
       }
       return;
@@ -683,14 +680,47 @@ XWiki.Annotation = Class.create({
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
 
-    // and get the annotations if they're loaded by default
-    if (this.displayedByDefault) {
+    // Disable the annotations while the annotated content is edited in-place.
+    this.annotatedElement.observe('xwiki:actions:edit', this.beforeInPlaceEdit.bindAsEventListener(this));
+    this.annotatedElement.observe('xwiki:actions:view', this.afterInPlaceEdit.bindAsEventListener(this));
+
+    if (window.location.hash === '#edit' || window.location.hash === '#translate') {
+      // The annotated content is being edited in-place so we need to postpone the display of the annotations (if asked)
+      // for when we leave the edit mode.
+      this.displayingAnnotations = displayedByDefault;
+    } else if (displayedByDefault) {
       if (XWiki.docsyntax != 'xwiki/1.0') {
+        // Fetch the annotations and display them.
         this.fetchAnnotations(true);
       } else {
         // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
         new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.wrongsyntax')", 'warning');
       }
+    }
+  },
+
+  beforeInPlaceEdit: function() {
+    // We need to restore the annotation visibility after the in-place edit is done.
+    this.shouldDisplayAnnotationsAfterInPlaceEdit = this.displayingAnnotations;
+    // Hide the annotations and close any annotation bubble that may be opened.
+    this.toggleAnnotations(false);
+    // Hide the settings panel.
+    this.settingsPanel?.addClassName('hidden');
+    // Disable the Annotate menu in order to prevent the users from accessing the settings panel while editing. Note
+    // that this also disables indirecly the shortcut keys for adding a new annotation and for showing the existing
+    // annotations (check their handlers).
+    $('tmAnnotationsTrigger')?.up('li')?.addClassName('disabled');
+  },
+
+  afterInPlaceEdit: function() {
+    // Re-enable the Annotate menu so that the users can access the settings panel. This also re-enables the shortcut
+    // keys for adding a new annotation and for showing the existing annotations (check their handlers).
+    $('tmAnnotationsTrigger')?.up('li')?.removeClassName('disabled');
+    // Force the reload of the annotations next time they are shown because the annotated content may have changed.
+    this.fetchedAnnotations = false;
+    // Show the annotations if they were displayed before the annotated content was edited.
+    if (this.shouldDisplayAnnotationsAfterInPlaceEdit) {
+      this.fetchAnnotations(true);
     }
   },
 
@@ -711,8 +741,8 @@ XWiki.Annotation = Class.create({
     var menu = event.element();
     // prevent link
     event.stop();
-    // if another click handling is in progress
-    if (menu.disabled) {
+    // Ignore if another click handling is in progress or if the annotations are disabled (in-place edit in progress).
+    if (menu.disabled || menu.up('li')?.hasClassName('disabled')) {
       return;
     }
     if (window.document.body.hasClassName('skin-flamingo')) {
@@ -746,12 +776,9 @@ XWiki.Annotation = Class.create({
           menu._x_notification.hide();
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
-          // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
-          if (this.displayedByDefault || this.displayingAnnotations) {
-            this.displayAnnotationsCheckbox.checked = true;
-          }
+          // Show this checkbox as checked if the annotations are currently displayed.
+          this.displayAnnotationsCheckbox.checked = this.displayingAnnotations;
           this.attachSettingsListeners();
-          $('tmAnnotations').toggleClassName('active');
         }.bind(this),
 
         onFailure: function(response) {
@@ -774,7 +801,6 @@ XWiki.Annotation = Class.create({
       });
     } else {
       this.settingsPanel.toggleClassName('hidden');
-      $('tmAnnotations').toggleClassName('active');
     }
   },
 
@@ -797,27 +823,23 @@ XWiki.Annotation = Class.create({
   },
 
   toggleAnnotations : function(visible) {
-    // don't standard toggle because we want to ensure it matches visible
     if (this.displayHighlight) {
-      this.annotatedElement.select('.annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+      this.annotatedElement.select('.annotation').invoke('toggleClassName', 'annotation-highlight', !!visible);
     }
-    //and toggle all annotation markers
-    this.annotatedElement.select('.annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
-    this.displayingAnnotations = visible;
+    // Toggle all annotation markers.
+    this.annotatedElement.select('.annotation-marker').invoke('toggleClassName', 'hidden', !visible);
+    this.setAnnotationVisibility(visible);
     if (!visible) {
-      // also close all open bubbles
-      this.bubbles.each(function(bubble){
-        // if it's the create panel, skip it
-        if (bubble != this.createPanel) {
-          bubble.remove();
-        }
-      }.bind(this));
-      this.bubbles.clear();
+      // Close all open bubbles.
+      while (this.bubbles.length) {
+        this.closeOpenBubble();
+      }
     }
   },
 
   toggleAnnotationHighlight : function(annotationId, visible) {
-    this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+    this.annotatedElement.select('.annotation.ID' + annotationId).invoke('toggleClassName', 'annotation-highlight',
+      !!visible);
   },
 
   /**
@@ -906,9 +928,7 @@ XWiki.Annotation = Class.create({
           this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
-          if (this.displayAnnotationsCheckbox) {
-            this.displayAnnotationsCheckbox.checked = true;
-          }
+          this.setAnnotationVisibility(andShow);
         }.bind(this),
 
         onFailure: function(response) {
@@ -918,9 +938,7 @@ XWiki.Annotation = Class.create({
           }
           // show the error message at the bottom
           this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
-          if (this.displayAnnotationsCheckbox) {
-            this.displayAnnotationsCheckbox.checked = false;
-          }
+          this.setAnnotationVisibility(false);
         }.bind(this),
 
         on0: function (response) {
@@ -1049,7 +1067,7 @@ XWiki.Annotation = Class.create({
               }
               this.fetchedAnnotations = true;
               // reload the received annotated content forcing update so that deleting last annotation is reflected in the list of annotations, with scroll to tab if not in bubble
-              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble, true);
+              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble, true);
             }.bind(this),
             onComplete : function() {
               // In the end: re-enable the button
@@ -1321,7 +1339,7 @@ XWiki.Annotation = Class.create({
         }
         this.fetchedAnnotations = true;
         // reload the received annotated content, with scroll to tab
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble);
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble);
       }.bind(this),
       onFailure : function(response) {
         var failureReason = response.statusText;
@@ -1457,7 +1475,10 @@ XWiki.Annotation = Class.create({
   },
 
   onToggleAnnotationsShortcut : function() {
-    if (this.fetchedAnnotations) {
+    if ($('tmAnnotationsTrigger')?.up('li')?.hasClassName('disabled')) {
+      // Annotations are disabled (probably because the annotated content is being edited in-place).
+      return;
+    } else if (this.fetchedAnnotations) {
       this.setAnnotationVisibility(!this.displayingAnnotations);
       this.toggleAnnotations(this.displayingAnnotations);
     } else {
@@ -1487,6 +1508,9 @@ XWiki.Annotation = Class.create({
     // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
     if (XWiki.docsyntax == 'xwiki/1.0') {
       new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
+      return;
+    } else if ($('tmAnnotationsTrigger')?.up('li')?.hasClassName('disabled')) {
+      // Annotations are disabled (probably because the annotated content is being edited in-place).
       return;
     }
     // parse the selection
@@ -1591,9 +1615,7 @@ XWiki.Annotation = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.checked = true;
-        }
+        this.setAnnotationVisibility(true);
         this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
@@ -1620,8 +1642,7 @@ XWiki.Annotation = Class.create({
    */
   refreshAnnotationsOnCommentDelete : function(event) {
     // if the annotations are currently visible, re-fetch the annotations and display them
-    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault;
-    if (visible) {
+    if (this.displayingAnnotations) {
       // Force the reloading in case this annotation was the last one.
       this.fetchAnnotations(true, true);
     } else {

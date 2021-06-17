@@ -692,9 +692,8 @@ define('editInPlace', [
 
   var view = function(xwikiDocument, reload) {
     var viewContent = $('#xwikicontent');
-    var form = viewContent.closest('.form');
     // Destroy the editors before returning to view.
-    form.trigger('xwiki:actions:view', {document: xwikiDocument});
+    viewContent.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
     viewContent.html(xwikiDocument.renderedContent);
     if (!reload) {
@@ -705,7 +704,7 @@ define('editInPlace', [
       $(document).trigger('xwiki:dom:updated', {'elements': viewContent.toArray()});
     }
     // Remove the action events scope.
-    form.removeClass('form');
+    viewContent.closest('.form').removeClass('form');
     // Update the URL.
     if (window.location.hash === '#edit' || window.location.hash === '#translate') {
       history.replaceState(null, null, '#');

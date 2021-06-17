@@ -725,7 +725,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         // FIXME: This is not the best way to go because the Annotations system should be in charge of
         // properly deleting annotations, not the Comments system. Try to find an alternative for the future.
         if (comment.hasClass('annotation')) {
-          document.trigger("xwiki:annotation:tab:deleted");
+          $(document).trigger("xwiki:annotation:tab:deleted");
         }
       },
       error: function() {

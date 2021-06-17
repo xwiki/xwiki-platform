@@ -34,6 +34,7 @@
     :property-id="propertyId"
     :entry="entry"
     :is-view.sync="isView"
+    :is-empty="false"
     @saveEdit="genericSave"
   >
 
@@ -45,8 +46,8 @@
       -->
       <a
         :href="href"
-        :class="{'explicit-empty-value': !htmlValue}"
-        v-html="htmlValue || $t('livedata.displayer.link.noValue')"
+        :class="{'explicit-empty-value': !html && !htmlValue}"
+        v-html="html || htmlValue || $t('livedata.displayer.link.noValue')"
       ></a>
     </template>
 
@@ -60,6 +61,7 @@
 
 <script>
 import displayerMixin from "./displayerMixin.js";
+import displayerLinkMixin from "./displayerLinkMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
 
@@ -72,7 +74,14 @@ export default {
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
-  mixins: [displayerMixin, displayerStatesMixin],
+  mixins: [displayerMixin, displayerLinkMixin, displayerStatesMixin],
+  
+  props: {
+    // An optional html to use instead of the computed htmlValue when displaying the inner html of the link.
+    html: {
+      optional: true
+    }
+  },
 
   computed: {
     // The link href taken from the propertyHref property of the entry
@@ -86,18 +95,6 @@ export default {
       }
       return values.map(value => this.entry[value]).find(value => value) || '#';
     },
-
-    htmlValue () {
-      const container = document.createElement('div');
-      container[this.config.html ? 'innerHTML' : 'textContent'] = this.value;
-      // Remove the interactive content because it isn't allowed inside an anchor element.
-      // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#properties
-      // See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#interactive_content
-      const interactiveContent = 'a, button, details, embed, iframe, keygen, label, select, textarea, audio[controls],'
-        + 'img[usemap], input, menu[type=toolbar], object[usemap], video[controls]';
-      [...container.querySelectorAll(interactiveContent)].forEach(node => node.parentNode.removeChild(node));
-      return container.innerHTML.trim();
-    }
   },
 };
 </script>

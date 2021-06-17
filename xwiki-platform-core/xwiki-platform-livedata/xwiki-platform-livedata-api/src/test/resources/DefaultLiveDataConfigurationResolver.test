@@ -151,7 +151,8 @@
       {"id":"html"},
       {"id":"xObjectProperty"},
       {"id":"actions"},
-      {"id":"boolean"}
+      {"id":"boolean"},
+      {"id":"docTitle"}
     ],
     "defaultDisplayer":"text",
     "pagination":{

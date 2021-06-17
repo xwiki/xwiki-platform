@@ -120,6 +120,11 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
               return true;
             }
           }, editBus)
+        },
+        footnotes: {
+          put() {},
+          reset() {},
+          list() { return []; }
         }
       }, logic),
     },

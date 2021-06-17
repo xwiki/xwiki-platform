@@ -65,4 +65,58 @@ describe('BaseDisplayer.vue', () => {
     expect(events['update:isView'][0]).toEqual([true]);
   })
 
+  it('Renders an non viewable entry with an empty content', () => {
+    const wrapper = initWrapper(BaseDisplayer, {
+      props: {
+        entry: {
+          color: undefined
+        }
+      }
+    });
+
+    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span> <span><sup>*</sup></span></div>');
+  })
+
+  it('Renders a viewable entry with an empty content', () => {
+    const wrapper = initWrapper(BaseDisplayer, {
+      props: {
+        entry: {
+          color: undefined
+        }
+      },
+      logic: {
+        isActionAllowed(action) {
+          return action === 'view';
+        }
+      }
+    });
+
+    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span>\n' +
+      '  <!---->\n' +
+      '</div>');
+  })
+
+  it('Renders an entry when isEmpty is set to false', () => {
+    const wrapper = initWrapper(BaseDisplayer, {
+      props: {
+        entry: {
+          color: undefined
+        },
+        isEmpty: false
+      },
+      logic: {
+        isActionAllowed(action) {
+          return action === 'view';
+        }
+      }
+    });
+
+    // Even when the action is not allowed and the property value is undefined, the '*' is not displayed
+    // if the props isEmpty is set to false.
+    // This is useful when a displayed has his own way to present empty values, such as the link displayer.
+    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span>\n' +
+      '  <!---->\n' +
+      '</div>');
+  })
+
 })

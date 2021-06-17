@@ -26,4 +26,17 @@ describe('DisplayerActions.vue', () => {
     const wrapper = initWrapper(DisplayerActions, {})
     expect(wrapper.text()).toMatch('jump')
   })
+
+  it('Renders an entry with not actions to display', () => {
+    const wrapper = initWrapper(DisplayerActions, {
+      logic: {
+        getDisplayerDescriptor() {
+          return {
+            actions: []
+          };
+        }
+      }
+    })
+    expect(wrapper.text()).toMatch('*')
+  })
 })

@@ -21,7 +21,7 @@
     @click="handler"
   >
     <XWikiIcon :icon-descriptor="icon" />
-    {{ $t("livedata.actions." + id) }}
+    {{ $t("livedata.displayer.actions." + id) }}
   </div>
 </template>
 

@@ -55,6 +55,14 @@
     <!-- Keep the default Editor widget -->
     <template #editor></template>
 
+
+    <!-- poppover actions actions -->
+    <template #popover-actions>
+      <ActionFollowLink
+        :displayer="{ href }"
+     />
+    </template>
+
   </BaseDisplayer>
 </template>
 
@@ -63,6 +71,7 @@
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
 import BaseDisplayer from "./BaseDisplayer.vue";
+import ActionFollowLink from "./actions/ActionFollowLink.vue";
 
 export default {
 
@@ -70,6 +79,7 @@ export default {
 
   components: {
     BaseDisplayer,
+    ActionFollowLink,
   },
 
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component

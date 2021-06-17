@@ -547,7 +547,7 @@ define('xwiki-livedata', [
       entry[propertyId] = value;
       const source = this.data.query.source;
       const entryId = this.getEntryId(entry);
-      // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other 
+      // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other
       // properties of the entry, but also possibly on other entriers, or in the way they are sorted.
       liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
         .then(() => this.updateEntries());
@@ -1365,7 +1365,7 @@ define('xwiki-livedata', [
         this.updateEntries().then(resolve, reject);
       });
     },
-    
+
     //
     // Edit Bus
     //

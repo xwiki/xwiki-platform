@@ -35,10 +35,10 @@
 
     <!-- Persistent configuration module (if supported by the config) -->
     <LivedataPersistentConfiguration v-if="data.id"/>
-    
+
     <!-- Displays a loader until the component is fully mounted. -->
     <div v-if="!layoutLoaded" class="loading"></div>
-    
+
   </div>
 </template>
 
@@ -49,6 +49,7 @@ __webpack_public_path__ = window.liveDataBaseURL;
 
 import Vue from "vue";
 import VueTippy from "vue-tippy";
+import 'tippy.js/themes/light-border.css'
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
@@ -57,7 +58,9 @@ import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.v
 // We can't declare vue plugins during initialization inside logic.js
 // because we are using in logic.js external webjars dependencies from RequireJs,
 // and not dependencies from nodejs package.json
-Vue.use(VueTippy);
+Vue.use(VueTippy, {
+  theme: 'light',
+});
 
 export default {
 
@@ -89,15 +92,15 @@ export default {
       logic: this.logic
     };
   },
-  
+
   data() {
     return {
       layoutLoaded: false
     }
   },
-  
+
   mounted() {
-    // Waits for the layout to be (lazily) loaded before hiding the loader.  
+    // Waits for the layout to be (lazily) loaded before hiding the loader.
     this.logic.onEvent("layoutLoaded", () => {
       this.layoutLoaded = true;
     });

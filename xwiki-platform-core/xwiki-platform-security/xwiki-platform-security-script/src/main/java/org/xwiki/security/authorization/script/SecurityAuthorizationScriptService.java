@@ -19,6 +19,8 @@
  */
 package org.xwiki.security.authorization.script;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -158,5 +160,15 @@ public class SecurityAuthorizationScriptService implements ScriptService
     public boolean isRightRegistered(String rightName)
     {
         return Right.toRight(rightName) != Right.ILLEGAL;
+    }
+
+    /**
+     * @return all the registered rights names.
+     * @since 13.5RC1
+     */
+    @Unstable
+    public List<String> getAllRightsNames()
+    {
+        return Right.getAllRightsAsString();
     }
 }

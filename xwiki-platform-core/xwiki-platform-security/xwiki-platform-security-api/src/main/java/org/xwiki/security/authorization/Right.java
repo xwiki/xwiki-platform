@@ -21,6 +21,7 @@ package org.xwiki.security.authorization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -122,6 +124,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     private static final Map<EntityType, Set<Right>> UNMODIFIABLE_ENABLED_RIGHTS = new HashMap<>();
 
+    /**
+     * The rights that are statically initialized, to be distinguished with the custom rights that can be registered
+     * through the components.
+     */
+    private static final List<Right> STANDARD_RIGHTS;
+
     static {
         LOGIN = new Right("login", ALLOW, ALLOW, true, null, WIKI_ONLY, true);
         VIEW = new Right("view", ALLOW, DENY, true, null, WIKI_SPACE_DOCUMENT, true);
@@ -142,6 +150,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
             new RightSet(LOGIN, VIEW, SCRIPT, EDIT, DELETE, REGISTER, COMMENT, ADMIN, CREATE_WIKI), FARM_ONLY, true);
 
         ILLEGAL = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null, false);
+
+        STANDARD_RIGHTS = Collections.unmodifiableList(Arrays.asList(
+            LOGIN, VIEW, EDIT, DELETE, CREATOR, REGISTER, COMMENT, SCRIPT, ADMIN, CREATE_WIKI, PROGRAM, ILLEGAL
+        ));
     }
 
     /** The numeric value of this access right. */
@@ -390,6 +402,55 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public static List<String> getAllRightsAsString()
     {
         return UNMODIFIABLE_ALL_RIGHTS;
+    }
+
+    /**
+     * @return the list of statically registered rights.
+     * @since 13.5RC1
+     */
+    @Unstable
+    public static List<Right> getStandardRights()
+    {
+        return STANDARD_RIGHTS;
+    }
+
+    /**
+     * Remove all occurrences of the current right.
+     * This method removes the right from the list of registered right, but also removes it from the map of rights
+     * associated to the entity types, and to the different lists of implied rights.
+     *
+     * @since 13.5RC1
+     */
+    @Unstable
+    void unregister()
+    {
+        Set<EntityType> entityTypes = this.getTargetedEntityType();
+        synchronized (VALUES) {
+            VALUES.remove(this);
+            ALL_RIGHTS.remove(this.name);
+            if (entityTypes != null) {
+                for (EntityType type : entityTypes) {
+                    if (type == EntityType.WIKI) {
+                        // If enabled on a wiki, remove also on main wiki.
+                        removeFromEnabledRights(FARM);
+                    }
+                    removeFromEnabledRights(type);
+                }
+            } else {
+                // If enabled on a wiki, enable also on main wiki.
+                removeFromEnabledRights(FARM);
+            }
+
+            for (Right impliedByRight : VALUES) {
+                impliedByRight.impliedRights.remove(this);
+            }
+        }
+    }
+
+    private void removeFromEnabledRights(EntityType type)
+    {
+        Set<Right> rights = ENABLED_RIGHTS.get(type);
+        rights.remove(this);
     }
 
     /**

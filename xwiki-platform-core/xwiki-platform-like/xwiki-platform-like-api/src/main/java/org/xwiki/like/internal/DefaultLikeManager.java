@@ -58,6 +58,7 @@ import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.UnableToRegisterRightException;
@@ -203,6 +204,11 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
     {
         this.likeExistCache.dispose();
         this.likeCountCache.dispose();
+        try {
+            this.authorizationManager.unregister(this.likeRight);
+        } catch (AuthorizationException e) {
+            throw new ComponentLifecycleException("Error while unregistering like right", e);
+        }
     }
 
     private String getExistCacheKey(UserReference source, EntityReference target)

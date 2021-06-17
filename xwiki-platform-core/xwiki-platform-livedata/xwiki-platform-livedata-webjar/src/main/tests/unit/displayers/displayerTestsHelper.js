@@ -49,8 +49,9 @@ import {mount} from '@vue/test-utils'
  * * `isEditable()` returns the constant `true`
  * The returns object is merged with the `editBus` parameter.
  *
- * The default `mock` parameter of `mount()` is an object with a single `$t()` key which returns the constant 
- * `"default test translation value"`
+ * The default `mock` parameter of `mount()` is an object with a single `$t()` key which returns the parameter key as
+ * the result.
+ *
  *
  * 
  * @param displayer the Vue displayer component to initialize
@@ -94,7 +95,7 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
         },
         isActionAllowed(action)
         {
-          return action === 'jump';
+          return action === 'jump' || action === 'view';
         },
         getActionDescriptor(action)
         {
@@ -129,7 +130,7 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
       }, logic),
     },
     mocks: Object.assign({
-      $t: () => 'default test translation value'
+      $t: (key) => key
     }, mocks)
   });
 }

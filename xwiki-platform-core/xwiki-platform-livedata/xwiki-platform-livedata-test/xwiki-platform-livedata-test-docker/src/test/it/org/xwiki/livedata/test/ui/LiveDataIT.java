@@ -43,6 +43,8 @@ import org.xwiki.text.StringUtils;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -64,6 +66,8 @@ class LiveDataIT
 
     private static final String NAME_CHARLY = "Charly";
 
+    private static final String NAME_NIKOLAY = "Nikolay";
+
     private static final String CHOICE_A = "value1";
 
     private static final String CHOICE_B = "value2";
@@ -79,6 +83,16 @@ class LiveDataIT
     private static final String BIRTHDAY_DATETIME = "11/05/2021 16:00:00";
 
     private static final String CANCELED_BIRTHDAY_DATETIME = "11/05/2021 16:00:10";
+
+    private static final String DOC_TITLE_COLUMN = "doc.title";
+
+    private static final String FOOTNOTE_COMPUTED_TITLE =
+        "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
+            + "pages.";
+
+    private static final String FOOTNOTES_PROPERTY_NOT_VIEWABLE =
+        "(N/A) Displayed when some pages require special rights"
+            + " to be viewed and thus fields cannot be extracted from them.";
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
@@ -97,9 +111,6 @@ class LiveDataIT
 
         initLocalization(testUtils, testReference);
 
-        // Become guest because the tests does not need specific rights. 
-        testUtils.forceGuestUser();
-
         String className = testUtils.serializeReference(testReference);
 
         // Initializes the page content.
@@ -111,15 +122,24 @@ class LiveDataIT
         // Creates corresponding XObjects.
         addXObject(testUtils, new DocumentReference("O1", (SpaceReference) testReference.getParent()), className,
             NAME_LYNDA, CHOICE_A, "U1");
-        addXObject(testUtils, new DocumentReference("O2", (SpaceReference) testReference.getParent()), className,
+        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
+        // Make 02 not viewable by guests to test the footnotes.
+        testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
+        addXObject(testUtils, o2, className,
             NAME_ESTHER, CHOICE_B, "U2");
-        addXObject(testUtils, new DocumentReference("O3", (SpaceReference) testReference.getParent()), className,
-            "Nikolay", "", null);
+        DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
+        // Set a localized title on O3 to test the footnotes.
+        testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
+        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null);
 
         testUtils.gotoPage(testReference);
 
-        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
         assertEquals(3, tableLayout.countRows());
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "O2");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "O3 1");
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_A);
@@ -145,10 +165,28 @@ class LiveDataIT
         tableLayout
             .assertCellWithLink(USER_COLUMN, "U2", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U2")));
         tableLayout.assertRow(USER_COLUMN, "");
+        assertEquals(1, liveDataElement.countFootnotes());
+        assertEquals(FOOTNOTE_COMPUTED_TITLE, liveDataElement.getFootnotesText().get(0));
         tableLayout.filterColumn(USER_COLUMN, "U1");
         assertEquals(1, tableLayout.countRows());
+        // The footnotes are supposed to disappear after the filter because the related entries are not displayed.
+        assertEquals(0, liveDataElement.countFootnotes());
         tableLayout
             .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
+
+        // Become guest because the tests does not need specific rights. 
+        testUtils.forceGuestUser();
+
+        testUtils.gotoPage(testReference);
+
+        liveDataElement = new LiveDataElement("test");
+        tableLayout = liveDataElement.getTableLayout();
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, "N/A");
+        tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
+        assertEquals(2, liveDataElement.countFootnotes());
+        assertThat(liveDataElement.getFootnotesText(),
+            containsInAnyOrder(FOOTNOTES_PROPERTY_NOT_VIEWABLE, FOOTNOTE_COMPUTED_TITLE));
     }
 
     @Test
@@ -182,7 +220,7 @@ class LiveDataIT
             new DocumentReference("Translation", testReference.getLastSpaceReference());
         testUtils.addObject(translationDocumentReference, "XWiki.TranslationDocumentClass",
             singletonMap("scope", "WIKI"));
-        testUtils.rest().savePage(translationDocumentReference, "emptyvalue=\n", "translation");
+        testUtils.rest().savePage(translationDocumentReference, "emptyvalue=\ncomputedTitle=O3", "translation");
     }
 
     /**
@@ -224,7 +262,8 @@ class LiveDataIT
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
         Page page = rest.page(testReference);
-        String properties = StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN);
+        String properties =
+            StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
         page.setContent("{{velocity}}\n"
             + "{{liveData\n"
             + "  id=\"test\"\n"

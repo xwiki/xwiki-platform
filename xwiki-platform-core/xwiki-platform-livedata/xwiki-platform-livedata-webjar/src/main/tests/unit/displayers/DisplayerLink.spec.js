@@ -43,6 +43,55 @@ describe('DisplayerLink.vue', () => {
     expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
   })
 
+  it('Renders an entry in view mode with an empty content', () => {
+    const wrapper = initWrapper(DisplayerLink, {
+      props: {
+        entry: {
+          colorHref: 'entryLink'
+        }
+      },
+      logic: {
+        getDisplayerDescriptor() {
+          return {
+            propertyHref: 'colorHref'
+          };
+        }
+      },
+      mocks: {
+        $t: (key) => key
+      }
+    });
+    expect(wrapper.text()).toMatch('livedata.displayer.link.noValue')
+    expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
+  })
+
+  it('Renders an entry in view mode when view action is not allowed', () => {
+    const wrapper = initWrapper(DisplayerLink, {
+      props: {
+        entry: {
+          colorHref: 'entryLink'
+        }
+      },
+      logic: {
+        getDisplayerDescriptor() {
+          return {
+            propertyHref: 'colorHref'
+          };
+        },
+        isActionAllowed()
+        {
+          return false;
+        },
+      },
+      mocks: {
+        $t: (key) => key
+      }
+    });
+    expect(wrapper.text()).toMatch('livedata.displayer.emptyValue')
+    expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
+  })
+
+
   it('Renders an entry in edit mode', async () => {
     const wrapper = initWrapper(DisplayerLink, {});
     const viewerDiv = wrapper.find('div[tabindex="0"]');

@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="footnotes">
     <div v-for="footnote in list"
          :key="`footnote-${footnote.prefix}-${footnote.translationKey}`"
-         class="box infomessage">
+         class="box infomessage footnote">
       (<small>{{ footnote.prefix }}</small>) {{ $t(footnote.translationKey) }}
     </div>
   </div>

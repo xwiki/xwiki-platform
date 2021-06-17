@@ -47,7 +47,7 @@
       <a
         :href="href"
         :class="{'explicit-empty-value': !html && !htmlValue}"
-        v-html="html || htmlValue || $t('livedata.displayer.link.noValue')"
+        v-html="linkContent"
       ></a>
     </template>
 
@@ -95,6 +95,15 @@ export default {
       }
       return values.map(value => this.entry[value]).find(value => value) || '#';
     },
+    linkContent() {
+      if (!this.logic.isActionAllowed('view', this.entry)) {
+        return this.$t('livedata.displayer.emptyValue');
+      } else if (this.html) {
+        return this.html;
+      } else {
+        return this.htmlValue || this.$t('livedata.displayer.link.noValue')
+      }
+    }
   },
 };
 </script>

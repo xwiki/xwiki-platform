@@ -202,6 +202,7 @@ define('xwiki-livedata', [
         "panel.sort.direction.descending",
         "panel.sort.add",
         "panel.sort.delete",
+        "displayer.emptyValue",
         "displayer.link.noValue",
         "displayer.boolean.true",
         "displayer.boolean.false",

@@ -27,16 +27,20 @@ describe('DisplayerActions.vue', () => {
     expect(wrapper.text()).toMatch('jump')
   })
 
-  it('Renders an entry with not actions to display', () => {
+  it('Renders an entry with no actions to display', () => {
     const wrapper = initWrapper(DisplayerActions, {
       logic: {
         getDisplayerDescriptor() {
           return {
             actions: []
           };
+        },
+        isActionAllowed()
+        {
+          return false;
         }
       }
     })
-    expect(wrapper.text()).toMatch('*')
+    expect(wrapper.text()).toMatch('livedata.displayer.emptyValue')
   })
 })

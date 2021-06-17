@@ -66,7 +66,7 @@ function initWrapper(mountConfiguration = {}) {
 describe('LivedataFootnotes.vue', () => {
   it('Render when no footnote', () => {
     const wrapper = initWrapper();
-    expect(wrapper.html()).toBe('<div></div>');
+    expect(wrapper.html()).toBe('<div class="footnotes"></div>');
   })
 
   it('Render when one footnote', () => {
@@ -81,8 +81,8 @@ describe('LivedataFootnotes.vue', () => {
         }
       }
     });
-    expect(wrapper.html()).toBe('<div>\n' +
-      '  <div class="box infomessage">\n' +
+    expect(wrapper.html()).toBe('<div class="footnotes">\n' +
+      '  <div class="box infomessage footnote">\n' +
       '    (<small>1</small>) a.b.c\n' +
       '  </div>\n' +
       '</div>');

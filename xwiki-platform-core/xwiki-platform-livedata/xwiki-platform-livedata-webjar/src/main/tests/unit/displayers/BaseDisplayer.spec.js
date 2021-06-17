@@ -71,10 +71,16 @@ describe('BaseDisplayer.vue', () => {
         entry: {
           color: undefined
         }
+      },
+      logic: {
+        isActionAllowed()
+        {
+          return false;
+        }
       }
     });
 
-    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span> <span><sup>*</sup></span></div>');
+    expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span> <span>livedata.displayer.emptyValue</span></div>');
   })
 
   it('Renders a viewable entry with an empty content', () => {
@@ -82,11 +88,6 @@ describe('BaseDisplayer.vue', () => {
       props: {
         entry: {
           color: undefined
-        }
-      },
-      logic: {
-        isActionAllowed(action) {
-          return action === 'view';
         }
       }
     });
@@ -103,15 +104,10 @@ describe('BaseDisplayer.vue', () => {
           color: undefined
         },
         isEmpty: false
-      },
-      logic: {
-        isActionAllowed(action) {
-          return action === 'view';
-        }
       }
     });
 
-    // Even when the action is not allowed and the property value is undefined, the '*' is not displayed
+    // Even when the action is not allowed and the property value is undefined, 'N/A' is not displayed
     // if the props isEmpty is set to false.
     // This is useful when a displayed has his own way to present empty values, such as the link displayer.
     expect(wrapper.find('[tabindex="0"]').html()).toBe('<div tabindex="0"><span></span>\n' +

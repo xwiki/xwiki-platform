@@ -360,13 +360,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
             // Calculate the cache key
             String key = getKey(doc, context);
 
-            LOGGER.debug("Cache: Trying to get doc {} from cache", key);
+            LOGGER.debug("Starting checking for Document [{}] in cache", key);
 
             XWikiDocument cachedoc;
             try {
                 cachedoc = getCache().get(key);
             } catch (Exception e) {
-                LOGGER.error("Failed to get document from the cache", e);
+                LOGGER.error("Failed to get document [{}] from cache", key, e);
 
                 cachedoc = null;
             }
@@ -374,12 +374,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
             if (cachedoc != null) {
                 cachedoc.setFromCache(true);
 
-                LOGGER.debug("Cache: got doc {} from cache", key);
+                LOGGER.debug("Document [{}] was retrieved from cache", key);
             } else {
                 Boolean result = getPageExistCache().get(key);
 
                 if (result == Boolean.FALSE) {
-                    LOGGER.debug("Cache: The document {} does not exist, return an empty one", key);
+                    LOGGER.debug("Document [{}] doesn't exist in cache, returning an empty one", key);
 
                     cachedoc = doc;
                     cachedoc.setNew(true);
@@ -389,11 +389,11 @@ public class XWikiCacheStore extends AbstractXWikiStore
                     cachedoc
                         .setOriginalDocument(new XWikiDocument(cachedoc.getDocumentReference(), cachedoc.getLocale()));
                 } else {
-                    LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
+                    LOGGER.debug("Trying to get Document [{}] from persistent storage", key);
 
                     cachedoc = this.store.loadXWikiDoc(doc, context);
 
-                    LOGGER.debug("Cache: Got doc {} from storage", key);
+                    LOGGER.debug("Document [{}] was retrieved from persistent storage", key);
 
                     if (cachedoc.isNew()) {
                         getPageExistCache().set(key, Boolean.FALSE);
@@ -404,12 +404,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
                         getPageExistCache().set(key, Boolean.TRUE);
                     }
 
-                    LOGGER.debug("Cache: put doc {} in cache", key);
+                    LOGGER.debug("Document [{}] was put in cache", key);
                 }
             }
 
             cachedoc.setStore(this);
-            LOGGER.debug("Cache: end for doc {} in cache", key);
+            LOGGER.debug("Ending checking for Document [{}] in cache", key);
 
             return cachedoc;
         } finally {

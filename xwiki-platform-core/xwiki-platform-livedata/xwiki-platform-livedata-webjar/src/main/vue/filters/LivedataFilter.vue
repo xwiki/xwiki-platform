@@ -48,6 +48,7 @@
     :property-id="propertyId"
     :index="index"
     :is-filtering.sync="isFiltering"
+    :is-advanced="isAdvanced"
   ></component>
 
   <!--
@@ -77,6 +78,10 @@ export default {
   props: {
     propertyId: String,
     index: Number,
+    isAdvanced: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data () {

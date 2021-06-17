@@ -17,36 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.ui.docker;
+package org.xwiki.index.test.po;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * All UI tests for the Index feature.
+ * Represents the actions possible on the Orphaned Pages page.
  *
  * @version $Id$
- * @since 11.4RC1
+ * @since 13.5RC1
  */
-@UITest
-public class AllITs
+public class OrphanedPagesPage extends ViewPage
 {
-    @Nested
-    @DisplayName("AllDocs Page UI")
-    class NestedAllDocsIT extends AllDocsIT
+    /**
+     * Go to the Orphaned Pages page.
+     *
+     * @return an page object of the Orphaned Pages page
+     */
+    public static OrphanedPagesPage goToPage()
     {
+        getUtil().gotoPage(new DocumentReference("xwiki", "XWiki", "OrphanedPages"));
+        return new OrphanedPagesPage();
     }
 
-    @Nested
-    @DisplayName("Deleted Attachment Page UI")
-    class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
+    /**
+     * @return a page object of the Orphaned Pages Live Data
+     */
+    public LiveDataElement getLiveData()
     {
-    }
-
-    @Nested
-    @DisplayName("Orphaned Pages Page UI")
-    class NestedOrphanedPagesIT extends OrphanedPagesIT
-    {
+        return new LiveDataElement("orphanedpages");
     }
 }

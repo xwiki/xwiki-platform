@@ -40,23 +40,37 @@ $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 ## for admin, register, programming and createwiki, allow preceedes over deny
-#if("$!request.section"=='wikis.rights')
+#set ($standardRights = ['view', 'comment', 'edit', 'script', 'delete', 'admin', 'register', 'programming', 'login',
+  'createwiki'])
+#set ($sectionWikiRights = 'wikis.rights')
+#set ($sectionExtensionRights = 'usersgroups.extensionrights')
+#set ($isStandardRights = false)
+#if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
-## This should be changed in the future to include dynamically registered rights.
-#elseif ($services.security.authorization.isRightRegistered('like'))
-  #set ($rightsLevels = {'view': 0, 'like': 1, 'comment': 2, 'edit': 3, 'script': 4, 'delete': 5, 'admin': 6, 'register': 7, 'programming': 8})
-  #set ($allowWins = [5, 6, 7])
+#elseif ("$!request.section"==$sectionExtensionRights)
+  #set ($allRights = $services.security.authorization.allRightsNames)
+  #set ($rightsLevels = {})
+  #set ($allowWins = [])
+  #set ($index = 0)
+  #foreach ($right in $allRights)
+    #if (!$standardRights.contains($right))
+      #set ($discard = $rightsLevels.put($right, $index))
+      #set ($discard = $allowWins.add($index))
+      #set ($index = $index + 1)
+    #end
+  #end
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
   #set ($allowWins = [5, 6, 7])
+  #set ($isStandardRights = true)
 #end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
 #set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, script, delete
-#if("$!request.section"=='wikis.rights')
+#if("$!request.section"==$sectionWikiRights)
   #set ($maxlevel = $rightsLevels.get('createwiki'))
   #set ($clsname = 'XWiki.XWikiGlobalRights')
 #else
@@ -82,7 +96,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #set ($clsname = 'XWiki.XWikiRights')
   #end
 #end
-
+#if ("$!request.section"==$sectionExtensionRights)
+  #set ($maxlevel = $index - 1)
+#end
 ## Get rights allowed for the current user
 #set ($currentAllowed = {})
 #foreach ($i in [0..$maxlevel])
@@ -235,7 +251,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   </table>
   ## Global settings: mandatory authentication for view/edit, captcha
   #set ($guest_comment_captcha_prop = $targetDocument.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'wikis.rights')
+  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop)
+  && $isStandardRights)
     <dl class="rights-settings">
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
@@ -342,11 +359,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin' && $request.section != 'wikis.rights')
+    #if("$!editor" == 'globaladmin' && $isStandardRights)
       Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
-    #if($guest_comment_captcha_prop && $request.section != 'wikis.rights')
+    #if($guest_comment_captcha_prop && $isStandardRights)
       Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
       return true;

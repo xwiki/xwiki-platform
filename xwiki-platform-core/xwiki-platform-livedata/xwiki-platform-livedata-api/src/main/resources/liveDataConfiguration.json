@@ -35,7 +35,7 @@
       },
       {
         "id": "list",
-        "operators": ["equals", "startsWith", "contains"]
+        "operators": ["equals", "startsWith", "contains", "empty"]
       }
     ],
 

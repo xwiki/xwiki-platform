@@ -177,6 +177,7 @@ define('xwiki-livedata', [
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "filter.list.emptyLabel",
       ],
     });
 
@@ -1190,7 +1191,7 @@ define('xwiki-livedata', [
      * @returns {Object} {oldEntry, newEntry}
      *  with oldEntry / newEntry being {property, index, operator, value}
      */
-    _computeFilterEntries (property, index, filterEntry) {
+    _computeFilterEntries (property, index, filterEntry, {filterOperator} = {}) {
       if (!this.isPropertyFilterable(property)) { return; }
       // default indexes
       index = index || 0;
@@ -1215,6 +1216,9 @@ define('xwiki-livedata', [
         index: 0,
       };
       newEntry = Object.assign({}, defaultEntry, oldEntry, newEntry);
+      if (filterOperator) {
+        newEntry.operator = filterOperator;
+      }
       // check newEntry operator
       const newEntryValidOperator = this.getFilterDescriptor(newEntry.property).operators
         .some(operator => operator.id === newEntry.operator);
@@ -1263,10 +1267,10 @@ define('xwiki-livedata', [
      * @param {String} filterEntry.value Value for the new filter entry
      * @returns {Promise}
      */
-    filter (property, index, filterEntry) {
+    filter(property, index, filterEntry, {filterOperator} = {}) {
       const err = new Error("Property `" + property + "` is not filterable");
       return new Promise ((resolve, reject) => {
-        const filterEntries = this._computeFilterEntries(property, index, filterEntry);
+        const filterEntries = this._computeFilterEntries(property, index, filterEntry, {filterOperator});
         if (!filterEntries) { return void reject(err); }
         const oldEntry = filterEntries.oldEntry;
         const newEntry = filterEntries.newEntry;

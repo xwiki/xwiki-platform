@@ -24,12 +24,13 @@ import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
@@ -52,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
     "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
 })
-public class UserProfileIT
+class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
 
@@ -108,7 +109,7 @@ public class UserProfileIT
     /** Functionality check: changing profile information. */
     @Test
     @Order(1)
-    public void editProfile()
+    void editProfile()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ProfileEditPage profileEditPage = userProfilePage.editProfile();
@@ -139,7 +140,7 @@ public class UserProfileIT
     /** Functionality check: changing the profile picture. */
     @Test
     @Order(2)
-    public void changeAvatarImage(TestConfiguration testConfiguration)
+    void changeAvatarImage(TestConfiguration testConfiguration)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ChangeAvatarPage changeAvatarImage = userProfilePage.changeAvatarImage();
@@ -152,7 +153,7 @@ public class UserProfileIT
     /** Functionality check: changing the user type. */
     @Test
     @Order(3)
-    public void changeUserProfile()
+    void changeUserProfile()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -182,7 +183,7 @@ public class UserProfileIT
     /** Functionality check: changing the default editor. */
     @Test
     @Order(4)
-    public void changeDefaultEditor()
+    void changeDefaultEditor()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
@@ -225,7 +226,7 @@ public class UserProfileIT
      */
     @Test
     @Order(5)
-    public void commentDoesntOverrideAboutInformation(TestUtils setup)
+    void commentDoesntOverrideAboutInformation(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         String commentContent = "this is from a comment";
@@ -242,7 +243,7 @@ public class UserProfileIT
 
     @Test
     @Order(6)
-    public void ensureDashboardUIAddAnObjectAtFirstEdit()
+    void ensureDashboardUIAddAnObjectAtFirstEdit()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         HistoryPane historyPane = userProfilePage.openHistoryDocExtraPane();
@@ -252,20 +253,21 @@ public class UserProfileIT
 
     @Test
     @Order(7)
-    public void verifyGroupTab()
+    void verifyGroupTab(TestUtils setup)
     {
         GroupsUserProfilePage preferencesPage = GroupsUserProfilePage.gotoPage(this.userName);
 
         assertEquals("Groups", preferencesPage.getPreferencesTitle());
-        LiveTableElement groupsPaneLiveTable = preferencesPage.getGroupsPaneLiveTable();
+        TableLayoutElement tableLayout = preferencesPage.getGroupsPaneLiveData().getTableLayout();
 
-        assertEquals(1, groupsPaneLiveTable.getRowCount());
-        assertEquals("XWikiAllGroup", groupsPaneLiveTable.getCell(1, 1).getText());
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertCellWithLink("Group", "XWikiAllGroup",
+            setup.getURL(new DocumentReference("xwiki", "XWiki", "XWikiAllGroup")));
     }
 
     @Test
     @Order(8)
-    public void toggleEnableDisable(TestUtils setup)
+    void toggleEnableDisable(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         // We are already logged in with this user, so we shouldn't be able to change the status

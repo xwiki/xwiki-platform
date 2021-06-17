@@ -17,36 +17,3 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.ui.docker;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
-
-/**
- * All UI tests for the Index feature.
- *
- * @version $Id$
- * @since 11.4RC1
- */
-@UITest
-public class AllITs
-{
-    @Nested
-    @DisplayName("AllDocs Page UI")
-    class NestedAllDocsIT extends AllDocsIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Deleted Attachment Page UI")
-    class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Orphaned Pages Page UI")
-    class NestedOrphanedPagesIT extends OrphanedPagesIT
-    {
-    }
-}

@@ -21,7 +21,7 @@ package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the User Profile Preferences Tab.
@@ -34,8 +34,6 @@ public class GroupsUserProfilePage extends AbstractUserProfilePage
 {
     @FindBy(id = "user.profile.groups.title")
     private WebElement groupsTitle;
-    
-    private LiveTableElement liveTable = new LiveTableElement("user.profile.group.table");
 
     public static GroupsUserProfilePage gotoPage(String username)
     {
@@ -54,9 +52,12 @@ public class GroupsUserProfilePage extends AbstractUserProfilePage
         return this.groupsTitle.getText();
     }
 
-    public LiveTableElement getGroupsPaneLiveTable()
+    /**
+     * @return the live data object of the groups pane
+     * @since 13.5RC1
+     */
+    public LiveDataElement getGroupsPaneLiveData()
     {
-        this.liveTable.waitUntilReady();
-        return this.liveTable;
+        return new LiveDataElement("user.profile.group.table");
     }
 }

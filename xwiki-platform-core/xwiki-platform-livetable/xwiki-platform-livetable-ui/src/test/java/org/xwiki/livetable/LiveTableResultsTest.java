@@ -20,6 +20,7 @@
 package org.xwiki.livetable;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.Query;
@@ -43,12 +45,15 @@ import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.velocity.tools.RegexTool;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -68,6 +73,9 @@ public class LiveTableResultsTest extends PageTest
     private ModelScriptService modelService;
 
     private Map<String, Object> results;
+
+    @Mock
+    private ScriptQuery query;
 
     @BeforeEach
     @SuppressWarnings("deprecation")
@@ -112,17 +120,16 @@ public class LiveTableResultsTest extends PageTest
         setOffset(13);
         setLimit(7);
 
-        ScriptQuery query = mock(ScriptQuery.class);
-        when(queryService.hql("  where 1=1    order by doc.date desc")).thenReturn(query);
-        when(query.addFilter("currentlanguage")).thenReturn(query);
-        when(query.addFilter("hidden")).thenReturn(query);
-        when(query.setLimit(7)).thenReturn(query);
+        when(queryService.hql("  where 1=1    order by doc.date desc")).thenReturn(this.query);
+        when(this.query.addFilter("currentlanguage")).thenReturn(this.query);
+        when(this.query.addFilter("hidden")).thenReturn(this.query);
+        when(this.query.setLimit(7)).thenReturn(this.query);
         // Offset starting from 0.
-        when(query.setOffset(12)).thenReturn(query);
-        when(query.bindValues(anyMap())).thenReturn(query);
+        when(this.query.setOffset(12)).thenReturn(this.query);
+        when(this.query.bindValues(anyMap())).thenReturn(this.query);
 
-        when(query.count()).thenReturn(17L);
-        when(query.execute()).thenReturn(Arrays.asList("A.B", "X.Y"));
+        when(this.query.count()).thenReturn(17L);
+        when(this.query.execute()).thenReturn(Arrays.asList("A.B", "X.Y"));
 
         DocumentReference abReference = new DocumentReference("wiki", "A", "B");
         when(modelService.resolveDocument("A.B")).thenReturn(abReference);
@@ -216,6 +223,106 @@ public class LiveTableResultsTest extends PageTest
         assertEquals("%test%", argument.getValue().get("locationFilterValue2"));
     }
 
+    /**
+     * Verify the query and its bound values when an empty matcher is used on one of the values. In this test, the
+     * filter is applied on a static string list with MultiSelect = false, which can be assimilated to a field of type 
+     * String when filtering.
+     */
+    @Test
+    void filterStringEmptyMatcher() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Panels", "PanelClass"));
+        StaticListClass category = document.getXClass().addStaticListField("category");
+        category.setValues("Information|Tools");
+        this.xwiki.saveDocument(document, "creates PanelClass", true, this.context);
+        
+        setColumns("name,description,category");
+        setSort("name", true);
+        setClassName("Panels.PanelClass");
+        setFilter("category_match", "empty");
+        setFilter("category", "-");
+        setFilter("category_match", "exact");
+        setFilter("category", "Information");
+        this.request.put("category/join_mode", "OR");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+
+        renderPage();
+
+        verify(this.queryService)
+            .hql(", BaseObject as obj , StringProperty as prop_category, StringProperty prop_name  "
+                + "where obj.name=doc.fullName and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
+                + "and (prop_category.value in (:prop_category_value_1, :prop_category_value_2)) "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
+                + "order by lower(prop_name.value) asc, prop_name.value asc");
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Panels.PanelClass");
+        values.put("classTemplate1", "Panels.PanelClassTemplate");
+        values.put("classTemplate2", "Panels.PanelTemplate");
+        values.put("prop_category_id_name", "category");
+        values.put("prop_category_value_1", "");
+        values.put("prop_category_value_2", "Information");
+        values.put("prop_name_name", "name");
+        verify(this.query).bindValues(values);
+    }
+
+    /**
+     * Verify the query and its bound values when an empty matcher is used on one of the values. In this test, the
+     * filter is applied on a static string list with MultiSelect = true.
+     */
+    @Test
+    void filterStringListEmptyMatcher() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Panels", "PanelClass"));
+        StaticListClass category = document.getXClass().addStaticListField("category");
+        category.setValues("Information|Tools");
+        category.setMultiSelect(true);
+        this.xwiki.saveDocument(document, "creates PanelClass", true, this.context);
+
+        setColumns("name,description,category");
+        setSort("name", true);
+        setClassName("Panels.PanelClass");
+        setFilter("category_match", "empty");
+        setFilter("category", "-");
+        setFilter("category_match", "exact");
+        setFilter("category", "Information");
+        setJoinMode("category", "OR");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+
+        renderPage();
+
+        verify(this.queryService)
+            .hql(", BaseObject as obj , StringListProperty as prop_category, StringProperty prop_name  "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_category.id.id "
+                + "and prop_category.id.name = :prop_category_id_name "
+                + "and ("
+                + "upper(concat('|', concat(prop_category.textValue, '|'))) like upper(:prop_category_textValue_1) "
+                + "OR upper(concat('|', concat(prop_category.textValue, '|'))) like upper(:prop_category_textValue_2)"
+                + ") "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
+                + "order by lower(prop_name.value) asc, prop_name.value asc");
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Panels.PanelClass");
+        values.put("classTemplate1", "Panels.PanelClassTemplate");
+        values.put("classTemplate2", "Panels.PanelTemplate");
+        values.put("prop_category_id_name", "category");
+        values.put("prop_category_textValue_1", "%||%");
+        values.put("prop_category_textValue_2", "%|Information|%");
+        values.put("prop_name_name", "name");
+        verify(this.query).bindValues(values);
+    }
+
+
     //
     // Helper methods
     //
@@ -272,6 +379,11 @@ public class LiveTableResultsTest extends PageTest
     private void setFilter(String column, String value)
     {
         request.put(column, value);
+    }
+
+    private void setJoinMode(String column, String joinMode)
+    {
+        this.request.put(column + "/join_mode", joinMode);
     }
 
     private void setQueryFilters(String... filters)

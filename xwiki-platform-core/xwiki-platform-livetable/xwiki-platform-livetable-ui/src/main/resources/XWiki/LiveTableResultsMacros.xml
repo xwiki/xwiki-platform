@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.LiveTableResultsMacros" locale="">
+<xwikidoc version="1.4" reference="XWiki.LiveTableResultsMacros" locale="">
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
@@ -414,7 +414,7 @@
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
     #set($rawTitle = $translatedDoc.title)
     #if($rawTitle != $row['doc_title'])
-	  #set($discard = $row.put('doc_title_raw', $rawTitle))
+   #set($discard = $row.put('doc_title_raw', $rawTitle))
     #end
     #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
@@ -907,6 +907,10 @@
   #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
+    #set ($actualMatchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
+    #if ($actualMatchType == 'empty')
+      #set ($filterValue = '')
+    #end
     #if ($whereParams.entrySet())
       #set ($discard = $whereParams.put("${paramPrefix}${foreach.count}", "%|$filterValue|%"))
     #else
@@ -938,7 +942,8 @@
   #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount $paramPrefix)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
+    #set ($actualMatchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
+    #livetable_addFilterParam($filterValue $actualMatchType $whereParams "${paramPrefix}${foreach.count}")
   #end
 #end
 
@@ -985,6 +990,12 @@
       #set ($discard = $params.put($paramName, "$!filterValue%"))
     #else
       #set ($discard = $params.add("$!filterValue%"))
+    #end
+  #elseif ($matchType == 'empty')
+    #if ($params.entrySet())
+      #set ($discard = $params.put($paramName, ''))
+    #else
+      #set ($discard = $params.add(''))
     #end
   #else
     #if ($params.entrySet())

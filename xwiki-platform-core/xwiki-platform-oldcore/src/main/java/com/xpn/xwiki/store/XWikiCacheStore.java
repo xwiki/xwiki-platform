@@ -366,7 +366,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
             try {
                 cachedoc = getCache().get(key);
             } catch (Exception e) {
-                LOGGER.error("Failed to get document [{}] from cache", key e);
+                LOGGER.error("Failed to get document [{}] from cache", key, e);
 
                 cachedoc = null;
             }

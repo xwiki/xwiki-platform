@@ -130,7 +130,9 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
+    // TODO: Put back timeout of 120 once we understand why on ci.xwiki.org we get xwiki startup timeouts for our
+    // functional tests.
+    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "240"));
 
     private int debugPort ;
 

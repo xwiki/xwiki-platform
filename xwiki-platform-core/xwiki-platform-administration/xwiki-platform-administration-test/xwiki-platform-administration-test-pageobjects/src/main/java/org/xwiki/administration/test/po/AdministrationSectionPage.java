@@ -175,8 +175,10 @@ public class AdministrationSectionPage extends ViewPage
     {
         if (getDriver().hasElementWithoutWaiting(By.xpath("//input[@type='submit'][@name='formactionsac']"))) {
             getDriver().waitUntilJavascriptCondition(
-                "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
-                    + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
+                "return XWiki != undefined "
+                    + "&& XWiki.actionButtons != undefined "
+                    + "&& XWiki.actionButtons.EditActions != undefined "
+                    + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
         }
     }
 }

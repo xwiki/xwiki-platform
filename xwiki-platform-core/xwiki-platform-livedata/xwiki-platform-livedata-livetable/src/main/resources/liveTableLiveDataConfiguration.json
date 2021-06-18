@@ -177,6 +177,7 @@
 
     "displayers": [
       {"id": "link", "propertyHref": "doc.url"},
+      {"id": "xObjectProperty"},
       {"id": "docTitle", "propertyHref": "doc.url"}
     ],
 

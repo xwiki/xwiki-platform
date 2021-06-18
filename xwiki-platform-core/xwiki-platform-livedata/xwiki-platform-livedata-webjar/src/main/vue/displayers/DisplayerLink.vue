@@ -44,11 +44,12 @@
         If there is no value but still a link, the user should still be able to click the link,
         so we create an explicit "no value" message in that case
       -->
-      <a
+      <a v-if="linkContent && hasViewRight"
         :href="href"
         :class="{'explicit-empty-value': !html && !htmlValue}"
         v-html="linkContent"
       ></a>
+      <span v-else v-html="linkContent"></span>
     </template>
 
 
@@ -96,13 +97,16 @@ export default {
       return values.map(value => this.entry[value]).find(value => value) || '#';
     },
     linkContent() {
-      if (!this.logic.isActionAllowed('view', this.entry)) {
+      if (!this.hasViewRight) {
         return this.$t('livedata.displayer.emptyValue');
       } else if (this.html) {
         return this.html;
       } else {
         return this.htmlValue || this.$t('livedata.displayer.link.noValue')
       }
+    },
+    hasViewRight() {
+      return this.logic.isActionAllowed('view', this.entry)
     }
   },
 };

@@ -87,8 +87,7 @@ describe('DisplayerLink.vue', () => {
         $t: (key) => key
       }
     });
-    expect(wrapper.text()).toMatch('livedata.displayer.emptyValue')
-    expect(wrapper.find('a').element.href).toBe('http://localhost/entryLink');
+    expect(wrapper.html()).toMatch('livedata.displayer.emptyValue')
   })
 
 

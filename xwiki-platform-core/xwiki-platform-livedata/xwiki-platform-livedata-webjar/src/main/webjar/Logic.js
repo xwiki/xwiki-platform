@@ -71,27 +71,28 @@ define('xwiki-livedata', [
    * A service providing footnotes related operations. 
    */
   class FootnotesService {
-    constructor(logic) {
-      this._logic = logic;
+    constructor() {
+      this._footnotes = [];
     }
 
     /**
-     * Register a new footnote. If a footnote with the same translationKey is already registered the new  
-     * @param prefix
-     * @param translationKey
+     * Register a new footnote. If a footnote with the same translationKey is already registered this method has no
+     * effect on the list of registered footnotes.
+     * @param symbol the symbol to identify the entries related to the footnote 
+     * @param translationKey the translation key of the footnote text 
      */
-    put(prefix, translationKey) {
-      if (!this._logic.data.footnotesSet.some(footnote => footnote.translationKey === translationKey)) {
-        this._logic.data.footnotesSet.push({prefix, translationKey});
+    put(symbol, translationKey) {
+      if (!this._footnotes.some(footnote => footnote.translationKey === translationKey)) {
+        this._footnotes.push({symbol, translationKey});
       }
     }
     
     reset() {
-      this._logic.data.footnotesSet.splice(0);
+      this._footnotes.splice(0);
     }
     
     list() {
-      return this._logic.data.footnotesSet;
+      return this._footnotes;
     }
   }
 
@@ -103,9 +104,7 @@ define('xwiki-livedata', [
    */
   const Logic = function (element) {
     this.element = element;
-    const data = JSON.parse(element.getAttribute("data-config") || "{}");
-    data.footnotesSet = [];
-    this.data = data;
+    this.data = JSON.parse(element.getAttribute("data-config") || "{}");
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -114,7 +113,7 @@ define('xwiki-livedata', [
       isGlobal: false,
     };
     this.openedPanels = [];
-    this.footnotes = new FootnotesService(this);
+    this.footnotes = new FootnotesService();
 
     element.removeAttribute("data-config");
 

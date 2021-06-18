@@ -1,9 +1,9 @@
 <template>
   <div class="footnotes">
-    <div v-for="footnote in list"
+    <div v-for="footnote in footnotes.list()"
          :key="`footnote-${footnote.prefix}-${footnote.translationKey}`"
          class="box infomessage footnote">
-      (<small>{{ footnote.prefix }}</small>) {{ $t(footnote.translationKey) }}
+      (<small>{{ footnote.symbol }}</small>) {{ $t(footnote.translationKey) }}
     </div>
   </div>
 </template>
@@ -12,10 +12,9 @@
 export default {
   name: "LivedataFootnotes",
   inject: ["logic"],
-
-  computed: {
-    list() {
-      return this.logic.footnotes.list();
+  data() {
+    return {
+      footnotes: this.logic.footnotes
     }
   }
 }

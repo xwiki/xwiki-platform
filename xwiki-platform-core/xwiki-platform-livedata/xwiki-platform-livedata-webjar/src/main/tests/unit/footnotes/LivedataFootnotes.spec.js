@@ -75,7 +75,7 @@ describe('LivedataFootnotes.vue', () => {
         logic: {
           footnotes: {
             list() {
-              return [{prefix: '1', translationKey: 'a.b.c'}]
+              return [{symbol: '1', translationKey: 'a.b.c'}]
             }
           }
         }

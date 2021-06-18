@@ -91,7 +91,7 @@ class LiveDataIT
             + "pages.";
 
     private static final String FOOTNOTES_PROPERTY_NOT_VIEWABLE =
-        "(N/A) Displayed when some pages require special rights"
+        "(*) Displayed when some entries require special rights"
             + " to be viewed and thus fields cannot be extracted from them.";
 
     /**
@@ -182,7 +182,7 @@ class LiveDataIT
         liveDataElement = new LiveDataElement("test");
         tableLayout = liveDataElement.getTableLayout();
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
-        tableLayout.assertRow(NAME_COLUMN, "N/A");
+        tableLayout.assertRow(NAME_COLUMN, "N/A*");
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
         assertEquals(2, liveDataElement.countFootnotes());
         assertThat(liveDataElement.getFootnotesText(),

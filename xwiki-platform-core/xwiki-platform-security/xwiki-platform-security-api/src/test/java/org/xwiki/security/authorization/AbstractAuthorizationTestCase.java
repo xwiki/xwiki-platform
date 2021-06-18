@@ -43,6 +43,8 @@ import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.security.authorization.testwikis.internal.parser.DefaultTestDefinitionParser;
 import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.xwiki.security.authorization.Right.ADMIN;
@@ -119,8 +121,8 @@ public abstract class AbstractAuthorizationTestCase
         }
     }
 
-    @Rule
-    public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    public MockitoComponentManager componentManager;
 
     /** Current wiki mock. */
     protected TestDefinition testDefinition;

@@ -23,15 +23,17 @@ package org.xwiki.security.authorization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -62,15 +64,25 @@ import org.xwiki.security.authorization.testwikis.TestUserDocument;
 import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.security.internal.UserBridge;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -93,27 +105,33 @@ import static org.xwiki.security.authorization.Right.values;
  * 
  * @since 5.0M2
  */
+@ComponentTest
 @ComponentList({ DefaultSecurityCache.class, DefaultStringEntityReferenceResolver.class,
     DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class,
     AuthorizationManagerConfiguration.class, DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
     DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class, DefaultSymbolScheme.class })
-public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
+class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
 {
-    private AuthorizationManager authorizationManager;
+    @InjectMockComponents
+    private DefaultAuthorizationManager authorizationManager;
 
-    @Rule
-    public final LogRule logCapture = new LogRule();
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     /** Mocked xWikiBridge */
+    @MockComponent
     private XWikiBridge xWikiBridge;
 
     /** Mocked userBridge */
+    @MockComponent
     private UserBridge userBridge;
 
     /** Mocked securityEntryReader */
+    @MockComponent
     private SecurityEntryReader securityEntryReader;
 
     /** Mocked securityCacheRulesInvalidator */
+    @MockComponent
     private SecurityCacheRulesInvalidator securityCacheRulesInvalidator;
 
     /** Mocked cache */
@@ -123,16 +141,11 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     private SecurityReferenceFactory securityReferenceFactory;
 
     @BeforeComponent
-    public void initializeMocks() throws Exception
+    void initializeMocks() throws Exception
     {
         cache = new TestCache<Object>();
         final CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);
-
-        xWikiBridge = componentManager.registerMockComponent(XWikiBridge.class);
-        userBridge = componentManager.registerMockComponent(UserBridge.class);
-        securityEntryReader = componentManager.registerMockComponent(SecurityEntryReader.class);
-        securityCacheRulesInvalidator = componentManager.registerMockComponent(SecurityCacheRulesInvalidator.class);
 
         when(xWikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
             .thenAnswer(new Answer<EntityReference>()
@@ -143,10 +156,12 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
                     return invocation.getArgument(0);
                 }
             });
+
+        when(xWikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         securityReferenceFactory = componentManager.getInstance(SecurityReferenceFactory.class);
         authorizationManager = componentManager.getInstance(AuthorizationManager.class);
@@ -164,7 +179,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     protected void assertAccessTrue(String message, Right right, DocumentReference userReference,
         EntityReference entityReference) throws Exception
     {
-        Assert.assertTrue(message, authorizationManager.hasAccess(right, userReference, entityReference));
+        assertTrue(authorizationManager.hasAccess(right, userReference, entityReference), message);
     }
 
     /**
@@ -179,7 +194,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     protected void assertAccessFalse(String message, Right right, DocumentReference userReference,
         EntityReference entityReference) throws Exception
     {
-        Assert.assertFalse(message, authorizationManager.hasAccess(right, userReference, entityReference));
+        assertFalse(authorizationManager.hasAccess(right, userReference, entityReference), message);
     }
 
     /**
@@ -388,7 +403,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testDefaultAccessOnEmptyWikis() throws Exception
+    void defaultAccessOnEmptyWikis() throws Exception
     {
         initialiseWikiMock("emptyWikis");
 
@@ -426,7 +441,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testInheritancePolicyForFullFarmAccess() throws Exception
+    void inheritancePolicyForFullFarmAccess() throws Exception
     {
         initialiseWikiMock("inheritancePolicyFullFarmAccess");
 
@@ -448,7 +463,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testInheritancePolicyForGlobalFullWikiAccess() throws Exception
+    void inheritancePolicyForGlobalFullWikiAccess() throws Exception
     {
         initialiseWikiMock("inheritancePolicyForGlobalFullWikiAccess");
 
@@ -474,7 +489,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testInheritancePolicyForLocalWikiAccess() throws Exception
+    void inheritancePolicyForLocalWikiAccess() throws Exception
     {
         initialiseWikiMock("inheritancePolicyForLocalWikiAccess");
 
@@ -508,7 +523,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testInheritancePolicyForNoAdminFarmAccess() throws Exception
+    void inheritancePolicyForNoAdminFarmAccess() throws Exception
     {
         initialiseWikiMock("inheritancePolicyForNoAdminFarmAccess");
 
@@ -533,7 +548,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testInheritancePolicyForNoAdminWikiAccess() throws Exception
+    void inheritancePolicyForNoAdminWikiAccess() throws Exception
     {
         initialiseWikiMock("inheritancePolicyForNoAdminWikiAccess");
 
@@ -558,7 +573,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testTieResolutionPolicy() throws Exception
+    void tieResolutionPolicy() throws Exception
     {
         initialiseWikiMock("tieResolutionPolicy");
 
@@ -594,7 +609,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testDocumentCreator() throws Exception
+    void documentCreator() throws Exception
     {
         initialiseWikiMock("documentCreator");
 
@@ -609,7 +624,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testOwnerAccess() throws Exception
+    void ownerAccess() throws Exception
     {
         initialiseWikiMock("ownerAccess");
 
@@ -631,7 +646,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testGroupAccess() throws Exception
+    void groupAccess() throws Exception
     {
         initialiseWikiMock("groupAccess");
 
@@ -681,23 +696,21 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testCheckAccess() throws Exception
+    void checkAccess() throws Exception
     {
         initialiseWikiMock("emptyWikis");
 
         authorizationManager.checkAccess(VIEW, null, getXDoc("an empty main wiki", "anySpace"));
 
-        try {
+        AccessDeniedException accessDeniedException = assertThrows(AccessDeniedException.class, () -> {
             authorizationManager.checkAccess(ADMIN, null, getXDoc("an empty main wiki", "anySpace"));
-            fail("checkAccess should throw access denied exception when access is denied.");
-        } catch (AccessDeniedException e) {
-            assertThat("checkAccess should throw access denied exception without any cause when access is denied",
-                e.getCause(), nullValue());
-        }
+        });
+        assertNull(accessDeniedException.getCause(),
+            "checkAccess should throw access denied exception without any cause when access is denied");
     }
 
     @Test
-    public void testLoadUserAfterUserDoc() throws Exception
+    void loadUserAfterUserDoc() throws Exception
     {
         initialiseWikiMock("loadUserAfterUserDoc");
 
@@ -726,7 +739,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 
     // Test XWIKI-12016
     @Test
-    public void testGroupCacheLoadingUserAfterGroupDoc() throws Exception
+    void groupCacheLoadingUserAfterGroupDoc() throws Exception
     {
         initialiseWikiMock("loadUserAfterUserDoc");
 
@@ -761,7 +774,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     }
 
     @Test
-    public void testLoadUserInAnotherWikiAfterUserDoc() throws Exception
+    void loadUserInAnotherWikiAfterUserDoc() throws Exception
     {
         initialiseWikiMock("loadUserAfterUserDoc");
 
@@ -796,5 +809,94 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA")),
                 securityReferenceFactory.newEntityReference(getDoc("any document", "any space", "subwiki"))),
             nullValue());
+    }
+
+    private class CustomRightDescription implements RightDescription
+    {
+        @Override
+        public String getName()
+        {
+            return "foo";
+        }
+
+        @Override
+        public RuleState getDefaultState()
+        {
+            return RuleState.DENY;
+        }
+
+        @Override
+        public RuleState getTieResolutionPolicy()
+        {
+            return RuleState.DENY;
+        }
+
+        @Override
+        public boolean getInheritanceOverridePolicy()
+        {
+            return true;
+        }
+
+        @Override
+        public Set<Right> getImpliedRights()
+        {
+            return Collections.singleton(EDIT);
+        }
+
+        @Override
+        public Set<EntityType> getTargetedEntityType()
+        {
+            return Collections.singleton(EntityType.DOCUMENT);
+        }
+
+        @Override
+        public boolean isReadOnly()
+        {
+            return false;
+        }
+    }
+
+    @Test
+    void register() throws AuthorizationException
+    {
+        Right registeredRight = null;
+        try {
+            registeredRight =
+                this.authorizationManager.register(new CustomRightDescription(), Collections.singleton(SCRIPT));
+            assertEquals("foo", registeredRight.getName());
+            assertEquals(RuleState.DENY, registeredRight.getDefaultState());
+            assertEquals(Collections.singleton(EDIT), registeredRight.getImpliedRights());
+            assertEquals(RuleState.DENY, registeredRight.getTieResolutionPolicy());
+            assertEquals(Collections.singleton(EntityType.DOCUMENT), registeredRight.getTargetedEntityType());
+            assertTrue(registeredRight.getInheritanceOverridePolicy());
+            assertFalse(registeredRight.isReadOnly());
+            assertTrue(SCRIPT.getImpliedRights().contains(registeredRight));
+            assertTrue(PROGRAM.getImpliedRights().contains(registeredRight));
+
+            Right otherRegisteredRight = this.authorizationManager.register(new CustomRightDescription());
+            assertSame(registeredRight, otherRegisteredRight);
+            assertSame(registeredRight, Right.toRight("foo"));
+        } finally {
+            if (registeredRight != null) {
+                this.authorizationManager.unregister(registeredRight);
+            }
+        }
+    }
+
+    @Test
+    void unregister() throws AuthorizationException
+    {
+        AuthorizationException authorizationException = assertThrows(AuthorizationException.class, () -> {
+            this.authorizationManager.unregister(SCRIPT);
+        });
+        assertEquals("Attempt to unregister the static right [script]", authorizationException.getMessage());
+
+        Right registeredRight =
+            this.authorizationManager.register(new CustomRightDescription(), Collections.singleton(SCRIPT));
+        this.authorizationManager.unregister(registeredRight);
+        assertFalse(SCRIPT.getImpliedRights().contains(registeredRight));
+        assertFalse(PROGRAM.getImpliedRights().contains(registeredRight));
+
+        assertEquals(ILLEGAL, Right.toRight("foo"));
     }
 }

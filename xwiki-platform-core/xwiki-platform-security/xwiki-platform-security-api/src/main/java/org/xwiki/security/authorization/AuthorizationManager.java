@@ -102,4 +102,16 @@ public interface AuthorizationManager
     {
         return register(rightDescription);
     }
+
+    /**
+     * Unregister the given custom {@link Right}.
+     *
+     * @param right the custom right to unregister.
+     * @throws AuthorizationException if the right is not custom.
+     * @since 13.5RC1
+     */
+    @Unstable
+    default void unregister(Right right) throws AuthorizationException
+    {
+    };
 }

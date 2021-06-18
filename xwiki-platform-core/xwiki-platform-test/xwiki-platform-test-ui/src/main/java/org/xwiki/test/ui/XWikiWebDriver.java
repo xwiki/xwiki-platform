@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -602,7 +603,10 @@ public class XWikiWebDriver extends RemoteWebDriver
                 if (rawResult instanceof Boolean) {
                     result = (Boolean) rawResult;
                 } else {
-                    throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                    throw new IllegalArgumentException(String.format(
+                        "The executed javascript expression [%s] called with the arguments [%s] does not return a"
+                            + " boolean value [%s]",
+                        booleanExpression, Arrays.toString(arguments), rawResult));
                 }
             } catch (JavascriptException e) {
                 // We might obtain reference error when checking the presence of some properties during a wait.

@@ -110,14 +110,29 @@ public class AnnotatableViewPage extends BaseElement
 
     public void addAnnotation(String annotatedText, String annotationText, boolean wait)
     {
-        selectText(annotatedText);
-        simulateCTRL_M();
-        annotationsWindow.addAnnotation(annotationText);
+        beginAddAnnotation(annotatedText).addAnnotation(annotationText);
 
         if (wait) {
             // check is the saved successfully message is displayed
             waitForNotificationSuccessMessage(XWIKI_ANNOTATION_ADD_SUCCESS);
         }
+    }
+
+    /**
+     * Selects the specified text and opens the create annotation dialog.
+     * 
+     * @param annotatedText the text to select and annotate
+     * @return the annotation creation dialog
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public AnnotationsWindow beginAddAnnotation(String annotatedText)
+    {
+        selectText(annotatedText);
+        simulateCTRL_M();
+        annotationsWindow.waitUntilReady();
+        return annotationsWindow;
     }
 
     public void deleteAnnotationByID(String id)
@@ -148,9 +163,24 @@ public class AnnotatableViewPage extends BaseElement
     }
 
     // Shows the annotations pane from the top of the page
-    public void showAnnotationsPane()
+    public AnnotationsPane showAnnotationsPane()
     {
-        annotationsPane.showAnnotationsPane();
+        return showAnnotationsPane(true);
+    }
+
+    /**
+     * Open the annotation settings pane using the menu and maybe wait for it.
+     * 
+     * @param wait whether to wait for the pane to be visible or not
+     * @return the annotation settings pane
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public AnnotationsPane showAnnotationsPane(boolean wait)
+    {
+        this.annotationsPane.showAnnotationsPane(wait);
+        return this.annotationsPane;
     }
 
     // Hides the annotations pane from the top of the page
@@ -162,13 +192,70 @@ public class AnnotatableViewPage extends BaseElement
     // Checks the "Show Annotations" check box.
     public void clickShowAnnotations()
     {
+        clickShowAnnotations(false);
+    }
+
+    /**
+     * Clicks on the checkbox to show the annotations and maybe waits for the annotations to be displayed.
+     * 
+     * @param wait whether to wait or not for the annotations to be displayed; pass {@code true} only if you know there
+     *            are existing annotations to display
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public void clickShowAnnotations(boolean wait)
+    {
         annotationsPane.clickShowAnnotations();
+        if (wait) {
+            waitForAnnotationsDisplayed();
+        }
+    }
+
+    /**
+     * Wait for at least one annotation to be displayed.
+     * 
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public void waitForAnnotationsDisplayed()
+    {
+        getDriver().waitUntilElementIsVisible(By.className("annotation-marker"));
     }
 
     // Un-checks the "Show Annotations" check box.
     public void clickHideAnnotations()
     {
         annotationsPane.clickHideAnnotations();
+    }
+
+    /**
+     * @return the number of annotations displayed on the page
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public int getAnnotationCount()
+    {
+        return getDriver().findElementsWithoutWaiting(By.className("annotation-marker")).size();
+    }
+
+    /**
+     * Toggle the display of the annotations using the keyboard shortcut.
+     * 
+     * @param wait whether to wait for the annotations to be displayed or not (as they may need to be fetched from the
+     *            server); pass {@code true} only if you know that there are existing annotations
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public void toggleAnnotationDisplayUsingShortcutKey(boolean wait)
+    {
+        getDriver().findElement(By.id("body")).sendKeys(Keys.chord(Keys.ALT, "a"));
+        if (wait) {
+            waitForAnnotationsDisplayed();
+        }
     }
 
     // Checks if the checkBox within AnnotationsPane is visible

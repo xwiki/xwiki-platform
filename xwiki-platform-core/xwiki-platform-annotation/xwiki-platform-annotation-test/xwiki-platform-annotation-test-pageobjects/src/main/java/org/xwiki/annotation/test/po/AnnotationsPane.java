@@ -19,6 +19,8 @@
  */
 package org.xwiki.annotation.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -32,6 +34,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class AnnotationsPane extends BaseElement
 {
+    private static final By PANE_CONTAINER = By.className("annotationsettings");
+
     @FindBy(id = "annotationsdisplay")
     private WebElement checkBox;
 
@@ -47,13 +51,28 @@ public class AnnotationsPane extends BaseElement
     }
 
     /**
-     * Shows the annotations pane from the top of the page
+     * Shows the annotations pane from the top of the page.
      */
     public void showAnnotationsPane()
     {
+        showAnnotationsPane(true);
+    }
+
+    /**
+     * Show the annotation settings pane from the top of the page.
+     * 
+     * @param wait whether to wait for the pane to be visible or not
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public void showAnnotationsPane(boolean wait)
+    {
         clickOnAnnotationMenu();
-        // Verify that the annotationssettings panel is open
-        getDriver().waitUntilElementIsVisible(By.className("annotationsettings"));
+        if (wait) {
+            // Verify that the annotationssettings panel is open
+            getDriver().waitUntilElementIsVisible(PANE_CONTAINER);
+        }
     }
 
     /**
@@ -63,7 +82,7 @@ public class AnnotationsPane extends BaseElement
     {
         clickOnAnnotationMenu();
         // Verify that the annotationssettings panel is close
-        getDriver().waitUntilElementDisappears(By.className("annotationsettings"));
+        getDriver().waitUntilElementDisappears(PANE_CONTAINER);
     }
 
     /**
@@ -98,5 +117,17 @@ public class AnnotationsPane extends BaseElement
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return {@code true} if the annotation settings pane is displayed, {@code false} otherwise
+     * @since 12.10.9
+     * @since 13.4.1
+     * @since 13.5RC1
+     */
+    public boolean isDisplayed()
+    {
+        List<WebElement> panes = getDriver().findElementsWithoutWaiting(PANE_CONTAINER);
+        return !panes.isEmpty() && panes.get(0).isDisplayed();
     }
 }

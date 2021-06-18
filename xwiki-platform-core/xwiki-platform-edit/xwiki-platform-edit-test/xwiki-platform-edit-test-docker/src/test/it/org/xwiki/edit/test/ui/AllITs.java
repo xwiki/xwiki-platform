@@ -44,4 +44,10 @@ class AllITs
     class NestedInplaceTranslateIT extends InplaceTranslateIT
     {
     }
+
+    @Nested
+    @DisplayName("In-place edit with annotations")
+    class NestedInplaceEditWithAnnotationsIT extends InplaceEditWithAnnotationsIT
+    {
+    }
 }

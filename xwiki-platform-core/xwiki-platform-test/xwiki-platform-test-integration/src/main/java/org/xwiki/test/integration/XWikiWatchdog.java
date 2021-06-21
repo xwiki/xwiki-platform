@@ -85,7 +85,6 @@ public class XWikiWatchdog
 
                 try (CloseableHttpResponse httpResponse = httpclient.execute(httpGet, httpContext)) {
                     HttpEntity entity = httpResponse.getEntity();
-                    EntityUtils.consume(entity);
                     response.responseBody = IOUtils.toString(entity.getContent(), "UTF-8");
                     if (DEBUG) {
                         LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,

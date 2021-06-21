@@ -43,10 +43,10 @@ public interface RequestParameterConverter
      * This method is supposed to create a mutable request and to modify and returns that one. However in case of
      * error it won't return the modified request, but it will handle directly the errors in the response.
      *
-     * @param request the request that might contain parameter needing conversion.
-     * @param response the response used to redirect or do changes in case of conversion error.
-     * @return a mutable request with the converted parameters, or an empty optional in case of error.
-     * @throws IOException in case of problem to write an answer in the response.
+     * @param request the request that might contain parameter needing conversion
+     * @param response the response used to redirect or do changes in case of conversion error
+     * @return a mutable request with the converted parameters, or an empty optional in case of error
+     * @throws IOException in case of problem to write an answer in the response
      */
     Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException;
 }

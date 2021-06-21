@@ -44,7 +44,7 @@ import org.xwiki.wysiwyg.filter.MutableServletRequest;
 import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
 
 /**
- * Default implementation of {@link RequestParameterConverter} that handles HTML conversion of parameters needed such
+ * Default implementation of {@link RequestParameterConverter} that handles HTML conversion of parameters needing such
  * conversion.
  *
  * @version $Id$

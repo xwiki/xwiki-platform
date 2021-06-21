@@ -29,6 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-like</artifactId>
   <name>XWiki Platform - Like - Parent POM</name>
+  <description>Like pages in XWiki</description>
   <packaging>pom</packaging>
   <dependencies>
     <dependency>

@@ -102,7 +102,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
             // Remove the list of request parameters that require HTML conversion to avoid recurrency.
             mreq.removeParameter(REQUIRES_HTML_CONVERSION);
             // Try to convert each parameter from the list and save caught exceptions.
-            Map<String, Throwable> errors = new HashMap<String, Throwable>();
+            Map<String, Throwable> errors = new HashMap<>();
             // Save also the output to prevent loosing data in case of conversion exceptions.
             Map<String, String> output = new HashMap<String, String>();
             convertHTMLWithExecutionContext(parametersRequiringHTMLConversion, mreq, output, errors);

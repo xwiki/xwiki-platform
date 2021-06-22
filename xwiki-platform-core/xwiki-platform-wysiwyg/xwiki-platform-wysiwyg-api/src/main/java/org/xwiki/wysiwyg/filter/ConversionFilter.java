@@ -28,8 +28,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.wysiwyg.converter.RequestParameterConverter;
 
 import com.xpn.xwiki.web.Utils;
@@ -42,11 +43,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public class ConversionFilter implements Filter
 {
-    /**
-     * The logger instance.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionFilter.class);
-
     @Override
     public void destroy()
     {
@@ -57,9 +53,12 @@ public class ConversionFilter implements Filter
         throws IOException, ServletException
     {
         RequestParameterConverter converter = Utils.getComponent(RequestParameterConverter.class);
-        Optional<ServletRequest> optionalServletRequest = converter.convert(req, res);
-        if (optionalServletRequest.isPresent()) {
-            chain.doFilter(optionalServletRequest.get(), res);
+        Execution execution = Utils.getComponent(Execution.class);
+        execution.pushContext(new ExecutionContext());
+        Optional<ServletRequest> servletRequest = converter.convert(req, res);
+        execution.popContext();
+        if (servletRequest.isPresent()) {
+            chain.doFilter(servletRequest.get(), res);
         }
     }
 
@@ -67,8 +66,4 @@ public class ConversionFilter implements Filter
     public void init(FilterConfig config) throws ServletException
     {
     }
-
-
-
-
 }

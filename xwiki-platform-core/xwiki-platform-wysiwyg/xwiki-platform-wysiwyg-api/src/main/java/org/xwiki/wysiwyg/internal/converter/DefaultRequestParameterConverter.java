@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -36,8 +35,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.converter.RequestParameterConverter;
 import org.xwiki.wysiwyg.filter.MutableServletRequest;
@@ -84,10 +81,6 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     private HTMLConverter htmlConverter;
 
     @Inject
-    @Named("context")
-    private ComponentManager componentManager;
-
-    @Inject
     private Logger logger;
 
     @Override
@@ -104,8 +97,8 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
             // Try to convert each parameter from the list and save caught exceptions.
             Map<String, Throwable> errors = new HashMap<>();
             // Save also the output to prevent loosing data in case of conversion exceptions.
-            Map<String, String> output = new HashMap<String, String>();
-            convertHTMLWithExecutionContext(parametersRequiringHTMLConversion, mreq, output, errors);
+            Map<String, String> output = new HashMap<>();
+            convertHTML(parametersRequiringHTMLConversion, mreq, output, errors);
             if (!errors.isEmpty()) {
                 handleConversionErrors(errors, output, mreq, response);
                 result = Optional.empty();
@@ -116,18 +109,10 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         return result;
     }
 
-    private void convertHTMLWithExecutionContext(String[] parametersRequiringHTMLConversion,
-        MutableServletRequest request, Map<String, String> output, Map<String, Throwable> errors)
-    {
-        new ExecutionContextRunnable(() -> convertHTML(parametersRequiringHTMLConversion, request, output, errors),
-            this.componentManager).run();
-    }
-
     private void convertHTML(String[] parametersRequiringHTMLConversion, MutableServletRequest request,
         Map<String, String> output, Map<String, Throwable> errors)
     {
-        for (int i = 0; i < parametersRequiringHTMLConversion.length; i++) {
-            String parameterName = parametersRequiringHTMLConversion[i];
+        for (String parameterName : parametersRequiringHTMLConversion) {
             String html = request.getParameter(parameterName);
             // Remove the syntax parameter from the request to avoid interference with further request processing.
             String syntax = request.removeParameter(parameterName + "_syntax");

@@ -211,8 +211,15 @@ public class CustomNotificationFilterModal extends BaseModal
      */
     public void clickSubmit()
     {
+        LiveTableElement liveTableElement =
+            new LiveTableElement("notificationCustomFilterPreferencesLiveTable");
+        int rowCount = liveTableElement.getRowCount();
         getSubmitButton().click();
         this.waitForClosed();
-        new LiveTableElement("notificationCustomFilterPreferencesLiveTable").waitUntilReady();
+
+        // This first wait might not be enough since the LT was already ready: so it might returns immediately
+        // while we actually want to wait that the number of rows increased. Hence the two waits.
+        liveTableElement.waitUntilReady();
+        liveTableElement.waitUntilRowCountGreaterThan(rowCount + 1);
     }
 }

@@ -33,14 +33,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rest.Relations;
-import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
@@ -63,7 +60,10 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ClassPropertyValuesResourceImpl}.
@@ -72,7 +72,7 @@ import static org.mockito.Mockito.*;
  * @since 9.8RC1
  */
 @ComponentTest
-public class ClassPropertyValuesResourceImplTest
+class ClassPropertyValuesResourceImplTest
 {
     @InjectMockComponents
     private ClassPropertyValuesResourceImpl resource;
@@ -99,20 +99,16 @@ public class ClassPropertyValuesResourceImplTest
     XWikiContext xcontext;
 
     @BeforeComponent
-    public void beforeComponent() throws Exception
+    void beforeComponent() throws Exception
     {
         this.xcontext = mock(XWikiContext.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", this.xcontext);
-        Execution execution = componentManager.registerMockComponent(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
     }
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
-        when(xcontextProvider.get()).thenReturn(xcontext);
         when(this.resolver.resolve("Path.To.Class", propertyReference.extractReference(EntityType.WIKI)))
             .thenReturn((DocumentReference) propertyReference.getParent());
 
@@ -128,7 +124,7 @@ public class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    public void getClassPropertyValuesUnauthorized() throws Exception
+    void getClassPropertyValuesUnauthorized() throws Exception
     {
         doThrow(new AccessDeniedException(xcontext.getUserReference(), this.propertyReference)).when(
             authorization).checkAccess(eq(Right.VIEW), eq(this.propertyReference));
@@ -141,7 +137,7 @@ public class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    public void getClassPropertyValuesNotFound() throws Exception
+    void getClassPropertyValuesNotFound() throws Exception
     {
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
@@ -152,7 +148,7 @@ public class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    public void getClassPropertyValues() throws Exception
+    void getClassPropertyValues() throws Exception
     {
         when(this.xclass.get("status")).thenReturn(new DBListClass());
 

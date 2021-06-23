@@ -62,8 +62,7 @@ public class PageChildrenResourceImpl extends XWikiResource implements PageChild
                 String pageId = Utils.getPageId(wikiName, childPageFullName);
 
                 if (!Utils.getXWikiApi(componentManager).exists(pageId)) {
-                    getLogger().warn("Page [{}] appears to be in space [{}] but no information is available.", pageName,
-                        spaceName);
+                    getLogger().warn("Child page [{}] of [{}] is missing.", childPageFullName, doc.getFullName());
                 } else {
                     Document childDoc = Utils.getXWikiApi(componentManager).getDocument(pageId);
 

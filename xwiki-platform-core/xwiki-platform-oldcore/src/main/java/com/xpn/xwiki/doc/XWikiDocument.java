@@ -6882,7 +6882,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (is == null) {
                 AttachmentRecycleBinStore attachmentRecycleBinStore = context.getWiki().getAttachmentRecycleBinStore();
                 List<DeletedAttachment> allDeletedAttachments =
-                    attachmentRecycleBinStore.getAllDeletedAttachments(this, context, true);
+                    attachmentRecycleBinStore.getAllDeletedAttachments(doc, context, true);
 
                 for (DeletedAttachment deletedAttachment : allDeletedAttachments) {
                     XWikiAttachment restoredAttachment = deletedAttachment.restoreAttachment();

@@ -35,8 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -76,7 +74,7 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  */
 @ComponentTest
-public class ClassResourceImplTest
+class ClassResourceImplTest
 {
     @InjectMockComponents
     private ClassResourceImpl resource;
@@ -112,19 +110,16 @@ public class ClassResourceImplTest
     XWikiContext xcontext;
 
     @BeforeComponent
-    public void beforeComponent() throws Exception
+    void beforeComponent() throws Exception
     {
         this.xcontext = mock(XWikiContext.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", this.xcontext);
-        Execution execution = componentManager.registerMockComponent(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
         Utils.setComponentManager(componentManager);
     }
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         when(xcontextProvider.get()).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xWiki);
@@ -152,7 +147,7 @@ public class ClassResourceImplTest
     }
 
     @Test
-    public void authorizedClassesOnly() throws XWikiRestException, AccessDeniedException
+    void authorizedClassesOnly() throws XWikiRestException, AccessDeniedException
     {
         DocumentReference protectedReference = new DocumentReference("xwiki", "XWiki", "Protected");
         doThrow(new AccessDeniedException(xcontext.getUserReference(), protectedReference)).when(

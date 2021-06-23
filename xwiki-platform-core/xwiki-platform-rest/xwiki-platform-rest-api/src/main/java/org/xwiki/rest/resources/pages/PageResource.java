@@ -21,6 +21,7 @@ package org.xwiki.rest.resources.pages;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,7 +40,7 @@ public interface PageResource
 {
     @GET Page getPage(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceNames,
             @PathParam("pageName") String pageName,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("objects") @DefaultValue("false") Boolean withObjects,
@@ -49,7 +50,7 @@ public interface PageResource
 
     @PUT Response putPage(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceNames,
             @PathParam("pageName") String pageName,
             @QueryParam("minorRevision") Boolean minorRevision,
             Page page
@@ -57,7 +58,7 @@ public interface PageResource
 
     @DELETE void deletePage(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceNames,
             @PathParam("pageName") String pageName
     ) throws XWikiRestException;
 }

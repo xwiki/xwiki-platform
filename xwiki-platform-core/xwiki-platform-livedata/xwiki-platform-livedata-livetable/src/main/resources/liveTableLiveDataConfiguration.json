@@ -12,7 +12,7 @@
 
     "propertyDescriptors": [
       {"id": "doc.name", "type": "String", "editable": false, "displayer": "link"},
-      {"id": "doc.title", "type": "String", "displayer": "link"},
+      {"id": "doc.title", "type": "String", "displayer": "docTitle"},
       {
         "id": "doc.hidden",
         "type": "Boolean",
@@ -176,7 +176,9 @@
     ],
 
     "displayers": [
-      {"id": "link", "propertyHref": "doc.url"}
+      {"id": "link", "propertyHref": "doc.url"},
+      {"id": "xObjectProperty"},
+      {"id": "docTitle", "propertyHref": "doc.url"}
     ],
 
     "filters": [

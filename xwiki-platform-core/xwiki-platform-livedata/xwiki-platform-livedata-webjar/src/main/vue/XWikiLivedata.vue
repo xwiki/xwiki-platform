@@ -33,6 +33,9 @@
     <!-- Where the layouts are going to be displayed -->
     <LivedataLayout :layout-id="layoutId"/>
 
+    <!-- Displays the footnotes once the layout is loaded. -->
+    <LivedataFootnotes v-if="layoutLoaded" />
+
     <!-- Persistent configuration module (if supported by the config) -->
     <LivedataPersistentConfiguration v-if="data.id"/>
     
@@ -50,6 +53,7 @@ __webpack_public_path__ = window.liveDataBaseURL;
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
+import LivedataFootnotes from "./footnotes/LivedataFootnotes";
 
 
 export default {
@@ -60,6 +64,7 @@ export default {
     LivedataAdvancedPanels,
     LivedataLayout,
     LivedataPersistentConfiguration,
+    LivedataFootnotes
   },
 
   props: {

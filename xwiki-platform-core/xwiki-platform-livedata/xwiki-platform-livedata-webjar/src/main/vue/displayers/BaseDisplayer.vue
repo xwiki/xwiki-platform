@@ -46,6 +46,7 @@
         -->
         <span>{{ value }}</span>
       </slot>
+      <span v-if="!isViewable" v-html="$t('livedata.displayer.emptyValue')"></span>
     </div>
 
     <!-- The slot containing the displayer Editor widget -->
@@ -108,6 +109,10 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+    isEmpty: {
+      type: Boolean,
+      default: undefined
     }
   },
 
@@ -123,7 +128,17 @@ export default {
       const noOtherEditing = this.logic.getEditBus().isEditable()
       return editable && noOtherEditing;
     },
-    
+    isViewable() {
+      var empty = this.isEmpty;
+      if (empty === undefined) {
+        empty = !this.value
+      }
+      const isViewable = this.logic.isActionAllowed('view', this.entry) || !empty;
+      if (!isViewable) {
+        this.logic.footnotes.put('*', 'livedata.footnotes.propertyNotViewable');
+      }
+      return isViewable;
+    }
   },
 
   // The following methods are only used by the BaseDisplayer component

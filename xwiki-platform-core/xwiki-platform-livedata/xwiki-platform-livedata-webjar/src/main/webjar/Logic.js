@@ -67,6 +67,34 @@ define('xwiki-livedata', [
     return instancesMap.get(element);
   };
 
+  /**
+   * A service providing footnotes related operations. 
+   */
+  class FootnotesService {
+    constructor() {
+      this._footnotes = [];
+    }
+
+    /**
+     * Register a new footnote. If a footnote with the same translationKey is already registered this method has no
+     * effect on the list of registered footnotes.
+     * @param symbol the symbol to identify the entries related to the footnote 
+     * @param translationKey the translation key of the footnote text 
+     */
+    put(symbol, translationKey) {
+      if (!this._footnotes.some(footnote => footnote.translationKey === translationKey)) {
+        this._footnotes.push({symbol, translationKey});
+      }
+    }
+    
+    reset() {
+      this._footnotes.splice(0);
+    }
+    
+    list() {
+      return this._footnotes;
+    }
+  }
 
   /**
    * Class for a logic element
@@ -85,6 +113,7 @@ define('xwiki-livedata', [
       isGlobal: false,
     };
     this.openedPanels = [];
+    this.footnotes = new FootnotesService();
 
     element.removeAttribute("data-config");
 
@@ -172,12 +201,15 @@ define('xwiki-livedata', [
         "panel.sort.direction.descending",
         "panel.sort.add",
         "panel.sort.delete",
+        "displayer.emptyValue",
         "displayer.link.noValue",
         "displayer.boolean.true",
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
         "filter.list.emptyLabel",
+        "footnotes.computedTitle",
+        "footnotes.propertyNotViewable"
       ],
     });
 
@@ -477,7 +509,11 @@ define('xwiki-livedata', [
 
     updateEntries () {
       return this.fetchEntries()
-        .then(data => this.data.data = data)
+        .then(data => {
+          this.data.data = data
+          // Remove the outdated footnotes, they will be recomputed by the new entries.
+          this.footnotes.reset()
+        })
         .catch(err => console.error(err));
     },
 

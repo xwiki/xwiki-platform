@@ -20,10 +20,13 @@
 package org.xwiki.livedata.test.po;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -68,6 +71,28 @@ public class LiveDataElement extends BaseElement
         return new CardLayoutElement(this.id);
     }
 
+    /**
+     * @return the number of displayed footnotes
+     * @since 13.6RC1
+     * @since 13.5
+     * @since 13.4.1
+     */
+    public int countFootnotes()
+    {
+        return getFootnotes().size();
+    }
+
+    /**
+     * @return a list of the text of the footnotes
+     * @since 13.6RC1
+     * @since 13.5
+     * @since 13.4.1
+     */
+    public List<String> getFootnotesText()
+    {
+        return getFootnotes().stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
     private void waitUntilReady()
     {
         // First the Live Data macro displays a simple div with the loading class.
@@ -93,5 +118,11 @@ public class LiveDataElement extends BaseElement
             input -> getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
                 .isEmpty()
         );
+    }
+
+    private List<WebElement> getFootnotes()
+    {
+        return getDriver().findElementWithoutWaiting(By.id(this.id))
+            .findElements(By.cssSelector(".footnotes > .footnote"));
     }
 }

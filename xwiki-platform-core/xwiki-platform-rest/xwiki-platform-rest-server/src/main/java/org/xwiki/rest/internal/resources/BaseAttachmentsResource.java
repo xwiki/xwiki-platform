@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.model.EntityType;
@@ -113,9 +112,6 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("hidden/document")
     private QueryFilter hiddenDocumentFilter;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     @Named("local")

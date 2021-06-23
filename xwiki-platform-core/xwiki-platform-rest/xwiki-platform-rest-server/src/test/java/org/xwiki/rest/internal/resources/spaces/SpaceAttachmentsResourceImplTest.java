@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
+class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 {
     @InjectMockComponents
     private SpaceAttachmentsResourceImpl spaceAttachmentsResource;
@@ -61,7 +61,7 @@ public class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourc
     }
 
     @Test
-    public void getAttachments() throws Exception
+    void getAttachments() throws Exception
     {
         Query query = mock(Query.class);
         when(this.queryManager.createQuery("select doc.space, doc.name, doc.version, attachment"

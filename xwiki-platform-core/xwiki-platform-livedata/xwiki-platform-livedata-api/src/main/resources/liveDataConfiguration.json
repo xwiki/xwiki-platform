@@ -45,7 +45,6 @@
       {"id": "text"},
       {"id": "link"},
       {"id": "html"},
-      {"id": "xObjectProperty"},
       {"id": "actions"},
       {"id": "boolean"}
     ],

@@ -73,7 +73,9 @@ public class LiveDataElement extends BaseElement
 
     /**
      * @return the number of displayed footnotes
-     * @since 13.5RC1
+     * @since 13.6RC1
+     * @since 13.5
+     * @since 13.4.1
      */
     public int countFootnotes()
     {
@@ -82,7 +84,9 @@ public class LiveDataElement extends BaseElement
 
     /**
      * @return a list of the text of the footnotes
-     * @since 13.5RC1
+     * @since 13.6RC1
+     * @since 13.5
+     * @since 13.4.1
      */
     public List<String> getFootnotesText()
     {

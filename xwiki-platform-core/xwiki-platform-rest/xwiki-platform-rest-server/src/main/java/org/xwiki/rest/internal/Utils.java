@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.httpclient.URIException;
@@ -31,7 +32,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -249,12 +249,9 @@ public class Utils
      */
     public static XWikiContext getXWikiContext(ComponentManager componentManager)
     {
-        Execution execution;
-        XWikiContext xwikiContext;
         try {
-            execution = componentManager.getInstance(Execution.class);
-            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            return xwikiContext;
+            Provider<XWikiContext> xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
+            return xcontextProvider.get();
         } catch (Exception e) {
             throw new RuntimeException("Unable to get XWiki context", e);
         }
@@ -296,7 +293,7 @@ public class Utils
             return XWikiRightService.GUEST_USER_FULLNAME;
         }
 
-        return user.getUser();
+        return user.getFullName();
     }
 
     /**

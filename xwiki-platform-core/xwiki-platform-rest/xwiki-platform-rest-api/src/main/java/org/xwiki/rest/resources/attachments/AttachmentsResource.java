@@ -22,6 +22,7 @@ package org.xwiki.rest.resources.attachments;
 import javax.mail.Multipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,7 +42,7 @@ public interface AttachmentsResource
 {
     @GET Attachments getAttachments(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("number") @DefaultValue("-1") Integer number,
@@ -54,7 +55,7 @@ public interface AttachmentsResource
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA) Response addAttachment(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             Multipart multipart,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,

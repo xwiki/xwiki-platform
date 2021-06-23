@@ -33,8 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -74,7 +72,7 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  */
 @ComponentTest
-public class ClassesResourceImplTest
+class ClassesResourceImplTest
 {
     @InjectMockComponents
     private ClassesResourceImpl resource;
@@ -110,19 +108,16 @@ public class ClassesResourceImplTest
     XWikiContext xcontext;
 
     @BeforeComponent
-    public void beforeComponent() throws Exception
+    void beforeComponent() throws Exception
     {
         this.xcontext = mock(XWikiContext.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", this.xcontext);
-        Execution execution = componentManager.registerMockComponent(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
         Utils.setComponentManager(componentManager);
     }
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         when(xcontextProvider.get()).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xWiki);
@@ -150,14 +145,14 @@ public class ClassesResourceImplTest
     }
 
     @Test
-    public void classesNoConstraint() throws XWikiRestException
+    void classesNoConstraint() throws XWikiRestException
     {
         Classes xwikiClasses = resource.getClasses("xwiki", 0, -1);
         assertEquals(4, xwikiClasses.getClazzs().size());
     }
 
     @Test
-    public void authorizedClassesOnly() throws XWikiRestException
+    void authorizedClassesOnly() throws XWikiRestException
     {
         when(authorization.hasAccess(eq(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "Protected"))))
             .thenReturn(false);

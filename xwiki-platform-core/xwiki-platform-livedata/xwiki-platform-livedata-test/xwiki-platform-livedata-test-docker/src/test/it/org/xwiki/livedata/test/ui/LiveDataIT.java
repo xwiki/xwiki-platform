@@ -189,6 +189,9 @@ class LiveDataIT
             containsInAnyOrder(FOOTNOTES_PROPERTY_NOT_VIEWABLE, FOOTNOTE_COMPUTED_TITLE));
     }
 
+    /**
+     * @since 12.10.9
+     */
     @Test
     @Order(2)
     void livedataLivetableTableLayoutResultPage(TestUtils testUtils, TestReference testReference) throws Exception

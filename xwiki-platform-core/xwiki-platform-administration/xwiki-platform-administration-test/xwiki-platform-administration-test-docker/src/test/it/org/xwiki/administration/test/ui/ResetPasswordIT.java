@@ -117,17 +117,19 @@ public class ResetPasswordIT
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
         resetPasswordPage = resetPasswordPage.clickResetPassword();
-        assertFalse(resetPasswordPage.isResetPasswordSent());
-        assertTrue(resetPasswordPage.getMessage().contains("user does not exist"));
+
+        // there should not have any indication if the user exists or not.
+        assertTrue(resetPasswordPage.isFormSubmitted());
 
         // Try again
-        resetPasswordPage = resetPasswordPage.clickRetry();
+        resetPasswordPage = ResetPasswordPage.gotoPage();
 
         // Try to reset the password of our user, when he has no email set
         resetPasswordPage.setUserName(userName);
         resetPasswordPage.clickResetPassword();
-        assertFalse(resetPasswordPage.isResetPasswordSent());
-        assertTrue(resetPasswordPage.getMessage().contains("email address not provided"));
+
+        // there should not have any indication if an email address is provided or not.
+        assertTrue(resetPasswordPage.isFormSubmitted());
 
         // Try again. This time, set the user's email address in the profile
         setup.loginAsSuperAdmin();
@@ -145,7 +147,7 @@ public class ResetPasswordIT
             "Actual message: " + newResetPasswordPage.getMessage());
 
         // Check the result
-        assertTrue(resetPasswordPage.isResetPasswordSent());
+        assertTrue(resetPasswordPage.isFormSubmitted());
         // Check the emails received by the user
         assertTrue(this.mail.waitForIncomingEmail(1));
         MimeMessage[] receivedEmails = this.mail.getReceivedMessages();

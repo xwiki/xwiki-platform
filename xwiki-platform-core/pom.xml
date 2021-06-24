@@ -554,6 +554,19 @@
                   <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, ===java.lang.String===, java.lang.String, java.util.List&lt;java.lang.String&gt;, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
                   <annotation>@javax.ws.rs.Encoded</annotation>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>
+                  <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</new>
+                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.ResetPasswordRequestResponse::getUserEmail()</old>
+                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

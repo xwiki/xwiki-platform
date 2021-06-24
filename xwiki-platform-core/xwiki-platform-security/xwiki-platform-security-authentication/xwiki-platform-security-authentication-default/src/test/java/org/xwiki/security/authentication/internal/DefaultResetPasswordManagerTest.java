@@ -28,6 +28,7 @@ import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
@@ -37,6 +38,8 @@ import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -59,7 +62,11 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -99,6 +106,9 @@ class DefaultResetPasswordManagerTest
 
     @MockComponent
     private Provider<ResetPasswordMailSender> resetPasswordMailSenderProvider;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private ResetPasswordMailSender resetPasswordMailSender;
 
@@ -145,24 +155,19 @@ class DefaultResetPasswordManagerTest
             .thenReturn("Save verification code 42");
 
         ResetPasswordRequestResponse expectedResult =
-            new DefaultResetPasswordRequestResponse(this.userReference, email,
-                verificationCode);
+            new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
         assertEquals(expectedResult, this.resetPasswordManager.requestResetPassword(this.userReference));
         verify(xObject).set(DefaultResetPasswordManager.VERIFICATION_PROPERTY, verificationCode, context);
         verify(this.xWiki).saveDocument(this.userDocument, "Save verification code 42", true, this.context);
     }
 
     @Test
-    void requestResetPasswordUnexistingUser()
+    void requestResetPasswordUnexistingUser() throws ResetPasswordException
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
-        String exceptionMessage = "User [user:Foobar] doesn't exist";
-        when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.noUser",
-            "user:Foobar")).thenReturn(exceptionMessage);
-        ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
-            () -> this.resetPasswordManager.requestResetPassword(this.userReference));
-        assertEquals(exceptionMessage, resetPasswordException.getMessage());
+        assertEquals(new DefaultResetPasswordRequestResponse(this.userReference, null),
+            this.resetPasswordManager.requestResetPassword(this.userReference));
     }
 
     @Test
@@ -180,12 +185,11 @@ class DefaultResetPasswordManagerTest
     void requestResetPasswordNoEmail() throws Exception
     {
         when(this.userManager.exists(this.userReference)).thenReturn(true);
-        String exceptionMessage = "User has no email address.";
-        when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.noEmail"))
-            .thenReturn(exceptionMessage);
-        ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
-            () -> this.resetPasswordManager.requestResetPassword(this.userReference));
-        assertEquals(exceptionMessage, resetPasswordException.getMessage());
+        assertEquals(new DefaultResetPasswordRequestResponse(this.userReference, null),
+            this.resetPasswordManager.requestResetPassword(this.userReference));
+        when(this.userReference.toString()).thenReturn("foo");
+        assertEquals("User [foo] asked to reset their password, but did not have any email configured.",
+            logCapture.getMessage(0));
     }
 
     @Test
@@ -210,6 +214,7 @@ class DefaultResetPasswordManagerTest
     @Test
     void sendResetPasswordEmailRequest() throws Exception
     {
+        when(this.userManager.exists(this.userReference)).thenReturn(true);
         when(this.referenceSerializer.serialize(this.userReference)).thenReturn("user:Foobar");
         when(this.userProperties.getFirstName()).thenReturn("Foo");
         when(this.userProperties.getLastName()).thenReturn("Bar");
@@ -231,9 +236,10 @@ class DefaultResetPasswordManagerTest
         when(urlFactory.getServerURL(this.context)).thenReturn(new URL("http://xwiki.org"));
 
         InternetAddress email = new InternetAddress("foobar@xwiki.org");
+        when(this.userProperties.getEmail()).thenReturn(email);
+
         DefaultResetPasswordRequestResponse requestResponse =
-            new DefaultResetPasswordRequestResponse(this.userReference, email,
-                verificationCode);
+            new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
         this.resetPasswordManager.sendResetPasswordEmailRequest(requestResponse);
         verify(this.resetPasswordMailSender).sendResetPasswordEmail("Foo Bar", email,
             new URL("http://xwiki.org/xwiki/authenticate/reset?u=user%3AFoobar&v=foobar4242"));
@@ -266,24 +272,20 @@ class DefaultResetPasswordManagerTest
             .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey"))
             .thenReturn(saveComment);
         DefaultResetPasswordRequestResponse expected =
-            new DefaultResetPasswordRequestResponse(this.userReference, email,
-                newVerificationCode);
+            new DefaultResetPasswordRequestResponse(this.userReference, newVerificationCode);
 
         assertEquals(expected, this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         verify(this.xWiki).saveDocument(this.userDocument, saveComment, true, context);
     }
 
     @Test
-    void checkVerificationCodeUnexistingUser()
+    void checkVerificationCodeUnexistingUser() throws ResetPasswordException
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
-        String exceptionMessage = "User [user:Foobar] doesn't exist";
-        when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.noUser",
-            "user:Foobar")).thenReturn(exceptionMessage);
-        ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
-            () -> this.resetPasswordManager.checkVerificationCode(this.userReference, "some code"));
-        assertEquals(exceptionMessage, resetPasswordException.getMessage());
+        ResetPasswordRequestResponse resetPasswordRequestResponse =
+            this.resetPasswordManager.checkVerificationCode(this.userReference, "some code");
+        assertEquals(new DefaultResetPasswordRequestResponse(this.userReference, null), resetPasswordRequestResponse);
     }
 
     @Test
@@ -358,12 +360,10 @@ class DefaultResetPasswordManagerTest
     {
         when(this.userReference.toString()).thenReturn("user:Foobar");
         when(this.userManager.exists(this.userReference)).thenReturn(false);
-        String exceptionMessage = "User [user:Foobar] doesn't exist";
-        when(this.localizationManager.getTranslationPlain("xe.admin.passwordReset.error.noUser",
-            "user:Foobar")).thenReturn(exceptionMessage);
-        ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
-            () -> this.resetPasswordManager.resetPassword(this.userReference, "some password"));
-        assertEquals(exceptionMessage, resetPasswordException.getMessage());
+        this.resetPasswordManager.resetPassword(this.userReference, "some password");
+        verify(this.xWiki, never()).getDocument(any(DocumentReference.class), any(XWikiContext.class));
+        verify(this.xWiki, never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
+            any(XWikiContext.class));
     }
 
     @Test

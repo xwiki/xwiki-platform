@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.6.12",
+    "vue": "2.6.12",
     "lz-string": "^1.4.4",
     "u-node": "^0.0.2",
     "vuedraggable": "^2.24.3"
@@ -22,6 +22,6 @@
     "eslint-plugin-vue": "^7.5.0",
     "less": "^4.1.1",
     "less-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "2.6.12"
   }
 }

@@ -195,9 +195,8 @@ class AuthenticationScriptServiceTest
         ResetPasswordRequestResponse requestResponse = mock(ResetPasswordRequestResponse.class);
         when(this.resetPasswordManager.requestResetPassword(userReference)).thenReturn(requestResponse);
         InternetAddress userEmail = new InternetAddress("acme@xwiki.org");
-        when(requestResponse.getUserEmail()).thenReturn(userEmail);
 
-        assertEquals(userEmail, this.scriptService.requestResetPassword(userReference));
+        this.scriptService.requestResetPassword(userReference);
         verify(this.resetPasswordManager).sendResetPasswordEmailRequest(requestResponse);
     }
 
@@ -206,7 +205,7 @@ class AuthenticationScriptServiceTest
     {
         when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
 
-        assertNull(this.scriptService.requestResetPassword(mock(UserReference.class)));
+        this.scriptService.requestResetPassword(mock(UserReference.class));
         verify(this.resetPasswordManager, never()).requestResetPassword(any());
         verify(this.resetPasswordManager, never()).sendResetPasswordEmailRequest(any());
     }

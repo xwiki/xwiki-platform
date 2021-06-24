@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.mail.internet.InternetAddress;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -190,21 +189,16 @@ public class AuthenticationScriptService implements ScriptService
      * This method returns the email address used, so that we can display it to the user.
      *
      * @param user the user for which to perform a reset password request.
-     * @return the email address used to send the verification code or {@code null} if the user calling this method
-     *         doesn't have programming rights.
      * @throws ResetPasswordException if any error occurs for performing the reset password request.
      * @since 13.1RC1
      */
     @Unstable
-    public InternetAddress requestResetPassword(UserReference user) throws ResetPasswordException
+    public void requestResetPassword(UserReference user) throws ResetPasswordException
     {
         if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
             ResetPasswordRequestResponse resetPasswordRequestResponse =
                 this.resetPasswordManager.requestResetPassword(user);
             this.resetPasswordManager.sendResetPasswordEmailRequest(resetPasswordRequestResponse);
-            return resetPasswordRequestResponse.getUserEmail();
-        } else {
-            return null;
         }
     }
 

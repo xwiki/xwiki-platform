@@ -187,6 +187,19 @@
                   <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
                   <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>
+                  <new>method void org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</new>
+                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.ResetPasswordRequestResponse::getUserEmail()</old>
+                  <justification>Unstable API: this API was not properly designed and shouldn't have returned that in first place.</justification>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

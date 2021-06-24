@@ -28,6 +28,7 @@ import org.xwiki.test.docker.junit5.UITest;
  *
  * @version $Id$
  * @since 13.4RC1
+ * @since 12.10.9
  */
 @UITest
 class AllITs
@@ -36,5 +37,5 @@ class AllITs
     @DisplayName("Live Data Tests")
     class NestedLiveDataIT extends LiveDataIT
     {
-    }    
+    }
 }

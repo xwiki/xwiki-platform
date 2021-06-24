@@ -140,6 +140,7 @@ public class TableLayoutElement extends BaseElement
      * Default constructor. Initializes a live data table layout page object.
      *
      * @param liveDataId the live data id
+     * @since 12.10.9
      */
     public TableLayoutElement(String liveDataId)
     {
@@ -153,6 +154,7 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel a column label (for instance {@code Title})
      * @param value the value to be found in the column
      * @see #assertRow(String, Matcher)
+     * @since 12.10.9
      */
     public void assertRow(String columnLabel, String value)
     {
@@ -167,6 +169,7 @@ public class TableLayoutElement extends BaseElement
      * @see #assertRow(String, String)
      * @since 13.5RC1
      * @since 13.4.1
+     * @since 12.10.9
      */
     public void assertRow(String columnLabel, Matcher<Iterable<? super WebElement>> matcher)
     {
@@ -190,6 +193,7 @@ public class TableLayoutElement extends BaseElement
      * content, see {@link #waitUntilReady(boolean)}.
      *
      * @see #waitUntilReady(boolean)
+     * @since 12.10.9
      */
     public void waitUntilReady()
     {
@@ -202,6 +206,7 @@ public class TableLayoutElement extends BaseElement
      * @param expectRows when {@code true} waits for rows to be displayed and loaded, when {@code false} continue
      *     without waiting for the content
      * @see #waitUntilReady()
+     * @since 12.10.9
      */
     public void waitUntilReady(boolean expectRows)
     {
@@ -330,6 +335,7 @@ public class TableLayoutElement extends BaseElement
 
     /**
      * @return the number of rows currently displayed in the live data
+     * @since 12.10.9
      */
     public int countRows()
     {
@@ -422,6 +428,7 @@ public class TableLayoutElement extends BaseElement
      * @return a matcher instance
      * @since 13.5RC1
      * @since 13.4.1
+     * @since 12.10.9
      */
     public Matcher<WebElement> getWebElementTextMatcher(String value)
     {
@@ -443,7 +450,7 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {
         return new CellWithLinkMatcher(text, link);
-    } 
+    }
 
     /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest
@@ -531,8 +538,8 @@ public class TableLayoutElement extends BaseElement
     /**
      * Does the steps for the edition of a cell, until the {@code newValue} is set on the requested field. Then call an
      * {@code userAction} (for instance a click outside of the cell, or pressing escape). The {@code userAction} is
-     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally,
-     * waits for the result of the user action to be completed before continuing.
+     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally, waits for the
+     * result of the user action to be completed before continuing.
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)

@@ -44,14 +44,41 @@ public interface RatingsManager
      */
     enum RatingQueryField
     {
+        /**
+         * Represents the 'id' field.
+         */
         IDENTIFIER("id"),
+        /**
+         * Represents the 'id' field.
+         */
         ENTITY_REFERENCE("reference"),
+        /**
+         * Represents the 'parents' field.
+         */
         PARENTS_REFERENCE("parents"),
+        /**
+         * Represents the 'author' field.
+         */
         USER_REFERENCE("author"),
+        /**
+         * Represents the 'vote' field.
+         */
         VOTE("vote"),
+        /**
+         * Represents the 'createdDate' field.
+         */
         CREATED_DATE("createdDate"),
+        /**
+         * Represents the 'updatedDate' field.
+         */
         UPDATED_DATE("updatedDate"),
+        /**
+         * Represents the 'managerId' field.
+         */
         MANAGER_ID("managerId"),
+        /**
+         * Represents the 'scale' field.
+         */
         SCALE("scale");
 
         private final String fieldName;

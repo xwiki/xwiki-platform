@@ -140,6 +140,7 @@ administration.section.users.deleteUser.newAuthor.hint=Select an user that has {
 administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 administration.section.users.deleteUser.newAuthor.programming=programming
 administration.section.users.deleteUser.newAuthor.script=script
+admin.usersgroups.extensionrights=Extension Rights
 
 # Other Category
 admin.other=Other

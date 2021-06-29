@@ -34,6 +34,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
+import org.xwiki.component.namespace.NamespaceUtils;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryStore;
@@ -48,9 +50,12 @@ import org.xwiki.livedata.rest.LiveDataEntryResource;
 import org.xwiki.livedata.rest.LiveDataSourceResource;
 import org.xwiki.livedata.rest.model.jaxb.Entries;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation of {@link LiveDataEntriesResource}.
@@ -66,25 +71,22 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     private static final String FILTERS_PREFIX = "filters.";
 
     @Override
-    public Entries getEntries(String sourceId, String namespace, List<String> properties, List<String> matchAll,
+    public Entries getEntries(String sourceId, String namespaceStr, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {
-        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue query-params
-        // gives list with null element)
-        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        LiveDataConfiguration config =
-            getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
-        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
-        if (source.isPresent()) {
-            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
-            LiveDataEntryStore entryStore = source.get().getEntries();
-            return createEntries(entryStore.get(config.getQuery()), idProperty, config.getQuery().getSource(),
-                namespace).withOffset(offset).withLimit(limit);
-        } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        XWikiContext xWikiContext = this.xcontextProvider.get();
+        String savedWikiId = xWikiContext.getWikiId();
+        try {
+            // Switch the wikiId of the context if a namespace is provided and is of type wiki (for instance "wiki:s1").
+            Namespace namespace = NamespaceUtils.toNamespace(namespaceStr);
+            if (namespace != null && Objects.equals(namespace.getType(), WikiNamespace.TYPE)) {
+                xWikiContext.setWikiId(namespace.getValue());
+            }
+
+            LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
+            return getEntries(namespaceStr, offset, limit, config);
+        } finally {
+            xWikiContext.setWikiId(savedWikiId);
         }
     }
 
@@ -178,5 +180,31 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
             .map(values -> this.createEntry(values, values.get(idProperty), source, namespace))
             .collect(Collectors.toList());
         return (Entries) new Entries().withEntries(entries).withCount(liveData.getCount()).withLinks(self, parent);
+    }
+
+    private LiveDataConfiguration initConfig(String sourceId, List<String> properties, List<String> matchAll,
+        List<String> sort, List<Boolean> descending, long offset, int limit) throws LiveDataException
+    {
+        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue 
+        // query-params gives list with null element).
+        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
+    }
+
+    private Entries getEntries(String namespace, long offset, int limit, LiveDataConfiguration config)
+        throws LiveDataException
+    {
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
+        if (source.isPresent()) {
+            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
+            LiveDataEntryStore entryStore = source.get().getEntries();
+            return createEntries(entryStore.get(config.getQuery()), idProperty, config.getQuery().getSource(),
+                namespace).withOffset(offset).withLimit(limit);
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
 }

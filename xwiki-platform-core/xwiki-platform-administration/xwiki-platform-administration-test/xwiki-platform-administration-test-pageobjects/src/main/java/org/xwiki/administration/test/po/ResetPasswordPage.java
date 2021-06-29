@@ -67,7 +67,13 @@ public class ResetPasswordPage extends ViewPage
         return new ResetPasswordPage();
     }
 
-    public boolean isResetPasswordSent()
+    /**
+     * This method only checks if the form was properly submitted and didn't return an error.
+     * It does not mean that an email was necessarily sent.
+     *
+     * @return {@code true} if the form is properly submitted.
+     */
+    public boolean isFormSubmitted()
     {
         // If there is no form and we see an info box, then the request was sent.
         return !getDriver().hasElementWithoutWaiting(By.cssSelector("#resetPasswordForm"))

@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authentication.internal;
 
-import javax.mail.internet.InternetAddress;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
@@ -35,19 +33,16 @@ import org.xwiki.user.UserReference;
 public final class DefaultResetPasswordRequestResponse implements ResetPasswordRequestResponse
 {
     private final UserReference userReference;
-    private final InternetAddress userEmail;
     private final String verificationCode;
 
     /**
      * Default constructor.
      * @param reference the user for whom a reset password request is performed.
-     * @param userEmail the email of the user.
      * @param verificationCode the code to send for resetting the password.
      */
-    DefaultResetPasswordRequestResponse(UserReference reference, InternetAddress userEmail, String verificationCode)
+    DefaultResetPasswordRequestResponse(UserReference reference, String verificationCode)
     {
         this.userReference = reference;
-        this.userEmail = userEmail;
         this.verificationCode = verificationCode;
     }
 
@@ -57,14 +52,6 @@ public final class DefaultResetPasswordRequestResponse implements ResetPasswordR
     public UserReference getUserReference()
     {
         return userReference;
-    }
-
-    /**
-     * @return the email of the user.
-     */
-    public InternetAddress getUserEmail()
-    {
-        return userEmail;
     }
 
     /**
@@ -90,7 +77,6 @@ public final class DefaultResetPasswordRequestResponse implements ResetPasswordR
 
         return new EqualsBuilder()
             .append(userReference, that.userReference)
-            .append(userEmail, that.userEmail)
             .append(verificationCode, that.verificationCode)
             .isEquals();
     }
@@ -100,7 +86,6 @@ public final class DefaultResetPasswordRequestResponse implements ResetPasswordR
     {
         return new HashCodeBuilder(17, 37)
             .append(userReference)
-            .append(userEmail)
             .append(verificationCode)
             .toHashCode();
     }

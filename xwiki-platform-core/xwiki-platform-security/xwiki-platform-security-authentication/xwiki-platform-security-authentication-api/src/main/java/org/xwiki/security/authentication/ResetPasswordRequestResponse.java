@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authentication;
 
-import javax.mail.internet.InternetAddress;
-
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -37,11 +35,6 @@ public interface ResetPasswordRequestResponse
      * @return the reference of the user for whom the reset password request have been performed.
      */
     UserReference getUserReference();
-
-    /**
-     * @return the email address of the user for whom the reset password request have been performed.
-     */
-    InternetAddress getUserEmail();
 
     /**
      * @return the verification code to be send to the user.

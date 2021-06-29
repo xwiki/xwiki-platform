@@ -168,7 +168,7 @@ public class WARBuilder
             // Step: Copy target/classes to WEB-INF/classes to allow docker tests to provide custom java code that is
             // deployed in the custom WAR.
             File webInfClassesDirectory = new File(webInfDirectory, "classes");
-            copyClasses(webInfClassesDirectory);
+            copyClasses(webInfClassesDirectory, this.testConfiguration);
 
             // Step: Add the webapp resources (web.xml, templates VM files, etc)
             copyWebappResources(this.testConfiguration, warDependencies, this.targetWARDirectory);
@@ -232,11 +232,12 @@ public class WARBuilder
         return result;
     }
 
-    private void copyClasses(File webInfClassesDirectory) throws Exception
+    private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
-        File sourceDirectory = new File("target/classes");
-        if (sourceDirectory.exists()) {
-            copyDirectory(new File("target/classes"), webInfClassesDirectory);
+        LOGGER.info("Copying resources to WEB-INF/classes ...");
+        File classesDirectory = new File(testConfiguration.getOutputDirectory(), "classes");
+        if (classesDirectory.exists()) {
+            copyDirectory(classesDirectory, webInfClassesDirectory);
         }
     }
 

@@ -47,13 +47,13 @@ import static org.mockito.Mockito.when;
  * @since 12.3RC1
  */
 @ComponentTest
-public class JobStatusRestURLGeneratorTest
+class JobStatusRestURLGeneratorTest
 {
     @InjectMockComponents
     private JobStatusRestURLGenerator jobStatusRestURLGenerator;
 
     @BeforeEach
-    public void setup(ComponentManager componentManager) throws Exception
+    void setup(ComponentManager componentManager) throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         XWikiContext xwikiContext = xwikiContextProvider.get();
@@ -67,7 +67,7 @@ public class JobStatusRestURLGeneratorTest
     }
 
     @Test
-    public void getURL() throws Exception
+    void getURL() throws Exception
     {
         List<String> stringList = Arrays.asList("flavor", "search", "wiki:xwiki");
         URL expectedUrl = new URL("http://localhost/rest/jobstatus/flavor/search/wiki:xwiki");

@@ -197,6 +197,7 @@ public class TableLayoutElement extends BaseElement
      * Default constructor. Initializes a live data table layout page object.
      *
      * @param liveDataId the live data id
+     * @since 12.10.9
      */
     public TableLayoutElement(String liveDataId)
     {
@@ -210,6 +211,7 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel a column label (for instance {@code Title})
      * @param value the value to be found in the column
      * @see #assertRow(String, Matcher)
+     * @since 12.10.9
      */
     public void assertRow(String columnLabel, String value)
     {
@@ -222,6 +224,9 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel a column label (for instance {@code Title})
      * @param matcher the matcher to apply on the values of the column
      * @see #assertRow(String, String)
+     * @since 13.5RC1
+     * @since 13.4.1
+     * @since 12.10.9
      */
     public void assertRow(String columnLabel, Matcher<Iterable<? super WebElement>> matcher)
     {
@@ -309,6 +314,7 @@ public class TableLayoutElement extends BaseElement
      * content, see {@link #waitUntilReady(boolean)}.
      *
      * @see #waitUntilReady(boolean)
+     * @since 12.10.9
      */
     public void waitUntilReady()
     {
@@ -321,6 +327,7 @@ public class TableLayoutElement extends BaseElement
      * @param expectRows when {@code true} waits for rows to be displayed and loaded, when {@code false} continue
      *     without waiting for the content
      * @see #waitUntilReady()
+     * @since 12.10.9
      */
     public void waitUntilReady(boolean expectRows)
     {
@@ -449,6 +456,7 @@ public class TableLayoutElement extends BaseElement
 
     /**
      * @return the number of rows currently displayed in the live data
+     * @since 12.10.9
      */
     public int countRows()
     {
@@ -508,6 +516,7 @@ public class TableLayoutElement extends BaseElement
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
      * @since 13.5RC1
+     * @since 13.4.1
      */
     public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
@@ -539,6 +548,8 @@ public class TableLayoutElement extends BaseElement
      * @param value the expected value of the text returned by {@link WebElement#getText()}
      * @return a matcher instance
      * @since 13.5RC1
+     * @since 13.4.1
+     * @since 12.10.9
      */
     public Matcher<WebElement> getWebElementTextMatcher(String value)
     {
@@ -566,6 +577,7 @@ public class TableLayoutElement extends BaseElement
      * @param link the expected link
      * @return a matcher instance
      * @since 13.5RC1
+     * @since 13.4.1
      */
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {

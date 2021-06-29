@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.attachments;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,7 +39,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 public interface AttachmentMetadataResource
 {
     @GET
-    Attachment getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
+    Attachment getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") @Encoded String spaceName,
         @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName,
         @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames) throws XWikiRestException;
 }

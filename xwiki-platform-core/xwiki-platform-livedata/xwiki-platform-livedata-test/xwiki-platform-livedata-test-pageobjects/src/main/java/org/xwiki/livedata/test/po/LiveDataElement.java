@@ -46,6 +46,7 @@ public class LiveDataElement extends BaseElement
      * Default constructor. Initializes a Live Data page object by its id.
      *
      * @param id the live data id
+     * @since 12.10.9
      */
     public LiveDataElement(String id)
     {
@@ -55,6 +56,7 @@ public class LiveDataElement extends BaseElement
 
     /**
      * @return a table layout page object for the live data
+     * @since 12.10.9
      */
     public TableLayoutElement getTableLayout()
     {

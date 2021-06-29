@@ -20,6 +20,7 @@
 package org.xwiki.rest.resources.objects;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -38,7 +39,7 @@ public interface ObjectPropertyResource
 {
     @GET Property getObjectProperty(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,
@@ -48,7 +49,7 @@ public interface ObjectPropertyResource
 
     @PUT Response updateObjectProperty(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName,
+            @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.resources.spaces;
 
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,6 +35,6 @@ public interface SpaceResource
 {
     @GET Space getSpace(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName
+            @PathParam("spaceName") @Encoded String spaceName
     ) throws XWikiRestException;
 }

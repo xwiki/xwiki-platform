@@ -160,34 +160,6 @@
               <criticality>highlight</criticality>
               <differences>
                 <item>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</old>
-                  <new>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</new>
-                  <justification>Not a breakage, the old XWikiContextInitializationFilter content has been moved to a new class of the same name in a new package and old class now inherits from the new one</justification>
-                </item>
-                <item>
-                  <code>java.method.removed</code>
-                  <old>method java.util.List&lt;java.lang.String&gt; com.xpn.xwiki.XWiki::getConfiguredSyntaxes()</old>
-                  <justification>Not a runtime breakage since that method has been moved to the oldcore legacy module</justification>
-                </item>
-                <item>
-                  <code>java.method.removed</code>
-                  <old>method java.util.List&lt;java.lang.String&gt; com.xpn.xwiki.api.XWiki::getConfiguredSyntaxes()</old>
-                  <justification>Not a runtime breakage since that method has been moved to the oldcore legacy module</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.store.migration.hibernate.R121001000XWIKI18145DataMigration</old>
-                  <justification>Migrations classes are not meant to be referenced from Java and there is no point in keeping a migration which became useless.</justification>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method void org.xwiki.like.script.LikeScriptService::cleanCacheUIX()</old>
-                  <justification>Unstable API: this method should not have been made public in first place, the cache clean is handled by listening on the events automatically.</justification>
-                </item>
-                <item>
                   <ignore>true</ignore>
                   <code>java.method.returnTypeChanged</code>
                   <old>method javax.mail.internet.InternetAddress org.xwiki.security.authentication.script.AuthenticationScriptService::requestResetPassword(org.xwiki.user.UserReference) throws org.xwiki.security.authentication.ResetPasswordException</old>

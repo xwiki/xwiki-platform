@@ -81,7 +81,7 @@
     <!-- AbstractCaptchaAction extends org.apache.struts.action.Action -->
     <dependency>
       <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
+      <artifactId>struts2-core</artifactId>
     </dependency>
   </dependencies>
   <build>

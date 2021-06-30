@@ -31,7 +31,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -45,7 +44,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.environment.Environment;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.entity.EntityResourceAction;
 
@@ -60,12 +58,9 @@ import org.xwiki.resource.entity.EntityResourceAction;
 @Singleton
 public class DefaultEntityResourceActionLister implements EntityResourceActionLister, Initializable
 {
-    private static final String STRUTS_CONFIG_RESOURCE = "/WEB-INF/struts-config.xml";
+    private static final String STRUTS2_CONFIG_RESOURCE = "struts.xml";
 
     private List<String> strutsActionNames;
-
-    @Inject
-    private Environment environment;
 
     @Inject
     @Named("context")
@@ -88,27 +83,22 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
         });
 
         // Step 1: Get a stream on the Struts config file if it exists
-        InputStream strutsConfigStream = this.environment.getResourceAsStream(getStrutsConfigResource());
+        try (
+            InputStream strutsConfigStream = getClass().getClassLoader().getResourceAsStream(STRUTS2_CONFIG_RESOURCE)) {
+            if (strutsConfigStream != null) {
+                // Step 2: Parse the Struts config file, looking for action names
+                Document document = builder.build(strutsConfigStream);
+                Element mappingElement = document.getRootElement().getChild("package");
+                for (Element element : mappingElement.getChildren("action")) {
+                    actionNames.add(element.getAttributeValue("name"));
+                }
+            }
 
-        if (strutsConfigStream != null) {
-            // Step 2: Parse the Strust config file, looking for action names
-            Document document;
-            try {
-                document = builder.build(strutsConfigStream);
-            } catch (JDOMException | IOException e) {
-                throw new InitializationException(
-                    String.format("Failed to parse Struts Config file [%s]", getStrutsConfigResource()), e);
-            }
-            Element mappingElement = document.getRootElement().getChild("action-mappings");
-            for (Element element : mappingElement.getChildren("action")) {
-                // We extract the action name from the path mapping. Note that we cannot use the "name" attribute since
-                // it's not reliable (it's not unique) and for example the sanveandcontinue action uses "save" as its
-                // "name" element value.
-                actionNames.add(StringUtils.strip(element.getAttributeValue("path"), "/"));
-            }
+            this.strutsActionNames = actionNames;
+        } catch (JDOMException | IOException e) {
+            throw new InitializationException(
+                String.format("Failed to parse Struts Config file [%s]", STRUTS2_CONFIG_RESOURCE), e);
         }
-
-        this.strutsActionNames = actionNames;
     }
 
     @Override
@@ -131,10 +121,5 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
         }
 
         return actionNames;
-    }
-
-    protected String getStrutsConfigResource()
-    {
-        return STRUTS_CONFIG_RESOURCE;
     }
 }

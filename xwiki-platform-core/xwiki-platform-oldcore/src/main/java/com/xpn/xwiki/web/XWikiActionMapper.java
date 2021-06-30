@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts2.RequestUtils;
+import org.apache.struts2.dispatcher.mapper.ActionMapper;
+import org.apache.struts2.dispatcher.mapper.ActionMapping;
+import org.apache.struts2.dispatcher.mapper.DefaultActionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -35,12 +37,16 @@ import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
 
+import com.opensymphony.xwork2.config.ConfigurationManager;
+
 /**
+ * Customize the behavior of the default {@link ActionMapper} to take into account resource reference handlers.
+ * 
  * @version $Id$
  */
-public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor
+public class XWikiActionMapper extends DefaultActionMapper
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiActionMapper.class);
 
     private ResourceTypeResolver<ExtendedURL> typeResolver =
         Utils.getComponent(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
@@ -49,22 +55,34 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
         Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
 
     @Override
-    protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-        throws IOException
+    public ActionMapping getMapping(HttpServletRequest request, ConfigurationManager configManager)
     {
-        String url = httpServletRequest.getRequestURL().toString();
+        String path = request.getPathInfo();
+        if (path == null) {
+            path = RequestUtils.getServletPath(request);
+        }
+
+        if (path == null) {
+            return null;
+        }
+
+        String url = request.getRequestURL().toString();
 
         try {
-            ExtendedURL extendedURL = new ExtendedURL(new URL(url), httpServletRequest.getContextPath());
+            ExtendedURL extendedURL = new ExtendedURL(new URL(url), request.getContextPath());
 
             ResourceType type = this.typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
 
-            EntityResourceReference entityResourceReference = (EntityResourceReference) this.resolver.resolve(
-                extendedURL, type, Collections.<String, Object>emptyMap());
+            EntityResourceReference entityResourceReference = (EntityResourceReference) this.resolver
+                .resolve(extendedURL, type, Collections.<String, Object>emptyMap());
 
-            return "/" + entityResourceReference.getAction().getActionName() + "/";
+            ActionMapping mapping = new ActionMapping();
+            mapping.setName(entityResourceReference.getAction().getActionName());
+            return mapping;
         } catch (Exception e) {
-            throw new IOException(String.format("Failed to extract the Entity Action from URL [%s]", url), e);
+            LOGGER.error("Failed to extract the Entity Action from URL [{}]", url, e);
         }
+
+        return null;
     }
 }

@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import org.apache.struts.upload.MultipartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 
 import com.xpn.xwiki.util.Util;
 
@@ -181,8 +181,8 @@ public class XWikiServletRequest implements XWikiRequest
     public StringBuffer getRequestURL()
     {
         StringBuffer requestURL = this.request.getRequestURL();
-        if ((requestURL == null) && (this.request instanceof MultipartRequestWrapper)) {
-            requestURL = ((HttpServletRequest) ((MultipartRequestWrapper) this.request).getRequest()).getRequestURL();
+        if ((requestURL == null) && (this.request instanceof MultiPartRequestWrapper)) {
+            requestURL = ((HttpServletRequest) ((MultiPartRequestWrapper) this.request).getRequest()).getRequestURL();
         }
         return requestURL;
     }

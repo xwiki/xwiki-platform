@@ -22,9 +22,7 @@ package org.xwiki.captcha.internal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.struts2.ServletActionContext;
 
 import com.octo.captcha.module.web.sound.SoundToWavHelper;
 import com.octo.captcha.service.sound.SoundCaptchaService;
@@ -38,16 +36,14 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
 public abstract class AbstractSoundCaptchaAction extends AbstractCaptchaAction<SoundCaptchaService>
 {
     @Override
-    public ActionForward execute(ActionMapping actionMapping, ActionForm actionForm,
-        HttpServletRequest request, HttpServletResponse response)
-        throws Exception
+    public String execute() throws Exception
     {
-        SoundToWavHelper.flushNewCaptchaToResponse(request,
-            response,
-            null,
-            getCaptchaService(),
-            getUserId(request),
+        HttpServletRequest request = ServletActionContext.getRequest();
+        HttpServletResponse response = ServletActionContext.getResponse();
+
+        SoundToWavHelper.flushNewCaptchaToResponse(request, response, null, getCaptchaService(), getUserId(request),
             request.getLocale());
+
         return null;
     }
 }

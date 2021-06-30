@@ -32,10 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
+import org.apache.struts2.ServletActionContext;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +68,7 @@ import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.opensymphony.xwork2.ActionSupport;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -112,7 +110,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  * right to perform the current action.
  * </p>
  */
-public abstract class XWikiAction extends Action
+public abstract class XWikiAction extends ActionSupport
 {
     public static final String ACTION_PROGRESS = "actionprogress";
 
@@ -133,6 +131,15 @@ public abstract class XWikiAction extends Action
     private ContextualLocalizationManager localization;
 
     private JobProgressManager progress;
+
+    /**
+     * @return the class of the XWikiForm in charge of parsing the request
+     * @since 7.1.4-struts2
+     */
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return null;
+    }
 
     protected ContextualLocalizationManager getLocalization()
     {
@@ -168,30 +175,26 @@ public abstract class XWikiAction extends Action
      * @throws ServletException if a servlet exception occurs
      */
     @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-        HttpServletResponse resp) throws Exception
+    public String execute() throws Exception
     {
-        ActionForward actionForward;
         XWikiContext context = null;
 
         try {
             // Initialize the XWiki Context which is the main object used to pass information across
             // classes/methods. It's also wrapping the request, response, and all container objects
             // in general.
-            context = initializeXWikiContext(mapping, form, req, resp);
+            context = initializeXWikiContext();
 
             // From this line forward all information can be found in the XWiki Context.
-            actionForward = execute(context);
+            return execute(context);
         } finally {
             if (context != null) {
                 cleanupComponents();
             }
         }
-
-        return actionForward;
     }
 
-    public ActionForward execute(XWikiContext context) throws Exception
+    public String execute(XWikiContext context) throws Exception
     {
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
@@ -582,36 +585,43 @@ public abstract class XWikiAction extends Action
         xcontext.setFinished(true);
     }
 
-    protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-        HttpServletResponse resp) throws XWikiException, ServletException
-    {
-        String action = mapping.getName();
+	protected XWikiContext initializeXWikiContext()
+			throws XWikiException, ServletException, InstantiationException, IllegalAccessException {
+        HttpServletRequest servletRequest = ServletActionContext.getRequest();
+        HttpServletResponse servletResponse = ServletActionContext.getResponse();
 
-        XWikiRequest request = new XWikiServletRequest(req);
-        XWikiResponse response = new XWikiServletResponse(resp);
-        XWikiContext context =
-            Utils.prepareContext(action, request, response, new XWikiServletContext(this.servlet.getServletContext()));
+        String action = getName();
 
-        // This code is already called by struts.
-        // However struts will also set all the parameters of the form data
-        // directly from the request objects.
-        // However because of bug http://jira.xwiki.org/jira/browse/XWIKI-2422
-        // We need to perform encoding of windows-1252 chars in ISO mode
-        // So we need to make sure this code is called
-        // TODO: completely get rid of struts so that we control this part of the code and can reduce drastically the
-        // number of calls
-        if (form != null) {
-            form.reset(mapping, request);
+        XWikiRequest request = new XWikiServletRequest(servletRequest);
+        XWikiResponse response = new XWikiServletResponse(servletResponse);
+		XWikiContext context = Utils.prepareContext(action, request, response,
+				new XWikiServletContext(ServletActionContext.getServletContext()));
+
+        XWikiForm form;
+        if (getFomClass() != null) {
+            form = getFomClass().newInstance();
+            form.reset(request);
+        } else {
+            form = null;
         }
 
         // Add the form to the context
-        context.setForm((XWikiForm) form);
+        context.setForm(form);
 
         // Initialize the Container component which is the new way of transporting the Context in the new
         // component architecture.
         initializeContainerComponent(context);
 
         return context;
+    }
+
+    /**
+     * @return the name to put in the {@link XWikiContext}, by default the one provided by Struts is used
+     * @since 7.1.4-struts2
+     */
+    protected String getName()
+    {
+        return ServletActionContext.getActionMapping().getName();
     }
 
     protected void initializeContainerComponent(XWikiContext context) throws ServletException
@@ -647,7 +657,7 @@ public abstract class XWikiAction extends Action
 
     public String getRealPath(String path)
     {
-        return this.servlet.getServletContext().getRealPath(path);
+        return ServletActionContext.getServletContext().getRealPath(path);
     }
 
     // hook

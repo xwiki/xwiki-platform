@@ -19,6 +19,10 @@
  */
 package org.xwiki.resource.internal.entity;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+
 import javax.inject.Provider;
 
 import org.junit.Before;
@@ -26,14 +30,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.environment.Environment;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultEntityResourceActionLister}.
@@ -58,10 +57,6 @@ public class DefaultEntityResourceActionListerTest
     @Test
     public void listActions() throws Exception
     {
-        Environment environment = this.mocker.getInstance(Environment.class);
-        when(environment.getResourceAsStream("/WEB-INF/struts-config.xml")).thenReturn(
-            getClass().getClassLoader().getResourceAsStream("WEB-INF/struts-config.xml"));
-
         this.mocker.registerMockComponent(new DefaultParameterizedType(null, ResourceReferenceHandler.class,
             EntityResourceAction.class), "testaction");
 

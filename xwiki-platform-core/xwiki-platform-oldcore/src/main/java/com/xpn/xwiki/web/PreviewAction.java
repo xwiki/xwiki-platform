@@ -50,6 +50,12 @@ public class PreviewAction extends EditAction
         this.waitForXWikiInitialization = true;
     }
 
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
     /**
      * Check if a certain action was selected by the user. This is needed in older skins, which don't make use of the
      * {@link ActionFilter}'s dispatcher functionality, but rely on detecting the submit button that was clicked.

@@ -36,6 +36,12 @@ import com.xpn.xwiki.util.Util;
 
 public class PropAddAction extends XWikiAction
 {
+	@Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return PropAddForm.class;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

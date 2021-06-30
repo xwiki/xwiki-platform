@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://jakarta.apache.org/struts/dtds/struts-2.5.dtd">
+
+<struts>
+    <!-- Register a custom logic to map a the URL to an action -->
+    <bean type="org.apache.struts2.dispatcher.mapper.ActionMapper" name="xwikimapper" class="com.xpn.xwiki.web.XWikiActionMapper" />
+    <constant name="struts.mapper.class" value="xwikimapper" />
+
+    <package name="xwiki" extends="struts-default">
+
+        <!-- ========== Global Result Definitions ============================== -->
+
+        <global-results>
+            <!-- Forward to view -->
+            <result name="start">/view/Main/WebHome</result>
+
+            <result name="login">/templates/login.vm"</result> <!-- not enough -->
+            <result name="accessdenied">/templates/accessdenied.vm</result>
+            <result name="userinactive">/templates/userinactive.vm</result>
+        </global-results>
+
+        <!-- ========== Action Mapping Definitions ============================== -->
+
+        <!-- XWiki Struts Application with Velocity -->
+        <action class="com.xpn.xwiki.web.ViewAction" name="view">
+            <result name="view" type="velocity">/templates/view.vm</result>
+            <result name="notexist" type="velocity">/templates/notexist.vm</result>
+            <result name="plain" type="velocity">/templates/plain.vm</result>
+        </action>
+        <action class="com.xpn.xwiki.web.ViewAttachRevAction" name="viewattachrev">
+            <result name="viewattachrev" type="velocity">/templates/viewattachrev.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.ViewrevAction" name="viewrev">
+            <result name="notexist" type="velocity">/templates/notexist.vm</result>
+            <result name="view" type="velocity">/templates/view.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.PDFAction" name="pdf" />
+        <action class="com.xpn.xwiki.web.TexAction" name="tex" />
+        <action class="com.xpn.xwiki.web.EditAction" name="edit">
+            <result name="edit" type="velocity">/templates/edit.vm</result>
+        </action>
+        <action class="com.xpn.xwiki.web.CreateAction" name="create">
+            <result name="create" type="velocity">/templates/create.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.InlineAction" name="inline">
+            <result name="inline" type="velocity">/templates/inline.vm</result>
+            <result name="pageexist" type="velocity">/templates/inline.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.PreviewAction" name="preview">
+            <result name="preview" type="velocity">/templates/preview.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.SaveAction" name="save">
+            <result name="save" type="velocity">/templates/save.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.SaveAndContinueAction" name="saveandcontinue">
+            <result name="save" type="velocity">/templates/save.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.RollbackAction" name="rollback">
+            <result name="edit" type="velocity">/templates/rollback.vm</result>
+            <result name="rollback" type="velocity">/templates/rollback.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.DeleteVersionsAction" name="deleteversions" />
+
+        <action class="com.xpn.xwiki.web.CancelAction" name="cancel">
+            <result name="cancel" type="velocity">/templates/cancel.vm
+            </result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.DeleteAction" name="delete">
+            <result name="delete" type="velocity">/templates/delete.vm</result>
+            <result name="deleted" type="velocity">/templates/deleted.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.DeleteSpaceAction" name="deletespace" />
+
+        <action class="com.xpn.xwiki.web.UndeleteAction" name="undelete" />
+
+        <action class="com.xpn.xwiki.web.ResetVersionsAction" name="reset">
+            <result name="delete" type="velocity">/templates/reset.vm</result>
+            <result name="deleted" type="velocity">/templates/reset.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.RegisterAction" name="register">
+            <result name="register" type="velocity">/templates/register.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.PropUpdateAction" name="propupdate">
+            <result name="propupdate" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.PropAddAction" name="propadd">
+            <result name="propadd" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.PropDisableAction" name="propdisable" />
+
+        <action class="com.xpn.xwiki.web.PropEnableAction" name="propenable" />
+
+        <action class="com.xpn.xwiki.web.PropDeleteAction" name="propdelete">
+            <result name="propdelete" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.ObjectAddAction" name="objectadd">
+            <result name="objectadd" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.CommentAddAction" name="commentadd">
+            <result name="commentadd" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.ObjectsSynchronizeAction" name="objectsync">
+        </action>
+        <action class="com.xpn.xwiki.web.ObjectRemoveAction" name="objectremove">
+            <result name="objectremove" type="velocity">/templates/edit.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.AttachAction" name="attach">
+            <result name="attach" type="velocity">/templates/attachments.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.UploadAction" name="upload">
+            <result name="upload" type="velocity">/templates/attachments.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.DownloadAction" name="download" />
+        <action class="com.xpn.xwiki.web.TempResourceAction" name="temp" />
+        <action class="com.xpn.xwiki.web.DownloadRevAction" name="downloadrev" />
+        <action class="com.xpn.xwiki.web.DotAction" name="dot" />
+
+        <action class="com.xpn.xwiki.web.SVGAction" name="svg" />
+
+        <action class="com.xpn.xwiki.web.DeleteAttachmentAction" name="delattachment" />
+
+        <action class="com.xpn.xwiki.web.SkinAction" name="skin" />
+
+        <action class="com.xpn.xwiki.web.JsxAction" name="jsx" />
+
+        <action class="com.xpn.xwiki.web.SsxAction" name="ssx" />
+
+        <action class="com.xpn.xwiki.web.LoginAction" name="login" />
+
+        <action class="com.xpn.xwiki.web.LoginSubmitAction" name="loginsubmit" />
+
+        <action class="com.xpn.xwiki.web.LoginErrorAction" name="loginerror" />
+
+        <action class="com.xpn.xwiki.web.LogoutAction" name="logout">
+            <result name="logout" type="velocity">/templates/logout.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.plugin.charts.actions.ChartingAction" name="charting" />
+
+        <action class="com.xpn.xwiki.web.LockAction" name="lock" />
+
+        <action class="com.xpn.xwiki.web.RedirectAction" name="redirect" />
+
+        <action class="com.xpn.xwiki.web.AdminAction" name="admin">
+            <result name="admin" type="velocity">/templates/admin.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.ExportAction" name="export">
+            <result name="export" type="velocity">/templates/export.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.ImportAction" name="import">
+            <result name="import" type="velocity">/templates/import.vm</result>
+        </action>
+
+        <action class="com.xpn.xwiki.web.GetAction" name="get">
+            <result name="get" type="velocity">/templates/get.vm</result>
+        </action>
+
+        <action class="org.xwiki.extension.distribution.internal.DistributionAction" name="distribution">
+            <result name="distribution" type="velocity">/templates/distribution.vm</result>
+        </action>
+
+        <action class="org.xwiki.captcha.internal.DefaultImageCaptchaAction" name="imagecaptcha"/>
+
+        <action class="com.xpn.xwiki.web.UnknownAction" name="*"/>
+
+<!-- 
+        <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor" debug="0"
+            contentType="text/html" />
+ -->
+    </package>
+</struts>

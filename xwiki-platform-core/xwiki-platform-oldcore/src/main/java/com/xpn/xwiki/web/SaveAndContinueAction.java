@@ -45,6 +45,18 @@ public class SaveAndContinueAction extends XWikiAction
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
+    protected String getName()
+    {
+        return "save";
+    }
+
     /**
      * Write an error response to an ajax request.
      *

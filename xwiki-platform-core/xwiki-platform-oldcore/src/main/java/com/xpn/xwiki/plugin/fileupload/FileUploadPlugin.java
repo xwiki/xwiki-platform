@@ -23,8 +23,13 @@ package com.xpn.xwiki.plugin.fileupload;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
@@ -34,10 +39,15 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -215,7 +225,6 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                         (DiskFileItem) super.createItem(fieldName, contentType, isFormField, fileName);
                     // Needed to make sure the File object is created.
                     item.getOutputStream();
-                    item.getStoreLocation().deleteOnExit();
                     return item;
                 } catch (IOException e) {
                     String path = System.getProperty("java.io.tmpdir");
@@ -237,27 +246,74 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             }
         }
 
-        // TODO: Does this work in portlet mode, or we must use PortletFileUpload?
-        FileUpload fileupload = new ServletFileUpload(factory);
-        RequestContext reqContext = new ServletRequestContext(context.getRequest().getHttpServletRequest());
-        fileupload.setSizeMax(uploadMaxSize);
-        // context.put("fileupload", fileupload);
+        List<FileItem> list;
 
-        try {
-            @SuppressWarnings("unchecked")
-            List<FileItem> list = fileupload.parseRequest(reqContext);
-            if (list.size() > 0) {
-                LOGGER.info("Loaded " + list.size() + " uploaded files");
+        HttpServletRequest request = context.getRequest().getHttpServletRequest();
+        if (request instanceof MultiPartRequestWrapper) {
+            // Struts "consume" the request when it's a multi part request so we have to get the file from it
+            MultiPartRequestWrapper multiPartRequest = (MultiPartRequestWrapper) request;
+
+            list = new ArrayList<>();
+
+            // Files
+            Enumeration<String> parameterNames = multiPartRequest.getFileParameterNames();
+            while (parameterNames.hasMoreElements()) {
+                String parameterName = parameterNames.nextElement();
+
+                UploadedFile[] files = multiPartRequest.getFiles(parameterName);
+                String[] contentTypes = multiPartRequest.getContentTypes(parameterName);
+                String[] fileNames = multiPartRequest.getFileNames(parameterName);
+                for (int i = 0; i < files.length; ++i) {
+                    FileItem fileItem = factory.createItem(parameterName, contentTypes[i], false, fileNames[i]);
+                    try {
+                        FileUtils.copyFile((File) files[i].getContent(), fileItem.getOutputStream());
+                    } catch (IOException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                            XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION,
+                            "Exception while copying uploaded file", e);
+                    }
+                    list.add(fileItem);
+                }
             }
-            // We store the file list in the context
-            context.put(FILE_LIST_KEY, list);
-        } catch (FileUploadBase.SizeLimitExceededException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "Exception uploaded file");
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
+
+            // Parameters
+            Map<String, String[]> parameters = multiPartRequest.getParameterMap();
+            for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+                for (String value : entry.getValue()) {
+                    FileItem fileItem = factory.createItem(entry.getKey(), null, true, null);
+                    try {
+                        IOUtils.write(value, fileItem.getOutputStream(), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                            XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION,
+                            "Exception while copying request parameter", e);
+                    }
+                    list.add(fileItem);
+                }
+            }
+        } else {
+            // TODO: Does this work in portlet mode, or we must use PortletFileUpload?
+            FileUpload fileupload = new ServletFileUpload(factory);
+            RequestContext reqContext = new ServletRequestContext(context.getRequest().getHttpServletRequest());
+            fileupload.setSizeMax(uploadMaxSize);
+            // context.put("fileupload", fileupload);
+
+            try {
+                list = fileupload.parseRequest(reqContext);
+                if (list.size() > 0) {
+                    LOGGER.info("Loaded " + list.size() + " uploaded files");
+                }
+            } catch (FileUploadBase.SizeLimitExceededException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "Exception uploaded file");
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
+            }
         }
+
+        // We store the file list in the context
+        context.put(FILE_LIST_KEY, list);
     }
 
     /**

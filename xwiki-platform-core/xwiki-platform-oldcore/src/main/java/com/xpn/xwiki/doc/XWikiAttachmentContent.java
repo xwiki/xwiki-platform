@@ -122,8 +122,6 @@ public class XWikiAttachmentContent implements Cloneable
             final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, dir);
             // This causes the temp file to be created.
             dfi.getOutputStream().close();
-            // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
-            dfi.getStoreLocation().deleteOnExit();
             return dfi;
         } catch (IOException e) {
             throw new UnexpectedException("Failed to create new attachment temporary file.", e);

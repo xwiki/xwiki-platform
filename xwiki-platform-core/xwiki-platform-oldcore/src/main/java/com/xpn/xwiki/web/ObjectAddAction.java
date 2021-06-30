@@ -55,6 +55,12 @@ public class ObjectAddAction extends XWikiAction
         "relative");
 
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return ObjectAddForm.class;
+    }
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         // CSRF prevention

@@ -35,6 +35,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractPropChangeAction extends XWikiAction
 {
+    @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return PropChangeForm.class;
+    }
+
     /**
      * Tries to change the specified property, and redirect back to the class editor (or the specified {@code xredirect}
      * location). If the property does not exist, forward to the exception page.

@@ -172,14 +172,9 @@
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
         <groupId>org.apache.struts</groupId>
-        <artifactId>struts-core</artifactId>
-        <version>1.3.10</version>
+        <artifactId>struts2-core</artifactId>
+        <version>2.5.25</version>
         <exclusions>
-          <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
-          <exclusion>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
-          </exclusion>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -249,6 +244,7 @@
         <version>${bootstrap.version}</version>
         <scope>runtime</scope>
       </dependency>
+
       <!-- All Batik artifacts should be in sync -->
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
@@ -519,6 +515,483 @@
               <className>com/xpn/xwiki/web/XWikiServletRequest</className>
               <method>void ajc$set$request(com.xpn.xwiki.web.XWikiServletRequest, javax.servlet.http.HttpServletRequest)</method>
               <justification>Not an actual breakage. AspectJ internal hacks.</justification>
+            </difference>
+
+            <!-- Upgrade to Struts 2-->
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/XWikiAction</className>
+              <method>org.apache.struts.action.ActionForward execute(com.xpn.xwiki.XWikiContext)</method>
+              <to>java.lang.String</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiAction</className>
+              <method>org.apache.struts.action.ActionForward execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)</method>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/XWikiAction</className>
+              <method>org.apache.struts.action.ActionForward execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)</method>
+              <to>java.lang.String</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiAction</className>
+              <method>com.xpn.xwiki.XWikiContext initializeXWikiContext(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)</method>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/AbstractPropChangeAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/AdminAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/AttachAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/CancelAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/CommentAddAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/CreateAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteAttachmentAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteSpaceAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DotAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DownloadAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DownloadRevAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/EditAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/EditForm</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ExportAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/GetAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ImportAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/InlineAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/LockAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/LoginAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/LoginErrorAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/LoginSubmitAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/LogoutAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectAddAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectRemoveAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectsSynchronizeAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PDFAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PreviewAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropAddAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropDeleteAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropDisableAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropEnableAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropUpdateAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/RedirectAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/RegisterAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ResetVersionsAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/RollbackAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/SVGAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/SaveAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/SaveAndContinueAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/SkinAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/TempResourceAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/TexAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/UndeleteAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/UnknownAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/UploadAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ViewAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ViewAttachRevAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ViewrevAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropEnableAction</className>
+              <to>org/apache/struts/action/Action</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/EditForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/EditForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectAddForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectAddForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectRemoveForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/ObjectRemoveForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/PrepareEditForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PrepareEditForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/PreviewForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PreviewForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/PropAddForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropAddForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/PropChangeForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/PropChangeForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/RollbackForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/RollbackForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiForm</className>
+              <to>java/io/Serializable</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiForm</className>
+              <to>org/apache/struts/action/ActionForm</to>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiForm</className>
+              <method>void reset(org.apache.struts.action.ActionMapping, javax.servlet.http.HttpServletRequest)</method>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>com/xpn/xwiki/web/XWikiForm</className>
+              <method>void reset(org.apache.struts.action.ActionMapping, com.xpn.xwiki.web.XWikiRequest)</method>
+              <justification>Upgrade to Struts 2</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/web/XWikiRequestProcessor</className>
+              <justification>Upgrade to Struts 2</justification>
             </difference>
           </ignored>
           <excludes>

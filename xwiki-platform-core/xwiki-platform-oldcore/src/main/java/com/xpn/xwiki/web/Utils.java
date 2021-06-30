@@ -41,7 +41,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.struts.upload.MultipartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -612,17 +612,17 @@ public class Utils
     {
         FileUploadPlugin fileupload = null;
         try {
-            if (request instanceof MultipartRequestWrapper) {
+            if (request instanceof MultiPartRequestWrapper) {
                 fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
                 context.put("fileuploadplugin", fileupload);
                 fileupload.loadFileList(context);
-                MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
+                MultiPartRequestWrapper mpreq = (MultiPartRequestWrapper) request;
                 List<FileItem> fileItems = fileupload.getFileItems(context);
                 for (FileItem item : fileItems) {
                     if (item.isFormField()) {
                         String sName = item.getFieldName();
                         String sValue = item.getString(context.getWiki().getEncoding());
-                        mpreq.setParameter(sName, sValue);
+                        mpreq.setAttribute(sName, sValue);
                     }
                 }
             }

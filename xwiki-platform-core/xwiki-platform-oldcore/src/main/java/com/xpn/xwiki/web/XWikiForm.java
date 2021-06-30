@@ -21,13 +21,10 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-
 /**
  * @version $Id$
  */
-public abstract class XWikiForm extends ActionForm
+public abstract class XWikiForm
 {
     private XWikiRequest request;
 
@@ -46,9 +43,9 @@ public abstract class XWikiForm extends ActionForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
+     * @since 7.1.4-struts2
      */
-    @Override
-    public void reset(ActionMapping mapping, HttpServletRequest request)
+    public void reset(HttpServletRequest request)
     {
         setRequest(request);
         readRequest();
@@ -59,8 +56,9 @@ public abstract class XWikiForm extends ActionForm
      *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
+     * @since 7.1.4-struts2
      */
-    public void reset(ActionMapping mapping, XWikiRequest request)
+    public void reset(XWikiRequest request)
     {
         this.request = request;
         readRequest();

@@ -52,6 +52,12 @@ public class EditAction extends XWikiAction
     }
 
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         try {

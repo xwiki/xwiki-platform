@@ -38,6 +38,12 @@ public class InlineAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(InlineAction.class);
 
     @Override
+    protected Class<? extends XWikiForm> getFomClass()
+    {
+        return EditForm.class;
+    }
+
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = context.getDoc();

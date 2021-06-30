@@ -75,9 +75,6 @@
   <!-- Log prepared statement cache activity -->
   <logger name="org.hibernate.ps.PreparedStatementCache" level="warn"/>
 
-  <!-- Deactivate Struts warnings -->
-  <logger name="org.apache.struts.util.RequestUtils" level="error"/>
-
   <!-- Deactive PDF Export CSS Applier warnings -->
   <logger name="org.apache.fop.layoutmgr.inline.ContentLayoutManager" level="error"/>
   <logger name="info.informatica.doc.style.css.dom" level="error"/>

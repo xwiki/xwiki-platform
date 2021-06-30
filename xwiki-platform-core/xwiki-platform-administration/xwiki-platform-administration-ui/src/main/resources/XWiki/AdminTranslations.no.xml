@@ -52,7 +52,6 @@ XWiki.XWikiPreferences_use_email_verification.hint=Hvis satt til "Ja", vil en e-
 XWiki.XWikiPreferences_validation_email_content.hint=E-postmalen som sendes til brukere for å validere e-postadressen.
 XWiki.XWikiPreferences_confirmation_email_content.hint=E-postmalen som tilsvarer posten som sendes etter at brukeren har godkjent sin konto ved å klikke på valideringslenken i den første e-posten han mottar.
 XWiki.XWikiPreferences_invitation_email_content.hint=E-postmalen som sendes til brukere som er invitert til å registrere seg.
-
 XWiki.Registration_heading.hint=Dette er linjen øverst på siden som vises til de som registrerer seg og når de nettopp har registrert seg. Velocity og wiki syntaks kan brukes.
 XWiki.Registration_welcomeMessage.hint=Dette vises bare når noen fyller ut skjemaet. Velocity og wiki-syntakskode kan brukes.
 XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
@@ -140,6 +139,7 @@ administration.section.users.deleteUser.newAuthor.hint=Velg en bruker som har {0
 administration.section.users.deleteUser.newAuthor.error=Den valgte brukeren har ikke {0} rettigheter!
 administration.section.users.deleteUser.newAuthor.programming=programmering
 administration.section.users.deleteUser.newAuthor.script=skript
+admin.usersgroups.extensionrights=Utvidelsesrettigheter
 
 # Other Category
 admin.other=Annet
@@ -162,5 +162,6 @@ administration.section.users.deleteUser.markInactiveMessage=I stedet for å slet
 administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

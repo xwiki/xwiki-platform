@@ -77,6 +77,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 12.10.9
  * @since 13.4.2
+ * @since 13.5.1
  * @since 13.6RC1
  */
 @ComponentTest

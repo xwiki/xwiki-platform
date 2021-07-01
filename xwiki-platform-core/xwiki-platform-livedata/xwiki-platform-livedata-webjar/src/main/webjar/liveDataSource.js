@@ -52,7 +52,8 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     var entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
     var parameters = {
       // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-      timestamp: new Date().getTime()
+      timestamp: new Date().getTime(),
+      namespace: `wiki:${XWiki.currentWiki}`
     };
     addSourceParameters(parameters, source);
     return entriesURL + '?' + $.param(parameters, true);

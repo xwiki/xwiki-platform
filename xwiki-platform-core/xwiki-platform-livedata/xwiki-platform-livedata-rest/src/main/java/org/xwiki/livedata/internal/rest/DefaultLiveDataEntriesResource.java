@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
@@ -65,27 +66,17 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
 {
     private static final String FILTERS_PREFIX = "filters.";
 
+    @Inject
+    private LiveDataResourceContextInitializer contextInitializer;
+
     @Override
     public Entries getEntries(String sourceId, String namespace, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {
-        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue query-params
-        // gives list with null element)
-        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        LiveDataConfiguration config =
-            getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
-        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
-        if (source.isPresent()) {
-            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
-            LiveDataEntryStore entryStore = source.get().getEntries();
-            return createEntries(entryStore.get(config.getQuery()), idProperty, config.getQuery().getSource(),
-                namespace).withOffset(offset).withLimit(limit);
-        } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
+        this.contextInitializer.initialize(namespace);
+
+        LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
+        return getEntries(namespace, offset, limit, config);
     }
 
     @Override
@@ -178,5 +169,31 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
             .map(values -> this.createEntry(values, values.get(idProperty), source, namespace))
             .collect(Collectors.toList());
         return (Entries) new Entries().withEntries(entries).withCount(liveData.getCount()).withLinks(self, parent);
+    }
+
+    private LiveDataConfiguration initConfig(String sourceId, List<String> properties, List<String> matchAll,
+        List<String> sort, List<Boolean> descending, long offset, int limit) throws LiveDataException
+    {
+        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue 
+        // query-params gives list with null element).
+        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
+    }
+
+    private Entries getEntries(String namespace, long offset, int limit, LiveDataConfiguration config)
+        throws LiveDataException
+    {
+        Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
+        if (source.isPresent()) {
+            String idProperty = config.getMeta().getEntryDescriptor().getIdProperty();
+            LiveDataEntryStore entryStore = source.get().getEntries();
+            return createEntries(entryStore.get(config.getQuery()), idProperty, config.getQuery().getSource(),
+                namespace).withOffset(offset).withLimit(limit);
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
 }

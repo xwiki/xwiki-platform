@@ -21,7 +21,6 @@ package org.xwiki.livedata.internal.rest;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +34,6 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.restlet.ext.jaxrs.internal.core.MultivaluedMapImpl;
 import org.xwiki.component.manager.ComponentManager;
@@ -53,7 +51,6 @@ import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.rest.model.jaxb.Entries;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
 import org.xwiki.livedata.rest.model.jaxb.StringMap;
-import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -70,7 +67,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,6 +88,9 @@ class DefaultLiveDataEntriesResourceTest
     private DefaultLiveDataEntriesResource resource;
 
     @MockComponent
+    private LiveDataResourceContextInitializer contextInitializer;
+    
+    @MockComponent
     private LiveDataSourceManager liveDataSourceManager;
 
     @MockComponent
@@ -102,10 +101,7 @@ class DefaultLiveDataEntriesResourceTest
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
-
-    @MockComponent
-    private QueryManager queryManager;
-
+    
     /*
      * Cannot be mocked by annotation because it is needed in the @BeforeComponent phase.
      */
@@ -187,7 +183,7 @@ class DefaultLiveDataEntriesResourceTest
             + "\"offset\":0,"
             + "\"limit\":10}}", this.objectMapper.writeValueAsString(configCaptor.getValue()));
 
-        verify(this.xcontext).setWikiId("s1");
+        verify(this.contextInitializer).initialize(null);
     }
 
     @Test
@@ -211,9 +207,8 @@ class DefaultLiveDataEntriesResourceTest
                 + "\"type\":null,\"hrefLang\":null}],\"entries\":[],\"count\":0,\"offset\":1,\"limit\":20}",
             this.objectMapper.writeValueAsString(entries));
 
-        InOrder inOrder = inOrder(this.xcontext);
-        inOrder.verify(this.xcontext).setWikiId("s2");
-        inOrder.verify(this.xcontext).setWikiId("s1");
+        verify(this.contextInitializer).initialize("wiki:s2");
+        
     }
 
     @Test
@@ -235,9 +230,8 @@ class DefaultLiveDataEntriesResourceTest
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), exception.getResponse().getStatus());
 
-        InOrder inOrder = inOrder(this.xcontext);
-        inOrder.verify(this.xcontext).setWikiId("s2");
-        inOrder.verify(this.xcontext).setWikiId("s1");
+        verify(this.contextInitializer).initialize("wiki:s2");
+        
     }
 
     @Test
@@ -249,6 +243,7 @@ class DefaultLiveDataEntriesResourceTest
             assertThrows(WebApplicationException.class, () -> this.resource.addEntry("sourceId", null, entry));
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), exception.getResponse().getStatus());
     }
+    
 
     @Test
     void addEntry() throws Exception

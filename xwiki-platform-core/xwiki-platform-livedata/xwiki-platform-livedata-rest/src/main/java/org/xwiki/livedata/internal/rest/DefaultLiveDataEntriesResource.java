@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
@@ -34,8 +35,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.namespace.Namespace;
-import org.xwiki.component.namespace.NamespaceUtils;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryStore;
@@ -50,12 +49,9 @@ import org.xwiki.livedata.rest.LiveDataEntryResource;
 import org.xwiki.livedata.rest.LiveDataSourceResource;
 import org.xwiki.livedata.rest.model.jaxb.Entries;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
-import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation of {@link LiveDataEntriesResource}.
@@ -70,24 +66,17 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
 {
     private static final String FILTERS_PREFIX = "filters.";
 
+    @Inject
+    private LiveDataResourceContextInitializer contextInitializer;
+
     @Override
     public Entries getEntries(String sourceId, String namespaceStr, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {
-        XWikiContext xWikiContext = this.xcontextProvider.get();
-        String savedWikiId = xWikiContext.getWikiId();
-        try {
-            // Switch the wikiId of the context if a namespace is provided and is of type wiki (for instance "wiki:s1").
-            Namespace namespace = NamespaceUtils.toNamespace(namespaceStr);
-            if (namespace != null && Objects.equals(namespace.getType(), WikiNamespace.TYPE)) {
-                xWikiContext.setWikiId(namespace.getValue());
-            }
+        this.contextInitializer.initialize(namespaceStr);
 
-            LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
-            return getEntries(namespaceStr, offset, limit, config);
-        } finally {
-            xWikiContext.setWikiId(savedWikiId);
-        }
+        LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
+        return getEntries(namespaceStr, offset, limit, config);
     }
 
     @Override

@@ -433,29 +433,23 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
     username.appendChild(document.createTextNode(title));
   }
 
-  // We set this map manually because we cannot use foreach loops with yuicompressor, that forbids the '#' character,
-  // since it has nothing to do in javascript.
-  var translatedRights = {
-    'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
-    'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
-    'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
-    'script'      : "$escapetool.javascript($services.localization.render('rightsmanager.script'))",
-    'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
-    'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin'))",
-    'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",
-    'programming' : "$escapetool.javascript($services.localization.render('rightsmanager.programming'))",
-    'createwiki'  : "$escapetool.javascript($services.localization.render('rightsmanager.createwiki'))"
-  };
+  // We directly retrieve the right names from the livetable headers.
+  var rightsNames = [];
+  var thElements = table.displayNode.parentElement.getElementsByTagName('th');
+  // We start from index 1 since the headers first display the group/user switches
+  for (var index = 1; index < thElements.length; index++) {
+    rightsNames[index - 1] = thElements[index].textContent;
+  }
 
   username.className = "username";
   tr.appendChild(username);
-  window.activeRights.each(function(right) {
+  window.activeRights.forEach(function(right, index) {
     if (right)
     {
       var td = document.createElement('td');
       td.className = "rights";
       // Set a data-title attribute for the responsive livetable (since Flamingo).
-      td.setAttribute("data-title", translatedRights[right]);
+      td.setAttribute("data-title", rightsNames[index]);
       var r = 0;
       if (denys.indexOf(right)>=0) {
         r = 2;

@@ -70,13 +70,13 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     private LiveDataResourceContextInitializer contextInitializer;
 
     @Override
-    public Entries getEntries(String sourceId, String namespaceStr, List<String> properties, List<String> matchAll,
+    public Entries getEntries(String sourceId, String namespace, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {
-        this.contextInitializer.initialize(namespaceStr);
+        this.contextInitializer.initialize(namespace);
 
         LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
-        return getEntries(namespaceStr, offset, limit, config);
+        return getEntries(namespace, offset, limit, config);
     }
 
     @Override

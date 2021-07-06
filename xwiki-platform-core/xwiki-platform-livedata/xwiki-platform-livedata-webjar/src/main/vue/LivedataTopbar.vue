@@ -45,10 +45,7 @@
 
 <script>
 export default {
-
   name: "LivedataTopbar",
-
-  inject: ["logic"],
 
 };
 </script>

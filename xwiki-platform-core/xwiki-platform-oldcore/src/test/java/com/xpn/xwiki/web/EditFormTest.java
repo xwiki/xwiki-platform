@@ -107,6 +107,7 @@ class EditFormTest
         parameterMap.put("Space.Some-Class_12_prop-erty", paramValue3);
         parameterMap.put("foobar_18_buz", paramValue1);
         parameterMap.put("foo_48bar_buz", paramValue1);
+        parameterMap.put("A class.With Some spaces_42_myProp", paramValue1);
 
         // Note that this one might be ambiguous, page name could be WebHome or WebHome_0_Something
         // This should be fixed as part of https://jira.xwiki.org/browse/XWIKI-17302
@@ -140,6 +141,10 @@ class EditFormTest
         treeMap.put(12, Collections.singletonMap("prop-erty", paramValue3));
         expectedMap.put("Space.Some-Class", treeMap);
 
+        treeMap = new TreeMap<>();
+        treeMap.put(42, Collections.singletonMap("myProp", paramValue1));
+        expectedMap.put("A class.With Some spaces", treeMap);
+
         assertEquals(expectedMap, this.editForm.getUpdateOrCreateMap());
     }
 
@@ -165,7 +170,8 @@ class EditFormTest
             "XWiki.XWikiRights_23",
             "AnotherClass_010",
             "foo_18_22",
-            "_29"
+            "_29",
+            "A class.With Some spaces_42"
         });
         this.editForm.readRequest();
 
@@ -174,6 +180,7 @@ class EditFormTest
         expectedMap.put("XWiki.MyClass", Collections.singletonList(1));
         expectedMap.put("MyClass_18_param.WebHome_0_Something", Collections.singletonList(18));
         expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", Collections.singletonList(0));
+        expectedMap.put("A class.With Some spaces", Collections.singletonList(42));
         assertEquals(expectedMap, this.editForm.getObjectsToAdd());
     }
 
@@ -199,7 +206,8 @@ class EditFormTest
             "XWiki.XWikiRights_23",
             "AnotherClass_010",
             "foo_18_22",
-            "_29"
+            "_29",
+            "A class.With Some spaces_42"
         });
         this.editForm.readRequest();
 
@@ -208,6 +216,7 @@ class EditFormTest
         expectedMap.put("XWiki.MyClass", Collections.singletonList(1));
         expectedMap.put("MyClass_18_param.WebHome_0_Something", Collections.singletonList(18));
         expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", Collections.singletonList(0));
+        expectedMap.put("A class.With Some spaces", Collections.singletonList(42));
         assertEquals(expectedMap, this.editForm.getObjectsToRemove());
     }
 }

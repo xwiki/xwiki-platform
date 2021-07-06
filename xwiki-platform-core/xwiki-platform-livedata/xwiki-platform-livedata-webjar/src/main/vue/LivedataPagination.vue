@@ -38,7 +38,7 @@
     -->
     <span
       class="pagination-current-entries"
-      v-if="data.meta.pagination.showEntryRange"
+      v-if="showEntryRange"
     >
       {{ $t('livedata.pagination.currentEntries', [
         logic.getFirstIndexOfPage() + 1,
@@ -58,7 +58,7 @@
     >
       {{ $t('livedata.pagination.pageSize') }}
       <select
-        @change="logic.setPageSize(+$event.target.value)"
+        @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
@@ -91,7 +91,7 @@
         v-if="data.meta.pagination.showFirstLast"
         :title="$t('livedata.pagination.first')"
         href="#"
-        @click.prevent="!isFirstPage && logic.setPageIndex(0)"
+        @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
         <span class="fa fa-angle-double-left"></span>
       </a>
@@ -108,7 +108,7 @@
         v-if="data.meta.pagination.showNextPrevious"
         :title="$t('livedata.pagination.previous')"
         href="#"
-        @click.prevent="!isFirstPage && logic.setPageIndex(logic.getPageIndex() - 1)"
+        @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
       >
         <span class="fa fa-angle-left"></span>
       </a>
@@ -142,7 +142,7 @@
             'current': pageIndex === logic.getPageIndex(),
           }"
           href="#"
-          @click.prevent="logic.setPageIndex(pageIndex)"
+          @click.prevent="changePageIndex(true, pageIndex)"
         >{{ pageIndex + 1 }}</a>
         <!-- pageIndex + 1 because pageIndex are 0-based -->
       </template>
@@ -159,7 +159,7 @@
         v-if="data.meta.pagination.showNextPrevious"
         :title="$t('livedata.pagination.next')"
         href="#"
-        @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageIndex() + 1)"
+        @click.prevent="changePageIndex(!isLastPage , logic.getPageIndex() + 1)"
       >
         <span class="fa fa-angle-right"></span>
       </a>
@@ -176,7 +176,7 @@
         v-if="data.meta.pagination.showFirstLast"
         :title="$t('livedata.pagination.last')"
         href="#"
-        @click.prevent="!isLastPage && logic.setPageIndex(logic.getPageCount() - 1)"
+        @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
         <span class="fa fa-angle-double-right"></span>
       </a>
@@ -280,8 +280,22 @@ export default {
       }
       // Converts the set of page size values into an array and sorts them in ascending numerical order.
       return Array.from(pageSizesSet).sort((a, b) => a - b);
+    },
+    showEntryRange() {
+      return this.data.meta.pagination.showEntryRange
     }
   },
+
+  methods: {
+    changePageSize($event) {
+      this.logic.setPageSize(+$event.target.value);
+    },
+    changePageIndex(condition, index) {
+      if (condition) {
+        this.logic.setPageIndex(index)
+      }
+    }
+  }
 
 };
 </script>

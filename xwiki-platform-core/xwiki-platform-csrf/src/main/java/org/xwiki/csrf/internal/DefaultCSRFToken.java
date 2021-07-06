@@ -195,16 +195,15 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     {
         String query = "resubmit=" + urlEncode(getRequestURI());
 
-        // back URL is the URL of the document that was about to be modified, so in most
+        // backURL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
         DocumentReference currentDocRef = this.docBridge.getCurrentDocumentReference();
         // If the current document is null (on the login page for example), let's redirect to the default page
         if (currentDocRef == null) {
-            currentDocRef = resolver.resolve("");
+            currentDocRef = resolver.resolve(null);
         }
         String backUrl = getDocumentURL(currentDocRef, null);
         query += "&xback=" + urlEncode(backUrl);
-        
         // redirect to the resubmission template
         query += "&xpage=" + RESUBMIT_TEMPLATE;
         return backUrl + "?" + query;

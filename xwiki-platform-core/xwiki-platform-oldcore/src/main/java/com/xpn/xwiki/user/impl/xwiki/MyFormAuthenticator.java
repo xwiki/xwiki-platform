@@ -189,7 +189,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // process login form submittal
         if ((this.loginSubmitPattern != null) && request.getMatchableURL().endsWith(this.loginSubmitPattern)) {
 
-            // Placed here to not interfere with persistentLoginManager
             CSRFToken csrfTokenVerifier = Utils.getComponent(CSRFToken.class);
             String token = request.getParameter("form_token");
             if (!csrfTokenVerifier.isTokenValid(token)) {

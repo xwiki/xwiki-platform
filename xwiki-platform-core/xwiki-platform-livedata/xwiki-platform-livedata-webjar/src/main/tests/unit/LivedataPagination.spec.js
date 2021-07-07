@@ -34,9 +34,10 @@ import _ from "lodash";
  *     data: {
  *       meta: {
  *         pagination: {
+ *           maxShownPages: 10,
  *           showEntryRange: true,
- *             showPageSizeDropdown: true,
- *               pageSizes: [10, 20, 30]
+ *           showPageSizeDropdown: true,
+ *           pageSizes: [10, 20, 30]
  *         }
  *       },
  *       query: { limit: 20 },
@@ -71,6 +72,7 @@ function initWrapper({provide} = {}) {
         data: {
           meta: {
             pagination: {
+              maxShownPages: 10,
               showEntryRange: true,
               showPageSizeDropdown: true,
               pageSizes: [10, 20, 30, 100]
@@ -131,5 +133,38 @@ describe('LivedataPagination.vue', () => {
       '  <option value="30">30</option>\n' +
       '  <option value="100">100</option>\n' +
       '</select>')
+  })
+
+  it('Displays the pagination indexes when there is no entries', () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          getPageCount() {
+            return 0;
+          }
+        }
+      }
+    });
+    expect(wrapper.find('.pagination-indexes').text()).toContain('livedata.pagination.page')
+    expect(wrapper.findAll('.pagination-indexes .page-nav').length).toBe(1)
+    expect(wrapper.find('.pagination-indexes .page-nav').text()).toBe("1");
+  })
+
+  it('Displays the pagination indexes when there is some entries', () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          getPageCount() {
+            return 3;
+          }
+        }
+      }
+    });
+    expect(wrapper.find('.pagination-indexes').text()).toContain('livedata.pagination.page')
+    let pageNavs = wrapper.findAll('.pagination-indexes .page-nav');
+    expect(pageNavs.length).toBe(3)
+    expect(pageNavs.at(0).text()).toBe("1");
+    expect(pageNavs.at(1).text()).toBe("2");
+    expect(pageNavs.at(2).text()).toBe("3");
   })
 })

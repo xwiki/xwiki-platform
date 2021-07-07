@@ -209,7 +209,8 @@ define('xwiki-livedata', [
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
         "filter.list.emptyLabel",
         "footnotes.computedTitle",
-        "footnotes.propertyNotViewable"
+        "footnotes.propertyNotViewable",
+        "bottombar.noEntries"
       ],
     });
 

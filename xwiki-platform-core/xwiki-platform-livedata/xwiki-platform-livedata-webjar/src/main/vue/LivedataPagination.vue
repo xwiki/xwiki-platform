@@ -204,6 +204,9 @@ export default {
 
     // Whether current page is last page
     isLastPage () {
+      if (this.data.data.entries.length === 0) {
+        return true;
+      }
       return this.logic.getPageIndex() === this.logic.getPageCount() - 1;
     },
 
@@ -264,6 +267,9 @@ export default {
           indexesAndDots.push("...");
         }
       });
+      if (indexesAndDots.length === 0) {
+        indexesAndDots.push(0)
+      }
       return indexesAndDots;
     },
 

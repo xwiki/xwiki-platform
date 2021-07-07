@@ -68,6 +68,11 @@
       <LayoutCardsNewCard v-if="canAddEntry"/>
 
     </div>
+    <LivedataBottombar>
+      <div v-if="this.entries.length === 0" class="noentries-card">
+        {{ $t('livedata.bottombar.noEntries') }}
+      </div>
+    </LivedataBottombar>
 
   </div>
 </template>
@@ -83,12 +88,14 @@ import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
 import LayoutLoader from "../LayoutLoader.vue";
+import LivedataBottombar from "../../LivedataBottombar";
 
 export default {
 
   name: "layout-cards",
 
   components: {
+    LivedataBottombar,
     LivedataTopbar,
     LivedataDropdownMenu,
     LivedataEntrySelectorAll,
@@ -138,4 +145,10 @@ export default {
   margin-bottom: 0.5rem;
 }
 
+.noentries-card {
+  text-align: center;
+  color: #777777;
+  width: 100%;
+  padding-bottom: 1em;
+}
 </style>

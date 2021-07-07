@@ -233,7 +233,11 @@ public class WARBuilder
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
         LOGGER.info("Copying resources to WEB-INF/classes ...");
-        File classesDirectory = new File(testConfiguration.getOutputDirectory(), "classes");
+        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
+        // in target/classes directly.
+        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
+            ? testConfiguration.getOutputDirectory() : "target";
+        File classesDirectory = new File(outputDirectory, "classes");
         if (classesDirectory.exists()) {
             copyDirectory(classesDirectory, webInfClassesDirectory);
         }

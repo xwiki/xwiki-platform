@@ -100,13 +100,13 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         XWikiDocument.backupContext(backup, context);
         try {
             sxDocument.setAsContextDoc(context);
-            return processSx(spaceNames, name, queryString, context, exportContext);
+            return processSx(sxDocument.getId(), queryString, context, exportContext);
         } finally {
             XWikiDocument.restoreContext(backup, context);
         }
     }
 
-    private URL processSx(List<String> spaceNames, String name, String queryString, XWikiContext context,
+    private URL processSx(long id, String queryString, XWikiContext context,
         FilesystemExportContext exportContext) throws Exception
     {
         SxSource sxSource = null;
@@ -128,7 +128,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
         // Write the content to file
         // We need a unique name for that SSX content
-        String targetPath = String.format("%s/%s/%s", getSxPrefix(), StringUtils.join(spaceNames, '/'), name);
+        String targetPath = String.format("%s/%s", getSxPrefix(), id);
         File targetDirectory = new File(exportContext.getExportDir(), targetPath);
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
@@ -146,11 +146,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
         path.append(getSxPrefix());
         path.append(URL_PATH_SEPARATOR);
-        for (String spaceName : spaceNames) {
-            path.append(encodeURLPart(spaceName));
-            path.append(URL_PATH_SEPARATOR);
-        }
-        path.append(encodeURLPart(name));
+        path.append(id);
         path.append(URL_PATH_SEPARATOR);
         path.append(encodeURLPart(targetLocation.getName()));
 
@@ -161,14 +157,14 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
     {
         String content;
 
-        // We know we're inside a SX file located at "<S|J>sx/<Space>/<Page>/<s|j>sx<NNN>.<css|js>". Inside this CSS
+        // We know we're inside a SX file located at "<S|J>sx/<id>/<s|j>sx<NNN>.<css|js>". Inside this CSS
         // there can be URLs and we need to ensure that the prefix for these URLs lead to the root of the path, i.e.
-        // 3 levels up ("../../../").
+        // 3 levels up ("../../").
         // To make this happen we reuse the Doc Parent Level from FileSystemExportContext to a fixed value of 3.
         // We also make sure to put back the original value
         int originalDocParentLevel = exportContext.getDocParentLevel();
         try {
-            exportContext.setDocParentLevels(3);
+            exportContext.setDocParentLevels(2);
             content = sxSource.getContent();
         } finally {
             exportContext.setDocParentLevels(originalDocParentLevel);

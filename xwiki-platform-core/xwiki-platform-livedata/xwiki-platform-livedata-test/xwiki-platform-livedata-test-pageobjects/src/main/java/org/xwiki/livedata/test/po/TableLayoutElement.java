@@ -26,6 +26,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -133,7 +134,15 @@ public class TableLayoutElement extends BaseElement
     public void waitUntilReady(boolean expectRows)
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
-        getDriver().waitUntilCondition(webDriver -> !expectRows || hasLines() && areCellsLoaded(), 20);
+        getDriver().waitUntilCondition(webDriver -> {
+            try {
+                return !expectRows || hasLines() && areCellsLoaded();
+            } catch (StaleElementReferenceException e) {
+                // The Live Data root element can be staled when Vue takes over the root element introduced by the 
+                // Live Data macro.
+                return false;
+            }
+        }, 20);
     }
 
     /**
